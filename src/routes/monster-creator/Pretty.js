@@ -13,7 +13,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Card, Divider, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
+import ReactMarkdown from "react-markdown";
+
 import { element } from "../../lib/monster";
+import { elementDamage } from "./elements/Elements";
 
 function Pretty({ monster }) {
   const calcInit = (monster) => {
@@ -172,7 +175,11 @@ function Pretty({ monster }) {
         </Grid>
       </Grid>
       {/*  Defenses */}
-      <Grid container justifyContent="space-between">
+      <Grid
+        container
+        justifyContent="space-between"
+        sx={{ borderBottom: "1px solid #674168" }}
+      >
         <Grid item sx={{ px: 1.4 }}>
           <Typography fontWeight="bold">DIF {calcDif(monster)}</Typography>
         </Grid>
@@ -214,8 +221,97 @@ function Pretty({ monster }) {
         </Grid>
       </Grid>
       {/* Attacks */}
+      <Grid container sx={{ mt: 1 }}>
+        <Grid
+          item
+          sx={{
+            flexGrow: 1,
+            px: 2,
+            background: "linear-gradient(90deg, #674168 0%, #ffffff 100%);",
+          }}
+          xs={12}
+        >
+          <Typography
+            variant="h6"
+            color="white.main"
+            fontWeight="medium"
+            sx={{ textTransform: "uppercase" }}
+          >
+            Attacchi Base
+          </Typography>
+        </Grid>
+        {monster.attacks.map((attack, i) => {
+          return (
+            <Grid item key={i} xs={12}>
+              <Attack monster={monster} attack={attack} />
+            </Grid>
+          );
+        })}
+      </Grid>
       {/* Rules */}
     </Card>
+  );
+}
+
+function Attack({ monster, attack }) {
+  const calcBonus = () => {
+    const bonus = parseInt(monster.lvl / 10);
+
+    if (bonus > 0) {
+      return `+${bonus}`;
+    }
+
+    return "";
+  };
+
+  const calcDamage = () => {
+    return 5;
+  };
+
+  return (
+    <Grid container spacing={0.5} rowSpacing={2} sx={{ px: 2 }}>
+      <Grid item sx={{ width: 30 }}>
+        {attack.type}
+      </Grid>
+      <Grid item xs>
+        <Typography component="span" fontWeight="bold">
+          {attack.name}
+        </Typography>
+        <Typography component="span" color="purple.main">
+          {" "}
+          ◆{" "}
+        </Typography>
+        <Typography
+          component="span"
+          fontWeight="bold"
+          sx={{ textTransform: "uppercase" }}
+        >
+          [{attack.ab1}+{attack.ab2}
+          {calcBonus()}]
+        </Typography>
+        <Typography component="span" color="purple.main">
+          {" "}
+          ◆{" "}
+        </Typography>
+        <Typography fontWeight="bold" component="span">
+          [TM + {calcDamage()}]
+        </Typography>{" "}
+        {elementDamage(attack.element)}
+        {". "}
+        {attack.effects.map((effect, i) => {
+          return (
+            <Typography component="span" key={i}>
+              <ReactMarkdown
+                allowedElements={["strong"]}
+                unwrapDisallowed={true}
+              >
+                {effect}
+              </ReactMarkdown>{" "}
+            </Typography>
+          );
+        })}
+      </Grid>
+    </Grid>
   );
 }
 

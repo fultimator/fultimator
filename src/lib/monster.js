@@ -48,4 +48,26 @@ function element(monster, type) {
   return "normal";
 }
 
-export { element };
+function skills(monster) {
+  let number = 4;
+
+  if (
+    monster.type === "Costrutto" ||
+    monster.type === "Elementale" ||
+    monster.type === "Non Morto"
+  ) {
+    number = 2;
+  }
+
+  if (
+    monster.type === "Demone" ||
+    monster.type === "Pianta" ||
+    monster.type === "Umanoide"
+  ) {
+    number = 3;
+  }
+
+  return number;
+}
+
+export { element, skills };

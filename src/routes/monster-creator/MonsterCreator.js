@@ -10,18 +10,19 @@ import ChangeAbilities from "./ChangeAbilities";
 import ExplainAbilities from "./ExplainAbilities";
 import Pretty from "./Pretty";
 import ChangeElements from "./ChangeElements";
+import ChangeAttacks from "./ChangeAttacks";
 
 function MonsterCreator() {
   const [monster, setMonster] = useState({
-    name: "",
+    name: "Ghigliopendra",
     // image: monsterImg,
     lvl: 5,
     type: "Bestia",
     desc: "",
     traits: "",
     des: 8,
-    int: 8,
-    vig: 8,
+    int: 6,
+    vig: 10,
     vol: 8,
     typeRules: {
       demonResistances: {
@@ -58,6 +59,57 @@ function MonsterCreator() {
         poison: false,
       },
     },
+    attacks: [
+      {
+        name: "Mandibola",
+        type: "M",
+        ab1: "Des",
+        ab2: "Vig",
+        element: "poison",
+        effects: ["Il bersaglio subisce lo status **debole**."],
+      },
+      {
+        name: "Sfera Tagliente",
+        type: "M",
+        ab1: "Des",
+        ab2: "Vig",
+        element: "physical",
+        effects: [
+          "Se la ghigliopendra ha eseguito l'azione di **Guardia** nel suo turno precedente, questo attacco infligge 5 danni extra.",
+        ],
+      },
+    ],
+    skills: [
+      {
+        name: "special-rule",
+        options: {
+          name: "Appallottolarsi",
+          effect:
+            "Quando esegue l'azione di **Guardia**, la Ghigliopendra diventa Immune ai danni **fisici** fino all'inizio del suo prossimo turno",
+        },
+      },
+      {
+        name: "element-resistance",
+        options: {
+          physical: false,
+          air: false,
+          lightning: false,
+          dark: true,
+          earth: true,
+          fire: false,
+          ice: false,
+          light: false,
+          poison: false,
+        },
+      },
+      {
+        name: "extra-defenses",
+        options: {
+          def: 2,
+          dmag: 1,
+        },
+      },
+    ],
   });
   return (
     <Layout>
@@ -94,6 +146,13 @@ function Manage({ monster, setMonster }) {
       <Grid item xs={5}>
         <ChangeElements monster={monster} setMonster={setMonster} />
       </Grid>
+      <Grid item xs={6}>
+        <ChangeAttacks monster={monster} setMonster={setMonster} />
+      </Grid>
+      <Grid item xs={1} />
+      {/* <Grid item xs={5}>
+        <ChangeSkills monster={monster} setMonster={setMonster} />
+      </Grid> */}
     </Grid>
   );
 }
