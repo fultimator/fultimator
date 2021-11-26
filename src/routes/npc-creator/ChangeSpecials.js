@@ -34,7 +34,7 @@ function ChangeSpecials({ npc, setnpc }) {
   };
 
   return (
-    <Grid container spacing={1} rowSpacing={2} sx={{ mt: 1 }}>
+    <Grid container spacing={1} rowSpacing={2}>
       <Grid item xs={12}>
         <Typography variant="h6">
           Regole Speciali

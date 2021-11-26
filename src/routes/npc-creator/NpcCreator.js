@@ -15,6 +15,7 @@ import ChangeDescription from "./ChangeDescription";
 import ExplainSkills from "./ExplainSkills";
 import ExplainElements from "./ExplainElements";
 import ChangeSpecials from "./ChangeSpecials";
+import ChangeDefs from "./ChangeDefs";
 
 function NpcCreator() {
   const [npc, setnpc] = useState({
@@ -144,6 +145,10 @@ function NpcCreator() {
           "Quando esegue l'azione di **Guardia**, la ghigliopendra dventa Immune ai danni **fisici** fino all'inizio del suo prossimo turno",
       },
     ],
+    defs: {
+      "2def1dmag": 1,
+      "1def2dmag": 0,
+    },
   });
   return (
     <Layout>
@@ -194,7 +199,7 @@ function Manage({ npc, setnpc }) {
         sx={{ width: "100%", my: 1 }}
       />
       <Grid item xs={10}>
-        <Grid container>
+        <Grid container spacing={2}>
           <Grid item xs={8}>
             <ChangeAttacks npc={npc} setnpc={setnpc} />
           </Grid>
@@ -203,6 +208,10 @@ function Manage({ npc, setnpc }) {
           </Grid>
           <Grid item xs={5}>
             <ChangeSpecials npc={npc} setnpc={setnpc} />
+          </Grid>
+          <Grid item xs={1} />
+          <Grid item xs={2}>
+            <ChangeDefs npc={npc} setnpc={setnpc} />
           </Grid>
         </Grid>
       </Grid>

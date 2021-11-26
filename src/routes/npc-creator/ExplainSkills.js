@@ -2,6 +2,7 @@ import { Card, Typography } from "@mui/material";
 import {
   calcSkillsCurrent,
   calcSkillsCurrentAttacks,
+  calcSkillsCurrentDefs,
   calcSkillsCurrentResistances,
   calcSkillsCurrentSpecial,
   calcSkillsMax,
@@ -15,6 +16,7 @@ function ExplainSkills({ npc }) {
   const skillsFromVulnerabilities = calcSkillsMaxVulnerabilities(npc);
   const skillsFromResistances = calcSkillsCurrentResistances(npc);
   const skillsFromSpecial = calcSkillsCurrentSpecial(npc);
+  const skillsFromDefs = calcSkillsCurrentDefs(npc);
 
   return (
     <Card sx={{ p: 1.61 }}>
@@ -41,6 +43,9 @@ function ExplainSkills({ npc }) {
         </li>
         <li>
           Regole speciali x <strong>{skillsFromSpecial}</strong>
+        </li>
+        <li>
+          Difese x <strong>{skillsFromDefs}</strong>
         </li>
       </Typography>
     </Card>

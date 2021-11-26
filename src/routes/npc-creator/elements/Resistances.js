@@ -20,7 +20,7 @@ function Resistances({ npc, setnpc }) {
   return (
     <Grid container>
       <Grid item xs={12}>
-        <Typography>Aggiungi resistenze (2 per punto abilità</Typography>
+        <Typography>Aggiungi resistenze (2 per punto abilità)</Typography>
       </Grid>
       {elementList.map((element) => {
         return (

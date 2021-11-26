@@ -24,11 +24,17 @@ function Pretty({ npc }) {
   };
 
   const calcDif = (npc) => {
-    return npc.des;
+    let dif =
+      parseInt(npc.defs["2def1dmag"] * 2) + parseInt(npc.defs["1def2dmag"]);
+
+    return "+" + dif;
   };
 
   const calcDifMag = (npc) => {
-    return npc.int;
+    let dif =
+      parseInt(npc.defs["2def1dmag"]) + parseInt(npc.defs["1def2dmag"] * 2);
+
+    return "+" + dif;
   };
 
   return (
