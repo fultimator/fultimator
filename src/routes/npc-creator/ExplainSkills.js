@@ -1,4 +1,4 @@
-import { Card, Divider, Typography } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import {
   calcSkillsCurrent,
   calcSkillsCurrentAttacks,

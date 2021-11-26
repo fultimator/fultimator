@@ -1,5 +1,4 @@
 import {
-  faFire,
   faMountain,
   faSkull,
   faSkullCrossbones,
@@ -135,7 +134,60 @@ const elementList = [
 
 // Affinity is calculated in a progressive manner from these:
 // race - race options - skills
-function calcAffinity(npc, element, opts) {}
+function calcAffinity(npc, element, opts) {
+  let affinity = calcAffinityVulnerabilities(npc, element);
+  if (affinity === "normal") {
+    affinity = calcAffinityRace(npc, element);
+  }
+
+  return affinity;
+}
+
+function calcAffinityVulnerabilities(npc, element) {
+  if (npc.vulnerabilities[element]) {
+    return "vulnerable";
+  }
+
+  return "normal";
+}
+
+function calcAffinityRace(npc, element) {
+  // Check Construct immunities and resistances
+  if (npc.type === "Costrutto" && element === "poison") {
+    return "immune";
+  }
+  if (npc.type === "Costrutto" && element === "earth") {
+    return "resistant";
+  }
+
+  // Check demon resistances
+  if (npc.type === "Demone" && npc.typeRules.demonResistances[element]) {
+    return "resistant";
+  }
+
+  // Check elemental immunities
+  if (npc.type === "Elementale" && npc.typeRules.elementalImmunities[element]) {
+    return "immune";
+  }
+
+  // Check plant vulnerabilities
+  if (npc.type === "Pianta" && npc.typeRules.plantVulnerabilities[element]) {
+    return "vulnerable";
+  }
+
+  // Check undead immunities and vulnerabilities
+  if (npc.type === "Non Morto" && element === "dark") {
+    return "immune";
+  }
+  if (npc.type === "Non Morto" && element === "poison") {
+    return "immune";
+  }
+  if (npc.type === "Non Morto" && element === "light") {
+    return "vulnerable";
+  }
+
+  return "normal";
+}
 
 function elementName(element) {
   return elementNames[element];

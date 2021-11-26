@@ -1,26 +1,13 @@
-import {
-  faBolt,
-  faFire,
-  faGun,
-  faMountain,
-  faSkull,
-  faSkullCrossbones,
-  faSnowflake,
-  faStar,
-  faWind,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Card, Divider, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
 import ReactMarkdown from "react-markdown";
 
-import { element } from "../../lib/npc";
 import {
   elementDamage,
   ElementIcon,
   elementList,
-  ElementNameIcon,
+  calcAffinity,
 } from "./elements/Elements";
 
 function Pretty({ npc }) {
@@ -196,7 +183,7 @@ function Pretty({ npc }) {
           return (
             <Grid item sx={{ px: 1.4 }} key={el}>
               <Element
-                status={element(npc, el)}
+                status={calcAffinity(npc, el)}
                 icon={<ElementIcon element={el} />}
               />
             </Grid>
