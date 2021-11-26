@@ -4,7 +4,7 @@ import {
   faSkullCrossbones,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { Checkbox, FormControlLabel, Grid, Typography } from "@mui/material";
 
 import {
   GiExplosionRays,
@@ -139,6 +139,9 @@ function calcAffinity(npc, element, opts) {
   if (affinity === "normal") {
     affinity = calcAffinityRace(npc, element);
   }
+  if (affinity === "normal") {
+    affinity = calcAffinityResistances(npc, element);
+  }
 
   return affinity;
 }
@@ -146,6 +149,14 @@ function calcAffinity(npc, element, opts) {
 function calcAffinityVulnerabilities(npc, element) {
   if (npc.vulnerabilities[element]) {
     return "vulnerable";
+  }
+
+  return "normal";
+}
+
+function calcAffinityResistances(npc, element) {
+  if (npc.resistances[element]) {
+    return "resistant";
   }
 
   return "normal";
@@ -195,9 +206,12 @@ function elementName(element) {
 
 function ElementNameIcon({ element }) {
   return (
-    <>
-      {elementIcons[element]} {elementNames[element]}
-    </>
+    <Grid container spacing="8">
+      <Grid item sx={{ width: 30 }}>
+        {elementIcons[element]}
+      </Grid>
+      <Grid item>{elementNames[element]}</Grid>
+    </Grid>
   );
 }
 

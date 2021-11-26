@@ -7,7 +7,7 @@ function ExplainElements({ npc }) {
       <Typography>Legenda dei tipi</Typography>
       {elementList.map((element) => {
         return (
-          <Typography key={element}>
+          <Typography key={element} component="div">
             <ElementNameIcon element={element} />
           </Typography>
         );

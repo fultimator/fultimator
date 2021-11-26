@@ -32,7 +32,7 @@ function Pretty({ npc }) {
   };
 
   return (
-    <Card sx={{ width: 600 }}>
+    <Card sx={{ width: 600, mb: 2 }}>
       {/* Header */}
       <Grid
         container
