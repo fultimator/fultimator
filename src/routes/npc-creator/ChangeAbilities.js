@@ -1,8 +1,8 @@
 import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
 
-function ChangeAbilities({ monster, setMonster }) {
+function ChangeAbilities({ npc, setnpc }) {
   const onChangeDes = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.des = e.target.value;
       return newState;
@@ -10,7 +10,7 @@ function ChangeAbilities({ monster, setMonster }) {
   };
 
   const onChangeInt = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.int = e.target.value;
       return newState;
@@ -18,7 +18,7 @@ function ChangeAbilities({ monster, setMonster }) {
   };
 
   const onChangeVig = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.vig = e.target.value;
       return newState;
@@ -26,7 +26,7 @@ function ChangeAbilities({ monster, setMonster }) {
   };
 
   const onChangeVol = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.vol = e.target.value;
       return newState;
@@ -45,7 +45,7 @@ function ChangeAbilities({ monster, setMonster }) {
             max={12}
             step={2}
             size="small"
-            value={monster.des}
+            value={npc.des}
             onChange={onChangeDes}
           />
         </FormControl>
@@ -61,7 +61,7 @@ function ChangeAbilities({ monster, setMonster }) {
             max={12}
             step={2}
             size="small"
-            value={monster.int}
+            value={npc.int}
             onChange={onChangeInt}
           />
         </FormControl>
@@ -77,7 +77,7 @@ function ChangeAbilities({ monster, setMonster }) {
             max={12}
             step={2}
             size="small"
-            value={monster.vig}
+            value={npc.vig}
             onChange={onChangeVig}
           />
         </FormControl>
@@ -110,7 +110,7 @@ function ChangeAbilities({ monster, setMonster }) {
             max={12}
             step={2}
             size="small"
-            value={monster.vol}
+            value={npc.vol}
             onChange={onChangeVol}
           />
         </FormControl>

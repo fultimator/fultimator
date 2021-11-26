@@ -1,7 +1,15 @@
+import {
+  faFire,
+  faMountain,
+  faSkull,
+  faSkullCrossbones,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Checkbox, FormControlLabel, Typography } from "@mui/material";
 
 import {
   GiExplosionRays,
+  GiFluffyFlame,
   GiPlainDagger,
   GiPowerLightning,
   GiSnowflake1,
@@ -14,11 +22,7 @@ function CheckElement({ element, icon, checked, onSelectElement }) {
       control={
         <Checkbox checked={checked} onChange={onSelectElement} name={element} />
       }
-      label={
-        <>
-          {elementIcons[element]} {elementNames[element]}
-        </>
-      }
+      label={<>{elementIcons[element]}</>}
     />
   );
 }
@@ -63,9 +67,31 @@ const elementIcons = {
       style={{ verticalAlign: "sub" }}
     />
   ),
-  dark: "",
-  earth: "",
-  fire: "",
+  dark: (
+    <FontAwesomeIcon
+      icon={faSkull}
+      stroke="#000000"
+      strokeWidth={32}
+      color="#e40134"
+    />
+  ),
+  earth: (
+    <FontAwesomeIcon
+      icon={faMountain}
+      stroke="#000000"
+      color="#d29d3e"
+      strokeWidth={32}
+    />
+  ),
+  fire: (
+    <GiFluffyFlame
+      stroke="#000000"
+      strokeWidth={16}
+      size={20}
+      color="#f59a00"
+      style={{ verticalAlign: "sub" }}
+    />
+  ),
   ice: (
     <GiSnowflake1
       stroke="#000000"
@@ -79,12 +105,20 @@ const elementIcons = {
     <GiExplosionRays
       stroke="#000000"
       strokeWidth={16}
+      strokeOpacity={1}
       size={20}
       color="#fff7b2"
       style={{ verticalAlign: "sub" }}
     />
   ),
-  poison: "",
+  poison: (
+    <FontAwesomeIcon
+      icon={faSkullCrossbones}
+      stroke="#000000"
+      strokeWidth={32}
+      color="#d679a2"
+    />
+  ),
 };
 
 const elementList = [
@@ -105,6 +139,18 @@ function calcAffinity(npc, element, opts) {}
 
 function elementName(element) {
   return elementNames[element];
+}
+
+function ElementNameIcon({ element }) {
+  return (
+    <>
+      {elementIcons[element]} {elementNames[element]}
+    </>
+  );
+}
+
+function ElementIcon({ element }) {
+  return elementIcons[element];
 }
 
 function elementDamage(element) {
@@ -133,4 +179,12 @@ function elementDamage(element) {
   );
 }
 
-export { elementList, elementName, elementDamage, calcAffinity, CheckElement };
+export {
+  elementList,
+  elementName,
+  elementDamage,
+  calcAffinity,
+  CheckElement,
+  ElementNameIcon,
+  ElementIcon,
+};

@@ -2,7 +2,7 @@ import { Card, Divider, Typography } from "@mui/material";
 
 function ExplainAbilities() {
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 1.61 }}>
       <Typography>
         <strong>Tuttofare</strong>: d8, d8, d8, d8
       </Typography>

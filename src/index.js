@@ -10,7 +10,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import Fabula from "./themes/Fabula";
 
 import Home from "./routes/Home";
-import MonsterCreator from "./routes/monster-creator/MonsterCreator";
+import NpcCreator from "./routes/npc-creator/NpcCreator";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,7 +19,7 @@ ReactDOM.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/monster-creator" element={<MonsterCreator />} />
+          <Route path="/npc-creator" element={<NpcCreator />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

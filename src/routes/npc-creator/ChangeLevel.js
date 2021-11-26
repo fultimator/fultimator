@@ -2,9 +2,9 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FormControl, IconButton, TextField } from "@mui/material";
 
-function ChangeLevel({ monster, setMonster }) {
+function ChangeLevel({ npc, setnpc }) {
   const onRaiseLevel = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       if (prevState.lvl >= 60) {
         return prevState;
       }
@@ -15,7 +15,7 @@ function ChangeLevel({ monster, setMonster }) {
     });
   };
   const onLowerLevel = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       if (prevState.lvl <= 5) {
         return prevState;
       }
@@ -29,11 +29,11 @@ function ChangeLevel({ monster, setMonster }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
-        label="Level"
+        label="Livello"
         type="number"
         min={5}
         max={60}
-        value={monster.lvl}
+        value={npc.lvl}
         InputProps={{
           readOnly: true,
           startAdornment: (

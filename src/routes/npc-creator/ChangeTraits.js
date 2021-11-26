@@ -1,8 +1,8 @@
 import { FormControl, TextField } from "@mui/material";
 
-function ChangeTraits({ monster, setMonster }) {
+function ChangeTraits({ npc, setnpc }) {
   const onChangeTraits = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.traits = e.target.value;
       return newState;
@@ -12,8 +12,8 @@ function ChangeTraits({ monster, setMonster }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="traits"
-        label="Traits"
-        value={monster.traits}
+        label="Tratti"
+        value={npc.traits}
         onChange={onChangeTraits}
       ></TextField>
     </FormControl>

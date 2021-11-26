@@ -10,28 +10,30 @@ import { Link as RouterLink } from "react-router-dom";
 
 import Layout from "../components/Layout";
 
-import monster from "./monster.jpg";
+import npc from "./npc.jpg";
 
 function Home() {
   return (
     <Layout>
       <Card sx={{ width: 300 }}>
-        <CardMedia component="img" height="140" image={monster} alt="" />
+        <CardMedia component="img" height="140" image={npc} alt="" />
         <CardContent>
           <Typography gutterBottom variant="h5">
-            Monster creator
+            Progettare PNG
           </Typography>
-          <Typography>Create your own Fabula Ultima monster!</Typography>
-          <Typography variant="caption">Now with 100% more cuteness</Typography>
+          <Typography>Crea il tuo PNG!</Typography>
+          <Typography variant="caption">
+            Ora col 100% in più di pucciosità
+          </Typography>
         </CardContent>
         <CardActions>
           <Button
             size="small"
             variant="outlined"
             component={RouterLink}
-            to="/monster-creator"
+            to="/npc-creator"
           >
-            Take me there
+            Vai
           </Button>
         </CardActions>
       </Card>

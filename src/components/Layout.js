@@ -7,7 +7,7 @@ const Layout = ({ children }) => {
         💎Fultimator!💎
       </Typography>
       <Typography textAlign="center">
-        Fultimator is an UNOFFICIAL tool to manage your Fabula Ultima campaigns
+        Fultimator è un tool NON UFFICIALE per gestire Fabula Ultima
       </Typography>
       <Divider sx={{ my: 2 }}></Divider>
       {children}

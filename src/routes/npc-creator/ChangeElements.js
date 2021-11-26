@@ -15,31 +15,41 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  Typography,
 } from "@mui/material";
+import Vulnerabilities from "./elements/Vulnerabilities";
 
-function ChangeElements({ monster, setMonster }) {
-  if (monster.type === "Demone") {
-    return <ChangeElementsDemon monster={monster} setMonster={setMonster} />;
+function ChangeElements({ npc, setnpc }) {
+  return (
+    <>
+      <Typography variant="h6">Affinità</Typography>
+      <ChangeElementType npc={npc} setnpc={setnpc} />
+      <Vulnerabilities npc={npc} setnpc={setnpc} />
+    </>
+  );
+}
+
+function ChangeElementType({ npc, setnpc }) {
+  if (npc.type === "Demone") {
+    return <ChangeElementsDemon npc={npc} setnpc={setnpc} />;
   }
-  if (monster.type === "Elementale") {
-    return (
-      <ChangeElementsElemental monster={monster} setMonster={setMonster} />
-    );
+  if (npc.type === "Elementale") {
+    return <ChangeElementsElemental npc={npc} setnpc={setnpc} />;
   }
-  if (monster.type === "Pianta") {
-    return <ChangeElementsPlant monster={monster} setMonster={setMonster} />;
+  if (npc.type === "Pianta") {
+    return <ChangeElementsPlant npc={npc} setnpc={setnpc} />;
   }
   return null;
 }
 
-function ChangeElementsDemon({ monster, setMonster }) {
-  const isResistant = (monster, element) => {
-    return monster.typeRules.demonResistances[element];
+function ChangeElementsDemon({ npc, setnpc }) {
+  const isResistant = (npc, element) => {
+    return npc.typeRules.demonResistances[element];
   };
 
-  const countResistances = (monster) => {
+  const countResistances = (npc) => {
     let sum = 0;
-    Object.entries(monster.typeRules.demonResistances).forEach((el) => {
+    Object.entries(npc.typeRules.demonResistances).forEach((el) => {
       if (el[1]) {
         sum++;
       }
@@ -48,12 +58,12 @@ function ChangeElementsDemon({ monster, setMonster }) {
   };
 
   const onSelectElement = (e) => {
-    if (countResistances(monster) >= 2) {
-      if (!isResistant(monster, e.target.name)) {
+    if (countResistances(npc) >= 2) {
+      if (!isResistant(npc, e.target.name)) {
         return;
       }
     }
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
 
       newState.typeRules.demonResistances[e.target.name] =
@@ -77,55 +87,55 @@ function ChangeElementsDemon({ monster, setMonster }) {
         <CheckElement
           element="physical"
           icon={faGun}
-          checked={isResistant(monster, "physical")}
+          checked={isResistant(npc, "physical")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="air"
           icon={faWind}
-          checked={isResistant(monster, "air")}
+          checked={isResistant(npc, "air")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="lightning"
           icon={faBolt}
-          checked={isResistant(monster, "lightning")}
+          checked={isResistant(npc, "lightning")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="dark"
           icon={faSkull}
-          checked={isResistant(monster, "dark")}
+          checked={isResistant(npc, "dark")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="earth"
           icon={faMountain}
-          checked={isResistant(monster, "earth")}
+          checked={isResistant(npc, "earth")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="fire"
           icon={faFire}
-          checked={isResistant(monster, "fire")}
+          checked={isResistant(npc, "fire")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="ice"
           icon={faSnowflake}
-          checked={isResistant(monster, "ice")}
+          checked={isResistant(npc, "ice")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="light"
           icon={faSnowflake}
-          checked={isResistant(monster, "light")}
+          checked={isResistant(npc, "light")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="poison"
           icon={faSkullCrossbones}
-          checked={isResistant(monster, "poison")}
+          checked={isResistant(npc, "poison")}
           onSelectElement={onSelectElement}
         />
       </FormGroup>
@@ -133,14 +143,14 @@ function ChangeElementsDemon({ monster, setMonster }) {
   );
 }
 
-function ChangeElementsElemental({ monster, setMonster }) {
-  const isImmune = (monster, element) => {
-    return monster.typeRules.elementalImmunities[element];
+function ChangeElementsElemental({ npc, setnpc }) {
+  const isImmune = (npc, element) => {
+    return npc.typeRules.elementalImmunities[element];
   };
 
-  const countImmunities = (monster) => {
+  const countImmunities = (npc) => {
     let sum = 0;
-    Object.entries(monster.typeRules.elementalImmunities).forEach((el) => {
+    Object.entries(npc.typeRules.elementalImmunities).forEach((el) => {
       if (el[1]) {
         sum++;
       }
@@ -149,12 +159,12 @@ function ChangeElementsElemental({ monster, setMonster }) {
   };
 
   const onSelectElement = (e) => {
-    if (countImmunities(monster) >= 2) {
-      if (!isImmune(monster, e.target.name)) {
+    if (countImmunities(npc) >= 2) {
+      if (!isImmune(npc, e.target.name)) {
         return;
       }
     }
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
 
       newState.typeRules.elementalImmunities[e.target.name] =
@@ -178,49 +188,49 @@ function ChangeElementsElemental({ monster, setMonster }) {
         <CheckElement
           element="physical"
           icon={faGun}
-          checked={isImmune(monster, "physical")}
+          checked={isImmune(npc, "physical")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="air"
           icon={faWind}
-          checked={isImmune(monster, "air")}
+          checked={isImmune(npc, "air")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="lightning"
           icon={faBolt}
-          checked={isImmune(monster, "lightning")}
+          checked={isImmune(npc, "lightning")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="dark"
           icon={faSkull}
-          checked={isImmune(monster, "dark")}
+          checked={isImmune(npc, "dark")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="earth"
           icon={faMountain}
-          checked={isImmune(monster, "earth")}
+          checked={isImmune(npc, "earth")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="fire"
           icon={faFire}
-          checked={isImmune(monster, "fire")}
+          checked={isImmune(npc, "fire")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="ice"
           icon={faSnowflake}
-          checked={isImmune(monster, "ice")}
+          checked={isImmune(npc, "ice")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="light"
           icon={faSnowflake}
-          checked={isImmune(monster, "light")}
+          checked={isImmune(npc, "light")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
@@ -234,14 +244,14 @@ function ChangeElementsElemental({ monster, setMonster }) {
   );
 }
 
-function ChangeElementsPlant({ monster, setMonster }) {
-  const isVulnerable = (monster, element) => {
-    return monster.typeRules.plantVulnerabilities[element];
+function ChangeElementsPlant({ npc, setnpc }) {
+  const isVulnerable = (npc, element) => {
+    return npc.typeRules.plantVulnerabilities[element];
   };
 
-  const countImmunities = (monster) => {
+  const countImmunities = (npc) => {
     let sum = 0;
-    Object.entries(monster.typeRules.plantVulnerabilities).forEach((el) => {
+    Object.entries(npc.typeRules.plantVulnerabilities).forEach((el) => {
       if (el[1]) {
         sum++;
       }
@@ -250,12 +260,12 @@ function ChangeElementsPlant({ monster, setMonster }) {
   };
 
   const onSelectElement = (e) => {
-    if (countImmunities(monster) >= 1) {
-      if (!isVulnerable(monster, e.target.name)) {
+    if (countImmunities(npc) >= 1) {
+      if (!isVulnerable(npc, e.target.name)) {
         return;
       }
     }
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
 
       newState.typeRules.plantVulnerabilities[e.target.name] =
@@ -279,25 +289,25 @@ function ChangeElementsPlant({ monster, setMonster }) {
         <CheckElement
           element="air"
           icon={faWind}
-          checked={isVulnerable(monster, "air")}
+          checked={isVulnerable(npc, "air")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="lightning"
           icon={faBolt}
-          checked={isVulnerable(monster, "lightning")}
+          checked={isVulnerable(npc, "lightning")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="fire"
           icon={faFire}
-          checked={isVulnerable(monster, "fire")}
+          checked={isVulnerable(npc, "fire")}
           onSelectElement={onSelectElement}
         />
         <CheckElement
           element="ice"
           icon={faSnowflake}
-          checked={isVulnerable(monster, "ice")}
+          checked={isVulnerable(npc, "ice")}
           onSelectElement={onSelectElement}
         />
       </FormGroup>

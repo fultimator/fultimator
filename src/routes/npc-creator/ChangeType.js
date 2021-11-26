@@ -1,8 +1,8 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
-function ChangeType({ monster, setMonster }) {
+function ChangeType({ npc, setnpc }) {
   const onChangeType = (e) => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.type = e.target.value;
       return newState;
@@ -10,11 +10,11 @@ function ChangeType({ monster, setMonster }) {
   };
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Type</InputLabel>
+      <InputLabel id="type">Specie</InputLabel>
       <Select
         labelId="type"
         id="select-type"
-        value={monster.type}
+        value={npc.type}
         label="Type"
         onChange={onChangeType}
       >

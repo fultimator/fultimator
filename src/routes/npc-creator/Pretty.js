@@ -15,28 +15,33 @@ import { Box } from "@mui/system";
 
 import ReactMarkdown from "react-markdown";
 
-import { element } from "../../lib/monster";
-import { elementDamage } from "./elements/Elements";
+import { element } from "../../lib/npc";
+import {
+  elementDamage,
+  ElementIcon,
+  elementList,
+  ElementNameIcon,
+} from "./elements/Elements";
 
-function Pretty({ monster }) {
-  const calcInit = (monster) => {
-    return (monster.des + monster.int) / 2;
+function Pretty({ npc }) {
+  const calcInit = (npc) => {
+    return (npc.des + npc.int) / 2;
   };
 
-  const calcPv = (monster) => {
-    return monster.lvl * 2 + monster.vig * 5;
+  const calcPv = (npc) => {
+    return npc.lvl * 2 + npc.vig * 5;
   };
 
-  const calcPm = (monster) => {
-    return monster.lvl + monster.vol * 5;
+  const calcPm = (npc) => {
+    return npc.lvl + npc.vol * 5;
   };
 
-  const calcDif = (monster) => {
-    return monster.des;
+  const calcDif = (npc) => {
+    return npc.des;
   };
 
-  const calcDifMag = (monster) => {
-    return monster.int;
+  const calcDifMag = (npc) => {
+    return npc.int;
   };
 
   return (
@@ -54,7 +59,7 @@ function Pretty({ monster }) {
         <Grid item sx={{ bgcolor: "white.main" }}>
           {/* <Avatar
             variant="square"
-            src={monster.image}
+            src={npc.image}
             alt=""
             sx={{ width: 110, height: 110, border: "2px solid #674168" }}
           /> */}
@@ -83,7 +88,7 @@ function Pretty({ monster }) {
                 fontWeight="medium"
                 sx={{ textTransform: "uppercase" }}
               >
-                {monster.name}
+                {npc.name}
               </Typography>
             </Grid>
             {/* Lvl and Type */}
@@ -99,14 +104,14 @@ function Pretty({ monster }) {
             >
               <Grid container alignItems="center">
                 <Grid item>
-                  <Typography variant="h6">Liv {monster.lvl}</Typography>
+                  <Typography variant="h6">Liv {npc.lvl}</Typography>
                 </Grid>
                 <Grid item>
                   <Typography color="purple.main">◆</Typography>
                 </Grid>
                 <Grid item>
                   <Typography variant="h6" sx={{ textTransform: "uppercase" }}>
-                    {monster.type}
+                    {npc.type}
                   </Typography>
                 </Grid>
               </Grid>
@@ -119,13 +124,13 @@ function Pretty({ monster }) {
             }}
           >
             <Typography sx={{ bgcolor: "white.main", px: 2, py: 0.5 }}>
-              {monster.desc}
+              {npc.desc}
             </Typography>
           </Box>
           <Divider></Divider>
           <Typography sx={{ bgcolor: "white.main", px: 2, py: 0.5 }}>
             <strong>Tratti: </strong>
-            {monster.traits}
+            {npc.traits}
           </Typography>
         </Grid>
       </Grid>
@@ -136,16 +141,16 @@ function Pretty({ monster }) {
         sx={{ borderBottom: "1px solid #674168" }}
       >
         <Grid item sx={{ px: 2 }}>
-          <Typography fontWeight="bold">DES d{monster.des}</Typography>
+          <Typography fontWeight="bold">DES d{npc.des}</Typography>
         </Grid>
         <Grid item sx={{ px: 2 }}>
-          <Typography fontWeight="bold">INT d{monster.int}</Typography>
+          <Typography fontWeight="bold">INT d{npc.int}</Typography>
         </Grid>
         <Grid item sx={{ px: 2 }}>
-          <Typography fontWeight="bold">VIG d{monster.vig}</Typography>
+          <Typography fontWeight="bold">VIG d{npc.vig}</Typography>
         </Grid>
         <Grid item sx={{ px: 2 }}>
-          <Typography fontWeight="bold">VOL d{monster.vol}</Typography>
+          <Typography fontWeight="bold">VOL d{npc.vol}</Typography>
         </Grid>
         <Divider orientation="vertical" flexItem />
         <Grid item sx={{ pl: 2 }}>
@@ -156,7 +161,7 @@ function Pretty({ monster }) {
             fontWeight="bold"
             sx={{ px: 1, bgcolor: "red.main", color: "white.main" }}
           >
-            {calcPv(monster)} ◆ {calcPv(monster) / 2}
+            {calcPv(npc)} ◆ {calcPv(npc) / 2}
           </Typography>
         </Grid>
         <Grid item sx={{ pl: 2 }}>
@@ -167,11 +172,11 @@ function Pretty({ monster }) {
             fontWeight="bold"
             sx={{ px: 1, bgcolor: "cyan.main", color: "white.main" }}
           >
-            {calcPm(monster)}
+            {calcPm(npc)}
           </Typography>
         </Grid>
         <Grid item sx={{ px: 2 }}>
-          <Typography fontWeight="bold">Iniz. {calcInit(monster)}</Typography>
+          <Typography fontWeight="bold">Iniz. {calcInit(npc)}</Typography>
         </Grid>
       </Grid>
       {/*  Defenses */}
@@ -181,44 +186,22 @@ function Pretty({ monster }) {
         sx={{ borderBottom: "1px solid #674168" }}
       >
         <Grid item sx={{ px: 1.4 }}>
-          <Typography fontWeight="bold">DIF {calcDif(monster)}</Typography>
+          <Typography fontWeight="bold">DIF {calcDif(npc)}</Typography>
         </Grid>
         <Grid item sx={{ px: 1.4 }}>
-          <Typography fontWeight="bold">
-            D. MAG {calcDifMag(monster)}
-          </Typography>
+          <Typography fontWeight="bold">D. MAG {calcDifMag(npc)}</Typography>
         </Grid>
         <Divider orientation="vertical" flexItem />
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "physical")} icon={faGun} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "air")} icon={faWind} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "lightning")} icon={faBolt} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "dark")} icon={faSkull} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "earth")} icon={faMountain} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "fire")} icon={faFire} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "ice")} icon={faSnowflake} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element status={element(monster, "light")} icon={faStar} />
-        </Grid>
-        <Grid item sx={{ px: 1.4 }}>
-          <Element
-            status={element(monster, "poison")}
-            icon={faSkullCrossbones}
-          />
-        </Grid>
+        {elementList.map((el) => {
+          return (
+            <Grid item sx={{ px: 1.4 }} key={el}>
+              <Element
+                status={element(npc, el)}
+                icon={<ElementIcon element={el} />}
+              />
+            </Grid>
+          );
+        })}
       </Grid>
       {/* Attacks */}
       <Grid container sx={{ mt: 1 }}>
@@ -240,10 +223,10 @@ function Pretty({ monster }) {
             Attacchi Base
           </Typography>
         </Grid>
-        {monster.attacks.map((attack, i) => {
+        {npc.attacks.map((attack, i) => {
           return (
             <Grid item key={i} xs={12}>
-              <Attack monster={monster} attack={attack} />
+              <Attack npc={npc} attack={attack} />
             </Grid>
           );
         })}
@@ -253,9 +236,9 @@ function Pretty({ monster }) {
   );
 }
 
-function Attack({ monster, attack }) {
+function Attack({ npc, attack }) {
   const calcBonus = () => {
-    const bonus = parseInt(monster.lvl / 10);
+    const bonus = parseInt(npc.lvl / 10);
 
     if (bonus > 0) {
       return `+${bonus}`;
@@ -321,7 +304,7 @@ function Element({ icon, status }) {
       <Typography component="div" sx={{ opacity: 0.2 }}>
         <Grid container>
           <Grid item xs={6}>
-            <FontAwesomeIcon icon={icon} />
+            {icon}
           </Grid>
           <Grid item xs={6}></Grid>
         </Grid>
@@ -334,7 +317,7 @@ function Element({ icon, status }) {
       <Typography component="div" color="warning.main">
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
-            <FontAwesomeIcon icon={icon} />
+            {icon}
           </Grid>
           <Grid item xs={6}>
             <Typography fontWeight="bold">RS</Typography>
@@ -349,7 +332,7 @@ function Element({ icon, status }) {
       <Typography component="div" color="success.main">
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
-            <FontAwesomeIcon icon={icon} />
+            {icon}
           </Grid>
           <Grid item xs={6}>
             <Typography fontWeight="bold">VU</Typography>
@@ -364,7 +347,7 @@ function Element({ icon, status }) {
       <Typography component="div" color="error.main">
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
-            <FontAwesomeIcon icon={icon} />
+            {icon}
           </Grid>
           <Grid item xs={6}>
             <Typography fontWeight="bold">IM</Typography>
@@ -378,7 +361,7 @@ function Element({ icon, status }) {
       <Typography component="div">
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
-            <FontAwesomeIcon icon={icon} />
+            {icon}
           </Grid>
           <Grid item xs={6}>
             <Typography fontWeight="bold">AB</Typography>

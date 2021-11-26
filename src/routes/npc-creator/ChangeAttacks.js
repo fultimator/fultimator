@@ -21,9 +21,9 @@ import {
 import React from "react";
 import { elementList, elementName } from "./elements/Elements";
 
-function ChangeAttacks({ monster, setMonster }) {
+function ChangeAttacks({ npc, setnpc }) {
   const addAttack = () => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.attacks.push({
         name: "Attack",
@@ -38,7 +38,7 @@ function ChangeAttacks({ monster, setMonster }) {
 
   const removeAttack = (i) => {
     return () => {
-      setMonster((prevState) => {
+      setnpc((prevState) => {
         const newState = Object.assign({}, prevState);
         newState.attacks.splice(i, 1);
         return newState;
@@ -50,17 +50,17 @@ function ChangeAttacks({ monster, setMonster }) {
     <Grid container spacing={1} rowSpacing={2}>
       <Grid item xs={12}>
         <Typography variant="h6">
-          Attacks
+          Attacchi
           <IconButton color="primary" onClick={addAttack}>
             <FontAwesomeIcon icon={faPlus} />
           </IconButton>
         </Typography>
       </Grid>
-      {monster.attacks.map((attack, i) => {
+      {npc.attacks.map((attack, i) => {
         return (
           <React.Fragment key={i}>
             <Grid item xs={11}>
-              <ChangeAttack monster={monster} setMonster={setMonster} i={i} />
+              <ChangeAttack npc={npc} setnpc={setnpc} i={i} />
             </Grid>
             <Grid item xs={1}>
               <IconButton color="primary" onClick={removeAttack(i)}>
@@ -75,9 +75,9 @@ function ChangeAttacks({ monster, setMonster }) {
   );
 }
 
-function ChangeAttack({ monster, setMonster, i }) {
+function ChangeAttack({ npc, setnpc, i }) {
   const addEffect = () => {
-    setMonster((prevState) => {
+    setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.attacks[i].effects.push("");
       return newState;
@@ -86,7 +86,7 @@ function ChangeAttack({ monster, setMonster, i }) {
 
   const removeEffect = (j) => {
     return () => {
-      setMonster((prevState) => {
+      setnpc((prevState) => {
         const newState = Object.assign({}, prevState);
         newState.attacks[i].effects.splice(j, 1);
         return newState;
@@ -96,7 +96,7 @@ function ChangeAttack({ monster, setMonster, i }) {
 
   const onChangeAttacks = (key) => {
     return (e) => {
-      setMonster((prevState) => {
+      setnpc((prevState) => {
         const newState = Object.assign({}, prevState);
         newState.attacks[i][key] = e.target.value;
         return newState;
@@ -106,7 +106,7 @@ function ChangeAttack({ monster, setMonster, i }) {
 
   const onChangeEffect = (j) => {
     return (e) => {
-      setMonster((prevState) => {
+      setnpc((prevState) => {
         const newState = Object.assign({}, prevState);
         newState.attacks[i].effects[j] = e.target.value;
         return newState;
@@ -114,7 +114,7 @@ function ChangeAttack({ monster, setMonster, i }) {
     };
   };
 
-  const attack = monster.attacks[i];
+  const attack = npc.attacks[i];
 
   return (
     <Grid container spacing={1} alignItems="center">
@@ -142,7 +142,7 @@ function ChangeAttack({ monster, setMonster, i }) {
               M
             </ToggleButton>
             <ToggleButton value="R" aria-label="right">
-              R
+              D
             </ToggleButton>
           </ToggleButtonGroup>
         </FormControl>
