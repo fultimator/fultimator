@@ -218,6 +218,33 @@ function Pretty({ npc }) {
           );
         })}
       </Grid>
+      <Grid container sx={{ mt: 1 }}>
+        <Grid
+          item
+          sx={{
+            flexGrow: 1,
+            px: 2,
+            background: "linear-gradient(90deg, #674168 0%, #ffffff 100%);",
+          }}
+          xs={12}
+        >
+          <Typography
+            variant="h6"
+            color="white.main"
+            fontWeight="medium"
+            sx={{ textTransform: "uppercase" }}
+          >
+            Regole Speciali
+          </Typography>
+        </Grid>
+        {npc.special.map((special, i) => {
+          return (
+            <Grid item key={i} xs={12}>
+              <Special npc={npc} special={special} />
+            </Grid>
+          );
+        })}
+      </Grid>
       {/* Rules */}
     </Card>
   );
@@ -280,6 +307,26 @@ function Attack({ npc, attack }) {
             </Typography>
           );
         })}
+      </Grid>
+    </Grid>
+  );
+}
+function Special({ npc, special }) {
+  return (
+    <Grid container spacing={0.5} rowSpacing={2} sx={{ px: 2 }}>
+      <Grid item xs>
+        <Typography component="span" fontWeight="bold">
+          {special.name}
+        </Typography>
+        <Typography component="span" color="purple.main">
+          {" "}
+          ◆{" "}
+        </Typography>
+        <Typography component="span">
+          <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+            {special.effect}
+          </ReactMarkdown>{" "}
+        </Typography>
       </Grid>
     </Grid>
   );

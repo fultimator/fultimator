@@ -14,6 +14,7 @@ import ChangeAttacks from "./ChangeAttacks";
 import ChangeDescription from "./ChangeDescription";
 import ExplainSkills from "./ExplainSkills";
 import ExplainElements from "./ExplainElements";
+import ChangeSpecials from "./ChangeSpecials";
 
 function NpcCreator() {
   const [npc, setnpc] = useState({
@@ -135,6 +136,14 @@ function NpcCreator() {
         },
       },
     ],
+    special: [
+      {
+        name: "Appallottolarsi",
+        skills: 2,
+        effect:
+          "Quando esegue l'azione di **Guardia**, la ghigliopendra dventa Immune ai danni **fisici** fino all'inizio del suo prossimo turno",
+      },
+    ],
   });
   return (
     <Layout>
@@ -184,18 +193,27 @@ function Manage({ npc, setnpc }) {
         flexItem
         sx={{ width: "100%", my: 1 }}
       />
-      <Grid item xs={6}>
-        <ChangeAttacks npc={npc} setnpc={setnpc} />
-      </Grid>
-
-      <Grid item xs={4}>
-        <ChangeElements npc={npc} setnpc={setnpc} />
+      <Grid item xs={10}>
+        <Grid container>
+          <Grid item xs={8}>
+            <ChangeAttacks npc={npc} setnpc={setnpc} />
+          </Grid>
+          <Grid item xs={4}>
+            <ChangeElements npc={npc} setnpc={setnpc} />
+          </Grid>
+          <Grid item xs={5}>
+            <ChangeSpecials npc={npc} setnpc={setnpc} />
+          </Grid>
+        </Grid>
       </Grid>
       <Grid item xs={2}>
         <ExplainSkills npc={npc} />
         <ExplainElements />
       </Grid>
-      <Grid item xs={1} />
+
+      <Grid item xs={4}></Grid>
+      <Grid item xs={2}></Grid>
+      <Grid item xs={6}></Grid>
       {/* <Grid item xs={5}>
         <ChangeSkills npc={npc} setnpc={setnpc} />
       </Grid> */}

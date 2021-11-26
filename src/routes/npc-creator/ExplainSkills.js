@@ -3,6 +3,7 @@ import {
   calcSkillsCurrent,
   calcSkillsCurrentAttacks,
   calcSkillsCurrentResistances,
+  calcSkillsCurrentSpecial,
   calcSkillsMax,
   calcSkillsMaxType,
   calcSkillsMaxVulnerabilities,
@@ -13,6 +14,7 @@ function ExplainSkills({ npc }) {
   const skillsFromType = calcSkillsMaxType(npc);
   const skillsFromVulnerabilities = calcSkillsMaxVulnerabilities(npc);
   const skillsFromResistances = calcSkillsCurrentResistances(npc);
+  const skillsFromSpecial = calcSkillsCurrentSpecial(npc);
 
   return (
     <Card sx={{ p: 1.61 }}>
@@ -36,6 +38,9 @@ function ExplainSkills({ npc }) {
         </li>
         <li>
           Resistenza al danno x <strong>{skillsFromResistances}</strong>
+        </li>
+        <li>
+          Regole speciali x <strong>{skillsFromSpecial}</strong>
         </li>
       </Typography>
     </Card>

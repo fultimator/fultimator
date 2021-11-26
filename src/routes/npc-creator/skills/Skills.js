@@ -37,7 +37,11 @@ function calcSkillsMaxVulnerabilities(npc) {
 }
 
 function calcSkillsCurrent(npc) {
-  return calcSkillsCurrentAttacks(npc) + calcSkillsCurrentResistances(npc);
+  return (
+    calcSkillsCurrentAttacks(npc) +
+    calcSkillsCurrentResistances(npc) +
+    calcSkillsCurrentSpecial(npc)
+  );
 }
 
 function calcSkillsCurrentAttacks(npc) {
@@ -59,6 +63,16 @@ function calcSkillsCurrentResistances(npc) {
   return sum / 2;
 }
 
+function calcSkillsCurrentSpecial(npc) {
+  let sum = 0;
+  Object.entries(npc.special).forEach((el) => {
+    if (el[1]) {
+      sum = sum + el[1].skills;
+    }
+  });
+  return sum;
+}
+
 export {
   skills,
   calcSkillsMax,
@@ -67,4 +81,5 @@ export {
   calcSkillsCurrent,
   calcSkillsCurrentAttacks,
   calcSkillsCurrentResistances,
+  calcSkillsCurrentSpecial,
 };
