@@ -5,38 +5,80 @@ import {
   CardMedia,
   Button,
   Typography,
+  Grid,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 
 import Layout from "../components/Layout";
 
-import npc from "./npc.jpg";
+import goo from "./goo.png";
+import robot from "./robot.png";
 
 function Home() {
   return (
     <Layout>
-      <Card sx={{ width: 300 }}>
-        <CardMedia component="img" height="140" image={npc} alt="" />
-        <CardContent>
-          <Typography gutterBottom variant="h5">
-            Progettare PNG
-          </Typography>
-          <Typography>Crea il tuo PNG!</Typography>
-          <Typography variant="caption">
-            Ora col 100% in più di pucciosità
-          </Typography>
-        </CardContent>
-        <CardActions>
-          <Button
-            size="small"
-            variant="outlined"
-            component={RouterLink}
-            to="/npc-creator"
-          >
-            Vai
-          </Button>
-        </CardActions>
-      </Card>
+      <Grid container spacing={3}>
+        <Grid item>
+          <Card sx={{ width: 300 }}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={robot}
+              alt=""
+              sx={{ objectFit: "contain" }}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5">
+                Rituali e Progetti
+              </Typography>
+              <Typography>Calcola requisiti ed effetti</Typography>
+              <Typography variant="caption">
+                Questo è più facile del creatore di mostri!
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                variant="outlined"
+                component={RouterLink}
+                to="rituals"
+              >
+                Vai
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item>
+          <Card sx={{ width: 300 }}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={goo}
+              alt=""
+              sx={{ objectFit: "contain" }}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5">
+                Progettare PNG
+              </Typography>
+              <Typography>Crea il tuo PNG!</Typography>
+              <Typography variant="caption">
+                Ora col 100% in più di pucciosità
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                variant="outlined"
+                component={RouterLink}
+                to="/npc-creator"
+              >
+                Vai
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
     </Layout>
   );
 }

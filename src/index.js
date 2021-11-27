@@ -11,6 +11,7 @@ import Fabula from "./themes/Fabula";
 
 import Home from "./routes/Home";
 import NpcCreator from "./routes/npc-creator/NpcCreator";
+import Rituals from "./routes/rituals/rituals";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -20,6 +21,7 @@ ReactDOM.render(
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/npc-creator" element={<NpcCreator />} />
+          <Route path="rituals" element={<Rituals />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
