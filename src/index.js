@@ -12,6 +12,7 @@ import Fabula from "./themes/Fabula";
 import Home from "./routes/Home";
 import NpcCreator from "./routes/npc-creator/NpcCreator";
 import Rituals from "./routes/rituals/rituals";
+import Equip from "./routes/equip/Equip";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -21,7 +22,8 @@ ReactDOM.render(
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/npc-creator" element={<NpcCreator />} />
-          <Route path="rituals" element={<Rituals />} />
+          <Route path="/rituals" element={<Rituals />} />
+          <Route path="/equip" element={<Equip />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

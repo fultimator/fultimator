@@ -1,0 +1,27 @@
+import { Checkbox, FormControl, FormControlLabel } from "@mui/material";
+
+function ChangeBonus({ prec, damageBonus, setPrecBonus, setDamageBonus }) {
+  return (
+    <FormControl variant="outlined" fullWidth>
+      <FormControlLabel
+        control={<Checkbox value={prec} />}
+        onChange={(e) => {
+          setPrecBonus(e.target.checked);
+        }}
+        label="+1 Precisione"
+        size="small"
+        sx={{ mb: -1 }}
+      />
+      <FormControlLabel
+        control={<Checkbox value={damageBonus} />}
+        onChange={(e) => {
+          setDamageBonus(e.target.checked);
+        }}
+        label="+4 Danni"
+        sx={{ mt: -1 }}
+      />
+    </FormControl>
+  );
+}
+
+export default ChangeBonus;
