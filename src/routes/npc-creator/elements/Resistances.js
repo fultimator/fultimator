@@ -10,7 +10,7 @@ function Resistances({ npc, setnpc }) {
     setnpc((prevState) => {
       const newState = Object.assign({}, prevState);
 
-      newState.Resistances[e.target.name] =
+      newState.resistances[e.target.name] =
         !prevState.resistances[e.target.name];
 
       return newState;
