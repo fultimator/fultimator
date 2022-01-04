@@ -9,13 +9,13 @@ import ChangeType from "./ChangeType";
 import ChangeAbilities from "./ChangeAbilities";
 import ExplainAbilities from "./ExplainAbilities";
 import Pretty from "./Pretty";
-import ChangeElements from "./ChangeElements";
 import ChangeAttacks from "./ChangeAttacks";
 import ChangeDescription from "./ChangeDescription";
 import ExplainSkills from "./ExplainSkills";
-import ExplainElements from "./ExplainElements";
+import ExplainTypes from "./ExplainTypes";
 import ChangeSpecials from "./ChangeSpecials";
 import ChangeDefs from "./ChangeDefs";
+import ChangeAffinities from "./ChangeAffinities";
 
 function NpcCreator() {
   const [npc, setnpc] = useState({
@@ -29,6 +29,17 @@ function NpcCreator() {
     int: 6,
     vig: 10,
     vol: 8,
+    affinities: {
+      physical: 1,
+      wind: 1,
+      bolt: 1,
+      dark: 2,
+      earth: 2,
+      fire: 0,
+      ice: 0,
+      light: 1,
+      poison: 1,
+    },
     typeRules: {
       demonResistances: {
         physical: false,
@@ -204,7 +215,7 @@ function Manage({ npc, setnpc }) {
             <ChangeAttacks npc={npc} setnpc={setnpc} />
           </Grid>
           <Grid item xs={4}>
-            <ChangeElements npc={npc} setnpc={setnpc} />
+            <ChangeAffinities npc={npc} setnpc={setnpc} />
           </Grid>
           <Grid item xs={5}>
             <ChangeSpecials npc={npc} setnpc={setnpc} />
@@ -217,7 +228,7 @@ function Manage({ npc, setnpc }) {
       </Grid>
       <Grid item xs={2}>
         <ExplainSkills npc={npc} />
-        <ExplainElements />
+        <ExplainTypes />
       </Grid>
 
       <Grid item xs={4}></Grid>

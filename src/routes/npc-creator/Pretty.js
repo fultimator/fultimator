@@ -2,13 +2,9 @@ import { Card, Divider, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 
 import ReactMarkdown from "react-markdown";
+import { TypeAffinity, typeList } from "../../components/types";
 
-import {
-  elementDamage,
-  ElementIcon,
-  elementList,
-  calcAffinity,
-} from "./elements/Elements";
+import { elementDamage } from "./elements/Elements";
 
 function Pretty({ npc }) {
   const calcInit = (npc) => {
@@ -185,7 +181,12 @@ function Pretty({ npc }) {
           <Typography fontWeight="bold">D. MAG {calcDifMag(npc)}</Typography>
         </Grid>
         <Divider orientation="vertical" flexItem />
-        {elementList.map((el) => {
+
+        {typeList.map((type) => {
+          return <TypeAffinity type={type} affinity={npc.affinities[type]} />;
+        })}
+
+        {/* {elementList.map((el) => {
           return (
             <Grid item sx={{ px: 1.4 }} key={el}>
               <Element
@@ -194,7 +195,7 @@ function Pretty({ npc }) {
               />
             </Grid>
           );
-        })}
+        })} */}
       </Grid>
       {/* Attacks */}
       <Grid container sx={{ mt: 1 }}>
@@ -336,82 +337,6 @@ function Special({ npc, special }) {
       </Grid>
     </Grid>
   );
-}
-
-function Element({ icon, status }) {
-  if (status === "normal") {
-    return (
-      <Typography component="div" sx={{ opacity: 0.2 }}>
-        <Grid container>
-          <Grid item xs={6}>
-            {icon}
-          </Grid>
-          <Grid item xs={6}></Grid>
-        </Grid>
-      </Typography>
-    );
-  }
-
-  if (status === "resistant") {
-    return (
-      <Typography component="div" color="warning.main">
-        <Grid container spacing={0.5}>
-          <Grid item xs={6}>
-            {icon}
-          </Grid>
-          <Grid item xs={6}>
-            <Typography fontWeight="bold">RS</Typography>
-          </Grid>
-        </Grid>
-      </Typography>
-    );
-  }
-
-  if (status === "vulnerable") {
-    return (
-      <Typography component="div" color="success.main">
-        <Grid container spacing={0.5}>
-          <Grid item xs={6}>
-            {icon}
-          </Grid>
-          <Grid item xs={6}>
-            <Typography fontWeight="bold">VU</Typography>
-          </Grid>
-        </Grid>
-      </Typography>
-    );
-  }
-
-  if (status === "immune") {
-    return (
-      <Typography component="div" color="error.main">
-        <Grid container spacing={0.5}>
-          <Grid item xs={6}>
-            {icon}
-          </Grid>
-          <Grid item xs={6}>
-            <Typography fontWeight="bold">IM</Typography>
-          </Grid>
-        </Grid>
-      </Typography>
-    );
-  }
-  if (status === "absorb") {
-    return (
-      <Typography component="div">
-        <Grid container spacing={0.5}>
-          <Grid item xs={6}>
-            {icon}
-          </Grid>
-          <Grid item xs={6}>
-            <Typography fontWeight="bold">AB</Typography>
-          </Grid>
-        </Grid>
-      </Typography>
-    );
-  }
-
-  return null;
 }
 
 export default Pretty;

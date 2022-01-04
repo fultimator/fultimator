@@ -28,8 +28,8 @@ function calcSkillsMaxType(npc) {
 
 function calcSkillsMaxVulnerabilities(npc) {
   let sum = 0;
-  Object.entries(npc.vulnerabilities).forEach((el) => {
-    if (el[1]) {
+  Object.entries(npc.affinities).forEach((el) => {
+    if (el[1] === 0) {
       sum++;
     }
   });
@@ -40,6 +40,8 @@ function calcSkillsCurrent(npc) {
   return (
     calcSkillsCurrentAttacks(npc) +
     calcSkillsCurrentResistances(npc) +
+    calcSkillsCurrentImmunities(npc) +
+    calcSkillsCurrentAbsorbs(npc) +
     calcSkillsCurrentSpecial(npc) +
     calcSkillsCurrentDefs(npc)
   );
@@ -56,12 +58,32 @@ function calcSkillsCurrentAttacks(npc) {
 
 function calcSkillsCurrentResistances(npc) {
   let sum = 0;
-  Object.entries(npc.vulnerabilities).forEach((el) => {
-    if (el[1]) {
+  Object.entries(npc.affinities).forEach((el) => {
+    if (el[1] === 2) {
       sum++;
     }
   });
   return sum / 2;
+}
+
+function calcSkillsCurrentImmunities(npc) {
+  let sum = 0;
+  Object.entries(npc.affinities).forEach((el) => {
+    if (el[1] === 3) {
+      sum++;
+    }
+  });
+  return sum;
+}
+
+function calcSkillsCurrentAbsorbs(npc) {
+  let sum = 0;
+  Object.entries(npc.affinities).forEach((el) => {
+    if (el[1] === 4) {
+      sum = sum + 1.5;
+    }
+  });
+  return sum;
 }
 
 function calcSkillsCurrentSpecial(npc) {
@@ -92,6 +114,8 @@ export {
   calcSkillsCurrent,
   calcSkillsCurrentAttacks,
   calcSkillsCurrentResistances,
+  calcSkillsCurrentImmunities,
+  calcSkillsCurrentAbsorbs,
   calcSkillsCurrentSpecial,
   calcSkillsCurrentDefs,
 };

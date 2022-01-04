@@ -1,8 +1,10 @@
 import { Card, Typography } from "@mui/material";
 import {
   calcSkillsCurrent,
+  calcSkillsCurrentAbsorbs,
   calcSkillsCurrentAttacks,
   calcSkillsCurrentDefs,
+  calcSkillsCurrentImmunities,
   calcSkillsCurrentResistances,
   calcSkillsCurrentSpecial,
   calcSkillsMax,
@@ -15,6 +17,8 @@ function ExplainSkills({ npc }) {
   const skillsFromType = calcSkillsMaxType(npc);
   const skillsFromVulnerabilities = calcSkillsMaxVulnerabilities(npc);
   const skillsFromResistances = calcSkillsCurrentResistances(npc);
+  const skillsFromImmunities = calcSkillsCurrentImmunities(npc);
+  const skillsFromAbsorbs = calcSkillsCurrentAbsorbs(npc);
   const skillsFromSpecial = calcSkillsCurrentSpecial(npc);
   const skillsFromDefs = calcSkillsCurrentDefs(npc);
 
@@ -40,6 +44,12 @@ function ExplainSkills({ npc }) {
         </li>
         <li>
           Resistenza al danno x <strong>{skillsFromResistances}</strong>
+        </li>
+        <li>
+          Immunità al danno x <strong>{skillsFromImmunities}</strong>
+        </li>
+        <li>
+          Assorbimento del danno x <strong>{skillsFromAbsorbs}</strong>
         </li>
         <li>
           Regole speciali x <strong>{skillsFromSpecial}</strong>
