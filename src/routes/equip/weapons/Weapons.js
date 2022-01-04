@@ -138,6 +138,7 @@ function Weapons() {
           {/* Change Bonus */}
           <Grid item xs={4}>
             <ChangeBonus
+              basePrec={base.prec}
               prec={prec}
               damageBonus={damageBonus}
               setPrecBonus={setPrecBonus}
