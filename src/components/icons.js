@@ -62,7 +62,7 @@ export function BoltIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -87,7 +87,7 @@ export function DarkIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
@@ -114,7 +114,7 @@ export function EarthIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -139,7 +139,7 @@ export function FireIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -166,7 +166,7 @@ export function IceIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -193,7 +193,7 @@ export function LightIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -219,7 +219,7 @@ export function PoisonIcon({ disabled }) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{ verticalAlign: "sub" }}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
@@ -229,6 +229,46 @@ q43 0 72.5 -34.5t29.5 -83.5t-29.5 -83.5t-72.5 -34.5q-42 0 -71.5 34.5t-29.5 83.5t
 t-30 83.5t30 83.5t72 34.5zM703 -45l-133 49l135 49q34 -22 63 -22q32 0 42 33q2 7 2 15q0 42 -54 45q22 22 22 43q0 22 -23 37q-12 6 -25 6q-44 0 -60 -71l-234 -87l-234 85q-16 73 -60 73q-13 0 -25 -6q-22 -15 -22 -37q0 -21 22 -43q-55 -3 -55 -45q0 -8 2 -15
 q11 -33 42 -33q29 0 63 22l136 -49l-134 -48q-35 25 -62 25q-32 0 -45 -33q-2 -7 -2 -15q0 -42 55 -45q-22 -22 -22 -43q0 -22 22 -37q14 -8 27 -8q41 0 59 70l233 85l233 -85q18 -70 60 -70q12 0 26 8q23 15 23 37q0 21 -22 43q54 3 54 45q0 8 -2 15q-12 33 -44 33
 q-27 0 -63 -26z"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function MeleeIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox="-10 0 981 1000"
+      width="1.2em"
+    >
+      <g transform="matrix(1 0 0 -1 0 800)">
+        <path
+          fill="currentColor"
+          d="M463 -11q5 19 -81 119l491 405l44 189l-195 -21l-440 -465q-94 93 -114 89q-20 -3 -75 -16q40 -25 79 -70q13 -15 20 -44q9 -33 24 -55l-94 -88q-33 4 -57.5 -18.5t-24.5 -55.5q0 -29 21 -51.5t54 -22.5q29 0 51 20.5t23 51.5l97 90q20 -15 51 -25q26 -9 39 -21.5
+t24 -25.5q26 -31 41 -59q12 32 22 74zM94 -60q-17 18 1 35t35 -1q17 -19 -1 -36t-35 2z"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function DistanceIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox="-10 0 1010 1000"
+      width="1.2em"
+    >
+      <g transform="matrix(1 0 0 -1 0 850)">
+        <path
+          fill="currentColor"
+          d="M147 748q-16 -9 -16 -33q0 -18 7.5 -36.5t20.5 -31.5l6 -7l26 -211l27 -210l60 60l-42 340h73q69 0 93 -2q108 -12 195 -83l14 -12l-181 -180l-181 -181l-39 -1q-26 -1 -33 -1.5t-13 -3.5t-19 -15q-10 -9 -37 -35l-44 -45h36q50 0 66 -1l30 -1v-132l53 53q26 27 33 35
+q10 13 13 24q2 8 3 31v43l181 181l181 180l12 -14q28 -34 47.5 -74.5t28.5 -83.5q5 -24 6.5 -53t1.5 -83v-65h-4q-3 0 -52 6q-58 7 -119 15l-165 21l-30 -30q-29 -29 -27.5 -31t209.5 -27l208 -26l12 -10q22 -18 46.5 -22.5t39 3t16 24.5t-7.5 27t-26 11h-1q-15 2 -18.5 4
+t-7.5 8.5t-4.5 20t-1.5 84.5v1q-1 78 -3 101t-12 59q-23 87 -83 161l-17 21l11 12q10 12 35 37l25 25l22 -22q15 -15 18.5 -17.5t4.5 1.5q4 15 18 88t13 73.5t-82.5 -15.5t-83 -16.5t20.5 -22.5l21 -21l-36 -36l-36 -37l-12 10q-97 84 -224 102q-22 4 -113 5h-10
+q-55 1 -69 2q-21 1 -27 7q-4 4 -6 19v3q-2 13 -5.5 20t-11.5 10.5t-18 3.5t-16 -4z"
         />
       </g>
     </svg>

@@ -13,6 +13,7 @@ import Home from "./routes/Home";
 import NpcCreator from "./routes/npc-creator/NpcCreator";
 import Rituals from "./routes/rituals/rituals";
 import Equip from "./routes/equip/Equip";
+import NpcGallery from "./routes/npc-gallery/npc-gallery";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -22,6 +23,7 @@ ReactDOM.render(
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/npc-creator" element={<NpcCreator />} />
+          <Route path="/npc-gallery" element={<NpcGallery />} />
           <Route path="/rituals" element={<Rituals />} />
           <Route path="/equip" element={<Equip />} />
         </Routes>

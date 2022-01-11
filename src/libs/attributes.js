@@ -14,7 +14,7 @@ const attributes = {
     shortcaps: "VIG",
     long: "Vigore",
   },
-  willpower: {
+  will: {
     short: "vol",
     shortcaps: "VOL",
     long: "Volontà",

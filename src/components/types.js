@@ -44,18 +44,23 @@ export function TypeIcon({ type, disabled }) {
 }
 
 export function TypeAffinity({ type, affinity }) {
-  const disabled = affinity === 1;
+  if (!affinity) {
+    affinity = "";
+  }
+  const disabled = affinity === "";
 
   return (
-    <Typography fontSize="1rem" color="red.main" fontWeight="bold">
+    <Typography
+      fontSize="inherit"
+      color="red.main"
+      fontWeight="bold"
+      fontFamily="inherit"
+      textAlign="left"
+      sx={{ textTransform: "uppercase", px: 0.2 }}
+    >
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
-
-      {/* Affinity */}
-      {affinity === 0 && " VU"}
-      {affinity === 2 && " RS"}
-      {affinity === 3 && " IM"}
-      {affinity === 4 && " AS"}
+      {/* Affinity */} {affinity}
     </Typography>
   );
 }
