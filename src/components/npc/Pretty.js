@@ -288,6 +288,7 @@ function Attacks({ npc }) {
   return (
     <Grid container>
       <Grid
+        item
         xs={12}
         sx={{
           mt: 1,
@@ -310,13 +311,13 @@ function Attacks({ npc }) {
       {npc.attacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
               <Typography textAlign="center">
                 {attack.range === "melee" && <MeleeIcon />}
                 {attack.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
-            <Grid xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>

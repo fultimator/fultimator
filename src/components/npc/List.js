@@ -7,14 +7,12 @@ import { Navigation } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react/swiper-react.js";
 import "swiper/swiper.scss"; // core Swiper
 
-import NpcPretty from "./Pretty";
-import NpcText from "./Text";
-import NpcUgly from "./Ugly";
-
-export default function NpcList({ listQuery }) {
+export default function NpcList({ listQuery, component }) {
   const [list] = useCollectionData(listQuery, {
     idField: "id",
   });
+
+  console.debug(list);
 
   return (
     <Grid container alignItems="center" sx={{ mt: 2 }}>
@@ -36,34 +34,10 @@ export default function NpcList({ listQuery }) {
           slidesPerGroup={2}
         >
           {list?.length &&
-            list.map((npc, i, list) => {
-              return (
-                <SwiperSlide key={i}>
-                  <NpcPretty npc={npc} />
-                  <NpcText npc={npc} />
-                  <NpcUgly npc={npc} />
-                </SwiperSlide>
-              );
+            list.map((npc, i) => {
+              return <SwiperSlide key={i}>{component(npc)}</SwiperSlide>;
             })}
         </Swiper>
-
-        {/* <Grid container spacing={2}>
-          {list?.length &&
-            list.map((npc, i, list) => {
-              if (i < offset) {
-                return null;
-              }
-              if (i >= offset + limit) {
-                return null;
-              }
-              return (
-                <Grid key={npc.id} item xs={6}>
-                  <NpcPretty npc={npc} />
-                  <NpcUgly npc={npc} />
-                </Grid>
-              );
-            })}
-        </Grid> */}
       </Grid>
       <Grid item xs={1} sx={{ textAlign: "center" }}>
         <IconButton className="swiper-button-next">
