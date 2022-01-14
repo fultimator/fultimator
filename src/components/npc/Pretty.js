@@ -2,18 +2,34 @@ import { Card, Grid, Typography } from "@mui/material";
 import { Fragment } from "react";
 import ReactMarkdown from "react-markdown";
 import attributes from "../../libs/attributes";
-import { calcDef, calcHP, calcInit, calcMDef, calcMP } from "../../libs/npcs";
+import {
+  calcDamage,
+  calcDef,
+  calcHP,
+  calcInit,
+  calcMagic,
+  calcMDef,
+  calcMP,
+  calcPrecision,
+} from "../../libs/npcs";
 import { CloseBracket, OpenBracket } from "../Bracket";
 import Diamond from "../Diamond";
-import { DistanceIcon, MeleeIcon } from "../icons";
+import {
+  DistanceIcon,
+  MeleeIcon,
+  OffensiveSpellIcon,
+  SpellIcon,
+} from "../icons";
 import { TypeAffinity } from "../types";
 
 export default function NpcPretty({ npc }) {
   return (
-    <Card sx={{ my: 1 }}>
+    <Card>
       <Header npc={npc} />
       <Stats npc={npc} />
       <Attacks npc={npc} />
+      <Spells npc={npc} />
+      <Special npc={npc} />
     </Card>
   );
 }
@@ -56,7 +72,7 @@ function Header({ npc }) {
           fontWeight="medium"
           sx={{ textTransform: "uppercase" }}
         >
-          Liv {npc.lvl} <Diamond /> {npc.species}
+          Liv {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
         </Typography>
       </Grid>
       <Grid
@@ -85,6 +101,17 @@ function Header({ npc }) {
         </Typography>
       </Grid>
     </Grid>
+  );
+}
+
+function Rank({ npc }) {
+  return (
+    <>
+      {npc.rank === "elite" && "Elite"}
+      {npc.rank === "champion2" && "Campione (2)"}
+      {npc.rank === "champion3" && "Campione (3)"}
+      {npc.rank === "champion4" && "Campione (4)"}
+    </>
   );
 }
 
@@ -324,8 +351,9 @@ function Attacks({ npc }) {
                   <OpenBracket />
                   {attributes[attack.attr1].shortcaps}+
                   {attributes[attack.attr2].shortcaps}
+                  {calcPrecision(npc) > 0 && `+${calcPrecision(npc)}`}
                   <CloseBracket /> <Diamond /> <OpenBracket />
-                  TM +5
+                  TM + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
                 danni {attack.type === "physical" && <strong>fisici</strong>}
@@ -345,10 +373,162 @@ function Attacks({ npc }) {
                       >
                         {effect}
                       </ReactMarkdown>
-                      {i === attack.special?.length - 1 && "."}
+                      .{" "}
                     </Typography>
                   );
                 })}
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
+function Spells({ npc }) {
+  if (!npc.spells || npc.spells.length === 0) {
+    return null;
+  }
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Incantesimi
+        </Typography>
+      </Grid>
+
+      {npc.spells?.map((spell, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+              <Typography textAlign="center">
+                <SpellIcon />
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+              <Typography>
+                <strong>{spell.name}</strong>{" "}
+                {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
+                <Diamond />{" "}
+                <strong>
+                  {spell.type === "offensive" && (
+                    <>
+                      <OpenBracket />
+                      {attributes[spell.attr1].shortcaps}+
+                      {attributes[spell.attr2].shortcaps}
+                      {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}
+                      <CloseBracket /> <Diamond />
+                    </>
+                  )}{" "}
+                  {spell.mp} PM <Diamond /> {spell.target} <Diamond />{" "}
+                  {spell.duration}
+                </strong>
+                <br />
+                <Typography component="span" key={i}>
+                  <ReactMarkdown
+                    allowedElements={["strong"]}
+                    unwrapDisallowed={true}
+                  >
+                    {spell.effect}
+                  </ReactMarkdown>
+                  .{" "}
+                </Typography>
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
+function Special({ npc }) {
+  const special = [];
+
+  if (npc.special) {
+    npc.special.forEach((s) => {
+      special.push(s);
+    });
+  }
+
+  // Species
+  if (npc.species === "Costrutto") {
+    special.push({
+      name: "Costrutto",
+      effect: "Immune allo status **avvelenato**",
+    });
+  }
+
+  if (npc.species === "Non Morto") {
+    special.push({
+      name: "Non Morto",
+      effect:
+        "Immune allo status **avvelenato** e cioè che farebbe recuperare Punti Vita può invece ferire (vedi pag **305**)",
+    });
+  }
+
+  if (npc.species === "Pianta") {
+    special.push({
+      name: "Pianta",
+      effect: "Immune agli status **confuso**, **furente**, **scosso**",
+    });
+  }
+
+  if (special.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Regole Speciali
+        </Typography>
+      </Grid>
+
+      {special?.map((special, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
+              <Typography>
+                <strong>{special.name}</strong> <Diamond />{" "}
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {special.effect}
+                </ReactMarkdown>
+                .
               </Typography>
             </Grid>
           </Fragment>

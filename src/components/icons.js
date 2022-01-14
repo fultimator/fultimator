@@ -259,7 +259,7 @@ export function DistanceIcon() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      viewBox="-10 0 1010 1000"
+      viewBox="-10 0 850 850"
       width="1.2em"
     >
       <g transform="matrix(1 0 0 -1 0 850)">
@@ -269,6 +269,48 @@ export function DistanceIcon() {
 q10 13 13 24q2 8 3 31v43l181 181l181 180l12 -14q28 -34 47.5 -74.5t28.5 -83.5q5 -24 6.5 -53t1.5 -83v-65h-4q-3 0 -52 6q-58 7 -119 15l-165 21l-30 -30q-29 -29 -27.5 -31t209.5 -27l208 -26l12 -10q22 -18 46.5 -22.5t39 3t16 24.5t-7.5 27t-26 11h-1q-15 2 -18.5 4
 t-7.5 8.5t-4.5 20t-1.5 84.5v1q-1 78 -3 101t-12 59q-23 87 -83 161l-17 21l11 12q10 12 35 37l25 25l22 -22q15 -15 18.5 -17.5t4.5 1.5q4 15 18 88t13 73.5t-82.5 -15.5t-83 -16.5t20.5 -22.5l21 -21l-36 -36l-36 -37l-12 10q-97 84 -224 102q-22 4 -113 5h-10
 q-55 1 -69 2q-21 1 -27 7q-4 4 -6 19v3q-2 13 -5.5 20t-11.5 10.5t-18 3.5t-16 -4z"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function SpellIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox="-10 0 1059 1059"
+      width="1.2em"
+      style={{ verticalAlign: "text-bottom" }}
+    >
+      <g transform="matrix(1 0 0 -1 0 800)">
+        <path
+          fill="currentColor"
+          d="M945 431h-291l-90 276q-9 29 -40 29t-41 -29l-90 -276h-290q-18 0 -30.5 -12.5t-12.5 -30.5q0 -22 18 -34l235 -171l-90 -277q-2 -6 -2 -13q0 -17 12.5 -29.5t30.5 -12.5q13 0 25 8l235 171l235 -171q11 -8 25 -8q17 0 29.5 12.5t12.5 29.5q0 7 -2 13l-89 277l235 171
+q17 12 17 34q0 18 -12.5 30.5t-29.5 12.5zM524 556l41 -125h-82zM234 346h132l-25 -78zM345 5l40 125l66 -48zM413 215l42 131h137l43 -131l-111 -80zM596 82l66 48l41 -125zM707 268l-25 78h132z"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function OffensiveSpellIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox="-10 0 1200 1200"
+      width="1.2em"
+      stroke="#000000"
+      strokeWidth={100}
+      paintOrder="stroke markers fill"
+      style={{ verticalAlign: "text-bottom" }}
+    >
+      <g transform="matrix(1 0 0 -1 0 1000)">
+        <path
+          fill="#cd1719"
+          d="M813 844l-593 -440l180 -40l-213 -360l593 460l-180 40z"
         />
       </g>
     </svg>

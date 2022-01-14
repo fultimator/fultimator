@@ -1,3 +1,5 @@
+import { Link as RouterLink } from "react-router-dom";
+
 import {
   query,
   orderBy,
@@ -12,12 +14,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 
-import { IconButton, Skeleton, Tooltip, Typography } from "@mui/material";
+import { IconButton, Skeleton, Tooltip, Typography, Grid } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcList from "../../components/npc/List";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
+// import NpcUgly from "../../components/npc/Ugly";
 import { ContentCopy, Delete, Edit } from "@mui/icons-material";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
 export default function NpcGallery() {
   const officialRef = collection(firestore, "npc-official");
@@ -52,6 +56,8 @@ export default function NpcGallery() {
           return (
             <>
               <NpcPretty npc={npc} />
+              {/* <NpcUgly npc={npc} /> */}
+
               {user && (
                 <Tooltip title="Copia">
                   <IconButton onClick={copyNpc(npc)}>
@@ -88,12 +94,9 @@ function Personal({ user }) {
     orderBy("lvl", "asc"),
     orderBy("name", "asc")
   );
-
-  const openEdit = function (npc) {
-    return function () {
-      console.debug(npc);
-    };
-  };
+  const [personalList] = useCollectionData(personalQuery, {
+    idField: "id",
+  });
 
   const deleteNpc = function (npc) {
     return function () {
@@ -103,15 +106,20 @@ function Personal({ user }) {
 
   return (
     <>
-      <Typography variant="h4">Npc Personali</Typography>
-      <NpcList
-        listQuery={personalQuery}
-        component={(npc) => {
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Npc Personali
+      </Typography>
+      <Grid container spacing={2}>
+        {personalList?.map((npc, i) => {
           return (
-            <>
+            <Grid item xs={6} key={i}>
               <NpcPretty npc={npc} />
+              {/* <NpcUgly npc={npc} /> */}
               <Tooltip title="Modifica">
-                <IconButton onClick={openEdit(npc)}>
+                <IconButton
+                  component={RouterLink}
+                  to={`/npc-gallery/${npc.id}`}
+                >
                   <Edit />
                 </IconButton>
               </Tooltip>{" "}
@@ -120,10 +128,10 @@ function Personal({ user }) {
                   <Delete />
                 </IconButton>
               </Tooltip>
-            </>
+            </Grid>
           );
-        }}
-      />
+        })}
+      </Grid>
     </>
   );
 }

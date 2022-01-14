@@ -12,10 +12,8 @@ export default function NpcList({ listQuery, component }) {
     idField: "id",
   });
 
-  console.debug(list);
-
   return (
-    <Grid container alignItems="center" sx={{ mt: 2 }}>
+    <Grid container alignItems="flex-start" sx={{ mt: 2 }}>
       <Grid item xs={1} sx={{ textAlign: "center" }}>
         <IconButton className="swiper-button-prev">
           <ChevronLeft />
@@ -33,7 +31,7 @@ export default function NpcList({ listQuery, component }) {
           slidesPerView={2}
           slidesPerGroup={2}
         >
-          {list?.length &&
+          {list?.length > 0 &&
             list.map((npc, i) => {
               return <SwiperSlide key={i}>{component(npc)}</SwiperSlide>;
             })}

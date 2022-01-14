@@ -53,5 +53,8 @@
   },
   "optionalDependencies": {
     "fsevents": "^2.3.2"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "^11.2.1"
   }
 }

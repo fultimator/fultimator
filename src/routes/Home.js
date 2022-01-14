@@ -92,7 +92,7 @@ function Home() {
               </Typography>
               <Typography>Crea il tuo PNG!</Typography>
               <Typography variant="caption">
-                Ora col 100% in più di pucciosità
+                Puoi anche salvarteli adesso :O
               </Typography>
             </CardContent>
             <CardActions>
@@ -100,7 +100,7 @@ function Home() {
                 size="small"
                 variant="outlined"
                 component={RouterLink}
-                to="/npc-creator"
+                to="/npc-gallery"
               >
                 Vai
               </Button>
