@@ -20,7 +20,7 @@ import {
   OffensiveSpellIcon,
   SpellIcon,
 } from "../icons";
-import { TypeAffinity } from "../types";
+import { TypeAffinity, TypeName } from "../types";
 
 export default function NpcPretty({ npc }) {
   return (
@@ -357,10 +357,12 @@ function Attacks({ npc }) {
                   <CloseBracket />
                 </strong>{" "}
                 danni {attack.type === "physical" && <strong>fisici</strong>}
-                {attack.type === "wind" && "da" && <strong>vento</strong>}
-                {attack.type === "poison" && (
+                {attack.type !== "physical" && (
                   <>
-                    da <strong>veleno</strong>
+                    da{" "}
+                    <strong style={{ textTransform: "lowercase" }}>
+                      <TypeName type={attack.type} />
+                    </strong>
                   </>
                 )}
                 .{" "}
