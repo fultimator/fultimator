@@ -195,7 +195,7 @@ function MP({ npc, setNpc }) {
       <TextField
         id="mp"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 5 }}
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
         label="Extra PM"
         value={npc.extra?.mp || 0}
         onChange={onChange}

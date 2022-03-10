@@ -262,7 +262,7 @@ export function calcUsedSkillsFromExtraMP(npc) {
   if (!npc.extra?.mp) {
     return 0;
   }
-  return npc.extra.mp / 5 / 2;
+  return npc.extra.mp / 10 / 2;
 }
 
 export function calcUsedSkillsFromExtraInit(npc) {
