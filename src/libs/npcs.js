@@ -221,6 +221,7 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromSpecialAttacks(npc) +
     calcUsedSkillsFromExtraDefs(npc) +
     calcUsedSkillsFromExtraHP(npc) +
+    calcUsedSkillsFromExtraMP(npc) +
     calcUsedSkillsFromExtraInit(npc) +
     calcUsedSkillsFromExtraPrecision(npc) +
     calcUsedSkillsFromExtraMagic(npc) +
@@ -255,6 +256,13 @@ export function calcUsedSkillsFromExtraHP(npc) {
     return 0;
   }
   return npc.extra.hp / 10;
+}
+
+export function calcUsedSkillsFromExtraMP(npc) {
+  if (!npc.extra?.mp) {
+    return 0;
+  }
+  return npc.extra.mp / 5 / 2;
 }
 
 export function calcUsedSkillsFromExtraInit(npc) {
