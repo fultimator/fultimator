@@ -24,7 +24,10 @@ export function calcHP(npc) {
 
 export function calcMP(npc) {
   let mp = npc.lvl + 5 * npc.attributes.will;
-
+  // Skill Extra MP
+  if (npc.extra?.mp) {
+    mp += parseInt(npc.extra.mp);
+  }
   // Rank
   if (
     npc.rank === "champion2" ||

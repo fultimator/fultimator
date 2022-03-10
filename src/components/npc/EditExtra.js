@@ -24,6 +24,7 @@ export default function EditExtra({ npc, setNpc }) {
         <Grid item xs={6}>
           <Stack spacing={1}>
             <HP npc={npc} setNpc={setNpc} />
+            <MP npc={npc} setNpc={setNpc} />
             <Init npc={npc} setNpc={setNpc} />
             <Precision npc={npc} setNpc={setNpc} />
             <Magic npc={npc} setNpc={setNpc} />
@@ -177,6 +178,31 @@ function HP({ npc, setNpc }) {
   );
 }
 
+function MP({ npc, setNpc }) {
+  const onChange = (e) => {
+    setNpc((prevState) => {
+      const newState = Object.assign({}, prevState);
+      if (!newState.extra) {
+        newState.extra = {};
+      }
+      newState.extra.mp = e.target.value;
+      return newState;
+    });
+  };
+
+  return (
+    <FormControl variant="standard" fullWidth>
+      <TextField
+        id="mp"
+        type="number"
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 5 }}
+        label="Extra PM"
+        value={npc.extra?.mp || 0}
+        onChange={onChange}
+      ></TextField>
+    </FormControl>
+  );
+}
 function Init({ npc, setNpc }) {
   const onChange = (e) => {
     setNpc((prevState) => {
