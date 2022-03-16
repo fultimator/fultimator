@@ -15,6 +15,7 @@ import {
   calcUsedSkills,
   calcUsedSkillsFromExtraDefs,
   calcUsedSkillsFromExtraHP,
+  calcUsedSkillsFromExtraMP,
   calcUsedSkillsFromExtraInit,
   calcUsedSkillsFromExtraMagic,
   calcUsedSkillsFromExtraPrecision,
@@ -122,6 +123,12 @@ export default function ExplainSkills({ npc }) {
             <TableRow>
               <TableCell>Dai PV extra</TableCell>
               <TableCell>{calcUsedSkillsFromExtraHP(npc)}</TableCell>
+            </TableRow>
+          )}
+          {calcUsedSkillsFromExtraMP(npc) > 0 && (
+            <TableRow>
+              <TableCell>Dai PM extra</TableCell>
+              <TableCell>{calcUsedSkillsFromExtraMP(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraInit(npc) > 0 && (

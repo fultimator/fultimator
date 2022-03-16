@@ -24,7 +24,10 @@ export function calcHP(npc) {
 
 export function calcMP(npc) {
   let mp = npc.lvl + 5 * npc.attributes.will;
-
+  // Skill Extra MP
+  if (npc.extra?.mp) {
+    mp += parseInt(npc.extra.mp);
+  }
   // Rank
   if (
     npc.rank === "champion2" ||
@@ -218,6 +221,7 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromSpecialAttacks(npc) +
     calcUsedSkillsFromExtraDefs(npc) +
     calcUsedSkillsFromExtraHP(npc) +
+    calcUsedSkillsFromExtraMP(npc) +
     calcUsedSkillsFromExtraInit(npc) +
     calcUsedSkillsFromExtraPrecision(npc) +
     calcUsedSkillsFromExtraMagic(npc) +
@@ -252,6 +256,13 @@ export function calcUsedSkillsFromExtraHP(npc) {
     return 0;
   }
   return npc.extra.hp / 10;
+}
+
+export function calcUsedSkillsFromExtraMP(npc) {
+  if (!npc.extra?.mp) {
+    return 0;
+  }
+  return npc.extra.mp / 10 / 2;
 }
 
 export function calcUsedSkillsFromExtraInit(npc) {
