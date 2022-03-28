@@ -2,7 +2,7 @@ const types = {
   physical: {
     long: "fisico",
   },
-  air: {
+  wind: {
     long: "aria",
   },
   bolt: {

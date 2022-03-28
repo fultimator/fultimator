@@ -480,7 +480,7 @@ function Special({ npc }) {
     special.push({
       name: "Non Morto",
       effect:
-        "Immune allo status **avvelenato** e cioè che farebbe recuperare Punti Vita può invece ferire (vedi pag **305**)",
+        "Immune allo status **avvelenato** e ciò che farebbe recuperare Punti Vita può invece ferire (vedi pag **305**)",
     });
   }
 
