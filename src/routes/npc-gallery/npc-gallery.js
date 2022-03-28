@@ -16,60 +16,18 @@ import { auth } from "../../firebase";
 
 import { IconButton, Skeleton, Tooltip, Typography, Grid } from "@mui/material";
 import Layout from "../../components/Layout";
-import NpcList from "../../components/npc/List";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
-import { ContentCopy, Delete, Edit } from "@mui/icons-material";
+import { AddCircle, ContentCopy, Delete, Edit } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 export default function NpcGallery() {
-  const officialRef = collection(firestore, "npc-official");
-  const officialQuery = query(
-    officialRef,
-    orderBy("lvl", "asc"),
-    orderBy("name", "asc")
-  );
-
   const [user, loading, error] = useAuthState(auth);
-  console.debug(user, loading, error);
-
-  const copyNpc = function (npc) {
-    return async function () {
-      const data = Object.assign({}, npc);
-      data.uid = user.uid;
-      delete data.id;
-      console.debug(data);
-
-      const ref = collection(firestore, "npc-personal");
-
-      await addDoc(ref, data);
-    };
-  };
+  console.debug("user, loading, error", user, loading, error);
 
   return (
     <Layout>
-      <Typography variant="h4">Npc Ufficiali</Typography>
-      <NpcList
-        listQuery={officialQuery}
-        component={(npc) => {
-          return (
-            <>
-              <NpcPretty npc={npc} />
-              {/* <NpcUgly npc={npc} /> */}
-
-              {user && (
-                <Tooltip title="Copia">
-                  <IconButton onClick={copyNpc(npc)}>
-                    <ContentCopy />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </>
-          );
-        }}
-      />
-
       {loading && <Skeleton />}
 
       {!loading && !user && (
@@ -94,9 +52,51 @@ function Personal({ user }) {
     orderBy("lvl", "asc"),
     orderBy("name", "asc")
   );
-  const [personalList] = useCollectionData(personalQuery, {
+  const [personalList, success, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
+
+  console.debug("useCollectionData length", personalList?.length);
+
+  console.debug("useCollectionData success, error: ", success, err);
+
+  const addNpc = async function () {
+    const data = {
+      name: "-",
+      species: "Bestia",
+      lvl: 5,
+      uid: user.uid,
+      attributes: {
+        dexterity: 8,
+        might: 8,
+        will: 8,
+        insight: 8,
+      },
+      attacks: [],
+      affinities: {},
+    };
+    const ref = collection(firestore, "npc-personal");
+
+    try {
+      const res = await addDoc(ref, data);
+      console.debug(res);
+    } catch (e) {
+      console.debug(e);
+    }
+  };
+
+  const copyNpc = function (npc) {
+    return async function () {
+      const data = Object.assign({}, npc);
+      data.uid = user.uid;
+      delete data.id;
+      console.debug(data);
+
+      const ref = collection(firestore, "npc-personal");
+
+      await addDoc(ref, data);
+    };
+  };
 
   const deleteNpc = function (npc) {
     return function () {
@@ -108,13 +108,22 @@ function Personal({ user }) {
     <>
       <Typography variant="h4" sx={{ mb: 2 }}>
         Npc Personali
+        <IconButton onClick={addNpc}>
+          <AddCircle />
+        </IconButton>
       </Typography>
       <Grid container spacing={2}>
         {personalList?.map((npc, i) => {
+          console.debug(npc.id, npc.attributes);
           return (
             <Grid item xs={6} key={i}>
               <NpcPretty npc={npc} />
               {/* <NpcUgly npc={npc} /> */}
+              <Tooltip title="Clona">
+                <IconButton onClick={copyNpc(npc)}>
+                  <ContentCopy />
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Modifica">
                 <IconButton
                   component={RouterLink}
@@ -122,7 +131,7 @@ function Personal({ user }) {
                 >
                   <Edit />
                 </IconButton>
-              </Tooltip>{" "}
+              </Tooltip>
               <Tooltip title="Cancella">
                 <IconButton onClick={deleteNpc(npc)}>
                   <Delete />
