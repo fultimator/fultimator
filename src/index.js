@@ -14,6 +14,7 @@ import Rituals from "./routes/rituals/rituals";
 import Equip from "./routes/equip/Equip";
 import NpcGallery from "./routes/npc-gallery/npc-gallery";
 import NpcEdit from "./routes/npc-edit/npc-edit";
+import Roller from "./routes/roller/roller";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -26,6 +27,7 @@ ReactDOM.render(
           <Route path="/npc-gallery" element={<NpcGallery />} />
           <Route path="/rituals" element={<Rituals />} />
           <Route path="/equip" element={<Equip />} />
+          <Route path="/roller" element={<Roller />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -14,6 +14,7 @@ import Layout from "../components/Layout";
 import goo from "./goo.png";
 import robot from "./robot.png";
 import axe from "./axe.png";
+import dice from "./dice.png";
 
 function Home() {
   return (
@@ -107,6 +108,34 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
+        {/* <Grid item>
+          <Card sx={{ width: 300 }}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={dice}
+              alt=""
+              sx={{ objectFit: "contain" }}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5">
+                Tirare dadi
+              </Typography>
+              <Typography>Non sono truccati!</Typography>
+              <Typography variant="caption">Giuro.</Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                variant="outlined"
+                component={RouterLink}
+                to="/roller"
+              >
+                Vai
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid> */}
       </Grid>
     </Layout>
   );
