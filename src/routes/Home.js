@@ -14,7 +14,7 @@ import Layout from "../components/Layout";
 import goo from "./goo.png";
 import robot from "./robot.png";
 import axe from "./axe.png";
-import dice from "./dice.png";
+// import dice from "./dice.png";
 
 function Home() {
   return (
