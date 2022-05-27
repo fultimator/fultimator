@@ -227,6 +227,7 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromExtraMagic(npc) +
     calcUsedSkillsFromResistances(npc) +
     calcUsedSkillsFromImmunities(npc) +
+    calcUsedSkillsFromAbsorbs(npc) +
     calcUsedSkillsFromSpecial(npc) +
     calcUsedSkillsFromSpells(npc)
   );
@@ -344,6 +345,21 @@ export function calcUsedSkillsFromImmunities(npc) {
   }
 
   return Math.ceil(sum);
+}
+
+export function calcUsedSkillsFromAbsorbs(npc) {
+  let sum = 0;
+  Object.entries(npc.affinities).forEach((el) => {
+    if (el[1] === "ab") {
+      sum++;
+    }
+  });
+
+  if (sum < 0) {
+    sum = 0;
+  }
+
+  return Math.ceil(sum) * 2;
 }
 
 export function calcUsedSkillsFromSpecial(npc) {

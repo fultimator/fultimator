@@ -24,6 +24,7 @@ import {
   calcUsedSkillsFromSpecial,
   calcUsedSkillsFromSpecialAttacks,
   calcUsedSkillsFromSpells,
+  calcUsedSkillsFromAbsorbs,
 } from "../../libs/npcs";
 
 export default function ExplainSkills({ npc }) {
@@ -159,6 +160,12 @@ export default function ExplainSkills({ npc }) {
             <TableRow>
               <TableCell>Dalle immunità</TableCell>
               <TableCell>{calcUsedSkillsFromImmunities(npc)}</TableCell>
+            </TableRow>
+          )}
+          {calcUsedSkillsFromAbsorbs(npc) > 0 && (
+            <TableRow>
+              <TableCell>Dagi assorbimenti</TableCell>
+              <TableCell>{calcUsedSkillsFromAbsorbs(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromSpecial(npc) > 0 && (
