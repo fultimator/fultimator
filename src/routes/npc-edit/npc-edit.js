@@ -17,6 +17,7 @@ import EditSpecial from "../../components/npc/EditSpecial";
 import ExplainAffinities from "../../components/npc/ExplainAffinities";
 import EditExtra from "../../components/npc/EditExtra";
 import EditSpells from "../../components/npc/EditSpells";
+import EditActions from "../../components/npc/EditActions";
 
 export default function NpcEdit() {
   let params = useParams();
@@ -92,6 +93,9 @@ export default function NpcEdit() {
       <Divider sx={{ my: 2 }} />
 
       <Grid container>
+        <Grid item xs={6}>
+          <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+        </Grid>
         <Grid item xs={6}>
           <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
         </Grid>

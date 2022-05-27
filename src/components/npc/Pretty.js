@@ -15,6 +15,7 @@ import {
 import { CloseBracket, OpenBracket } from "../Bracket";
 import Diamond from "../Diamond";
 import {
+  ActionIcon,
   DistanceIcon,
   MeleeIcon,
   OffensiveSpellIcon,
@@ -29,6 +30,7 @@ export default function NpcPretty({ npc }) {
       <Stats npc={npc} />
       <Attacks npc={npc} />
       <Spells npc={npc} />
+      <Actions npc={npc} />
       <Special npc={npc} />
     </Card>
   );
@@ -529,6 +531,69 @@ function Special({ npc }) {
                   unwrapDisallowed={true}
                 >
                   {special.effect}
+                </ReactMarkdown>
+                .
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
+function Actions({ npc }) {
+  const actions = [];
+
+  if (npc.actions) {
+    npc.actions.forEach((s) => {
+      actions.push(s);
+    });
+  }
+
+  if (actions.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Altre Azioni
+        </Typography>
+      </Grid>
+
+      {actions?.map((actions, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+              <Typography textAlign="center">
+                <ActionIcon />
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+              <Typography>
+                <strong>{actions.name}</strong> <Diamond />{" "}
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {actions.effect}
                 </ReactMarkdown>
                 .
               </Typography>
