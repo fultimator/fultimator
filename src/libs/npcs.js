@@ -96,10 +96,16 @@ export function calcDamage(attack, npc) {
     number = number + 5;
   }
 
+  // Equip
+  if (attack.weapon) {
+    number = number + attack.weapon.damage;
+  }
+
   return number;
 }
 
-export function calcPrecision(npc) {
+export function calcPrecision(attack, npc) {
+  console.debug(attack, npc);
   let number = 0;
 
   // Level
@@ -108,6 +114,11 @@ export function calcPrecision(npc) {
   // Extra Precision
   if (npc.extra?.precision) {
     number = number + 3;
+  }
+
+  // Equip
+  if (attack.weapon) {
+    number = number + attack.weapon.prec;
   }
 
   return number;

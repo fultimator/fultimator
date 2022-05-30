@@ -32,6 +32,7 @@ export default function NpcPretty({ npc }) {
       <Spells npc={npc} />
       <Actions npc={npc} />
       <Special npc={npc} />
+      <Equip npc={npc} />
     </Card>
   );
 }
@@ -353,13 +354,70 @@ function Attacks({ npc }) {
                   <OpenBracket />
                   {attributes[attack.attr1].shortcaps}+
                   {attributes[attack.attr2].shortcaps}
-                  {calcPrecision(npc) > 0 && `+${calcPrecision(npc)}`}
+                  {calcPrecision(attack, npc) > 0 &&
+                    `+${calcPrecision(attack, npc)}`}
                   <CloseBracket /> <Diamond /> <OpenBracket />
                   TM + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
                 danni {attack.type === "physical" && <strong>fisici</strong>}
                 {attack.type !== "physical" && (
+                  <>
+                    da{" "}
+                    <strong style={{ textTransform: "lowercase" }}>
+                      <TypeName type={attack.type} />
+                    </strong>
+                  </>
+                )}
+                .{" "}
+                {attack.special?.map((effect, i) => {
+                  return (
+                    <Typography component="span" key={i}>
+                      <ReactMarkdown
+                        allowedElements={["strong"]}
+                        unwrapDisallowed={true}
+                      >
+                        {effect}
+                      </ReactMarkdown>
+                      .{" "}
+                    </Typography>
+                  );
+                })}
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+
+      {npc.weaponattacks?.map((attack, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+              <Typography textAlign="center">
+                {attack.weapon.range === "melee" && <MeleeIcon />}
+                {attack.weapon.range === "distance" && <DistanceIcon />}
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+              <Typography>
+                <strong>
+                  {attack.name} ({attack.weapon.name}){" "}
+                </strong>{" "}
+                <Diamond /> {attack.weapon.hands === 1 ? "1 mano" : "2 mani"}{" "}
+                <Diamond />{" "}
+                <strong>
+                  <OpenBracket />
+                  {attributes[attack.weapon.att1].shortcaps}+
+                  {attributes[attack.weapon.att2].shortcaps}
+                  {calcPrecision(attack, npc) > 0 &&
+                    `+${calcPrecision(attack, npc)}`}
+                  <CloseBracket /> <Diamond /> <OpenBracket />
+                  TM + {calcDamage(attack, npc)}
+                  <CloseBracket />
+                </strong>{" "}
+                danni{" "}
+                {attack.weapon.type === "physical" && <strong>fisici</strong>}
+                {attack.weapon.type !== "physical" && (
                   <>
                     da{" "}
                     <strong style={{ textTransform: "lowercase" }}>
@@ -601,6 +659,75 @@ function Actions({ npc }) {
           </Fragment>
         );
       })}
+    </Grid>
+  );
+}
+
+function Equip({ npc }) {
+  const weapons = [];
+
+  npc.weaponattacks?.forEach((attack) => {
+    if (weapons.find((weapon) => weapon.name === attack.weapon.name)) {
+      return;
+    }
+    weapons.push(attack.weapon);
+  });
+
+  if (weapons.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Equipaggiamento
+        </Typography>
+      </Grid>
+
+      {weapons.map((weapon) => (
+        <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+          <Typography>
+            <strong>Arma:</strong> {weapon.name} <Diamond />{" "}
+            {weapon.hands === 1 ? "1 mano" : "2 mani"} <Diamond />{" "}
+            <strong>
+              {" "}
+              <OpenBracket />
+              {attributes[weapon.att1].shortcaps}+
+              {attributes[weapon.att2].shortcaps}
+              {weapon.prec > 0 && `+${weapon.prec}`}
+              <CloseBracket /> <Diamond /> <OpenBracket />
+              TM + {weapon.damage}
+              <CloseBracket />
+            </strong>{" "}
+            danni {weapon.type === "physical" && <strong>fisici</strong>}
+            {weapon.type !== "physical" && (
+              <>
+                da{" "}
+                <strong style={{ textTransform: "lowercase" }}>
+                  <TypeName type={weapon.type} />
+                </strong>
+              </>
+            )}{" "}
+            <Diamond /> <strong>{weapon.cost}</strong> zenit
+          </Typography>
+        </Grid>
+      ))}
     </Grid>
   );
 }

@@ -9,22 +9,21 @@ import {
   TextField,
   Typography,
   Divider,
-  ToggleButtonGroup,
-  ToggleButton,
   FormGroup,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import types from "../../libs/types";
-import { DistanceIcon, MeleeIcon } from "../icons";
+import attributes from "../../libs/attributes";
+import { baseWeapons } from "../../libs/equip";
+import { CloseBracket, OpenBracket } from "../Bracket";
 
-export default function EditAttacks({ npc, setNpc }) {
+export default function EditWeaponAttacks({ npc, setNpc }) {
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.attacks[i][key] = value;
+        newState.weaponattacks[i][key] = value;
         return newState;
       });
     };
@@ -33,15 +32,12 @@ export default function EditAttacks({ npc, setNpc }) {
   const addAttack = () => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
-      if (!newState.attacks) {
-        newState.attacks = [];
+      if (!newState.weaponattacks) {
+        newState.weaponattacks = [];
       }
-      newState.attacks.push({
+      newState.weaponattacks.push({
         name: "",
-        range: "melee",
-        attr1: "dexterity",
-        attr2: "dexterity",
-        type: "physical",
+        weapon: baseWeapons[0],
         special: [],
       });
       return newState;
@@ -52,7 +48,7 @@ export default function EditAttacks({ npc, setNpc }) {
     return () => {
       setNpc((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.attacks.splice(i, 1);
+        newState.weaponattacks.splice(i, 1);
         return newState;
       });
     };
@@ -61,13 +57,13 @@ export default function EditAttacks({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Attacchi Base
+        Attacchi Con Armi
         <IconButton onClick={addAttack}>
           <AddCircleOutline />
         </IconButton>
       </Typography>
 
-      {npc.attacks?.map((attack, i) => {
+      {npc.weaponattacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
             <Grid item xs={7}>
@@ -83,7 +79,7 @@ export default function EditAttacks({ npc, setNpc }) {
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
-            {i !== npc.attacks.length - 1 && (
+            {i !== npc.weaponattacks.length - 1 && (
               <Grid item xs={12} sx={{ py: 1 }}>
                 <Divider />
               </Grid>
@@ -117,87 +113,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         </FormControl>
       </Grid>
       <Grid item>
-        <FormControl variant="standard" fullWidth>
-          <ToggleButtonGroup
-            size="small"
-            value={attack.range}
-            exclusive
-            onChange={(e, value) => {
-              return setAttack("range", value);
-            }}
-            aria-label="text alignment"
-          >
-            <ToggleButton value="melee" aria-label="left aligned">
-              <MeleeIcon />
-            </ToggleButton>
-            <ToggleButton value="distance" aria-label="right">
-              <DistanceIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </FormControl>
-      </Grid>
-      <Grid item>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr1label"}>Car 1</InputLabel>
-          <Select
-            value={attack.attr1}
-            labelId={"attack-" + i + "-attr1label"}
-            id={"attack-" + i + "-attr1"}
-            label="Car 1"
-            size="small"
-            onChange={(e) => {
-              return setAttack("attr1", e.target.value);
-            }}
-          >
-            <MenuItem value={"dexterity"}>Des</MenuItem>
-            <MenuItem value={"insight"}>Int</MenuItem>
-            <MenuItem value={"might"}>Vig</MenuItem>
-            <MenuItem value={"will"}>Vol</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr2label"}>Car 2</InputLabel>
-          <Select
-            value={attack.attr2}
-            labelId={"attack-" + i + "-attr2label"}
-            id={"attack-" + i + "-attr2"}
-            label="Car 2"
-            size="small"
-            onChange={(e, value) => {
-              return setAttack("attr2", e.target.value);
-            }}
-          >
-            <MenuItem value={"dexterity"}>Des</MenuItem>
-            <MenuItem value={"insight"}>Int</MenuItem>
-            <MenuItem value={"might"}>Vig</MenuItem>
-            <MenuItem value={"will"}>Vol</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-type"}>Tipo</InputLabel>
-          <Select
-            value={attack.type}
-            labelId={"attack-" + i + "-type"}
-            id={"attack-" + i + "-type"}
-            label="Ab 1"
-            size="small"
-            onChange={(e, value) => {
-              return setAttack("type", e.target.value);
-            }}
-          >
-            {Object.keys(types).map((type) => {
-              return (
-                <MenuItem key={type} value={type}>
-                  {types[type].long}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
+        <SelectWeapon
+          weapon={attack.weapon}
+          setWeapon={(value) => {
+            return setAttack("weapon", value);
+          }}
+        />
       </Grid>
       <Grid item>
         <FormGroup>
@@ -247,6 +168,44 @@ function EditAttackSpecial({ attack, setAttack }) {
         size="small"
         helperText="Vai a capo per introdurre diversi effetti speciali (ogni linea costa 1 abilità)"
       ></TextField>
+    </FormControl>
+  );
+}
+
+function SelectWeapon({ weapon, setWeapon }) {
+  const onChange = function (e) {
+    const weapon = baseWeapons.find((weapon) => weapon.name === e.target.value);
+
+    setWeapon(weapon);
+  };
+
+  const options = [<MenuItem key={1} value="" disabled />];
+
+  for (const weapon of baseWeapons) {
+    options.push(
+      <MenuItem key={weapon.name} value={weapon.name}>
+        {weapon.name} <OpenBracket />
+        {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
+        {weapon.prec > 0 && `+${weapon.prec}`}
+        <CloseBracket /> <OpenBracket />
+        TM + {weapon.damage}
+        <CloseBracket />
+      </MenuItem>
+    );
+  }
+
+  return (
+    <FormControl fullWidth>
+      <InputLabel id="type">Arma</InputLabel>
+      <Select
+        labelId="type"
+        id="select-type"
+        value={weapon.name}
+        label="Arma"
+        onChange={onChange}
+      >
+        {options}
+      </Select>
     </FormControl>
   );
 }

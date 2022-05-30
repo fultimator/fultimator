@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import EditAttacks from "../../components/npc/EditAttacks";
+import EditWeaponAttacks from "../../components/npc/EditWeaponAttacks";
 import EditAffinities from "../../components/npc/EditAffinities";
 import EditSpecial from "../../components/npc/EditSpecial";
 import ExplainAffinities from "../../components/npc/ExplainAffinities";
@@ -85,6 +86,7 @@ export default function NpcEdit() {
       <Divider sx={{ my: 2 }} />
 
       <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+      <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
 
       <Divider sx={{ my: 2 }} />
 
