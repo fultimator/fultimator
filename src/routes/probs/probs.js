@@ -93,7 +93,7 @@ export default function Probs() {
   const [dl, setDl] = useState(10);
   const [hp, setHp] = useState(60);
 
-  const prob hit = calcProbHit (firstDie, secondDie, bonus, dl);
+  const probHit = calcProbHit (firstDie, secondDie, bonus, dl);
 
   const expectedDamage = calcExpectedDamage(
     firstDie,
