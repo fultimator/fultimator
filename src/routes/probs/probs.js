@@ -53,7 +53,7 @@ function calcProbHit(firstDie, secondDie, bonus, dl) {
   }
 
   const prob = firstDie * secondDie;
-  return sub/prob*100;
+  return sum/prob*100;
 }
 
 function calcExpectedDamage(firstDie, secondDie, bonus, damage, dl) {
