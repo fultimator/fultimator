@@ -43,6 +43,19 @@ function calcDamage(firstResult, secondResult, bonus, damage, dl) {
   return secondResult + damage;
 }
 
+function calcProbHit(firstDie, secondDie, bonus, dl) {
+  let sum = 0;
+
+  for (let i = 1; i <= firstDie; i++) {
+    for (let j = 1; j <= secondDie; j++) {
+      sum = sum + calcHit(i, j, bonus, dl);
+    }
+  }
+
+  const prob = firstDie * secondDie;
+  return sub/prob*100;
+}
+
 function calcExpectedDamage(firstDie, secondDie, bonus, damage, dl) {
   let sum = 0;
 
@@ -79,6 +92,8 @@ export default function Probs() {
   const [damage, setDamage] = useState(5);
   const [dl, setDl] = useState(10);
   const [hp, setHp] = useState(60);
+
+  const prob hit = calcProbHit (firstDie, secondDie, bonus, dl);
 
   const expectedDamage = calcExpectedDamage(
     firstDie,
@@ -340,6 +355,7 @@ export default function Probs() {
           })}
         </TableBody>
       </Table>
+      <Typography>Probabilità di colpire: {probHit.toFixed(2)}%</Typography>
       <Typography>Danno atteso: {Math.floor(expectedDamage)}</Typography>
       <Typography>
         Numero di attacchi necessari: {Math.ceil(hp / expectedDamage)}
