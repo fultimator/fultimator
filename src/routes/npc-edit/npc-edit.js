@@ -78,7 +78,6 @@ export default function NpcEdit() {
         <Grid item xs={1}></Grid>
         <Grid item xs={5}>
           <ExplainAffinities npc={npcTemp} />
-          <Divider sx={{ py: 1 }} />
           <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
         </Grid>
       </Grid>

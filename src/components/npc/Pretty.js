@@ -249,7 +249,11 @@ function Stats({ npc }) {
                 py: 0.4,
               }}
             >
-              DIF +{calcDef(npc)}
+              {npc.armor?.def > 0 ? (
+                <>DIF {calcDef(npc)}</>
+              ) : (
+                <>DIF +{calcDef(npc)}</>
+              )}
             </Grid>
             <Grid
               item
@@ -673,7 +677,10 @@ function Equip({ npc }) {
     weapons.push(attack.weapon);
   });
 
-  if (weapons.length === 0) {
+  if (
+    weapons.length === 0 &&
+    (!npc.armor || npc.armor.name === "Nessuna Armatura")
+  ) {
     return null;
   }
 
@@ -700,8 +707,9 @@ function Equip({ npc }) {
         </Typography>
       </Grid>
 
+      {/* Weapons */}
       {weapons.map((weapon) => (
-        <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
           <Typography>
             <strong>Arma:</strong> {weapon.name} <Diamond />{" "}
             {weapon.hands === 1 ? "1 mano" : "2 mani"} <Diamond />{" "}
@@ -728,6 +736,21 @@ function Equip({ npc }) {
           </Typography>
         </Grid>
       ))}
+
+      {/* Armor */}
+      {npc.armor && npc.armor.name !== "Nessuna Armatura" && (
+        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
+          <strong>Armatura:</strong> {npc.armor.name} <Diamond />{" "}
+          {npc.armor.def > 0 ? (
+            <strong>DIF {npc.armor.def}</strong>
+          ) : (
+            <strong>DIF + {npc.armor.defbonus}</strong>
+          )}{" "}
+          <Diamond /> <strong>D. MAG +{npc.armor.mdefbonus}</strong> <Diamond />{" "}
+          Iniz. <strong>{npc.armor.init}</strong> <Diamond />{" "}
+          <strong>{npc.armor.cost}</strong> zenit
+        </Grid>
+      )}
     </Grid>
   );
 }

@@ -60,11 +60,25 @@ export function calcInit(npc) {
     init = init + 4;
   }
 
+  // Armor
+  if (npc.armor?.init) {
+    init += npc.armor?.init;
+  }
+
   return init;
 }
 
 export function calcDef(npc) {
   let def = 0;
+
+  // Armor
+  if (npc.armor?.def) {
+    def += npc.armor?.def;
+  }
+
+  if (npc.armor?.defbonus) {
+    def += npc.armor?.defbonus;
+  }
 
   // Skill Extra def
   if (npc.extra?.def) {
@@ -80,6 +94,11 @@ export function calcMDef(npc) {
   // Skill Extra M def
   if (npc.extra?.mDef) {
     mdef += npc.extra?.mDef;
+  }
+
+  // Armor
+  if (npc.armor?.mdefbonus) {
+    mdef += npc.armor?.mdefbonus;
   }
 
   return mdef;
@@ -240,7 +259,8 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromImmunities(npc) +
     calcUsedSkillsFromAbsorbs(npc) +
     calcUsedSkillsFromSpecial(npc) +
-    calcUsedSkillsFromSpells(npc)
+    calcUsedSkillsFromSpells(npc) +
+    calcUsedSkillsFromEquip(npc)
   );
 }
 
@@ -379,4 +399,22 @@ export function calcUsedSkillsFromSpecial(npc) {
 
 export function calcUsedSkillsFromSpells(npc) {
   return npc.spells?.length / 2 || 0;
+}
+
+export function calcUsedSkillsFromEquip(npc) {
+  let equip = false;
+
+  if (npc.weaponattacks?.lenght > 0) {
+    equip = true;
+  }
+
+  if (npc.armor) {
+    equip = true;
+  }
+
+  if (npc.species === "Umanoide") {
+    equip = false;
+  }
+
+  return equip ? 1 : 0;
 }

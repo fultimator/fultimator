@@ -5,21 +5,24 @@ import {
   FormGroup,
   FormLabel,
   Grid,
+  InputLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Fragment } from "react";
+import { baseArmors } from "../../libs/equip";
 
 export default function EditExtra({ npc, setNpc }) {
   return (
     <>
-      <Typography variant="h6">Extra</Typography>
-      <Grid container>
+      <Grid container sx={{ mt: 2 }}>
         <Grid item xs={6}>
           <Defenses npc={npc} setNpc={setNpc} />
+          <SelectArmor npc={npc} setNpc={setNpc} />
         </Grid>
         <Grid item xs={6}>
           <Stack spacing={1}>
@@ -119,32 +122,32 @@ function Defenses({ npc, setNpc }) {
       >
         <FormControlLabel
           value="00"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+0 Def / +0 M. Def"
         />
         <FormControlLabel
           value="12"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+1 Def / +2 M. Def"
         />
         <FormControlLabel
           value="21"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+2 Def / +1 M. Def"
         />
         <FormControlLabel
           value="33"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+3 Def / +3 M. Def"
         />
         <FormControlLabel
           value="24"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+2 Def / +4 M. Def"
         />
         <FormControlLabel
           value="42"
-          control={<Radio size="small" />}
+          control={<Radio size="small" sx={{ py: 0.8 }} />}
           label="+4 Def / +2 M. Def"
         />
       </RadioGroup>
@@ -263,5 +266,53 @@ function Magic({ npc, setNpc }) {
         label="+3 ai test di Magia"
       />
     </FormGroup>
+  );
+}
+
+function SelectArmor({ npc, setNpc }) {
+  const onChange = function (e) {
+    const armor = baseArmors.find((armor) => armor.name === e.target.value);
+
+    setNpc((prevState) => {
+      const newState = Object.assign({}, prevState);
+      if (!newState.extra) {
+        newState.extra = {};
+      }
+      newState.armor = armor;
+      return newState;
+    });
+  };
+
+  const options = [<MenuItem key={1} value="" disabled />];
+
+  for (const armor of baseArmors) {
+    options.push(
+      <MenuItem key={armor.name} value={armor.name}>
+        {armor.name}
+      </MenuItem>
+    );
+  }
+
+  let armor = npc.armor;
+  if (!armor) {
+    armor = baseArmors[0];
+  }
+
+  console.debug(armor);
+
+  return (
+    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
+      <InputLabel id="type">Armatura</InputLabel>
+      <Select
+        size="small"
+        labelId="armor"
+        id="select-armor"
+        value={armor.name}
+        label="Armatura"
+        onChange={onChange}
+      >
+        {options}
+      </Select>
+    </FormControl>
   );
 }

@@ -25,6 +25,7 @@ import {
   calcUsedSkillsFromSpecialAttacks,
   calcUsedSkillsFromSpells,
   calcUsedSkillsFromAbsorbs,
+  calcUsedSkillsFromEquip,
 } from "../../libs/npcs";
 
 export default function ExplainSkills({ npc }) {
@@ -172,6 +173,16 @@ export default function ExplainSkills({ npc }) {
             <TableRow>
               <TableCell>Dalle regole speciali</TableCell>
               <TableCell>{calcUsedSkillsFromSpecial(npc)}</TableCell>
+            </TableRow>
+          )}
+          {calcUsedSkillsFromEquip(npc) > 0 && (
+            <TableRow>
+              <TableCell>
+                Da Equipaggiabile{" "}
+                {npc.species === "Bestia" &&
+                  "(anche se come Bestia non dovrebbe averla)"}{" "}
+              </TableCell>
+              <TableCell>{calcUsedSkillsFromEquip(npc)}</TableCell>
             </TableRow>
           )}
         </TableBody>
