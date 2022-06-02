@@ -117,7 +117,7 @@ export function calcDamage(attack, npc) {
 
   // Equip
   if (attack.weapon) {
-    number = number + attack.weapon.damage;
+    number = number - 5 + attack.weapon.damage;
   }
 
   return number;
