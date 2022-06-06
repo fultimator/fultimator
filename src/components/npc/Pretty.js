@@ -708,8 +708,8 @@ function Equip({ npc }) {
       </Grid>
 
       {/* Weapons */}
-      {weapons.map((weapon) => (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
+      {weapons.map((weapon, i) => (
+        <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
           <Typography>
             <strong>Arma:</strong> {weapon.name} <Diamond />{" "}
             {weapon.hands === 1 ? "1 mano" : "2 mani"} <Diamond />{" "}
