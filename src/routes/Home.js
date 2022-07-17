@@ -14,6 +14,7 @@ import Layout from "../components/Layout";
 import goo from "./goo.png";
 import robot from "./robot.png";
 import axe from "./axe.png";
+import scroll from "./scroll.png";
 // import dice from "./dice.png";
 
 function Home() {
@@ -108,6 +109,34 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
+        <Grid item>
+          <Card sx={{ width: 300 }}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={scroll}
+              alt=""
+              sx={{ objectFit: "contain" }}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5">
+                Tieni traccia dei pv durante i combattimenti
+              </Typography>
+              <Typography>Non fa molto altro</Typography>
+              <Typography variant="caption">Che altro dovrebbe fare</Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                variant="outlined"
+                component={RouterLink}
+                to="/combat"
+              >
+                Vai
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
         {/* <Grid item>
           <Card sx={{ width: 300 }}>
             <CardMedia
@@ -137,6 +166,15 @@ function Home() {
           </Card>
         </Grid> */}
       </Grid>
+
+      <Typography sx={{ p: 3 }}>
+        Le immagini sono state fatte con{" "}
+        <a href="https://game-icons.net/" target="_blank" rel="noreferrer">
+          https://game-icons.net/
+        </a>{" "}
+        che permette tra le altre cose anche di colorarle in maniera carina.
+        Check it out, sono Creative Commons!
+      </Typography>
     </Layout>
   );
 }
