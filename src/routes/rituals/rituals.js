@@ -7,6 +7,7 @@ import {
   Grid,
   Radio,
   RadioGroup,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
@@ -183,11 +184,16 @@ function Projects() {
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
   const [defect, setDefect] = useState(false);
+  const [tinkerers, setThinkeres] = useState(1);
+  const [helpers, setHelpers] = useState(0);
+  const [visionary, setVisionary] = useState(0);
 
   const defectMod = defect ? 0.75 : 1;
   const cost =
     powerCosts[power] * areaCosts[area] * usesCosts[uses] * defectMod;
-  const days = Math.ceil(cost / 100 > 1 ? cost / 100 : 1);
+  const progress = Math.ceil(cost / 100 > 1 ? cost / 100 : 1);
+  const progressPerDay = tinkerers * 2 + helpers + visionary;
+  const days = progress / progressPerDay;
 
   return (
     <>
@@ -294,13 +300,76 @@ function Projects() {
           </FormControl>
         </Grid>
       </Grid>
-      <Divider />
-      <Grid container sx={{ m: 1 }}>
+      <Divider sx={{ my: 1 }} />
+      <Grid container spacing={1}>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">{cost} Zenith</Typography>
+          <FormControl variant="standard" fullWidth>
+            <TextField
+              id="tinkerers"
+              label="Artefici al lavoro"
+              type="number"
+              size="small"
+              min={1}
+              max={10}
+              value={tinkerers}
+              onChange={(e) => {
+                setThinkeres(parseInt(e.target.value));
+              }}
+            />
+          </FormControl>
         </Grid>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">{days} Progresso</Typography>
+          <FormControl variant="standard" fullWidth>
+            <TextField
+              id="helpers"
+              label="Aiutanti"
+              type="number"
+              size="small"
+              min={1}
+              max={10}
+              value={helpers}
+              onChange={(e) => {
+                setHelpers(parseInt(e.target.value));
+              }}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={4}>
+          <FormControl variant="standard" fullWidth>
+            <TextField
+              id="visionary"
+              label="Livelli in Visionario"
+              type="number"
+              size="small"
+              min={1}
+              max={10}
+              value={visionary}
+              onChange={(e) => {
+                setVisionary(parseInt(e.target.value));
+              }}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography fontWeight="bold">{cost} Zenith</Typography>
+          {visionary > 0 && (
+            <Typography fontWeight="bold">
+              {visionary * 100} Pagati da Visionario
+            </Typography>
+          )}
+        </Grid>
+        <Grid item xs={4}>
+          <Typography fontWeight="bold">{progress} Progresso</Typography>
+        </Grid>
+        <Grid item xs={4}>
+          {days < 1 && (
+            <Typography fontWeight="bold">Poche ore {days}</Typography>
+          )}
+          {days >= 1 && (
+            <Typography fontWeight="bold">
+              {progressPerDay} progresso al giorno / {Math.ceil(days)} giorni
+            </Typography>
+          )}
         </Grid>
       </Grid>
     </>
