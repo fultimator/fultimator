@@ -300,3 +300,33 @@ export const baseArmors = [
     init: -4,
   },
 ];
+
+export const baseShields = [
+  {
+    name: "Nessuno Scudo",
+    cost: 0,
+    def: 0,
+    defbonus: 0,
+    mdef: 0,
+    mdefbonus: 0,
+    init: 0,
+  },
+  {
+    name: "Scudo di Bronzo",
+    cost: 100,
+    def: 0,
+    defbonus: 2,
+    mdef: 0,
+    mdefbonus: 0,
+    init: 0,
+  },
+  {
+    name: "Scudo Runico",
+    cost: 150,
+    def: 0,
+    defbonus: 2,
+    mdef: 0,
+    mdefbonus: 2,
+    init: 0,
+  },
+];

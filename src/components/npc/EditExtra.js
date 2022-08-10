@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Fragment } from "react";
 import { baseArmors } from "../../libs/equip";
+import { baseShields } from "../../libs/equip";
 
 export default function EditExtra({ npc, setNpc }) {
   return (
@@ -23,6 +24,7 @@ export default function EditExtra({ npc, setNpc }) {
         <Grid item xs={6}>
           <Defenses npc={npc} setNpc={setNpc} />
           <SelectArmor npc={npc} setNpc={setNpc} />
+          <SelectShield npc={npc} setNpc={setNpc} />
         </Grid>
         <Grid item xs={6}>
           <Stack spacing={1}>
@@ -309,6 +311,54 @@ function SelectArmor({ npc, setNpc }) {
         id="select-armor"
         value={armor.name}
         label="Armatura"
+        onChange={onChange}
+      >
+        {options}
+      </Select>
+    </FormControl>
+  );
+}
+
+function SelectShield({ npc, setNpc }) {
+  const onChange = function (e) {
+    const shield = baseShields.find((shield) => shield.name === e.target.value);
+
+    setNpc((prevState) => {
+      const newState = Object.assign({}, prevState);
+      if (!newState.extra) {
+        newState.extra = {};
+      }
+      newState.shield = shield;
+      return newState;
+    });
+  };
+
+  const options = [<MenuItem key={1} value="" disabled />];
+
+  for (const shield of baseShields) {
+    options.push(
+      <MenuItem key={shield.name} value={shield.name}>
+        {shield.name}
+      </MenuItem>
+    );
+  }
+
+  let shield = npc.shield;
+  if (!shield) {
+    shield = baseShields[0];
+  }
+
+  console.debug(shield);
+
+  return (
+    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
+      <InputLabel id="type">Scudo</InputLabel>
+      <Select
+        size="small"
+        labelId="shield"
+        id="select-shield"
+        value={shield.name}
+        label="Scudo"
         onChange={onChange}
       >
         {options}

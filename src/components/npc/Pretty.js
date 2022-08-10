@@ -677,10 +677,11 @@ function Equip({ npc }) {
     weapons.push(attack.weapon);
   });
 
-  if (
-    weapons.length === 0 &&
-    (!npc.armor || npc.armor.name === "Nessuna Armatura")
-  ) {
+  const hasWeapons = weapons.length !== 0;
+  const hasArmor = npc.armor && npc.armor.name !== "Nessuna Armatura";
+  const hasShield = npc.shield && npc.shield.name !== "Nessuno Scudo";
+
+  if (!hasWeapons && !hasArmor && !hasShield) {
     return null;
   }
 
@@ -749,6 +750,21 @@ function Equip({ npc }) {
           <Diamond /> <strong>D. MAG +{npc.armor.mdefbonus}</strong> <Diamond />{" "}
           Iniz. <strong>{npc.armor.init}</strong> <Diamond />{" "}
           <strong>{npc.armor.cost}</strong> zenit
+        </Grid>
+      )}
+
+      {/* Shield */}
+      {npc.shield && npc.shield.name !== "Nessuno Scudo" && (
+        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
+          <strong>Scudo:</strong> {npc.shield.name} <Diamond />{" "}
+          {npc.shield.def > 0 ? (
+            <strong>DIF {npc.shield.def}</strong>
+          ) : (
+            <strong>DIF + {npc.shield.defbonus}</strong>
+          )}{" "}
+          <Diamond /> <strong>D. MAG +{npc.shield.mdefbonus}</strong>{" "}
+          <Diamond /> Iniz. <strong>{npc.shield.init}</strong> <Diamond />{" "}
+          <strong>{npc.shield.cost}</strong> zenit
         </Grid>
       )}
     </Grid>

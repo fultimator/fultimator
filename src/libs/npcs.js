@@ -80,6 +80,15 @@ export function calcDef(npc) {
     def += npc.armor?.defbonus;
   }
 
+  // Shield
+  if (npc.shield?.def) {
+    def += npc.shield?.def;
+  }
+
+  if (npc.shield?.defbonus) {
+    def += npc.shield?.defbonus;
+  }
+
   // Skill Extra def
   if (npc.extra?.def) {
     def += npc.extra?.def;
@@ -99,6 +108,11 @@ export function calcMDef(npc) {
   // Armor
   if (npc.armor?.mdefbonus) {
     mdef += npc.armor?.mdefbonus;
+  }
+
+  // Shield
+  if (npc.shield?.mdefbonus) {
+    mdef += npc.shield?.mdefbonus;
   }
 
   return mdef;
@@ -273,6 +287,13 @@ export function calcUsedSkillsFromSpecialAttacks(npc) {
     }
   });
 
+  npc.weaponattacks?.forEach((attack) => {
+    sum += attack.special.length;
+    if (attack.extraDamage) {
+      sum++;
+    }
+  });
+
   return sum;
 }
 
@@ -404,11 +425,15 @@ export function calcUsedSkillsFromSpells(npc) {
 export function calcUsedSkillsFromEquip(npc) {
   let equip = false;
 
-  if (npc.weaponattacks?.lenght > 0) {
+  if (npc.weaponattacks?.length > 0) {
     equip = true;
   }
 
   if (npc.armor) {
+    equip = true;
+  }
+
+  if (npc.shield) {
     equip = true;
   }
 
