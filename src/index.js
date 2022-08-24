@@ -15,6 +15,7 @@ import Equip from "./routes/equip/Equip";
 import NpcGallery from "./routes/npc-gallery/npc-gallery";
 import NpcEdit from "./routes/npc-edit/npc-edit";
 import Roller from "./routes/roller/roller";
+import RollerScoped from "./routes/roller/roller-scoped";
 import Probs from "./routes/probs/probs";
 import Combat from "./routes/combat/combat";
 
@@ -30,6 +31,7 @@ ReactDOM.render(
           <Route path="/rituals" element={<Rituals />} />
           <Route path="/equip" element={<Equip />} />
           <Route path="/roller" element={<Roller />} />
+          <Route path="/roller/:scope" element={<RollerScoped />} />
           <Route path="/probs" element={<Probs />} />
           <Route path="/combat" element={<Combat />} />
         </Routes>
