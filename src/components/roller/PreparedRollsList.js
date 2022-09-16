@@ -11,11 +11,11 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
     <>
       {rolls.map((roll, i) => {
         return (
-            <Grid key={i} container spacing={2} rowSpacing={1} sx={{my:1}} alignItems="center">
-              <Grid item><Button variant="contained" startIcon={<ArrowBack />} onClick={handleRoll(roll)}>Tira</Button></Grid>
+            <Grid key={i} container spacing={1} rowSpacing={1} sx={{my:1}} alignItems="center">
+              <Grid item><Button variant="contained" startIcon={<ArrowBack sx={{display: {xs: "none", sm: "inline"}}} />} onClick={handleRoll(roll)}>Tira</Button></Grid>
               <Grid item xs>
                 <Typography fontSize="1.1rem"><Roll roll={roll} /> <Diamond/> {roll.label}</Typography></Grid>
-              <Grid item><Button variant="outlined" color="red" startIcon={<Delete />} onClick={handleDelete(roll.id)}>Elimina</Button></Grid>
+              <Grid item><Button variant="outlined" color="red" startIcon={<Delete sx={{display: {xs: "none", sm: "inline"}}} />} onClick={handleDelete(roll.id)}>Elimina</Button></Grid>
             </Grid>
         );
       })}

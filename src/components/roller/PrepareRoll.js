@@ -158,13 +158,13 @@ export default function PrepareRoll({savePreparedRoll, createRoll}) {
         </Badge>
       </IconButton>
     </Grid>
-    <Grid item xs={8}>
+    <Grid item xs={12} sm={8}>
       <TextField fullWidth label="Descrizione" value={label} onChange={(e) => {
         setLabel(e.target.value)
       }
       }></TextField>
     </Grid>
-    <Grid item xs={8}>
+    <Grid item xs={12} sm={8}>
       <Grid
         container
         justifyContent="center"
@@ -174,14 +174,14 @@ export default function PrepareRoll({savePreparedRoll, createRoll}) {
         sx={{}}
       >
         <Grid item>
-          <Button variant="contained" startIcon={<SouthWest/>} onClick={onRoll}>Tira</Button>
+          <Button variant="contained" startIcon={<SouthWest sx={{display: {xs: "none", sm: "inline"}}}/>} onClick={onRoll}>Tira</Button>
         </Grid>
         <Grid item>
-          <Button variant="outlined" startIcon={<Close/>} onClick={onReset}>Resetta!</Button>
+          <Button variant="outlined" startIcon={<Close sx={{display: {xs: "none", sm: "inline"}}}/>} onClick={onReset}>Resetta</Button>
         </Grid>
         <Grid item>
-          <Button variant="outlined" startIcon={<SouthEast/>} onClick={onSave}>
-            Salva
+          <Button variant="outlined" startIcon={<SouthEast sx={{display: {xs: "none", sm: "inline"}}}/>} onClick={onSave}>
+            Prepara
           </Button>
         </Grid>
       </Grid>

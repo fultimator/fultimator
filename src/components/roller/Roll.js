@@ -34,7 +34,7 @@ function RegularRoll({roll}) {
             {roll.label}
           </Typography>
           <Typography textAlign="center">
-            {roll.username} - {format(roll.timestamp.toDate(), 'dd/mm/yyyy hh:mm')}
+            {roll.username} - {format(roll.timestamp.toDate(), 'dd/mm/yyyy hh:mm:ss')}
           </Typography>
         </Stack>
       </Stack>
@@ -118,7 +118,7 @@ function FabulaRoll({roll, saveRoll, currentUser}) {
     <Card sx={{width: "100%", p: 1}}>
       <Stack>
         <Grid container sx={{my: 1}}>
-          <Grid item xs={6}>
+          <Grid item xs={5} sm={6}>
             <Typography textAlign={"center"} fontSize="2rem">
               {sum() + roll.modifier}
             </Typography>
@@ -126,7 +126,7 @@ function FabulaRoll({roll, saveRoll, currentUser}) {
               Risultato
             </Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={7} sm={6}>
             <Grid container alignItems="center" spacing={1}>
               <Grid item xs={6}>
                 <Typography textAlign="right">Calcolo: </Typography>
@@ -143,7 +143,7 @@ function FabulaRoll({roll, saveRoll, currentUser}) {
                 </Typography>}
               </Grid>
               <Grid item xs={6}>
-                <Typography textAlign="right">Tiro Maggiore (TM): </Typography>
+                <Typography textAlign="right">TM: </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography textAlign="center" fontWeight="bold" fontSize="1.5rem">
@@ -200,8 +200,9 @@ function FabulaRoll({roll, saveRoll, currentUser}) {
           </Typography>
           
           {roll.attempts.map((attempt, i) => {
-            return <Typography textAlign="center" key={i}>{roll.username}
-              <Diamond/> {attempt.attempt[0]} ({roll.dice[0]}) <Diamond/> {attempt.attempt[1]} ({roll.dice[1]}) <Diamond/> {format(attempt.timestamp.toDate(), 'dd/mm/yyyy hh:mm')}
+            return <Typography textAlign="center" key={i} fontSize="0.9rem">
+              {roll.username}{" "}
+              <Diamond/> {attempt.attempt[0]} ({roll.dice[0]}) <Diamond/> {attempt.attempt[1]} ({roll.dice[1]}) <Diamond/> {format(attempt.timestamp.toDate(), 'dd/mm/yyyy hh:mm:ss')}
             </Typography>
           })}
         </Stack>

@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import {createTheme} from "@mui/material/styles";
 
 const Fabula = createTheme({
   palette: {
@@ -31,6 +31,7 @@ const Fabula = createTheme({
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     h1: {
       fontFamily: ["Antonio", "sans-serif"].join(","),
+      fontSize: "2rem"
     },
     h2: {
       fontFamily: ["Antonio", "sans-serif"].join(","),

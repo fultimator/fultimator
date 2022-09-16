@@ -101,10 +101,10 @@ function RollerScopedAuthenticated({user}) {
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={1}>
-        <Grid item>
+        <Grid item xs={12} sm={6} sx={{order: 1}}>
           <ShareLink scope={scope}/>
         </Grid>
-        <Grid item>
+        <Grid item sx={{order: 2}}>
           <Card sx={{p: 2}}>
             <Typography>
               Clicca col sinistro su un dado per aggiungerlo alla tua mano<br/>
@@ -113,14 +113,14 @@ function RollerScopedAuthenticated({user}) {
             </Typography>
           </Card>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{order: 3}}>
           <PrepareRoll savePreparedRoll={savePreparedRoll} createRoll={createRoll}/>
         </Grid>
-        <Grid item xs={5} sx={{my:1}}>
+        <Grid item xs={12} sm={5} sx={{order: {xs: 6, sm: 5}}}>
           <RollList scope={scope} saveRoll={saveRoll} user={user}/>
         </Grid>
-        <Grid item xs={1}/>
-        <Grid item xs={5}  sx={{my:1}}>
+        <Grid item xs={0} sm={1} sx={{order: {xs: 6, sm: 5}}}/>
+        <Grid item xs={12} sm={5} sx={{my: 1, order: {xs: 5, sm: 6}}}>
           <PreparedRolls user={user} scope={scope} createRoll={createRoll}/>
         </Grid>
       </Grid>

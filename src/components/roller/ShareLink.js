@@ -17,7 +17,7 @@ export default function ShareLink({scope}) {
   };
   
   return (
-    <Card sx={{p: 2, width: 400, margin: "0 auto"}}>
+    <Card sx={{p: 2, width: "100%", margin: "0 auto"}}>
       <Typography sx={{mb: 1}}>
         Condividi questo url per vedere gli stessi tiri:
       </Typography>
