@@ -1,43 +1,30 @@
-import { Card, Grid, Typography } from "@mui/material";
-import { Fragment } from "react";
+import {Card, Grid, Typography} from "@mui/material";
+import React, {Fragment} from "react";
 import ReactMarkdown from "react-markdown";
 import attributes from "../../libs/attributes";
-import {
-  calcDamage,
-  calcDef,
-  calcHP,
-  calcInit,
-  calcMagic,
-  calcMDef,
-  calcMP,
-  calcPrecision,
-} from "../../libs/npcs";
-import { CloseBracket, OpenBracket } from "../Bracket";
+import {calcDamage, calcDef, calcHP, calcInit, calcMagic, calcMDef, calcMP, calcPrecision,} from "../../libs/npcs";
+import {CloseBracket, OpenBracket} from "../Bracket";
 import Diamond from "../Diamond";
-import {
-  ActionIcon,
-  DistanceIcon,
-  MeleeIcon,
-  OffensiveSpellIcon,
-  SpellIcon,
-} from "../icons";
-import { TypeAffinity, TypeName } from "../types";
+import {ActionIcon, DistanceIcon, MeleeIcon, OffensiveSpellIcon, SpellIcon,} from "../icons";
+import {TypeAffinity, TypeName} from "../types";
 
-export default function NpcPretty({ npc }) {
+function NpcPretty({npc}, ref) {
   return (
     <Card>
-      <Header npc={npc} />
-      <Stats npc={npc} />
-      <Attacks npc={npc} />
-      <Spells npc={npc} />
-      <Actions npc={npc} />
-      <Special npc={npc} />
-      <Equip npc={npc} />
+      <div ref={ref}>
+        <Header npc={npc}/>
+        <Stats npc={npc}/>
+        <Attacks npc={npc}/>
+        <Spells npc={npc}/>
+        <Actions npc={npc}/>
+        <Special npc={npc}/>
+        <Equip npc={npc}/>
+      </div>
     </Card>
   );
 }
 
-function Header({ npc }) {
+function Header({npc}) {
   return (
     <Grid container alignItems="stretch">
       <Grid
@@ -54,7 +41,7 @@ function Header({ npc }) {
           fontFamily="Antonio"
           fontSize="1.5rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           {npc.name}
         </Typography>
@@ -73,9 +60,9 @@ function Header({ npc }) {
           fontFamily="Antonio"
           fontSize="1.25rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
-          Liv {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
+          Liv {npc.lvl} <Rank npc={npc}/> <Diamond/> {npc.species}
         </Typography>
       </Grid>
       <Grid
@@ -107,7 +94,7 @@ function Header({ npc }) {
   );
 }
 
-function Rank({ npc }) {
+function Rank({npc}) {
   return (
     <>
       {npc.rank === "elite" && "Elite"}
@@ -118,7 +105,7 @@ function Rank({ npc }) {
   );
 }
 
-function Stats({ npc }) {
+function Stats({npc}) {
   return (
     <Typography
       component="div"
@@ -175,7 +162,7 @@ function Stats({ npc }) {
             >
               VIG d{npc.attributes?.might}
             </Grid>
-            <Grid item xs sx={{ bgcolor: "#f9f8fb", py: 0.4 }}>
+            <Grid item xs sx={{bgcolor: "#f9f8fb", py: 0.4}}>
               VOL d{npc.attributes?.will}
             </Grid>
           </Grid>
@@ -194,7 +181,7 @@ function Stats({ npc }) {
           }}
         >
           <Grid container alignItems="stretch" justifyContent="space-between">
-            <Grid item sx={{ px: 1, py: 0.4 }}>
+            <Grid item sx={{px: 1, py: 0.4}}>
               PV
             </Grid>
             <Grid
@@ -206,9 +193,9 @@ function Stats({ npc }) {
                 bgcolor: "red.main",
               }}
             >
-              {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
+              {calcHP(npc)} <Diamond color="white.main"/> {Math.floor(calcHP(npc) / 2)}
             </Grid>
-            <Grid item sx={{ px: 1, py: 0.4 }}>
+            <Grid item sx={{px: 1, py: 0.4}}>
               PM
             </Grid>
             <Grid
@@ -222,7 +209,7 @@ function Stats({ npc }) {
             >
               {calcMP(npc)}
             </Grid>
-            <Grid item xs sx={{ py: 0.4 }}>
+            <Grid item xs sx={{py: 0.4}}>
               Iniz. {calcInit(npc)}
             </Grid>
           </Grid>
@@ -280,35 +267,35 @@ function Stats({ npc }) {
         >
           {npc.affinities && (
             <Grid container>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #513455" }}>
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #513455"}}>
                 <TypeAffinity
                   type="physical"
                   affinity={npc.affinities.physical}
                 />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #604365" }}>
-                <TypeAffinity type="wind" affinity={npc.affinities.wind} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #604365"}}>
+                <TypeAffinity type="wind" affinity={npc.affinities.wind}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}>
-                <TypeAffinity type="bolt" affinity={npc.affinities.bolt} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #6f5375"}}>
+                <TypeAffinity type="bolt" affinity={npc.affinities.bolt}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #816687" }}>
-                <TypeAffinity type="dark" affinity={npc.affinities.dark} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #816687"}}>
+                <TypeAffinity type="dark" affinity={npc.affinities.dark}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}>
-                <TypeAffinity type="earth" affinity={npc.affinities.earth} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #957d9b"}}>
+                <TypeAffinity type="earth" affinity={npc.affinities.earth}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}>
-                <TypeAffinity type="fire" affinity={npc.affinities.fire} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #ac97b0"}}>
+                <TypeAffinity type="fire" affinity={npc.affinities.fire}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}>
-                <TypeAffinity type="ice" affinity={npc.affinities.ice} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #c4b4c7"}}>
+                <TypeAffinity type="ice" affinity={npc.affinities.ice}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}>
-                <TypeAffinity type="light" affinity={npc.affinities.light} />
+              <Grid item xs sx={{py: 0.4, borderRight: "1px solid #e0d7e2"}}>
+                <TypeAffinity type="light" affinity={npc.affinities.light}/>
               </Grid>
-              <Grid item xs sx={{ py: 0.4 }}>
-                <TypeAffinity type="poison" affinity={npc.affinities.poison} />
+              <Grid item xs sx={{py: 0.4}}>
+                <TypeAffinity type="poison" affinity={npc.affinities.poison}/>
               </Grid>
             </Grid>
           )}
@@ -318,7 +305,7 @@ function Stats({ npc }) {
   );
 }
 
-function Attacks({ npc }) {
+function Attacks({npc}) {
   return (
     <Grid container>
       <Grid
@@ -336,40 +323,40 @@ function Attacks({ npc }) {
           fontFamily="Antonio"
           fontSize="1.1rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           Attacchi base
         </Typography>
       </Grid>
-
+      
       {npc.attacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={1} sx={{px: 1, py: 0.5}}>
               <Typography textAlign="center">
-                {attack.range === "melee" && <MeleeIcon />}
-                {attack.range === "distance" && <DistanceIcon />}
+                {attack.range === "melee" && <MeleeIcon/>}
+                {attack.range === "distance" && <DistanceIcon/>}
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={11} sx={{px: 1, py: 0.5}}>
               <Typography>
-                <strong>{attack.name}</strong> <Diamond />{" "}
+                <strong>{attack.name}</strong> <Diamond/>{" "}
                 <strong>
-                  <OpenBracket />
+                  <OpenBracket/>
                   {attributes[attack.attr1].shortcaps}+
                   {attributes[attack.attr2].shortcaps}
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                  <CloseBracket /> <Diamond /> <OpenBracket />
+                  <CloseBracket/> <Diamond/> <OpenBracket/>
                   TM + {calcDamage(attack, npc)}
-                  <CloseBracket />
+                  <CloseBracket/>
                 </strong>{" "}
                 danni {attack.type === "physical" && <strong>fisici</strong>}
                 {attack.type !== "physical" && (
                   <>
                     da{" "}
-                    <strong style={{ textTransform: "lowercase" }}>
-                      <TypeName type={attack.type} />
+                    <strong style={{textTransform: "lowercase"}}>
+                      <TypeName type={attack.type}/>
                     </strong>
                   </>
                 )}
@@ -392,40 +379,40 @@ function Attacks({ npc }) {
           </Fragment>
         );
       })}
-
+      
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={1} sx={{px: 1, py: 0.5}}>
               <Typography textAlign="center">
-                {attack.weapon.range === "melee" && <MeleeIcon />}
-                {attack.weapon.range === "distance" && <DistanceIcon />}
+                {attack.weapon.range === "melee" && <MeleeIcon/>}
+                {attack.weapon.range === "distance" && <DistanceIcon/>}
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={11} sx={{px: 1, py: 0.5}}>
               <Typography>
                 <strong>
                   {attack.name} ({attack.weapon.name}){" "}
                 </strong>{" "}
-                <Diamond /> {attack.weapon.hands === 1 ? "1 mano" : "2 mani"}{" "}
-                <Diamond />{" "}
+                <Diamond/> {attack.weapon.hands === 1 ? "1 mano" : "2 mani"}{" "}
+                <Diamond/>{" "}
                 <strong>
-                  <OpenBracket />
+                  <OpenBracket/>
                   {attributes[attack.weapon.att1].shortcaps}+
                   {attributes[attack.weapon.att2].shortcaps}
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                  <CloseBracket /> <Diamond /> <OpenBracket />
+                  <CloseBracket/> <Diamond/> <OpenBracket/>
                   TM + {calcDamage(attack, npc)}
-                  <CloseBracket />
+                  <CloseBracket/>
                 </strong>{" "}
                 danni{" "}
                 {attack.weapon.type === "physical" && <strong>fisici</strong>}
                 {attack.weapon.type !== "physical" && (
                   <>
                     da{" "}
-                    <strong style={{ textTransform: "lowercase" }}>
-                      <TypeName type={attack.type} />
+                    <strong style={{textTransform: "lowercase"}}>
+                      <TypeName type={attack.type}/>
                     </strong>
                   </>
                 )}
@@ -452,7 +439,7 @@ function Attacks({ npc }) {
   );
 }
 
-function Spells({ npc }) {
+function Spells({npc}) {
   if (!npc.spells || npc.spells.length === 0) {
     return null;
   }
@@ -472,39 +459,39 @@ function Spells({ npc }) {
           fontFamily="Antonio"
           fontSize="1.1rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           Incantesimi
         </Typography>
       </Grid>
-
+      
       {npc.spells?.map((spell, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={1} sx={{px: 1, py: 0.5}}>
               <Typography textAlign="center">
-                <SpellIcon />
+                <SpellIcon/>
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={11} sx={{px: 1, py: 0.5}}>
               <Typography>
                 <strong>{spell.name}</strong>{" "}
-                {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
-                <Diamond />{" "}
+                {spell.type === "offensive" && <OffensiveSpellIcon/>}{" "}
+                <Diamond/>{" "}
                 <strong>
                   {spell.type === "offensive" && (
                     <>
-                      <OpenBracket />
+                      <OpenBracket/>
                       {attributes[spell.attr1].shortcaps}+
                       {attributes[spell.attr2].shortcaps}
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}
-                      <CloseBracket /> <Diamond />
+                      <CloseBracket/> <Diamond/>
                     </>
                   )}{" "}
-                  {spell.mp} PM <Diamond /> {spell.target} <Diamond />{" "}
+                  {spell.mp} PM <Diamond/> {spell.target} <Diamond/>{" "}
                   {spell.duration}
                 </strong>
-                <br />
+                <br/>
                 <Typography component="span" key={i}>
                   <ReactMarkdown
                     allowedElements={["strong"]}
@@ -523,15 +510,15 @@ function Spells({ npc }) {
   );
 }
 
-function Special({ npc }) {
+function Special({npc}) {
   const special = [];
-
+  
   if (npc.special) {
     npc.special.forEach((s) => {
       special.push(s);
     });
   }
-
+  
   // Species
   if (npc.species === "Costrutto") {
     special.push({
@@ -539,7 +526,7 @@ function Special({ npc }) {
       effect: "Immune allo status **avvelenato**",
     });
   }
-
+  
   if (npc.species === "Non Morto") {
     special.push({
       name: "Non Morto",
@@ -547,18 +534,18 @@ function Special({ npc }) {
         "Immune allo status **avvelenato** e ciò che farebbe recuperare Punti Vita può invece ferire (vedi pag **305**)",
     });
   }
-
+  
   if (npc.species === "Pianta") {
     special.push({
       name: "Pianta",
       effect: "Immune agli status **confuso**, **furente**, **scosso**",
     });
   }
-
+  
   if (special.length === 0) {
     return null;
   }
-
+  
   return (
     <Grid container>
       <Grid
@@ -576,18 +563,18 @@ function Special({ npc }) {
           fontFamily="Antonio"
           fontSize="1.1rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           Regole Speciali
         </Typography>
       </Grid>
-
+      
       {special?.map((special, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
+            <Grid item xs={12} sx={{px: 3, py: 0.5}}>
               <Typography>
-                <strong>{special.name}</strong> <Diamond />{" "}
+                <strong>{special.name}</strong> <Diamond/>{" "}
                 <ReactMarkdown
                   allowedElements={["strong"]}
                   unwrapDisallowed={true}
@@ -604,19 +591,19 @@ function Special({ npc }) {
   );
 }
 
-function Actions({ npc }) {
+function Actions({npc}) {
   const actions = [];
-
+  
   if (npc.actions) {
     npc.actions.forEach((s) => {
       actions.push(s);
     });
   }
-
+  
   if (actions.length === 0) {
     return null;
   }
-
+  
   return (
     <Grid container>
       <Grid
@@ -634,23 +621,23 @@ function Actions({ npc }) {
           fontFamily="Antonio"
           fontSize="1.1rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           Altre Azioni
         </Typography>
       </Grid>
-
+      
       {actions?.map((actions, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={1} sx={{px: 1, py: 0.5}}>
               <Typography textAlign="center">
-                <ActionIcon />
+                <ActionIcon/>
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid item xs={11} sx={{px: 1, py: 0.5}}>
               <Typography>
-                <strong>{actions.name}</strong> <Diamond />{" "}
+                <strong>{actions.name}</strong> <Diamond/>{" "}
                 <ReactMarkdown
                   allowedElements={["strong"]}
                   unwrapDisallowed={true}
@@ -667,24 +654,24 @@ function Actions({ npc }) {
   );
 }
 
-function Equip({ npc }) {
+function Equip({npc}) {
   const weapons = [];
-
+  
   npc.weaponattacks?.forEach((attack) => {
     if (weapons.find((weapon) => weapon.name === attack.weapon.name)) {
       return;
     }
     weapons.push(attack.weapon);
   });
-
+  
   const hasWeapons = weapons.length !== 0;
   const hasArmor = npc.armor && npc.armor.name !== "Nessuna Armatura";
   const hasShield = npc.shield && npc.shield.name !== "Nessuno Scudo";
-
+  
   if (!hasWeapons && !hasArmor && !hasShield) {
     return null;
   }
-
+  
   return (
     <Grid container>
       <Grid
@@ -702,71 +689,73 @@ function Equip({ npc }) {
           fontFamily="Antonio"
           fontSize="1.1rem"
           fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
+          sx={{textTransform: "uppercase"}}
         >
           Equipaggiamento
         </Typography>
       </Grid>
-
+      
       {/* Weapons */}
       {weapons.map((weapon, i) => (
-        <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
+        <Grid key={i} item xs={12} sx={{px: 2, py: 0}}>
           <Typography>
-            <strong>Arma:</strong> {weapon.name} <Diamond />{" "}
-            {weapon.hands === 1 ? "1 mano" : "2 mani"} <Diamond />{" "}
+            <strong>Arma:</strong> {weapon.name} <Diamond/>{" "}
+            {weapon.hands === 1 ? "1 mano" : "2 mani"} <Diamond/>{" "}
             <strong>
               {" "}
-              <OpenBracket />
+              <OpenBracket/>
               {attributes[weapon.att1].shortcaps}+
               {attributes[weapon.att2].shortcaps}
               {weapon.prec > 0 && `+${weapon.prec}`}
-              <CloseBracket /> <Diamond /> <OpenBracket />
+              <CloseBracket/> <Diamond/> <OpenBracket/>
               TM + {weapon.damage}
-              <CloseBracket />
+              <CloseBracket/>
             </strong>{" "}
             danni {weapon.type === "physical" && <strong>fisici</strong>}
             {weapon.type !== "physical" && (
               <>
                 da{" "}
-                <strong style={{ textTransform: "lowercase" }}>
-                  <TypeName type={weapon.type} />
+                <strong style={{textTransform: "lowercase"}}>
+                  <TypeName type={weapon.type}/>
                 </strong>
               </>
             )}{" "}
-            <Diamond /> <strong>{weapon.cost}</strong> zenit
+            <Diamond/> <strong>{weapon.cost}</strong> zenit
           </Typography>
         </Grid>
       ))}
-
+      
       {/* Armor */}
       {npc.armor && npc.armor.name !== "Nessuna Armatura" && (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
-          <strong>Armatura:</strong> {npc.armor.name} <Diamond />{" "}
+        <Grid item xs={12} sx={{px: 2, py: 0}}>
+          <strong>Armatura:</strong> {npc.armor.name} <Diamond/>{" "}
           {npc.armor.def > 0 ? (
             <strong>DIF {npc.armor.def}</strong>
           ) : (
             <strong>DIF + {npc.armor.defbonus}</strong>
           )}{" "}
-          <Diamond /> <strong>D. MAG +{npc.armor.mdefbonus}</strong> <Diamond />{" "}
-          Iniz. <strong>{npc.armor.init}</strong> <Diamond />{" "}
+          <Diamond/> <strong>D. MAG +{npc.armor.mdefbonus}</strong> <Diamond/>{" "}
+          Iniz. <strong>{npc.armor.init}</strong> <Diamond/>{" "}
           <strong>{npc.armor.cost}</strong> zenit
         </Grid>
       )}
-
+      
       {/* Shield */}
       {npc.shield && npc.shield.name !== "Nessuno Scudo" && (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
-          <strong>Scudo:</strong> {npc.shield.name} <Diamond />{" "}
+        <Grid item xs={12} sx={{px: 2, py: 0}}>
+          <strong>Scudo:</strong> {npc.shield.name} <Diamond/>{" "}
           {npc.shield.def > 0 ? (
             <strong>DIF {npc.shield.def}</strong>
           ) : (
             <strong>DIF + {npc.shield.defbonus}</strong>
           )}{" "}
-          <Diamond /> <strong>D. MAG +{npc.shield.mdefbonus}</strong>{" "}
-          <Diamond /> Iniz. <strong>{npc.shield.init}</strong> <Diamond />{" "}
+          <Diamond/> <strong>D. MAG +{npc.shield.mdefbonus}</strong>{" "}
+          <Diamond/> Iniz. <strong>{npc.shield.init}</strong> <Diamond/>{" "}
           <strong>{npc.shield.cost}</strong> zenit
         </Grid>
       )}
     </Grid>
   );
 }
+
+export default React.forwardRef(NpcPretty);

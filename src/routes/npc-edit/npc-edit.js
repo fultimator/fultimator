@@ -7,8 +7,8 @@ import NpcPretty from "../../components/npc/Pretty";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "@firebase/firestore";
 import EditBasics from "../../components/npc/EditBasics";
-import { Save } from "@mui/icons-material";
-import { useCallback, useEffect, useState } from "react";
+import {Download, Save} from "@mui/icons-material";
+import {createRef, useCallback, useEffect, useState} from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import EditAttacks from "../../components/npc/EditAttacks";
@@ -19,6 +19,7 @@ import ExplainAffinities from "../../components/npc/ExplainAffinities";
 import EditExtra from "../../components/npc/EditExtra";
 import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
+import {createFileName, useScreenshot} from "use-react-screenshot";
 
 export default function NpcEdit() {
   let params = useParams();
@@ -43,7 +44,8 @@ export default function NpcEdit() {
     },
     [ref, npcTemp]
   );
-
+  
+ 
   useEffect(() => {
     document.addEventListener("keydown", handleCtrlS);
     return () => {
@@ -51,6 +53,26 @@ export default function NpcEdit() {
     };
   });
 
+  // Download
+  const prettyRef = createRef(null);
+  
+  const [image, takeScreenShot] = useScreenshot()
+  
+  const download = (image, { name = 'img', extension = 'png' } = {}) => {
+    const a = document.createElement('a')
+    a.href = image
+    a.download = createFileName(extension, name)
+    a.click()
+  }
+  
+  const getImage = () => takeScreenShot(prettyRef.current)
+  
+  useEffect(() => {
+    if (image) {
+      download(image, { name: npc.name, extension: 'png' })
+    }
+  }, [image, npc?.name])
+  
   if (!npcTemp) {
     return null;
   }
@@ -59,7 +81,7 @@ export default function NpcEdit() {
     <Layout>
       <Grid container spacing={2}>
         <Grid item xs={7}>
-          <NpcPretty npc={npcTemp} />
+          <NpcPretty npc={npcTemp} ref={prettyRef}/>
         </Grid>
         <Grid item xs={5}>
           <ExplainSkills npc={npcTemp} />
@@ -108,7 +130,7 @@ export default function NpcEdit() {
       <Fab
         color="primary"
         aria-label="save"
-        sx={{ position: "absolute", bottom: 0, right: 0 }}
+        sx={{ position: "absolute", bottom: 70, right: 0 }}
         onClick={() => {
           setDoc(ref, npcTemp);
         }}
@@ -118,6 +140,14 @@ export default function NpcEdit() {
         disabled={JSON.stringify(npc) === JSON.stringify(npcTemp)}
       >
         <Save />
+      </Fab>
+      <Fab
+        color="primary"
+        aria-label="save"
+        sx={{ position: "absolute", bottom: 5, right: 0 }}
+        onClick={getImage}
+      >
+        <Download />
       </Fab>
     </Layout>
   );
