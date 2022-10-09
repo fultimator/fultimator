@@ -206,7 +206,7 @@ function Stats({ npc }) {
                 bgcolor: "red.main",
               }}
             >
-              {calcHP(npc)} <Diamond color="white.main" /> {calcHP(npc) / 2}
+              {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
             </Grid>
             <Grid item sx={{ px: 1, py: 0.4 }}>
               PM

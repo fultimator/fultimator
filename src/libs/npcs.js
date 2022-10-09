@@ -18,7 +18,17 @@ export function calcHP(npc) {
   if (npc.rank === "champion4") {
     hp = hp * 4;
   }
+  
+  if (npc.rank === "champion5") {
+    hp = hp * 5;
+  }
 
+  if (npc.rank === "companion") {
+    const sl = npc.companionlvl || 1;
+    const lvl = npc.companionpclvl || 5;
+    hp = sl * npc.attributes.might + Math.floor(lvl / 2)
+  }
+  
   return hp;
 }
 
@@ -153,7 +163,13 @@ export function calcPrecision(attack, npc) {
   if (attack.weapon) {
     number = number + attack.weapon.prec;
   }
-
+  
+  // Companion
+  if (npc.rank === "companion") {
+    const sl = npc.companionlvl || 1;
+    number = number + sl;
+  }
+  
   return number;
 }
 
@@ -167,7 +183,14 @@ export function calcMagic(npc) {
   if (npc.extra?.magic) {
     number = number + 3;
   }
-
+  
+  // Companion
+  if (npc.rank === "companion") {
+    const sl = npc.companionlvl || 1;
+    number = number + sl;
+  }
+  
+  
   return number;
 }
 
