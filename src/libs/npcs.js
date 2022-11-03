@@ -42,7 +42,8 @@ export function calcMP(npc) {
   if (
     npc.rank === "champion2" ||
     npc.rank === "champion3" ||
-    npc.rank === "champion4"
+    npc.rank === "champion4" ||
+    npc.rank === "champion5"
   ) {
     mp = mp * 2;
   }
