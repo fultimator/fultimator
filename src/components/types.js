@@ -17,7 +17,7 @@ export function TypeName({ type }) {
       {type === "physical" && "Fisico"}
       {type === "wind" && "Aria"}
       {type === "bolt" && "Fulmine"}
-      {type === "dark" && "Oscurità"}
+      {type === "dark" && "Ombra"}
       {type === "earth" && "Terra"}
       {type === "fire" && "Fuoco"}
       {type === "ice" && "Ghiaccio"}
