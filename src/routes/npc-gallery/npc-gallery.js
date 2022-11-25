@@ -41,7 +41,7 @@ export default function NpcGallery() {
       {!loading && !user && (
         <>
           <Typography sx={{ my: 1 }}>
-            Devi essere loggato per usare questa feature
+            You have to be logged in to access this feature
           </Typography>
           <SignIn />
         </>

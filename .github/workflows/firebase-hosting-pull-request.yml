@@ -13,5 +13,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FULTIMATOR }}'
-          projectId: fultimator
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FABULA_ULTIMA_HELPER }}'
+          projectId: fabula-ultima-helper
