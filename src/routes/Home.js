@@ -186,12 +186,11 @@ function Home() {
       </Grid>
 
       <Typography sx={{ p: 3 }}>
-        Le immagini sono state fatte con{" "}
+        Images and Icons are from{" "}
         <a href="https://game-icons.net/" target="_blank" rel="noreferrer">
           https://game-icons.net/
         </a>{" "}
-        che permette tra le altre cose anche di colorarle in maniera carina.
-        Check it out, sono Creative Commons!
+        under CC BY 3.0 licence
       </Typography>
     </Layout>
   );
