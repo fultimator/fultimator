@@ -7,7 +7,7 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="quality"
-            label="Qualità"
+            label="Quality"
             value={quality}
             onChange={setQuality}
             multiline
@@ -19,7 +19,7 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
           <TextField
             id="cost"
             type="number"
-            label="Costo della Qualità"
+            label="Cost of Quality"
             value={qualityCost}
             onChange={setQualityCost}
           ></TextField>

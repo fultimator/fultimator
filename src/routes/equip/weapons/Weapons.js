@@ -91,7 +91,7 @@ function Weapons() {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h4">Armi Rare</Typography>
+        <Typography variant="h4">Rare Weapons</Typography>
       </Grid>
       {/* Form */}
       <Grid item xs={5}>
@@ -161,7 +161,6 @@ function Weapons() {
                 const quality = qualities.find(
                   (el) => el.name === e.target.value
                 );
-
                 setSelectedQuality(quality.name);
                 setQuality(quality.quality);
                 setQualityCost(quality.cost);

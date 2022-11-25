@@ -53,7 +53,7 @@ function calcProbHit(firstDie, secondDie, bonus, dl) {
   }
 
   const prob = firstDie * secondDie;
-  return sum/prob*100;
+  return (sum / prob) * 100;
 }
 
 function calcExpectedDamage(firstDie, secondDie, bonus, damage, dl) {
@@ -93,7 +93,7 @@ export default function Probs() {
   const [dl, setDl] = useState(10);
   const [hp, setHp] = useState(60);
 
-  const probHit = calcProbHit (firstDie, secondDie, bonus, dl);
+  const probHit = calcProbHit(firstDie, secondDie, bonus, dl);
 
   const expectedDamage = calcExpectedDamage(
     firstDie,
@@ -105,17 +105,17 @@ export default function Probs() {
 
   return (
     <Layout>
-      <Typography variant="h4">Attacco e Danni</Typography>
+      <Typography variant="h4">Attack and Damage</Typography>
       <Grid container sx={{ mt: 2 }}>
         {/* First die */}
         <Grid item xs>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"firstdie"}>Dado 1</InputLabel>
+            <InputLabel id={"firstdie"}>Die 1</InputLabel>
             <Select
               value={firstDie}
               labelId={"firstdie"}
               id={"firstdie"}
-              label="Dado 1"
+              label="Die 1"
               size="small"
               onChange={(e) => {
                 return setFirstDie(e.target.value);
@@ -132,12 +132,12 @@ export default function Probs() {
         {/* Second die */}
         <Grid item xs>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"seconddie"}>Dado 2</InputLabel>
+            <InputLabel id={"seconddie"}>Die 2</InputLabel>
             <Select
               value={secondDie}
               labelId={"seconddie"}
               id={"seconddie"}
-              label="Dado 2"
+              label="Die 2"
               size="small"
               onChange={(e) => {
                 return setSecondDie(e.target.value);
@@ -196,7 +196,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
-              label="Danno"
+              label="Damage"
               type="number"
               min={0}
               max={60}
@@ -237,7 +237,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
-              label="LD"
+              label="DL"
               type="number"
               min={7}
               max={20}
@@ -276,7 +276,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"
-              label="PV"
+              label="HP"
               type="number"
               min={30}
               max={300}
@@ -355,10 +355,10 @@ export default function Probs() {
           })}
         </TableBody>
       </Table>
-      <Typography>Probabilità di colpire: {probHit.toFixed(2)}%</Typography>
-      <Typography>Danno atteso: {Math.floor(expectedDamage)}</Typography>
+      <Typography>Probability to hit: {probHit.toFixed(2)}%</Typography>
+      <Typography>Expected damage: {Math.floor(expectedDamage)}</Typography>
       <Typography>
-        Numero di attacchi necessari: {Math.ceil(hp / expectedDamage)}
+        Number of attacks needed: {Math.ceil(hp / expectedDamage)}
       </Typography>
     </Layout>
   );

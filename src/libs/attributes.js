@@ -1,23 +1,23 @@
 const attributes = {
   dexterity: {
-    short: "des",
-    shortcaps: "DES",
-    long: "Destrezza",
+    short: "dex",
+    shortcaps: "DEX",
+    long: "Dexterity",
   },
   insight: {
-    short: "int",
-    shortcaps: "INT",
-    long: "Intuito",
+    short: "ins",
+    shortcaps: "INS",
+    long: "Insight",
   },
   might: {
-    short: "vig",
-    shortcaps: "VIG",
-    long: "Vigore",
+    short: "mig",
+    shortcaps: "MIG",
+    long: "Might",
   },
   will: {
-    short: "vol",
-    shortcaps: "VOL",
-    long: "Volontà",
+    short: "wil",
+    shortcaps: "WLP",
+    long: "Willpower",
   },
 };
 

@@ -44,7 +44,7 @@ export default function EditSpecial({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Regole Speciali
+        Special Rules
         <IconButton onClick={addSpecial}>
           <AddCircleOutline />
         </IconButton>
@@ -62,7 +62,7 @@ export default function EditSpecial({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Nome"
+                  label="Name"
                   value={special.name}
                   onChange={(e) => {
                     return onChangeSpecial(i, "name", e.target.value);
@@ -76,7 +76,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 <TextField
                   multiline
                   id="effect"
-                  label="Effetto"
+                  label="Effect"
                   value={special.effect}
                   onChange={(e) => {
                     return onChangeSpecial(i, "effect", e.target.value);

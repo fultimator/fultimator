@@ -19,10 +19,16 @@ import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
-import {AddCircle, ContentCopy, Delete, Download, Edit} from "@mui/icons-material";
+import {
+  AddCircle,
+  ContentCopy,
+  Delete,
+  Download,
+  Edit,
+} from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import {createFileName, useScreenshot} from "use-react-screenshot";
-import {createRef, useEffect} from "react";
+import { createFileName, useScreenshot } from "use-react-screenshot";
+import { createRef, useEffect } from "react";
 
 export default function NpcGallery() {
   const [user, loading, error] = useAuthState(auth);
@@ -65,7 +71,7 @@ function Personal({ user }) {
   const addNpc = async function () {
     const data = {
       name: "-",
-      species: "Bestia",
+      species: "Beast",
       lvl: 5,
       uid: user.uid,
       attributes: {
@@ -109,64 +115,65 @@ function Personal({ user }) {
   return (
     <>
       <Typography variant="h4" sx={{ mb: 2 }}>
-        Npc Personali
+        NPCs
         <IconButton onClick={addNpc}>
           <AddCircle />
         </IconButton>
       </Typography>
       <Grid container spacing={2}>
         {personalList?.map((npc, i) => {
-          return <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />;
+          return (
+            <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
+          );
         })}
       </Grid>
     </>
   );
 }
 
-function Npc({npc, copyNpc, deleteNpc}) {
+function Npc({ npc, copyNpc, deleteNpc }) {
   const ref = createRef(null);
-  
-  const [image, takeScreenShot] = useScreenshot()
-  
-  const download = (image, { name = 'img', extension = 'png' } = {}) => {
-    const a = document.createElement('a')
-    a.href = image
-    a.download = createFileName(extension, name)
-    a.click()
-  }
-  
-  const getImage = () => takeScreenShot(ref.current)
-  
+
+  const [image, takeScreenShot] = useScreenshot();
+
+  const download = (image, { name = "img", extension = "png" } = {}) => {
+    const a = document.createElement("a");
+    a.href = image;
+    a.download = createFileName(extension, name);
+    a.click();
+  };
+
+  const getImage = () => takeScreenShot(ref.current);
+
   useEffect(() => {
     if (image) {
-      download(image, { name: npc.name, extension: 'png' })
+      download(image, { name: npc.name, extension: "png" });
     }
-  }, [image, npc.name])
-  return <Grid item xs={6}>
-    <NpcPretty npc={npc} ref={ref} />
-    {/* <NpcUgly npc={npc} /> */}
-    <Tooltip title="Clona">
-      <IconButton onClick={copyNpc(npc)}>
-        <ContentCopy />
-      </IconButton>
-    </Tooltip>
-    <Tooltip title="Modifica">
-      <IconButton
-        component={RouterLink}
-        to={`/npc-gallery/${npc.id}`}
-      >
-        <Edit />
-      </IconButton>
-    </Tooltip>
-    <Tooltip title="Cancella">
-      <IconButton onClick={deleteNpc(npc)}>
-        <Delete />
-      </IconButton>
-    </Tooltip>
-    <Tooltip title="Scarica">
-      <IconButton onClick={getImage}>
-        <Download />
-      </IconButton>
-    </Tooltip>
-  </Grid>
+  }, [image, npc.name]);
+  return (
+    <Grid item xs={6}>
+      <NpcPretty npc={npc} ref={ref} />
+      {/* <NpcUgly npc={npc} /> */}
+      <Tooltip title="Copy">
+        <IconButton onClick={copyNpc(npc)}>
+          <ContentCopy />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Edit">
+        <IconButton component={RouterLink} to={`/npc-gallery/${npc.id}`}>
+          <Edit />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete">
+        <IconButton onClick={deleteNpc(npc)}>
+          <Delete />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Download">
+        <IconButton onClick={getImage}>
+          <Download />
+        </IconButton>
+      </Tooltip>
+    </Grid>
+  );
 }

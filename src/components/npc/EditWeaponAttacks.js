@@ -57,7 +57,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Attacchi Con Armi
+        Attacks with Weapons
         <IconButton onClick={addAttack}>
           <AddCircleOutline />
         </IconButton>
@@ -103,7 +103,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Nome"
+            label="Name"
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -132,7 +132,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 }}
               />
             }
-            label="Danno Extra"
+            label="Extra Damage"
           />
         </FormGroup>
       </Grid>
@@ -161,12 +161,12 @@ function EditAttackSpecial({ attack, setAttack }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="special"
-        label="Speciale"
+        label="Special"
         multiline
         value={specials}
         onChange={onChange}
         size="small"
-        helperText="Vai a capo per introdurre diversi effetti speciali (ogni linea costa 1 abilità)"
+        helperText="Adding a special effect cost 1 skill point"
       ></TextField>
     </FormControl>
   );
@@ -188,7 +188,7 @@ function SelectWeapon({ weapon, setWeapon }) {
         {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
         {weapon.prec > 0 && `+${weapon.prec}`}
         <CloseBracket /> <OpenBracket />
-        TM + {weapon.damage}
+        HR + {weapon.damage}
         <CloseBracket />
       </MenuItem>
     );
@@ -196,12 +196,12 @@ function SelectWeapon({ weapon, setWeapon }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Arma</InputLabel>
+      <InputLabel id="type">Weapon</InputLabel>
       <Select
         labelId="type"
         id="select-type"
         value={weapon.name}
-        label="Arma"
+        label="Weapon"
         onChange={onChange}
       >
         {options}

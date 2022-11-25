@@ -1,13 +1,22 @@
-import {useParams} from "react-router-dom";
-import {addDoc, collection, deleteDoc, doc, orderBy, query, setDoc, where} from "firebase/firestore";
-import {useAuthState} from "react-firebase-hooks/auth";
-import {useCollectionData} from "react-firebase-hooks/firestore";
-import {Card, Grid, Stack, Typography,} from "@mui/material";
+import { useParams } from "react-router-dom";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { Card, Grid, Stack, Typography } from "@mui/material";
 
-import {auth, firestore} from "../../firebase";
+import { auth, firestore } from "../../firebase";
 import PreparedRollsList from "../../components/roller/PreparedRollsList";
 import PrepareRoll from "../../components/roller/PrepareRoll";
-import {SignIn} from "../../components/auth";
+import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
 import Roll from "../../components/roller/Roll";
 import ShareLink from "../../components/roller/ShareLink";
@@ -17,26 +26,28 @@ function RollerScoped() {
   if (error) {
     console.error(error);
   }
-  
+
   if (loading) {
     return null;
   }
-  
+
   if (!user) {
-    return <Layout>
-      <Typography sx={{my: 1}}>
-        Per prima cosa loggati con Google
-      </Typography>
-      <SignIn/>
-    </Layout>
+    return (
+      <Layout>
+        <Typography sx={{ my: 1 }}>
+          Per prima cosa loggati con Google
+        </Typography>
+        <SignIn />
+      </Layout>
+    );
   }
-  
-  return <RollerScopedAuthenticated user={user}/>
+
+  return <RollerScopedAuthenticated user={user} />;
 }
 
-function RollerScopedAuthenticated({user}) {
-  const {scope} = useParams();
-  
+function RollerScopedAuthenticated({ user }) {
+  const { scope } = useParams();
+
   const savePreparedRoll = async (dice, modifier, label) => {
     const data = {
       uid: user.uid,
@@ -46,7 +57,7 @@ function RollerScopedAuthenticated({user}) {
       label: label,
       timestamp: new Date(),
     };
-    
+
     try {
       const rollsPreparedRef = collection(firestore, "rolls-prepared");
       const res = await addDoc(rollsPreparedRef, data);
@@ -55,7 +66,7 @@ function RollerScopedAuthenticated({user}) {
       console.debug(e);
     }
   };
-  
+
   const saveRoll = async (roll) => {
     const ref = doc(firestore, "rolls", roll.id);
     try {
@@ -65,7 +76,7 @@ function RollerScopedAuthenticated({user}) {
       console.debug(e);
     }
   };
-  
+
   const createRoll = async (dice, modifier, label) => {
     const timestamp = new Date();
     const data = {
@@ -75,20 +86,22 @@ function RollerScopedAuthenticated({user}) {
       dice: dice,
       modifier: modifier,
       label: label,
-      attempts: [{
-        timestamp: timestamp,
-        attempt: []
-      }],
-      timestamp: timestamp
+      attempts: [
+        {
+          timestamp: timestamp,
+          attempt: [],
+        },
+      ],
+      timestamp: timestamp,
     };
-    
+
     for (let i = 0; i < dice.length; i++) {
       const randomValues = window.crypto.getRandomValues(new Uint32Array(1));
       const size = parseInt(dice[i].slice(1));
-      
+
       data.attempts[0].attempt.push((randomValues[0] % size) + 1);
     }
-    
+
     try {
       const rollsRef = collection(firestore, "rolls");
       const res = await addDoc(rollsRef, data);
@@ -97,42 +110,43 @@ function RollerScopedAuthenticated({user}) {
       console.debug(e);
     }
   };
-  
+
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={1}>
-        <Grid item xs={12} sm={6} sx={{order: 1}}>
-          <ShareLink scope={scope}/>
+        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+          <ShareLink scope={scope} />
         </Grid>
-        <Grid item sx={{order: 2}}>
-          <Card sx={{p: 2}}>
+        <Grid item sx={{ order: 2 }}>
+          <Card sx={{ p: 2 }}>
             <Typography>
-              Clicca col sinistro su un dado per aggiungerlo alla tua mano<br/>
-              Clicca col destro su un dado per rimuoverlo dalla tua mano<br/>
-              Schiaccia Invio per tirare
+              Left-click on a die to add it to your pool
+              <br />
+              Right-click a die to remove it from your hand
+              <br />
+              Press enter to roll
             </Typography>
           </Card>
         </Grid>
-        <Grid item xs={12} sx={{order: 3}}>
-          <PrepareRoll savePreparedRoll={savePreparedRoll} createRoll={createRoll}/>
+        <Grid item xs={12} sx={{ order: 3 }}>
+          <PrepareRoll
+            savePreparedRoll={savePreparedRoll}
+            createRoll={createRoll}
+          />
         </Grid>
-        <Grid item xs={12} sm={5} sx={{order: {xs: 6, sm: 5}}}>
-          <RollList scope={scope} saveRoll={saveRoll} user={user}/>
+        <Grid item xs={12} sm={5} sx={{ order: { xs: 6, sm: 5 } }}>
+          <RollList scope={scope} saveRoll={saveRoll} user={user} />
         </Grid>
-        <Grid item xs={0} sm={1} sx={{order: {xs: 6, sm: 5}}}/>
-        <Grid item xs={12} sm={5} sx={{my: 1, order: {xs: 5, sm: 6}}}>
-          <PreparedRolls user={user} scope={scope} createRoll={createRoll}/>
+        <Grid item xs={0} sm={1} sx={{ order: { xs: 6, sm: 5 } }} />
+        <Grid item xs={12} sm={5} sx={{ my: 1, order: { xs: 5, sm: 6 } }}>
+          <PreparedRolls user={user} scope={scope} createRoll={createRoll} />
         </Grid>
       </Grid>
     </Layout>
   );
 }
 
-function PreparedRolls(
-  {
-    user, scope, createRoll
-  }
-) {
+function PreparedRolls({ user, scope, createRoll }) {
   const preparedRollsRef = collection(firestore, "rolls-prepared");
   const preparedRollsQuery = query(
     preparedRollsRef,
@@ -140,7 +154,7 @@ function PreparedRolls(
     where("scope", "==", scope),
     orderBy("timestamp", "desc")
   );
-  
+
   const deletePreparedRoll = (id) => {
     return async () => {
       try {
@@ -149,52 +163,58 @@ function PreparedRolls(
       } catch (e) {
         console.debug(e);
       }
-    }
-  }
-  
+    };
+  };
+
   const [rolls, success, err] = useCollectionData(preparedRollsQuery, {
     idField: "id",
   });
-  
-  console.debug(success, err)
-  
+
+  console.debug(success, err);
+
   const handleRoll = (roll) => {
     return () => {
       createRoll(roll.dice, roll.modifier, roll.label);
-    }
-  }
-  
+    };
+  };
+
   return (
-    <Card sx={{p: 1}}>
-      <Typography variant="h4">Tiri preparati</Typography>
-      <PreparedRollsList rolls={rolls} handleRoll={handleRoll} handleDelete={deletePreparedRoll}/>
+    <Card sx={{ p: 1 }}>
+      <Typography variant="h4">Prepared Rolls</Typography>
+      <PreparedRollsList
+        rolls={rolls}
+        handleRoll={handleRoll}
+        handleDelete={deletePreparedRoll}
+      />
     </Card>
   );
 }
 
-
-function RollList(
-  {
-    scope, saveRoll, user
-  }
-) {
+function RollList({ scope, saveRoll, user }) {
   const rollsRef = collection(firestore, "rolls");
   const rollsQuery = query(
     rollsRef,
     where("scope", "==", scope),
     orderBy("timestamp", "desc")
   );
-  
+
   const [rolls, success, err] = useCollectionData(rollsQuery, {
     idField: "id",
   });
-  
-  console.debug(success, err)
-  
+
+  console.debug(success, err);
+
   return (
     <Stack spacing={2}>
       {rolls?.map((roll, i) => {
-        return <Roll key={i} roll={roll} saveRoll={saveRoll} currentUser={user.uid}/>
+        return (
+          <Roll
+            key={i}
+            roll={roll}
+            saveRoll={saveRoll}
+            currentUser={user.uid}
+          />
+        );
       })}
     </Stack>
   );

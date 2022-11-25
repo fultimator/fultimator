@@ -27,12 +27,12 @@ function ChangeBase({ value, onChange }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Arma Base</InputLabel>
+      <InputLabel id="type">Basic Weapon</InputLabel>
       <Select
         labelId="type"
         id="select-type"
         value={value}
-        label="Arma Base"
+        label="Basic Weapon"
         onChange={onChange}
       >
         {options}

@@ -61,7 +61,7 @@ export default function EditAttacks({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Attacchi Base
+        Basic Attacks
         <IconButton onClick={addAttack}>
           <AddCircleOutline />
         </IconButton>
@@ -107,7 +107,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Nome"
+            label="Name"
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -138,47 +138,47 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid item>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr1label"}>Car 1</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr1label"}>Attr 1</InputLabel>
           <Select
             value={attack.attr1}
             labelId={"attack-" + i + "-attr1label"}
             id={"attack-" + i + "-attr1"}
-            label="Car 1"
+            label="Attr 1"
             size="small"
             onChange={(e) => {
               return setAttack("attr1", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>Des</MenuItem>
-            <MenuItem value={"insight"}>Int</MenuItem>
-            <MenuItem value={"might"}>Vig</MenuItem>
-            <MenuItem value={"will"}>Vol</MenuItem>
+            <MenuItem value={"dexterity"}>Dex</MenuItem>
+            <MenuItem value={"insight"}>Ins</MenuItem>
+            <MenuItem value={"might"}>Mig</MenuItem>
+            <MenuItem value={"will"}>Wil</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr2label"}>Car 2</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr2label"}>Attr 2</InputLabel>
           <Select
             value={attack.attr2}
             labelId={"attack-" + i + "-attr2label"}
             id={"attack-" + i + "-attr2"}
-            label="Car 2"
+            label="Attr 2"
             size="small"
             onChange={(e, value) => {
               return setAttack("attr2", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>Des</MenuItem>
-            <MenuItem value={"insight"}>Int</MenuItem>
-            <MenuItem value={"might"}>Vig</MenuItem>
-            <MenuItem value={"will"}>Vol</MenuItem>
+            <MenuItem value={"dexterity"}>Dex</MenuItem>
+            <MenuItem value={"insight"}>Ins</MenuItem>
+            <MenuItem value={"might"}>Mig</MenuItem>
+            <MenuItem value={"will"}>Wil</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-type"}>Tipo</InputLabel>
+          <InputLabel id={"attack-" + i + "-type"}>Type</InputLabel>
           <Select
             value={attack.type}
             labelId={"attack-" + i + "-type"}
@@ -211,7 +211,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 }}
               />
             }
-            label="Danno Extra"
+            label="Extra Damage"
           />
         </FormGroup>
       </Grid>
@@ -240,12 +240,12 @@ function EditAttackSpecial({ attack, setAttack }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="special"
-        label="Speciale"
+        label="Special"
         multiline
         value={specials}
         onChange={onChange}
         size="small"
-        helperText="Vai a capo per introdurre diversi effetti speciali (ogni linea costa 1 abilità)"
+        helperText="Adding a special effect cost 1 skill point"
       ></TextField>
     </FormControl>
   );

@@ -5,7 +5,7 @@ function ChangeName({ value, onChange }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="name"
-        label="Cambia Nome"
+        label="Change Name"
         value={value}
         onChange={onChange}
       ></TextField>

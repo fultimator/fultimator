@@ -9,14 +9,14 @@ export default function NpcText({ npc }) {
       {npc.name} ⬥ {npc.species} lvl {npc.lvl}
       <br />
       {npc.description} <br />
-      Tratti tipici: {npc.traits}
+      Typical Traits: {npc.traits}
       <br />
       <br />
-      Des d{npc.attributes.dexterity} · Int d{npc.attributes.insight} · Vig d
-      {npc.attributes.might} · Vol d{npc.attributes.insight} ⬥ PV {calcHP(npc)}{" "}
-      · PM {calcMP(npc)} · Init {calcInit(npc)}
+      Dex d{npc.attributes.dexterity} · Ins d{npc.attributes.insight} · Mig d
+      {npc.attributes.might} · Wip d{npc.attributes.willpower} ⬥ HP{" "}
+      {calcHP(npc)} · MP {calcMP(npc)} · Init {calcInit(npc)}
       <br />
-      Dif +{calcDef(npc)} · D. Mag +{calcMDef(npc)} ⬥{" "}
+      Def +{calcDef(npc)} · D. Mag +{calcMDef(npc)} ⬥{" "}
       {typeList.map((type) => {
         if (!npc.affinities[type]) {
           return null;

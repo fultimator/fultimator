@@ -46,15 +46,15 @@ function PrettySingle({ weapon }) {
           </Grid>
           <Grid item>
             <Typography fontWeight="bold">
-              【TM + {weapon.damage}】{types[weapon.type].long}
+              【HR + {weapon.damage}】{types[weapon.type].long}
             </Typography>
           </Grid>
         </Grid>
         <Grid container>
           <Grid item>
             <Typography>
-              {weapon.hands === 1 && "Una mano"}
-              {weapon.hands === 2 && "Due mani"}
+              {weapon.hands === 1 && "One Hand"}
+              {weapon.hands === 2 && "Two Hands"}
             </Typography>
           </Grid>
           <Grid item>
@@ -62,13 +62,13 @@ function PrettySingle({ weapon }) {
           </Grid>
           <Grid item>
             <Typography>
-              {weapon.melee && "Mischia"}
-              {weapon.distance && "Distanza"}
+              {weapon.melee && "Melee"}
+              {weapon.ranged && "Distant"}
             </Typography>
           </Grid>
         </Grid>
         <Typography>
-          {!weapon.quality && "Nessuna Qualità :("}{" "}
+          {!weapon.quality && "No Qualities"}{" "}
           <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
             {weapon.quality}
           </ReactMarkdown>

@@ -15,7 +15,7 @@ import goo from "./goo.png";
 import robot from "./robot.png";
 import axe from "./axe.png";
 import scroll from "./scroll.png";
-// import dice from "./dice.png";
+import dice from "./dice.png";
 
 function Home() {
   return (
@@ -32,12 +32,9 @@ function Home() {
             />
             <CardContent>
               <Typography gutterBottom variant="h5">
-                Rituali e Progetti
+                Rituals and Projects
               </Typography>
-              <Typography>Calcola requisiti ed effetti</Typography>
-              <Typography variant="caption">
-                Questo è più facile del creatore di mostri!
-              </Typography>
+              <Typography>Calculate requirements and effects</Typography>
             </CardContent>
             <CardActions>
               <Button
@@ -46,7 +43,7 @@ function Home() {
                 component={RouterLink}
                 to="rituals"
               >
-                Vai
+                Go
               </Button>
             </CardActions>
           </Card>
@@ -62,10 +59,9 @@ function Home() {
             />
             <CardContent>
               <Typography gutterBottom variant="h5">
-                Oggetti rari
+                Rare Items
               </Typography>
-              <Typography>Progetta ricompense</Typography>
-              <Typography variant="caption">Senza esagerare</Typography>
+              <Typography>Design rewards and its cost</Typography>
             </CardContent>
             <CardActions>
               <Button
@@ -74,7 +70,7 @@ function Home() {
                 component={RouterLink}
                 to="equip"
               >
-                Vai
+                Go
               </Button>
             </CardActions>
           </Card>
@@ -90,12 +86,9 @@ function Home() {
             />
             <CardContent>
               <Typography gutterBottom variant="h5">
-                Progettare PNG
+                Monster Designer
               </Typography>
-              <Typography>Crea il tuo PNG!</Typography>
-              <Typography variant="caption">
-                Puoi anche salvarteli adesso :O
-              </Typography>
+              <Typography>Create your own NPC!</Typography>
             </CardContent>
             <CardActions>
               <Button
@@ -104,7 +97,7 @@ function Home() {
                 component={RouterLink}
                 to="/npc-gallery"
               >
-                Vai
+                Go
               </Button>
             </CardActions>
           </Card>
@@ -120,10 +113,9 @@ function Home() {
             />
             <CardContent>
               <Typography gutterBottom variant="h5">
-                Tieni traccia dei pv durante i combattimenti
+                Combat Simulator and Tracker
               </Typography>
-              <Typography>Non fa molto altro</Typography>
-              <Typography variant="caption">Che altro dovrebbe fare</Typography>
+              <Typography>Tracks HP, MP and Statuses</Typography>
             </CardContent>
             <CardActions>
               <Button
@@ -132,12 +124,12 @@ function Home() {
                 component={RouterLink}
                 to="/combat"
               >
-                Vai
+                Go
               </Button>
             </CardActions>
           </Card>
         </Grid>
-        {/* <Grid item>
+        <Grid item>
           <Card sx={{ width: 300 }}>
             <CardMedia
               component="img"
@@ -148,10 +140,9 @@ function Home() {
             />
             <CardContent>
               <Typography gutterBottom variant="h5">
-                Tirare dadi
+                Dice Roller
               </Typography>
-              <Typography>Non sono truccati!</Typography>
-              <Typography variant="caption">Giuro.</Typography>
+              <Typography>Share your rolls with other players</Typography>
             </CardContent>
             <CardActions>
               <Button
@@ -160,11 +151,38 @@ function Home() {
                 component={RouterLink}
                 to="/roller"
               >
-                Vai
+                Go
               </Button>
             </CardActions>
           </Card>
-        </Grid> */}
+        </Grid>
+        <Grid item>
+          <Card sx={{ width: 300 }}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={dice}
+              alt=""
+              sx={{ objectFit: "contain" }}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5">
+                Dice Probability
+              </Typography>
+              <Typography>Calculate your probability and chance</Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                variant="outlined"
+                component={RouterLink}
+                to="/probs"
+              >
+                Go
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
       </Grid>
 
       <Typography sx={{ p: 3 }}>

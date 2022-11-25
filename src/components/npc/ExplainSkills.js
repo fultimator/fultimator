@@ -41,7 +41,7 @@ export default function ExplainSkills({ npc }) {
                 fontSize: "1.3rem",
               }}
             >
-              Abilità totali
+              Total Available Skills
             </TableCell>
             <TableCell
               sx={{
@@ -56,18 +56,18 @@ export default function ExplainSkills({ npc }) {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>Dalla specie</TableCell>
+            <TableCell>Available skills from Species</TableCell>
             <TableCell>{calcAvailableSkillsFromSpecies(npc)}</TableCell>
           </TableRow>
           {calcAvailableSkillsFromLevel(npc) > 0 && (
             <TableRow>
-              <TableCell>Dal livello</TableCell>
+              <TableCell>Available skills from levels</TableCell>
               <TableCell>{calcAvailableSkillsFromLevel(npc)}</TableCell>
             </TableRow>
           )}
           {calcAvailableSkillsFromVulnerabilities(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalle vulnerabilità</TableCell>
+              <TableCell>Available skills from vulnerabilities</TableCell>
               <TableCell>
                 {calcAvailableSkillsFromVulnerabilities(npc)}
               </TableCell>
@@ -75,7 +75,7 @@ export default function ExplainSkills({ npc }) {
           )}
           {calcAvailableSkillsFromRank(npc) > 0 && (
             <TableRow>
-              <TableCell>Dal rango</TableCell>
+              <TableCell>Available Skills from rank</TableCell>
               <TableCell>{calcAvailableSkillsFromRank(npc)}</TableCell>
             </TableRow>
           )}
@@ -89,7 +89,7 @@ export default function ExplainSkills({ npc }) {
                 fontSize: "1.3rem",
               }}
             >
-              Abilità usate
+              Total Used Skills
             </TableCell>
             <TableCell
               sx={{
@@ -105,82 +105,82 @@ export default function ExplainSkills({ npc }) {
         <TableBody>
           {calcUsedSkillsFromSpecialAttacks(npc) > 0 && (
             <TableRow>
-              <TableCell>Dagli attacchi speciali</TableCell>
+              <TableCell>Used skills from special attacks</TableCell>
               <TableCell>{calcUsedSkillsFromSpecialAttacks(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromSpells(npc) > 0 && (
             <TableRow>
-              <TableCell>Dagli incantesimi</TableCell>
+              <TableCell>Used skills from spells</TableCell>
               <TableCell>{calcUsedSkillsFromSpells(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraDefs(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalle difese extra</TableCell>
+              <TableCell>Used skills from extra defense</TableCell>
               <TableCell>{calcUsedSkillsFromExtraDefs(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraHP(npc) > 0 && (
             <TableRow>
-              <TableCell>Dai PV extra</TableCell>
+              <TableCell>Used skills from extra HP</TableCell>
               <TableCell>{calcUsedSkillsFromExtraHP(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraMP(npc) > 0 && (
             <TableRow>
-              <TableCell>Dai PM extra</TableCell>
+              <TableCell>Used skills from extra MP</TableCell>
               <TableCell>{calcUsedSkillsFromExtraMP(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraInit(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalla iniziativa extra</TableCell>
+              <TableCell>Used skills from extra initiative bonus</TableCell>
               <TableCell>{calcUsedSkillsFromExtraInit(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraPrecision(npc) > 0 && (
             <TableRow>
-              <TableCell>Dal bonus ai test di Precisione</TableCell>
+              <TableCell>Used skills from extra accuracy check</TableCell>
               <TableCell>{calcUsedSkillsFromExtraPrecision(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromExtraMagic(npc) > 0 && (
             <TableRow>
-              <TableCell>Dal bonus ai test di Magia</TableCell>
+              <TableCell>Used skills from extra magic check</TableCell>
               <TableCell>{calcUsedSkillsFromExtraMagic(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromResistances(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalle resistenze</TableCell>
+              <TableCell>Used skills from resistances</TableCell>
               <TableCell>{calcUsedSkillsFromResistances(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromImmunities(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalle immunità</TableCell>
+              <TableCell>Used skills from immunities</TableCell>
               <TableCell>{calcUsedSkillsFromImmunities(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromAbsorbs(npc) > 0 && (
             <TableRow>
-              <TableCell>Dagi assorbimenti</TableCell>
+              <TableCell>Used skills from absorption</TableCell>
               <TableCell>{calcUsedSkillsFromAbsorbs(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromSpecial(npc) > 0 && (
             <TableRow>
-              <TableCell>Dalle regole speciali</TableCell>
+              <TableCell>Used skills from resistances</TableCell>
               <TableCell>{calcUsedSkillsFromSpecial(npc)}</TableCell>
             </TableRow>
           )}
           {calcUsedSkillsFromEquip(npc) > 0 && (
             <TableRow>
               <TableCell>
-                Da Equipaggiabile{" "}
-                {npc.species === "Bestia" &&
-                  "(anche se come Bestia non dovrebbe averla)"}{" "}
+                Used skills from equipment{" "}
+                {npc.species === "Beast" &&
+                  "(but beast shouldn't have equipment)"}{" "}
               </TableCell>
               <TableCell>{calcUsedSkillsFromEquip(npc)}</TableCell>
             </TableRow>

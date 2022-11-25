@@ -14,7 +14,7 @@ export function EditAttributes({ npc, setNpc }) {
   return (
     <Grid container sx={{ px: 1 }} rowSpacing={1}>
       <Grid item xs={2}>
-        <InputLabel id="des">Des</InputLabel>
+        <InputLabel id="dex">Dex</InputLabel>
       </Grid>
       <Grid item xs={10}>
         <FormControl variant="standard" fullWidth>
@@ -30,7 +30,7 @@ export function EditAttributes({ npc, setNpc }) {
         </FormControl>
       </Grid>
       <Grid item xs={2}>
-        <InputLabel id="int">Int</InputLabel>
+        <InputLabel id="ins">Ins</InputLabel>
       </Grid>
       <Grid item xs={10}>
         <FormControl variant="standard" fullWidth>
@@ -46,7 +46,7 @@ export function EditAttributes({ npc, setNpc }) {
         </FormControl>
       </Grid>
       <Grid item xs={2}>
-        <InputLabel id="vig">Vig</InputLabel>
+        <InputLabel id="mig">Mig</InputLabel>
       </Grid>
       <Grid item xs={10}>
         <FormControl variant="standard" fullWidth>
@@ -62,7 +62,7 @@ export function EditAttributes({ npc, setNpc }) {
         </FormControl>
       </Grid>
       <Grid item xs={2}>
-        <InputLabel id="vol">Vol</InputLabel>
+        <InputLabel id="wil">Wil</InputLabel>
       </Grid>
       <Grid item xs={10}>
         <FormControl variant="standard" fullWidth>

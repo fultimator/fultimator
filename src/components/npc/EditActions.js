@@ -44,7 +44,7 @@ export default function EditActions({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Altre Azioni
+        Other Actions
         <IconButton onClick={addActions}>
           <AddCircleOutline />
         </IconButton>
@@ -62,7 +62,7 @@ export default function EditActions({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Nome"
+                  label="Name"
                   value={actions.name}
                   onChange={(e) => {
                     return onChangeActions(i, "name", e.target.value);
@@ -76,7 +76,7 @@ export default function EditActions({ npc, setNpc }) {
                 <TextField
                   multiline
                   id="effect"
-                  label="Effetto"
+                  label="Effect"
                   value={actions.effect}
                   onChange={(e) => {
                     return onChangeActions(i, "effect", e.target.value);

@@ -4,12 +4,12 @@ import types from "../../../libs/types";
 function ChangeType({ value, onChange }) {
   return (
     <FormControl variant="outlined" fullWidth>
-      <InputLabel id="type">Cambia Tipo</InputLabel>
+      <InputLabel id="type">Change Type</InputLabel>
       <Select
         labelId="type"
         id="select-type"
         value={value}
-        label="Cambia tipo"
+        label="Change Type"
         onChange={onChange}
       >
         {Object.entries(types).map((key, i) => {

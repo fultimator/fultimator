@@ -1,30 +1,30 @@
 const types = {
   physical: {
-    long: "fisico",
+    long: "physical",
   },
   wind: {
-    long: "aria",
+    long: "wind",
   },
   bolt: {
-    long: "fulmine",
+    long: "bolt",
   },
   dark: {
-    long: "ombra",
+    long: "dark",
   },
   earth: {
-    long: "terra",
+    long: "earth",
   },
   fire: {
-    long: "fuoco",
+    long: "fire",
   },
   ice: {
-    long: "ghiaccio",
+    long: "ice",
   },
   light: {
-    long: "luce",
+    long: "light",
   },
   poison: {
-    long: "veleno",
+    long: "poison",
   },
 };
 

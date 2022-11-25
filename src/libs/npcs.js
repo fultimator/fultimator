@@ -18,7 +18,7 @@ export function calcHP(npc) {
   if (npc.rank === "champion4") {
     hp = hp * 4;
   }
-  
+
   if (npc.rank === "champion5") {
     hp = hp * 5;
   }
@@ -26,9 +26,9 @@ export function calcHP(npc) {
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     const lvl = npc.companionpclvl || 5;
-    hp = sl * npc.attributes.might + Math.floor(lvl / 2)
+    hp = sl * npc.attributes.might + Math.floor(lvl / 2);
   }
-  
+
   return hp;
 }
 
@@ -164,13 +164,13 @@ export function calcPrecision(attack, npc) {
   if (attack.weapon) {
     number = number + attack.weapon.prec;
   }
-  
+
   // Companion
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     number = number + sl;
   }
-  
+
   return number;
 }
 
@@ -184,14 +184,13 @@ export function calcMagic(npc) {
   if (npc.extra?.magic) {
     number = number + 3;
   }
-  
+
   // Companion
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     number = number + sl;
   }
-  
-  
+
   return number;
 }
 
@@ -208,17 +207,17 @@ export function calcAvailableSkillsFromSpecies(npc) {
   let number = 4;
 
   if (
-    npc.species === "Costrutto" ||
-    npc.species === "Elementale" ||
-    npc.species === "Non Morto"
+    npc.species === "Construct" ||
+    npc.species === "Elemental" ||
+    npc.species === "Undead"
   ) {
     number = 2;
   }
 
   if (
-    npc.species === "Demone" ||
-    npc.species === "Pianta" ||
-    npc.species === "Umanoide"
+    npc.species === "Demon" ||
+    npc.species === "Planta" ||
+    npc.species === "Humanoid"
   ) {
     number = 3;
   }
@@ -243,13 +242,13 @@ export function calcAvailableSkillsFromVulnerabilities(npc) {
   }
 
   // Undeads are vulnerable to light
-  if (npc.species === "Non Morto" && npc.affinities.light === "vu") {
+  if (npc.species === "Undead" && npc.affinities.light === "vu") {
     sum = sum - 1;
   }
 
   // Plants have a free vulnerability
   if (
-    npc.species === "Pianta" &&
+    npc.species === "Planta" &&
     (npc.affinities.fire ||
       npc.affinities.wind ||
       npc.affinities.ice ||
@@ -367,8 +366,8 @@ export function calcUsedSkillsFromResistances(npc) {
   let sum = 0;
   Object.entries(npc.affinities).forEach((el) => {
     if (el[1] === "rs") {
-      // Don't count earth for Costrutto
-      if (npc.species === "Costrutto" && el[0] === "earth") {
+      // Don't count earth for Construct
+      if (npc.species === "Construct" && el[0] === "earth") {
         return;
       }
 
@@ -377,7 +376,7 @@ export function calcUsedSkillsFromResistances(npc) {
   });
 
   // Demons have two free resistances
-  if (npc.species === "Demone") {
+  if (npc.species === "Demon") {
     sum = sum - 2;
   }
 
@@ -392,18 +391,18 @@ export function calcUsedSkillsFromImmunities(npc) {
   let sum = 0;
   Object.entries(npc.affinities).forEach((el) => {
     if (el[1] === "im") {
-      // Don't count poison for Costrutto, Elementale, Non Mortto
+      // Don't count poison for Construct, Elemental, Non Mortto
       if (
-        (npc.species === "Costrutto" ||
-          npc.species === "Elementale" ||
-          npc.species === "Non Morto") &&
+        (npc.species === "Construct" ||
+          npc.species === "Elemental" ||
+          npc.species === "Undead") &&
         el[0] === "poison"
       ) {
         return;
       }
 
       // Don't count dark for Non Mortto
-      if (npc.species === "Non Morto" && el[0] === "dark") {
+      if (npc.species === "Undead" && el[0] === "dark") {
         return;
       }
 
@@ -412,7 +411,7 @@ export function calcUsedSkillsFromImmunities(npc) {
   });
 
   // Elementals have a free immunity
-  if (npc.species === "Elementale") {
+  if (npc.species === "Elemental") {
     sum = sum - 1;
   }
 
@@ -461,7 +460,7 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.species === "Umanoide") {
+  if (npc.species === "Humanoid") {
     equip = false;
   }
 

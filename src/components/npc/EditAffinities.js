@@ -66,7 +66,7 @@ export default function EditAffinities({ npc, setNpc }) {
 
   return (
     <>
-      <Typography variant="h6">Affinità</Typography>
+      <Typography variant="h6">Affinity</Typography>
       <Grid container sx={{ mt: 2, pr: 2 }} rowSpacing={1}>
         {Object.keys(typeList).map((type, i, arr) => {
           const marks =
@@ -74,7 +74,7 @@ export default function EditAffinities({ npc, setNpc }) {
               ? [
                   {
                     value: 0,
-                    label: "Vulnerabile",
+                    label: "Vulnerability",
                   },
                   {
                     value: 1,
@@ -82,15 +82,15 @@ export default function EditAffinities({ npc, setNpc }) {
                   },
                   {
                     value: 2,
-                    label: "Resistente",
+                    label: "Resistance",
                   },
                   {
                     value: 3,
-                    label: "Immune",
+                    label: "Immunity",
                   },
                   {
                     value: 4,
-                    label: "Assorbe",
+                    label: "Absorption",
                   },
                 ]
               : [];

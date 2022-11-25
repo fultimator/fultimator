@@ -6,12 +6,12 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
     <Grid container spacing={1}>
       <Grid item xs={6}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id="att1">Cambia Car 1</InputLabel>
+          <InputLabel id="att1">Change Attr 1</InputLabel>
           <Select
             labelId="att1"
             id="select-att1"
             value={att1}
-            label="Cambia tipo"
+            label="Change Type"
             onChange={setAtt1}
           >
             {Object.entries(attributes).map((key, i) => {
@@ -26,12 +26,12 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
       </Grid>
       <Grid item xs={6}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id="att2">Cambia Car 2</InputLabel>
+          <InputLabel id="att2">Change Attr 2</InputLabel>
           <Select
             labelId="att2"
             id="select-att2"
             value={att2}
-            label="Cambia tipo"
+            label="Change Type"
             onChange={setAtt2}
           >
             {Object.entries(attributes).map((key, i) => {

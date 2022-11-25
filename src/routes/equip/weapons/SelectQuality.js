@@ -27,12 +27,12 @@ function SelectQuality({ quality, setQuality }) {
 
   return (
     <FormControl variant="outlined" fullWidth>
-      <InputLabel id="quality">Scegli una Qualità</InputLabel>
+      <InputLabel id="quality">Select Quality</InputLabel>
       <Select
         labelId="quality"
         id="select-quality"
         value={quality}
-        label="Scegli una Qualità"
+        label="Select Quality"
         onChange={setQuality}
       >
         {options}

@@ -28,13 +28,13 @@ export default function Combat() {
 
   return (
     <Layout>
-      <Typography variant="h4">Combattimento</Typography>
+      <Typography variant="h4">Combat</Typography>
       {loading && <Skeleton />}
 
       {!loading && !user && (
         <>
           <Typography sx={{ my: 1 }}>
-            Devi essere loggato per usare questa feature
+            You must be logged in to use this feature
           </Typography>
           <SignIn />
         </>
@@ -137,9 +137,9 @@ function Npc({ npc }) {
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
           <Grid item xs={2}>
             <Typography variant="h5" color="red">
-              PV: {hp}
+              HP: {hp}
             </Typography>
-            {crisis && "CRISI!"}
+            {crisis && "Crisis!"}
           </Grid>
           <Grid item xs={5}>
             <ButtonGroup variant="outlined" size="small" color="red">
@@ -161,7 +161,7 @@ function Npc({ npc }) {
           </Grid>
           <Grid item xs={2}>
             <Typography variant="h5" color="cyan">
-              PM: {mp}
+              MP: {mp}
             </Typography>
           </Grid>
           <Grid item xs={5}>
@@ -187,25 +187,25 @@ function Npc({ npc }) {
               <FormControlLabel
                 value="slow"
                 control={<Checkbox />}
-                label="Lento"
+                label="Slow"
                 labelPlacement="top"
               />
               <FormControlLabel
-                value="confused"
+                value="dazed"
                 control={<Checkbox />}
-                label="Confuso"
+                label="Dazed"
                 labelPlacement="top"
               />
               <FormControlLabel
                 value="weak"
                 control={<Checkbox />}
-                label="Debole"
+                label="Weak"
                 labelPlacement="top"
               />
               <FormControlLabel
                 value="shaken"
                 control={<Checkbox />}
-                label="Scosso"
+                label="Shaken"
                 labelPlacement="top"
               />
             </FormGroup>
@@ -213,15 +213,15 @@ function Npc({ npc }) {
           <Grid item xs={12}>
             <FormGroup aria-label="position" row>
               <FormControlLabel
-                value="angry"
+                value="enraged"
                 control={<Checkbox />}
-                label="Furente"
+                label="Enraged"
                 labelPlacement="top"
               />
               <FormControlLabel
                 value="poisoned"
                 control={<Checkbox />}
-                label="Avvelenato"
+                label="Poisoned"
                 labelPlacement="top"
               />
             </FormGroup>

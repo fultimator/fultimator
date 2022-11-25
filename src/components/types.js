@@ -14,15 +14,15 @@ import {
 export function TypeName({ type }) {
   return (
     <>
-      {type === "physical" && "Fisico"}
-      {type === "wind" && "Aria"}
-      {type === "bolt" && "Fulmine"}
-      {type === "dark" && "Ombra"}
-      {type === "earth" && "Terra"}
-      {type === "fire" && "Fuoco"}
-      {type === "ice" && "Ghiaccio"}
-      {type === "light" && "Luce"}
-      {type === "poison" && "Veleno"}
+      {type === "physical" && "Physical"}
+      {type === "wind" && "Wind"}
+      {type === "bolt" && "Bolt"}
+      {type === "dark" && "Dark"}
+      {type === "earth" && "Earth"}
+      {type === "fire" && "Fire"}
+      {type === "ice" && "Ice"}
+      {type === "light" && "Light"}
+      {type === "poison" && "Poison"}
     </>
   );
 }

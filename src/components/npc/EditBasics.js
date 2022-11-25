@@ -1,4 +1,4 @@
-import {Add, Remove} from "@mui/icons-material";
+import { Add, Remove } from "@mui/icons-material";
 import {
   Card,
   Divider,
@@ -12,9 +12,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import {EditAttributes} from "./EditAttributes";
+import { EditAttributes } from "./EditAttributes";
 
-export default function EditBasics({npc, setNpc}) {
+export default function EditBasics({ npc, setNpc }) {
   const onChange = (key) => {
     return (e) => {
       setNpc((prevState) => {
@@ -24,51 +24,51 @@ export default function EditBasics({npc, setNpc}) {
       });
     };
   };
-  
+
   const onChangeSpecies = function (e) {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
       newState.species = e.target.value;
-      
+
       if (
-        e.target.value === "Bestia" ||
-        e.target.value === "Demone" ||
-        e.target.value === "Mostro" ||
-        e.target.value === "Pianta" ||
-        e.target.value === "Umanoide"
+        e.target.value === "Beast" ||
+        e.target.value === "Demon" ||
+        e.target.value === "Monster" ||
+        e.target.value === "Planta" ||
+        e.target.value === "Humanoid"
       ) {
         newState.affinities = {};
       }
-      if (e.target.value === "Costrutto") {
+      if (e.target.value === "Construct") {
         newState.affinities = {
           poison: "im",
           earth: "rs",
         };
       }
-      if (e.target.value === "Elementale") {
+      if (e.target.value === "Elemental") {
         newState.affinities = {
           poison: "im",
         };
       }
-      if (e.target.value === "Non Morto") {
+      if (e.target.value === "Undead") {
         newState.affinities = {
           dark: "im",
           poison: "im",
           light: "vu",
         };
       }
-      
+
       return newState;
     });
   };
-  
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={2}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Nome"
+            label="Name"
             value={npc.name}
             onChange={onChange("name")}
           ></TextField>
@@ -78,92 +78,95 @@ export default function EditBasics({npc, setNpc}) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="traits"
-            label="Tratti"
+            label="Traits"
             value={npc.traits}
             onChange={onChange("traits")}
           ></TextField>
         </FormControl>
       </Grid>
       <Grid item xs={2}>
-        <EditLevel npc={npc} setnpc={setNpc}/>
+        <EditLevel npc={npc} setnpc={setNpc} />
       </Grid>
       <Grid item xs={2}>
         <FormControl fullWidth>
-          <InputLabel id="species">Specie</InputLabel>
+          <InputLabel id="species">Species</InputLabel>
           <Select
             labelId="species"
             id="select-species"
             value={npc.species}
-            label="Specie"
+            label="Species"
             onChange={onChangeSpecies}
           >
-            <MenuItem value={"Bestia"}>Bestia</MenuItem>
-            <MenuItem value={"Costrutto"}>Costrutto</MenuItem>
-            <MenuItem value={"Demone"}>Demone</MenuItem>
-            <MenuItem value={"Elementale"}>Elementale</MenuItem>
-            <MenuItem value={"Mostro"}>Mostro</MenuItem>
-            <MenuItem value={"Pianta"}>Pianta</MenuItem>
-            <MenuItem value={"Non Morto"}>Non Morto</MenuItem>
-            <MenuItem value={"Umanoide"}>Umanoide</MenuItem>
+            <MenuItem value={"Beast"}>Beast</MenuItem>
+            <MenuItem value={"Construct"}>Construct</MenuItem>
+            <MenuItem value={"Demon"}>Demon</MenuItem>
+            <MenuItem value={"Elemental"}>Elemental</MenuItem>
+            <MenuItem value={"Monster"}>Monster</MenuItem>
+            <MenuItem value={"Planta"}>Planta</MenuItem>
+            <MenuItem value={"Undead"}>Undead</MenuItem>
+            <MenuItem value={"Humanoid"}>Humanoid</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs={2}>
         <Stack spacing={1}>
           <FormControl fullWidth>
-            <InputLabel id="rank">Rango</InputLabel>
+            <InputLabel id="rank">Rank</InputLabel>
             <Select
               labelId="rank"
               id="select-rank"
               value={npc.rank}
-              label="Rango"
+              label="Rank"
               onChange={onChange("rank")}
             >
-              <MenuItem value={"soldier"}>Soldato</MenuItem>
+              <MenuItem value={"soldier"}>Soldier</MenuItem>
               <MenuItem value={"elite"}>Elite</MenuItem>
-              <MenuItem value={"champion2"}>Campione(2)</MenuItem>
-              <MenuItem value={"champion3"}>Campione(3)</MenuItem>
-              <MenuItem value={"champion4"}>Campione(4)</MenuItem>
-              <MenuItem value={"champion5"}>Campione(5)</MenuItem>
-              <MenuItem value={"companion"}>Compagno Fedele</MenuItem>
+              <MenuItem value={"champion2"}>Champion(2)</MenuItem>
+              <MenuItem value={"champion3"}>Champion(3)</MenuItem>
+              <MenuItem value={"champion4"}>Champion(4)</MenuItem>
+              <MenuItem value={"champion5"}>Champion(5)</MenuItem>
+              <MenuItem value={"companion"}>Companion</MenuItem>
             </Select>
           </FormControl>
-          
-          {npc.rank === "companion" && <FormControl fullWidth>
-            <InputLabel id="companionlvl">Livello Abilità</InputLabel>
-            <Select
-              labelId="companionlvl"
-              id="select-companionlvl"
-              value={npc.companionlvl || 1}
-              label="Livello Abilità"
-              onChange={onChange("companionlvl")}
-            >
-              <MenuItem value={1}>1</MenuItem>
-              <MenuItem value={2}>2</MenuItem>
-              <MenuItem value={3}>3</MenuItem>
-              <MenuItem value={4}>4</MenuItem>
-              <MenuItem value={5}>5</MenuItem>
-            </Select>
-          </FormControl>}
-  
-          {npc.rank === "companion" && <FormControl fullWidth>
-            <TextField
-              labelId="companionpclvl"
-              id="textfield-companionpclvl"
-              value={npc.companionpclvl || 5}
-              label="Livello del PG"
-              onChange={onChange("companionpclvl")}
-              type="number"
-            >
-            </TextField>
-          </FormControl>}
+
+          {npc.rank === "companion" && (
+            <FormControl fullWidth>
+              <InputLabel id="companionlvl">Skill Level</InputLabel>
+              <Select
+                labelId="companionlvl"
+                id="select-companionlvl"
+                value={npc.companionlvl || 1}
+                label="Skill Level"
+                onChange={onChange("companionlvl")}
+              >
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
+          {npc.rank === "companion" && (
+            <FormControl fullWidth>
+              <TextField
+                labelId="companionpclvl"
+                id="textfield-companionpclvl"
+                value={npc.companionpclvl || 5}
+                label="PC Level"
+                onChange={onChange("companionpclvl")}
+                type="number"
+              ></TextField>
+            </FormControl>
+          )}
         </Stack>
       </Grid>
       <Grid item xs={7}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="Description"
-            label="Descrizione"
+            label="Description"
             value={npc.description}
             onChange={onChange("description")}
             multiline
@@ -171,29 +174,30 @@ export default function EditBasics({npc, setNpc}) {
           ></TextField>
         </FormControl>
       </Grid>
-      
+
       <Grid item xs={2}>
-        <EditAttributes npc={npc} setNpc={setNpc}/>
+        <EditAttributes npc={npc} setNpc={setNpc} />
       </Grid>
       <Grid item xs>
         <Grid item>
-          <Card sx={{p: 1.61}}>
+          <Card sx={{ p: 1.61 }}>
             <Typography>
-              <strong>Tuttofare</strong>: d8, d8, d8, d8
+              <strong>Jack of All Trades</strong>: d8, d8, d8, d8
             </Typography>
             <Typography>
               <strong>Standard</strong>: d10, d8, d8, d6
             </Typography>
             <Typography>
-              <strong>Specializzato</strong>: d10, d10, d6, d6
+              <strong>Specialized</strong>: d10, d10, d6, d6
             </Typography>
             <Typography>
-              <strong>Iperspecializzato</strong>: d12, d8, d6, d6
+              <strong>Super Specialized</strong>: d12, d8, d6, d6
             </Typography>
-            <Divider sx={{my: 1}}/>
+            <Divider sx={{ my: 1 }} />
             <Typography variant="body2">
-              Ai lvl <strong>20</strong>, <strong>40</strong>,{" "}
-              <strong>60</strong> puoi aumentare una caratteristica
+              Upon reaching levels <strong>20</strong>, <strong>40</strong>, and{" "}
+              <strong>60</strong> , the NPC chooses one of its Attributes and
+              increases it by one die size (to a maximum of d12).
             </Typography>
           </Card>
         </Grid>
@@ -202,13 +206,13 @@ export default function EditBasics({npc, setNpc}) {
   );
 }
 
-function EditLevel({npc, setnpc}) {
+function EditLevel({ npc, setnpc }) {
   const onRaiseLevel = (e) => {
     setnpc((prevState) => {
       if (prevState.lvl >= 60) {
         return prevState;
       }
-      
+
       const newState = Object.assign({}, prevState);
       newState.lvl = prevState.lvl + 5;
       return newState;
@@ -219,7 +223,7 @@ function EditLevel({npc, setnpc}) {
       if (prevState.lvl <= 5) {
         return prevState;
       }
-      
+
       const newState = Object.assign({}, prevState);
       newState.lvl = prevState.lvl - 5;
       return newState;
@@ -229,7 +233,7 @@ function EditLevel({npc, setnpc}) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
-        label="Livello"
+        label="Level"
         type="number"
         min={5}
         max={60}
@@ -242,7 +246,7 @@ function EditLevel({npc, setnpc}) {
               edge="start"
               onClick={onLowerLevel}
             >
-              <Remove/>
+              <Remove />
             </IconButton>
           ),
           endAdornment: (
@@ -251,7 +255,7 @@ function EditLevel({npc, setnpc}) {
               edge="end"
               onClick={onRaiseLevel}
             >
-              <Add/>
+              <Add />
             </IconButton>
           ),
         }}

@@ -3,81 +3,81 @@ import { Card, Typography } from "@mui/material";
 export default function ExplainAffinities({ npc }) {
   return (
     <Card sx={{ p: 2 }}>
-      <Typography>Assegnare vulnerabilità conferisce Abilità</Typography>
-      <Typography>
-        Assegnare vulnerabilità a fisico conferisce 2 Abilità
-      </Typography>
-      <Typography>Assegnare resistenze costa 0.5 Abilità</Typography>
-      <Typography>Assegnare immunità costa 1 Abilità</Typography>
-      <Typography>Assegnare assorbimento costa 2 Abilità</Typography>
-      {npc.species === "Costrutto" && (
+      <Typography>Gain 1 skill per vulnerability.</Typography>
+      <Typography>Gain 2 skills per physical vulnerability.</Typography>
+      <Typography>Use 0.5 skill per Resistance </Typography>
+      <Typography>Use 1 skill per Immunity</Typography>
+      <Typography>Use 2 skill per Absorbtion</Typography>
+      {npc.species === "Construct" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Specie: costrutto
+            Species: Construct
           </Typography>
           <Typography>
-            I costrutti sono Immuni al danno da <strong>veleno</strong> e
-            Resistenti al danno da <strong>terra</strong>.
+            <strong>Constructs</strong> are Immune to <strong>poison</strong>{" "}
+            damage and Resistant to <strong>earth</strong> damage.
           </Typography>
         </>
       )}
-      {npc.species === "Demone" && (
+      {npc.species === "Demon" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Specie: Demone
+            Species: Demon
           </Typography>
           <Typography>
-            I demoni sono resistenti a due tipi di danno a tua scelta.
+            <strong>Demons</strong> are Resistant to two damage types of your
+            choice.
           </Typography>
         </>
       )}
-      {npc.species === "Elementale" && (
+      {npc.species === "Elemental" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Specie: Elementale
+            Species: Elemental
           </Typography>
           <Typography>
-            Gli elementali sono Immuni al danno da <strong>veleno</strong> e a
-            un altro tipo di danno a tua scelta.
+            <strong>Elementals</strong> are Immune to <strong>poison</strong>{" "}
+            damage, Immune to a second damage type of your choice, and immune to{" "}
+            <strong>poisoned</strong>.
           </Typography>
         </>
       )}
-      {npc.species === "Non Morto" && (
+      {npc.species === "Undead" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Specie: Non Morto
+            Species: Undead
           </Typography>
           <Typography>
-            I non morti sono Immuni al danno da <strong>ombra</strong> e da{" "}
-            <strong>veleno</strong> e Vulnerabili al danno da{" "}
-            <strong>luce</strong>.
+            <strong>Undead</strong> are Immune to <strong>dark</strong> and{" "}
+            <strong>poison</strong> damage, and Vulnerable to{" "}
+            <strong>light</strong> damage.
           </Typography>
         </>
       )}
-      {npc.species === "Pianta" && (
+      {npc.species === "Planta" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Specie: Pianta
+            Species: Planta
           </Typography>
           <Typography>
-            Le piante sono Vulnerabili al danno da (scegliere uno tra{" "}
-            <strong>aria</strong>, <strong>fulmine</strong>,{" "}
-            <strong>fuoco</strong>, <strong>ghiaccio</strong>)
+            <strong>Plants</strong> are Vulnerable to (choose one:{" "}
+            <strong>air</strong>, <strong>bolt</strong>, <strong>fire</strong>,{" "}
+            <strong>ice</strong>) damage.
           </Typography>
         </>
       )}

@@ -44,15 +44,15 @@ const powerCosts = {
 const areaPMs = {
   individual: 1,
   small: 2,
-  big: 3,
-  enormous: 4,
+  large: 3,
+  huge: 4,
 };
 
 const areaCosts = {
   individual: 1,
   small: 2,
-  big: 3,
-  enormous: 4,
+  large: 3,
+  huge: 4,
 };
 
 const usesCosts = {
@@ -93,11 +93,11 @@ function Rituals() {
   }
   return (
     <>
-      <Typography variant="h4">Rituali</Typography>
+      <Typography variant="h4">Rituals</Typography>
       <Grid container>
         <Grid item xs={6}>
           <FormControl component="fieldset">
-            <FormLabel component="legend">Potenza</FormLabel>
+            <FormLabel component="legend">Potency</FormLabel>
             <RadioGroup
               aria-label="power"
               name="power-group"
@@ -109,22 +109,22 @@ function Rituals() {
               <FormControlLabel
                 value="minor"
                 control={<Radio />}
-                label="Minore"
+                label="Minor"
               />
               <FormControlLabel
                 value="medium"
                 control={<Radio />}
-                label="Media"
+                label="Medium"
               />
               <FormControlLabel
                 value="major"
                 control={<Radio />}
-                label="Maggiore"
+                label="Major"
               />
               <FormControlLabel
                 value="extreme"
                 control={<Radio />}
-                label="Estrema"
+                label="Extreme"
               />
             </RadioGroup>
           </FormControl>
@@ -143,23 +143,19 @@ function Rituals() {
               <FormControlLabel
                 value="individual"
                 control={<Radio />}
-                label="Individuale"
+                label="Individual"
               />
               <FormControlLabel
                 value="small"
                 control={<Radio />}
-                label="Piccola"
+                label="Small"
               />
               <FormControlLabel
-                value="big"
+                value="large"
                 control={<Radio />}
-                label="Grande"
+                label="Large"
               />
-              <FormControlLabel
-                value="enormous"
-                control={<Radio />}
-                label="Enorme"
-              />
+              <FormControlLabel value="huge" control={<Radio />} label="Huge" />
             </RadioGroup>
           </FormControl>
         </Grid>
@@ -167,13 +163,13 @@ function Rituals() {
       <Divider />
       <Grid container sx={{ m: 1 }}>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">{calcPM()} PM</Typography>
+          <Typography fontWeight="bold">{calcPM()} MP</Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">{calcLD()} LD</Typography>
+          <Typography fontWeight="bold">{calcLD()} DL</Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">Orologio da {calcClock()}</Typography>
+          <Typography fontWeight="bold">Clock {calcClock()}</Typography>
         </Grid>
       </Grid>
     </>
@@ -184,7 +180,7 @@ function Projects() {
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
   const [defect, setDefect] = useState(false);
-  const [tinkerers, setThinkeres] = useState(1);
+  const [tinkerers, setThinkerers] = useState(1);
   const [helpers, setHelpers] = useState(0);
   const [visionary, setVisionary] = useState(0);
 
@@ -197,11 +193,11 @@ function Projects() {
 
   return (
     <>
-      <Typography variant="h4">Progetti</Typography>
+      <Typography variant="h4">Projects</Typography>
       <Grid container>
         <Grid item xs={4}>
           <FormControl component="fieldset">
-            <FormLabel component="legend">Potenza</FormLabel>
+            <FormLabel component="legend">Potency</FormLabel>
             <RadioGroup
               aria-label="power"
               name="power-group"
@@ -213,22 +209,22 @@ function Projects() {
               <FormControlLabel
                 value="minor"
                 control={<Radio />}
-                label="Minore"
+                label="Minor"
               />
               <FormControlLabel
                 value="medium"
                 control={<Radio />}
-                label="Media"
+                label="Medium"
               />
               <FormControlLabel
                 value="major"
                 control={<Radio />}
-                label="Maggiore"
+                label="Major"
               />
               <FormControlLabel
                 value="extreme"
                 control={<Radio />}
-                label="Estrema"
+                label="Extreme"
               />
             </RadioGroup>
           </FormControl>
@@ -247,29 +243,25 @@ function Projects() {
               <FormControlLabel
                 value="individual"
                 control={<Radio />}
-                label="Individuale"
+                label="Individual"
               />
               <FormControlLabel
                 value="small"
                 control={<Radio />}
-                label="Piccola"
+                label="Small"
               />
               <FormControlLabel
-                value="big"
+                value="large"
                 control={<Radio />}
-                label="Grande"
+                label="Large"
               />
-              <FormControlLabel
-                value="enormous"
-                control={<Radio />}
-                label="Enorme"
-              />
+              <FormControlLabel value="huge" control={<Radio />} label="Huge" />
             </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={4}>
           <FormControl component="fieldset">
-            <FormLabel component="legend">Usi</FormLabel>
+            <FormLabel component="legend">Uses</FormLabel>
             <RadioGroup
               aria-label="uses"
               name="uses-group"
@@ -281,12 +273,12 @@ function Projects() {
               <FormControlLabel
                 value="consumable"
                 control={<Radio />}
-                label="Consumabile"
+                label="Consumable"
               />
               <FormControlLabel
                 value="permanent"
                 control={<Radio />}
-                label="Permanente"
+                label="Permanent"
               />
             </RadioGroup>
             <br />
@@ -295,7 +287,7 @@ function Projects() {
               onChange={(e) => {
                 setDefect(e.target.checked);
               }}
-              label="Difettoso"
+              label="Has terrible flaw"
             />
           </FormControl>
         </Grid>
@@ -306,14 +298,16 @@ function Projects() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="tinkerers"
-              label="Artefici al lavoro"
+              label="Number of Tinkerers"
               type="number"
               size="small"
               min={1}
               max={10}
               value={tinkerers}
               onChange={(e) => {
-                setThinkeres(parseInt(e.target.value));
+                if (e.target.value !== "")
+                  setThinkerers(parseInt(e.target.value));
+                else setThinkerers(0);
               }}
             />
           </FormControl>
@@ -322,14 +316,15 @@ function Projects() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="helpers"
-              label="Aiutanti"
+              label="Number of Hired Helpers"
               type="number"
               size="small"
               min={1}
               max={10}
               value={helpers}
               onChange={(e) => {
-                setHelpers(parseInt(e.target.value));
+                if (e.target.value !== "") setHelpers(parseInt(e.target.value));
+                else setHelpers(0);
               }}
             />
           </FormControl>
@@ -338,14 +333,16 @@ function Projects() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="visionary"
-              label="Livelli in Visionario"
+              label="Levels in Visionary"
               type="number"
               size="small"
               min={1}
               max={10}
               value={visionary}
               onChange={(e) => {
-                setVisionary(parseInt(e.target.value));
+                if (e.target.value !== "")
+                  setVisionary(parseInt(e.target.value));
+                else setVisionary(0);
               }}
             />
           </FormControl>
@@ -354,20 +351,22 @@ function Projects() {
           <Typography fontWeight="bold">{cost} Zenith</Typography>
           {visionary > 0 && (
             <Typography fontWeight="bold">
-              {visionary * 100} Pagati da Visionario
+              {visionary * 100} Cost covered by Visionary
             </Typography>
           )}
         </Grid>
         <Grid item xs={4}>
-          <Typography fontWeight="bold">{progress} Progresso</Typography>
+          <Typography fontWeight="bold">{progress} Progress</Typography>
         </Grid>
         <Grid item xs={4}>
           {days < 1 && (
-            <Typography fontWeight="bold">Poche ore {days}</Typography>
+            <Typography fontWeight="bold">
+              Number of days {Math.ceil(days)}
+            </Typography>
           )}
           {days >= 1 && (
             <Typography fontWeight="bold">
-              {progressPerDay} progresso al giorno / {Math.ceil(days)} giorni
+              {progressPerDay} progress per day / {Math.ceil(days)} days
             </Typography>
           )}
         </Grid>

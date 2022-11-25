@@ -114,7 +114,7 @@ function Defenses({ npc, setNpc }) {
 
   return (
     <FormControl>
-      <FormLabel id="extra-defenses">Difese</FormLabel>
+      <FormLabel id="extra-defenses">Defenses</FormLabel>
       <RadioGroup
         size="small"
         aria-labelledby="extra-defenses"
@@ -172,10 +172,10 @@ function HP({ npc, setNpc }) {
   return (
     <FormControl variant="standard" fullWidth>
       <TextField
-        id="pv"
+        id="HP"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra PV"
+        label="Extra HP"
         value={npc.extra?.hp || 0}
         onChange={onChange}
       ></TextField>
@@ -201,7 +201,7 @@ function MP({ npc, setNpc }) {
         id="mp"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra PM"
+        label="Extra MP"
         value={npc.extra?.mp || 0}
         onChange={onChange}
       ></TextField>
@@ -223,7 +223,7 @@ function Init({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.init} onChange={onChange} />}
-        label="+4 Iniziativa"
+        label="+4 Initiative"
       />
     </FormGroup>
   );
@@ -244,7 +244,7 @@ function Precision({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.precision} onChange={onChange} />}
-        label="+3 ai test di Precisione"
+        label="+3 bonus to all Accuracy Checks"
       />
     </FormGroup>
   );
@@ -265,7 +265,7 @@ function Magic({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.magic} onChange={onChange} />}
-        label="+3 ai test di Magia"
+        label="+3 bonus to all Magic Checks."
       />
     </FormGroup>
   );
@@ -304,13 +304,13 @@ function SelectArmor({ npc, setNpc }) {
 
   return (
     <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
-      <InputLabel id="type">Armatura</InputLabel>
+      <InputLabel id="type">Armor</InputLabel>
       <Select
         size="small"
         labelId="armor"
         id="select-armor"
         value={armor.name}
-        label="Armatura"
+        label="Armor"
         onChange={onChange}
       >
         {options}
@@ -352,13 +352,13 @@ function SelectShield({ npc, setNpc }) {
 
   return (
     <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
-      <InputLabel id="type">Scudo</InputLabel>
+      <InputLabel id="type">Shield</InputLabel>
       <Select
         size="small"
         labelId="shield"
         id="select-shield"
         value={shield.name}
-        label="Scudo"
+        label="Shield"
         onChange={onChange}
       >
         {options}

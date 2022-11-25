@@ -1,7 +1,7 @@
 export const baseWeapons = [
   {
     category: "Arcane",
-    name: "Bastone",
+    name: "Staff",
     cost: 100,
     att1: "will",
     att2: "will",
@@ -9,11 +9,11 @@ export const baseWeapons = [
     damage: 6,
     type: "physical",
     hands: 2,
-    range: "melee",
+    range: true,
   },
   {
     category: "Arcane",
-    name: "Tomo",
+    name: "Tome",
     cost: 100,
     att1: "insight",
     att2: "insight",
@@ -24,8 +24,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Archi",
-    name: "Balestra",
+    category: "Bow",
+    name: "Crossbow",
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -36,8 +36,8 @@ export const baseWeapons = [
     range: "distance",
   },
   {
-    category: "Archi",
-    name: "Arco Corto",
+    category: "Bow",
+    name: "Shortbow",
     cost: 200,
     att1: "dexterity",
     att2: "dexterity",
@@ -48,8 +48,8 @@ export const baseWeapons = [
     range: "distance",
   },
   {
-    category: "Flagelli",
-    name: "Frusta-Catena",
+    category: "Flail",
+    name: "Chain Whip",
     cost: 150,
     att1: "dexterity",
     att2: "dexterity",
@@ -60,8 +60,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Da Fuoco",
-    name: "Pistola",
+    category: "Firearm",
+    name: "Pistol",
     cost: 250,
     att1: "dexterity",
     att2: "insight",
@@ -69,11 +69,11 @@ export const baseWeapons = [
     damage: 8,
     type: "physical",
     hands: 1,
-    range: "distance",
+    dstance: true,
   },
   {
-    category: "Lance",
-    name: "Lancia Leggera",
+    category: "Spear",
+    name: "Light Spear",
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -84,8 +84,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Lance",
-    name: "Lancia Pesante",
+    category: "Spear",
+    name: "Heavy Spear",
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -96,7 +96,7 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Da Lancio",
+    category: "Thrown",
     name: "Shuriken",
     cost: 150,
     att1: "dexterity",
@@ -108,8 +108,8 @@ export const baseWeapons = [
     range: "distance",
   },
   {
-    category: "Pesanti",
-    name: "Martello di Ferro",
+    category: "Heavy",
+    name: "Iron Hammer",
     cost: 200,
     att1: "might",
     att2: "might",
@@ -120,8 +120,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Pesanti",
-    name: "Ascia",
+    category: "Heavy",
+    name: "Broadaxe",
     cost: 250,
     att1: "might",
     att2: "might",
@@ -132,8 +132,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Pesanti",
-    name: "Ascia da Guerra",
+    category: "Heavy",
+    name: "Waraxe",
     cost: 250,
     att1: "might",
     att2: "might",
@@ -144,8 +144,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Pugnali",
-    name: "Pugnale d'Acciaio",
+    category: "Dagger",
+    name: "Steel Dagger",
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -156,8 +156,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Da Rissa",
-    name: "Tirapugni di ferro",
+    category: "Brawling",
+    name: "Iron Knuckle",
     cost: 150,
     att1: "dexterity",
     att2: "might",
@@ -168,7 +168,7 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Spade",
+    category: "Sword",
     name: "Katana",
     cost: 200,
     att1: "dexterity",
@@ -180,8 +180,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Spade",
-    name: "Spada di bronzo",
+    category: "Sword",
+    name: "Bronze Sword",
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -192,8 +192,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Spade",
-    name: "Spadone",
+    category: "Sword",
+    name: "Greatsword",
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -204,8 +204,8 @@ export const baseWeapons = [
     range: "melee",
   },
   {
-    category: "Spade",
-    name: "Stocco",
+    category: "Sword",
+    name: "Rapier",
     cost: 200,
     att1: "dexterity",
     att2: "insight",
@@ -219,7 +219,7 @@ export const baseWeapons = [
 
 export const baseArmors = [
   {
-    name: "Nessuna Armatura",
+    name: "No Armor",
     cost: 0,
     def: 0,
     defbonus: 0,
@@ -228,7 +228,7 @@ export const baseArmors = [
     init: 0,
   },
   {
-    name: "Abito da Viaggio",
+    name: "Travel Garb",
     cost: 100,
     def: 0,
     defbonus: 1,
@@ -237,7 +237,7 @@ export const baseArmors = [
     init: -1,
   },
   {
-    name: "Camicia di Seta",
+    name: "Silk Shirt",
     cost: 100,
     def: 0,
     defbonus: 0,
@@ -246,7 +246,7 @@ export const baseArmors = [
     init: -1,
   },
   {
-    name: "Tunica da Lotta",
+    name: "Combat Tunic",
     cost: 150,
     def: 0,
     defbonus: 1,
@@ -255,7 +255,7 @@ export const baseArmors = [
     init: 0,
   },
   {
-    name: "Veste del Saggio",
+    name: "Sage Robe",
     cost: 200,
     def: 0,
     defbonus: 1,
@@ -264,7 +264,7 @@ export const baseArmors = [
     init: -2,
   },
   {
-    name: "Brigantina",
+    name: "Brigandine",
     cost: 150,
     def: 10,
     defbonus: 0,
@@ -273,7 +273,7 @@ export const baseArmors = [
     init: -2,
   },
   {
-    name: "Corazza di Bronzo",
+    name: "Bronze Plate",
     cost: 200,
     def: 11,
     defbonus: 0,
@@ -282,7 +282,7 @@ export const baseArmors = [
     init: -3,
   },
   {
-    name: "Corazza Runica",
+    name: "Runic Plate",
     cost: 250,
     def: 11,
     defbonus: 0,
@@ -291,7 +291,7 @@ export const baseArmors = [
     init: -3,
   },
   {
-    name: "Corazza d'Acciaio",
+    name: "Steel Plate",
     cost: 300,
     def: 12,
     defbonus: 0,
@@ -303,7 +303,7 @@ export const baseArmors = [
 
 export const baseShields = [
   {
-    name: "Nessuno Scudo",
+    name: "No Shield",
     cost: 0,
     def: 0,
     defbonus: 0,
@@ -312,7 +312,7 @@ export const baseShields = [
     init: 0,
   },
   {
-    name: "Scudo di Bronzo",
+    name: "Bronze Shield",
     cost: 100,
     def: 0,
     defbonus: 2,
@@ -321,7 +321,7 @@ export const baseShields = [
     init: 0,
   },
   {
-    name: "Scudo Runico",
+    name: "Runic Shield",
     cost: 150,
     def: 0,
     defbonus: 2,

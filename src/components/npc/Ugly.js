@@ -26,7 +26,7 @@ export default function NpcUgly({ npc }) {
         }}
       />
       <Button variant="outlined" onClick={saveNpc}>
-        Salva
+        Save
       </Button>
     </>
   );

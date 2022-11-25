@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
         </Typography>
       </RouterLink>
       <Typography textAlign="center">
-        Fultimator è un tool NON UFFICIALE per gestire Fabula Ultima
+        Fultimator is an Unofficial tool for TTRPG Fabula Ultima
       </Typography>
       <Divider sx={{ my: 2 }}></Divider>
       {children}
