@@ -216,7 +216,7 @@ export function calcAvailableSkillsFromSpecies(npc) {
 
   if (
     npc.species === "Demon" ||
-    npc.species === "Planta" ||
+    npc.species === "Plant" ||
     npc.species === "Humanoid"
   ) {
     number = 3;
@@ -248,7 +248,7 @@ export function calcAvailableSkillsFromVulnerabilities(npc) {
 
   // Plants have a free vulnerability
   if (
-    npc.species === "Planta" &&
+    npc.species === "Plant" &&
     (npc.affinities.fire ||
       npc.affinities.wind ||
       npc.affinities.ice ||

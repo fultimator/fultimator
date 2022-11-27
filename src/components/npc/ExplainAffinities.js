@@ -7,7 +7,7 @@ export default function ExplainAffinities({ npc }) {
       <Typography>Gain 2 skills per physical vulnerability.</Typography>
       <Typography>Use 0.5 skill per Resistance </Typography>
       <Typography>Use 1 skill per Immunity</Typography>
-      <Typography>Use 2 skill per Absorbtion</Typography>
+      <Typography>Use 2 skill per Absorption</Typography>
       {npc.species === "Construct" && (
         <>
           <Typography
@@ -66,13 +66,13 @@ export default function ExplainAffinities({ npc }) {
           </Typography>
         </>
       )}
-      {npc.species === "Planta" && (
+      {npc.species === "Plant" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Planta
+            Species: Plant
           </Typography>
           <Typography>
             <strong>Plants</strong> are Vulnerable to (choose one:{" "}

@@ -7,13 +7,13 @@ import "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB0cC_pOHaDjG14qJFj97LNKDdlIRR1boc",
-  authDomain: "fultimator.firebaseapp.com",
-  projectId: "fultimator",
-  storageBucket: "fultimator.appspot.com",
-  messagingSenderId: "980964047050",
-  appId: "1:980964047050:web:e438942af588a97064dc33",
-  measurementId: "G-E37Q3Z19TE",
+  apiKey: "AIzaSyAL0PZFyFcTg5OG7LE0wvBWGcpu1hsJ_Ro",
+  authDomain: "fabula-ultima-helper.firebaseapp.com",
+  projectId: "fabula-ultima-helper",
+  storageBucket: "fabula-ultima-helper.appspot.com",
+  messagingSenderId: "384266567864",
+  appId: "1:384266567864:web:3f56d8d7557cac54aef44d",
+  measurementId: "G-PN5NS6ZV35",
 };
 
 // Initialize Firebase

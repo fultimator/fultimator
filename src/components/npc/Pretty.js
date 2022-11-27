@@ -370,10 +370,10 @@ function Attacks({ npc }) {
                 damage {attack.type === "physical" && <strong>physical</strong>}
                 {attack.type !== "physical" && (
                   <>
-                    da{" "}
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
-                    </strong>
+                    </strong>{" "}
+                    damage
                   </>
                 )}
                 .{" "}
@@ -427,10 +427,10 @@ function Attacks({ npc }) {
                 {attack.weapon.type === "physical" && <strong>physical</strong>}
                 {attack.weapon.type !== "physical" && (
                   <>
-                    da{" "}
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
-                    </strong>
+                    </strong>{" "}
+                    damage
                   </>
                 )}
                 .{" "}
@@ -505,7 +505,7 @@ function Spells({ npc }) {
                       <CloseBracket /> <Diamond />
                     </>
                   )}{" "}
-                  {spell.mp} PM <Diamond /> {spell.target} <Diamond />{" "}
+                  {spell.mp} MP <Diamond /> {spell.target} <Diamond />{" "}
                   {spell.duration}
                 </strong>
                 <br />
@@ -731,10 +731,10 @@ function Equip({ npc }) {
             damage {weapon.type === "physical" && <strong>physical</strong>}
             {weapon.type !== "physical" && (
               <>
-                da{" "}
                 <strong style={{ textTransform: "lowercase" }}>
                   <TypeName type={weapon.type} />
-                </strong>
+                </strong>{" "}
+                damage
               </>
             )}{" "}
             <Diamond /> <strong>{weapon.cost}</strong> zenit

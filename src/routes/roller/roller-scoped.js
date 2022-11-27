@@ -35,7 +35,7 @@ function RollerScoped() {
     return (
       <Layout>
         <Typography sx={{ my: 1 }}>
-          Per prima cosa loggati con Google
+          You have to be logged in to access this feature
         </Typography>
         <SignIn />
       </Layout>

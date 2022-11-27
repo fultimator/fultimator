@@ -34,7 +34,7 @@ export default function EditBasics({ npc, setNpc }) {
         e.target.value === "Beast" ||
         e.target.value === "Demon" ||
         e.target.value === "Monster" ||
-        e.target.value === "Planta" ||
+        e.target.value === "Plant" ||
         e.target.value === "Humanoid"
       ) {
         newState.affinities = {};
@@ -102,7 +102,7 @@ export default function EditBasics({ npc, setNpc }) {
             <MenuItem value={"Demon"}>Demon</MenuItem>
             <MenuItem value={"Elemental"}>Elemental</MenuItem>
             <MenuItem value={"Monster"}>Monster</MenuItem>
-            <MenuItem value={"Planta"}>Planta</MenuItem>
+            <MenuItem value={"Plant"}>Plant</MenuItem>
             <MenuItem value={"Undead"}>Undead</MenuItem>
             <MenuItem value={"Humanoid"}>Humanoid</MenuItem>
           </Select>
