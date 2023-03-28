@@ -279,7 +279,9 @@ export function calcAvailableSkillsFromRank(npc) {
   if (npc.rank === "champion4") {
     return 4;
   }
-
+  if (npc.rank === "champion5") {
+    return 5;
+  }
   return 0;
 }
 
@@ -383,8 +385,8 @@ export function calcUsedSkillsFromResistances(npc) {
   if (sum < 0) {
     sum = 0;
   }
-
-  return Math.ceil(sum / 2);
+  //return Math.ceil(sum / 2);
+  return (sum / 2);
 }
 
 export function calcUsedSkillsFromImmunities(npc) {

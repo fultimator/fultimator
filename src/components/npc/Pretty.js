@@ -116,6 +116,7 @@ function Rank({ npc }) {
       {npc.rank === "champion2" && "Champion (2)"}
       {npc.rank === "champion3" && "Champion (3)"}
       {npc.rank === "champion4" && "Champion (4)"}
+      {npc.rank === "champion5" && "Champion (5)"}
     </>
   );
 }
@@ -367,7 +368,7 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                damage {attack.type === "physical" && <strong>physical</strong>}
+                {attack.type === "physical" && <><strong>physical</strong> damage</>}
                 {attack.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
@@ -376,17 +377,17 @@ function Attacks({ npc }) {
                     damage
                   </>
                 )}
-                .{" "}
+                {" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
+                      {" "}-{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
                         {effect}
                       </ReactMarkdown>
-                      .{" "}
                     </Typography>
                   );
                 })}
@@ -423,8 +424,7 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                damage{" "}
-                {attack.weapon.type === "physical" && <strong>physical</strong>}
+                {attack.weapon.type === "physical" && <><strong>physical</strong> damage </>}
                 {attack.weapon.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
@@ -433,10 +433,11 @@ function Attacks({ npc }) {
                     damage
                   </>
                 )}
-                .{" "}
+                {" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
+                      {" "}-{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
