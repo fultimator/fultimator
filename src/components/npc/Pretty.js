@@ -20,6 +20,7 @@ import {
   MeleeIcon,
   OffensiveSpellIcon,
   SpellIcon,
+  RareItemIcon
 } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 
@@ -33,6 +34,7 @@ function NpcPretty({ npc }, ref) {
         <Spells npc={npc} />
         <Actions npc={npc} />
         <Special npc={npc} />
+        <RareGear npc={npc} />
         <Equip npc={npc} />
       </div>
     </Card>
@@ -661,6 +663,69 @@ function Actions({ npc }) {
                   unwrapDisallowed={true}
                 >
                   {actions.effect}
+                </ReactMarkdown>
+                .
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
+function RareGear({ npc }) {
+  const raregear = [];
+
+  if (npc.raregear) {
+    npc.raregear.forEach((s) => {
+      raregear.push(s);
+    });
+  }
+
+  if (raregear.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Rare Equipment
+        </Typography>
+      </Grid>
+
+      {raregear?.map((raregear, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+              <Typography textAlign="center">
+                <RareItemIcon />
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+              <Typography>
+                <strong>{raregear.name}</strong> <Diamond />{" "}
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {raregear.effect}
                 </ReactMarkdown>
                 .
               </Typography>
