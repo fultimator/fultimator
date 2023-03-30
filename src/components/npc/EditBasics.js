@@ -230,11 +230,12 @@ function EditLevel({ npc, setnpc }) {
     });
   };
   return (
+
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
         label="Level"
-        type="number"
+        //type="number"
         min={5}
         max={60}
         value={npc.lvl}
