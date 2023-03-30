@@ -112,7 +112,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs={3.5}>
         <SelectWeapon
           weapon={attack.weapon}
           setWeapon={(value) => {
@@ -120,6 +120,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           }}
         />
       </Grid>
+      
       <Grid item>
         <FormGroup>
           <FormControlLabel
@@ -135,6 +136,21 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             label="Extra Damage"
           />
         </FormGroup>
+      </Grid>
+      <Grid item xs={1.5}>
+        <FormControl variant="standard">
+          <TextField
+            id="flatdmg"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label="Mod. Dmg."
+            value={attack.flatdmg || 0}
+            onChange={(e) => {
+              return setAttack("flatdmg", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
       </Grid>
     </Grid>
   );

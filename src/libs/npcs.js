@@ -147,6 +147,9 @@ export function calcDamage(attack, npc) {
     number = number - 5 + attack.weapon.damage;
   }
 
+  //Flat Damage Input
+  let flat = Number(attack.flatdmg)
+  number += flat
   return number;
 }
 
