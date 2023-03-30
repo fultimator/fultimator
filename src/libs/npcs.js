@@ -148,8 +148,9 @@ export function calcDamage(attack, npc) {
   }
 
   //Flat Damage Input
-  let flat = Number(attack.flatdmg)
-  number += flat
+  if (attack.flatdmg) {
+    number += Number(attack.flatdmg)
+  }
   return number;
 }
 

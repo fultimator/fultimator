@@ -119,8 +119,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             return setAttack("weapon", value);
           }}
         />
-      </Grid>
-      
+      </Grid>  
       <Grid item>
         <FormGroup>
           <FormControlLabel
