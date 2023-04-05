@@ -176,6 +176,10 @@ export function calcPrecision(attack, npc) {
     const sl = npc.companionlvl || 1;
     number = number + sl;
   }
+  //Flat Hit Input
+  if (attack.flathit) {
+    number += Number(attack.flathit)
+  }
 
   return number;
 }

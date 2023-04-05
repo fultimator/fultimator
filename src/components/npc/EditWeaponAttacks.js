@@ -119,8 +119,38 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             return setAttack("weapon", value);
           }}
         />
+      </Grid>
+      <Grid item xs={1.2}>
+        <FormControl variant="standard">
+          <TextField
+            id="flathit"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label="Acc."
+            value={attack.flathit || 0}
+            onChange={(e) => {
+              return setAttack("flathit", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
+      </Grid>
+      <Grid item xs={1.2}>
+        <FormControl variant="standard">
+          <TextField
+            id="flatdmg"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label="Dmg."
+            value={attack.flatdmg || 0}
+            onChange={(e) => {
+              return setAttack("flatdmg", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
       </Grid>  
-      <Grid item>
+      <Grid item xs={2.1}>
         <FormGroup>
           <FormControlLabel
             control={
@@ -133,23 +163,10 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               />
             }
             label="Extra Damage"
+            labelPlacement="top"
+            style={{ padding: '0px' }}
           />
         </FormGroup>
-      </Grid>
-      <Grid item xs={1.5}>
-        <FormControl variant="standard">
-          <TextField
-            id="flatdmg"
-            type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label="Mod. Dmg."
-            value={attack.flatdmg || 0}
-            onChange={(e) => {
-              return setAttack("flatdmg", e.target.value);
-            }}
-            size="small"
-          ></TextField>
-        </FormControl>
       </Grid>
     </Grid>
   );
