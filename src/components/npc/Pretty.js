@@ -356,7 +356,7 @@ function Attacks({ npc }) {
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
-                <strong>{attack.name}</strong> <Diamond />{" "}
+                <strong>{attack.name}</strong> <Diamond />
                 <strong>
                   <OpenBracket />
                   {attributes[attack.attr1].shortcaps}+
@@ -366,17 +366,16 @@ function Attacks({ npc }) {
                   <CloseBracket /> <Diamond /> <OpenBracket />
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
-                </strong>{" "}
-                damage {attack.type === "physical" && <strong>physical</strong>}
+                </strong>
+                {attack.type === "physical" && <strong>physical</strong>}
                 {attack.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
-                    </strong>{" "}
-                    damage
+                    </strong>
                   </>
                 )}
-                .{" "}
+                {` damage. `}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
@@ -384,9 +383,8 @@ function Attacks({ npc }) {
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {effect}
+                        {` ${effect}`}
                       </ReactMarkdown>
-                      .{" "}
                     </Typography>
                   );
                 })}
@@ -423,17 +421,15 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                damage{" "}
                 {attack.weapon.type === "physical" && <strong>physical</strong>}
                 {attack.weapon.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
                     </strong>{" "}
-                    damage
                   </>
                 )}
-                .{" "}
+                {` damage. `}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
@@ -441,9 +437,8 @@ function Attacks({ npc }) {
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {effect}
+                        {` ${effect}`}
                       </ReactMarkdown>
-                      .{" "}
                     </Typography>
                   );
                 })}
@@ -728,15 +723,15 @@ function Equip({ npc }) {
               HR + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
-            damage {weapon.type === "physical" && <strong>physical</strong>}
+            {weapon.type === "physical" && <strong>physical</strong>}
             {weapon.type !== "physical" && (
               <>
                 <strong style={{ textTransform: "lowercase" }}>
                   <TypeName type={weapon.type} />
-                </strong>{" "}
-                damage
+                </strong>
               </>
             )}{" "}
+            damage
             <Diamond /> <strong>{weapon.cost}</strong> zenit
           </Typography>
         </Grid>
