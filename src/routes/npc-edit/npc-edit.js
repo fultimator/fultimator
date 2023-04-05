@@ -19,6 +19,7 @@ import ExplainAffinities from "../../components/npc/ExplainAffinities";
 import EditExtra from "../../components/npc/EditExtra";
 import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
+import EditRareGear from "../../components/npc/EditRareGear";
 import {createFileName, useScreenshot} from "use-react-screenshot";
 
 export default function NpcEdit() {
@@ -121,6 +122,9 @@ export default function NpcEdit() {
         </Grid>
         <Grid item xs={6}>
           <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+        </Grid>
+        <Grid item xs={6}>
+          <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />

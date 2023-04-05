@@ -171,7 +171,7 @@ export default function ExplainSkills({ npc }) {
           )}
           {calcUsedSkillsFromSpecial(npc) > 0 && (
             <TableRow>
-              <TableCell>Used skills from resistances</TableCell>
+              <TableCell>Used skills from special rules</TableCell>
               <TableCell>{calcUsedSkillsFromSpecial(npc)}</TableCell>
             </TableRow>
           )}

@@ -20,6 +20,7 @@ import {
   MeleeIcon,
   OffensiveSpellIcon,
   SpellIcon,
+  RareItemIcon
 } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 
@@ -33,6 +34,7 @@ function NpcPretty({ npc }, ref) {
         <Spells npc={npc} />
         <Actions npc={npc} />
         <Special npc={npc} />
+        <RareGear npc={npc} />
         <Equip npc={npc} />
       </div>
     </Card>
@@ -116,6 +118,7 @@ function Rank({ npc }) {
       {npc.rank === "champion2" && "Champion (2)"}
       {npc.rank === "champion3" && "Champion (3)"}
       {npc.rank === "champion4" && "Champion (4)"}
+      {npc.rank === "champion5" && "Champion (5)"}
     </>
   );
 }
@@ -356,7 +359,7 @@ function Attacks({ npc }) {
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
-                <strong>{attack.name}</strong> <Diamond />
+                <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
                   <OpenBracket />
                   {attributes[attack.attr1].shortcaps}+
@@ -366,24 +369,26 @@ function Attacks({ npc }) {
                   <CloseBracket /> <Diamond /> <OpenBracket />
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
-                </strong>
-                {attack.type === "physical" && <strong>physical</strong>}
+                </strong>{" "}
+                {attack.type === "physical" && <><strong>physical</strong> damage</>}
                 {attack.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
-                    </strong>
+                    </strong>{" "}
+                    damage
                   </>
                 )}
-                {` damage. `}
+                {" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
+                      {" "}-{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {` ${effect}`}
+                        {effect}
                       </ReactMarkdown>
                     </Typography>
                   );
@@ -421,24 +426,27 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.weapon.type === "physical" && <strong>physical</strong>}
+                {attack.weapon.type === "physical" && <><strong>physical</strong> damage </>}
                 {attack.weapon.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
                       <TypeName type={attack.type} />
                     </strong>{" "}
+                    damage
                   </>
                 )}
-                {` damage. `}
+                {" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
+                      {" "}-{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {` ${effect}`}
+                        {effect}
                       </ReactMarkdown>
+                      .{" "}
                     </Typography>
                   );
                 })}
@@ -666,6 +674,69 @@ function Actions({ npc }) {
   );
 }
 
+function RareGear({ npc }) {
+  const raregear = [];
+
+  if (npc.raregear) {
+    npc.raregear.forEach((s) => {
+      raregear.push(s);
+    });
+  }
+
+  if (raregear.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Rare Equipment
+        </Typography>
+      </Grid>
+
+      {raregear?.map((raregear, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+              <Typography textAlign="center">
+                <RareItemIcon />
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+              <Typography>
+                <strong>{raregear.name}</strong> <Diamond />{" "}
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {raregear.effect}
+                </ReactMarkdown>
+                .
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
 function Equip({ npc }) {
   const weapons = [];
 
@@ -723,15 +794,15 @@ function Equip({ npc }) {
               HR + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
-            {weapon.type === "physical" && <strong>physical</strong>}
+            damage {weapon.type === "physical" && <strong>physical</strong>}
             {weapon.type !== "physical" && (
               <>
                 <strong style={{ textTransform: "lowercase" }}>
                   <TypeName type={weapon.type} />
-                </strong>
+                </strong>{" "}
+                damage
               </>
             )}{" "}
-            damage
             <Diamond /> <strong>{weapon.cost}</strong> zenit
           </Typography>
         </Grid>
