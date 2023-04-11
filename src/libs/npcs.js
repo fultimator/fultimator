@@ -55,8 +55,11 @@ export function calcInit(npc) {
   let init = (npc.attributes.dexterity + npc.attributes.insight) / 2;
 
   // Skill Extra Init
-  let flatinit = Number(npc.extra?.extrainit)
-  init += flatinit
+  let flatinit = Number(npc.extra?.extrainit);
+  if (!isNaN(flatinit)) {
+    init += flatinit;
+  }
+
   if (npc.extra?.init) {
     init += 4;
   }
@@ -71,12 +74,14 @@ export function calcInit(npc) {
   if (npc.rank === "champion4") {
     init = init + 4;
   }
+  if (npc.rank === "champion5") {
+    init = init + 5;
+  }
 
   // Armor
   if (npc.armor?.init) {
     init += npc.armor?.init;
   }
-
 
   return init;
 }
@@ -149,7 +154,7 @@ export function calcDamage(attack, npc) {
 
   //Flat Damage Input
   if (attack.flatdmg) {
-    number += Number(attack.flatdmg)
+    number += Number(attack.flatdmg);
   }
   return number;
 }
@@ -178,7 +183,7 @@ export function calcPrecision(attack, npc) {
   }
   //Flat Hit Input
   if (attack.flathit) {
-    number += Number(attack.flathit)
+    number += Number(attack.flathit);
   }
 
   return number;
@@ -396,7 +401,7 @@ export function calcUsedSkillsFromResistances(npc) {
     sum = 0;
   }
   //return Math.ceil(sum / 2);
-  return (sum / 2);
+  return sum / 2;
 }
 
 export function calcUsedSkillsFromImmunities(npc) {
