@@ -7,8 +7,8 @@ import NpcPretty from "../../components/npc/Pretty";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "@firebase/firestore";
 import EditBasics from "../../components/npc/EditBasics";
-import { Download, Save, Code } from "@mui/icons-material";
-import { createRef, useCallback, useEffect, useState } from "react";
+import { Download, Save, Code, Publish } from "@mui/icons-material";
+import { createRef, useCallback, useEffect, useState, useRef } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import EditAttacks from "../../components/npc/EditAttacks";
@@ -77,6 +77,23 @@ export default function NpcEdit() {
     a.download = createFileName(extension, name);
     a.click();
   };
+
+  const readFile = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsText(file, "utf-8");
+      reader.onload = () => {
+        try {
+          const { result } = reader;
+          if (!result) reject();
+          resolve(JSON.parse(result));
+        } catch (error) {
+          reject();
+        }
+      };
+    });
+
+  const uploaderRef = useRef(null);
 
   const getImage = () => takeScreenShot(prettyRef.current);
 
@@ -172,6 +189,30 @@ export default function NpcEdit() {
         onClick={downloadJSON}
       >
         <Code />
+      </Fab>
+
+      <input
+        type="file"
+        ref={uploaderRef}
+        multiple={false}
+        accept=".json"
+        style={{ display: " none" }}
+        onChange={async ({ target }) => {
+          const file = target.files?.[0];
+          if (!file) return;
+          setNpcTemp(await readFile(file));
+        }}
+      />
+      <Fab
+        color="primary"
+        aria-label="export"
+        sx={{ position: "absolute", bottom: -180, right: 0 }}
+        onClick={() => {
+          if (!uploaderRef.current) return;
+          uploaderRef.current.click();
+        }}
+      >
+        <Publish />
       </Fab>
     </Layout>
   );
