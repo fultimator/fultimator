@@ -20,7 +20,7 @@ import {
   MeleeIcon,
   OffensiveSpellIcon,
   SpellIcon,
-  RareItemIcon
+  RareItemIcon,
 } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 
@@ -370,7 +370,11 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.type === "physical" && <><strong>physical</strong> damage</>}
+                {attack.type === "physical" && (
+                  <>
+                    <strong>physical</strong> damage
+                  </>
+                )}
                 {attack.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
@@ -378,12 +382,12 @@ function Attacks({ npc }) {
                     </strong>{" "}
                     damage
                   </>
-                )}
-                {" "}
+                )}{" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
-                      {" "}-{" "}
+                      {" "}
+                      -{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
@@ -426,7 +430,11 @@ function Attacks({ npc }) {
                   HR + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.weapon.type === "physical" && <><strong>physical</strong> damage </>}
+                {attack.weapon.type === "physical" && (
+                  <>
+                    <strong>physical</strong> damage{" "}
+                  </>
+                )}
                 {attack.weapon.type !== "physical" && (
                   <>
                     <strong style={{ textTransform: "lowercase" }}>
@@ -434,19 +442,18 @@ function Attacks({ npc }) {
                     </strong>{" "}
                     damage
                   </>
-                )}
-                {" "}
+                )}{" "}
                 {attack.special?.map((effect, i) => {
                   return (
                     <Typography component="span" key={i}>
-                      {" "}-{" "}
+                      {" "}
+                      -{" "}
                       <ReactMarkdown
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
                         {effect}
-                      </ReactMarkdown>
-                      .{" "}
+                      </ReactMarkdown>{" "}
                     </Typography>
                   );
                 })}
@@ -518,8 +525,7 @@ function Spells({ npc }) {
                     unwrapDisallowed={true}
                   >
                     {spell.effect}
-                  </ReactMarkdown>
-                  .{" "}
+                  </ReactMarkdown>{" "}
                 </Typography>
               </Typography>
             </Grid>
@@ -601,7 +607,6 @@ function Special({ npc }) {
                 >
                   {special.effect}
                 </ReactMarkdown>
-                .
               </Typography>
             </Grid>
           </Fragment>
@@ -664,7 +669,6 @@ function Actions({ npc }) {
                 >
                   {actions.effect}
                 </ReactMarkdown>
-                .
               </Typography>
             </Grid>
           </Fragment>
@@ -727,7 +731,6 @@ function RareGear({ npc }) {
                 >
                   {raregear.effect}
                 </ReactMarkdown>
-                .
               </Typography>
             </Grid>
           </Fragment>
