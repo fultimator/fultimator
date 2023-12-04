@@ -5,7 +5,6 @@ import {
   Checkbox,
   Divider,
   FormControlLabel,
-  FormGroup,
   Grid,
   Skeleton,
   TextField,
@@ -21,6 +20,7 @@ import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { useEffect } from "react";
 
 export default function Combat() {
   const [user, loading, error] = useAuthState(auth);
@@ -114,6 +114,17 @@ function AuthCombat({ user }) {
 function Npc({ npc }) {
   const [hp, setHp] = useState(calcHP(npc));
   const [mp, setMp] = useState(calcMP(npc));
+  const [attributes, setAttributes] = useState(npc.attributes);
+  const [statusEffects, setStatusEffects] = useState({
+    slow: false,
+    dazed: false,
+    weak: false,
+    shaken: false,
+    enraged: false,
+    poisoned: false,
+  });
+
+  const originalAttributes = npc.attributes;
 
   const changeHp = (value) => {
     return () => {
@@ -124,6 +135,84 @@ function Npc({ npc }) {
     return () => {
       setMp(mp + value);
     };
+  };
+
+  const adjustAttribute = (attribute = 0, amount = 0, min = 6) => {
+    return attribute + amount <= min ? min : attribute + amount;
+  };
+
+  useEffect(() => {
+    let { slow, dazed, weak, shaken, enraged, poisoned } = statusEffects;
+
+    setAttributes({
+      dexterity:
+        enraged && slow
+          ? adjustAttribute(originalAttributes.dexterity, -4)
+          : enraged || slow
+          ? adjustAttribute(originalAttributes.dexterity, -2)
+          : originalAttributes.dexterity,
+      insight:
+        enraged && dazed
+          ? adjustAttribute(originalAttributes.insight, -4)
+          : enraged || dazed
+          ? adjustAttribute(originalAttributes.insight, -2)
+          : originalAttributes.insight,
+      might:
+        poisoned && weak
+          ? adjustAttribute(originalAttributes.might, -4)
+          : poisoned || weak
+          ? adjustAttribute(originalAttributes.might, -2)
+          : originalAttributes.might,
+      will:
+        poisoned && shaken
+          ? adjustAttribute(originalAttributes.will, -4)
+          : poisoned || shaken
+          ? adjustAttribute(originalAttributes.will, -2)
+          : originalAttributes.will,
+    });
+  }, [statusEffects]);
+
+  const toggleStatus = (status = "", hasStatus = false) => {
+    switch (status) {
+      case "slow":
+        setStatusEffects((s) => ({
+          ...s,
+          slow: hasStatus,
+        }));
+        break;
+      case "dazed":
+        setStatusEffects((s) => ({
+          ...s,
+          dazed: hasStatus,
+        }));
+        break;
+      case "weak":
+        setStatusEffects((s) => ({
+          ...s,
+          weak: hasStatus,
+        }));
+        break;
+      case "shaken":
+        setStatusEffects((s) => ({
+          ...s,
+          shaken: hasStatus,
+        }));
+        break;
+      case "enraged":
+        setStatusEffects((s) => ({
+          ...s,
+          enraged: hasStatus,
+        }));
+        break;
+      case "poisoned":
+        setStatusEffects((s) => ({
+          ...s,
+          poisoned: hasStatus,
+        }));
+        break;
+      default:
+        break;
+    }
   };
 
   const crisis = hp < calcHP(npc) / 2;
@@ -182,49 +271,101 @@ function Npc({ npc }) {
               <Button onClick={changeMp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={12}>
-            <FormGroup aria-label="position" row>
+          <Grid item container xs={12}>
+            <Grid item xs>
+              <Typography variant="h5">DEX: d{attributes.dexterity}</Typography>
+            </Grid>
+            <Grid item xs>
+              <Typography variant="h5">INS: d{attributes.insight}</Typography>
+            </Grid>
+            <Grid item xs>
+              <Typography variant="h5">MIG: d{attributes.might}</Typography>
+            </Grid>
+            <Grid item xs>
+              <Typography variant="h5">WIL: d{attributes.will}</Typography>
+            </Grid>
+          </Grid>
+          <Grid item container xs={12}>
+            <Grid item xs>
               <FormControlLabel
                 value="slow"
                 control={<Checkbox />}
                 label="Slow"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
+            </Grid>
+            <Grid item xs>
               <FormControlLabel
                 value="dazed"
                 control={<Checkbox />}
                 label="Dazed"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
+            </Grid>
+            <Grid item xs>
               <FormControlLabel
                 value="weak"
                 control={<Checkbox />}
                 label="Weak"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
+            </Grid>
+            <Grid item xs>
               <FormControlLabel
                 value="shaken"
                 control={<Checkbox />}
                 label="Shaken"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
-            </FormGroup>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <FormGroup aria-label="position" row>
+          <Grid item container xs={12}>
+            <Grid item xs display="flex" justifyContent="center">
               <FormControlLabel
                 value="enraged"
                 control={<Checkbox />}
                 label="Enraged"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
+            </Grid>
+            <Grid item xs display="flex" justifyContent="center">
               <FormControlLabel
                 value="poisoned"
                 control={<Checkbox />}
                 label="Poisoned"
                 labelPlacement="top"
+                onClick={({ target: { value, checked } }) => {
+                  if (typeof checked === "boolean") {
+                    toggleStatus(value, checked);
+                  }
+                }}
               />
-            </FormGroup>
+            </Grid>
           </Grid>
           <Grid item flex="1"></Grid>
         </Grid>
