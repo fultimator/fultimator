@@ -83,6 +83,9 @@ function AuthCombat({ user }) {
   });
 
   console.debug(npcs);
+  console.log(
+    npcs
+  )
 
   return (
     <Grid container sx={{ mt: 2 }}>
