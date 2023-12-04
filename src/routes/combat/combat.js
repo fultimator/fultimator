@@ -20,6 +20,7 @@ import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { useEffect } from "react";
 
 export default function Combat() {
   const [user, loading, error] = useAuthState(auth);
@@ -137,83 +138,66 @@ function Npc({ npc }) {
     };
   };
 
-  const decreaseAttribute = (attribute = 0, min = 6) => {
-    return attribute <= min ? min : attribute - 2;
+  const adjustAttribute = (attribute = 0, amount = 0, min = 6) => {
+    return attribute + amount <= min ? min : attribute + amount
   }
 
-  const increaseAttribute = (attribute = 0, max = 12) => {
-    return attribute >= max ? max : attribute + 2;
-  }
+  useEffect(() => {
+    let {
+      slow,
+      dazed,
+      weak,
+      shaken,
+      enraged,
+      poisoned
+    } = statusEffects
+
+    setAttributes({
+      dexterity: enraged && slow ? adjustAttribute(originalAttributes.dexterity, -4) : enraged || slow ? adjustAttribute(originalAttributes.dexterity, -2) : originalAttributes.dexterity,
+      insight: enraged && dazed ? adjustAttribute(originalAttributes.insight, -4) : enraged || dazed ? adjustAttribute(originalAttributes.insight, -2) : originalAttributes.insight,
+      might: poisoned && weak ? adjustAttribute(originalAttributes.might, -4) : poisoned || weak ? adjustAttribute(originalAttributes.might, -2) : originalAttributes.might,
+      will: poisoned && shaken ? adjustAttribute(originalAttributes.will, -4) : poisoned || shaken ? adjustAttribute(originalAttributes.will, -2) : originalAttributes.will
+    });
+  }, [statusEffects]);
+
 
   const toggleStatus = (status = '', hasStatus = false) => {
     switch (status) {
       case 'slow':
-
         setStatusEffects(s => ({
           ...s,
           slow: hasStatus
         }));
-        setAttributes(s => ({
-          ...s,
-          dexterity: hasStatus ? decreaseAttribute(s.dexterity) : increaseAttribute(s.dexterity, originalAttributes.dexterity)
-        }));
         break;
       case 'dazed':
-
         setStatusEffects(s => ({
           ...s,
           dazed: hasStatus
         }))
-        setAttributes(s => ({
-          ...s,
-          insight: hasStatus ? decreaseAttribute(s.insight) : increaseAttribute(s.insight, originalAttributes.insight)
-        }));
         break;
       case 'weak':
-
         setStatusEffects(s => ({
           ...s,
           weak: hasStatus
         }))
-        setAttributes(s => ({
-          ...s,
-          might: hasStatus ? decreaseAttribute(s.might) : increaseAttribute(s.might, originalAttributes.might)
-        }));
         break;
       case 'shaken':
-
         setStatusEffects(s => ({
           ...s,
           shaken: hasStatus
         }))
-        setAttributes(s => ({
-          ...s,
-          will: hasStatus ? decreaseAttribute(s.will) : increaseAttribute(s.will, originalAttributes.will)
-        }));
         break;
       case 'enraged':
-
         setStatusEffects(s => ({
           ...s,
           enraged: hasStatus
         }))
-        setAttributes(s => ({
-          ...s,
-          dexterity: hasStatus ? decreaseAttribute(s.dexterity) : increaseAttribute(s.dexterity, originalAttributes.dexterity),
-          insight: hasStatus ? decreaseAttribute(s.insight) : increaseAttribute(s.insight, originalAttributes.insight)
-        }));
         break;
       case 'poisoned':
-
         setStatusEffects(s => ({
           ...s,
           poisoned: hasStatus
         }))
-        setAttributes(s => ({
-          ...s,
-          might: hasStatus ? decreaseAttribute(s.might) : increaseAttribute(s.might, originalAttributes.might),
-          will: hasStatus ? decreaseAttribute(s.will) : increaseAttribute(s.will, originalAttributes.will)
-        }));
         break;
       default:
         break;
@@ -307,14 +291,11 @@ function Npc({ npc }) {
                 value="slow"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="Slow"
                 labelPlacement="top"
-
               />
             </Grid>
             <Grid item xs>
@@ -322,9 +303,7 @@ function Npc({ npc }) {
                 value="dazed"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="Dazed"
@@ -336,9 +315,7 @@ function Npc({ npc }) {
                 value="weak"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="Weak"
@@ -350,14 +327,11 @@ function Npc({ npc }) {
                 value="shaken"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="Shaken"
                 labelPlacement="top"
-
               />
             </Grid>
           </Grid>
@@ -367,9 +341,7 @@ function Npc({ npc }) {
                 value="enraged"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="Enraged"
@@ -381,9 +353,7 @@ function Npc({ npc }) {
                 value="poisoned"
                 control={<Checkbox
                   onClick={({ target: { value, checked } }) => {
-
                     toggleStatus(value, checked)
-
                   }}
                 />}
                 label="poisoned"
