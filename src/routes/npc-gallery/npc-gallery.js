@@ -54,8 +54,6 @@ export default function NpcGallery() {
 }
 
 function Personal({ user }) {
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -162,22 +160,11 @@ function Personal({ user }) {
           ))}
         </Select>
       </FormControl>
-
-      {isSmallScreen ? (
-        <Grid spacing={2} sx={{ width: '200%' }}>
-          {personalList?.map((npc, i) => (
-            <div key={i} sx={{ flexBasis: '100%', width: '100%' }}>
-              <Npc npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
-            </div>
-          ))}
-        </Grid>
-      ) : (
       <Grid container spacing={2}>
         {personalList?.map((npc, i) => (
             <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
         ))}
         </Grid>
-      )}
     </>
    );
 }
@@ -215,7 +202,7 @@ function Npc({ npc, copyNpc, deleteNpc }) {
     }
   }, [image, npc.name]);
   return (
-    <Grid item xs={6}>
+    <Grid item xs={12} md={6}>
       <NpcPretty npc={npc} ref={ref} />
       {/* <NpcUgly npc={npc} /> */}
       <Tooltip title="Copy">
