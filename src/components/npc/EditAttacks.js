@@ -14,12 +14,17 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  useMediaQuery, 
+  useTheme
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import types from "../../libs/types";
 import { DistanceIcon, MeleeIcon } from "../icons";
 
 export default function EditAttacks({ npc, setNpc }) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -70,21 +75,21 @@ export default function EditAttacks({ npc, setNpc }) {
       {npc.attacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={7}>
+            <Grid item xs={isSmallScreen ? 12 : isMediumScreen ? 10 : 5}>
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
                 removeAttack={removeAttack(i)}
               />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={12} md={7}>
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.attacks.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1 }}>
+              <Grid item xs={12} sx={{ py: isSmallScreen ? 1 : 2 }}>
                 <Divider />
               </Grid>
             )}
@@ -103,7 +108,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item>
+      <Grid item xs={8}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -116,10 +121,10 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs={2} md={1}>
         <FormControl variant="standard" fullWidth>
           <ToggleButtonGroup
-            size="small"
+            size="medium"
             value={attack.range}
             exclusive
             onChange={(e, value) => {
@@ -136,7 +141,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </ToggleButtonGroup>
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr1label"}>Attr 1</InputLabel>
           <Select
@@ -156,7 +161,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr2label"}>Attr 2</InputLabel>
           <Select
@@ -176,7 +181,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs>
+      <Grid item xs={8} lg={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>Type</InputLabel>
           <Select
@@ -199,12 +204,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs={4} lg={2}>
         <FormGroup>
           <FormControlLabel
             control={
               <Checkbox
-                size="small"
+                size="medium"
                 value={attack.extraDamage}
                 onChange={(e, value) => {
                   return setAttack("extraDamage", e.target.checked);
@@ -237,16 +242,20 @@ function EditAttackSpecial({ attack, setAttack }) {
   };
 
   return (
-    <FormControl variant="standard" fullWidth>
-      <TextField
-        id="special"
-        label="Special"
-        multiline
-        value={specials}
-        onChange={onChange}
-        size="small"
-        helperText="Adding a special effect cost 1 skill point"
-      ></TextField>
-    </FormControl>
+    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+      <Grid item xs={12}>
+        <FormControl variant="standard" fullWidth>
+          <TextField
+            id="special"
+            label="Special"
+            multiline
+            value={specials}
+            onChange={onChange}
+            size="small"
+            helperText="Adding a special effect cost 1 skill point"
+          ></TextField>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 }

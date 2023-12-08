@@ -9,6 +9,8 @@ import {
   Skeleton,
   TextField,
   Typography,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -217,10 +219,15 @@ function Npc({ npc }) {
 
   const crisis = hp < calcHP(npc) / 2;
 
+  const [selectedStudy, setSelectedStudy] = useState("0");
+
+  const handleStudyChange = (event) => {
+    setSelectedStudy(event.target.value);
+  }
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} />
+        <NpcPretty npc={npc} study={selectedStudy} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
@@ -284,6 +291,25 @@ function Npc({ npc }) {
             <Grid item xs>
               <Typography variant="h5">WIL: d{attributes.will}</Typography>
             </Grid>
+          </Grid>
+          <Grid item container xs={12}>
+            <Grid item xs={2}>
+              <Typography variant="h5">Study Roll:</Typography>
+            </Grid>
+            <Grid item xs={2}>
+            <Select
+              labelId="study"
+              id="study"
+              value={selectedStudy}
+              onChange={handleStudyChange}
+              fullWidth
+            >
+              <MenuItem value={0}>-</MenuItem>
+              <MenuItem value={1}>7+</MenuItem>
+              <MenuItem value={2}>10+</MenuItem>
+              <MenuItem value={3}>13+</MenuItem>
+            </Select>
+          </Grid>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>
