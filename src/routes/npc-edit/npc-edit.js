@@ -103,7 +103,7 @@ export default function NpcEdit() {
 
   const downloadJSON = () => {
     const jsonData = JSON.stringify(npcTemp);
-    downloadFile(jsonData, "npc-export.json", "text/plain");
+    downloadFile(jsonData, `${npc.name.replace(" ", "_")}.json`, "text/plain");
   };
 
   const [image, takeScreenShot] = useScreenshot();
