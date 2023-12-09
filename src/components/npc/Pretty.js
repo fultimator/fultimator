@@ -29,7 +29,7 @@ function NpcPretty({ npc, study }, ref) {
   return (
     <Card>
       <div ref={ref}>
-        {(study === "0" || study === null || study === undefined) && (
+        {(study === 0 || study === null || study === undefined) && (
           <>
             <Header npc={npc} />
             <Stats npc={npc} />
@@ -42,9 +42,9 @@ function NpcPretty({ npc, study }, ref) {
           </>
         )}
 
-        {(study >= 1) && (
+        {study >= 1 && (
           <div>
-             <Study npc={npc} study={study} />
+            <Study npc={npc} study={study} />
           </div>
         )}
       </div>
@@ -103,7 +103,7 @@ function Header({ npc }) {
           borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
         }}
       >
-      <Typography
+        <Typography
           fontFamily="Antonio"
           fontSize="1.25rem"
           sx={{ textTransform: "uppercase" }}
@@ -873,18 +873,28 @@ function Equip({ npc }) {
   );
 }
 
-
 function renderVillainPhase({ villain, phases, multipart }) {
-
   const phaseString = phases && phases >= 1 ? `Phase ${phases}` : null;
 
-  const values = [villain && `${villain} Villain`, phaseString, multipart].filter(Boolean);
+  const values = [
+    villain && `${villain} Villain`,
+    phaseString,
+    multipart,
+  ].filter(Boolean);
 
-  const combinedString = values.length > 0 ? values.join(' ⬥ ') : null;
+  const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
 
-  return <>{combinedString && <>{combinedString} {Diamond}</>}</>;
+  return (
+    <>
+      {combinedString && (
+        <>
+          {combinedString} {Diamond}
+        </>
+      )}
+    </>
+  );
 }
 
 export default React.forwardRef(NpcPretty);
 
-export {calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells}
+export { calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells };
