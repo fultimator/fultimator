@@ -201,9 +201,8 @@ export default function EditBasics({ npc, setNpc }) {
             </FormControl>
             </Grid>
           )}
-      
 
-      <Grid item xs={12} sm={5}>
+      <Grid item xs={12} sm={5} md>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
@@ -215,8 +214,6 @@ export default function EditBasics({ npc, setNpc }) {
         </FormControl>
       </Grid>
 
-
-      
       <Grid item xs={12}>
         <FormControl variant="standard" fullWidth>
           <TextField
