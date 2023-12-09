@@ -219,7 +219,7 @@ function Npc({ npc }) {
 
   const crisis = hp < calcHP(npc) / 2;
 
-  const [selectedStudy, setSelectedStudy] = useState("0");
+  const [selectedStudy, setSelectedStudy] = useState(0);
 
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);

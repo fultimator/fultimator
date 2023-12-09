@@ -101,10 +101,12 @@ function Love({ npc, study }) {
               ml: "2px",
               my: "2px",
               flexBasis: "calc(50% - 2px)",
+              px: 0.2,
+              py: 0.2,
             }}
           >
-            <Grid container alignItems="stretch" justifyContent="space-between">
-              <Grid item xs sx={{ px: 1, py: 0.4 }}>
+            <Grid container alignItems="stretch" >
+              <Grid item sx={{ px: 1.5, py: 0.4 }}> 
                 HP
               </Grid>
               <Grid
@@ -119,22 +121,19 @@ function Love({ npc, study }) {
                 {calcHP(npc)} <Diamond color="white.main" />{" "}
                 {Math.floor(calcHP(npc) / 2)}
               </Grid>
-              <Grid item sx={{ px: 1, py: 0.4 }}>
+              <Grid item sx={{ px: 1.5, py: 0.4 }}>
                 MP
               </Grid>
               <Grid
                 item
                 sx={{
-                  px: 1.5,
                   py: 0.4,
+                  px: 1.5,
                   color: "white.main",
                   bgcolor: "cyan.main",
                 }}
               >
                 {calcMP(npc)}
-              </Grid>
-              <Grid item xs sx={{ py: 0.4 }}>
-                Init. {calcInit(npc)}
               </Grid>
             </Grid>
           </Grid>
