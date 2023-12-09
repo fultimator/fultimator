@@ -14,7 +14,17 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 
-import { IconButton, Skeleton, Tooltip, Typography, Grid, useMediaQuery, useTheme, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import {
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography,
+  Grid,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
@@ -32,8 +42,7 @@ import { createFileName, useScreenshot } from "use-react-screenshot";
 import { createRef, useEffect, useState } from "react";
 
 export default function NpcGallery() {
-  const [user, loading, error] = useAuthState(auth);
-  console.debug("user, loading, error", user, loading, error);
+  const [user, loading] = useAuthState(auth);
 
   return (
     <Layout>
@@ -113,7 +122,7 @@ function Personal({ user }) {
     };
   };
 
-  const [selectedNpc, setSelectedNpc] = useState('');
+  const [selectedNpc, setSelectedNpc] = useState("");
 
   const handleNpcChange = (event) => {
     setSelectedNpc(event.target.value);
@@ -121,7 +130,7 @@ function Personal({ user }) {
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
         <Typography variant="h4">
           NPCs
           <Tooltip title="Create NPC">
@@ -130,12 +139,14 @@ function Personal({ user }) {
             </IconButton>
           </Tooltip>
         </Typography>
-        
-        <Typography sx={{ marginLeft: 'none', fontStyle: 'italic', color: '#777' }}>
+
+        <Typography
+          sx={{ marginLeft: "none", fontStyle: "italic", color: "#777" }}
+        >
           Note for Mobile Users: For better quality, export in landscape mode.
         </Typography>
       </div>
-      
+
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel id="npc-select-label">Select NPC</InputLabel>
         <Select
@@ -162,11 +173,11 @@ function Personal({ user }) {
       </FormControl>
       <Grid container spacing={2}>
         {personalList?.map((npc, i) => (
-            <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
+          <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
         ))}
-        </Grid>
+      </Grid>
     </>
-   );
+  );
 }
 
 function Npc({ npc, copyNpc, deleteNpc }) {
@@ -183,7 +194,7 @@ function Npc({ npc, copyNpc, deleteNpc }) {
   }
   const getJSON = () => {
     const jsonData = JSON.stringify(npc);
-    const fileName = `${npc.name.replace(/\s/g, '_').toLowerCase()}.json`;
+    const fileName = `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`;
     downloadFile(jsonData, fileName, "text/plain");
   };
 

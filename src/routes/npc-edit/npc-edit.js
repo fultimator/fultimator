@@ -1,14 +1,23 @@
 import { useParams } from "react-router-dom";
 import { firestore } from "../../firebase";
 
-import { Grid, Divider, Fab, Fade, Tooltip } from "@mui/material";
+import { Grid, Divider, Fab, Fade, Tooltip, Snackbar } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc } from "@firebase/firestore";
+import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
 import EditBasics from "../../components/npc/EditBasics";
-import { Download, Save, Code, Publish, ArrowUpward, Menu, Close } from "@mui/icons-material";
-import { createRef, useCallback, useEffect, useState, useRef } from "react";
+import {
+  Download,
+  Save,
+  Code,
+  Share,
+  ArrowUpward,
+  Menu,
+  ContentCopy,
+  Close,
+} from "@mui/icons-material";
+import { createRef, useCallback, useEffect, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import EditAttacks from "../../components/npc/EditAttacks";
@@ -21,13 +30,17 @@ import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
 import EditRareGear from "../../components/npc/EditRareGear";
 import { createFileName, useScreenshot } from "use-react-screenshot";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
 
 export default function NpcEdit() {
   let params = useParams();
   const ref = doc(firestore, "npc-personal", params.npcId);
+
+  const [user] = useAuthState(auth);
   const [showScrollTop, setShowScrollTop] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  
+
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -102,22 +115,32 @@ export default function NpcEdit() {
     a.click();
   };
 
-  const readFile = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsText(file, "utf-8");
-      reader.onload = () => {
-        try {
-          const { result } = reader;
-          if (!result) reject();
-          resolve(JSON.parse(result));
-        } catch (error) {
-          reject();
-        }
-      };
-    });
+  const copyNpc = async (npc) => {
+    const data = Object.assign({}, npc);
+    data.uid = user.uid;
+    delete data.id;
+    console.debug(data);
 
-  const uploaderRef = useRef(null);
+    const ref = collection(firestore, "npc-personal");
+
+    addDoc(ref, data)
+      .then(function (docRef) {
+        window.location.href = `/npc-gallery/${docRef.id}`;
+      })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
+  };
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleClick = () => {
+    setOpen(true);
+  };
 
   const getImage = () => takeScreenShot(prettyRef.current);
 
@@ -143,59 +166,76 @@ export default function NpcEdit() {
       </Grid>
       <Divider sx={{ my: 2 }} />
 
-      <EditBasics npc={npcTemp} setNpc={setNpcTemp}/>
+      {user && user.uid === npc.uid && (
+        <>
+          <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      <Grid container>
-        <Grid item xs={12} md={6}>
-          <EditAffinities npc={npcTemp} setNpc={setNpcTemp}/>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <ExplainAffinities npc={npcTemp} />
-          <EditExtra npc={npcTemp} setNpc={setNpcTemp}/>
-        </Grid>
-      </Grid>
+          <Grid container>
+            <Grid item xs={12} md={6}>
+              <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <ExplainAffinities npc={npcTemp} />
+              <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+          </Grid>
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
-      <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
+          <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+          <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
+          <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      <Grid container>
-        <Grid item xs={12} md={6}>
-          <EditActions npc={npcTemp} setNpc={setNpcTemp} />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
-        </Grid>
-      </Grid>
-      <Divider sx={{ my: 2 }} />
+          <Grid container>
+            <Grid item xs={12} md={6}>
+              <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+          </Grid>
+          <Divider sx={{ my: 2 }} />
+        </>
+      )}
 
       {/* <NpcUgly npc={npcTemp} /> */}
 
-      <Grid sx={{
+      <Grid
+        sx={{
           position: "fixed",
           top: 10,
           right: 10,
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
-        }}>
+        }}
+      >
         {/* Collapse for the Buttons */}
         {!isCollapsed && (
-            <div sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', zIndex: 1000 }}>
+          <div
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              zIndex: 1000,
+            }}
+          >
             {/* Export Button */}
-            <Tooltip title="Export JSON File" placement="bottom" sx={{ marginLeft: "5px" }}>
+            <Tooltip
+              title="Export JSON File"
+              placement="bottom"
+              sx={{ marginLeft: "5px" }}
+            >
               <Fab
                 color="primary"
                 aria-label="export"
@@ -205,34 +245,21 @@ export default function NpcEdit() {
                 <Code />
               </Fab>
             </Tooltip>
-            {/* Upload Button */}
-            <Tooltip title="Upload JSON File" placement="bottom">
+            {/* Share Button */}
+            <Tooltip title="Share URL" placement="bottom">
               <Fab
                 color="primary"
-                aria-label="upload"
-                onClick={() => {
-                  if (!uploaderRef.current) return;
-                  uploaderRef.current.click();
+                aria-label="Share"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(window.location.href);
+                  handleClick();
                 }}
                 size="medium"
-                style={{ marginLeft: "5px"}}
+                style={{ marginLeft: "5px" }}
               >
-                <Publish />
+                <Share />
               </Fab>
             </Tooltip>
-            {/* Input for File Upload */}
-            <input
-              type="file"
-              ref={uploaderRef}
-              multiple={false}
-              accept=".json"
-              style={{ display: "none"}}
-              onChange={async ({ target }) => {
-                const file = target.files?.[0];
-                if (!file) return;
-                setNpcTemp(await readFile(file));
-              }}
-            />
             {/* Download Button */}
             <Tooltip title="Download Sheet" placement="bottom">
               <Fab
@@ -241,11 +268,26 @@ export default function NpcEdit() {
                 onClick={getImage}
                 size="medium"
                 style={{ marginLeft: "5px", zIndex: 1000 }}
-
               >
                 <Download />
-            </Fab>
+              </Fab>
             </Tooltip>
+
+            {user && user.uid !== npc.uid && (
+              <Tooltip title="Copy and Edit Sheet" placement="bottom">
+                <Fab
+                  color="primary"
+                  aria-label="duplicate"
+                  onClick={() => {
+                    copyNpc(npcTemp);
+                  }}
+                  size="medium"
+                  style={{ marginLeft: "5px", zIndex: 1000 }}
+                >
+                  <ContentCopy />
+                </Fab>
+              </Tooltip>
+            )}
           </div>
         )}
         {/* Collapse Toggle Button */}
@@ -256,44 +298,52 @@ export default function NpcEdit() {
           size="medium"
           style={{ marginLeft: "5px" }}
         >
-          {isCollapsed ? <Menu /> : <Close  />}
+          {isCollapsed ? <Menu /> : <Close />}
         </Fab>
-    </Grid>
-    
-    {JSON.stringify(npc) !== JSON.stringify(npcTemp) && (
-      <Grid style={{ position: "fixed", top: 80, right: 10, zIndex: 100}}>
+      </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message="Copied to Clipboard!"
+      />
+
+      {JSON.stringify(npc) !== JSON.stringify(npcTemp) && (
+        <Grid style={{ position: "fixed", top: 80, right: 10, zIndex: 100 }}>
+          <Fade in={showScrollTop} timeout={300}>
+            <Tooltip title="Save" placement="bottom">
+              <Fab
+                color="primary"
+                aria-label="save"
+                onClick={() => setDoc(ref, npcTemp)}
+                disabled={JSON.stringify(npc) === JSON.stringify(npcTemp)}
+                size="medium"
+                style={{ marginLeft: "5px" }}
+              >
+                <Save />
+              </Fab>
+            </Tooltip>
+          </Fade>
+        </Grid>
+      )}
+
+      <Grid style={{ position: "fixed", bottom: 10, right: 10 }}>
+        {/* Move to Top Button */}
         <Fade in={showScrollTop} timeout={300}>
-          <Tooltip title="Save" placement="bottom">
+          <div style={{ marginBottom: "5px", zIndex: 100 }}>
             <Fab
               color="primary"
-              aria-label="save"
-              onClick={() => setDoc(ref, npcTemp)}
-              disabled={JSON.stringify(npc) === JSON.stringify(npcTemp)}
+              aria-label="move-to-top"
+              onClick={handleMoveToTop}
               size="medium"
-              style={{ marginLeft: "5px"}}
             >
-              <Save />
+              <ArrowUpward />
             </Fab>
-          </Tooltip>
+          </div>
         </Fade>
       </Grid>
-    )}
-    
-    <Grid style={{ position: "fixed", bottom: 10, right: 10 }}>
-      {/* Move to Top Button */}
-      <Fade in={showScrollTop} timeout={300}>
-        <div style={{ marginBottom: "5px", zIndex: 100 }}>
-          <Fab
-            color="primary"
-            aria-label="move-to-top"
-            onClick={handleMoveToTop}
-            size="medium"
-          >
-            <ArrowUpward />
-          </Fab>
-        </div>
-      </Fade>
-    </Grid>
     </Layout>
   );
 }
