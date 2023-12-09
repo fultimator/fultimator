@@ -24,6 +24,7 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Snackbar,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -33,6 +34,7 @@ import {
   AddCircle,
   ContentCopy,
   Delete,
+  Share,
   Download,
   Edit,
   Code,
@@ -128,6 +130,17 @@ function Personal({ user }) {
     setSelectedNpc(event.target.value);
   };
 
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const shareNpc = async (id) => {
+    await navigator.clipboard.writeText(window.location.href + "/" + id);
+    setOpen(true);
+  };
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center" }}>
@@ -173,14 +186,28 @@ function Personal({ user }) {
       </FormControl>
       <Grid container spacing={2}>
         {personalList?.map((npc, i) => (
-          <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
+          <Npc
+            key={i}
+            npc={npc}
+            copyNpc={copyNpc}
+            deleteNpc={deleteNpc}
+            shareNpc={shareNpc}
+          />
         ))}
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message="Copied to Clipboard!"
+      />
     </>
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc }) {
+function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
   const ref = createRef(null);
 
   const [image, takeScreenShot] = useScreenshot();
@@ -229,6 +256,11 @@ function Npc({ npc, copyNpc, deleteNpc }) {
       <Tooltip title="Delete">
         <IconButton onClick={deleteNpc(npc)}>
           <Delete />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Share URL">
+        <IconButton onClick={() => shareNpc(npc.id)}>
+          <Share />
         </IconButton>
       </Tooltip>
       <Tooltip title="Download">
