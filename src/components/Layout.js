@@ -3,13 +3,11 @@ import { Link as RouterLink } from "react-router-dom";
 
 const Layout = ({ children }) => {
   return (
-    <Container>
+    <Container style={{ marginTop: "1em" }}>
       <RouterLink to="/" style={{ color: "inherit", textDecoration: "none" }}>
-        <Typography variant="h1" textAlign="center">
-          💎Fultimator!💎
-        </Typography>
+        <Typography variant="h1">Fultimator!</Typography>
       </RouterLink>
-      <Typography textAlign="center">
+      <Typography>
         Fultimator is an Unofficial tool for TTRPG Fabula Ultima
       </Typography>
       <Divider sx={{ my: 2 }}></Divider>
