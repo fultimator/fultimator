@@ -16,6 +16,7 @@ import robot from "./robot.png";
 import axe from "./axe.png";
 import scroll from "./scroll.png";
 import dice from "./dice.png";
+import React from "react";
 
 function Home() {
   return (

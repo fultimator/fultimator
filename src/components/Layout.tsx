@@ -1,7 +1,12 @@
 import { Container, Divider, Typography } from "@mui/material";
+import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 
-const Layout = ({ children }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   return (
     <Container style={{ marginTop: "1em" }}>
       <RouterLink to="/" style={{ color: "inherit", textDecoration: "none" }}>
