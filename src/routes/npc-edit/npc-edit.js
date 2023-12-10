@@ -28,6 +28,7 @@ import ExplainAffinities from "../../components/npc/ExplainAffinities";
 import EditExtra from "../../components/npc/EditExtra";
 import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
+import EditNotes from "../../components/npc/EditNotes";
 import EditRareGear from "../../components/npc/EditRareGear";
 import { createFileName, useScreenshot } from "use-react-screenshot";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -202,6 +203,9 @@ export default function NpcEdit() {
             </Grid>
             <Grid item xs={12} md={6}>
               <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
             </Grid>
           </Grid>
           <Divider sx={{ my: 2 }} />
