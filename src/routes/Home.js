@@ -22,7 +22,7 @@ function Home() {
     <Layout>
       <Grid container spacing={3}>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -49,7 +49,7 @@ function Home() {
           </Card>
         </Grid>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -76,7 +76,7 @@ function Home() {
           </Card>
         </Grid>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -103,7 +103,7 @@ function Home() {
           </Card>
         </Grid>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -130,7 +130,7 @@ function Home() {
           </Card>
         </Grid>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -157,7 +157,7 @@ function Home() {
           </Card>
         </Grid>
         <Grid item xs={4}>
-          <Card sx={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
