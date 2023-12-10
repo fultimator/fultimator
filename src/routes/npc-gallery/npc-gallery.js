@@ -14,7 +14,18 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 
-import { IconButton, Skeleton, Tooltip, Typography, Grid } from "@mui/material";
+import {
+  IconButton,
+  Skeleton,
+  Tooltip,
+  Typography,
+  Grid,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Snackbar,
+} from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
@@ -23,16 +34,17 @@ import {
   AddCircle,
   ContentCopy,
   Delete,
+  Share,
   Download,
   Edit,
+  Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { createFileName, useScreenshot } from "use-react-screenshot";
-import { createRef, useEffect } from "react";
+import { createRef, useEffect, useState } from "react";
 
 export default function NpcGallery() {
-  const [user, loading, error] = useAuthState(auth);
-  console.debug("user, loading, error", user, loading, error);
+  const [user, loading] = useAuthState(auth);
 
   return (
     <Layout>
@@ -112,29 +124,106 @@ function Personal({ user }) {
     };
   };
 
+  const [selectedNpc, setSelectedNpc] = useState("");
+
+  const handleNpcChange = (event) => {
+    setSelectedNpc(event.target.value);
+  };
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const shareNpc = async (id) => {
+    await navigator.clipboard.writeText(window.location.href + "/" + id);
+    setOpen(true);
+  };
+
   return (
     <>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        NPCs
-        <IconButton onClick={addNpc}>
-          <AddCircle />
-        </IconButton>
-      </Typography>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <Typography variant="h4">
+          NPCs
+          <Tooltip title="Create NPC">
+            <IconButton onClick={addNpc}>
+              <AddCircle />
+            </IconButton>
+          </Tooltip>
+        </Typography>
+
+        <Typography
+          sx={{ marginLeft: "none", fontStyle: "italic", color: "#777" }}
+        >
+          Note for Mobile Users: For better quality, export in landscape mode.
+        </Typography>
+      </div>
+
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel id="npc-select-label">Select NPC</InputLabel>
+        <Select
+          labelId="npc-select-label"
+          id="npc-select"
+          value={selectedNpc}
+          onChange={handleNpcChange}
+          label="Select NPC"
+        >
+          <MenuItem value="" disabled>
+            Select an NPC
+          </MenuItem>
+          {personalList?.map((npc) => (
+            <MenuItem
+              key={npc.id}
+              value={npc.id}
+              component={RouterLink}
+              to={`/npc-gallery/${npc.id}`}
+            >
+              {npc.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <Grid container spacing={2}>
-        {personalList?.map((npc, i) => {
-          return (
-            <Npc key={i} npc={npc} copyNpc={copyNpc} deleteNpc={deleteNpc} />
-          );
-        })}
+        {personalList?.map((npc, i) => (
+          <Npc
+            key={i}
+            npc={npc}
+            copyNpc={copyNpc}
+            deleteNpc={deleteNpc}
+            shareNpc={shareNpc}
+          />
+        ))}
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message="Copied to Clipboard!"
+      />
     </>
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc }) {
+function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
   const ref = createRef(null);
 
   const [image, takeScreenShot] = useScreenshot();
+
+  function downloadFile(content, fileName, contentType) {
+    const a = document.createElement("a");
+    const file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+  }
+  const getJSON = () => {
+    const jsonData = JSON.stringify(npc);
+    const fileName = `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`;
+    downloadFile(jsonData, fileName, "text/plain");
+  };
 
   const download = (image, { name = "img", extension = "png" } = {}) => {
     const a = document.createElement("a");
@@ -151,7 +240,7 @@ function Npc({ npc, copyNpc, deleteNpc }) {
     }
   }, [image, npc.name]);
   return (
-    <Grid item xs={6}>
+    <Grid item xs={12} md={6}>
       <NpcPretty npc={npc} ref={ref} />
       {/* <NpcUgly npc={npc} /> */}
       <Tooltip title="Copy">
@@ -169,9 +258,19 @@ function Npc({ npc, copyNpc, deleteNpc }) {
           <Delete />
         </IconButton>
       </Tooltip>
+      <Tooltip title="Share URL">
+        <IconButton onClick={() => shareNpc(npc.id)}>
+          <Share />
+        </IconButton>
+      </Tooltip>
       <Tooltip title="Download">
         <IconButton onClick={getImage}>
           <Download />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Export JSON">
+        <IconButton onClick={getJSON}>
+          <Code />
         </IconButton>
       </Tooltip>
     </Grid>

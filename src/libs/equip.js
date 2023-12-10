@@ -9,7 +9,7 @@ export const baseWeapons = [
     damage: 6,
     type: "physical",
     hands: 2,
-    range: true,
+    range: "distance",
   },
   {
     category: "Arcane",

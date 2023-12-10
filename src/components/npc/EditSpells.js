@@ -11,10 +11,15 @@ import {
   Divider,
   ToggleButtonGroup,
   ToggleButton,
+  useMediaQuery, 
+  useTheme
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
 
 export default function EditSpells({ npc, setNpc }) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const onChangeSpells = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -64,8 +69,8 @@ export default function EditSpells({ npc, setNpc }) {
 
       {npc.spells?.map((spell, i) => {
         return (
-          <Grid container key={i} spacing={1}>
-            <Grid item xs={9}>
+          <Grid container key={i} spacing={isSmallScreen ? 1 : 2}>
+            <Grid item xs={isSmallScreen ? 12 : isMediumScreen ? 12 : 12}>
               <EditSpell
                 spell={spell}
                 setSpell={onChangeSpells(i)}
@@ -73,7 +78,7 @@ export default function EditSpells({ npc, setNpc }) {
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1 }}>
+              <Grid item xs={12} sx={{ py: isSmallScreen ? 1 : 2 }}>
                 <Divider />
               </Grid>
             )}
@@ -92,7 +97,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item>
+      <Grid item xs={10} lg>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -108,7 +113,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       <Grid item>
         <FormControl variant="standard" fullWidth>
           <ToggleButtonGroup
-            size="small"
+            size="medium"
             value={spell.type}
             exclusive
             onChange={(e, value) => {
@@ -123,7 +128,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </FormControl>
       </Grid>
       {spell.type === "offensive" && (
-        <Grid item>
+        <Grid item xs={5} sm={4} md={2} lg={1}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr1label"}>Attr 1</InputLabel>
             <Select
@@ -145,7 +150,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item>
+        <Grid item xs={5} sm={4} md={2} lg={1}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr2label"}>Attr 2</InputLabel>
             <Select
@@ -166,7 +171,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </FormControl>
         </Grid>
       )}
-      <Grid item xs>
+      <Grid item xs={4} md={2} lg={1}>
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="mp"
@@ -179,7 +184,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs>
+      <Grid item xs={4} md={3} lg={2}>
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="target"
@@ -188,11 +193,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             onChange={(e) => {
               return setSpell("target", e.target.value);
             }}
+            multiline
             size="small"
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs>
+      <Grid item xs={4} md={3} lg={2}>
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="duration"
@@ -214,6 +220,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             onChange={(e) => {
               return setSpell("effect", e.target.value);
             }}
+            multiline
             size="small"
           ></TextField>
         </FormControl>

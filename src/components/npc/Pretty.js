@@ -23,19 +23,30 @@ import {
   RareItemIcon,
 } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
+import Study from "./Study";
 
-function NpcPretty({ npc }, ref) {
+function NpcPretty({ npc, study }, ref) {
   return (
     <Card>
       <div ref={ref}>
-        <Header npc={npc} />
-        <Stats npc={npc} />
-        <Attacks npc={npc} />
-        <Spells npc={npc} />
-        <Actions npc={npc} />
-        <Special npc={npc} />
-        <RareGear npc={npc} />
-        <Equip npc={npc} />
+        {(study === 0 || study === null || study === undefined) && (
+          <>
+            <Header npc={npc} />
+            <Stats npc={npc} />
+            <Attacks npc={npc} />
+            <Spells npc={npc} />
+            <Actions npc={npc} />
+            <Special npc={npc} />
+            <RareGear npc={npc} />
+            <Equip npc={npc} />
+          </>
+        )}
+
+        {study >= 1 && (
+          <div>
+            <Study npc={npc} study={study} />
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -80,6 +91,24 @@ function Header({ npc }) {
           sx={{ textTransform: "uppercase" }}
         >
           Lvl {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
+        </Typography>
+      </Grid>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          px: 2,
+          py: 0.5,
+          borderBottom: "1px solid #b9a9be",
+          borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+        }}
+      >
+        <Typography
+          fontFamily="Antonio"
+          fontSize="1.25rem"
+          sx={{ textTransform: "uppercase" }}
+        >
+          {renderVillainPhase(npc)}
         </Typography>
       </Grid>
       <Grid
@@ -844,4 +873,28 @@ function Equip({ npc }) {
   );
 }
 
+function renderVillainPhase({ villain, phases, multipart }) {
+  const phaseString = phases && phases >= 1 ? `Phase ${phases}` : null;
+
+  const values = [
+    villain && `${villain} Villain`,
+    phaseString,
+    multipart,
+  ].filter(Boolean);
+
+  const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
+
+  return (
+    <>
+      {combinedString && (
+        <>
+          {combinedString} {Diamond}
+        </>
+      )}
+    </>
+  );
+}
+
 export default React.forwardRef(NpcPretty);
+
+export { calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells };

@@ -58,7 +58,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item>
+            <Grid item xs={10} lg={4}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -71,7 +71,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs>
+            <Grid item xs={12} lg={7}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline

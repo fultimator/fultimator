@@ -12,6 +12,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  useMediaQuery, 
+  useTheme
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import attributes from "../../libs/attributes";
@@ -19,6 +21,9 @@ import { baseWeapons } from "../../libs/equip";
 import { CloseBracket, OpenBracket } from "../Bracket";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -65,22 +70,22 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 
       {npc.weaponattacks?.map((attack, i) => {
         return (
-          <Grid container key={i} spacing={1}>
-            <Grid item xs={7}>
+          <Grid container key={i} spacing={isSmallScreen ? 0 : 1}>
+            <Grid item xs={isSmallScreen ? 12 : isMediumScreen ? 10 : 5}>
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
                 removeAttack={removeAttack(i)}
               />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={12} md={7}>
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.weaponattacks.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1 }}>
+              <Grid item xs={12} sx={{ py: isSmallScreen ? 1 : 2 }}>
                 <Divider />
               </Grid>
             )}
@@ -99,7 +104,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item>
+      <Grid item xs={11}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -112,15 +117,16 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={3.5}>
+      <Grid item xs={12} sm={6}>
         <SelectWeapon
           weapon={attack.weapon}
           setWeapon={(value) => {
             return setAttack("weapon", value);
           }}
+          size="small"
         />
       </Grid>
-      <Grid item xs={1.2}>
+      <Grid item xs={3} sm={3}>
         <FormControl variant="standard">
           <TextField
             id="flathit"
@@ -135,7 +141,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={1.2}>
+      <Grid item xs={3} sm={3}>
         <FormControl variant="standard">
           <TextField
             id="flatdmg"
@@ -150,12 +156,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>  
-      <Grid item xs={2.1}>
+      <Grid item xs={4} lg={2}>
         <FormGroup>
           <FormControlLabel
             control={
               <Checkbox
-                size="small"
+                size="medium"
                 value={attack.extraDamage}
                 onChange={(e, value) => {
                   return setAttack("extraDamage", e.target.checked);
@@ -163,8 +169,6 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               />
             }
             label="Extra Damage"
-            labelPlacement="top"
-            style={{ padding: '0px' }}
           />
         </FormGroup>
       </Grid>
@@ -190,17 +194,21 @@ function EditAttackSpecial({ attack, setAttack }) {
   };
 
   return (
-    <FormControl variant="standard" fullWidth>
-      <TextField
-        id="special"
-        label="Special"
-        multiline
-        value={specials}
-        onChange={onChange}
-        size="small"
-        helperText="Adding a special effect cost 1 skill point"
-      ></TextField>
-    </FormControl>
+    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+      <Grid item xs={12}>
+        <FormControl variant="standard" fullWidth>
+          <TextField
+            id="special"
+            label="Special"
+            multiline
+            value={specials}
+            onChange={onChange}
+            size="small"
+            helperText="Adding a special effect cost 1 skill point"
+          ></TextField>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 }
 
@@ -235,6 +243,7 @@ function SelectWeapon({ weapon, setWeapon }) {
         value={weapon.name}
         label="Weapon"
         onChange={onChange}
+        size="small"
       >
         {options}
       </Select>

@@ -22,8 +22,8 @@ function Home() {
   return (
     <Layout>
       <Grid container spacing={3}>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -49,8 +49,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -76,8 +76,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -103,8 +103,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -130,8 +130,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -157,8 +157,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
