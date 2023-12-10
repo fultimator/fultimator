@@ -748,7 +748,7 @@ function Notes({ npc }) {
       {notes?.map((notes, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 3, py: 1 }}>
+            <Grid item xs={1} sx={{ pl: 2, py: 1 }}>
               <Typography textAlign="center" style={{ width: 20, height: 20 }}>
                 <NotesIcon />
               </Typography>
