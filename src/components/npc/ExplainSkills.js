@@ -160,7 +160,6 @@ export default function ExplainSkills({ npc }) {
           )}
           {calcUsedSkillsFromImmunities(npc) > 0 && (
             <TableRow>
-              calcUsedSkillsFromSpecial
               <TableCell>Used skills from immunities</TableCell>
               <TableCell>{calcUsedSkillsFromImmunities(npc)}</TableCell>
             </TableRow>
