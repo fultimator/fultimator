@@ -9,9 +9,8 @@ export interface Weapon {
     att1: Attributes,
     att2: Attributes,
     name: string,
-    range?: string,
+    range: string,
     hands: number,
     damage: number,
     type: string,
-    dstance?: boolean
 }

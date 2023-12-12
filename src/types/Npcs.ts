@@ -80,6 +80,11 @@ export interface NpcAffinities {
     poison?: Affinities,
 }
 
+export interface NpcNotes {
+    name: string,
+    effect: string
+}
+
 export interface TypeNpc {
     id: string,
     uid: string,
@@ -102,4 +107,5 @@ export interface TypeNpc {
     sheild?: NpcArmor,
     raregear?: NpcRareGear[],
     label?: string
+    notes?: NpcNotes[]
 }
