@@ -11,18 +11,23 @@ import {
   Typography,
   MenuItem,
   Select,
+  Tooltip
 } from "@mui/material";
-import { useState } from "react";
+import {
+  Download,
+  CropOriginalOutlined
+} from "@mui/icons-material";
+import { useState, useEffect, createRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import { createFileName, useScreenshot } from "use-react-screenshot";
 
 import { SignIn } from "../../components/auth";
 import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
-import { useEffect } from "react";
 
 export default function Combat() {
   const [user, loading, error] = useAuthState(auth);
@@ -224,10 +229,30 @@ function Npc({ npc }) {
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);
   }
+
+  // Download
+  const prettyRef = createRef(null);
+
+  const [image, takeScreenShot] = useScreenshot();
+
+  const download = (image, { name = "img", extension = "png" } = {}) => {
+    const a = document.createElement("a");
+    a.href = image;
+    a.download = createFileName(extension, name);
+    a.click();
+  };
+  const getImage = () => takeScreenShot(prettyRef.current);
+
+  useEffect(() => {
+    if (image) {
+      download(image, { name: npc.name, extension: "png" });
+    }
+  }, [image, npc?.name]);
+
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} />
+        <NpcPretty npc={npc} study={selectedStudy} ref={prettyRef} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
@@ -310,6 +335,17 @@ function Npc({ npc }) {
               <MenuItem value={3}>13+</MenuItem>
             </Select>
           </Grid>
+          {/* Download Button */}
+          <Button
+            color="primary"
+            aria-label="download"
+            onClick={getImage}
+            style={{ cursor: 'pointer', fontSize: '1rem' }}
+          >
+            <Tooltip title="Download Sheet" placement="bottom">
+            <Download />
+            </Tooltip>
+          </Button>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>
