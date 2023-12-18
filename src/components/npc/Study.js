@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, Typography } from "@mui/material";
-import { calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells } from "./Pretty";
+import { calcHP, calcMP, Rank, Stats, Attacks, Spells } from "./Pretty";
 import Diamond from "../Diamond";
 const Study = ({ npc, study }) => {
   return (
@@ -85,11 +85,10 @@ function Love({ npc, study }) {
       textAlign="center"
       fontSize="0.9rem"
     >
-      
       <Grid container>
         {study >= 2 ? (
           <Stats npc={npc} study={study} />
-        ) : (       
+        ) : (
           <Grid
             item
             xs={6}
@@ -105,8 +104,8 @@ function Love({ npc, study }) {
               py: 0.2,
             }}
           >
-            <Grid container alignItems="stretch" >
-              <Grid item sx={{ px: 1.5, py: 0.4 }}> 
+            <Grid container alignItems="stretch">
+              <Grid item sx={{ px: 1.5, py: 0.4 }}>
                 HP
               </Grid>
               <Grid

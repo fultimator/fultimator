@@ -11,23 +11,21 @@ import {
   Typography,
   MenuItem,
   Select,
-  Tooltip
 } from "@mui/material";
-import {
-  Download,
-  CropOriginalOutlined
-} from "@mui/icons-material";
-import { useState, useEffect, createRef } from "react";
+import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { createFileName, useScreenshot } from "use-react-screenshot";
+import { User } from "firebase/auth";
 
 import { SignIn } from "../../components/auth";
 import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { useEffect } from "react";
+import React from "react";
+import { TypeNpc } from "../../types/Npcs";
 
 export default function Combat() {
   const [user, loading, error] = useAuthState(auth);
@@ -52,7 +50,11 @@ export default function Combat() {
   );
 }
 
-function AuthCombat({ user }) {
+interface AuthCombatProps {
+  user: User;
+}
+
+function AuthCombat({ user }: AuthCombatProps) {
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -64,10 +66,12 @@ function AuthCombat({ user }) {
     idField: "id",
   });
 
-  const [npcs, setNpcs] = useState([]);
+  const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
-  const addNpc = (e, newValue) => {
-    setNpcs((prevState) => [...prevState, newValue]);
+  const addNpc = (e: any, newValue: any) => {
+    setNpcs((prevState) => {
+      return newValue ? [...prevState, newValue as TypeNpc] : prevState;
+    });
   };
 
   // const removeAttack = (i) => {
@@ -99,7 +103,7 @@ function AuthCombat({ user }) {
         }
         return (
           <Grid item xs={12} key={npc.id}>
-            <Npc npc={npc}></Npc>
+            <NpcCombatant npc={npc}></NpcCombatant>
           </Grid>
         );
       })}
@@ -108,7 +112,7 @@ function AuthCombat({ user }) {
           size="small"
           disablePortal
           id="combo-box-demo"
-          options={personalList}
+          options={personalList || []}
           sx={{ width: 300 }}
           onChange={addNpc}
           renderInput={(params) => <TextField {...params} label="Png" />}
@@ -118,7 +122,11 @@ function AuthCombat({ user }) {
   );
 }
 
-function Npc({ npc }) {
+interface NpcProps {
+  npc: TypeNpc;
+}
+
+function NpcCombatant({ npc }: NpcProps) {
   const [hp, setHp] = useState(calcHP(npc));
   const [mp, setMp] = useState(calcMP(npc));
   const [attributes, setAttributes] = useState(npc.attributes);
@@ -133,12 +141,12 @@ function Npc({ npc }) {
 
   const originalAttributes = npc.attributes;
 
-  const changeHp = (value) => {
+  const changeHp = (value: number) => {
     return () => {
       setHp(hp + value);
     };
   };
-  const changeMp = (value) => {
+  const changeMp = (value: number) => {
     return () => {
       setMp(mp + value);
     };
@@ -177,7 +185,13 @@ function Npc({ npc }) {
           ? adjustAttribute(originalAttributes.will, -2)
           : originalAttributes.will,
     });
-  }, [statusEffects]);
+  }, [
+    statusEffects,
+    originalAttributes.dexterity,
+    originalAttributes.insight,
+    originalAttributes.might,
+    originalAttributes.will,
+  ]);
 
   const toggleStatus = (status = "", hasStatus = false) => {
     switch (status) {
@@ -229,30 +243,10 @@ function Npc({ npc }) {
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);
   }
-
-  // Download
-  const prettyRef = createRef(null);
-
-  const [image, takeScreenShot] = useScreenshot();
-
-  const download = (image, { name = "img", extension = "png" } = {}) => {
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = createFileName(extension, name);
-    a.click();
-  };
-  const getImage = () => takeScreenShot(prettyRef.current);
-
-  useEffect(() => {
-    if (image) {
-      download(image, { name: npc.name, extension: "png" });
-    }
-  }, [image, npc?.name]);
-
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} ref={prettyRef} />
+        <NpcPretty npc={npc} study={selectedStudy} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
@@ -263,7 +257,7 @@ function Npc({ npc }) {
             {crisis && "Crisis!"}
           </Grid>
           <Grid item xs={5}>
-            <ButtonGroup variant="outlined" size="small" color="red">
+            <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(-1)}>-1</Button>
               <Button onClick={changeHp(-2)}>-2</Button>
               <Button onClick={changeHp(-5)}>-5</Button>
@@ -272,7 +266,7 @@ function Npc({ npc }) {
             </ButtonGroup>
           </Grid>
           <Grid item xs={5}>
-            <ButtonGroup variant="outlined" size="small" color="red">
+            <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(+1)}>+1</Button>
               <Button onClick={changeHp(+2)}>+2</Button>
               <Button onClick={changeHp(+5)}>+5</Button>
@@ -286,7 +280,7 @@ function Npc({ npc }) {
             </Typography>
           </Grid>
           <Grid item xs={5}>
-            <ButtonGroup variant="outlined" size="small" color="cyan">
+            <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(-1)}>-1</Button>
               <Button onClick={changeMp(-2)}>-2</Button>
               <Button onClick={changeMp(-5)}>-5</Button>
@@ -295,7 +289,7 @@ function Npc({ npc }) {
             </ButtonGroup>
           </Grid>
           <Grid item xs={5}>
-            <ButtonGroup variant="outlined" size="small" color="cyan">
+            <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(+1)}>+1</Button>
               <Button onClick={changeMp(+2)}>+2</Button>
               <Button onClick={changeMp(+5)}>+5</Button>
@@ -335,69 +329,70 @@ function Npc({ npc }) {
               <MenuItem value={3}>13+</MenuItem>
             </Select>
           </Grid>
-          {/* Download Button */}
-          <Button
-            color="primary"
-            aria-label="download"
-            onClick={getImage}
-            style={{ cursor: 'pointer', fontSize: '1rem' }}
-          >
-            <Tooltip title="Download Sheet" placement="bottom">
-            <Download />
-            </Tooltip>
-          </Button>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>
               <FormControlLabel
                 value="slow"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Slow"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
             <Grid item xs>
               <FormControlLabel
                 value="dazed"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Dazed"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
             <Grid item xs>
               <FormControlLabel
                 value="weak"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Weak"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
             <Grid item xs>
               <FormControlLabel
                 value="shaken"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Shaken"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
           </Grid>
@@ -405,27 +400,33 @@ function Npc({ npc }) {
             <Grid item xs display="flex" justifyContent="center">
               <FormControlLabel
                 value="enraged"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Enraged"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
             <Grid item xs display="flex" justifyContent="center">
               <FormControlLabel
                 value="poisoned"
-                control={<Checkbox />}
+                control={
+                  <Checkbox
+                    onChange={({ target: { value, checked } }) => {
+                      if (typeof checked === "boolean") {
+                        toggleStatus(value, checked);
+                      }
+                    }}
+                  />
+                }
                 label="Poisoned"
                 labelPlacement="top"
-                onClick={({ target: { value, checked } }) => {
-                  if (typeof checked === "boolean") {
-                    toggleStatus(value, checked);
-                  }
-                }}
               />
             </Grid>
           </Grid>

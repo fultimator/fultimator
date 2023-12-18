@@ -1,7 +1,7 @@
-export function PhysicalIcon({disabled}) {
+export function PhysicalIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#d8d7d7";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -24,10 +24,10 @@ t95.5 153.5q-78 -42 -153.5 -96t-139.5 -116v0z"
   );
 }
 
-export function WindIcon({disabled}) {
+export function WindIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#bade15";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -49,10 +49,10 @@ t43 533.5q125 -265 -105.5 -489.5t-555.5 -239.5q419 91 558.5 397.5t-169.5 469.5q-
   );
 }
 
-export function BoltIcon({disabled}) {
+export function BoltIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#fff423";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +62,7 @@ export function BoltIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -74,10 +74,10 @@ export function BoltIcon({disabled}) {
   );
 }
 
-export function DarkIcon({disabled}) {
+export function DarkIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#ed153e";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +87,7 @@ export function DarkIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
@@ -101,10 +101,10 @@ t-68.5 -33.5zM508 15q-24 0 -35 14q-7 7 -7 19q0 18 14 36.5t27 18.5q14 0 25.5 -20t
   );
 }
 
-export function EarthIcon({disabled}) {
+export function EarthIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#cc8d2e";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +114,7 @@ export function EarthIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -127,10 +127,10 @@ q20 -21 153 -167l154 -168l-13 144l-294 191v0z"
   );
 }
 
-export function FireIcon({disabled}) {
+export function FireIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#f79010";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ export function FireIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -155,10 +155,10 @@ t-153.5 89.5v0z"
   );
 }
 
-export function IceIcon({disabled}) {
+export function IceIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#b3e7fb";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -168,7 +168,7 @@ export function IceIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -182,10 +182,10 @@ l47 -11v-145l-47 -11l-127 83v0v0zM557 587q0 9 -4 76l-5 76l34 36l125 -72l-14 -47l
   );
 }
 
-export function LightIcon({disabled}) {
+export function LightIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#fffa99";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -195,7 +195,7 @@ export function LightIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1024)">
         <path
@@ -208,10 +208,10 @@ q14 31 18 67l182 56l-187 15q-7 32 -23 60l367 189v175l-395 -326q-17 20 -38 34l33 
   );
 }
 
-export function PoisonIcon({disabled}) {
+export function PoisonIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#d757a1";
   const strokeWidth = disabled ? "0" : "100";
-  
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +221,7 @@ export function PoisonIcon({disabled}) {
       stroke="#000000"
       strokeWidth={strokeWidth}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
@@ -284,7 +284,7 @@ export function SpellIcon() {
       version="1.1"
       viewBox="-10 0 1059 1059"
       width="1.2em"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
@@ -307,7 +307,7 @@ export function OffensiveSpellIcon() {
       stroke="#000000"
       strokeWidth={100}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 1000)">
         <path
@@ -327,7 +327,7 @@ export function D4Icon() {
         version="1.1"
         width="1.2em"
         viewBox="0 0 24 24"
-        style={{verticalAlign: "text-bottom"}}
+        style={{ verticalAlign: "text-bottom" }}
       >
         <path
           fill="currentcolor"
@@ -345,7 +345,7 @@ export function D6Icon() {
       version="1.1"
       width="1.2em"
       viewBox="0 0 24 24"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <path
         fill="currentcolor"
@@ -362,7 +362,7 @@ export function D8Icon() {
       version="1.1"
       width="1.2em"
       viewBox="0 0 24 24"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <path
         fill="currentcolor"
@@ -379,7 +379,7 @@ export function D10Icon() {
       version="1.1"
       width="1.2em"
       viewBox="0 0 24 24"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <path
         fill="currentcolor"
@@ -396,7 +396,7 @@ export function D12Icon() {
       version="1.1"
       width="1.2em"
       viewBox="0 0 24 24"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <path
         fill="currentcolor"
@@ -413,7 +413,7 @@ export function D20Icon() {
       version="1.1"
       width="1.2em"
       viewBox="0 0 24 24"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <path
         fill="currentcolor"
@@ -433,7 +433,7 @@ export function ActionIcon() {
       stroke="#000000"
       // strokeWidth={100}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
       <g transform="matrix(1 0 0 -1 0 801)">
         <path
@@ -442,6 +442,25 @@ export function ActionIcon() {
 l121 160c-8 15 -14 30 -19 46l-199 28v142l199 28c5 15 12 31 19 45l-120 159l101 100l160 -119c15 8 31 14 47 20l28 195h143l28 -195c16 -5 33 -12 48 -19l158 117l102 -100l-119 -156c8 -16 15 -32 20 -48z"
         />
       </g>
+    </svg>
+  );
+}
+
+export function NotesIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      shape-rendering="geometricPrecision"
+      text-rendering="geometricPrecision"
+      image-rendering="optimizeQuality"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      viewBox="0 0 412 511.87"
+    >
+      <path
+        fill-rule="nonzero"
+        d="M35.7 32.95h33.54V11.18C69.24 5.01 74.25 0 80.43 0c6.17 0 11.18 5.01 11.18 11.18v21.77h49.21V11.18c0-6.17 5.01-11.18 11.19-11.18 6.17 0 11.18 5.01 11.18 11.18v21.77h49.21V11.18C212.4 5.01 217.41 0 223.59 0c6.17 0 11.18 5.01 11.18 11.18v21.77h49.21V11.18c0-6.17 5.01-11.18 11.19-11.18 6.17 0 11.18 5.01 11.18 11.18v21.77h34.55c9.83 0 18.76 4.03 25.21 10.49 5.36 5.35 9.04 12.4 10.15 20.23h.04c9.82 0 18.76 4.03 25.21 10.48C407.98 80.62 412 89.56 412 99.37v376.8c0 9.77-4.04 18.7-10.49 25.17-6.51 6.5-15.45 10.53-25.21 10.53H67.71c-9.81 0-18.75-4.02-25.22-10.49-6.14-6.14-10.09-14.53-10.45-23.8-8.36-.86-15.9-4.66-21.55-10.31C4.03 460.82 0 451.89 0 442.06V68.65c0-9.83 4.03-18.77 10.48-25.22 6.45-6.45 15.39-10.48 25.22-10.48zm340.9 51.06v358.05c0 9.8-4.03 18.74-10.49 25.2-6.47 6.47-15.41 10.5-25.21 10.5H52.43c.39 3.59 2.01 6.82 4.44 9.25 2.79 2.79 6.64 4.53 10.84 4.53H376.3c4.22 0 8.07-1.74 10.85-4.52 2.78-2.78 4.52-6.63 4.52-10.85V99.37c0-4.2-1.74-8.05-4.54-10.84a15.334 15.334 0 0 0-10.53-4.52zm-294 302.37c-5.74 0-10.4-4.86-10.4-10.85 0-5.99 4.66-10.85 10.4-10.85h214.78c5.74 0 10.41 4.86 10.41 10.85 0 5.99-4.67 10.85-10.41 10.85H82.6zm0-71.58c-5.74 0-10.4-4.86-10.4-10.85 0-5.99 4.66-10.85 10.4-10.85h214.78c5.74 0 10.41 4.86 10.41 10.85 0 5.99-4.67 10.85-10.41 10.85H82.6zm0-71.58c-5.74 0-10.4-4.86-10.4-10.85 0-5.99 4.66-10.85 10.4-10.85h214.78c5.74 0 10.41 4.86 10.41 10.85 0 5.99-4.67 10.85-10.41 10.85H82.6zm0-71.58c-5.74 0-10.4-4.86-10.4-10.85 0-5.99 4.66-10.85 10.4-10.85h214.78c5.74 0 10.41 4.86 10.41 10.85 0 5.99-4.67 10.85-10.41 10.85H82.6zM306.35 53.28v21.77c0 6.17-5.01 11.18-11.18 11.18-6.18 0-11.19-5.01-11.19-11.18V53.28h-49.21v21.77c0 6.17-5.01 11.18-11.18 11.18-6.18 0-11.19-5.01-11.19-11.18V53.28h-49.21v21.77c0 6.17-5.01 11.18-11.18 11.18-6.18 0-11.19-5.01-11.19-11.18V53.28H91.61v21.77c0 6.17-5.01 11.18-11.18 11.18-6.18 0-11.19-5.01-11.19-11.18V53.28H35.7c-4.22 0-8.07 1.75-10.85 4.52-2.77 2.78-4.52 6.63-4.52 10.85v373.41c0 4.2 1.75 8.05 4.53 10.84 2.8 2.79 6.65 4.53 10.84 4.53h305.2c4.19 0 8.03-1.75 10.83-4.54 2.79-2.8 4.54-6.65 4.54-10.83V68.65c0-4.19-1.74-8.04-4.53-10.84-2.79-2.78-6.64-4.53-10.84-4.53h-34.55z"
+      />
     </svg>
   );
 }
@@ -456,41 +475,38 @@ export function RareItemIcon() {
       stroke="#000000"
       // strokeWidth={100}
       paintOrder="stroke markers fill"
-      style={{verticalAlign: "text-bottom"}}
+      style={{ verticalAlign: "text-bottom" }}
     >
-    <g transform="matrix(1.33 0 0 1.33 104.757 57.577)">
-      <path
-      fill="currentColor"
-      d="M467.9 201.48c-65.238 11.434-103.04-10.023-117.92-21.566-14.867 11.547-52.605 33.02-117.91 21.566-.578 15.438-1.383 39.766-1.418 41.613 1.29 80.059 36.191 149.7 95.762 190.75 7.219 4.973 15.047 9.703 23.25 14.062.191.102.45.094.637 0 8.238-4.375 16.055-9.102 23.238-14.062 59.574-41.055 94.473-110.68 95.77-191.05-.024-1.629-.828-25.887-1.406-41.305z"
-      />
-    </g>
-    <g transform="matrix(1.33 0 0 1.33 104.248 56.91)">
-      <path
-      fill="currentColor"
-      d="m146.21 90.41 42.816 47.73-30.891 30.891a2.438 2.438 0 0 0 0 3.437l5.606 5.606a2.436 2.436 0 0 0 2.918.398l33.875-19.227 16.992 17.445 1.148-.93 5.324 1.231c22.152 5.117 40.812 6.16 56.285 4.93l-51.89-50.535 19.226-33.875a2.43 2.43 0 0 0-.398-2.918l-5.606-5.606a2.438 2.438 0 0 0-3.437 0l-30.891 30.891-47.523-42.633c2.957-7.918 1.304-17.168-5.063-23.535-8.695-8.695-22.793-8.695-31.488 0-8.695 8.696-8.695 22.793 0 31.488 6.235 6.204 15.2 7.891 22.996 5.211z"
-    />
-    </g>
-    <g transform="matrix(1.33 0 0 1.33 105.258 56.92)">
-      <path
-      fill="currentColor"
-      d="m475.97 176.98 5.324-1.23 1.164.94 17-17.46 33.875 19.227c.953.539 2.145.379 2.918-.399l5.606-5.605a2.438 2.438 0 0 0 0-3.438l-30.891-30.89 42.816-47.73c7.797 2.683 16.762.992 22.98-5.231 8.695-8.695 8.695-22.793 0-31.488s-22.793-8.695-31.488 0c-6.367 6.367-8.024 15.617-5.063 23.535l-47.523 42.633-30.89-30.891a2.438 2.438 0 0 0-3.438 0l-5.606 5.605a2.436 2.436 0 0 0-.398 2.918l19.227 33.875-51.891 50.535c15.484 1.254 34.133.215 56.277-4.906z"
-    />
-    </g>
-    <g transform="matrix(1.33 0 0 1.33 104.223 57.993)">
-      <path
-      fill="currentColor"
-      d="M158.56 436.25a36.877 36.877 0 0 0-8.238 12.066l-34.41 64.512 66.613-32.305a36.845 36.845 0 0 0 12.066-8.238l67.305-69.11c-10.074-12.991-18.82-27.07-26.176-42.073z"
-    />
-    </g>
-    <g transform="matrix(1.33 0 0 1.33 105.29 57.986)">
-      <path
-      fill="currentColor"
-      d="M549.68 448.31a36.845 36.845 0 0 0-8.238-12.066l-77.188-75.168c-7.352 15.004-16.102 29.086-26.168 42.078l67.324 69.125a36.877 36.877 0 0 0 12.066 8.238l66.613 32.305z"
-    />
-    </g>
-  </svg>
+      <g transform="matrix(1.33 0 0 1.33 104.757 57.577)">
+        <path
+          fill="currentColor"
+          d="M467.9 201.48c-65.238 11.434-103.04-10.023-117.92-21.566-14.867 11.547-52.605 33.02-117.91 21.566-.578 15.438-1.383 39.766-1.418 41.613 1.29 80.059 36.191 149.7 95.762 190.75 7.219 4.973 15.047 9.703 23.25 14.062.191.102.45.094.637 0 8.238-4.375 16.055-9.102 23.238-14.062 59.574-41.055 94.473-110.68 95.77-191.05-.024-1.629-.828-25.887-1.406-41.305z"
+        />
+      </g>
+      <g transform="matrix(1.33 0 0 1.33 104.248 56.91)">
+        <path
+          fill="currentColor"
+          d="m146.21 90.41 42.816 47.73-30.891 30.891a2.438 2.438 0 0 0 0 3.437l5.606 5.606a2.436 2.436 0 0 0 2.918.398l33.875-19.227 16.992 17.445 1.148-.93 5.324 1.231c22.152 5.117 40.812 6.16 56.285 4.93l-51.89-50.535 19.226-33.875a2.43 2.43 0 0 0-.398-2.918l-5.606-5.606a2.438 2.438 0 0 0-3.437 0l-30.891 30.891-47.523-42.633c2.957-7.918 1.304-17.168-5.063-23.535-8.695-8.695-22.793-8.695-31.488 0-8.695 8.696-8.695 22.793 0 31.488 6.235 6.204 15.2 7.891 22.996 5.211z"
+        />
+      </g>
+      <g transform="matrix(1.33 0 0 1.33 105.258 56.92)">
+        <path
+          fill="currentColor"
+          d="m475.97 176.98 5.324-1.23 1.164.94 17-17.46 33.875 19.227c.953.539 2.145.379 2.918-.399l5.606-5.605a2.438 2.438 0 0 0 0-3.438l-30.891-30.89 42.816-47.73c7.797 2.683 16.762.992 22.98-5.231 8.695-8.695 8.695-22.793 0-31.488s-22.793-8.695-31.488 0c-6.367 6.367-8.024 15.617-5.063 23.535l-47.523 42.633-30.89-30.891a2.438 2.438 0 0 0-3.438 0l-5.606 5.605a2.436 2.436 0 0 0-.398 2.918l19.227 33.875-51.891 50.535c15.484 1.254 34.133.215 56.277-4.906z"
+        />
+      </g>
+      <g transform="matrix(1.33 0 0 1.33 104.223 57.993)">
+        <path
+          fill="currentColor"
+          d="M158.56 436.25a36.877 36.877 0 0 0-8.238 12.066l-34.41 64.512 66.613-32.305a36.845 36.845 0 0 0 12.066-8.238l67.305-69.11c-10.074-12.991-18.82-27.07-26.176-42.073z"
+        />
+      </g>
+      <g transform="matrix(1.33 0 0 1.33 105.29 57.986)">
+        <path
+          fill="currentColor"
+          d="M549.68 448.31a36.845 36.845 0 0 0-8.238-12.066l-77.188-75.168c-7.352 15.004-16.102 29.086-26.168 42.078l67.324 69.125a36.877 36.877 0 0 0 12.066 8.238l66.613 32.305z"
+        />
+      </g>
+    </svg>
   );
 }
-
-
-

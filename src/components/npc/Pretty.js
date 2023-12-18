@@ -21,6 +21,7 @@ import {
   OffensiveSpellIcon,
   SpellIcon,
   RareItemIcon,
+  NotesIcon,
 } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
@@ -39,6 +40,7 @@ function NpcPretty({ npc, study }, ref) {
             <Special npc={npc} />
             <RareGear npc={npc} />
             <Equip npc={npc} />
+            <Notes npc={npc} />
           </>
         )}
 
@@ -697,6 +699,68 @@ function Actions({ npc }) {
                   unwrapDisallowed={true}
                 >
                   {actions.effect}
+                </ReactMarkdown>
+              </Typography>
+            </Grid>
+          </Fragment>
+        );
+      })}
+    </Grid>
+  );
+}
+
+function Notes({ npc }) {
+  const notes = [];
+
+  if (npc.notes) {
+    npc.notes.forEach((s) => {
+      notes.push(s);
+    });
+  }
+
+  if (notes.length === 0) {
+    return null;
+  }
+
+  return (
+    <Grid container>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase" }}
+        >
+          Notes
+        </Typography>
+      </Grid>
+
+      {notes?.map((notes, i) => {
+        return (
+          <Fragment key={i}>
+            <Grid item xs={1} sx={{ pl: 2, py: 1 }}>
+              <Typography textAlign="center" style={{ width: 20, height: 20 }}>
+                <NotesIcon />
+              </Typography>
+            </Grid>
+            <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
+              <Typography>
+                <strong>{notes.name}</strong> <Diamond />{" "}
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {notes.effect}
                 </ReactMarkdown>
               </Typography>
             </Grid>

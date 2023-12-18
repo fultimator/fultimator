@@ -16,13 +16,14 @@ import robot from "./robot.png";
 import axe from "./axe.png";
 import scroll from "./scroll.png";
 import dice from "./dice.png";
+import React from "react";
 
 function Home() {
   return (
     <Layout>
       <Grid container spacing={3}>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -48,8 +49,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -75,8 +76,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -102,8 +103,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -129,8 +130,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"
@@ -156,8 +157,8 @@ function Home() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item>
-          <Card sx={{ width: 300 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ padding: "1.5em" }}>
             <CardMedia
               component="img"
               height="140"

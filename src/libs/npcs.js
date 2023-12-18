@@ -314,8 +314,13 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromAbsorbs(npc) +
     calcUsedSkillsFromSpecial(npc) +
     calcUsedSkillsFromSpells(npc) +
-    calcUsedSkillsFromEquip(npc)
+    calcUsedSkillsFromEquip(npc) +
+    calcUsedSkillsFromOtherActions(npc)
   );
+}
+
+export function calcUsedSkillsFromOtherActions(npc) {
+  return npc.actions?.length || 0;
 }
 
 export function calcUsedSkillsFromSpecialAttacks(npc) {
