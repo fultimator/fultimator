@@ -11,19 +11,24 @@ import {
   Typography,
   MenuItem,
   Select,
+  Tooltip
 } from "@mui/material";
+import {
+  Download,
+} from "@mui/icons-material";
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { User } from "firebase/auth";
+import { createFileName, useScreenshot } from "use-react-screenshot";
 
 import { SignIn } from "../../components/auth";
 import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
-import { useEffect } from "react";
+import { useEffect, createRef } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
 
@@ -243,10 +248,29 @@ function NpcCombatant({ npc }: NpcProps) {
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);
   }
+
+  // Download
+  const prettyRef = createRef();
+  const [image, takeScreenShot] = useScreenshot();
+
+  const download = (image: string, { name = 'img', extension = 'png' }: { name?: string; extension?: string } = {}) => {
+    const a = document.createElement("a");
+    a.href = image;
+    a.download = createFileName(extension!, name!); 
+    a.click();
+  };
+  const getImage = () => takeScreenShot(prettyRef.current);
+
+  useEffect(() => {
+    if (image) {
+      download(image, { name: npc?.name, extension: "png" });
+    }
+  }, [image, npc?.name]);
+
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} />
+        <NpcPretty npc={npc} study={selectedStudy} ref={prettyRef} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
@@ -329,6 +353,17 @@ function NpcCombatant({ npc }: NpcProps) {
               <MenuItem value={3}>13+</MenuItem>
             </Select>
           </Grid>
+          {/* Download Button */}
+          <Button
+            color="primary"
+            aria-label="download"
+            onClick={getImage}
+            style={{ cursor: 'pointer'}}
+          >
+            <Tooltip title="Download Sheet" placement="bottom">
+            <Download />
+            </Tooltip>
+          </Button>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>
