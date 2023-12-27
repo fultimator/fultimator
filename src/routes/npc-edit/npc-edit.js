@@ -50,10 +50,17 @@ export default function NpcEdit() {
     idField: "id",
   });
 
+  const [isUpdated, setIsUpdated] = useState(false);
+
   const [npcTemp, setNpcTemp] = useState(npc);
 
+  const updateNPC = (data) => {
+    setIsUpdated(true);
+    setNpcTemp(data);
+  };
+
   useEffect(() => {
-    setNpcTemp(npc);
+    updateNPC(npc);
   }, [npc]);
 
   const handleCtrlS = useCallback(
@@ -169,43 +176,43 @@ export default function NpcEdit() {
 
       {user && user.uid === npc.uid && (
         <>
-          <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
+          <EditBasics npc={npcTemp} setNpc={updateNPC} />
 
           <Divider sx={{ my: 2 }} />
 
           <Grid container>
             <Grid item xs={12} md={6}>
-              <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+              <EditAffinities npc={npcTemp} setNpc={updateNPC} />
             </Grid>
             <Grid item xs={12} md={6}>
               <ExplainAffinities npc={npcTemp} />
-              <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
+              <EditExtra npc={npcTemp} setNpc={updateNPC} />
             </Grid>
           </Grid>
 
           <Divider sx={{ my: 2 }} />
 
-          <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
-          <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
+          <EditAttacks npc={npcTemp} setNpc={updateNPC} />
+          <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
 
           <Divider sx={{ my: 2 }} />
 
-          <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
+          <EditSpells npc={npcTemp} setNpc={updateNPC} />
 
           <Divider sx={{ my: 2 }} />
 
           <Grid container>
             <Grid item xs={12} md={6}>
-              <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+              <EditActions npc={npcTemp} setNpc={updateNPC} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+              <EditSpecial npc={npcTemp} setNpc={updateNPC} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+              <EditRareGear npc={npcTemp} setNpc={updateNPC} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+              <EditNotes npc={npcTemp} setNpc={updateNPC} />
             </Grid>
           </Grid>
           <Divider sx={{ my: 2 }} />
@@ -314,15 +321,18 @@ export default function NpcEdit() {
         message="Copied to Clipboard!"
       />
 
-      {JSON.stringify(npc) !== JSON.stringify(npcTemp) && (
+      {isUpdated && (
         <Grid style={{ position: "fixed", top: 80, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">
               <Fab
                 color="primary"
                 aria-label="save"
-                onClick={() => setDoc(ref, npcTemp)}
-                disabled={JSON.stringify(npc) === JSON.stringify(npcTemp)}
+                onClick={() => {
+                  setIsUpdated(false);
+                  setDoc(ref, npcTemp);
+                }}
+                disabled={!isUpdated}
                 size="medium"
                 style={{ marginLeft: "5px" }}
               >
