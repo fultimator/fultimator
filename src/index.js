@@ -13,6 +13,7 @@ import Home from "./routes/Home";
 import Rituals from "./routes/rituals/rituals";
 import Equip from "./routes/equip/Equip";
 import NpcGallery from "./routes/npc-gallery/npc-gallery";
+import NpcCompedium from "./routes/npc-compedium/npc-compedium";
 import NpcEdit from "./routes/npc-edit/npc-edit";
 import Roller from "./routes/roller/roller";
 import RollerScoped from "./routes/roller/roller-scoped";
@@ -28,6 +29,7 @@ ReactDOM.render(
           <Route path="/" element={<Home />} />
           <Route path="/npc-gallery/:npcId" element={<NpcEdit />} />
           <Route path="/npc-gallery" element={<NpcGallery />} />
+          <Route path="/npc-compedium" element={<NpcCompedium />} />
           <Route path="/rituals" element={<Rituals />} />
           <Route path="/equip" element={<Equip />} />
           <Route path="/roller" element={<Roller />} />

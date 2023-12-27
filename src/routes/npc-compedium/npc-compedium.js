@@ -3,6 +3,8 @@ import { Link as RouterLink } from "react-router-dom";
 import {
   query,
   orderBy,
+  limit,
+  startAfter,
   collection,
   where,
   doc,
@@ -20,30 +22,37 @@ import {
   Tooltip,
   Typography,
   Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   Snackbar,
+  Paper,
+  TextField,
+  Slider,
+  Autocomplete,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
-  AddCircle,
+  ArrowRight,
   ContentCopy,
-  Delete,
   Share,
   Download,
-  Edit,
   Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { createFileName, useScreenshot } from "use-react-screenshot";
 import { createRef, useEffect, useState } from "react";
 
-export default function NpcGallery() {
+import allToken from "../icons/All-token.png";
+import constructToken from "../icons/Construct-token.png";
+import demonToken from "../icons/Demon-token.png";
+import elementalToken from "../icons/Elemental-token.png";
+import humanToken from "../icons/Human-token.png";
+import monsterToken from "../icons/Monster-token.png";
+import plantToken from "../icons/Plant-token.png";
+import undeadToken from "../icons/Undead-token.png";
+
+export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
 
   return (
@@ -65,44 +74,24 @@ export default function NpcGallery() {
 }
 
 function Personal({ user }) {
+  const [lastItem, setLastItem] = useState(undefined);
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
-    where("uid", "==", user.uid),
+    where("name", "!=", ""),
+    orderBy("name", "asc"),
     orderBy("lvl", "asc"),
-    orderBy("name", "asc")
+    startAfter(lastItem ? lastItem.id : 0),
+    limit(10)
   );
-  const [personalList, success, err] = useCollectionData(personalQuery, {
-    idField: "id",
-  });
+  const [personalList, success, err] = useCollectionData(personalQuery);
 
   console.debug("useCollectionData length", personalList?.length);
 
   console.debug("useCollectionData success, error: ", success, err);
 
-  const addNpc = async function () {
-    const data = {
-      name: "-",
-      species: "Beast",
-      lvl: 5,
-      uid: user.uid,
-      attributes: {
-        dexterity: 8,
-        might: 8,
-        will: 8,
-        insight: 8,
-      },
-      attacks: [],
-      affinities: {},
-    };
-    const ref = collection(firestore, "npc-personal");
-
-    try {
-      const res = await addDoc(ref, data);
-      console.debug(res);
-    } catch (e) {
-      console.debug(e);
-    }
+  const nextPage = () => {
+    setLastItem(personalList[personalList.length - 1]);
   };
 
   const copyNpc = function (npc) {
@@ -124,12 +113,6 @@ function Personal({ user }) {
     };
   };
 
-  const [selectedNpc, setSelectedNpc] = useState("");
-
-  const handleNpcChange = (event) => {
-    setSelectedNpc(event.target.value);
-  };
-
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -141,79 +124,119 @@ function Personal({ user }) {
     setOpen(true);
   };
 
+  const enemyType = (token) => {
+    return (
+      <Grid
+        item
+        xs={4}
+        md={1.5}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ display: "flex" }}
+      >
+        <img src={token} alt="all" />
+      </Grid>
+    );
+  };
+
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Typography variant="h4">
-          NPCs
-          <Tooltip title="Create NPC">
-            <IconButton onClick={addNpc}>
-              <AddCircle />
-            </IconButton>
-          </Tooltip>
-        </Typography>
+      <Paper elevation={3} sx={{ margin: 5 }}>
+        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+          {enemyType(allToken)}
+          {enemyType(constructToken)}
+          {enemyType(demonToken)}
+          {enemyType(elementalToken)}
+          {enemyType(humanToken)}
+          {enemyType(monsterToken)}
+          {enemyType(plantToken)}
+          {enemyType(undeadToken)}
+        </Grid>
 
-        <Typography
-          sx={{ marginLeft: "none", fontStyle: "italic", color: "#777" }}
-        >
-          Note for Mobile Users: For better quality, export in landscape mode.
-        </Typography>
-      </div>
+        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+          <Grid
+            item
+            xs={4}
+            md={1.5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <TextField
+              id="outlined-basic"
+              label="Adversary Name"
+              variant="outlined"
+            />
+          </Grid>
 
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="npc-select-label">Select NPC</InputLabel>
-        <Select
-          labelId="npc-select-label"
-          id="npc-select"
-          value={selectedNpc}
-          onChange={handleNpcChange}
-          label="Select NPC"
-        >
-          <MenuItem value="" disabled>
-            Select an NPC
-          </MenuItem>
-          {personalList?.map((npc) => (
-            <MenuItem
-              key={npc.id}
-              value={npc.id}
-              component={RouterLink}
-              to={`/npc-gallery/${npc.id}`}
-            >
-              {npc.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <div style={{ display: "flex", rowGap: 30 }}>
-        <div style={{ marginRight: 10 }}>
-          {personalList?.map((npc, i) => {
-            if (i % 2 === 0) return "";
-            return (
-              <Npc
-                key={i}
-                npc={npc}
-                copyNpc={copyNpc}
-                deleteNpc={deleteNpc}
-                shareNpc={shareNpc}
-              />
-            );
-          })}
-        </div>
-        <div style={{ marginLeft: 10 }}>
-          {personalList?.map((npc, i) => {
-            if (i % 2 !== 0) return "";
-            return (
-              <Npc
-                key={i}
-                npc={npc}
-                copyNpc={copyNpc}
-                deleteNpc={deleteNpc}
-                shareNpc={shareNpc}
-              />
-            );
-          })}
-        </div>
-      </div>
+          <Grid
+            item
+            xs={4}
+            md={1.5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Typography>Level</Typography>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            md={1.5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Slider
+              getAriaLabel={() => "Level"}
+              value={[0, 20]}
+              onChange={() => {}}
+              sx={{ width: 300 }}
+              max={60}
+              valueLabelDisplay="auto"
+              getAriaValueText={(value) => {
+                return `Lvl:${value}`;
+              }}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            md={1.5}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              options={[
+                "soldier",
+                "elite",
+                "champion2",
+                "champion3",
+                "champion4",
+                "champion5",
+              ]}
+              renderInput={(params) => <TextField {...params} label="Rank" />}
+            />
+          </Grid>
+          <IconButton aria-label="" onClick={nextPage}>
+            <ArrowRight />
+          </IconButton>
+        </Grid>
+      </Paper>
+      <Grid container spacing={2}>
+        {personalList?.map((npc, i) => (
+          <Npc
+            key={i}
+            npc={npc}
+            copyNpc={copyNpc}
+            deleteNpc={deleteNpc}
+            shareNpc={shareNpc}
+          />
+        ))}
+      </Grid>
 
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -259,22 +282,11 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     }
   }, [image, npc.name]);
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
+    <Grid item xs={12} md={6}>
       <NpcPretty npc={npc} ref={ref} />
-      {/* <NpcUgly npc={npc} /> */}
       <Tooltip title="Copy">
         <IconButton onClick={copyNpc(npc)}>
           <ContentCopy />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Edit">
-        <IconButton component={RouterLink} to={`/npc-gallery/${npc.id}`}>
-          <Edit />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete">
-        <IconButton onClick={deleteNpc(npc)}>
-          <Delete />
         </IconButton>
       </Tooltip>
       <Tooltip title="Share URL">
