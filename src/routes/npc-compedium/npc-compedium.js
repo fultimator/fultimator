@@ -226,17 +226,36 @@ function Personal({ user }) {
           </IconButton>
         </Grid>
       </Paper>
-      <Grid container spacing={2}>
-        {personalList?.map((npc, i) => (
-          <Npc
-            key={i}
-            npc={npc}
-            copyNpc={copyNpc}
-            deleteNpc={deleteNpc}
-            shareNpc={shareNpc}
-          />
-        ))}
-      </Grid>
+      <div style={{ display: "flex", rowGap: 30 }}>
+        <div style={{ marginRight: 10, width: "50%" }}>
+          {personalList?.map((npc, i) => {
+            if (i % 2 === 0) return "";
+            return (
+              <Npc
+                key={i}
+                npc={npc}
+                copyNpc={copyNpc}
+                deleteNpc={deleteNpc}
+                shareNpc={shareNpc}
+              />
+            );
+          })}
+        </div>
+        <div style={{ marginLeft: 10, width: "50%" }}>
+          {personalList?.map((npc, i) => {
+            if (i % 2 !== 0) return "";
+            return (
+              <Npc
+                key={i}
+                npc={npc}
+                copyNpc={copyNpc}
+                deleteNpc={deleteNpc}
+                shareNpc={shareNpc}
+              />
+            );
+          })}
+        </div>
+      </div>
 
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -282,7 +301,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     }
   }, [image, npc.name]);
   return (
-    <Grid item xs={12} md={6}>
+    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty npc={npc} ref={ref} />
       <Tooltip title="Copy">
         <IconButton onClick={copyNpc(npc)}>

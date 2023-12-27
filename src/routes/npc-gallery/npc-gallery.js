@@ -185,7 +185,7 @@ function Personal({ user }) {
         </Select>
       </FormControl>
       <div style={{ display: "flex", rowGap: 30 }}>
-        <div style={{ marginRight: 10 }}>
+        <div style={{ marginRight: 10, width: "50%" }}>
           {personalList?.map((npc, i) => {
             if (i % 2 === 0) return "";
             return (
@@ -199,7 +199,7 @@ function Personal({ user }) {
             );
           })}
         </div>
-        <div style={{ marginLeft: 10 }}>
+        <div style={{ marginLeft: 10, width: "50%" }}>
           {personalList?.map((npc, i) => {
             if (i % 2 !== 0) return "";
             return (
