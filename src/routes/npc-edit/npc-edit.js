@@ -60,7 +60,7 @@ export default function NpcEdit() {
   };
 
   useEffect(() => {
-    updateNPC(npc);
+    setNpcTemp(npc);
   }, [npc]);
 
   const handleCtrlS = useCallback(

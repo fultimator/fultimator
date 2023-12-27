@@ -95,24 +95,26 @@ function Header({ npc }) {
           Lvl {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
         </Typography>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          px: 2,
-          py: 0.5,
-          borderBottom: "1px solid #b9a9be",
-          borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
-        }}
-      >
-        <Typography
-          fontFamily="Antonio"
-          fontSize="1.25rem"
-          sx={{ textTransform: "uppercase" }}
+      {npc.villain && (
+        <Grid
+          item
+          xs={12}
+          sx={{
+            px: 2,
+            py: 0.5,
+            borderBottom: "1px solid #b9a9be",
+            borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+          }}
         >
-          {renderVillainPhase(npc)}
-        </Typography>
-      </Grid>
+          <Typography
+            fontFamily="Antonio"
+            fontSize="1.25rem"
+            sx={{ textTransform: "uppercase" }}
+          >
+            {renderVillainPhase(npc)}
+          </Typography>
+        </Grid>
+      )}
       <Grid
         item
         xs={12}
