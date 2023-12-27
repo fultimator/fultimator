@@ -95,7 +95,7 @@ function Header({ npc }) {
           Lvl {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
         </Typography>
       </Grid>
-      {npc.villain && (
+      {(npc.villain || npc.phases || npc.multipart) && (
         <Grid
           item
           xs={12}
