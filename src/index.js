@@ -10,8 +10,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import Fabula from "./themes/Fabula";
 
 import Home from "./routes/Home";
-import Rituals from "./routes/rituals/rituals";
-import Equip from "./routes/equip/Equip";
+import Generator from "./routes/generator/generator";
 import NpcGallery from "./routes/npc-gallery/npc-gallery";
 import NpcCompedium from "./routes/npc-compedium/npc-compedium";
 import NpcEdit from "./routes/npc-edit/npc-edit";
@@ -30,8 +29,7 @@ ReactDOM.render(
           <Route path="/npc-gallery/:npcId" element={<NpcEdit />} />
           <Route path="/npc-gallery" element={<NpcGallery />} />
           <Route path="/npc-compedium" element={<NpcCompedium />} />
-          <Route path="/rituals" element={<Rituals />} />
-          <Route path="/equip" element={<Equip />} />
+          <Route path="/generate" element={<Generator />} />
           <Route path="/roller" element={<Roller />} />
           <Route path="/roller/:scope" element={<RollerScoped />} />
           <Route path="/probs" element={<Probs />} />

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import Layout from "../../components/Layout";
+import Weapons from "../equip/weapons/Weapons";
 
 const powerPMs = {
   minor: 20,
@@ -70,6 +71,11 @@ function RitualsProjects() {
         <Grid item xs={2} />
         <Grid item xs={6}>
           <Projects />
+        </Grid>
+      </Grid>
+      <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 5 }}>
+        <Grid item xs={12}>
+          <Weapons />
         </Grid>
       </Grid>
     </Layout>

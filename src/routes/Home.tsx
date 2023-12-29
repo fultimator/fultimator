@@ -42,7 +42,7 @@ function Home() {
                 size="small"
                 variant="outlined"
                 component={RouterLink}
-                to="rituals"
+                to="generate"
               >
                 Go
               </Button>
