@@ -12,8 +12,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  useMediaQuery, 
-  useTheme
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import attributes from "../../libs/attributes";
@@ -108,7 +108,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name"
+            label="Name:"
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -155,7 +155,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             size="small"
           ></TextField>
         </FormControl>
-      </Grid>  
+      </Grid>
       <Grid item xs={4} lg={2}>
         <FormGroup>
           <FormControlLabel
@@ -199,7 +199,7 @@ function EditAttackSpecial({ attack, setAttack }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="special"
-            label="Special"
+            label="Special:"
             multiline
             value={specials}
             onChange={onChange}
@@ -236,7 +236,7 @@ function SelectWeapon({ weapon, setWeapon }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Weapon</InputLabel>
+      <InputLabel id="type">Weapon:</InputLabel>
       <Select
         labelId="type"
         id="select-type"

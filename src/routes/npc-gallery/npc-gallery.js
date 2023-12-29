@@ -25,6 +25,7 @@ import {
   InputLabel,
   FormControl,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -72,13 +73,9 @@ function Personal({ user }) {
     orderBy("lvl", "asc"),
     orderBy("name", "asc")
   );
-  const [personalList, success, err] = useCollectionData(personalQuery, {
+  const [personalList, loading] = useCollectionData(personalQuery, {
     idField: "id",
   });
-
-  console.debug("useCollectionData length", personalList?.length);
-
-  console.debug("useCollectionData success, error: ", success, err);
 
   const addNpc = async function () {
     const data = {
@@ -213,6 +210,16 @@ function Personal({ user }) {
             );
           })}
         </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: 50,
+        }}
+      >
+        {loading && <CircularProgress />}
       </div>
 
       <Snackbar

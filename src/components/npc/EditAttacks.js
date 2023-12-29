@@ -14,8 +14,8 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  useMediaQuery, 
-  useTheme
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import types from "../../libs/types";
@@ -112,7 +112,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name"
+            label="Name:"
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -143,12 +143,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr1label"}>Attr 1</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr1label"}>Attr 1:</InputLabel>
           <Select
             value={attack.attr1}
             labelId={"attack-" + i + "-attr1label"}
             id={"attack-" + i + "-attr1"}
-            label="Attr 1"
+            label="Attr 1:"
             size="small"
             onChange={(e) => {
               return setAttack("attr1", e.target.value);
@@ -163,12 +163,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr2label"}>Attr 2</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr2label"}>Attr 2:</InputLabel>
           <Select
             value={attack.attr2}
             labelId={"attack-" + i + "-attr2label"}
             id={"attack-" + i + "-attr2"}
-            label="Attr 2"
+            label="Attr 2:"
             size="small"
             onChange={(e, value) => {
               return setAttack("attr2", e.target.value);
@@ -183,12 +183,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid item xs={8} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-type"}>Type</InputLabel>
+          <InputLabel id={"attack-" + i + "-type"}>Type:</InputLabel>
           <Select
             value={attack.type}
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
-            label="Ab 1"
+            label="Ab 1:"
             size="small"
             onChange={(e, value) => {
               return setAttack("type", e.target.value);
@@ -247,7 +247,7 @@ function EditAttackSpecial({ attack, setAttack }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="special"
-            label="Special"
+            label="Special:"
             multiline
             value={specials}
             onChange={onChange}

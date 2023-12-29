@@ -62,7 +62,7 @@ export default function EditRareGear({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Name"
+                  label="Name:"
                   value={raregear.name}
                   onChange={(e) => {
                     return onChangeRareGear(i, "name", e.target.value);
@@ -76,7 +76,7 @@ export default function EditRareGear({ npc, setNpc }) {
                 <TextField
                   multiline
                   id="effect"
-                  label="Effect"
+                  label="Effect:"
                   value={raregear.effect}
                   onChange={(e) => {
                     return onChangeRareGear(i, "effect", e.target.value);

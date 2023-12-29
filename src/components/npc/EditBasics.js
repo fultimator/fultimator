@@ -68,7 +68,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name"
+            label="Name:"
             value={npc.name}
             onChange={onChange("name")}
           ></TextField>
@@ -78,7 +78,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="traits"
-            label="Traits"
+            label="Traits:"
             value={npc.traits}
             onChange={onChange("traits")}
             multiline
@@ -90,12 +90,12 @@ export default function EditBasics({ npc, setNpc }) {
       </Grid>
       <Grid item xs={4} sm={3}>
         <FormControl fullWidth>
-          <InputLabel id="species">Species</InputLabel>
+          <InputLabel id="species">Species:</InputLabel>
           <Select
             labelId="species"
             id="select-species"
             value={npc.species}
-            label="Species"
+            label="Species:"
             onChange={onChangeSpecies}
           >
             <MenuItem value={"Beast"}>Beast</MenuItem>
@@ -112,12 +112,12 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid item xs={4} sm={3}>
         <Stack spacing={1}>
           <FormControl fullWidth>
-            <InputLabel id="rank">Rank</InputLabel>
+            <InputLabel id="rank">Rank:</InputLabel>
             <Select
               labelId="rank"
               id="select-rank"
               value={npc.rank}
-              label="Rank"
+              label="Rank:"
               onChange={onChange("rank")}
             >
               <MenuItem value={"soldier"}>Soldier</MenuItem>
@@ -131,16 +131,16 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Stack>
       </Grid>
-      
+
       {/* Villain & Phase Section*/}
       <Grid item xs={4} sm={3}>
         <FormControl fullWidth>
-          <InputLabel id="villain">Villain</InputLabel>
+          <InputLabel id="villain">Villain:</InputLabel>
           <Select
             labelId="villain"
             id="select-villain"
             value={npc.villain}
-            label="villain"
+            label="Villain:"
             onChange={onChange("villain")}
           >
             <MenuItem value={""}>None</MenuItem>
@@ -157,56 +157,54 @@ export default function EditBasics({ npc, setNpc }) {
             labelId="phases"
             id="textfield-phases"
             value={npc.phases || 0}
-            label="Phases"
+            label="Phases:"
             onChange={onChange("phases")}
             type="number"
           ></TextField>
         </FormControl>
       </Grid>
 
-      
       {npc.rank === "companion" && (
         <Grid item xs={2} sm={2}>
-            <FormControl fullWidth>
-              <InputLabel id="companionlvl">SL</InputLabel>
-              <Select
-                labelId="companionlvl"
-                id="select-companionlvl"
-                value={npc.companionlvl || 1}
-                label="Skill Level"
-                onChange={onChange("companionlvl")}
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                <MenuItem value={4}>4</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-              </Select>
-            </FormControl>
-            </Grid>
-          )}
-      
-      
-          {npc.rank === "companion" && (
-            <Grid item xs={3} sm={2}>
-            <FormControl fullWidth>
-              <TextField
-                labelId="companionpclvl"
-                id="textfield-companionpclvl"
-                value={npc.companionpclvl || 5}
-                label="PC Level"
-                onChange={onChange("companionpclvl")}
-                type="number"
-              ></TextField>
-            </FormControl>
-            </Grid>
-          )}
+          <FormControl fullWidth>
+            <InputLabel id="companionlvl">SL</InputLabel>
+            <Select
+              labelId="companionlvl"
+              id="select-companionlvl"
+              value={npc.companionlvl || 1}
+              label="Skill Level:"
+              onChange={onChange("companionlvl")}
+            >
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
+
+      {npc.rank === "companion" && (
+        <Grid item xs={3} sm={2}>
+          <FormControl fullWidth>
+            <TextField
+              labelId="companionpclvl"
+              id="textfield-companionpclvl"
+              value={npc.companionpclvl || 5}
+              label="PC Level:"
+              onChange={onChange("companionpclvl")}
+              type="number"
+            ></TextField>
+          </FormControl>
+        </Grid>
+      )}
 
       <Grid item xs={12} sm={5} md>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
-            label="Multi-Part"
+            label="Multi-Part:"
             value={npc.multipart}
             onChange={onChange("multipart")}
             multiline
@@ -218,7 +216,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="Description"
-            label="Description"
+            label="Description:"
             value={npc.description}
             onChange={onChange("description")}
             multiline
@@ -282,11 +280,10 @@ function EditLevel({ npc, setnpc }) {
     });
   };
   return (
-
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
-        label="Level"
+        label="Level:"
         //type="number"
         min={5}
         max={60}

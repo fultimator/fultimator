@@ -176,7 +176,7 @@ function HP({ npc, setNpc }) {
         id="HP"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra HP"
+        label="Extra HP:"
         value={npc.extra?.hp || 0}
         onChange={onChange}
       ></TextField>
@@ -202,7 +202,7 @@ function MP({ npc, setNpc }) {
         id="mp"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra MP"
+        label="Extra MP:"
         value={npc.extra?.mp || 0}
         onChange={onChange}
       ></TextField>
@@ -246,15 +246,14 @@ function ExtraInit({ npc, setNpc }) {
       <TextField
         id="extrainit"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*"}}
-        label="Extra Init."
+        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+        label="Extra Init:"
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
       ></TextField>
     </FormControl>
   );
 }
-
 
 function Precision({ npc, setNpc }) {
   const onChange = (e) => {

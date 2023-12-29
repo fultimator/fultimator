@@ -1,15 +1,13 @@
-import { Link as RouterLink } from "react-router-dom";
-
 import {
   query,
   orderBy,
   limit,
-  startAfter,
   collection,
   where,
   doc,
   addDoc,
   deleteDoc,
+  startAfter,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -26,7 +24,10 @@ import {
   Paper,
   TextField,
   Slider,
+  Avatar,
   Autocomplete,
+  Button,
+  CircularProgress,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -34,6 +35,8 @@ import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
   ArrowRight,
+  RestartAltOutlined,
+  Search,
   ContentCopy,
   Share,
   Download,
@@ -44,6 +47,7 @@ import { createFileName, useScreenshot } from "use-react-screenshot";
 import { createRef, useEffect, useState } from "react";
 
 import allToken from "../icons/All-token.png";
+import beastToken from "../icons/Beast-token.png";
 import constructToken from "../icons/Construct-token.png";
 import demonToken from "../icons/Demon-token.png";
 import elementalToken from "../icons/Elemental-token.png";
@@ -76,22 +80,62 @@ export default function NpcCompedium() {
 function Personal({ user }) {
   const [lastItem, setLastItem] = useState(undefined);
   const personalRef = collection(firestore, "npc-personal");
-  const personalQuery = query(
-    personalRef,
-    where("name", "!=", ""),
-    orderBy("name", "asc"),
-    orderBy("lvl", "asc"),
-    startAfter(lastItem ? lastItem.id : 0),
-    limit(10)
-  );
-  const [personalList, success, err] = useCollectionData(personalQuery);
+  const [selectedType, setSelectedType] = useState("All");
+  const [name, setName] = useState("");
+  const [rank, setRank] = useState("");
+  const [levels, setLevels] = useState([5, 60]);
 
-  console.debug("useCollectionData length", personalList?.length);
+  const [searchParams, setSearchParams] = useState({
+    type: "All",
+    name: "",
+    level: [5, 60],
+    rank: "",
+  });
 
-  console.debug("useCollectionData success, error: ", success, err);
+  const constraints = [
+    where("published", "==", true),
+    where("lvl", ">=", searchParams.level[0]),
+    where("lvl", "<=", searchParams.level[1]),
+  ];
+
+  if (searchParams.name !== "") {
+    constraints.push(
+      where("searchString", "array-contains-any", [
+        ...searchParams.name.split(" "),
+      ])
+    );
+  }
+
+  if (searchParams.rank !== "") {
+    constraints.push(where("rank", "==", searchParams.rank));
+  }
+
+  if (searchParams.type !== "All") {
+    constraints.push(where("species", "==", searchParams.type));
+  }
+
+  constraints.push(orderBy("lvl", "asc"), orderBy("publishedAt", "desc"));
+
+  if (lastItem) {
+    constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
+  }
+
+  constraints.push(limit(4));
+
+  const personalQuery = query(personalRef, ...constraints);
+  const [personalList, loading, err] = useCollectionData(personalQuery);
+
+  console.log(personalList);
+
+  console.log(err);
 
   const nextPage = () => {
-    setLastItem(personalList[personalList.length - 1]);
+    for (let i = 1; i < personalList.length; i++) {
+      if (personalList[personalList.length - i]?.id) {
+        setLastItem(personalList[personalList.length - 1]);
+        return;
+      }
+    }
   };
 
   const copyNpc = function (npc) {
@@ -124,40 +168,103 @@ function Personal({ user }) {
     setOpen(true);
   };
 
-  const enemyType = (token) => {
+  const enemyType = (token, name) => {
     return (
       <Grid
         item
         xs={4}
-        md={1.5}
+        md={1.3}
         alignItems="center"
         justifyContent="center"
-        sx={{ display: "flex" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <img src={token} alt="all" />
+        <Avatar
+          alt="Remy Sharp"
+          src={token}
+          sx={{
+            width: 100,
+            height: 100,
+            border: selectedType === name ? "6px solid purple" : "none",
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            setSelectedType(name);
+          }}
+        />
+        <div
+          style={{
+            color: selectedType === name ? "purple" : "#999999",
+            fontWeight: selectedType === name ? 700 : 400,
+          }}
+        >
+          {name}
+        </div>
       </Grid>
     );
   };
 
+  const marks = [
+    {
+      value: 10,
+      label: "Lvl 10",
+    },
+    {
+      value: 20,
+      label: "Lvl 20",
+    },
+    {
+      value: 30,
+      label: "Lvl 30",
+    },
+    {
+      value: 40,
+      label: "Lvl 40",
+    },
+    {
+      value: 50,
+      label: "Lvl 50",
+    },
+    {
+      value: 60,
+      label: "Lvl 60",
+    },
+  ];
+
   return (
     <>
-      <Paper elevation={3} sx={{ margin: 5 }}>
+      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
-          {enemyType(allToken)}
-          {enemyType(constructToken)}
-          {enemyType(demonToken)}
-          {enemyType(elementalToken)}
-          {enemyType(humanToken)}
-          {enemyType(monsterToken)}
-          {enemyType(plantToken)}
-          {enemyType(undeadToken)}
+          {enemyType(allToken, "All")}
+          {enemyType(beastToken, "Beast")}
+          {enemyType(constructToken, "Construct")}
+          {enemyType(demonToken, "Demon")}
+          {enemyType(elementalToken, "Elemental")}
+          {enemyType(humanToken, "Humanoid")}
+          {enemyType(monsterToken, "Monster")}
+          {enemyType(plantToken, "Plant")}
+          {enemyType(undeadToken, "Undead")}
         </Grid>
 
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
           <Grid
             item
-            xs={4}
-            md={1.5}
+            xs={12}
+            md={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Typography fontWeight={700}>Search:</Typography>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={2}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex" }}
@@ -166,31 +273,34 @@ function Personal({ user }) {
               id="outlined-basic"
               label="Adversary Name"
               variant="outlined"
+              size="small"
+              fullWidth
+              value={name}
+              onChange={(evt) => {
+                setName(evt.target.value);
+              }}
             />
           </Grid>
 
           <Grid
             item
-            xs={4}
-            md={1.5}
+            xs={12}
+            md={3}
             alignItems="center"
             justifyContent="center"
-            sx={{ display: "flex" }}
-          >
-            <Typography>Level</Typography>
-          </Grid>
-          <Grid
-            item
-            xs={4}
-            md={1.5}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
+            sx={{ display: "flex", marginLeft: 5, marginRight: 5 }}
           >
             <Slider
               getAriaLabel={() => "Level"}
-              value={[0, 20]}
-              onChange={() => {}}
+              value={levels}
+              aria-label="Always visible"
+              step={5}
+              min={5}
+              marks={marks}
+              onChange={(val, val2) => {
+                console.log(val2);
+                setLevels(val2);
+              }}
               sx={{ width: 300 }}
               max={60}
               valueLabelDisplay="auto"
@@ -201,8 +311,8 @@ function Personal({ user }) {
           </Grid>
           <Grid
             item
-            xs={4}
-            md={1.5}
+            xs={12}
+            md={2}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex" }}
@@ -210,6 +320,8 @@ function Personal({ user }) {
             <Autocomplete
               disablePortal
               id="combo-box-demo"
+              fullWidth
+              value={rank}
               options={[
                 "soldier",
                 "elite",
@@ -218,16 +330,50 @@ function Personal({ user }) {
                 "champion4",
                 "champion5",
               ]}
+              size="small"
+              onChange={(evt, val2) => {
+                setRank(val2);
+              }}
               renderInput={(params) => <TextField {...params} label="Rank" />}
             />
           </Grid>
-          <IconButton aria-label="" onClick={nextPage}>
-            <ArrowRight />
-          </IconButton>
+          <Grid
+            item
+            xs={12}
+            md={2}
+            sx={{ display: "flex" }}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Button
+              variant="contained"
+              sx={{}}
+              startIcon={<Search />}
+              onClick={() => {
+                console.log({
+                  type: selectedType,
+                  name: name.toLowerCase(),
+                  level: levels,
+                  rank: rank ? rank : "",
+                });
+                setLastItem(undefined);
+                setSearchParams({
+                  type: selectedType,
+                  name: name.toLowerCase(),
+                  level: levels,
+                  rank: rank ? rank : "",
+                });
+              }}
+            >
+              Search
+            </Button>
+          </Grid>
         </Grid>
       </Paper>
-      <div style={{ display: "flex", rowGap: 30 }}>
-        <div style={{ marginRight: 10, width: "50%" }}>
+      <div
+        style={{ display: "flex", flexDirection: "row-reverse", rowGap: 30 }}
+      >
+        <div style={{ marginLeft: 10, width: "50%" }}>
           {personalList?.map((npc, i) => {
             if (i % 2 === 0) return "";
             return (
@@ -241,7 +387,7 @@ function Personal({ user }) {
             );
           })}
         </div>
-        <div style={{ marginLeft: 10, width: "50%" }}>
+        <div style={{ marginRight: 10, width: "50%" }}>
           {personalList?.map((npc, i) => {
             if (i % 2 !== 0) return "";
             return (
@@ -255,6 +401,49 @@ function Personal({ user }) {
             );
           })}
         </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: 50,
+        }}
+      >
+        {!loading ? (
+          <>
+            {personalList && personalList.length > 1 ? (
+              <Button
+                variant="contained"
+                sx={{}}
+                endIcon={<ArrowRight />}
+                onClick={nextPage}
+                size="large"
+              >
+                Next Items
+              </Button>
+            ) : (
+              <div style={{ textAlign: "center" }}>
+                <Typography fontWeight={700} marginBottom={4}>
+                  No more adversaries found.
+                </Typography>
+                <Button
+                  variant="contained"
+                  sx={{}}
+                  startIcon={<RestartAltOutlined />}
+                  onClick={() => {
+                    setLastItem(undefined);
+                  }}
+                  size="large"
+                >
+                  Reset
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <CircularProgress />
+        )}
       </div>
 
       <Snackbar
@@ -323,6 +512,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
           <Code />
         </IconButton>
       </Tooltip>
+      <span style={{ fontSize: 14 }}>Created By: {npc.createdBy}</span>
     </Grid>
   );
 }

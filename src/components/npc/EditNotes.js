@@ -62,7 +62,7 @@ export default function EditNotes({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Name"
+                  label="Name:"
                   value={notes.name}
                   onChange={(e) => {
                     return onChangeNotes(i, "name", e.target.value);
@@ -76,7 +76,7 @@ export default function EditNotes({ npc, setNpc }) {
                 <TextField
                   multiline
                   id="effect"
-                  label="Effect"
+                  label="Details:"
                   value={notes.effect}
                   onChange={(e) => {
                     return onChangeNotes(i, "effect", e.target.value);

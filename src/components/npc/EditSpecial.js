@@ -62,7 +62,7 @@ export default function EditSpecial({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Name"
+                  label="Name:"
                   value={special.name}
                   onChange={(e) => {
                     return onChangeSpecial(i, "name", e.target.value);
@@ -76,7 +76,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 <TextField
                   multiline
                   id="effect"
-                  label="Effect"
+                  label="Effect:"
                   value={special.effect}
                   onChange={(e) => {
                     return onChangeSpecial(i, "effect", e.target.value);

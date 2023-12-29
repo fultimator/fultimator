@@ -1,7 +1,16 @@
 import { useParams } from "react-router-dom";
 import { firestore } from "../../firebase";
 
-import { Grid, Divider, Fab, Fade, Tooltip, Snackbar } from "@mui/material";
+import {
+  Grid,
+  Divider,
+  Fab,
+  Fade,
+  Tooltip,
+  Snackbar,
+  Button,
+  TextField,
+} from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -9,6 +18,7 @@ import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
 import EditBasics from "../../components/npc/EditBasics";
 import {
   Download,
+  Publish,
   Save,
   Code,
   Share,
@@ -162,6 +172,70 @@ export default function NpcEdit() {
     return null;
   }
 
+  const canPublish = () => {
+    console.log(npcTemp);
+    if (!npcTemp.name || npcTemp.name === "") {
+      return {
+        disabled: true,
+        message: "It must have a name in order to be published.",
+      };
+    }
+
+    if (!npcTemp.description || npcTemp.description === "") {
+      return {
+        disabled: true,
+        message: "It must have a description in order to be published.",
+      };
+    }
+
+    if (!npcTemp.traits || npcTemp.traits === "") {
+      return {
+        disabled: true,
+        message: "It must have a traits in order to be published.",
+      };
+    }
+
+    if (!npcTemp.createdBy || npcTemp.createdBy === "") {
+      return {
+        disabled: true,
+        message: "'Credit By' needs to be filled in order to be published",
+      };
+    }
+
+    if (
+      (npcTemp.weaponattacks && npcTemp.weaponattacks.length) ||
+      (npcTemp.attacks && npcTemp.attacks.length)
+    ) {
+      return { disabled: false };
+    }
+
+    return {
+      disabled: true,
+      message: "It must have at least one attack, in order to be published.",
+    };
+  };
+
+  const publish = () => {
+    setIsUpdated(false);
+    setDoc(ref, {
+      ...npcTemp,
+      published: true,
+      searchString: npcTemp.name
+        .replace(/[\W_]+/g, " ")
+        .toLowerCase()
+        .split(" "),
+      publishedAt: Date.now(),
+    });
+  };
+
+  const unPublish = () => {
+    setIsUpdated(false);
+    setDoc(ref, {
+      ...npcTemp,
+      published: false,
+    });
+  };
+
   return (
     <Layout>
       <Grid container spacing={2}>
@@ -170,6 +244,64 @@ export default function NpcEdit() {
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
+          {user && user.uid === npc.uid && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <TextField
+                id="outlined-basic"
+                label="Created By:"
+                sx={{ marginTop: 2 }}
+                size="small"
+                helperText={
+                  npcTemp.published
+                    ? "This Adversary is part of the Community Compedium."
+                    : "Help the community compedium grow by publishing your finished work!"
+                }
+                fullWidth
+                value={npcTemp.createdBy}
+                onChange={(evt) => {
+                  updateNPC({ ...npcTemp, createdBy: evt.target.value });
+                }}
+              />
+              {!npcTemp.published && (
+                <Button
+                  variant="contained"
+                  sx={{ marginTop: 1 }}
+                  startIcon={<Publish />}
+                  disabled={canPublish().disabled}
+                  onClick={publish}
+                >
+                  Publish to Adversary Compedium
+                </Button>
+              )}
+              {npcTemp.published && (
+                <Button
+                  variant="outlined"
+                  sx={{ marginTop: 1 }}
+                  onClick={unPublish}
+                >
+                  Unpublish
+                </Button>
+              )}
+              {canPublish().disabled && (
+                <div
+                  style={{
+                    fontSize: 12,
+                    textAlign: "center",
+                    marginTop: 4,
+                    color: "red",
+                  }}
+                >
+                  {canPublish().message}
+                </div>
+              )}
+            </div>
+          )}
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
