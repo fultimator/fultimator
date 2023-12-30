@@ -240,7 +240,7 @@ export default function NpcEdit() {
     <Layout>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <NpcPretty npc={npcTemp} ref={prettyRef} />
+          <NpcPretty npc={npcTemp} ref={prettyRef} collapse={true} />
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />

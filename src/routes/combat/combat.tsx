@@ -11,11 +11,9 @@ import {
   Typography,
   MenuItem,
   Select,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
-import {
-  Download,
-} from "@mui/icons-material";
+import { Download } from "@mui/icons-material";
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
@@ -118,9 +116,9 @@ function AuthCombat({ user }: AuthCombatProps) {
           disablePortal
           id="combo-box-demo"
           options={personalList || []}
-          sx={{ width: 300 }}
+          sx={{ width: 300, mb: 10 }}
           onChange={addNpc}
-          renderInput={(params) => <TextField {...params} label="Png" />}
+          renderInput={(params) => <TextField {...params} label="Adversary" />}
         />
       </Grid>
     </Grid>
@@ -247,16 +245,22 @@ function NpcCombatant({ npc }: NpcProps) {
 
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);
-  }
+  };
 
   // Download
   const prettyRef = createRef();
   const [image, takeScreenShot] = useScreenshot();
 
-  const download = (image: string, { name = 'img', extension = 'png' }: { name?: string; extension?: string } = {}) => {
+  const download = (
+    image: string,
+    {
+      name = "img",
+      extension = "png",
+    }: { name?: string; extension?: string } = {}
+  ) => {
     const a = document.createElement("a");
     a.href = image;
-    a.download = createFileName(extension!, name!); 
+    a.download = createFileName(extension!, name!);
     a.click();
   };
   const getImage = () => takeScreenShot(prettyRef.current);
@@ -270,7 +274,12 @@ function NpcCombatant({ npc }: NpcProps) {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} ref={prettyRef} />
+        <NpcPretty
+          npc={npc}
+          study={selectedStudy}
+          ref={prettyRef}
+          collapse={true}
+        />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
@@ -340,30 +349,30 @@ function NpcCombatant({ npc }: NpcProps) {
               <Typography variant="h5">Study Roll:</Typography>
             </Grid>
             <Grid item xs={2}>
-            <Select
-              labelId="study"
-              id="study"
-              value={selectedStudy}
-              onChange={handleStudyChange}
-              fullWidth
+              <Select
+                labelId="study"
+                id="study"
+                value={selectedStudy}
+                onChange={handleStudyChange}
+                fullWidth
+              >
+                <MenuItem value={0}>-</MenuItem>
+                <MenuItem value={1}>7+</MenuItem>
+                <MenuItem value={2}>10+</MenuItem>
+                <MenuItem value={3}>13+</MenuItem>
+              </Select>
+            </Grid>
+            {/* Download Button */}
+            <Button
+              color="primary"
+              aria-label="download"
+              onClick={getImage}
+              style={{ cursor: "pointer" }}
             >
-              <MenuItem value={0}>-</MenuItem>
-              <MenuItem value={1}>7+</MenuItem>
-              <MenuItem value={2}>10+</MenuItem>
-              <MenuItem value={3}>13+</MenuItem>
-            </Select>
-          </Grid>
-          {/* Download Button */}
-          <Button
-            color="primary"
-            aria-label="download"
-            onClick={getImage}
-            style={{ cursor: 'pointer'}}
-          >
-            <Tooltip title="Download Sheet" placement="bottom">
-            <Download />
-            </Tooltip>
-          </Button>
+              <Tooltip title="Download Sheet" placement="bottom">
+                <Download />
+              </Tooltip>
+            </Button>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>

@@ -120,14 +120,10 @@ function Personal({ user }) {
     constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
   }
 
-  constraints.push(limit(4));
+  constraints.push(limit(6));
 
   const personalQuery = query(personalRef, ...constraints);
-  const [personalList, loading, err] = useCollectionData(personalQuery);
-
-  console.log(personalList);
-
-  console.log(err);
+  const [personalList, loading] = useCollectionData(personalQuery);
 
   const nextPage = () => {
     for (let i = 1; i < personalList.length; i++) {
@@ -169,6 +165,7 @@ function Personal({ user }) {
   };
 
   const enemyType = (token, name) => {
+    const isMobile = window.innerWidth < 900;
     return (
       <Grid
         item
@@ -184,11 +181,25 @@ function Personal({ user }) {
         }}
       >
         <Avatar
-          alt="Remy Sharp"
+          alt="icon"
           src={token}
           sx={{
-            width: 100,
-            height: 100,
+            width:
+              selectedType === name
+                ? isMobile
+                  ? 80
+                  : 130
+                : isMobile
+                ? 60
+                : 100,
+            height:
+              selectedType === name
+                ? isMobile
+                  ? 80
+                  : 130
+                : isMobile
+                ? 60
+                : 100,
             border: selectedType === name ? "6px solid purple" : "none",
             cursor: "pointer",
           }}
@@ -234,6 +245,8 @@ function Personal({ user }) {
       label: "Lvl 60",
     },
   ];
+
+  const isMobile = window.innerWidth < 900;
 
   return (
     <>
@@ -370,12 +383,10 @@ function Personal({ user }) {
           </Grid>
         </Grid>
       </Paper>
-      <div
-        style={{ display: "flex", flexDirection: "row-reverse", rowGap: 30 }}
-      >
-        <div style={{ marginLeft: 10, width: "50%" }}>
+
+      {isMobile ? (
+        <div>
           {personalList?.map((npc, i) => {
-            if (i % 2 === 0) return "";
             return (
               <Npc
                 key={i}
@@ -387,21 +398,40 @@ function Personal({ user }) {
             );
           })}
         </div>
-        <div style={{ marginRight: 10, width: "50%" }}>
-          {personalList?.map((npc, i) => {
-            if (i % 2 !== 0) return "";
-            return (
-              <Npc
-                key={i}
-                npc={npc}
-                copyNpc={copyNpc}
-                deleteNpc={deleteNpc}
-                shareNpc={shareNpc}
-              />
-            );
-          })}
+      ) : (
+        <div
+          style={{ display: "flex", flexDirection: "row-reverse", rowGap: 30 }}
+        >
+          <div style={{ marginLeft: 10, width: "50%" }}>
+            {personalList?.map((npc, i) => {
+              if (i % 2 === 0) return "";
+              return (
+                <Npc
+                  key={i}
+                  npc={npc}
+                  copyNpc={copyNpc}
+                  deleteNpc={deleteNpc}
+                  shareNpc={shareNpc}
+                />
+              );
+            })}
+          </div>
+          <div style={{ marginRight: 10, width: "50%" }}>
+            {personalList?.map((npc, i) => {
+              if (i % 2 !== 0) return "";
+              return (
+                <Npc
+                  key={i}
+                  npc={npc}
+                  copyNpc={copyNpc}
+                  deleteNpc={deleteNpc}
+                  shareNpc={shareNpc}
+                />
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         style={{

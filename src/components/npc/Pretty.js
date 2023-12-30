@@ -26,21 +26,62 @@ import {
 import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
 
-function NpcPretty({ npc, study }, ref) {
+import { useState } from "react";
+
+import { ArrowDropDown } from "@mui/icons-material";
+
+function NpcPretty({ npc, study, collapse }, ref) {
+  const [isCollapsed, setCollapsed] = useState(window.innerWidth >= 900);
   return (
     <Card>
-      <div ref={ref}>
+      <div
+        ref={ref}
+        onClick={() => setCollapsed(!isCollapsed)}
+        style={{ cursor: "pointer" }}
+      >
         {(study === 0 || study === null || study === undefined) && (
           <>
-            <Header npc={npc} />
-            <Stats npc={npc} />
-            <Attacks npc={npc} />
-            <Spells npc={npc} />
-            <Actions npc={npc} />
-            <Special npc={npc} />
-            <RareGear npc={npc} />
-            <Equip npc={npc} />
-            <Notes npc={npc} />
+            <div
+              style={{
+                boxShadow: isCollapsed || collapse ? "none" : "1px 1px 5px",
+              }}
+            >
+              <Header npc={npc} />
+            </div>
+            {isCollapsed || collapse ? (
+              <>
+                <Stats npc={npc} />
+                <Attacks npc={npc} />
+                <Spells npc={npc} />
+                <Actions npc={npc} />
+                <Special npc={npc} />
+                <RareGear npc={npc} />
+                <Equip npc={npc} />
+                <Notes npc={npc} />
+              </>
+            ) : (
+              <Grid container>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    padding: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ArrowDropDown />
+                  <Typography
+                    color="black"
+                    fontSize="1.1rem"
+                    fontWeight="medium"
+                  >
+                    Expand
+                  </Typography>
+                  <ArrowDropDown />
+                </Grid>
+              </Grid>
+            )}
           </>
         )}
 
@@ -157,6 +198,7 @@ function Rank({ npc }) {
 }
 
 function Stats({ npc }) {
+  const isMobile = window.innerWidth < 900;
   return (
     <Typography
       component="div"
@@ -168,7 +210,7 @@ function Stats({ npc }) {
       <Grid container>
         <Grid
           item
-          xs={6}
+          xs={isMobile ? 12 : 6}
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -176,7 +218,7 @@ function Stats({ npc }) {
             borderImage: "linear-gradient(90deg, #341b35, #6d5072) 1;",
             mr: "2px",
             my: "2px",
-            flexBasis: "calc(50% - 2px)",
+            flexBasis: isMobile ? "none" : "calc(50% - 2px)",
           }}
         >
           <Grid container alignItems="stretch" justifyContent="space-between">
@@ -218,9 +260,50 @@ function Stats({ npc }) {
             </Grid>
           </Grid>
         </Grid>
+        {isMobile && (
+          <Grid
+            item
+            xs={4}
+            sx={{
+              borderBottom: "1px solid #281127",
+              borderTop: "1px solid #281127",
+              borderRight: "1px solid #281127",
+              borderImage: "linear-gradient(90deg, #432846, #432846) 1;",
+              flexBasis: "calc(50% - 4px)",
+            }}
+          >
+            <Grid container justifyItems="space-between">
+              <Grid
+                item
+                xs
+                sx={{
+                  bgcolor: "#efecf5",
+                  borderRight: "1px solid #ffffff",
+                  py: 0.6,
+                }}
+              >
+                {npc.armor?.def > 0 ? (
+                  <>DEF {calcDef(npc)}</>
+                ) : (
+                  <>DEF +{calcDef(npc)}</>
+                )}
+              </Grid>
+              <Grid
+                item
+                xs
+                sx={{
+                  bgcolor: "#efecf5",
+                  py: 0.6,
+                }}
+              >
+                D.MAG +{calcMDef(npc)}
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
         <Grid
           item
-          xs={6}
+          xs={7}
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -228,7 +311,7 @@ function Stats({ npc }) {
             borderImage: "linear-gradient(90deg, #6d5072, #ffffff) 1;",
             ml: "2px",
             my: "2px",
-            flexBasis: "calc(50% - 2px)",
+            flexBasis: isMobile ? "none" : "calc(50% - 2px)",
           }}
         >
           <Grid container alignItems="stretch" justifyContent="space-between">
@@ -266,55 +349,58 @@ function Stats({ npc }) {
             </Grid>
           </Grid>
         </Grid>
-        <Grid
-          item
-          xs={3}
-          sx={{
-            borderBottom: "1px solid #281127",
-            borderTop: "1px solid #281127",
-            borderRight: "1px solid #281127",
-            borderImage: "linear-gradient(90deg, #432846, #432846) 1;",
-            mr: "2px",
-            flexBasis: "calc(50% - 2px)",
-          }}
-        >
-          <Grid container justifyItems="space-between">
-            <Grid
-              item
-              xs
-              sx={{
-                bgcolor: "#efecf5",
-                borderRight: "1px solid #ffffff",
-                py: 0.4,
-              }}
-            >
-              {npc.armor?.def > 0 ? (
-                <>DEF {calcDef(npc)}</>
-              ) : (
-                <>DEF +{calcDef(npc)}</>
-              )}
-            </Grid>
-            <Grid
-              item
-              xs
-              sx={{
-                bgcolor: "#efecf5",
-                py: 0.4,
-              }}
-            >
-              D.MAG +{calcMDef(npc)}
+        {!isMobile && (
+          <Grid
+            item
+            xs={3}
+            sx={{
+              borderBottom: "1px solid #281127",
+              borderTop: "1px solid #281127",
+              borderRight: "1px solid #281127",
+              borderImage: "linear-gradient(90deg, #432846, #432846) 1;",
+              mr: "2px",
+              flexBasis: "calc(50% - 2px)",
+            }}
+          >
+            <Grid container justifyItems="space-between">
+              <Grid
+                item
+                xs
+                sx={{
+                  bgcolor: "#efecf5",
+                  borderRight: "1px solid #ffffff",
+                  py: 0.4,
+                }}
+              >
+                {npc.armor?.def > 0 ? (
+                  <>DEF {calcDef(npc)}</>
+                ) : (
+                  <>DEF +{calcDef(npc)}</>
+                )}
+              </Grid>
+              <Grid
+                item
+                xs
+                sx={{
+                  bgcolor: "#efecf5",
+                  py: 0.4,
+                }}
+              >
+                D.MAG +{calcMDef(npc)}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        )}
         <Grid
           item
-          xs
+          xs={isMobile ? 12 : true}
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
             borderLeft: "1px solid #281127",
             borderImage: "linear-gradient(90deg, #432846, #ffffff) 1;",
             ml: "2px",
+            mt: isMobile ? "2px" : 0,
           }}
         >
           {npc.affinities && (
@@ -430,6 +516,31 @@ function Attacks({ npc }) {
                     </Typography>
                   );
                 })}
+                {typeof myVar === "string" ||
+                  (attack.special instanceof String && (
+                    <Typography component="span" key={i}>
+                      <ReactMarkdown
+                        allowedElements={["strong"]}
+                        unwrapDisallowed={true}
+                      >
+                        {attack.special}
+                      </ReactMarkdown>
+                    </Typography>
+                  ))}
+                {/* {attack.special?.map((effect, i) => {
+                  return (
+                    <Typography component="span" key={i}>
+                      {" "}
+                      -{" "}
+                      <ReactMarkdown
+                        allowedElements={["strong"]}
+                        unwrapDisallowed={true}
+                      >
+                        {effect}
+                      </ReactMarkdown>
+                    </Typography>
+                  );
+                })} */}
               </Typography>
             </Grid>
           </Fragment>

@@ -205,7 +205,7 @@ function RollList({ scope, saveRoll, user }) {
   console.debug(success, err);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ marginBottom: 10 }}>
       {rolls?.map((roll, i) => {
         return (
           <Roll
