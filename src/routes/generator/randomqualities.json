@@ -8,11 +8,11 @@
     "Effects": "gain +1 bonus accuracy. This effect last till the end of your next turn."
   },
   {
-    "Conditions": "When you hit a/an {species} enemy",
+    "Conditions": "When you hit a(n) {species} enemy",
     "Effects": "gain +2 bonus to opposed checks. This effect last till the end of your next turn."
   },
   {
-    "Conditions": "When you get hit by a {species} enemy",
+    "Conditions": "When you get hit by a(n) {species} enemy",
     "Effects": "gain +1 bonus defense. This effect last till the start of your next turn."
   },
   {
@@ -25,11 +25,11 @@
   },
   {
     "Conditions": "When you get hit by a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do. This effect last till the end of your next turn."
+    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do. This effect last till the end of your next turn."
+    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a ranged attack",
@@ -52,11 +52,11 @@
     "Effects": "the enemy that hits you suffers {status}. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When you do a guard action",
+    "Conditions": "When you perform the Guard action",
     "Effects": "the enemy that hits you suffers 5 {type} damage (or 10 at level 30). This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When you do a hinder action",
+    "Conditions": "When you perform the Hinder action",
     "Effects": "the enemy targets you hit suffers {status}. This effect last till the end of your next turn."
   },
   {
@@ -105,27 +105,23 @@
   },
   {
     "Conditions": "When you get hit by a ranged attack and the accuracy is an even number",
-    "Effects": "your next spell/skill action cost half MP."
+    "Effects": "your next spell/skill action that costs MP cost half MP."
   },
   {
     "Conditions": "When you get hit by a spell attack and the magic check is an even number",
     "Effects": "your next action that uses IP cost 1 IP less."
   },
   {
-    "Conditions": "When you use a certain skill",
+    "Conditions": "When an attack misses you",
     "Effects": "you cannot be targeted by melee attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When an attack misses you",
+    "Conditions": "When a spell misses you",
     "Effects": "you cannot be targeted by ranged attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When a spell misses you",
-    "Effects": "you cannot be targeted by enemy spells unless you are the only target available. This effect last till the start of your next turn."
-  },
-  {
     "Conditions": "At the start of a conflict scene",
-    "Effects": ""
+    "Effects": "you cannot be targeted by enemy spells unless you are the only target available. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you are the first character to take the turn this round",
@@ -148,6 +144,10 @@
     "Effects": ""
   },
   {
+    "Conditions": "When you spend a fabula point to alter the story",
+    "Effects": ""
+  },
+  {
     "Conditions": "When you spend a fabula point to invoke a trait",
     "Effects": ""
   },
@@ -156,15 +156,23 @@
     "Effects": ""
   },
   {
-    "Conditions": "When you rolled a critical",
+    "Conditions": "When you roll a critical success",
     "Effects": ""
   },
   {
-    "Conditions": "When you rolled a fumble",
+    "Conditions": "When you roll a fumble",
     "Effects": ""
   },
   {
-    "Conditions": "When you get inflicted by {status}",
+    "Conditions": "When you get afflicted with {status}",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you inflict {status}",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you increase/decrease a clock",
     "Effects": ""
   }
 ]
