@@ -137,7 +137,7 @@ export default function NpcEdit() {
     const data = Object.assign({}, npc);
     data.uid = user.uid;
     delete data.id;
-    console.debug(data);
+    data.published = false;
 
     const ref = collection(firestore, "npc-personal");
 
@@ -173,7 +173,6 @@ export default function NpcEdit() {
   }
 
   const canPublish = () => {
-    console.log(npcTemp);
     if (!npcTemp.name || npcTemp.name === "") {
       return {
         disabled: true,
@@ -259,8 +258,8 @@ export default function NpcEdit() {
                 size="small"
                 helperText={
                   npcTemp.published
-                    ? "This Adversary is part of the Community Compedium."
-                    : "Help the community compedium grow by publishing your finished work!"
+                    ? "This NPC is part of the Adversary Compedium."
+                    : "Help the Adversary Compedium grow by publishing your finished work!"
                 }
                 fullWidth
                 value={npcTemp.createdBy}

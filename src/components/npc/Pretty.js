@@ -26,29 +26,22 @@ import {
 import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
 
-import { useState } from "react";
-
 import { ArrowDropDown } from "@mui/icons-material";
 
-function NpcPretty({ npc, study, collapse }, ref) {
-  const [isCollapsed, setCollapsed] = useState(window.innerWidth >= 900);
+function NpcPretty({ npc, study, collapse, onClick = () => {} }, ref) {
   return (
     <Card>
-      <div
-        ref={ref}
-        onClick={() => setCollapsed(!isCollapsed)}
-        style={{ cursor: "pointer" }}
-      >
+      <div ref={ref} onClick={() => onClick()} style={{ cursor: "pointer" }}>
         {(study === 0 || study === null || study === undefined) && (
           <>
             <div
               style={{
-                boxShadow: isCollapsed || collapse ? "none" : "1px 1px 5px",
+                boxShadow: collapse ? "none" : "1px 1px 5px",
               }}
             >
               <Header npc={npc} />
             </div>
-            {isCollapsed || collapse ? (
+            {collapse ? (
               <>
                 <Stats npc={npc} />
                 <Attacks npc={npc} />

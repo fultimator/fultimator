@@ -523,8 +523,6 @@ function QualitiesGenerator() {
     return suffixes[Math.floor(Math.random() * suffixes.length)];
   };
 
-  console.log(prefixes.length * suffixes.length);
-
   return (
     <>
       <Typography variant="h4">Qualities Generator</Typography>

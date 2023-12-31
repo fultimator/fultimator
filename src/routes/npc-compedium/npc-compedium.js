@@ -149,11 +149,17 @@ function Personal({ user }) {
       const data = Object.assign({}, npc);
       data.uid = user.uid;
       delete data.id;
-      console.debug(data);
+      data.published = false;
 
       const ref = collection(firestore, "npc-personal");
 
-      await addDoc(ref, data);
+      addDoc(ref, data)
+        .then(function (docRef) {
+          window.location.href = `/npc-gallery/${docRef.id}`;
+        })
+        .catch(function (error) {
+          console.error("Error adding document: ", error);
+        });
     };
   };
 
@@ -321,7 +327,6 @@ function Personal({ user }) {
               min={5}
               marks={marks}
               onChange={(val, val2) => {
-                console.log(val2);
                 setLevels(val2);
               }}
               sx={{ width: 300 }}
@@ -373,12 +378,6 @@ function Personal({ user }) {
               sx={{}}
               startIcon={<Search />}
               onClick={() => {
-                console.log({
-                  type: selectedType,
-                  name: name.toLowerCase(),
-                  level: levels,
-                  rank: rank ? rank : "",
-                });
                 setPrevLastItem([]);
                 setLastItem(undefined);
                 setSearchParams({
@@ -540,16 +539,41 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     a.click();
   };
 
-  const getImage = () => takeScreenShot(ref.current);
+  const [takingScreenshot, setTakingScreenshot] = useState(false);
+
+  const getImage = () => {
+    if (collapse) {
+      takeScreenShot(ref.current);
+    } else {
+      setCollapse(true);
+      setTakingScreenshot(true);
+    }
+  };
+
+  useEffect(() => {
+    if (takingScreenshot) {
+      takeScreenShot(ref.current);
+      setTakingScreenshot(false);
+    }
+  }, [ref, takeScreenShot, takingScreenshot]);
 
   useEffect(() => {
     if (image) {
       download(image, { name: npc.name, extension: "png" });
     }
   }, [image, npc.name]);
+
+  const [collapse, setCollapse] = useState(window.innerWidth >= 900);
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
-      <NpcPretty npc={npc} ref={ref} />
+      <NpcPretty
+        npc={npc}
+        ref={ref}
+        collapse={collapse}
+        onClick={() => {
+          setCollapse(!collapse);
+        }}
+      />
       <Tooltip title="Copy">
         <IconButton onClick={copyNpc(npc)}>
           <ContentCopy />

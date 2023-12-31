@@ -107,6 +107,7 @@ function Personal({ user }) {
       const data = Object.assign({}, npc);
       data.uid = user.uid;
       delete data.id;
+      data.published = false;
       console.debug(data);
 
       const ref = collection(firestore, "npc-personal");
@@ -277,16 +278,41 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     a.click();
   };
 
-  const getImage = () => takeScreenShot(ref.current);
+  const [takingScreenshot, setTakingScreenshot] = useState(false);
+
+  const getImage = () => {
+    if (collapse) {
+      takeScreenShot(ref.current);
+    } else {
+      setCollapse(true);
+      setTakingScreenshot(true);
+    }
+  };
+
+  useEffect(() => {
+    if (takingScreenshot) {
+      takeScreenShot(ref.current);
+      setTakingScreenshot(false);
+    }
+  }, [ref, takeScreenShot, takingScreenshot]);
 
   useEffect(() => {
     if (image) {
       download(image, { name: npc.name, extension: "png" });
     }
   }, [image, npc.name]);
+
+  const [collapse, setCollapse] = useState(window.innerWidth >= 900);
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
-      <NpcPretty npc={npc} ref={ref} />
+      <NpcPretty
+        npc={npc}
+        ref={ref}
+        collapse={collapse}
+        onClick={() => {
+          setCollapse(!collapse);
+        }}
+      />
       {/* <NpcUgly npc={npc} /> */}
       <Tooltip title="Copy">
         <IconButton onClick={copyNpc(npc)}>
