@@ -93,11 +93,13 @@ function Personal({ user }) {
     rank: "",
   });
 
-  const constraints = [
-    where("published", "==", true),
-    where("lvl", ">=", searchParams.level[0]),
-    where("lvl", "<=", searchParams.level[1]),
-  ];
+  const constraints = [where("published", "==", true)];
+
+  if (searchParams.level[0] !== 5 && searchParams.level[1] !== 60) {
+    constraints.push(where("lvl", ">=", searchParams.level[0]));
+    constraints.push(where("lvl", "<=", searchParams.level[1]));
+    constraints.push(orderBy("lvl", "asc"));
+  }
 
   if (searchParams.name !== "") {
     constraints.push(
@@ -115,10 +117,14 @@ function Personal({ user }) {
     constraints.push(where("species", "==", searchParams.type));
   }
 
-  constraints.push(orderBy("lvl", "asc"), orderBy("publishedAt", "desc"));
+  constraints.push(orderBy("publishedAt", "desc"));
 
   if (lastItem) {
-    constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
+    if (searchParams.level[0] !== 5 && searchParams.level[1] !== 60) {
+      constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
+    } else {
+      constraints.push(startAfter(lastItem.publishedAt));
+    }
   }
 
   constraints.push(limit(6));

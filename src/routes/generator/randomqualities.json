@@ -4,11 +4,11 @@
     "Effects": "gain +1 bonus to your magic accuracy till the end of your next turn."
   },
   {
-    "Conditions": "When your action targets a {species} enemy",
+    "Conditions": "When your action targets a/an {species} enemy",
     "Effects": "gain +1 bonus accuracy till the end of your next turn."
   },
   {
-    "Conditions": "When you hit a {species} enemy",
+    "Conditions": "When you hit a/an {species} enemy",
     "Effects": "gain +2 bonus to opposed checks till the start of your next turn."
   },
   {
@@ -49,79 +49,79 @@
   },
   {
     "Conditions": "When you do an attack action",
-    "Effects": "the enemy targets you hit or the enemy that hits you suffers {status} till the start of your next turn."
+    "Effects": "the enemy that hits you suffers {status} till the start of your next turn."
   },
   {
     "Conditions": "When you do a guard action",
-    "Effects": "the enemy targets you hit or the enemy that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
+    "Effects": "the enemy that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
   },
   {
     "Conditions": "When you do a hinder action",
-    "Effects": "you recover 5 extra hitpoints, or 10 at level 20, or 15 at level 40."
+    "Effects": "the enemy targets you hit suffers {status} till the start of your next turn."
   },
   {
     "Conditions": "When you do an inventory action",
-    "Effects": "you recover 5 extra mindpoints, or 10 at level 30."
+    "Effects": "the enemy targets you hit suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
   },
   {
     "Conditions": "When you do an objective action",
-    "Effects": "you recover from one status effect."
+    "Effects": "you recover 5 extra hitpoints, or 10 at level 20, or 15 at level 40."
   },
   {
     "Conditions": "When you do a spell action that target yourself",
-    "Effects": "you are immune to {status} till the start of your next turn."
+    "Effects": "you recover 5 extra mindpoints, or 10 at level 30."
   },
   {
     "Conditions": "When you do an spell action that targets your allies",
-    "Effects": "you increase your {attribute} by one die size higher till the start of your next turn."
+    "Effects": "you recover from one status effect."
   },
   {
     "Conditions": "When you have this equipped on the end of your turn",
-    "Effects": "you target's magic defense instead of defense till the start of your next turn."
+    "Effects": "you are immune to {status} till the start of your next turn."
   },
   {
     "Conditions": "When you do a study action",
-    "Effects": "you can increase/decrease a clock's progress by one (explain how it happens!)."
+    "Effects": "you increase your {attribute} by one die size higher till the start of your next turn."
   },
   {
     "Conditions": "When you spend IP",
-    "Effects": "you may do a free attack action, treat your High Roll (HR) as 0 when calculating damage for this attack."
+    "Effects": "you target's magic defense instead of defense till the start of your next turn."
   },
   {
     "Conditions": "When you spend MP",
-    "Effects": "you may do a free inventory action."
+    "Effects": "you can increase/decrease a clock's progress by one (explain how it happens!)."
   },
   {
     "Conditions": "When you recover HP of another creature",
-    "Effects": "you may do a free hinder action."
+    "Effects": "you may do a free attack action, treat your High Roll (HR) as 0 when calculating damage for this attack."
   },
   {
     "Conditions": "When you get hit by a melee attack and the accuracy is an even number",
-    "Effects": "your next spell/skill action cost half MP."
+    "Effects": "you may do a free inventory action."
   },
   {
     "Conditions": "When you get hit by a ranged attack and the accuracy is an even number",
-    "Effects": "your next action that uses IP cost 1 IP less."
+    "Effects": "you may do a free hinder action."
   },
   {
     "Conditions": "When you get hit by a spell attack and the magic check is an even number",
-    "Effects": "you cannot be targeted by melee attacks unless you are the only target available till the start of your next turn"
+    "Effects": "your next spell/skill action cost half MP."
   },
   {
     "Conditions": "When you use a certain skill",
-    "Effects": "you cannot be targeted by ranged attacks unless you are the only target available till the start of your next turn"
+    "Effects": "your next action that uses IP cost 1 IP less."
   },
   {
     "Conditions": "When an attack misses you",
-    "Effects": "you cannot be targeted by enemy spells unless you are the only target available till the start of your next turn"
+    "Effects": "you cannot be targeted by melee attacks unless you are the only target available till the start of your next turn"
   },
   {
     "Conditions": "When a spell misses you",
-    "Effects": ""
+    "Effects": "you cannot be targeted by ranged attacks unless you are the only target available till the start of your next turn"
   },
   {
     "Conditions": "At the start of a conflict scene",
-    "Effects": ""
+    "Effects": "you cannot be targeted by enemy spells unless you are the only target available till the start of your next turn"
   },
   {
     "Conditions": "When you are the first character to take the turn this round",
