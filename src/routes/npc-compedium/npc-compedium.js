@@ -274,6 +274,15 @@ function Personal({ user }) {
 
   const isMobile = window.innerWidth < 900;
 
+  if (err?.code === "resource-exhausted") {
+    return (
+      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+        Apologies, fultimator has reached its read quota at the moment, please
+        try again later. (Usually 12-24hrs)
+      </Paper>
+    );
+  }
+
   return (
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>

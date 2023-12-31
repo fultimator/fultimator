@@ -379,7 +379,7 @@ function Stats({ npc }) {
                   py: 0.4,
                 }}
               >
-                D.MAG +{calcMDef(npc)}
+                M.DEF +{calcMDef(npc)}
               </Grid>
             </Grid>
           </Grid>

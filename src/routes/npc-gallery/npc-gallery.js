@@ -26,6 +26,7 @@ import {
   FormControl,
   Snackbar,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -73,7 +74,7 @@ function Personal({ user }) {
     orderBy("lvl", "asc"),
     orderBy("name", "asc")
   );
-  const [personalList, loading] = useCollectionData(personalQuery, {
+  const [personalList, loading, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
 
@@ -145,6 +146,15 @@ function Personal({ user }) {
   };
 
   const isMobile = window.innerWidth < 900;
+
+  if (err?.code === "resource-exhausted") {
+    return (
+      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+        Apologies, fultimator has reached its read quota at the moment, please
+        try again later. (Usually 12-24hrs)
+      </Paper>
+    );
+  }
 
   return (
     <>
@@ -308,6 +318,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
   }, [image, npc.name]);
 
   const [collapse, setCollapse] = useState(false);
+
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
