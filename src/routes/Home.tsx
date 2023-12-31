@@ -1,23 +1,18 @@
-import {
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Button,
-  Typography,
-} from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { CardMedia, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import Layout from "../components/Layout";
 
-import goo from "./goo.png";
-import book from "./book.png";
-import axe from "./axe.png";
-import scroll from "./scroll.png";
-import dice from "./dice.png";
-import React from "react";
+import adversary_compedium from "./adversary_compedium.png";
+import adversary_designer from "./adversary_designer.png";
+import combat_simulator from "./combat_simulator.png";
+import dice_roller from "./dice_roller.png";
+import items_rituals_projects from "./items_rituals_projects.png";
+import React, { useState } from "react";
 
 function Home() {
+  const navigate = useNavigate();
+  const [hover, setHover] = useState("");
   return (
     <Layout>
       <div
@@ -28,141 +23,118 @@ function Home() {
           gap: 10,
         }}
       >
-        <Card sx={{ padding: "1.5em", width: 300 }}>
-          <CardMedia
-            component="img"
-            height="140"
-            image={goo}
-            alt=""
-            sx={{ objectFit: "contain" }}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5">
-              Adversary Designer
-            </Typography>
-            <Typography>Create your own NPC!</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="outlined"
-              component={RouterLink}
-              to="/npc-gallery"
-            >
-              Go
-            </Button>
-          </CardActions>
-        </Card>
+        <CardMedia
+          component="img"
+          image={adversary_designer}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
+            transform: hover === "adversary_designer" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("adversary_designer");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/npc-gallery");
+          }}
+        />
 
-        <Card sx={{ padding: "1.5em", width: 300 }}>
-          <CardMedia
-            component="img"
-            height="140"
-            image={book}
-            alt=""
-            sx={{ objectFit: "contain" }}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5">
-              Adversary Compedium
-            </Typography>
-            <Typography>
-              View and copy creations made by other people!
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="outlined"
-              component={RouterLink}
-              to="/npc-compedium"
-            >
-              Go
-            </Button>
-          </CardActions>
-        </Card>
+        <CardMedia
+          component="img"
+          image={adversary_compedium}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
+            transform: hover === "adversary_compedium" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("adversary_compedium");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/npc-compedium");
+          }}
+        />
 
-        <Card sx={{ padding: "1.5em", width: 300 }}>
-          <CardMedia
-            component="img"
-            height="140"
-            image={scroll}
-            alt=""
-            sx={{ objectFit: "contain" }}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5">
-              Combat Simulator and Tracker
-            </Typography>
-            <Typography>Tracks HP, MP and Statuses</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="outlined"
-              component={RouterLink}
-              to="/combat"
-            >
-              Go
-            </Button>
-          </CardActions>
-        </Card>
+        <CardMedia
+          component="img"
+          image={combat_simulator}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
+            transform: hover === "combat_simulator" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("combat_simulator");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/combat");
+          }}
+        />
 
-        <Card sx={{ padding: "1.5em", width: 300 }}>
-          <CardMedia
-            component="img"
-            height="140"
-            image={axe}
-            alt=""
-            sx={{ objectFit: "contain" }}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5">
-              Items, Projects, Rituals
-            </Typography>
-            <Typography>Calculate requirements and effects</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="outlined"
-              component={RouterLink}
-              to="generate"
-            >
-              Go
-            </Button>
-          </CardActions>
-        </Card>
+        <CardMedia
+          component="img"
+          image={items_rituals_projects}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
+            transform:
+              hover === "items_rituals_projects" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("items_rituals_projects");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/generate");
+          }}
+        />
 
-        <Card sx={{ padding: "1.5em", width: 300 }}>
-          <CardMedia
-            component="img"
-            height="140"
-            image={dice}
-            alt=""
-            sx={{ objectFit: "contain" }}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5">
-              Dice Roller
-            </Typography>
-            <Typography>Share your rolls with other players</Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="outlined"
-              component={RouterLink}
-              to="/roller"
-            >
-              Go
-            </Button>
-          </CardActions>
-        </Card>
+        <CardMedia
+          component="img"
+          image={dice_roller}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
+            transform: hover === "dice_roller" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("dice_roller");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/roller");
+          }}
+        />
       </div>
 
-      <Typography sx={{ p: 3 }}>
-        Monster Icons are from{" "}
+      <Typography sx={{ p: 3, textAlign: "center" }}>
+        The wonderful Fultimator Icons are made by Runty! Email:{" "}
+        <a href="mailto:contactrunty@iCloud.com">contactrunty@iCloud.com</a>
+        <br />
+        Monster Icons are taken from{" "}
         <a href="http://www.akashics.moe/" target="_blank" rel="noreferrer">
           http://www.akashics.moe/
         </a>
