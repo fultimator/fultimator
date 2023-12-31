@@ -1,75 +1,75 @@
 [
   {
     "Conditions": "When you reach Crisis",
-    "Effects": "gain +1 bonus to your magic accuracy till the end of your next turn."
+    "Effects": "gain +1 bonus to your magic accuracy. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When your action targets a/an {species} enemy",
-    "Effects": "gain +1 bonus accuracy till the end of your next turn."
+    "Effects": "gain +1 bonus accuracy. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you hit a/an {species} enemy",
-    "Effects": "gain +2 bonus to opposed checks till the start of your next turn."
+    "Effects": "gain +2 bonus to opposed checks. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you get hit by a {species} enemy",
-    "Effects": "gain +1 bonus defense till the start of your next turn."
+    "Effects": "gain +1 bonus defense. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you get hit by a spell",
-    "Effects": "gain +1 bonus magic defense till the start of your next turn."
+    "Effects": "gain +1 bonus magic defense. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you get hit by a range attack",
-    "Effects": "gain +1 bonus defense and magic defense till the start of your next turn."
+    "Effects": "gain +1 bonus defense and magic defense. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you get hit by a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do till the start of your end turn."
+    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do till the start of your end turn."
+    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a ranged attack",
-    "Effects": "gain resistance to {type} till the start of your next turn."
+    "Effects": "gain resistance to {type}. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with an offensive spell",
-    "Effects": "your damage type for all melee attacks changes to {type} till the start of your next turn."
+    "Effects": "your damage type for all melee attacks changes to {type}. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you recover HP",
-    "Effects": "your damage type for all ranged attacks changes to {type} till the start of your next turn."
+    "Effects": "your damage type for all ranged attacks changes to {type}. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you recover MP",
-    "Effects": "you ignore enemy resistances till the end of your next turn."
+    "Effects": "you ignore enemy resistances. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you do an attack action",
-    "Effects": "the enemy that hits you suffers {status} till the start of your next turn."
+    "Effects": "the enemy that hits you suffers {status}. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you do a guard action",
-    "Effects": "the enemy that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
+    "Effects": "the enemy that hits you suffers 5 {type} damage (or 10 at level 30). This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you do a hinder action",
-    "Effects": "the enemy targets you hit suffers {status} till the start of your next turn."
+    "Effects": "the enemy targets you hit suffers {status}. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you do an inventory action",
-    "Effects": "the enemy targets you hit suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
+    "Effects": "the enemy targets you hit suffers 5 {type} damage (or 10 at level 30). This effect last till the end turn of your turn."
   },
   {
     "Conditions": "When you do an objective action",
-    "Effects": "you recover 5 extra hitpoints, or 10 at level 20, or 15 at level 40."
+    "Effects": "you recover 5 hitpoints, or 10 at level 20, or 15 at level 40."
   },
   {
     "Conditions": "When you do a spell action that target yourself",
-    "Effects": "you recover 5 extra mindpoints, or 10 at level 30."
+    "Effects": "you recover 5 mindpoints, or 10 at level 30."
   },
   {
     "Conditions": "When you do an spell action that targets your allies",
@@ -77,15 +77,15 @@
   },
   {
     "Conditions": "When you have this equipped on the end of your turn",
-    "Effects": "you are immune to {status} till the start of your next turn."
+    "Effects": "you are immune to {status}. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you do a study action",
-    "Effects": "you increase your {attribute} by one die size higher till the start of your next turn."
+    "Effects": "you increase your {attribute} by one die size higher. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you spend IP",
-    "Effects": "you target's magic defense instead of defense till the start of your next turn."
+    "Effects": "you target's magic defense instead of defense. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you spend MP",
@@ -113,15 +113,15 @@
   },
   {
     "Conditions": "When an attack misses you",
-    "Effects": "you cannot be targeted by melee attacks unless you are the only target available till the start of your next turn"
+    "Effects": "you cannot be targeted by melee attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When a spell misses you",
-    "Effects": "you cannot be targeted by ranged attacks unless you are the only target available till the start of your next turn"
+    "Effects": "you cannot be targeted by ranged attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
     "Conditions": "At the start of a conflict scene",
-    "Effects": "you cannot be targeted by enemy spells unless you are the only target available till the start of your next turn"
+    "Effects": "you cannot be targeted by enemy spells unless you are the only target available. This effect last till the start of your next turn."
   },
   {
     "Conditions": "When you are the first character to take the turn this round",
