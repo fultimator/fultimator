@@ -1,5 +1,5 @@
 import { Card, Grid, Stack, Typography } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowDownward from "@mui/icons-material/ArrowDownward";
 import attributes from "../../../libs/attributes";
 import types from "../../../libs/types";
 import ReactMarkdown from "react-markdown";
@@ -8,25 +8,19 @@ function Pretty({ base, custom }) {
   console.debug("base", base);
   console.debug("custom", custom);
   return (
-    <Grid container alignItems="center" justifyContent="space-between">
-      <Grid item xs>
-        <PrettySingle weapon={base} />
-      </Grid>
-      <Grid item sx={{ mx: 1 }}>
-        <Typography textAlign="center">
-          <ArrowForwardIcon />
-        </Typography>
-      </Grid>
-      <Grid item xs>
-        <PrettySingle weapon={custom} />
-      </Grid>
-    </Grid>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <PrettySingle weapon={base} />
+      <Typography textAlign="center">
+        <ArrowDownward />
+      </Typography>
+      <PrettySingle weapon={custom} />
+    </div>
   );
 }
 
 function PrettySingle({ weapon }) {
   return (
-    <Card sx={{ p: 1 }}>
+    <Card sx={{ p: 1, mb: 2 }}>
       <Stack>
         <Grid container justifyContent="space-between">
           <Grid item>
@@ -35,17 +29,10 @@ function PrettySingle({ weapon }) {
         </Grid>
         <Grid container justifyContent="space-between">
           <Grid item>
-            <Typography>{weapon.cost} z</Typography>
-          </Grid>
-          <Grid item>
             <Typography fontWeight="bold">
-              【{attributes[weapon.att1].shortcaps} +{" "}
+              {weapon.cost} z 【{attributes[weapon.att1].shortcaps} +{" "}
               {attributes[weapon.att2].shortcaps}】
               {weapon.prec !== 0 && `+${weapon.prec}`}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography fontWeight="bold">
               【HR + {weapon.damage}】{types[weapon.type].long}
             </Typography>
           </Grid>

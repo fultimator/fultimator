@@ -162,11 +162,10 @@ function Home() {
       </div>
 
       <Typography sx={{ p: 3 }}>
-        Images and Icons are from{" "}
-        <a href="https://game-icons.net/" target="_blank" rel="noreferrer">
-          https://game-icons.net/
-        </a>{" "}
-        under CC BY 3.0 licence
+        Monster Icons are from{" "}
+        <a href="http://www.akashics.moe/" target="_blank" rel="noreferrer">
+          http://www.akashics.moe/
+        </a>
       </Typography>
     </Layout>
   );

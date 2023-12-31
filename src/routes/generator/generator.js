@@ -9,10 +9,16 @@ import {
   RadioGroup,
   TextField,
   Typography,
+  Paper,
+  Autocomplete,
+  Button,
 } from "@mui/material";
-import { useState } from "react";
+
+import { RestartAltOutlined } from "@mui/icons-material";
+import { useState, useMemo } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
+import randomQualities from "./randomqualities.json";
 
 const powerPMs = {
   minor: 20,
@@ -64,6 +70,7 @@ const usesCosts = {
 function RitualsProjects() {
   return (
     <Layout>
+      <QualitiesGenerator />
       <Grid container>
         <Grid item xs={4}>
           <Rituals />
@@ -377,6 +384,246 @@ function Projects() {
           )}
         </Grid>
       </Grid>
+    </>
+  );
+}
+
+const damageTypes = [
+  "physical",
+  "wind",
+  "bolt",
+  "dark",
+  "earth",
+  "fire",
+  "ice",
+  "light",
+  "poison",
+];
+
+const species = [
+  "beast",
+  "construct",
+  "demon",
+  "elemental",
+  "humanoid",
+  "monster",
+  "plant",
+  "undead",
+];
+
+const attributes = ["dexterity", "insight", "strength", "willpower"];
+
+const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
+
+function QualitiesGenerator() {
+  const [selectedDamageType, setSelectedDamageType] = useState("All");
+  const [selectedSpecies, setSelectedSpecies] = useState("All");
+  const [selectedAttributes, setSelectedAttributes] = useState("All");
+  const [selectedStatuses, setSelectedStatues] = useState("All");
+  const [generate, setGenerate] = useState(0);
+
+  const generatePrefixes = () => {
+    const prefixes = [];
+    randomQualities.forEach((item) => {
+      if (item.Conditions && item.Conditions !== "") {
+        if (item.Conditions.includes("{type}")) {
+          if (selectedDamageType === "All") {
+            damageTypes.forEach((type) => {
+              prefixes.push(item.Conditions.replace("{type}", type));
+            });
+          } else
+            prefixes.push(
+              item.Conditions.replace("{type}", selectedDamageType)
+            );
+        } else if (item.Conditions.includes("{species}")) {
+          if (selectedSpecies === "All") {
+            species.forEach((speciesGet) => {
+              prefixes.push(item.Conditions.replace("{species}", speciesGet));
+            });
+          } else
+            prefixes.push(
+              item.Conditions.replace("{species}", selectedSpecies)
+            );
+        } else if (item.Conditions.includes("{status}")) {
+          if (selectedStatuses === "All") {
+            statuses.forEach((status) => {
+              prefixes.push(item.Conditions.replace("{status}", status));
+            });
+          } else
+            prefixes.push(
+              item.Conditions.replace("{status}", selectedStatuses)
+            );
+        } else {
+          prefixes.push(item.Conditions);
+        }
+      }
+    });
+    return prefixes;
+  };
+
+  const generateSuffixes = () => {
+    const prefixes = [];
+    randomQualities.forEach((item) => {
+      if (item.Effects && item.Effects !== "") {
+        if (item.Effects.includes("{type}")) {
+          if (selectedDamageType === "All") {
+            damageTypes.forEach((type) => {
+              prefixes.push(item.Effects.replace("{type}", type));
+            });
+          } else
+            prefixes.push(item.Effects.replace("{type}", selectedDamageType));
+        } else if (item.Effects.includes("{species}")) {
+          if (selectedSpecies === "All") {
+            species.forEach((speciesGet) => {
+              prefixes.push(item.Effects.replace("{species}", speciesGet));
+            });
+          } else
+            prefixes.push(item.Effects.replace("{species}", selectedSpecies));
+        } else if (item.Effects.includes("{status}")) {
+          if (selectedStatuses === "All") {
+            statuses.forEach((status) => {
+              prefixes.push(item.Effects.replace("{status}", status));
+            });
+          } else
+            prefixes.push(item.Effects.replace("{status}", selectedStatuses));
+        } else if (item.Effects.includes("{attribute}")) {
+          if (selectedAttributes === "All") {
+            attributes.forEach((attribute) => {
+              prefixes.push(item.Effects.replace("{attribute}", attribute));
+            });
+          } else
+            prefixes.push(
+              item.Effects.replace("{attribute}", selectedAttributes)
+            );
+        } else {
+          prefixes.push(item.Effects);
+        }
+      }
+    });
+    return prefixes;
+  };
+
+  const prefixes = useMemo(generatePrefixes, [
+    selectedDamageType,
+    selectedSpecies,
+    selectedStatuses,
+  ]);
+  const suffixes = useMemo(generateSuffixes, [
+    selectedDamageType,
+    selectedSpecies,
+    selectedStatuses,
+    selectedAttributes,
+  ]);
+
+  const getRandomPrefix = () => {
+    return prefixes[Math.floor(Math.random() * prefixes.length)];
+  };
+
+  const getRandomSuffix = () => {
+    return suffixes[Math.floor(Math.random() * suffixes.length)];
+  };
+
+  console.log(prefixes.length * suffixes.length);
+
+  return (
+    <>
+      <Typography variant="h4">Qualities Generator</Typography>
+
+      <Grid container spacing={1} sx={{ my: 1 }}>
+        <Grid item xs={3}>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            fullWidth
+            defaultValue={"All"}
+            value={selectedDamageType}
+            options={["All", ...damageTypes]}
+            size="small"
+            onChange={(evt, val2) => {
+              if (val2) {
+                setSelectedDamageType(val2);
+              } else setSelectedDamageType("All");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Damage Type" />
+            )}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            fullWidth
+            value={selectedSpecies}
+            options={["All", ...species]}
+            size="small"
+            onChange={(evt, val2) => {
+              if (val2) {
+                setSelectedSpecies(val2);
+              } else setSelectedSpecies("All");
+            }}
+            renderInput={(params) => <TextField {...params} label="Species" />}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            fullWidth
+            value={selectedAttributes}
+            options={["All", ...attributes]}
+            size="small"
+            onChange={(evt, val2) => {
+              if (val2) {
+                setSelectedAttributes(val2);
+              } else setSelectedAttributes("All");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Attributes" />
+            )}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            fullWidth
+            value={selectedStatuses}
+            options={["All", ...statuses]}
+            size="small"
+            onChange={(evt, val2) => {
+              if (val2) {
+                setSelectedStatues(val2);
+              } else setSelectedStatues("All");
+            }}
+            renderInput={(params) => <TextField {...params} label="Statuses" />}
+          />
+        </Grid>
+      </Grid>
+
+      <Paper
+        sx={{
+          padding: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+        }}
+      >
+        <Typography> {`${getRandomPrefix()}, ${getRandomSuffix()}`}</Typography>
+        <Button
+          variant="contained"
+          startIcon={<RestartAltOutlined />}
+          onClick={() => {
+            setGenerate(generate + 1);
+          }}
+        >
+          Generate
+        </Button>
+      </Paper>
+      <Typography sx={{ fontSize: 14, marginLeft: 1, mb: 4 }}>
+        Warning: Some effects are imbalanced, use with caution!
+      </Typography>
     </>
   );
 }

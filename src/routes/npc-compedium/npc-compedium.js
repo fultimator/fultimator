@@ -35,6 +35,7 @@ import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
   ArrowRight,
+  ArrowLeft,
   RestartAltOutlined,
   Search,
   ContentCopy,
@@ -79,6 +80,7 @@ export default function NpcCompedium() {
 
 function Personal({ user }) {
   const [lastItem, setLastItem] = useState(undefined);
+  const [prevLastItem, setPrevLastItem] = useState([]);
   const personalRef = collection(firestore, "npc-personal");
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
@@ -126,12 +128,20 @@ function Personal({ user }) {
   const [personalList, loading] = useCollectionData(personalQuery);
 
   const nextPage = () => {
+    setPrevLastItem([...prevLastItem, lastItem]);
     for (let i = 1; i < personalList.length; i++) {
       if (personalList[personalList.length - i]?.id) {
         setLastItem(personalList[personalList.length - 1]);
         return;
       }
     }
+  };
+
+  const prevPage = () => {
+    setLastItem(prevLastItem[prevLastItem.length - 1]);
+    const newPrevLastItem = [...prevLastItem];
+    newPrevLastItem.pop();
+    setPrevLastItem(newPrevLastItem);
   };
 
   const copyNpc = function (npc) {
@@ -369,6 +379,7 @@ function Personal({ user }) {
                   level: levels,
                   rank: rank ? rank : "",
                 });
+                setPrevLastItem([]);
                 setLastItem(undefined);
                 setSearchParams({
                   type: selectedType,
@@ -442,32 +453,49 @@ function Personal({ user }) {
       >
         {!loading ? (
           <>
-            {personalList && personalList.length > 1 ? (
-              <Button
-                variant="contained"
-                sx={{}}
-                endIcon={<ArrowRight />}
-                onClick={nextPage}
-                size="large"
-              >
-                Next Items
-              </Button>
+            {personalList && personalList.length > 5 ? (
+              <>
+                {prevLastItem.length ? (
+                  <Button
+                    variant="contained"
+                    sx={{ marginRight: 4 }}
+                    startIcon={<ArrowLeft />}
+                    onClick={prevPage}
+                    size="large"
+                  >
+                    Prev Items
+                  </Button>
+                ) : (
+                  ""
+                )}
+                <Button
+                  variant="contained"
+                  sx={{}}
+                  endIcon={<ArrowRight />}
+                  onClick={nextPage}
+                  size="large"
+                >
+                  Next Items
+                </Button>
+              </>
             ) : (
               <div style={{ textAlign: "center" }}>
                 <Typography fontWeight={700} marginBottom={4}>
                   No more adversaries found.
                 </Typography>
-                <Button
-                  variant="contained"
-                  sx={{}}
-                  startIcon={<RestartAltOutlined />}
-                  onClick={() => {
-                    setLastItem(undefined);
-                  }}
-                  size="large"
-                >
-                  Reset
-                </Button>
+                {prevLastItem.length ? (
+                  <Button
+                    variant="contained"
+                    sx={{}}
+                    startIcon={<ArrowLeft />}
+                    onClick={prevPage}
+                    size="large"
+                  >
+                    Prev Items
+                  </Button>
+                ) : (
+                  ""
+                )}
               </div>
             )}
           </>

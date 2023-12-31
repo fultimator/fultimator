@@ -1,0 +1,166 @@
+[
+  {
+    "Conditions": "When you reach Crisis",
+    "Effects": "gain +1 bonus to your magic accuracy till the end of your next turn."
+  },
+  {
+    "Conditions": "When your action targets a {species} enemy",
+    "Effects": "gain +1 bonus accuracy till the end of your next turn."
+  },
+  {
+    "Conditions": "When you hit a {species} enemy",
+    "Effects": "gain +2 bonus to opposed checks till the start of your next turn."
+  },
+  {
+    "Conditions": "When you get hit by a {species} enemy",
+    "Effects": "gain +1 bonus defense till the start of your next turn."
+  },
+  {
+    "Conditions": "When you get hit by a spell",
+    "Effects": "gain +1 bonus magic defense till the start of your next turn."
+  },
+  {
+    "Conditions": "When you get hit by a range attack",
+    "Effects": "gain +1 bonus defense and magic defense till the start of your next turn."
+  },
+  {
+    "Conditions": "When you get hit by a melee attack",
+    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do till the start of your end turn."
+  },
+  {
+    "Conditions": "When you hit an enemy with a melee attack",
+    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do till the start of your end turn."
+  },
+  {
+    "Conditions": "When you hit an enemy with a ranged attack",
+    "Effects": "gain resistance to {type} till the start of your next turn."
+  },
+  {
+    "Conditions": "When you hit an enemy with an offensive spell",
+    "Effects": "your damage type for all melee attacks changes to {type} till the start of your next turn."
+  },
+  {
+    "Conditions": "When you recover HP",
+    "Effects": "your damage type for all ranged attacks changes to {type} till the start of your next turn."
+  },
+  {
+    "Conditions": "When you recover MP",
+    "Effects": "you ignore enemy resistances till the end of your next turn."
+  },
+  {
+    "Conditions": "When you do an attack action",
+    "Effects": "the enemy targets you hit or the enemy targets that hits you suffers {status} till the start of your next turn."
+  },
+  {
+    "Conditions": "When you do a guard action",
+    "Effects": "the enemy targets you hit or the enemy targets that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
+  },
+  {
+    "Conditions": "When you do a hinder action",
+    "Effects": "you recover 5 extra hitpoints, or 10 at level 20, or 15 at level 40."
+  },
+  {
+    "Conditions": "When you do an inventory action",
+    "Effects": "you recover 5 extra mindpoints, or 10 at level 30."
+  },
+  {
+    "Conditions": "When you do an objective action",
+    "Effects": "you recover from one status effect."
+  },
+  {
+    "Conditions": "When you do a spell action that target yourself",
+    "Effects": "you are immune to {status} till the start of your next turn."
+  },
+  {
+    "Conditions": "When you do an spell action that targets your allies",
+    "Effects": "you increase your {attribute} by one die size higher till the start of your next turn."
+  },
+  {
+    "Conditions": "When you have this equipped on the end of your turn",
+    "Effects": "you target's magic defense instead of defense till the start of your next turn."
+  },
+  {
+    "Conditions": "When you do a study action",
+    "Effects": "you can increase/decrease a clock's progress by one (explain how it happens!)."
+  },
+  {
+    "Conditions": "When you spend IP",
+    "Effects": "you may do a free attack action, treat your High Roll (HR) as 0 when calculating damage for this attack."
+  },
+  {
+    "Conditions": "When you spend MP",
+    "Effects": "you may do a free inventory action."
+  },
+  {
+    "Conditions": "When you recover HP of another creature",
+    "Effects": "you may do a free hinder action."
+  },
+  {
+    "Conditions": "When you get hit by a melee attack and the accuracy is an even number",
+    "Effects": "your next spell/skill action cost half MP."
+  },
+  {
+    "Conditions": "When you get hit by a ranged attack and the accuracy is an even number",
+    "Effects": "your next action that uses IP cost 1 IP less."
+  },
+  {
+    "Conditions": "When you get hit by a spell attack and the magic check is an even number",
+    "Effects": "you cannot be targeted by melee attacks unless you are the only target available till the start of your next turn"
+  },
+  {
+    "Conditions": "When you use a certain skill",
+    "Effects": "you cannot be targeted by ranged attacks unless you are the only target available till the start of your next turn"
+  },
+  {
+    "Conditions": "When an attack misses you",
+    "Effects": "you cannot be targeted by enemy spells unless you are the only target available till the start of your next turn"
+  },
+  {
+    "Conditions": "When a spell misses you",
+    "Effects": ""
+  },
+  {
+    "Conditions": "At the start of a conflict scene",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you are the first character to take the turn this round",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you are the last character to take the turn this round",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you miss your melee attack against all targets",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you miss your ranged attack against all targets",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you miss your offensive spell against all targets",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you spend a fabula point to invoke a trait",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you spend a fabula point to invoke a bond",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you rolled a critical",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you rolled a fumble",
+    "Effects": ""
+  },
+  {
+    "Conditions": "When you get inflicted by {status}",
+    "Effects": ""
+  }
+]
