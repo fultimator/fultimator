@@ -49,11 +49,11 @@
   },
   {
     "Conditions": "When you do an attack action",
-    "Effects": "the enemy targets you hit or the enemy targets that hits you suffers {status} till the start of your next turn."
+    "Effects": "the enemy targets you hit or the enemy that hits you suffers {status} till the start of your next turn."
   },
   {
     "Conditions": "When you do a guard action",
-    "Effects": "the enemy targets you hit or the enemy targets that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
+    "Effects": "the enemy targets you hit or the enemy that hits you suffers 5 {type} damage (or 10 at level 30) till the start of your next turn."
   },
   {
     "Conditions": "When you do a hinder action",
