@@ -95,7 +95,7 @@ function Personal({ user }) {
 
   const constraints = [where("published", "==", true)];
 
-  if (searchParams.level[0] !== 5 && searchParams.level[1] !== 60) {
+  if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
     constraints.push(where("lvl", ">=", searchParams.level[0]));
     constraints.push(where("lvl", "<=", searchParams.level[1]));
     constraints.push(orderBy("lvl", "asc"));
@@ -120,7 +120,7 @@ function Personal({ user }) {
   constraints.push(orderBy("publishedAt", "desc"));
 
   if (lastItem) {
-    if (searchParams.level[0] !== 5 && searchParams.level[1] !== 60) {
+    if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
       constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
     } else {
       constraints.push(startAfter(lastItem.publishedAt));
@@ -130,7 +130,9 @@ function Personal({ user }) {
   constraints.push(limit(6));
 
   const personalQuery = query(personalRef, ...constraints);
-  const [personalList, loading] = useCollectionData(personalQuery);
+  const [personalList, loading, err] = useCollectionData(personalQuery);
+
+  console.log(err);
 
   const nextPage = () => {
     setPrevLastItem([...prevLastItem, lastItem]);

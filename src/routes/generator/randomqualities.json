@@ -25,11 +25,11 @@
   },
   {
     "Conditions": "When you get hit by a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do. This effect last till the start of your next turn."
+    "Effects": "gain multi(2) or increase multi by one for the next melee attack you do. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a melee attack",
-    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do. This effect last till the start of your next turn."
+    "Effects": "gain multi(2) or increase multi by one for the next ranged attack you do. This effect last till the end of your next turn."
   },
   {
     "Conditions": "When you hit an enemy with a ranged attack",
