@@ -104,7 +104,10 @@ function Personal({ user }) {
   if (searchParams.name !== "") {
     constraints.push(
       where("searchString", "array-contains-any", [
-        ...searchParams.name.split(" "),
+        ...searchParams.name
+          .replace(/[\W_]+/g, " ")
+          .toLowerCase()
+          .split(" "),
       ])
     );
   }
