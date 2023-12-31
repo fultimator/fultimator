@@ -36,7 +36,6 @@ import NpcPretty from "../../components/npc/Pretty";
 import {
   ArrowRight,
   ArrowLeft,
-  RestartAltOutlined,
   Search,
   ContentCopy,
   Share,
