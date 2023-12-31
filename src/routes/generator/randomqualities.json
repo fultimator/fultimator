@@ -80,48 +80,52 @@
     "Effects": "you are immune to {status}. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When you do a study action",
+    "Conditions": "When you have this equipped on the start of your turn",
     "Effects": "you increase your {attribute} by one die size higher. This effect last till the end of your next turn."
   },
   {
-    "Conditions": "When you spend IP",
+    "Conditions": "When you do a study action",
     "Effects": "you target's magic defense instead of defense. This effect last till the end of your next turn."
   },
   {
-    "Conditions": "When you spend MP",
+    "Conditions": "When you spend IP",
     "Effects": "you can increase/decrease a clock's progress by one (explain how it happens!)."
   },
   {
-    "Conditions": "When you recover HP of another creature",
+    "Conditions": "When you spend MP",
     "Effects": "you may do a free attack action, treat your High Roll (HR) as 0 when calculating damage for this attack."
   },
   {
-    "Conditions": "When you get hit by a melee attack and the accuracy is an even number",
+    "Conditions": "When you recover HP of another creature",
     "Effects": "you may do a free inventory action."
   },
   {
-    "Conditions": "When you get hit by a ranged attack and the accuracy is an even number",
+    "Conditions": "When you get hit by a melee attack and the accuracy is an even number",
     "Effects": "you may do a free hinder action."
   },
   {
-    "Conditions": "When you get hit by a spell attack and the magic check is an even number",
+    "Conditions": "When you get hit by a ranged attack and the accuracy is an even number",
     "Effects": "your next spell/skill action cost half MP."
   },
   {
-    "Conditions": "When you use a certain skill",
+    "Conditions": "When you get hit by a spell attack and the magic check is an even number",
     "Effects": "your next action that uses IP cost 1 IP less."
   },
   {
-    "Conditions": "When an attack misses you",
+    "Conditions": "When you use a certain skill",
     "Effects": "you cannot be targeted by melee attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "When a spell misses you",
+    "Conditions": "When an attack misses you",
     "Effects": "you cannot be targeted by ranged attacks unless you are the only target available. This effect last till the start of your next turn."
   },
   {
-    "Conditions": "At the start of a conflict scene",
+    "Conditions": "When a spell misses you",
     "Effects": "you cannot be targeted by enemy spells unless you are the only target available. This effect last till the start of your next turn."
+  },
+  {
+    "Conditions": "At the start of a conflict scene",
+    "Effects": ""
   },
   {
     "Conditions": "When you are the first character to take the turn this round",
