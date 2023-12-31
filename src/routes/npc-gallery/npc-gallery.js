@@ -108,11 +108,16 @@ function Personal({ user }) {
       data.uid = user.uid;
       delete data.id;
       data.published = false;
-      console.debug(data);
 
       const ref = collection(firestore, "npc-personal");
 
-      await addDoc(ref, data);
+      addDoc(ref, data)
+        .then(function (docRef) {
+          window.location.href = `/npc-gallery/${docRef.id}`;
+        })
+        .catch(function (error) {
+          console.error("Error adding document: ", error);
+        });
     };
   };
 
@@ -302,7 +307,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     }
   }, [image, npc.name]);
 
-  const [collapse, setCollapse] = useState(window.innerWidth >= 900);
+  const [collapse, setCollapse] = useState(false);
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
