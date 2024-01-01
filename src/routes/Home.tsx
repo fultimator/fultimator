@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import Layout from "../components/Layout";
 
-import adversary_compedium from "./adversary_compedium.png";
-import adversary_designer from "./adversary_designer.png";
-import combat_simulator from "./combat_simulator.png";
-import dice_roller from "./dice_roller.png";
-import items_rituals_projects from "./items_rituals_projects.png";
+import adversary_compedium from "./adversary_compedium.webp";
+import adversary_designer from "./adversary_designer.webp";
+import combat_simulator from "./combat_simulator.webp";
+import dice_roller from "./dice_roller.webp";
+import items_rituals_projects from "./items_rituals_projects.webp";
 import React, { useState } from "react";
 
 function Home() {

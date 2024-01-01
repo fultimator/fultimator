@@ -208,6 +208,11 @@ export default function EditBasics({ npc, setNpc }) {
             value={npc.multipart}
             onChange={onChange("multipart")}
             multiline
+            helperText={
+              npc.multipart
+                ? "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                : ""
+            }
           ></TextField>
         </FormControl>
       </Grid>

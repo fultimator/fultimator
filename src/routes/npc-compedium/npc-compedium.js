@@ -46,15 +46,15 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { createFileName, useScreenshot } from "use-react-screenshot";
 import { createRef, useEffect, useState } from "react";
 
-import allToken from "../icons/All-token.png";
-import beastToken from "../icons/Beast-token.png";
-import constructToken from "../icons/Construct-token.png";
-import demonToken from "../icons/Demon-token.png";
-import elementalToken from "../icons/Elemental-token.png";
-import humanToken from "../icons/Human-token.png";
-import monsterToken from "../icons/Monster-token.png";
-import plantToken from "../icons/Plant-token.png";
-import undeadToken from "../icons/Undead-token.png";
+import allToken from "../icons/All-token.webp";
+import beastToken from "../icons/Beast-token.webp";
+import constructToken from "../icons/Construct-token.webp";
+import demonToken from "../icons/Demon-token.webp";
+import elementalToken from "../icons/Elemental-token.webp";
+import humanToken from "../icons/Human-token.webp";
+import monsterToken from "../icons/Monster-token.webp";
+import plantToken from "../icons/Plant-token.webp";
+import undeadToken from "../icons/Undead-token.webp";
 
 export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
