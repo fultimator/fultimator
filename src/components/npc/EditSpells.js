@@ -97,7 +97,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={10} lg>
+      <Grid item xs={10} md={3} lg>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -198,7 +198,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={4} md={3} lg={2}>
+      <Grid item xs={4} md>
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="duration"
