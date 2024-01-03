@@ -3,13 +3,19 @@ import {createTheme} from "@mui/material/styles";
 const Fabula = createTheme({
   palette: {
     primary: {
-      main: "#264137",
+      main: "#2b4b42",
     },
     secondary: {
       main: "#85C3B1",
     },
+    ternary: {
+      main: "#e9f3ea",
+    },
+    quaternary: {
+      main: "#47645b",
+    },
     background: {
-      default: "#E2F3EE",
+      default: "#e2f3ee",
     },
     red: {
       main: "#d1232a",
