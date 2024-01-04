@@ -1,4 +1,5 @@
-import { Grid, Typography } from "@mui/material";
+import { Grid, Typography, Paper, useTheme} from "@mui/material";
+import { AutoAwesome } from "@mui/icons-material";
 import { useState } from "react";
 import weapons from "./base";
 import ChangeBase from "./ChangeBase";
@@ -13,6 +14,9 @@ import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
 
 function Weapons() {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const quaternary = theme.palette.quaternary.main;
   const [base, setBase] = useState(weapons[0]);
   const [name, setName] = useState(weapons[0].name);
   const [type, setType] = useState(weapons[0].type);
@@ -90,11 +94,30 @@ function Weapons() {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Typography variant="h4">Rare Weapons</Typography>
-      </Grid>
+
       {/* Form */}
-      <Grid item xs={5}>
+      <Grid item xs={12} sm={6}>
+      <Grid item xs={12}>
+      <Typography
+        variant="h4"
+        sx={{
+          px: 3,
+          py: 1,
+          color: "#ffffff",
+          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
+        }}
+      >
+        <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
+        Rare Weapons
+      </Typography>
+      </Grid>
+      <Paper
+        sx={{
+          background: "#ffffff",
+          padding: 2,
+
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           {/* Change Base */}
           <Grid item xs={6}>
@@ -176,12 +199,11 @@ function Weapons() {
             />
           </Grid>
         </Grid>
+        </Paper>
       </Grid>
 
-      <Grid item xs={1} />
-
       {/* Pretty */}
-      <Grid item xs={6}>
+      <Grid item xs={12} sm={6}>
         <Pretty
           base={base}
           custom={{
@@ -190,6 +212,7 @@ function Weapons() {
             att2: att2,
             type: type,
             hands: hands,
+            category: base.category,
             melee: base.melee,
             ranged: base.ranged,
             cost: cost,

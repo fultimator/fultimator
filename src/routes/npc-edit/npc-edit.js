@@ -30,6 +30,7 @@ import {
 import { createRef, useCallback, useEffect, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
+import ExplainSkillsSimplified from "../../components/npc/ExplainSkillsSimplified";
 import EditAttacks from "../../components/npc/EditAttacks";
 import EditWeaponAttacks from "../../components/npc/EditWeaponAttacks";
 import EditAffinities from "../../components/npc/EditAffinities";
@@ -360,8 +361,11 @@ export default function NpcEdit() {
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
+          zIndex: 10
         }}
       >
+        {/* SP Tracker Field */}
+        <ExplainSkillsSimplified npc={npcTemp} />
         {/* Collapse for the Buttons */}
         {!isCollapsed && (
           <div
@@ -453,7 +457,7 @@ export default function NpcEdit() {
       />
 
       {isUpdated && (
-        <Grid style={{ position: "fixed", top: 80, right: 10, zIndex: 100 }}>
+        <Grid style={{ position: "fixed", top: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">
               <Fab

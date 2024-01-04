@@ -12,13 +12,16 @@ import {
   Paper,
   Autocomplete,
   Button,
+  useTheme,
+  ThemeProvider
 } from "@mui/material";
 
-import { RestartAltOutlined } from "@mui/icons-material";
+import { RestartAltOutlined, Spa } from "@mui/icons-material";
 import { useState, useMemo } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
 import randomQualities from "./randomqualities.json";
+import Fabula from "../../themes/Fabula";
 
 const powerPMs = {
   minor: 20,
@@ -69,27 +72,36 @@ const usesCosts = {
 
 function RitualsProjects() {
   return (
+    <ThemeProvider theme={Fabula}>
     <Layout>
-      <QualitiesGenerator />
-      <Grid container>
-        <Grid item xs={4}>
+      <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
+        <Grid item xs={12}>
+          <QualitiesGenerator />
+        </Grid>
+      </Grid>
+      <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
+        <Grid item xs={12} sm={5}>
           <Rituals />
         </Grid>
-        <Grid item xs={2} />
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={1} />
+        <Grid item xs={12} sm={6}>
           <Projects />
         </Grid>
       </Grid>
-      <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 5 }}>
+      <Grid container spacing={1} sx={{ marginBottom: 1, marginTop: 1 }}>
         <Grid item xs={12}>
           <Weapons />
         </Grid>
       </Grid>
     </Layout>
+    </ThemeProvider>
   );
 }
 
 function Rituals() {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
 
@@ -106,8 +118,27 @@ function Rituals() {
   }
   return (
     <>
-      <Typography variant="h4">Rituals</Typography>
-      <Grid container>
+      <Typography
+        variant="h4"
+        sx={{
+          px: 3,
+          py: 1,
+          color: "#ffffff",
+          background: `linear-gradient(to right, ${primary}, ${quaternary},  transparent)`,
+        }}
+      >
+        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
+        Rituals
+      </Typography>
+      <Paper
+        sx={{
+          padding: 2,
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+        }}
+      >
+      <Grid container >
         <Grid item xs={6}>
           <FormControl component="fieldset">
             <FormLabel component="legend">Potency</FormLabel>
@@ -185,10 +216,14 @@ function Rituals() {
           <Typography fontWeight="bold">Clock {calcClock()}</Typography>
         </Grid>
       </Grid>
+      </Paper>
     </>
   );
 }
 function Projects() {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
@@ -206,7 +241,26 @@ function Projects() {
 
   return (
     <>
-      <Typography variant="h4">Projects</Typography>
+      <Typography
+        variant="h4"
+        sx={{
+          px: 3,
+          py: 1,
+          color: "#ffffff",
+          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
+        }}
+      >
+        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
+        Projects
+        </Typography>      
+        <Paper
+        sx={{
+          padding: 2,
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+        }}
+      >
       <Grid container>
         <Grid item xs={4}>
           <FormControl component="fieldset">
@@ -384,6 +438,7 @@ function Projects() {
           )}
         </Grid>
       </Grid>
+      </Paper>
     </>
   );
 }
@@ -416,6 +471,9 @@ const attributes = ["dexterity", "insight", "strength", "willpower"];
 const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 
 function QualitiesGenerator() {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const quaternary = theme.palette.quaternary.main;
   const [selectedDamageType, setSelectedDamageType] = useState("All");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
   const [selectedAttributes, setSelectedAttributes] = useState("All");
@@ -525,8 +583,27 @@ function QualitiesGenerator() {
 
   return (
     <>
-      <Typography variant="h4">Qualities Generator</Typography>
-
+      <Typography
+        variant="h4"
+        sx={{
+          px: 3,
+          py: 1,
+          color: "#ffffff",
+          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
+        }}
+      >
+        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
+        Qualities Generator
+      </Typography>
+      <Paper
+        sx={{
+          background: "#ffffff",
+          padding: 2,
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+        }}
+      >
       <Grid container spacing={1} sx={{ my: 1 }}>
         <Grid item xs={3}>
           <Autocomplete
@@ -601,6 +678,7 @@ function QualitiesGenerator() {
 
       <Paper
         sx={{
+          background: "linear-gradient(to right, #eaf0f4, transparent)",
           padding: 2,
           display: "flex",
           justifyContent: "space-between",
@@ -608,20 +686,28 @@ function QualitiesGenerator() {
           mb: 1,
         }}
       >
-        <Typography> {`${getRandomPrefix()}, ${getRandomSuffix()}`}</Typography>
+        <Typography
+          sx={{
+            px: 1,
+          }}
+        > {`${getRandomPrefix()}, ${getRandomSuffix()}`}</Typography>
         <Button
           variant="contained"
           startIcon={<RestartAltOutlined />}
           onClick={() => {
             setGenerate(generate + 1);
           }}
+          sx={{
+            minWidth: 100,
+          }}
         >
           Generate
         </Button>
       </Paper>
-      <Typography sx={{ fontSize: 14, marginLeft: 1, mb: 4 }}>
+      <Typography sx={{ fontSize: 14, marginLeft: 1}}>
         Warning: Some effects are imbalanced, use with caution!
       </Typography>
+      </Paper>
     </>
   );
 }
