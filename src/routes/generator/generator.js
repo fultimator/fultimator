@@ -20,6 +20,7 @@ import { RestartAltOutlined, Spa } from "@mui/icons-material";
 import { useState, useMemo } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
+import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import randomQualities from "./randomqualities.json";
 import Fabula from "../../themes/Fabula";
 
@@ -73,12 +74,7 @@ const usesCosts = {
 function RitualsProjects() {
   return (
     <ThemeProvider theme={Fabula}>
-      <Layout>
-        <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
-          <Grid item xs={12}>
-            <QualitiesGenerator />
-          </Grid>
-        </Grid>
+      <Layout sx={{ marginBottom: 40 }}>
         <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
           <Grid item xs={12} sm={5}>
             <Rituals />
@@ -88,9 +84,21 @@ function RitualsProjects() {
             <Projects />
           </Grid>
         </Grid>
-        <Grid container spacing={1} sx={{ marginBottom: 1, marginTop: 1 }}>
+
+        <Grid container spacing={2} sx={{ marginBottom: 10, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <QualitiesGenerator />
+          </Grid>
+        </Grid>
+        <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 1 }}>
           <Grid item xs={12}>
             <Weapons />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={1} sx={{ marginBottom: 20, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <ArmorShield />
           </Grid>
         </Grid>
       </Layout>

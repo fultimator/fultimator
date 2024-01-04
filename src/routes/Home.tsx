@@ -1,4 +1,4 @@
-import { CardMedia, Typography } from "@mui/material";
+import { CardMedia, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import Layout from "../components/Layout";
@@ -15,6 +15,18 @@ function Home() {
   const [hover, setHover] = useState("");
   return (
     <Layout>
+      <Paper
+        style={{
+          textAlign: "center",
+          padding: 10,
+          margin: 10,
+          marginBottom: 30,
+        }}
+      >
+        We're seeking your insight into the current Fultimator experience and
+        new features we have planned. Share your feedback in our latest poll:{" "}
+        <a href="https://forms.gle/Y6c1wknDwq4G3tWh6">Google Form.</a>
+      </Paper>
       <div
         style={{
           display: "flex",
