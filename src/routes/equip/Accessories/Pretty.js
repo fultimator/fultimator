@@ -8,15 +8,10 @@ import {
   Avatar,
   useTheme,
 } from "@mui/material";
-import ArrowDownward from "@mui/icons-material/ArrowDownward";
 
-function Pretty({ base, custom }) {
+function Pretty({ custom }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <PrettySingle armor={base} />
-      <Typography textAlign="center">
-        <ArrowDownward />
-      </Typography>
       <PrettySingle armor={custom} />
     </div>
   );
@@ -62,24 +57,14 @@ function PrettySingle({ armor }) {
           }}
         >
           <Grid item xs={1}></Grid>
-          <Grid item xs={3}>
+          <Grid item xs={6}>
             <Typography variant="h4" textAlign="left">
-              {armor.category}
+              Accessory
             </Typography>
           </Grid>
           <Grid item xs={1}>
             <Typography variant="h4" textAlign="center">
               Cost
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              Defense
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="h4" textAlign="center">
-              M. Defense
             </Typography>
           </Grid>
         </Grid>
@@ -136,33 +121,11 @@ function PrettySingle({ armor }) {
                 padding: "5px",
               }}
             >
-              <Grid item xs={3}>
+              <Grid item xs={6}>
                 <Typography fontWeight="bold">{armor.name}</Typography>
               </Grid>
               <Grid item xs={1}>
                 <Typography textAlign="center">{`${armor.cost}z`}</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography fontWeight="bold" textAlign="center">
-                  {armor.category === "Shield" ? "+" + armor.def : ""}
-                  {armor.category === "Armor" && armor.martial ? armor.def : ""}
-                  {armor.category === "Armor" && !armor.martial
-                    ? armor.def === 0
-                      ? "DEX die"
-                      : "DEX die +" + armor.def
-                    : ""}
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography fontWeight="bold" textAlign="center">
-                  {armor.category === "Shield" ? "+" + armor.mdef : ""}
-                  {armor.category === "Armor" && armor.martial ? armor.def : ""}
-                  {armor.category === "Armor"
-                    ? armor.mdef === 0
-                      ? "INS die"
-                      : "INS die +" + armor.mdef
-                    : ""}
-                </Typography>
               </Grid>
             </Grid>
 

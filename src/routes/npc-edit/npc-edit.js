@@ -347,7 +347,7 @@ export default function NpcEdit() {
               <EditNotes npc={npcTemp} setNpc={updateNPC} />
             </Grid>
           </Grid>
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2, marginBottom: 20 }} />
         </>
       )}
 
@@ -361,7 +361,7 @@ export default function NpcEdit() {
           display: "flex",
           flexDirection: "row",
           alignItems: "flex-start",
-          zIndex: 10
+          zIndex: 10,
         }}
       >
         {/* SP Tracker Field */}

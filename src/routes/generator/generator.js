@@ -21,6 +21,7 @@ import { useState, useMemo } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
+import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
 import Fabula from "../../themes/Fabula";
 
@@ -96,9 +97,15 @@ function RitualsProjects() {
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ marginBottom: 20, marginTop: 1 }}>
+        <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 1 }}>
           <Grid item xs={12}>
             <ArmorShield />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={1} sx={{ marginBottom: 20, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <Accessories />
           </Grid>
         </Grid>
       </Layout>

@@ -54,49 +54,48 @@ const qualities = [
     cost: 2000,
   },
   {
-    category: "Offensive Qualities",
-    name: "Magical",
-    quality: "The Weapon targets Magic Defense instead of Defense",
-    cost: 100,
-  },
-  {
-    category: "Offensive Qualities",
-    name: "Hunter",
+    category: "Enhancement Qualities",
+    name: "Damage Change",
     quality:
-      "The weapon deals 5 extra damage to creatures of a particular species",
+      "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
     cost: 300,
   },
   {
-    category: "Offensive Qualities",
-    name: "Piercing",
-    quality: "Weapon damage ignores Resistances",
-    cost: 400,
-  },
-  {
-    category: "Offensive Qualities",
-    name: "Dual Hunter",
-    quality:
-      "The weapon deals 5 extra damage to the creatures of two particular species",
-    cost: 500,
-  },
-  {
-    category: "Offensive Qualities",
-    name: "Multi",
-    quality: "Weapon attacks have multi (2) property",
+    category: "Enhancement Qualities",
+    name: "Accuracy Up",
+    quality: "You gain a +1 bonus to your Accuracy Checks.",
     cost: 1000,
   },
   {
-    category: "Offensive Qualities",
-    name: "Status",
+    category: "Enhancement Qualities",
+    name: "Magic Up",
+    quality: "You gain a +1 bonus to your Magic Checks.",
+    cost: 1000,
+  },
+  {
+    category: "Enhancement Qualities",
+    name: "Vitality Up",
+    quality: "When you recover HP, you recover 5 extra HP.",
+    cost: 1000,
+  },
+  {
+    category: "Enhancement Qualities",
+    name: "Healing Up",
     quality:
-      "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
+      "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
     cost: 1500,
   },
   {
-    category: "Offensive Qualities",
-    name: "Status Plus",
+    category: "Enhancement Qualities",
+    name: "Spell Up",
+    quality: "Spells you cast deal 5 extra damage.",
+    cost: 2000,
+  },
+  {
+    category: "Enhancement Qualities",
+    name: "Weapon Up",
     quality:
-      "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
+      "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
     cost: 2000,
   },
 ];
