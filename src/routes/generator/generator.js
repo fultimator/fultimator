@@ -13,7 +13,7 @@ import {
   Autocomplete,
   Button,
   useTheme,
-  ThemeProvider
+  ThemeProvider,
 } from "@mui/material";
 
 import { RestartAltOutlined, Spa } from "@mui/icons-material";
@@ -73,27 +73,27 @@ const usesCosts = {
 function RitualsProjects() {
   return (
     <ThemeProvider theme={Fabula}>
-    <Layout>
-      <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
-        <Grid item xs={12}>
-          <QualitiesGenerator />
+      <Layout>
+        <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <QualitiesGenerator />
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
-        <Grid item xs={12} sm={5}>
-          <Rituals />
+        <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
+          <Grid item xs={12} sm={5}>
+            <Rituals />
+          </Grid>
+          <Grid item xs={12} sm={1} />
+          <Grid item xs={12} sm={6}>
+            <Projects />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={1} />
-        <Grid item xs={12} sm={6}>
-          <Projects />
+        <Grid container spacing={1} sx={{ marginBottom: 1, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <Weapons />
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid container spacing={1} sx={{ marginBottom: 1, marginTop: 1 }}>
-        <Grid item xs={12}>
-          <Weapons />
-        </Grid>
-      </Grid>
-    </Layout>
+      </Layout>
     </ThemeProvider>
   );
 }
@@ -138,84 +138,88 @@ function Rituals() {
           mb: 1,
         }}
       >
-      <Grid container >
-        <Grid item xs={6}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Potency</FormLabel>
-            <RadioGroup
-              aria-label="power"
-              name="power-group"
-              value={power}
-              onChange={(e) => {
-                setPower(e.target.value);
-              }}
-            >
-              <FormControlLabel
-                value="minor"
-                control={<Radio />}
-                label="Minor"
-              />
-              <FormControlLabel
-                value="medium"
-                control={<Radio />}
-                label="Medium"
-              />
-              <FormControlLabel
-                value="major"
-                control={<Radio />}
-                label="Major"
-              />
-              <FormControlLabel
-                value="extreme"
-                control={<Radio />}
-                label="Extreme"
-              />
-            </RadioGroup>
-          </FormControl>
+        <Grid container>
+          <Grid item xs={6}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Potency</FormLabel>
+              <RadioGroup
+                aria-label="power"
+                name="power-group"
+                value={power}
+                onChange={(e) => {
+                  setPower(e.target.value);
+                }}
+              >
+                <FormControlLabel
+                  value="minor"
+                  control={<Radio />}
+                  label="Minor"
+                />
+                <FormControlLabel
+                  value="medium"
+                  control={<Radio />}
+                  label="Medium"
+                />
+                <FormControlLabel
+                  value="major"
+                  control={<Radio />}
+                  label="Major"
+                />
+                <FormControlLabel
+                  value="extreme"
+                  control={<Radio />}
+                  label="Extreme"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Area</FormLabel>
+              <RadioGroup
+                aria-label="area"
+                name="area-group"
+                value={area}
+                onChange={(e) => {
+                  setArea(e.target.value);
+                }}
+              >
+                <FormControlLabel
+                  value="individual"
+                  control={<Radio />}
+                  label="Individual"
+                />
+                <FormControlLabel
+                  value="small"
+                  control={<Radio />}
+                  label="Small"
+                />
+                <FormControlLabel
+                  value="large"
+                  control={<Radio />}
+                  label="Large"
+                />
+                <FormControlLabel
+                  value="huge"
+                  control={<Radio />}
+                  label="Huge"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Area</FormLabel>
-            <RadioGroup
-              aria-label="area"
-              name="area-group"
-              value={area}
-              onChange={(e) => {
-                setArea(e.target.value);
-              }}
-            >
-              <FormControlLabel
-                value="individual"
-                control={<Radio />}
-                label="Individual"
-              />
-              <FormControlLabel
-                value="small"
-                control={<Radio />}
-                label="Small"
-              />
-              <FormControlLabel
-                value="large"
-                control={<Radio />}
-                label="Large"
-              />
-              <FormControlLabel value="huge" control={<Radio />} label="Huge" />
-            </RadioGroup>
-          </FormControl>
+        <Divider />
+        <Grid container sx={{ m: 1 }}>
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">{calcPM()} MP</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">{calcLD()} DL</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">Clock {calcClock()}</Typography>
+          </Grid>
         </Grid>
-      </Grid>
-      <Divider />
-      <Grid container sx={{ m: 1 }}>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold">{calcPM()} MP</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold">{calcLD()} DL</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold">Clock {calcClock()}</Typography>
-        </Grid>
-      </Grid>
       </Paper>
     </>
   );
@@ -252,8 +256,8 @@ function Projects() {
       >
         <Spa sx={{ fontSize: 36, marginRight: 1 }} />
         Projects
-        </Typography>      
-        <Paper
+      </Typography>
+      <Paper
         sx={{
           padding: 2,
           justifyContent: "space-between",
@@ -261,183 +265,188 @@ function Projects() {
           mb: 1,
         }}
       >
-      <Grid container>
-        <Grid item xs={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Potency</FormLabel>
-            <RadioGroup
-              aria-label="power"
-              name="power-group"
-              value={power}
-              onChange={(e) => {
-                setPower(e.target.value);
-              }}
-            >
+        <Grid container>
+          <Grid item xs={4}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Potency</FormLabel>
+              <RadioGroup
+                aria-label="power"
+                name="power-group"
+                value={power}
+                onChange={(e) => {
+                  setPower(e.target.value);
+                }}
+              >
+                <FormControlLabel
+                  value="minor"
+                  control={<Radio />}
+                  label="Minor"
+                />
+                <FormControlLabel
+                  value="medium"
+                  control={<Radio />}
+                  label="Medium"
+                />
+                <FormControlLabel
+                  value="major"
+                  control={<Radio />}
+                  label="Major"
+                />
+                <FormControlLabel
+                  value="extreme"
+                  control={<Radio />}
+                  label="Extreme"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Area</FormLabel>
+              <RadioGroup
+                aria-label="area"
+                name="area-group"
+                value={area}
+                onChange={(e) => {
+                  setArea(e.target.value);
+                }}
+              >
+                <FormControlLabel
+                  value="individual"
+                  control={<Radio />}
+                  label="Individual"
+                />
+                <FormControlLabel
+                  value="small"
+                  control={<Radio />}
+                  label="Small"
+                />
+                <FormControlLabel
+                  value="large"
+                  control={<Radio />}
+                  label="Large"
+                />
+                <FormControlLabel
+                  value="huge"
+                  control={<Radio />}
+                  label="Huge"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Uses</FormLabel>
+              <RadioGroup
+                aria-label="uses"
+                name="uses-group"
+                value={uses}
+                onChange={(e) => {
+                  setUses(e.target.value);
+                }}
+              >
+                <FormControlLabel
+                  value="consumable"
+                  control={<Radio />}
+                  label="Consumable"
+                />
+                <FormControlLabel
+                  value="permanent"
+                  control={<Radio />}
+                  label="Permanent"
+                />
+              </RadioGroup>
+              <br />
               <FormControlLabel
-                value="minor"
-                control={<Radio />}
-                label="Minor"
+                control={<Checkbox value={defect} />}
+                onChange={(e) => {
+                  setDefect(e.target.checked);
+                }}
+                label="Has terrible flaw"
               />
-              <FormControlLabel
-                value="medium"
-                control={<Radio />}
-                label="Medium"
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Divider sx={{ my: 1 }} />
+        <Grid container spacing={1}>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="tinkerers"
+                label="Number of Tinkerers"
+                type="number"
+                size="small"
+                min={1}
+                max={10}
+                value={tinkerers}
+                onChange={(e) => {
+                  if (e.target.value !== "")
+                    setThinkerers(parseInt(e.target.value));
+                  else setThinkerers(0);
+                }}
               />
-              <FormControlLabel
-                value="major"
-                control={<Radio />}
-                label="Major"
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="helpers"
+                label="Number of Hired Helpers"
+                type="number"
+                size="small"
+                min={1}
+                max={10}
+                value={helpers}
+                onChange={(e) => {
+                  if (e.target.value !== "")
+                    setHelpers(parseInt(e.target.value));
+                  else setHelpers(0);
+                }}
               />
-              <FormControlLabel
-                value="extreme"
-                control={<Radio />}
-                label="Extreme"
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="visionary"
+                label="Levels in Visionary"
+                type="number"
+                size="small"
+                min={1}
+                max={10}
+                value={visionary}
+                onChange={(e) => {
+                  if (e.target.value !== "")
+                    setVisionary(parseInt(e.target.value));
+                  else setVisionary(0);
+                }}
               />
-            </RadioGroup>
-          </FormControl>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">{cost} Zenit</Typography>
+            {visionary > 0 && (
+              <Typography fontWeight="bold">
+                {visionary * 100} Cost covered by Visionary
+              </Typography>
+            )}
+          </Grid>
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">{progress} Progress</Typography>
+          </Grid>
+          <Grid item xs={4}>
+            {days < 1 && (
+              <Typography fontWeight="bold">
+                Number of days {Math.ceil(days)}
+              </Typography>
+            )}
+            {days >= 1 && (
+              <Typography fontWeight="bold">
+                {progressPerDay} progress per day / {Math.ceil(days)} days
+              </Typography>
+            )}
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Area</FormLabel>
-            <RadioGroup
-              aria-label="area"
-              name="area-group"
-              value={area}
-              onChange={(e) => {
-                setArea(e.target.value);
-              }}
-            >
-              <FormControlLabel
-                value="individual"
-                control={<Radio />}
-                label="Individual"
-              />
-              <FormControlLabel
-                value="small"
-                control={<Radio />}
-                label="Small"
-              />
-              <FormControlLabel
-                value="large"
-                control={<Radio />}
-                label="Large"
-              />
-              <FormControlLabel value="huge" control={<Radio />} label="Huge" />
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend">Uses</FormLabel>
-            <RadioGroup
-              aria-label="uses"
-              name="uses-group"
-              value={uses}
-              onChange={(e) => {
-                setUses(e.target.value);
-              }}
-            >
-              <FormControlLabel
-                value="consumable"
-                control={<Radio />}
-                label="Consumable"
-              />
-              <FormControlLabel
-                value="permanent"
-                control={<Radio />}
-                label="Permanent"
-              />
-            </RadioGroup>
-            <br />
-            <FormControlLabel
-              control={<Checkbox value={defect} />}
-              onChange={(e) => {
-                setDefect(e.target.checked);
-              }}
-              label="Has terrible flaw"
-            />
-          </FormControl>
-        </Grid>
-      </Grid>
-      <Divider sx={{ my: 1 }} />
-      <Grid container spacing={1}>
-        <Grid item xs={4}>
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="tinkerers"
-              label="Number of Tinkerers"
-              type="number"
-              size="small"
-              min={1}
-              max={10}
-              value={tinkerers}
-              onChange={(e) => {
-                if (e.target.value !== "")
-                  setThinkerers(parseInt(e.target.value));
-                else setThinkerers(0);
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="helpers"
-              label="Number of Hired Helpers"
-              type="number"
-              size="small"
-              min={1}
-              max={10}
-              value={helpers}
-              onChange={(e) => {
-                if (e.target.value !== "") setHelpers(parseInt(e.target.value));
-                else setHelpers(0);
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="visionary"
-              label="Levels in Visionary"
-              type="number"
-              size="small"
-              min={1}
-              max={10}
-              value={visionary}
-              onChange={(e) => {
-                if (e.target.value !== "")
-                  setVisionary(parseInt(e.target.value));
-                else setVisionary(0);
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold">{cost} Zenith</Typography>
-          {visionary > 0 && (
-            <Typography fontWeight="bold">
-              {visionary * 100} Cost covered by Visionary
-            </Typography>
-          )}
-        </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold">{progress} Progress</Typography>
-        </Grid>
-        <Grid item xs={4}>
-          {days < 1 && (
-            <Typography fontWeight="bold">
-              Number of days {Math.ceil(days)}
-            </Typography>
-          )}
-          {days >= 1 && (
-            <Typography fontWeight="bold">
-              {progressPerDay} progress per day / {Math.ceil(days)} days
-            </Typography>
-          )}
-        </Grid>
-      </Grid>
       </Paper>
     </>
   );
@@ -604,109 +613,116 @@ function QualitiesGenerator() {
           mb: 1,
         }}
       >
-      <Grid container spacing={1} sx={{ my: 1 }}>
-        <Grid item xs={3}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            fullWidth
-            defaultValue={"All"}
-            value={selectedDamageType}
-            options={["All", ...damageTypes]}
-            size="small"
-            onChange={(evt, val2) => {
-              if (val2) {
-                setSelectedDamageType(val2);
-              } else setSelectedDamageType("All");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Damage Type" />
-            )}
-          />
+        <Grid container spacing={1} sx={{ my: 1 }}>
+          <Grid item xs={3}>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              defaultValue={"All"}
+              value={selectedDamageType}
+              options={["All", ...damageTypes]}
+              size="small"
+              onChange={(evt, val2) => {
+                if (val2) {
+                  setSelectedDamageType(val2);
+                } else setSelectedDamageType("All");
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Damage Type" />
+              )}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              value={selectedSpecies}
+              options={["All", ...species]}
+              size="small"
+              onChange={(evt, val2) => {
+                if (val2) {
+                  setSelectedSpecies(val2);
+                } else setSelectedSpecies("All");
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Species" />
+              )}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              value={selectedAttributes}
+              options={["All", ...attributes]}
+              size="small"
+              onChange={(evt, val2) => {
+                if (val2) {
+                  setSelectedAttributes(val2);
+                } else setSelectedAttributes("All");
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Attributes" />
+              )}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              value={selectedStatuses}
+              options={["All", ...statuses]}
+              size="small"
+              onChange={(evt, val2) => {
+                if (val2) {
+                  setSelectedStatues(val2);
+                } else setSelectedStatues("All");
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Statuses" />
+              )}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            fullWidth
-            value={selectedSpecies}
-            options={["All", ...species]}
-            size="small"
-            onChange={(evt, val2) => {
-              if (val2) {
-                setSelectedSpecies(val2);
-              } else setSelectedSpecies("All");
-            }}
-            renderInput={(params) => <TextField {...params} label="Species" />}
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            fullWidth
-            value={selectedAttributes}
-            options={["All", ...attributes]}
-            size="small"
-            onChange={(evt, val2) => {
-              if (val2) {
-                setSelectedAttributes(val2);
-              } else setSelectedAttributes("All");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Attributes" />
-            )}
-          />
-        </Grid>
-        <Grid item xs={3}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            fullWidth
-            value={selectedStatuses}
-            options={["All", ...statuses]}
-            size="small"
-            onChange={(evt, val2) => {
-              if (val2) {
-                setSelectedStatues(val2);
-              } else setSelectedStatues("All");
-            }}
-            renderInput={(params) => <TextField {...params} label="Statuses" />}
-          />
-        </Grid>
-      </Grid>
 
-      <Paper
-        sx={{
-          background: "linear-gradient(to right, #eaf0f4, transparent)",
-          padding: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1,
-        }}
-      >
-        <Typography
+        <Paper
           sx={{
-            px: 1,
-          }}
-        > {`${getRandomPrefix()}, ${getRandomSuffix()}`}</Typography>
-        <Button
-          variant="contained"
-          startIcon={<RestartAltOutlined />}
-          onClick={() => {
-            setGenerate(generate + 1);
-          }}
-          sx={{
-            minWidth: 100,
+            background: "linear-gradient(to right, #eaf0f4, transparent)",
+            padding: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 1,
           }}
         >
-          Generate
-        </Button>
-      </Paper>
-      <Typography sx={{ fontSize: 14, marginLeft: 1}}>
-        Warning: Some effects are imbalanced, use with caution!
-      </Typography>
+          <Typography
+            sx={{
+              px: 1,
+            }}
+          >
+            {" "}
+            {`${getRandomPrefix()}, ${getRandomSuffix()}`}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<RestartAltOutlined />}
+            onClick={() => {
+              setGenerate(generate + 1);
+            }}
+            sx={{
+              minWidth: 100,
+            }}
+          >
+            Generate
+          </Button>
+        </Paper>
+        <Typography sx={{ fontSize: 14, marginLeft: 1 }}>
+          Warning: Some effects are imbalanced, use with caution!
+        </Typography>
       </Paper>
     </>
   );
