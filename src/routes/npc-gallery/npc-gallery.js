@@ -172,116 +172,124 @@ function Personal({ user }) {
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
-        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
-          <Grid
-            item
-            xs={12}
-            md={2}
-            alignItems="center"
-            sx={{ display: "flex" }}
-          >
-            <Typography variant="h4">
-              NPCs
-              <Tooltip title="Create NPC">
-                <IconButton onClick={addNpc}>
-                  <AddCircle />
-                </IconButton>
-              </Tooltip>
-            </Typography>
-          </Grid>
-
-          <Grid
-            item
-            xs={12}
-            md={3}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
-            <TextField
-              id="outlined-basic"
-              label="Adversary Name"
-              variant="outlined"
-              size="small"
-              fullWidth
-              value={name}
-              onChange={(evt) => {
-                setName(evt.target.value);
-              }}
-            />
-          </Grid>
-
-          <Grid
-            item
-            xs={4}
-            md={3}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              fullWidth
-              value={rank}
-              options={[
-                "soldier",
-                "elite",
-                "champion2",
-                "champion3",
-                "champion4",
-                "champion5",
-              ]}
-              size="small"
-              onChange={(evt, val2) => {
-                setRank(val2);
-              }}
-              renderInput={(params) => <TextField {...params} label="Rank" />}
-            />
-          </Grid>
-          <Grid
-            item
-            xs={4}
-            md={3}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              fullWidth
-              value={species}
-              options={[
-                "Beast",
-                "Construct",
-                "Demon",
-                "Elemental",
-                "Humanoid",
-                "Monster",
-                "Plant",
-              ]}
-              size="small"
-              onChange={(evt, val2) => {
-                setSpecies(val2);
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Species" />
-              )}
-            />
-          </Grid>
-          <Grid item xs={4} md={1} alignItems="center" sx={{ display: "flex" }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => {
-                setCollapse(!collapse);
-              }}
+        <Paper sx={{ width: "100%", px: 2, py: 1 }}>
+          <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+            <Grid
+              item
+              xs={12}
+              md={2}
+              alignItems="center"
+              sx={{ display: "flex" }}
             >
-              Collapse
-            </Button>
+              <Typography variant="h4">
+                NPCs
+                <Tooltip title="Create NPC">
+                  <IconButton onClick={addNpc}>
+                    <AddCircle />
+                  </IconButton>
+                </Tooltip>
+              </Typography>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}
+              md={3}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <TextField
+                id="outlined-basic"
+                label="Adversary Name"
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={name}
+                onChange={(evt) => {
+                  setName(evt.target.value);
+                }}
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={4}
+              md={3}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                fullWidth
+                value={rank}
+                options={[
+                  "soldier",
+                  "elite",
+                  "champion2",
+                  "champion3",
+                  "champion4",
+                  "champion5",
+                ]}
+                size="small"
+                onChange={(evt, val2) => {
+                  setRank(val2);
+                }}
+                renderInput={(params) => <TextField {...params} label="Rank" />}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              md={3}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                fullWidth
+                value={species}
+                options={[
+                  "Beast",
+                  "Construct",
+                  "Demon",
+                  "Elemental",
+                  "Humanoid",
+                  "Monster",
+                  "Plant",
+                ]}
+                size="small"
+                onChange={(evt, val2) => {
+                  setSpecies(val2);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Species" />
+                )}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              md={1}
+              alignItems="center"
+              sx={{ display: "flex" }}
+            >
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => {
+                  setCollapse(!collapse);
+                }}
+              >
+                Collapse
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
+        </Paper>
       </div>
 
       {isMobile ? (
