@@ -20,13 +20,12 @@ import {
   Tooltip,
   Typography,
   Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  Autocomplete,
   Snackbar,
   CircularProgress,
   Paper,
+  TextField,
+  Button,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -67,6 +66,11 @@ export default function NpcGallery() {
 }
 
 function Personal({ user }) {
+  const [name, setName] = useState("");
+  const [rank, setRank] = useState("");
+  const [species, setSpecies] = useState("");
+  const [collapse, setCollapse] = useState(false);
+
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -128,12 +132,6 @@ function Personal({ user }) {
     };
   };
 
-  const [selectedNpc, setSelectedNpc] = useState("");
-
-  const handleNpcChange = (event) => {
-    setSelectedNpc(event.target.value);
-  };
-
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -151,57 +149,144 @@ function Personal({ user }) {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         Apologies, fultimator has reached its read quota at the moment, please
-        try again later. (Around 3-5 hours)
+        try again tomorrow. (Around 12-24 hours)
       </Paper>
     );
   }
 
+  const filteredList = personalList
+    ? personalList.filter((item) => {
+        if (
+          name !== "" &&
+          !item.name.toLowerCase().includes(name.toLocaleLowerCase())
+        )
+          return false;
+
+        if (species && item.species !== species) return false;
+
+        if (rank && item.rank !== rank) return false;
+        return true;
+      })
+    : [];
+
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Typography variant="h4">
-          NPCs
-          <Tooltip title="Create NPC">
-            <IconButton onClick={addNpc}>
-              <AddCircle />
-            </IconButton>
-          </Tooltip>
-        </Typography>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+          <Grid
+            item
+            xs={12}
+            md={2}
+            alignItems="center"
+            sx={{ display: "flex" }}
+          >
+            <Typography variant="h4">
+              NPCs
+              <Tooltip title="Create NPC">
+                <IconButton onClick={addNpc}>
+                  <AddCircle />
+                </IconButton>
+              </Tooltip>
+            </Typography>
+          </Grid>
 
-        <Typography
-          sx={{ marginLeft: "none", fontStyle: "italic", color: "#777" }}
-        >
-          Note for Mobile Users: For better quality, export in landscape mode.
-        </Typography>
+          <Grid
+            item
+            xs={12}
+            md={3}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <TextField
+              id="outlined-basic"
+              label="Adversary Name"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={name}
+              onChange={(evt) => {
+                setName(evt.target.value);
+              }}
+            />
+          </Grid>
+
+          <Grid
+            item
+            xs={4}
+            md={3}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              value={rank}
+              options={[
+                "soldier",
+                "elite",
+                "champion2",
+                "champion3",
+                "champion4",
+                "champion5",
+              ]}
+              size="small"
+              onChange={(evt, val2) => {
+                setRank(val2);
+              }}
+              renderInput={(params) => <TextField {...params} label="Rank" />}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            md={3}
+            alignItems="center"
+            justifyContent="center"
+            sx={{ display: "flex" }}
+          >
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              fullWidth
+              value={species}
+              options={[
+                "Beast",
+                "Construct",
+                "Demon",
+                "Elemental",
+                "Humanoid",
+                "Monster",
+                "Plant",
+              ]}
+              size="small"
+              onChange={(evt, val2) => {
+                setSpecies(val2);
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Species" />
+              )}
+            />
+          </Grid>
+          <Grid item xs={4} md={1} alignItems="center" sx={{ display: "flex" }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => {
+                setCollapse(!collapse);
+              }}
+            >
+              Collapse
+            </Button>
+          </Grid>
+        </Grid>
       </div>
 
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel id="npc-select-label">Select NPC</InputLabel>
-        <Select
-          labelId="npc-select-label"
-          id="npc-select"
-          value={selectedNpc}
-          onChange={handleNpcChange}
-          label="Select NPC"
-        >
-          <MenuItem value="" disabled>
-            Select an NPC
-          </MenuItem>
-          {personalList?.map((npc) => (
-            <MenuItem
-              key={npc.id}
-              value={npc.id}
-              component={RouterLink}
-              to={`/npc-gallery/${npc.id}`}
-            >
-              {npc.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
       {isMobile ? (
         <div>
-          {personalList?.map((npc, i) => {
+          {filteredList?.map((npc, i) => {
             return (
               <Npc
                 key={i}
@@ -209,6 +294,7 @@ function Personal({ user }) {
                 copyNpc={copyNpc}
                 deleteNpc={deleteNpc}
                 shareNpc={shareNpc}
+                collapseGet={collapse}
               />
             );
           })}
@@ -218,7 +304,7 @@ function Personal({ user }) {
           style={{ display: "flex", flexDirection: "row-reverse", rowGap: 30 }}
         >
           <div style={{ marginLeft: 10, width: "50%" }}>
-            {personalList?.map((npc, i) => {
+            {filteredList?.map((npc, i) => {
               if (i % 2 === 0) return "";
               return (
                 <Npc
@@ -227,12 +313,13 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  collapseGet={collapse}
                 />
               );
             })}
           </div>
           <div style={{ marginRight: 10, width: "50%" }}>
-            {personalList?.map((npc, i) => {
+            {filteredList?.map((npc, i) => {
               if (i % 2 !== 0) return "";
               return (
                 <Npc
@@ -241,6 +328,7 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  collapseGet={collapse}
                 />
               );
             })}
@@ -268,7 +356,7 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
+function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = createRef(null);
 
   const [image, takeScreenShot] = useScreenshot();
@@ -294,6 +382,10 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
   };
 
   const [takingScreenshot, setTakingScreenshot] = useState(false);
+
+  useEffect(() => {
+    setCollapse(collapseGet);
+  }, [collapseGet]);
 
   const getImage = () => {
     if (collapse) {

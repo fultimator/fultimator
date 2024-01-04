@@ -278,7 +278,7 @@ function Personal({ user }) {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         Apologies, fultimator has reached its read quota at the moment, please
-        try again later. (Around 3-5 hours)
+        try again tomorrow. (Around 12-24 hours)
       </Paper>
     );
   }
