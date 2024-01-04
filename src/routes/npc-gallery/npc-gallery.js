@@ -171,7 +171,7 @@ function Personal({ user }) {
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
           <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
             <Grid
