@@ -285,7 +285,7 @@ function Personal({ user }) {
                   setCollapse(!collapse);
                 }}
               >
-                Collapse
+                {collapse ? 'Collapse' : 'Expand'}
               </Button>
             </Grid>
           </Grid>

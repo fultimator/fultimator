@@ -78,6 +78,7 @@ export default function NpcCompedium() {
 }
 
 function Personal({ user }) {
+  const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
   const personalRef = collection(firestore, "npc-personal");
@@ -410,6 +411,17 @@ function Personal({ user }) {
               Search
             </Button>
           </Grid>
+          <Grid item xs={4} md={1} alignItems="center" sx={{ display: "flex" }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => {
+                setCollapse(!collapse);
+              }}
+            >
+              {collapse ? 'Collapse' : 'Expand'}
+            </Button>
+          </Grid>
         </Grid>
       </Paper>
 
@@ -423,6 +435,7 @@ function Personal({ user }) {
                 copyNpc={copyNpc}
                 deleteNpc={deleteNpc}
                 shareNpc={shareNpc}
+                collapseGet={collapse}
               />
             );
           })}
@@ -441,6 +454,7 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  collapseGet={collapse}
                 />
               );
             })}
@@ -455,6 +469,7 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  collapseGet={collapse}
                 />
               );
             })}
@@ -533,7 +548,7 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
+function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = createRef(null);
 
   const [image, takeScreenShot] = useScreenshot();
@@ -560,6 +575,10 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
 
   const [takingScreenshot, setTakingScreenshot] = useState(false);
 
+  useEffect(() => {
+    setCollapse(collapseGet);
+  }, [collapseGet]);
+
   const getImage = () => {
     if (collapse) {
       takeScreenShot(ref.current);
@@ -582,7 +601,9 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc }) {
     }
   }, [image, npc.name]);
 
-  const [collapse, setCollapse] = useState(window.innerWidth >= 900);
+  // const [collapse, setCollapse] = useState(window.innerWidth >= 900);
+  const [collapse, setCollapse] = useState(false);
+  
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
