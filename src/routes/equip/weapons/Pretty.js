@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Card, Grid, Stack, Typography, Box, Avatar, useTheme } from "@mui/material";
+import { Card, Grid, Stack, Typography, Box, Avatar, useTheme, ThemeProvider} from "@mui/material";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
 import ReactMarkdown from "react-markdown";
 import attributes from "../../../libs/attributes";
@@ -8,16 +8,19 @@ import { OpenBracket, CloseBracket } from "../../../components/Bracket"
 import Diamond from "../../../components/Diamond";
 
 function Pretty({ base, custom }) {
+  const theme = useTheme();
   console.debug("base", base);
   console.debug("custom", custom);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <PrettySingle weapon={base} />
-      <Typography textAlign="center">
-        <ArrowDownward />
-      </Typography>
-      <PrettySingle weapon={custom} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <PrettySingle weapon={base} />
+        <Typography textAlign="center">
+          <ArrowDownward />
+        </Typography>
+        <PrettySingle weapon={custom} />
+      </div>
+    </ThemeProvider>
   );
 }
 
@@ -52,7 +55,7 @@ function PrettySingle({ weapon }) {
           alignItems="center"
           sx={{
             p: 1,
-            background: "#2a4a41",
+            background: `${primary}`,
             color: "#ffffff",
             "& .MuiTypography-root": {
               fontSize: "1.2rem",
@@ -84,7 +87,7 @@ function PrettySingle({ weapon }) {
         </Grid>
         <Grid container>
         {/* Image */}
-        <Grid item xs={2} sx={{ flex: "0 0 70px", minWidth: "70px", minHeight: "70px", overflow: "hidden", border: "1px solid #587169", background: "#e1efe2" }} onClick={handleGridItemClick}>
+        <Grid item xs={2} sx={{ flex: "0 0 70px", minWidth: "70px", minHeight: "70px", overflow: "hidden", border: `1px solid ${primary}`, background: `${ternary}` }} onClick={handleGridItemClick}>
           <Box
             sx={{
               width: "70px",

@@ -7,13 +7,17 @@ import {
   Box,
   Avatar,
   useTheme,
+  ThemeProvider
 } from "@mui/material";
 
 function Pretty({ custom }) {
+  const theme = useTheme();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <PrettySingle armor={custom} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <PrettySingle armor={custom} />
+      </div>
+    </ThemeProvider>
   );
 }
 
@@ -48,7 +52,7 @@ function PrettySingle({ armor }) {
           alignItems="center"
           sx={{
             p: 1,
-            background: "#2a4a41",
+            background: `${primary}`,
             color: "#ffffff",
             "& .MuiTypography-root": {
               fontSize: "1.2rem",
@@ -62,7 +66,7 @@ function PrettySingle({ armor }) {
               Accessory
             </Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={2}>
             <Typography variant="h4" textAlign="center">
               Cost
             </Typography>
@@ -78,8 +82,8 @@ function PrettySingle({ armor }) {
               minWidth: "70px",
               minHeight: "70px",
               overflow: "hidden",
-              border: "1px solid #587169",
-              background: "#e1efe2",
+              border: `1px solid ${primary}`,
+              background: `${ternary}`,
             }}
             onClick={handleGridItemClick}
           >
@@ -124,7 +128,7 @@ function PrettySingle({ armor }) {
               <Grid item xs={6}>
                 <Typography fontWeight="bold">{armor.name}</Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={2}>
                 <Typography textAlign="center">{`${armor.cost}z`}</Typography>
               </Grid>
             </Grid>

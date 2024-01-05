@@ -7,18 +7,22 @@ import {
   Box,
   Avatar,
   useTheme,
+  ThemeProvider
 } from "@mui/material";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
 
 function Pretty({ base, custom }) {
+  const theme = useTheme();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <PrettySingle armor={base} />
-      <Typography textAlign="center">
-        <ArrowDownward />
-      </Typography>
-      <PrettySingle armor={custom} />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <PrettySingle armor={base} />
+        <Typography textAlign="center">
+          <ArrowDownward />
+        </Typography>
+        <PrettySingle armor={custom} />
+      </div>
+    </ThemeProvider>
   );
 }
 
@@ -53,7 +57,7 @@ function PrettySingle({ armor }) {
           alignItems="center"
           sx={{
             p: 1,
-            background: "#2a4a41",
+            background: `${primary}`,
             color: "#ffffff",
             "& .MuiTypography-root": {
               fontSize: "1.2rem",
@@ -93,8 +97,8 @@ function PrettySingle({ armor }) {
               minWidth: "70px",
               minHeight: "70px",
               overflow: "hidden",
-              border: "1px solid #587169",
-              background: "#e1efe2",
+              border: `1px solid ${primary}`,
+              background: `${ternary}`,
             }}
             onClick={handleGridItemClick}
           >
