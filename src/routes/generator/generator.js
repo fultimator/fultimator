@@ -23,7 +23,6 @@ import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
-import Fabula from "../../themes/Fabula";
 
 const powerPMs = {
   minor: 20,
@@ -73,8 +72,9 @@ const usesCosts = {
 };
 
 function RitualsProjects() {
+  const theme = useTheme();
   return (
-    <ThemeProvider theme={Fabula}>
+    <ThemeProvider theme={theme}>
       <Layout sx={{ marginBottom: 40 }}>
         <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
           <Grid item xs={12} sm={5}>
@@ -116,6 +116,8 @@ function RitualsProjects() {
 function Rituals() {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
   const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
@@ -242,6 +244,8 @@ function Rituals() {
 function Projects() {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
   const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
@@ -497,6 +501,8 @@ const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 function QualitiesGenerator() {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
   const quaternary = theme.palette.quaternary.main;
   const [selectedDamageType, setSelectedDamageType] = useState("All");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
@@ -706,7 +712,7 @@ function QualitiesGenerator() {
 
         <Paper
           sx={{
-            background: "linear-gradient(to right, #eaf0f4, transparent)",
+            background: `linear-gradient(to right, ${ternary}, transparent)`,
             padding: 2,
             display: "flex",
             justifyContent: "space-between",
@@ -730,6 +736,7 @@ function QualitiesGenerator() {
             }}
             sx={{
               minWidth: 100,
+              fontWeight: "bold",
             }}
           >
             Generate
