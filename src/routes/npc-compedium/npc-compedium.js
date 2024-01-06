@@ -139,7 +139,9 @@ function Personal({ user }) {
   const personalQuery = query(personalRef, ...constraints);
   const [personalList, loading, err] = useCollectionData(personalQuery);
 
-  console.log(err);
+  if (err) {
+    console.log(err);
+  }
 
   const nextPage = () => {
     setPrevLastItem([...prevLastItem, lastItem]);
