@@ -128,7 +128,9 @@ function Personal({ user }) {
 
   const deleteNpc = function (npc) {
     return function () {
-      deleteDoc(doc(firestore, "npc-personal", npc.id));
+      if (window.confirm("Are you sure you want to delete?")) {
+        deleteDoc(doc(firestore, "npc-personal", npc.id));
+      }
     };
   };
 
@@ -285,7 +287,7 @@ function Personal({ user }) {
                   setCollapse(!collapse);
                 }}
               >
-                {collapse ? 'Collapse' : 'Expand'}
+                {collapse ? "Collapse" : "Expand"}
               </Button>
             </Grid>
           </Grid>
