@@ -25,8 +25,11 @@ import {
   TextField,
   Slider,
   Avatar,
-  Autocomplete,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   CircularProgress,
 } from "@mui/material";
 import Layout from "../../components/Layout";
@@ -365,25 +368,26 @@ function Personal({ user }) {
             justifyContent="center"
             sx={{ display: "flex" }}
           >
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              fullWidth
-              value={rank}
-              options={[
-                "soldier",
-                "elite",
-                "champion2",
-                "champion3",
-                "champion4",
-                "champion5",
-              ]}
-              size="small"
-              onChange={(evt, val2) => {
-                setRank(val2);
-              }}
-              renderInput={(params) => <TextField {...params} label="Rank" />}
-            />
+            <FormControl fullWidth size="small">
+              <InputLabel id="rank">Rank:</InputLabel>
+              <Select
+                labelId="rank"
+                id="select-rank"
+                value={rank}
+                label="Rank:"
+                onChange={(evt, val2) => {
+                  setRank(evt.target.value);
+                }}
+              >
+                <MenuItem value={""}>All</MenuItem>
+                <MenuItem value={"soldier"}>Soldier</MenuItem>
+                <MenuItem value={"elite"}>Elite</MenuItem>
+                <MenuItem value={"champion2"}>Champion(2)</MenuItem>
+                <MenuItem value={"champion3"}>Champion(3)</MenuItem>
+                <MenuItem value={"champion4"}>Champion(4)</MenuItem>
+                <MenuItem value={"champion5"}>Champion(5)</MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid
             item
