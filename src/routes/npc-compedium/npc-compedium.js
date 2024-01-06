@@ -419,7 +419,7 @@ function Personal({ user }) {
                 setCollapse(!collapse);
               }}
             >
-              {collapse ? 'Collapse' : 'Expand'}
+              {collapse ? "Collapse" : "Expand"}
             </Button>
           </Grid>
         </Grid>
@@ -603,7 +603,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
 
   // const [collapse, setCollapse] = useState(window.innerWidth >= 900);
   const [collapse, setCollapse] = useState(false);
-  
+
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
@@ -614,7 +614,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           setCollapse(!collapse);
         }}
       />
-      <Tooltip title="Copy">
+      <Tooltip title="Copy to adversary designer">
         <IconButton onClick={copyNpc(npc)}>
           <ContentCopy />
         </IconButton>
