@@ -15,7 +15,7 @@ export function TypeName({ type }) {
   return (
     <>
       {type === "physical" && "Physical"}
-      {type === "wind" && "Wind"}
+      {type === "wind" && "Air"}
       {type === "bolt" && "Bolt"}
       {type === "dark" && "Dark"}
       {type === "earth" && "Earth"}
