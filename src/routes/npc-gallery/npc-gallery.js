@@ -274,6 +274,7 @@ function Personal({ user }) {
                   <MenuItem value={"Humanoid"}>Humanoid</MenuItem>
                   <MenuItem value={"Monster"}>Monster</MenuItem>
                   <MenuItem value={"Plant"}>Plant</MenuItem>
+                  <MenuItem value={"Undead"}>Undead</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
