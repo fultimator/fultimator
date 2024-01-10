@@ -130,7 +130,7 @@ function Home() {
         />
       </div>
       <Typography sx={{ p: 3, textAlign: "center" }}>
-        If you have any feedback, you can proceed with this:{" "}
+        If you have any feedback, give us your thoughts here:{" "}
         <a href=" https://forms.gle/3P7Bq1CtZrnFwQsm8">Google Form.</a> <br />
         The wonderful Fultimator Icons are made by Runty! Email:{" "}
         <a href="mailto:contactrunty@iCloud.com">contactrunty@iCloud.com</a>
