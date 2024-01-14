@@ -41,6 +41,7 @@ import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
 import EditNotes from "../../components/npc/EditNotes";
 import EditRareGear from "../../components/npc/EditRareGear";
+import Probs from "../../routes/probs/probs";
 import { createFileName, useScreenshot } from "use-react-screenshot";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
@@ -347,6 +348,8 @@ export default function NpcEdit() {
               <EditNotes npc={npcTemp} setNpc={updateNPC} />
             </Grid>
           </Grid>
+          <Divider sx={{ my: 2 }} />
+          <Probs />
           <Divider sx={{ my: 2, marginBottom: 20 }} />
         </>
       )}

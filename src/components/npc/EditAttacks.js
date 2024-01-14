@@ -17,7 +17,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import types from "../../libs/types";
 import { DistanceIcon, MeleeIcon } from "../icons";
 
@@ -225,20 +225,17 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
 }
 
 function EditAttackSpecial({ attack, setAttack }) {
-  const [specials, setSpecials] = useState(attack.special.join("/n"));
-
-  useEffect(() => {
-    setSpecials(attack.special.join("\n"));
-  }, [attack.special, setSpecials]);
+  const [specials, setSpecials] = useState(attack.special[0]);
 
   const onChange = (e) => {
+    setSpecials(e.target.value);
+
     if (e.target.value === "") {
       setAttack("special", []);
       return;
     }
 
-    const parts = e.target.value.split("\n");
-    setAttack("special", parts);
+    setAttack("special", [e.target.value]);
   };
 
   return (

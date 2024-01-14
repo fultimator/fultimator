@@ -15,18 +15,6 @@ function Home() {
   const [hover, setHover] = useState("");
   return (
     <Layout>
-      <Paper
-        style={{
-          textAlign: "center",
-          padding: 10,
-          margin: 10,
-          marginBottom: 30,
-        }}
-      >
-        We're seeking your insight into the current Fultimator experience and
-        new features we have planned. Share your feedback in our latest poll:{" "}
-        <a href="https://forms.gle/Y6c1wknDwq4G3tWh6">Google Form.</a>
-      </Paper>
       <div
         style={{
           display: "flex",
@@ -141,8 +129,9 @@ function Home() {
           }}
         />
       </div>
-
       <Typography sx={{ p: 3, textAlign: "center" }}>
+        If you have any feedback, give us your thoughts here:{" "}
+        <a href=" https://forms.gle/3P7Bq1CtZrnFwQsm8">Google Form.</a> <br />
         The wonderful Fultimator Icons are made by Runty! Email:{" "}
         <a href="mailto:contactrunty@iCloud.com">contactrunty@iCloud.com</a>
         <br />

@@ -103,10 +103,12 @@ export default function Probs() {
     dl
   );
 
+  const isMobile = window.innerWidth < 900;
+
   return (
-    <Layout>
-      <Typography variant="h4">Attack and Damage</Typography>
-      <Grid container sx={{ mt: 2 }}>
+    <div>
+      <Typography variant="h5">Attack Chance Calculator</Typography>
+      <Grid container sx={{ mt: 2, gap: 2 }}>
         {/* First die */}
         <Grid item xs>
           <FormControl variant="outlined" fullWidth>
@@ -230,8 +232,6 @@ export default function Probs() {
             />
           </FormControl>
         </Grid>
-        {/* Divider */}
-        <Divider flexItem orientation="vertical" sx={{ mx: 1 }} />
         {/* LD */}
         <Grid item xs>
           <FormControl variant="standard" fullWidth>
@@ -312,54 +312,62 @@ export default function Probs() {
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
-      <Table>
-        <TableBody>
-          <TableRow>
-            <TableCell></TableCell>
-            {[...Array(firstDie)].map((e, i) => {
+      <div
+        style={{
+          width: "100%",
+          overflowX: isMobile ? "scroll" : "hidden",
+          overflowY: "hidden",
+        }}
+      >
+        <Table size="small">
+          <TableBody>
+            <TableRow>
+              <TableCell></TableCell>
+              {[...Array(firstDie)].map((e, i) => {
+                i = parseInt(i);
+                i++;
+                return (
+                  <TableCell key={i} sx={{ fontWeight: "bold" }}>
+                    {i}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+
+            {[...Array(secondDie)].map((e, i) => {
               i = parseInt(i);
               i++;
               return (
-                <TableCell key={i} sx={{ fontWeight: "bold" }}>
-                  {i}
-                </TableCell>
+                <TableRow key={i}>
+                  <TableCell key={i} sx={{ fontWeight: "bold" }}>
+                    {i}
+                  </TableCell>
+
+                  {[...Array(firstDie)].map((e, j) => {
+                    j = parseInt(j);
+                    j++;
+                    return (
+                      <DamageCell
+                        key={j}
+                        firstResult={j}
+                        secondResult={i}
+                        bonus={bonus}
+                        damage={damage}
+                        dl={dl}
+                      />
+                    );
+                  })}
+                </TableRow>
               );
             })}
-          </TableRow>
-
-          {[...Array(secondDie)].map((e, i) => {
-            i = parseInt(i);
-            i++;
-            return (
-              <TableRow key={i}>
-                <TableCell key={i} sx={{ fontWeight: "bold" }}>
-                  {i}
-                </TableCell>
-
-                {[...Array(firstDie)].map((e, j) => {
-                  j = parseInt(j);
-                  j++;
-                  return (
-                    <DamageCell
-                      key={j}
-                      firstResult={j}
-                      secondResult={i}
-                      bonus={bonus}
-                      damage={damage}
-                      dl={dl}
-                    />
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </div>
       <Typography>Probability to hit: {probHit.toFixed(2)}%</Typography>
       <Typography>Expected damage: {Math.floor(expectedDamage)}</Typography>
       <Typography>
         Number of attacks needed: {Math.ceil(hp / expectedDamage)}
       </Typography>
-    </Layout>
+    </div>
   );
 }
