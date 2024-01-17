@@ -2,10 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" alt="Fultimator Logo"/>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+    <title>Fultimator!</title>
+    <meta name="description" content="An unofficial Fabula Ultima tool for creating homebrew content!" />
+
+    <!-- Search Engine Tags -->
+    <meta itemprop="name" content="Fultimator!">
+    <meta itemprop="description" content="An unofficial Fabula Ultima tool for creating homebrew content!">
+    <meta itemprop="image" content="%PUBLIC_URL%/logo192.png">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:url" content="https://fabula-ultima-helper.web.app">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Fultimator!">
+    <meta property="og:description" content="An unofficial Fabula Ultima tool for creating homebrew content!">
+    <meta property="og:image" content="%PUBLIC_URL%/logo192.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fultimator!">
+    <meta name="twitter:description" content="An unofficial Fabula Ultima tool for creating homebrew content!">
+    <meta name="twitter:image" content="%PUBLIC_URL%/logo192.png">
+
+    <!-- Canonical Tag -->
+    <link rel="canonical" href="https://fabula-ultima-helper.web.app" />
+
+    <!-- Schema Markup -->
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "WebPage",
+        "name": "Fultimator",
+        "description": "An unofficial Fabula Ultima tool for creating homebrew content!",
+        "url": "https://fabula-ultima-helper.web.app"
+      }
+    </script>
+
+    <!-- Apple iOS Tags-->
+    <meta name="apple-mobile-web-app-title" content="Fultimator!">
+    <meta name='apple-mobile-web-app-capable' content='yes'>
+    <meta name='apple-touch-fullscreen' content='yes'>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" alt="Fultimator Logo"/>
+
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -20,7 +62,6 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Fultimator!</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -31,7 +72,7 @@
     />
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript role="alert">You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
       This HTML file is a template.
