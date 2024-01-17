@@ -35,10 +35,10 @@ When opening a PR, ensure it goes into the most relevant branch.
 ### Prerequisite Software
 
 - [Git](https://git-scm.com/)
-- [Node.js LTS](https://nodejs.org)
+- [Node v16.16.0 (LTS)](https://nodejs.org/en/blog/release/v16.16.0)
 - Code editor (recommended: [Visual Studio Code](https://code.visualstudio.com/))
 
-### Setup
+## Setup
 
 Clone the repository using the following command in your terminal:
 
@@ -46,19 +46,19 @@ Clone the repository using the following command in your terminal:
 git clone https://github.com/greg-argulla/fultimator.git
 ```
 
-Then, navigate to the project folder and run:
+Then, navigate to the project folder and use npm to download dependencies locked in `package-lock.json`
 
 ```bash
-npm install
-```
-
-If you get a dependency error, use the following:
-
-```bash
-npm install --force
+npm ci
 ```
 
 ### Building from Source
+
+To start the application locally you can run:
+
+```bash
+npm run start
+```
 
 To create an optimized production build:
 
@@ -66,23 +66,20 @@ To create an optimized production build:
 npm run build
 ```
 
-To start the development server, use:
-
-```bash
-npm run start
-```
-
 This will help you visualize and test your changes locally.
 
-To manually deploy to firebase, use:
+## Deploy
+
+The app is hosted by firebase.
+
+To deploy you need to have firebase installed. 
+See [firebase - npm](https://www.npmjs.com/package/firebase)
+
+You also need to have the proper permissions. 
+See [Firebase IAM permissions](https://firebase.google.com/docs/projects/iam/permissions).
 
 ```bash
-npm run deploy
+$ npm run deploy
 ```
 
-
-## Code Contributions
-
-To contribute code, [fork the repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and submit a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
-
-We look forward to your contributions!
+This command will build a production version of the app, and upload it to firebase.
