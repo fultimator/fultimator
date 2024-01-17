@@ -1,6 +1,15 @@
-# Contributing Guidelines for Fultimator
+# Fultimator
 
 ## Introduction
+
+An unofficial Fabula Ultima Tool
+
+- Fabula Ultima: https://www.needgames.it/fabula-ultima-en/
+- Fultimator: https://fabula-ultima-helper.web.app/
+
+It contains multiple tools to manage a game of Fabula Ultima.
+
+> Fultimator is not affiliated with Need Games, it's a product of the work of fans of the game. 
 
 Welcome to the contribution guidelines for Fultimator! We appreciate your interest in improving our web app. Please follow the guidelines below for code and content contributions.
 
@@ -27,10 +36,12 @@ Fultimator uses [React](https://react.dev/) for building dynamic user interfaces
 
 ### Branches
 
-- **main:** Mainline branch to be deployed to Firebase
-- **mobile:** A development branch for mobile related features
+- **main:** The mainline branch intended for deployment to Firebase.
+- **dev:** The primary development branch for most features.
+- **mobile:** A development branch specifically for mobile-related features.
 
-When opening a PR, ensure it goes into the most relevant branch.
+When opening a pull request (PR), ensure it goes into the most relevant branch.
+
 
 ### Prerequisite Software
 
