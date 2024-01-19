@@ -7,6 +7,8 @@ import {
   Grid,
   Radio,
   RadioGroup,
+  InputLabel,
+  Input,
   TextField,
   Typography,
   Paper,
@@ -77,10 +79,9 @@ function RitualsProjects() {
     <ThemeProvider theme={theme}>
       <Layout sx={{ marginBottom: 40 }}>
         <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={6}>
             <Rituals />
           </Grid>
-          <Grid item xs={12} sm={1} />
           <Grid item xs={12} sm={6}>
             <Projects />
           </Grid>
@@ -121,17 +122,27 @@ function Rituals() {
   const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
-
+  const [ingredient, setIngredient] = useState(false);
+  const [itemHeld, setItemHeld] = useState(false);
+  const [dlReduction, setDLReduction] = useState(2);
+  const [fastRitual, setFastRitual] = useState(false);
+  const ingredientMod = ingredient ? 0.50 : 1;
+  const itemHeldMod = itemHeld ? dlReduction : 0;
+   
   function calcPM() {
-    return powerPMs[power] * areaPMs[area];
+    return powerPMs[power] * areaPMs[area] * ingredientMod;
   }
 
   function calcLD() {
-    return powerLDs[power];
+    return powerLDs[power] - itemHeldMod;
   }
 
   function calcClock() {
-    return powerClocks[power];
+    let clockValue = powerClocks[power];
+    if (fastRitual && clockValue >= 6) {
+      clockValue -= 2;
+    }
+    return clockValue;
   }
   return (
     <>
@@ -156,7 +167,7 @@ function Rituals() {
         }}
       >
         <Grid container>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">Potency</FormLabel>
               <RadioGroup
@@ -190,7 +201,7 @@ function Rituals() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">Area</FormLabel>
               <RadioGroup
@@ -222,6 +233,47 @@ function Rituals() {
                   label="Huge"
                 />
               </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Reductions</FormLabel>
+
+              <FormControlLabel
+                control={<Checkbox value={ingredient} />}
+                onChange={(e) => {
+                  setIngredient(e.target.checked);
+                }}
+                label="Using special ingredient"
+              />
+
+              <FormControlLabel
+                control={<Checkbox value={itemHeld} />}
+                onChange={(e) => {
+                  setItemHeld(e.target.checked);
+                }}
+                label="Relevant item held"
+              />
+              {itemHeld && (
+                <FormControl variant="standard" fullWidth>
+                  <InputLabel htmlFor="dlReduction">DL Reduction</InputLabel>
+                  <Input
+                    id="dlReduction"
+                    type="number"
+                    value={dlReduction}
+                    onChange={(e) => setDLReduction(e.target.value)}
+                  />
+                </FormControl>
+              )}
+
+
+              <FormControlLabel
+                control={<Checkbox value={fastRitual} />}
+                onChange={(e) => {
+                  setFastRitual(e.target.checked);
+                }}
+                label="Fast Ritual"
+              />
             </FormControl>
           </Grid>
         </Grid>
