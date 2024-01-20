@@ -1,11 +1,9 @@
-import React, { createRef, useRef, useState, useEffect } from "react";
+import React, { createRef, useEffect } from "react";
 import {
   Card,
   Grid,
   Stack,
   Typography,
-  Box,
-  Avatar,
   useTheme,
   ThemeProvider,
   Tooltip,
@@ -13,6 +11,7 @@ import {
 } from "@mui/material";
 import { createFileName, useScreenshot } from "use-react-screenshot";
 import { Download, Code } from "@mui/icons-material";
+import EditableImage from "../../../components/EditableImage";
 
 function Pretty({ custom }) {
   const theme = useTheme();
@@ -31,23 +30,7 @@ function PrettySingle({ accessory, showActions }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  const fileInputRef = useRef(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const handleGridItemClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileInputChange = (event) => {
-    const selectedFile = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageDataURL = reader.result;
-      setSelectedImage(imageDataURL);
-    };
-    reader.readAsDataURL(selectedFile);
-  };
-
+  
   const [image, takeScreenShot] = useScreenshot();
 
   function downloadFile(content, fileName, contentType) {
@@ -116,44 +99,14 @@ function PrettySingle({ accessory, showActions }) {
               </Grid>
             </Grid>
             <Grid container>
-              {/* Image */}
-              <Grid
-                item
-                xs={2}
-                sx={{
-                  flex: "0 0 70px",
-                  minWidth: "70px",
-                  minHeight: "70px",
-                  overflow: "hidden",
-                  border: `1px solid ${primary}`,
-                  background: `${ternary}`,
-                }}
-                onClick={handleGridItemClick}
-              >
-                <Box
-                  sx={{
-                    width: "70px",
-                    height: "70px",
-                    background: "white",
-                    border: `1px solid ${primary}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Avatar
-                    alt="Image"
-                    src={selectedImage || ""}
-                    sx={{ objectFit: "cover", borderRadius: "0" }}
-                  />
-                </Box>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileInputChange}
-                />
+              <Grid item
+                    sx={{
+                      flex: "0 0 70px",
+                      minWidth: "70px",
+                      minHeight: "70px",
+                      background: `white`,
+                    }}>
+                <EditableImage size={70}/>
               </Grid>
 
               <Grid container direction="column" item xs>
