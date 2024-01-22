@@ -277,7 +277,7 @@ export default function NpcEdit() {
                   disabled={canPublish().disabled}
                   onClick={publish}
                 >
-                  Publish to Adversary Compedium
+                  Publish to Adversary Compendium
                 </Button>
               )}
               {npcTemp.published && (

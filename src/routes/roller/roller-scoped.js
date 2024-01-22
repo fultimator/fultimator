@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import {
   addDoc,
   collection,
@@ -11,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { Card, Grid, Stack, Typography } from "@mui/material";
+import { Card, Grid, Stack, Typography, TextField } from "@mui/material";
 
 import { auth, firestore } from "../../firebase";
 import PreparedRollsList from "../../components/roller/PreparedRollsList";
@@ -47,6 +48,7 @@ function RollerScoped() {
 
 function RollerScopedAuthenticated({ user }) {
   const { scope } = useParams();
+  const [name, setName] = useState("");
 
   const savePreparedRoll = async (dice, modifier, label) => {
     const data = {
@@ -81,7 +83,7 @@ function RollerScopedAuthenticated({ user }) {
     const timestamp = new Date();
     const data = {
       uid: user.uid,
-      username: user.displayName,
+      username: name,
       scope: scope,
       dice: dice,
       modifier: modifier,
@@ -114,8 +116,25 @@ function RollerScopedAuthenticated({ user }) {
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={1}>
-        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+        <Grid item xs={12} sm={5} sx={{ order: 1 }}>
           <ShareLink scope={scope} />
+        </Grid>
+        <Grid item xs={12} sm={3} sx={{ order: 1 }}>
+          <Card sx={{ p: 2 }}>
+            <Typography sx={{ marginBottom: "8px" }}>
+              Set name to display here:
+            </Typography>
+            <TextField
+              id="name"
+              label="Name:"
+              value={name}
+              onChange={(e) => {
+                return setName(e.target.value);
+              }}
+              size="small"
+              fullWidth
+            ></TextField>
+          </Card>
         </Grid>
         <Grid item sx={{ order: 2 }}>
           <Card sx={{ p: 2 }}>
@@ -128,6 +147,7 @@ function RollerScopedAuthenticated({ user }) {
             </Typography>
           </Card>
         </Grid>
+
         <Grid item xs={12} sx={{ order: 3 }}>
           <PrepareRoll
             savePreparedRoll={savePreparedRoll}
