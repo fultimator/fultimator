@@ -27,7 +27,7 @@ import {
   ContentCopy,
   Close,
 } from "@mui/icons-material";
-import { createRef, useCallback, useEffect, useState } from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import ExplainSkillsSimplified from "../../components/npc/ExplainSkillsSimplified";
@@ -42,9 +42,10 @@ import EditActions from "../../components/npc/EditActions";
 import EditNotes from "../../components/npc/EditNotes";
 import EditRareGear from "../../components/npc/EditRareGear";
 import Probs from "../../routes/probs/probs";
-import { createFileName, useScreenshot } from "use-react-screenshot";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
+import useDownloadImage from "../../hooks/useDownloadImage";
+import useDownloadJSON from "../../hooks/useDownloadJSON";
 
 export default function NpcEdit() {
   let params = useParams();
@@ -111,29 +112,9 @@ export default function NpcEdit() {
   }, [handleCtrlS]);
 
   // Download
-  const prettyRef = createRef(null);
-
-  function downloadFile(content, fileName, contentType) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-  }
-
-  const downloadJSON = () => {
-    const jsonData = JSON.stringify(npcTemp);
-    downloadFile(jsonData, `${npc.name.replace(" ", "_")}.json`, "text/plain");
-  };
-
-  const [image, takeScreenShot] = useScreenshot();
-
-  const download = (image, { name = "img", extension = "png" } = {}) => {
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = createFileName(extension, name);
-    a.click();
-  };
+  const prettyRef = useRef();
+  const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
+  const [downloadJSON] = useDownloadJSON(npc?.name, npc);
 
   const copyNpc = async (npc) => {
     const data = Object.assign({}, npc);
@@ -161,14 +142,6 @@ export default function NpcEdit() {
   const handleClick = () => {
     setOpen(true);
   };
-
-  const getImage = () => takeScreenShot(prettyRef.current);
-
-  useEffect(() => {
-    if (image) {
-      download(image, { name: npc.name, extension: "png" });
-    }
-  }, [image, npc?.name]);
 
   if (!npcTemp) {
     return null;
@@ -414,7 +387,7 @@ export default function NpcEdit() {
               <Fab
                 color="primary"
                 aria-label="download"
-                onClick={getImage}
+                onClick={downloadImage}
                 size="medium"
                 style={{ marginLeft: "5px", zIndex: 1000 }}
               >

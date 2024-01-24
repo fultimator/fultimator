@@ -46,8 +46,7 @@ import {
   Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { createFileName, useScreenshot } from "use-react-screenshot";
-import { createRef, useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 
 import allToken from "../icons/All-token.webp";
 import beastToken from "../icons/Beast-token.webp";
@@ -58,6 +57,8 @@ import humanToken from "../icons/Human-token.webp";
 import monsterToken from "../icons/Monster-token.webp";
 import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
+import useDownloadImage from "../../hooks/useDownloadImage";
+import useDownloadJSON from "../../hooks/useDownloadJSON";
 
 export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
@@ -555,57 +556,13 @@ function Personal({ user }) {
 }
 
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
-  const ref = createRef(null);
-
-  const [image, takeScreenShot] = useScreenshot();
-
-  function downloadFile(content, fileName, contentType) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-  }
-  const getJSON = () => {
-    const jsonData = JSON.stringify(npc);
-    const fileName = `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`;
-    downloadFile(jsonData, fileName, "text/plain");
-  };
-
-  const download = (image, { name = "img", extension = "png" } = {}) => {
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = createFileName(extension, name);
-    a.click();
-  };
-
-  const [takingScreenshot, setTakingScreenshot] = useState(false);
+  const ref = useRef();
+  const [downloadImage] = useDownloadImage(npc.name, ref);
+  const [downloadJSON] = useDownloadJSON(npc.name, npc);
 
   useEffect(() => {
     setCollapse(collapseGet);
   }, [collapseGet]);
-
-  const getImage = () => {
-    if (collapse) {
-      takeScreenShot(ref.current);
-    } else {
-      setCollapse(true);
-      setTakingScreenshot(true);
-    }
-  };
-
-  useEffect(() => {
-    if (takingScreenshot) {
-      takeScreenShot(ref.current);
-      setTakingScreenshot(false);
-    }
-  }, [ref, takeScreenShot, takingScreenshot]);
-
-  useEffect(() => {
-    if (image) {
-      download(image, { name: npc.name, extension: "png" });
-    }
-  }, [image, npc.name]);
 
   // const [collapse, setCollapse] = useState(window.innerWidth >= 900);
   const [collapse, setCollapse] = useState(false);
@@ -631,12 +588,12 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Tooltip title="Download">
-        <IconButton onClick={getImage}>
+        <IconButton onClick={downloadImage}>
           <Download />
         </IconButton>
       </Tooltip>
       <Tooltip title="Export JSON">
-        <IconButton onClick={getJSON}>
+        <IconButton onClick={downloadJSON}>
           <Code />
         </IconButton>
       </Tooltip>
