@@ -5,6 +5,7 @@ const shield = [
     cost: 100,
     def: 2,
     mdef: 0,
+    martial: false,
   },
   {
     category: "Shield",
@@ -12,6 +13,7 @@ const shield = [
     cost: 150,
     def: 2,
     mdef: 2,
+    martial: true,
   },
   {
     category: "Armor",
