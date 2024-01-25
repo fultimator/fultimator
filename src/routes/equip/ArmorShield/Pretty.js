@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from "react";
+import React, {useRef} from "react";
 import {
   Card,
   Grid,
@@ -10,9 +10,10 @@ import {
   IconButton,
 } from "@mui/material";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { createFileName, useScreenshot } from "use-react-screenshot";
 import { Download, Code } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
+import useDownloadImage from "../../../hooks/useDownloadImage";
+import useDownloadJSON from "../../../hooks/useDownloadJSON";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -30,44 +31,14 @@ function Pretty({ base, custom }) {
 }
 
 function PrettySingle({ armor, showActions }) {
-  const ref = createRef(null);
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-
-  const [image, takeScreenShot] = useScreenshot();
-
-  function downloadFile(content, fileName, contentType) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-  }
-
-  const getJSON = () => {
-    const jsonData = JSON.stringify(armor);
-    const fileName = `${armor.name.replace(/\s/g, "_").toLowerCase()}.json`;
-    downloadFile(jsonData, fileName, "text/plain");
-  };
-
-  const download = (image, { name = "img", extension = "png" } = {}) => {
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = createFileName(extension, name);
-    a.click();
-  };
-
-  const getImage = () => {
-    takeScreenShot(ref.current);
-  };
-
-  useEffect(() => {
-    if (image) {
-      download(image, { name: armor.name, extension: "png" });
-    }
-  }, [image, armor.name]);
+  
+  const ref = useRef();
+  const [downloadImage] = useDownloadImage(armor.name, ref);
+  const [downloadJSON] = useDownloadJSON(armor.name, armor);
 
   return (
     <>
@@ -191,12 +162,12 @@ function PrettySingle({ armor, showActions }) {
       {showActions && (
         <div style={{ display: "flex" }}>
           <Tooltip title="Download">
-            <IconButton onClick={getImage}>
+            <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
           <Tooltip title="Export JSON">
-            <IconButton onClick={getJSON}>
+            <IconButton onClick={downloadJSON}>
               <Code />
             </IconButton>
           </Tooltip>

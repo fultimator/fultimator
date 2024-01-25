@@ -14,21 +14,21 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
-import { useState } from "react";
+import {useRef, useState} from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { User } from "firebase/auth";
-import { createFileName, useScreenshot } from "use-react-screenshot";
 
 import { SignIn } from "../../components/auth";
 import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import { calcHP, calcMP } from "../../libs/npcs";
-import { useEffect, createRef } from "react";
+import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
+import useDownloadImage from "../../hooks/useDownloadImage";
 
 export default function Combat() {
   const [user, loading, error] = useAuthState(auth);
@@ -247,29 +247,8 @@ function NpcCombatant({ npc }: NpcProps) {
     setSelectedStudy(event.target.value);
   };
 
-  // Download
-  const prettyRef = createRef();
-  const [image, takeScreenShot] = useScreenshot();
-
-  const download = (
-    image: string,
-    {
-      name = "img",
-      extension = "png",
-    }: { name?: string; extension?: string } = {}
-  ) => {
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = createFileName(extension!, name!);
-    a.click();
-  };
-  const getImage = () => takeScreenShot(prettyRef.current);
-
-  useEffect(() => {
-    if (image) {
-      download(image, { name: npc?.name, extension: "png" });
-    }
-  }, [image, npc?.name]);
+  const ref = useRef();
+  const [downloadImage] = useDownloadImage(npc.name, ref);
 
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
@@ -277,7 +256,7 @@ function NpcCombatant({ npc }: NpcProps) {
         <NpcPretty
           npc={npc}
           study={selectedStudy}
-          ref={prettyRef}
+          ref={ref}
           collapse={true}
         />
       </Grid>
@@ -366,7 +345,7 @@ function NpcCombatant({ npc }: NpcProps) {
             <Button
               color="primary"
               aria-label="download"
-              onClick={getImage}
+              onClick={downloadImage}
               style={{ cursor: "pointer" }}
             >
               <Tooltip title="Download Sheet" placement="bottom">
