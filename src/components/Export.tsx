@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
-import { Tooltip, IconButton, Menu, MenuItem } from "@mui/material";
+import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
 
 type Props = {
   name?: string;
@@ -16,6 +16,7 @@ enum ExportAction {
 function Export({ name = "", data = {} }: Props) {
   const [downloadJSON, copyToClipboard] = useDownloadJSON(name, data);
 
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [exportAnchor, setExportAnchor] = useState(null);
   const isExportMenuOpen = Boolean(exportAnchor);
 
@@ -27,6 +28,14 @@ function Export({ name = "", data = {} }: Props) {
     setExportAnchor(null);
   }
 
+  function handleSnackbarOpen() {
+    setIsSnackbarOpen(true);
+  }
+
+  function handleSnackbarClose() {
+    setIsSnackbarOpen(false);
+  }
+
   function exportJSON(action: ExportAction) {
     switch (action) {
       case ExportAction.FILE:
@@ -34,6 +43,7 @@ function Export({ name = "", data = {} }: Props) {
         break;
       case ExportAction.CLIPBOARD:
         copyToClipboard();
+        handleSnackbarOpen();
         break;
       default:
         break;
@@ -70,6 +80,13 @@ function Export({ name = "", data = {} }: Props) {
           Copy JSON to Clipboard
         </MenuItem>
       </Menu>
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={isSnackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        message="Copied to Clipboard!"
+      />
     </>
   );
 }
