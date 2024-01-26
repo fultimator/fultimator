@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import { useRef } from "react";
 import {
   Card,
   Grid,
@@ -16,10 +16,10 @@ import types from "../../../libs/types";
 import { OpenBracket, CloseBracket } from "../../../components/Bracket";
 import Diamond from "../../../components/Diamond";
 
-import { Download, Code } from "@mui/icons-material";
+import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
-import useDownloadJSON from "../../../hooks/useDownloadJSON";
+import Export from "../../../components/Export";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -46,8 +46,7 @@ function PrettySingle({ weapon, showActions }) {
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(weapon.name, ref);
-  const [downloadJSON] = useDownloadJSON(weapon.name, weapon);
-  
+
   return (
     <>
       <Card>
@@ -93,17 +92,18 @@ function PrettySingle({ weapon, showActions }) {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item
-                    sx={{
-                      flex: "0 0 70px",
-                      minWidth: "70px",
-                      minHeight: "70px",
-                      background: `white`,
-                    }}>
-                <EditableImage size={70}/>
+              <Grid
+                item
+                sx={{
+                  flex: "0 0 70px",
+                  minWidth: "70px",
+                  minHeight: "70px",
+                  background: `white`,
+                }}
+              >
+                <EditableImage size={70} />
               </Grid>
-              
-              
+
               <Grid container direction="column" item xs>
                 {/* First Row */}
                 <Grid
@@ -198,16 +198,12 @@ function PrettySingle({ weapon, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download">
+          <Tooltip title="Download as Image">
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export JSON">
-            <IconButton onClick={downloadJSON}>
-              <Code />
-            </IconButton>
-          </Tooltip>
+          <Export name={`${weapon.name}`} data={weapon} />
         </div>
       )}
     </>

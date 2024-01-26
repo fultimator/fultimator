@@ -43,10 +43,9 @@ import {
   ContentCopy,
   Share,
   Download,
-  Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 
 import allToken from "../icons/All-token.webp";
 import beastToken from "../icons/Beast-token.webp";
@@ -58,7 +57,7 @@ import monsterToken from "../icons/Monster-token.webp";
 import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import useDownloadJSON from "../../hooks/useDownloadJSON";
+import Export from "../../components/Export";
 
 export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
@@ -558,7 +557,6 @@ function Personal({ user }) {
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
-  const [downloadJSON] = useDownloadJSON(npc.name, npc);
 
   useEffect(() => {
     setCollapse(collapseGet);
@@ -587,16 +585,12 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download">
+      <Tooltip title="Download as Image">
         <IconButton onClick={downloadImage}>
           <Download />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Export JSON">
-        <IconButton onClick={downloadJSON}>
-          <Code />
-        </IconButton>
-      </Tooltip>
+      <Export name={`${npc.name}`} data={npc} />
       <span style={{ fontSize: 14 }}>Created By: {npc.createdBy}</span>
     </Grid>
   );

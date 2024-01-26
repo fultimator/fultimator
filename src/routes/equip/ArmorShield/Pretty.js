@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import { useRef } from "react";
 import {
   Card,
   Grid,
@@ -10,10 +10,10 @@ import {
   IconButton,
 } from "@mui/material";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import { Download, Code } from "@mui/icons-material";
+import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
-import useDownloadJSON from "../../../hooks/useDownloadJSON";
+import Export from "../../../components/Export";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -35,10 +35,9 @@ function PrettySingle({ armor, showActions }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  
+
   const ref = useRef();
   const [downloadImage] = useDownloadImage(armor.name, ref);
-  const [downloadJSON] = useDownloadJSON(armor.name, armor);
 
   return (
     <>
@@ -85,14 +84,16 @@ function PrettySingle({ armor, showActions }) {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item
-                    sx={{
-                      flex: "0 0 70px",
-                      minWidth: "70px",
-                      minHeight: "70px",
-                      background: `white`,
-                    }}>
-                <EditableImage size={70}/>
+              <Grid
+                item
+                sx={{
+                  flex: "0 0 70px",
+                  minWidth: "70px",
+                  minHeight: "70px",
+                  background: `white`,
+                }}
+              >
+                <EditableImage size={70} />
               </Grid>
 
               <Grid container direction="column" item xs>
@@ -161,16 +162,12 @@ function PrettySingle({ armor, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download">
+          <Tooltip title="Download as Image">
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export JSON">
-            <IconButton onClick={downloadJSON}>
-              <Code />
-            </IconButton>
-          </Tooltip>
+          <Export name={`${armor.name}`} data={armor} />
         </div>
       )}
     </>
