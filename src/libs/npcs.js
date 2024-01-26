@@ -26,8 +26,8 @@ export function calcHP(npc) {
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     const lvl = npc.companionpclvl || 5;
-    const extraHP = parseInt(npc.extra.hp) || 0
-    hp = (sl * npc.attributes.might + Math.floor(lvl / 2)) + extraHP;
+    const extraHP = npc.extra && npc.extra.hp ? parseInt(npc.extra.hp) : 0;
+    hp = sl * npc.attributes.might + Math.floor(lvl / 2) + extraHP;
   }
 
   return hp;
