@@ -29,7 +29,6 @@ import {
   Select,
   MenuItem,
   Button,
-  Menu,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -42,12 +41,11 @@ import {
   Share,
   Download,
   Edit,
-  Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import useDownloadJSON from "../../hooks/useDownloadJSON";
+import Export from "../../components/Export";
 
 export default function NpcGallery() {
   const [user, loading] = useAuthState(auth);
@@ -375,12 +373,8 @@ function Personal({ user }) {
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
-  const [downloadJSON, copyToClipboard] = useDownloadJSON(npc.name, npc);
 
   const [collapse, setCollapse] = useState(false);
-
-  const [exportAnchor, setExportAnchor] = useState(null);
-  const isExportMenuOpen = Boolean(exportAnchor);
 
   useEffect(() => {
     setCollapse(collapseGet);
@@ -389,28 +383,6 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   function expandAndDownloadImage() {
     setCollapse(true);
     setTimeout(downloadImage, 100);
-  }
-
-  function handleOpenExportMenu(event) {
-    setExportAnchor(event.currentTarget);
-  }
-
-  function handleCloseExportMenu() {
-    setExportAnchor(null);
-  }
-
-  function exportJSON(action = "") {
-    switch (action) {
-      case "file":
-        downloadJSON();
-        break;
-      case "clipboard":
-        copyToClipboard();
-        break;
-      default:
-        break;
-    }
-    handleCloseExportMenu();
   }
 
   return (
@@ -453,31 +425,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Download />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Export">
-        <IconButton onClick={handleOpenExportMenu}>
-          <Code />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        anchorEl={exportAnchor}
-        open={isExportMenuOpen}
-        onClose={handleCloseExportMenu}
-      >
-        <MenuItem
-          onClick={() => {
-            exportJSON("file");
-          }}
-        >
-          Export as JSON File
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            exportJSON("clipboard");
-          }}
-        >
-          Copy JSON to Clipboard
-        </MenuItem>
-      </Menu>
+      <Export name={`${npc.name}`} data={npc} />
     </Grid>
   );
 }

@@ -31,7 +31,6 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-  Menu,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -44,7 +43,6 @@ import {
   ContentCopy,
   Share,
   Download,
-  Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -59,7 +57,7 @@ import monsterToken from "../icons/Monster-token.webp";
 import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import useDownloadJSON from "../../hooks/useDownloadJSON";
+import Export from "../../components/Export";
 
 export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
@@ -559,7 +557,6 @@ function Personal({ user }) {
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
-  const [downloadJSON, copyToClipboard] = useDownloadJSON(npc.name, npc);
 
   useEffect(() => {
     setCollapse(collapseGet);
@@ -568,30 +565,6 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   // const [collapse, setCollapse] = useState(window.innerWidth >= 900);
   const [collapse, setCollapse] = useState(false);
 
-  const [exportAnchor, setExportAnchor] = useState(null);
-  const isExportMenuOpen = Boolean(exportAnchor);
-
-  function handleOpenExportMenu(event) {
-    setExportAnchor(event.currentTarget);
-  }
-
-  function handleCloseExportMenu() {
-    setExportAnchor(null);
-  }
-
-  function exportJSON(action = "") {
-    switch (action) {
-      case "file":
-        downloadJSON();
-        break;
-      case "clipboard":
-        copyToClipboard();
-        break;
-      default:
-        break;
-    }
-    handleCloseExportMenu();
-  }
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
@@ -612,36 +585,12 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download">
+      <Tooltip title="Download as Image">
         <IconButton onClick={downloadImage}>
           <Download />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Export">
-        <IconButton onClick={handleOpenExportMenu}>
-          <Code />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        anchorEl={exportAnchor}
-        open={isExportMenuOpen}
-        onClose={handleCloseExportMenu}
-      >
-        <MenuItem
-          onClick={() => {
-            exportJSON("file");
-          }}
-        >
-          Export as JSON File
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            exportJSON("clipboard");
-          }}
-        >
-          Copy JSON to Clipboard
-        </MenuItem>
-      </Menu>
+      <Export name={`${npc.name}`} data={npc} />
       <span style={{ fontSize: 14 }}>Created By: {npc.createdBy}</span>
     </Grid>
   );
