@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import { useRef } from "react";
 import {
   Card,
   Grid,
@@ -9,11 +9,11 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { Download, Code } from "@mui/icons-material";
+import { Download } from "@mui/icons-material";
 
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
-import useDownloadJSON from "../../../hooks/useDownloadJSON";
+import Export from "../../../components/Export";
 
 function Pretty({ custom }) {
   const theme = useTheme();
@@ -31,10 +31,9 @@ function PrettySingle({ accessory, showActions }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  
+
   const ref = useRef();
   const [downloadImage] = useDownloadImage(accessory.name, ref);
-  const [downloadJSON] = useDownloadJSON(accessory.name, accessory);
 
   return (
     <>
@@ -71,14 +70,16 @@ function PrettySingle({ accessory, showActions }) {
               </Grid>
             </Grid>
             <Grid container>
-              <Grid item
-                    sx={{
-                      flex: "0 0 70px",
-                      minWidth: "70px",
-                      minHeight: "70px",
-                      background: `white`,
-                    }}>
-                <EditableImage size={70}/>
+              <Grid
+                item
+                sx={{
+                  flex: "0 0 70px",
+                  minWidth: "70px",
+                  minHeight: "70px",
+                  background: `white`,
+                }}
+              >
+                <EditableImage size={70} />
               </Grid>
 
               <Grid container direction="column" item xs>
@@ -121,16 +122,12 @@ function PrettySingle({ accessory, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download">
+          <Tooltip title="Download as Image">
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Export JSON">
-            <IconButton onClick={downloadJSON}>
-              <Code />
-            </IconButton>
-          </Tooltip>
+          <Export name={`${accessory.name}`} data={accessory} />
         </div>
       )}
     </>
