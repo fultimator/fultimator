@@ -26,8 +26,9 @@ import {
   Menu,
   ContentCopy,
   Close,
+  ContentPaste,
 } from "@mui/icons-material";
-import {useCallback, useEffect, useRef, useState} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import ExplainSkillsSimplified from "../../components/npc/ExplainSkillsSimplified";
@@ -54,6 +55,15 @@ export default function NpcEdit() {
   const [user] = useAuthState(auth);
   const [showScrollTop, setShowScrollTop] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  function handleSnackbarOpen() {
+    setIsSnackbarOpen(true);
+  }
+
+  function handleSnackbarClose() {
+    setIsSnackbarOpen(false);
+  }
 
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -114,7 +124,7 @@ export default function NpcEdit() {
   // Download
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
-  const [downloadJSON] = useDownloadJSON(npc?.name, npc);
+  const [downloadJSON, copyJSONToClipboard] = useDownloadJSON(npc?.name, npc);
 
   const copyNpc = async (npc) => {
     const data = Object.assign({}, npc);
@@ -209,6 +219,11 @@ export default function NpcEdit() {
       published: false,
     });
   };
+
+  function copyToClipboard() {
+    copyJSONToClipboard();
+    handleSnackbarOpen();
+  }
 
   return (
     <Layout>
@@ -352,7 +367,21 @@ export default function NpcEdit() {
               zIndex: 1000,
             }}
           >
-            {/* Export Button */}
+            {/* Export Buttons */}
+            <Tooltip
+              title="Copy JSON to Clipboard"
+              placement="bottom"
+              sx={{ marginLeft: "5px" }}
+            >
+              <Fab
+                color="primary"
+                aria-label="export"
+                onClick={copyToClipboard}
+                size="medium"
+              >
+                <ContentPaste />
+              </Fab>
+            </Tooltip>
             <Tooltip
               title="Export JSON File"
               placement="bottom"
@@ -469,6 +498,14 @@ export default function NpcEdit() {
           </div>
         </Fade>
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={isSnackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleSnackbarClose}
+        message="Copied to Clipboard!"
+      />
     </Layout>
   );
 }
