@@ -12,9 +12,7 @@ function useDownloadJSON(name: string, data: any) {
 
   function copyJSONToClipboard() {
     const jsonData = JSON.stringify(data);
-    navigator.clipboard.writeText(jsonData).then(() => {
-      console.log("Copy complete", data);
-    });
+    navigator.clipboard.writeText(jsonData);
   }
 
   return [downloadJSON, copyJSONToClipboard];
