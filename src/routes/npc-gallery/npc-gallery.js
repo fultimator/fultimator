@@ -29,6 +29,7 @@ import {
   Select,
   MenuItem,
   Button,
+  Menu,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -44,7 +45,7 @@ import {
   Code,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import useDownloadJSON from "../../hooks/useDownloadJSON";
 
@@ -374,19 +375,44 @@ function Personal({ user }) {
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
-  const [downloadJSON] = useDownloadJSON(npc.name, npc);
-  
+  const [downloadJSON, copyToClipboard] = useDownloadJSON(npc.name, npc);
+
   const [collapse, setCollapse] = useState(false);
-  
+
+  const [exportAnchor, setExportAnchor] = useState(null);
+  const isExportMenuOpen = Boolean(exportAnchor);
+
   useEffect(() => {
     setCollapse(collapseGet);
   }, [collapseGet]);
-  
+
   function expandAndDownloadImage() {
     setCollapse(true);
-    downloadImage();
+    setTimeout(downloadImage, 100);
   }
-  
+
+  function handleOpenExportMenu(event) {
+    setExportAnchor(event.currentTarget);
+  }
+
+  function handleCloseExportMenu() {
+    setExportAnchor(null);
+  }
+
+  function exportJSON(action = "") {
+    switch (action) {
+      case "file":
+        downloadJSON();
+        break;
+      case "clipboard":
+        copyToClipboard();
+        break;
+      default:
+        break;
+    }
+    handleCloseExportMenu();
+  }
+
   return (
     <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
       <NpcPretty
@@ -418,16 +444,40 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download">
-        <IconButton onClick={expandAndDownloadImage}>
+      <Tooltip title="Download as Image">
+        <IconButton
+          onClick={() => {
+            expandAndDownloadImage();
+          }}
+        >
           <Download />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Export JSON">
-        <IconButton onClick={downloadJSON}>
+      <Tooltip title="Export">
+        <IconButton onClick={handleOpenExportMenu}>
           <Code />
         </IconButton>
       </Tooltip>
+      <Menu
+        anchorEl={exportAnchor}
+        open={isExportMenuOpen}
+        onClose={handleCloseExportMenu}
+      >
+        <MenuItem
+          onClick={() => {
+            exportJSON("file");
+          }}
+        >
+          Export as JSON File
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            exportJSON("clipboard");
+          }}
+        >
+          Copy JSON to Clipboard
+        </MenuItem>
+      </Menu>
     </Grid>
   );
 }
