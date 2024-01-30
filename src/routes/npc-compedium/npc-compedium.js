@@ -347,7 +347,6 @@ function Personal({ user }) {
             <Slider
               getAriaLabel={() => "Level"}
               value={levels}
-              aria-label="Always visible"
               step={5}
               min={5}
               marks={marks}
