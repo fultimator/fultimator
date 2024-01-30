@@ -1,21 +1,22 @@
 import {createTheme} from "@mui/material/styles";
+import ExtendedTheme from "./../types/Theme";
 
-const Techno = createTheme({
+const Midnight = createTheme({
   palette: {
     primary: {
-      main: "#406376",
+      main: "#1B1F47",
     },
     secondary: {
-      main: "#879da9",
+      main: "#9176AC",
     },
     ternary: {
-      main: "#eaf0f4",
+      main: "#E1E7FF",
     },
     quaternary: {
-      main: "#607989",
+      main: "#4C5D8B",
     },
     background: {
-      default: "#dce9f2",
+      default: "#D9E3FF",
     },
     red: {
       main: "#d1232a",
@@ -32,7 +33,7 @@ const Techno = createTheme({
     purple: {
       main: "#794a75",
     },
-  },
+  } as ExtendedTheme['palette'],
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     h1: {
@@ -57,4 +58,4 @@ const Techno = createTheme({
   },
 });
 
-export default Techno;
+export default Midnight;

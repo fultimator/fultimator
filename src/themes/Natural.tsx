@@ -1,21 +1,22 @@
 import {createTheme} from "@mui/material/styles";
+import ExtendedTheme from "./../types/Theme";
 
-const Fabula = createTheme({
+const Natural = createTheme({
   palette: {
     primary: {
-      main: "#2b4b42",
+      main: "#765f43",
     },
     secondary: {
-      main: "#85C3B1",
+      main: "#dccdc4",
     },
     ternary: {
-      main: "#e9f3ea",
+      main: "#fff3ec",
     },
     quaternary: {
-      main: "#47645b",
+      main: "#756449",
     },
     background: {
-      default: "#e2f3ee",
+      default: "#fdf6eb",
     },
     red: {
       main: "#d1232a",
@@ -32,7 +33,7 @@ const Fabula = createTheme({
     purple: {
       main: "#794a75",
     },
-  },
+  } as ExtendedTheme['palette'],
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     h1: {
@@ -57,4 +58,4 @@ const Fabula = createTheme({
   },
 });
 
-export default Fabula;
+export default Natural;

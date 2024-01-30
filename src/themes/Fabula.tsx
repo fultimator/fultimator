@@ -1,21 +1,22 @@
 import {createTheme} from "@mui/material/styles";
+import ExtendedTheme from "./../types/Theme";
 
-const High = createTheme({
+const Fabula = createTheme({
   palette: {
     primary: {
-      main: "#861628",
+      main: "#2b4b42",
     },
     secondary: {
-      main: "#cd9c9f",
+      main: "#85C3B1",
     },
     ternary: {
-      main: "#fdeae1",
+      main: "#e9f3ea",
     },
     quaternary: {
-      main: "#a24b4d",
+      main: "#47645b",
     },
     background: {
-      default: "#fef3ee",
+      default: "#e2f3ee",
     },
     red: {
       main: "#d1232a",
@@ -32,7 +33,7 @@ const High = createTheme({
     purple: {
       main: "#794a75",
     },
-  },
+  } as ExtendedTheme['palette'],
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     h1: {
@@ -57,4 +58,4 @@ const High = createTheme({
   },
 });
 
-export default High;
+export default Fabula;
