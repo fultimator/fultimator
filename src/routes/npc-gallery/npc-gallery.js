@@ -144,7 +144,9 @@ function Personal({ user }) {
   };
 
   const shareNpc = async (id) => {
-    await navigator.clipboard.writeText(window.location.href + "/" + id);
+    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    const fullUrl = `${baseUrl}/npc-gallery/${id}`;
+    await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
 
@@ -412,7 +414,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Tooltip title="Share URL">
-        <IconButton onClick={() => shareNpc(npc.id)}>
+      <IconButton onClick={() => shareNpc(npc.id)}>
           <Share />
         </IconButton>
       </Tooltip>

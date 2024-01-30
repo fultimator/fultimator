@@ -192,7 +192,9 @@ function Personal({ user }) {
   };
 
   const shareNpc = async (id) => {
-    await navigator.clipboard.writeText(window.location.href + "/" + id);
+    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    const fullUrl = `${baseUrl}/npc-gallery/${id}`;
+    await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
 
