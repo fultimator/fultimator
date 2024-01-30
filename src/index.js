@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider, useTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 
 import Home from "./routes/Home";
 import Generator from "./routes/generator/generator";
@@ -17,12 +17,27 @@ import RollerScoped from "./routes/roller/roller-scoped";
 import Probs from "./routes/probs/probs";
 import Combat from "./routes/combat/combat";
 import Fabula from "./themes/Fabula";
+import High from "./themes/High";
+import Techno from "./themes/Techno";
+import Natural from "./themes/Natural";
+import Midnight from "./themes/Midnight";
+
+import { ThemeProvider as AppThemeProvider, useThemeContext } from './ThemeContext';
+
+const themes = {
+  Fabula,
+  High,
+  Techno,
+  Natural,
+  Midnight,
+};
 
 const App = () => {
+  const { selectedTheme } = useThemeContext();
 
   return (
     <React.StrictMode>
-      <ThemeProvider theme={Fabula}>
+      <ThemeProvider theme={themes[selectedTheme]}>
         <CssBaseline />
         <BrowserRouter>
           <Routes>
@@ -41,6 +56,12 @@ const App = () => {
     </React.StrictMode>
   );
 };
+
+const Root = () => (
+  <AppThemeProvider>
+    <App />
+  </AppThemeProvider>
+);
 
 const root = document.getElementById("root");
 const rootElement = ReactDOM.createRoot(root);
