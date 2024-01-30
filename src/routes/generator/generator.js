@@ -767,7 +767,7 @@ function QualitiesGenerator() {
             background: `linear-gradient(to right, ${ternary}, transparent)`,
             padding: 2,
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-start",
             alignItems: "center",
             mb: 1,
           }}
@@ -775,6 +775,7 @@ function QualitiesGenerator() {
           <Typography
             sx={{
               px: 1,
+              flex: 1,
             }}
           >
             {" "}
