@@ -22,6 +22,7 @@ import {
   Save,
   Share,
   ArrowUpward,
+  ContentCopy
 } from "@mui/icons-material";
 import { useCallback, useEffect, useRef, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
@@ -177,6 +178,23 @@ export default function NpcEdit() {
     });
   };
 
+  const copyNpc = async (npc) => {
+    const data = Object.assign({}, npc);
+    data.uid = user.uid;
+    delete data.id;
+    data.published = false;
+
+    const ref = collection(firestore, "npc-personal");
+
+    addDoc(ref, data)
+      .then(function (docRef) {
+        window.location.href = `/npc-gallery/${docRef.id}`;
+      })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
+  };
+
   const shareNpc = async (id) => {
     await navigator.clipboard.writeText(window.location.href + "/");
   };
@@ -205,6 +223,18 @@ export default function NpcEdit() {
             </IconButton>
           </Tooltip>
           <Export name={`${npc.name}`} data={npc} />
+          {user && user.uid !== npc.uid && (
+            <Tooltip title="Copy and Edit Sheet" placement="bottom">
+              <IconButton
+                aria-label="duplicate"
+                onClick={() => {
+                  copyNpc(npcTemp);
+                }}
+              >
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+          )}
           <Divider />
           {user && user.uid === npc.uid && (
             <div
