@@ -71,6 +71,8 @@ export default function NpcGallery() {
 function Personal({ user }) {
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
+  const [sort, setSort] = useState("name");
+  const [direction, setDirection] = useState("accending");
   const [species, setSpecies] = useState("");
   const [collapse, setCollapse] = useState(false);
 
@@ -162,18 +164,44 @@ function Personal({ user }) {
   }
 
   const filteredList = personalList
-    ? personalList.filter((item) => {
-        if (
-          name !== "" &&
-          !item.name.toLowerCase().includes(name.toLocaleLowerCase())
-        )
-          return false;
+    ? personalList
+        .filter((item) => {
+          if (
+            name !== "" &&
+            !item.name.toLowerCase().includes(name.toLocaleLowerCase())
+          )
+            return false;
 
-        if (species && item.species !== species) return false;
+          if (species && item.species !== species) return false;
 
-        if (rank && item.rank !== rank) return false;
-        return true;
-      })
+          if (rank && item.rank !== rank) return false;
+          return true;
+        })
+        .sort((item1, item2) => {
+          if (direction === "accending") {
+            if (sort === "name") {
+              return item1.name - item2.name;
+            } else if (sort === "level") {
+              return item1.lvl - item2.lvl;
+            } else if (sort === "publishedAt") {
+              return (
+                (item1.publishedAt ? item1.publishedAt : 0) -
+                (item2.publishedAt ? item2.publishedAt : 0)
+              );
+            }
+          } else {
+            if (sort === "name") {
+              return item2.name - item1.name;
+            } else if (sort === "level") {
+              return item2.lvl - item1.lvl;
+            } else if (sort === "publishedAt") {
+              return (
+                (item2.publishedAt ? item2.publishedAt : 0) -
+                (item1.publishedAt ? item1.publishedAt : 0)
+              );
+            }
+          }
+        })
     : [];
 
   return (
@@ -222,7 +250,7 @@ function Personal({ user }) {
             <Grid
               item
               xs={4}
-              md={3}
+              md={1.5}
               alignItems="center"
               justifyContent="center"
               sx={{ display: "flex" }}
@@ -251,7 +279,7 @@ function Personal({ user }) {
             <Grid
               item
               xs={4}
-              md={3}
+              md={1.5}
               alignItems="center"
               justifyContent="center"
               sx={{ display: "flex" }}
@@ -276,6 +304,55 @@ function Personal({ user }) {
                   <MenuItem value={"Monster"}>Monster</MenuItem>
                   <MenuItem value={"Plant"}>Plant</MenuItem>
                   <MenuItem value={"Undead"}>Undead</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              md={1.5}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <FormControl fullWidth size="small">
+                <InputLabel id="sort">Sort:</InputLabel>
+                <Select
+                  labelId="sort"
+                  id="select-sort"
+                  value={sort}
+                  label="Sort:"
+                  onChange={(evt, val2) => {
+                    setSort(evt.target.value);
+                  }}
+                >
+                  <MenuItem value={"name"}>Name</MenuItem>
+                  <MenuItem value={"level"}>Level</MenuItem>
+                  <MenuItem value={"publishedAt"}>Published Date</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              md={1.5}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <FormControl fullWidth size="small">
+                <InputLabel id="direction">Direction:</InputLabel>
+                <Select
+                  labelId="direction"
+                  id="select-direction"
+                  value={direction}
+                  label="direction:"
+                  onChange={(evt, val2) => {
+                    setDirection(evt.target.value);
+                  }}
+                >
+                  <MenuItem value={"accending"}>Accending</MenuItem>
+                  <MenuItem value={"descending"}>Descending</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -414,7 +491,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Tooltip title="Share URL">
-      <IconButton onClick={() => shareNpc(npc.id)}>
+        <IconButton onClick={() => shareNpc(npc.id)}>
           <Share />
         </IconButton>
       </Tooltip>
