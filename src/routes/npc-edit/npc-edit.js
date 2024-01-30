@@ -7,9 +7,9 @@ import {
   Fab,
   Fade,
   Tooltip,
-  Snackbar,
   Button,
   TextField,
+  IconButton,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -20,13 +20,8 @@ import {
   Download,
   Publish,
   Save,
-  Code,
   Share,
   ArrowUpward,
-  Menu,
-  ContentCopy,
-  Close,
-  ContentPaste,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useRef, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
@@ -46,7 +41,7 @@ import Probs from "../../routes/probs/probs";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import useDownloadJSON from "../../hooks/useDownloadJSON";
+import Export from "../../components/Export";
 
 export default function NpcEdit() {
   let params = useParams();
@@ -54,16 +49,6 @@ export default function NpcEdit() {
 
   const [user] = useAuthState(auth);
   const [showScrollTop, setShowScrollTop] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-
-  function handleSnackbarOpen() {
-    setIsSnackbarOpen(true);
-  }
-
-  function handleSnackbarClose() {
-    setIsSnackbarOpen(false);
-  }
 
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -124,34 +109,6 @@ export default function NpcEdit() {
   // Download
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
-  const [downloadJSON, copyJSONToClipboard] = useDownloadJSON(npc?.name, npc);
-
-  const copyNpc = async (npc) => {
-    const data = Object.assign({}, npc);
-    data.uid = user.uid;
-    delete data.id;
-    data.published = false;
-
-    const ref = collection(firestore, "npc-personal");
-
-    addDoc(ref, data)
-      .then(function (docRef) {
-        window.location.href = `/npc-gallery/${docRef.id}`;
-      })
-      .catch(function (error) {
-        console.error("Error adding document: ", error);
-      });
-  };
-
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleClick = () => {
-    setOpen(true);
-  };
 
   if (!npcTemp) {
     return null;
@@ -220,9 +177,12 @@ export default function NpcEdit() {
     });
   };
 
-  function copyToClipboard() {
-    copyJSONToClipboard();
-    handleSnackbarOpen();
+  const shareNpc = async (id) => {
+    await navigator.clipboard.writeText(window.location.href + "/");
+  };
+
+  function DownloadImage() {
+    setTimeout(downloadImage, 100);
   }
 
   return (
@@ -233,6 +193,19 @@ export default function NpcEdit() {
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
+          <Divider sx={{ mt: 1 }} />
+          <Tooltip title="Download as Image">
+            <IconButton onClick={() => { DownloadImage(); }}>
+              <Download />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share URL">
+            <IconButton onClick={() => shareNpc(npc.id)}>
+              <Share />
+            </IconButton>
+          </Tooltip>
+          <Export name={`${npc.name}`} data={npc} />
+          <Divider />
           {user && user.uid === npc.uid && (
             <div
               style={{
@@ -347,7 +320,7 @@ export default function NpcEdit() {
       <Grid
         sx={{
           position: "fixed",
-          top: 10,
+          top: 120,
           right: 10,
           display: "flex",
           flexDirection: "row",
@@ -357,112 +330,10 @@ export default function NpcEdit() {
       >
         {/* SP Tracker Field */}
         <ExplainSkillsSimplified npc={npcTemp} />
-        {/* Collapse for the Buttons */}
-        {!isCollapsed && (
-          <div
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              zIndex: 1000,
-            }}
-          >
-            {/* Export Buttons */}
-            <Tooltip
-              title="Copy JSON to Clipboard"
-              placement="bottom"
-              sx={{ marginLeft: "5px" }}
-            >
-              <Fab
-                color="primary"
-                aria-label="export"
-                onClick={copyToClipboard}
-                size="medium"
-              >
-                <ContentPaste />
-              </Fab>
-            </Tooltip>
-            <Tooltip
-              title="Export JSON File"
-              placement="bottom"
-              sx={{ marginLeft: "5px" }}
-            >
-              <Fab
-                color="primary"
-                aria-label="export"
-                onClick={downloadJSON}
-                size="medium"
-              >
-                <Code />
-              </Fab>
-            </Tooltip>
-            {/* Share Button */}
-            <Tooltip title="Share URL" placement="bottom">
-              <Fab
-                color="primary"
-                aria-label="Share"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(window.location.href);
-                  handleClick();
-                }}
-                size="medium"
-                style={{ marginLeft: "5px" }}
-              >
-                <Share />
-              </Fab>
-            </Tooltip>
-            {/* Download Button */}
-            <Tooltip title="Download Sheet" placement="bottom">
-              <Fab
-                color="primary"
-                aria-label="download"
-                onClick={downloadImage}
-                size="medium"
-                style={{ marginLeft: "5px", zIndex: 1000 }}
-              >
-                <Download />
-              </Fab>
-            </Tooltip>
-
-            {user && user.uid !== npc.uid && (
-              <Tooltip title="Copy and Edit Sheet" placement="bottom">
-                <Fab
-                  color="primary"
-                  aria-label="duplicate"
-                  onClick={() => {
-                    copyNpc(npcTemp);
-                  }}
-                  size="medium"
-                  style={{ marginLeft: "5px", zIndex: 1000 }}
-                >
-                  <ContentCopy />
-                </Fab>
-              </Tooltip>
-            )}
-          </div>
-        )}
-        {/* Collapse Toggle Button */}
-        <Fab
-          color="primary"
-          aria-label="toggle-collapse"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          size="medium"
-          style={{ marginLeft: "5px" }}
-        >
-          {isCollapsed ? <Menu /> : <Close />}
-        </Fab>
       </Grid>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={2000}
-        onClose={handleClose}
-        message="Copied to Clipboard!"
-      />
-
       {isUpdated && (
-        <Grid style={{ position: "fixed", top: 65, right: 10, zIndex: 100 }}>
+        <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">
               <Fab
@@ -483,29 +354,20 @@ export default function NpcEdit() {
         </Grid>
       )}
 
-      <Grid style={{ position: "fixed", bottom: 10, right: 10 }}>
+      <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
         {/* Move to Top Button */}
         <Fade in={showScrollTop} timeout={300}>
-          <div style={{ marginBottom: "5px", zIndex: 100 }}>
-            <Fab
-              color="primary"
-              aria-label="move-to-top"
-              onClick={handleMoveToTop}
-              size="medium"
-            >
-              <ArrowUpward />
-            </Fab>
-          </div>
+          <Fab
+            color="primary"
+            aria-label="move-to-top"
+            onClick={handleMoveToTop}
+            size="medium"
+          >
+            <ArrowUpward />
+          </Fab>
         </Fade>
       </Grid>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={isSnackbarOpen}
-        autoHideDuration={2000}
-        onClose={handleSnackbarClose}
-        message="Copied to Clipboard!"
-      />
     </Layout>
   );
 }
