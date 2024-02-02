@@ -21,13 +21,11 @@ export default function EditExtra({ npc, setNpc }) {
   return (
     <>
       <Grid container sx={{ mt: 2 }}>
-        <Grid item xs={6}>
-          <Defenses npc={npc} setNpc={setNpc} />
-          <SelectArmor npc={npc} setNpc={setNpc} />
-          <SelectShield npc={npc} setNpc={setNpc} />
-        </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Stack spacing={1}>
+            <Defenses npc={npc} setNpc={setNpc} />
+            <SelectArmor npc={npc} setNpc={setNpc} />
+            <SelectShield npc={npc} setNpc={setNpc} />
             <HP npc={npc} setNpc={setNpc} />
             <MP npc={npc} setNpc={setNpc} />
             <ExtraInit npc={npc} setNpc={setNpc} />
@@ -329,10 +327,10 @@ function SelectArmor({ npc, setNpc }) {
   console.debug(armor);
 
   return (
-    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
+    <FormControl fullWidth sx={{ mt: 1 }}>
       <InputLabel id="type">Armor</InputLabel>
       <Select
-        size="small"
+        size="medium"
         labelId="armor"
         id="select-armor"
         value={armor.name}
@@ -377,10 +375,10 @@ function SelectShield({ npc, setNpc }) {
   console.debug(shield);
 
   return (
-    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
+    <FormControl fullWidth sx={{  mt: 1 }}>
       <InputLabel id="type">Shield</InputLabel>
       <Select
-        size="small"
+        size="medium"
         labelId="shield"
         id="select-shield"
         value={shield.name}

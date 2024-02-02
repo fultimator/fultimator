@@ -11,10 +11,13 @@ import {
   Stack,
   TextField,
   Typography,
+  useTheme
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
 
 export default function EditBasics({ npc, setNpc }) {
+  const theme = useTheme();
+  const ternary = theme.palette.ternary.main;
   const onChange = (key) => {
     return (e) => {
       setNpc((prevState) => {
@@ -230,12 +233,12 @@ export default function EditBasics({ npc, setNpc }) {
         </FormControl>
       </Grid>
 
-      <Grid item xs={6}>
+      <Grid item xs={12} sm={6}>
         <EditAttributes npc={npc} setNpc={setNpc} />
       </Grid>
-      <Grid item xs>
+      <Grid item xs={12} sm={6}>
         <Grid item>
-          <Card sx={{ p: 1.61 }}>
+          <Card sx={{ p: 1.61, background: `linear-gradient(to right, ${ternary}, transparent)`, }}>
             <Typography>
               <strong>Jack of All Trades</strong>: d8, d8, d8, d8
             </Typography>

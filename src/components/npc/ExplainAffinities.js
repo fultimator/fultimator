@@ -1,8 +1,10 @@
-import { Card, Typography } from "@mui/material";
+import { Card, Typography, useTheme } from "@mui/material";
 
 export default function ExplainAffinities({ npc }) {
+  const theme = useTheme();
+  const ternary = theme.palette.ternary.main;
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 1.61, background: `linear-gradient(to right, ${ternary}, transparent)`, }}>
       <Typography>Gain 1 skill per vulnerability.</Typography>
       <Typography>Gain 2 skills per physical vulnerability.</Typography>
       <Typography>Use 0.5 skill per Resistance </Typography>

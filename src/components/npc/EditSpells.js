@@ -171,7 +171,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </FormControl>
         </Grid>
       )}
-      <Grid item xs={4} md={2} lg={1}>
+      <Grid item xs={2} md={2} lg={1}>
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="mp"

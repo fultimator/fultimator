@@ -10,6 +10,9 @@ import {
   Button,
   TextField,
   IconButton,
+  Paper,
+  Typography,
+  useTheme
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -43,8 +46,14 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { transform } from "typescript";
 
 export default function NpcEdit() {
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
+  const quaternary = theme.palette.quaternary.main;
   let params = useParams();
   const ref = doc(firestore, "npc-personal", params.npcId);
 
@@ -211,7 +220,7 @@ export default function NpcEdit() {
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
-          <Divider sx={{ mt: 1 }} />
+          <Divider sx={{ my: 1 }} />
           <Tooltip title="Download as Image">
             <IconButton onClick={() => { DownloadImage(); }}>
               <Download />
@@ -235,113 +244,136 @@ export default function NpcEdit() {
               </IconButton>
             </Tooltip>
           )}
-          <Divider />
-          {user && user.uid === npc.uid && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <TextField
-                id="outlined-basic"
-                label="Created By:"
-                sx={{ marginTop: 2 }}
-                size="small"
-                helperText={
-                  npcTemp.published
-                    ? "This NPC is part of the Adversary Compedium."
-                    : "Help the Adversary Compedium grow by publishing your finished work!"
-                }
-                fullWidth
-                value={npcTemp.createdBy}
-                onChange={(evt) => {
-                  updateNPC({ ...npcTemp, createdBy: evt.target.value });
+          <Divider sx={{ my: 1 }} />
+          <Paper elevation={3} sx={{ p: '10px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            {user && user.uid === npc.uid && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
-              />
-              {!npcTemp.published && (
-                <Button
-                  variant="contained"
-                  sx={{ marginTop: 1 }}
-                  startIcon={<Publish />}
-                  disabled={canPublish().disabled}
-                  onClick={publish}
-                >
-                  Publish to Adversary Compendium
-                </Button>
-              )}
-              {npcTemp.published && (
-                <Button
-                  variant="outlined"
-                  sx={{ marginTop: 1 }}
-                  onClick={unPublish}
-                >
-                  Unpublish
-                </Button>
-              )}
-              {canPublish().disabled && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    textAlign: "center",
-                    marginTop: 4,
-                    color: "red",
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Created By:"
+                  sx={{ marginTop: 2 }}
+                  size="small"
+                  helperText={
+                    npcTemp.published
+                      ? "This NPC is part of the Adversary Compedium."
+                      : "Help the Adversary Compedium grow by publishing your finished work!"
+                  }
+                  fullWidth
+                  value={npcTemp.createdBy}
+                  onChange={(evt) => {
+                    updateNPC({ ...npcTemp, createdBy: evt.target.value });
                   }}
-                >
-                  {canPublish().message}
-                </div>
-              )}
-            </div>
-          )}
+                />
+                {!npcTemp.published && (
+                  <Button
+                    variant="contained"
+                    sx={{ marginTop: 1 }}
+                    startIcon={<Publish />}
+                    disabled={canPublish().disabled}
+                    onClick={publish}
+                  >
+                    Publish to Adversary Compendium
+                  </Button>
+                )}
+                {npcTemp.published && (
+                  <Button
+                    variant="outlined"
+                    sx={{ marginTop: 1 }}
+                    onClick={unPublish}
+                  >
+                    Unpublish
+                  </Button>
+                )}
+                {canPublish().disabled && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      textAlign: "center",
+                      marginTop: 4,
+                      color: "red",
+                    }}
+                  >
+                    {canPublish().message}
+                  </div>
+                )}
+              </div>
+            )}
+          </Paper>
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
 
       {user && user.uid === npc.uid && (
         <>
-          <EditBasics npc={npcTemp} setNpc={updateNPC} />
+          <Paper elevation={3} sx={{ borderRadius: '16px', border: '3px solid', borderColor: secondary, padding: '20px' }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Basic Information</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <EditBasics npc={npcTemp} setNpc={updateNPC} />
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <EditAffinities npc={npcTemp} setNpc={updateNPC} />
+          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Affinity</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <ExplainAffinities npc={npcTemp} />
+                <EditAffinities npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditExtra npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <ExplainAffinities npc={npcTemp} />
-              <EditExtra npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-          </Grid>
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <EditAttacks npc={npcTemp} setNpc={updateNPC} />
-          <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
+          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Attacks</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <Grid container>
+              <Grid item xs={12}><EditAttacks npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12}><EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} /></Grid>
+            </Grid>
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <EditSpells npc={npcTemp} setNpc={updateNPC} />
+          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Spells</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <EditSpells npc={npcTemp} setNpc={updateNPC} />
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <EditActions npc={npcTemp} setNpc={updateNPC} />
+          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Features</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <Grid container>
+              <Grid item xs={12} md={6}><EditActions npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12} md={6}><EditSpecial npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12} md={6}><EditRareGear npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12} md={6}><EditNotes npc={npcTemp} setNpc={updateNPC} /></Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <EditSpecial npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <EditRareGear npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <EditNotes npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-          </Grid>
+          </Paper>
+
           <Divider sx={{ my: 2 }} />
-          <Probs />
-          <Divider sx={{ my: 2, marginBottom: 20 }} />
+
+          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Attacks Chance Generator</Typography>
+            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+            <Probs />
+          </Paper>
+
+          <Divider sx={{ my: 2, mb: 20 }} />
         </>
       )}
 

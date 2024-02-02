@@ -61,6 +61,7 @@ export default function EditActions({ npc, setNpc }) {
             <Grid item xs={10} lg={4}>
               <FormControl variant="standard" fullWidth>
                 <TextField
+                  multiline
                   id="name"
                   label="Name:"
                   value={actions.name}
@@ -68,10 +69,11 @@ export default function EditActions({ npc, setNpc }) {
                     return onChangeActions(i, "name", e.target.value);
                   }}
                   size="small"
+                  sx={{ mb: 2 }}
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12} lg={7}>
+            <Grid item xs={12} lg={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline

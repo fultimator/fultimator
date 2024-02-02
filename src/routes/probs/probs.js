@@ -107,7 +107,6 @@ export default function Probs() {
 
   return (
     <div>
-      <Typography variant="h5">Attack Chance Calculator</Typography>
       <Grid container sx={{ mt: 2, gap: 2 }}>
         {/* First die */}
         <Grid item xs>
