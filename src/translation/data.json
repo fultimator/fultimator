@@ -1,0 +1,392 @@
+[
+  {
+    "key": "If you have any feedback, give us your thoughts here",
+    "en": "If you have any feedback, give us your thoughts here",
+    "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
+    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken"
+  },
+  {
+    "key": "Google Form.",
+    "en": "Google Form.",
+    "it": "Modulo di Google.",
+    "de": "Google Form."
+  },
+  {
+    "key": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "en": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
+    "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:"
+  },
+  {
+    "key": "Monster Icons are taken from:",
+    "en": "Monster Icons are taken from:",
+    "it": "Le icone dei mostri sono prelevate da:",
+    "de": "Monster -Ikonen stammen aus:"
+  },
+  {
+    "key": "Set name to display here:",
+    "en": "Set name to display here:",
+    "it": "Imposta il nome da visualizzare qui:",
+    "de": "Stellen Sie den Namen fest, um hier anzuzeigen:"
+  },
+  {
+    "key": "Left-click on a die to add it to your pool",
+    "en": "Left-click on a die to add it to your pool",
+    "it": "Fai clic con il tasto sinistro su un dado per aggiungerlo alla piscina",
+    "de": "Klicken Sie mit der linken Maustaste auf einen Würfel, um es Ihrem Pool hinzuzufügen"
+  },
+  {
+    "key": "Rituals",
+    "en": "Rituals",
+    "it": "Rituali",
+    "de": "Rituale"
+  },
+  {
+    "key": "Potency",
+    "en": "Potency",
+    "it": "Potenza",
+    "de": "Potenz"
+  },
+  {
+    "key": "Minor",
+    "en": "Minor",
+    "it": "Minore",
+    "de": "Unerheblich"
+  },
+  {
+    "key": "Medium",
+    "en": "Medium",
+    "it": "medio",
+    "de": "Mittel"
+  },
+  {
+    "key": "Major",
+    "en": "Major",
+    "it": "Maggiore",
+    "de": "Wesentlich"
+  },
+  {
+    "key": "Extreme",
+    "en": "Extreme",
+    "it": "Estremo",
+    "de": "Extrem"
+  },
+  {
+    "key": "Area",
+    "en": "Area",
+    "it": "La zona",
+    "de": "Bereich"
+  },
+  {
+    "key": "Individual",
+    "en": "Individual",
+    "it": "Individuale",
+    "de": "Individuell"
+  },
+  {
+    "key": "Small",
+    "en": "Small",
+    "it": "Piccolo",
+    "de": "Klein"
+  },
+  {
+    "key": "Large",
+    "en": "Large",
+    "it": "Grande",
+    "de": "Groß"
+  },
+  {
+    "key": "Huge",
+    "en": "Huge",
+    "it": "Enorme",
+    "de": "Riesig"
+  },
+  {
+    "key": "Reductions",
+    "en": "Reductions",
+    "it": "Riduzioni",
+    "de": "Reduzierungen"
+  },
+  {
+    "key": "Using special ingredient",
+    "en": "Using special ingredient",
+    "it": "Usando ingrediente speciale",
+    "de": "Mit besonderer Zutat"
+  },
+  {
+    "key": "Relevant item held",
+    "en": "Relevant item held",
+    "it": "Articolo pertinente detenuto",
+    "de": "Relevanter Artikel gehalten"
+  },
+  {
+    "key": "Fast Ritual",
+    "en": "Fast Ritual",
+    "it": "Rituale veloce",
+    "de": "Schnelles Ritual"
+  },
+  {
+    "key": "MP",
+    "en": "MP",
+    "it": "Mp",
+    "de": "MP"
+  },
+  {
+    "key": "DL",
+    "en": "DL",
+    "it": "Dl",
+    "de": "Dl"
+  },
+  {
+    "key": "Clock",
+    "en": "Clock",
+    "it": "Orologio",
+    "de": "Uhr"
+  },
+  {
+    "key": "Rituals",
+    "en": "Rituals",
+    "it": "Rituali",
+    "de": "Rituale"
+  },
+  {
+    "key": "Potency",
+    "en": "Potency",
+    "it": "Potenza",
+    "de": "Potenz"
+  },
+  {
+    "key": "Minor",
+    "en": "Minor",
+    "it": "Minore",
+    "de": "Unerheblich"
+  },
+  {
+    "key": "Medium",
+    "en": "Medium",
+    "it": "medio",
+    "de": "Mittel"
+  },
+  {
+    "key": "Major",
+    "en": "Major",
+    "it": "Maggiore",
+    "de": "Wesentlich"
+  },
+  {
+    "key": "Extreme",
+    "en": "Extreme",
+    "it": "Estremo",
+    "de": "Extrem"
+  },
+  {
+    "key": "Area",
+    "en": "Area",
+    "it": "La zona",
+    "de": "Bereich"
+  },
+  {
+    "key": "Individual",
+    "en": "Individual",
+    "it": "Individuale",
+    "de": "Individuell"
+  },
+  {
+    "key": "Small",
+    "en": "Small",
+    "it": "Piccolo",
+    "de": "Klein"
+  },
+  {
+    "key": "Large",
+    "en": "Large",
+    "it": "Grande",
+    "de": "Groß"
+  },
+  {
+    "key": "Huge",
+    "en": "Huge",
+    "it": "Enorme",
+    "de": "Riesig"
+  },
+  {
+    "key": "Reductions",
+    "en": "Reductions",
+    "it": "Riduzioni",
+    "de": "Reduzierungen"
+  },
+  {
+    "key": "Using special ingredient",
+    "en": "Using special ingredient",
+    "it": "Usando ingrediente speciale",
+    "de": "Mit besonderer Zutat"
+  },
+  {
+    "key": "Relevant item held",
+    "en": "Relevant item held",
+    "it": "Articolo pertinente detenuto",
+    "de": "Relevanter Artikel gehalten"
+  },
+  {
+    "key": "Fast Ritual",
+    "en": "Fast Ritual",
+    "it": "Rituale veloce",
+    "de": "Schnelles Ritual"
+  },
+  {
+    "key": "MP",
+    "en": "MP",
+    "it": "Mp",
+    "de": "MP"
+  },
+  {
+    "key": "DL",
+    "en": "DL",
+    "it": "Dl",
+    "de": "Dl"
+  },
+  {
+    "key": "Clock",
+    "en": "Clock",
+    "it": "Orologio",
+    "de": "Uhr"
+  },
+  {
+    "key": "Projects",
+    "en": "Projects",
+    "it": "Progetti",
+    "de": "Projekte"
+  },
+  {
+    "key": "Potency",
+    "en": "Potency",
+    "it": "Potenza",
+    "de": "Potenz"
+  },
+  {
+    "key": "Minor",
+    "en": "Minor",
+    "it": "Minore",
+    "de": "Unerheblich"
+  },
+  {
+    "key": "Medium",
+    "en": "Medium",
+    "it": "medio",
+    "de": "Mittel"
+  },
+  {
+    "key": "Major",
+    "en": "Major",
+    "it": "Maggiore",
+    "de": "Wesentlich"
+  },
+  {
+    "key": "Extreme",
+    "en": "Extreme",
+    "it": "Estremo",
+    "de": "Extrem"
+  },
+  {
+    "key": "Area",
+    "en": "Area",
+    "it": "La zona",
+    "de": "Bereich"
+  },
+  {
+    "key": "Individual",
+    "en": "Individual",
+    "it": "Individuale",
+    "de": "Individuell"
+  },
+  {
+    "key": "Small",
+    "en": "Small",
+    "it": "Piccolo",
+    "de": "Klein"
+  },
+  {
+    "key": "Large",
+    "en": "Large",
+    "it": "Grande",
+    "de": "Groß"
+  },
+  {
+    "key": "Huge",
+    "en": "Huge",
+    "it": "Enorme",
+    "de": "Riesig"
+  },
+  {
+    "key": "Projects",
+    "en": "Projects",
+    "it": "Progetti",
+    "de": "Projekte"
+  },
+  {
+    "key": "Potency",
+    "en": "Potency",
+    "it": "Potenza",
+    "de": "Potenz"
+  },
+  {
+    "key": "Minor",
+    "en": "Minor",
+    "it": "Minore",
+    "de": "Unerheblich"
+  },
+  {
+    "key": "Medium",
+    "en": "Medium",
+    "it": "medio",
+    "de": "Mittel"
+  },
+  {
+    "key": "Major",
+    "en": "Major",
+    "it": "Maggiore",
+    "de": "Wesentlich"
+  },
+  {
+    "key": "Extreme",
+    "en": "Extreme",
+    "it": "Estremo",
+    "de": "Extrem"
+  },
+  {
+    "key": "Area",
+    "en": "Area",
+    "it": "La zona",
+    "de": "Bereich"
+  },
+  {
+    "key": "Individual",
+    "en": "Individual",
+    "it": "Individuale",
+    "de": "Individuell"
+  },
+  {
+    "key": "Small",
+    "en": "Small",
+    "it": "Piccolo",
+    "de": "Klein"
+  },
+  {
+    "key": "Large",
+    "en": "Large",
+    "it": "Grande",
+    "de": "Groß"
+  },
+  {
+    "key": "Huge",
+    "en": "Huge",
+    "it": "Enorme",
+    "de": "Riesig"
+  },
+  {
+    "key": "",
+    "en": "",
+    "it": "#VALUE!",
+    "de": "#VALUE!"
+  }
+]

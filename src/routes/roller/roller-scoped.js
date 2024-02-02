@@ -21,6 +21,7 @@ import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
 import Roll from "../../components/roller/Roll";
 import ShareLink from "../../components/roller/ShareLink";
+import { t } from "../../translation/translate";
 
 function RollerScoped() {
   const [user, loading, error] = useAuthState(auth);
@@ -122,11 +123,11 @@ function RollerScopedAuthenticated({ user }) {
         <Grid item xs={12} sm={3} sx={{ order: 1 }}>
           <Card sx={{ p: 2 }}>
             <Typography sx={{ marginBottom: "8px" }}>
-              Set name to display here:
+              {t("Set name to display here:")}
             </Typography>
             <TextField
               id="name"
-              label="Name:"
+              label={t("Name:")}
               value={name}
               onChange={(e) => {
                 return setName(e.target.value);
@@ -139,11 +140,11 @@ function RollerScopedAuthenticated({ user }) {
         <Grid item sx={{ order: 2 }}>
           <Card sx={{ p: 2 }}>
             <Typography>
-              Left-click on a die to add it to your pool
+              {t("Left-click on a die to add it to your pool")}
               <br />
-              Right-click a die to remove it from your hand
+              {t("Right-click a die to remove it from your hand")}
               <br />
-              Press enter to roll
+              {t("Press enter to roll")}
             </Typography>
           </Card>
         </Grid>
@@ -200,7 +201,7 @@ function PreparedRolls({ user, scope, createRoll }) {
 
   return (
     <Card sx={{ p: 1 }}>
-      <Typography variant="h4">Prepared Rolls</Typography>
+      <Typography variant="h4">{t("Prepared Rolls")}</Typography>
       <PreparedRollsList
         rolls={rolls}
         handleRoll={handleRoll}

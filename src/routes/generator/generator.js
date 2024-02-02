@@ -25,6 +25,7 @@ import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
+import { t } from "../../translation/translate";
 
 const powerPMs = {
   minor: 20,
@@ -126,9 +127,9 @@ function Rituals() {
   const [itemHeld, setItemHeld] = useState(false);
   const [dlReduction, setDLReduction] = useState(2);
   const [fastRitual, setFastRitual] = useState(false);
-  const ingredientMod = ingredient ? 0.50 : 1;
+  const ingredientMod = ingredient ? 0.5 : 1;
   const itemHeldMod = itemHeld ? dlReduction : 0;
-   
+
   function calcPM() {
     return powerPMs[power] * areaPMs[area] * ingredientMod;
   }
@@ -156,7 +157,7 @@ function Rituals() {
         }}
       >
         <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-        Rituals
+        {t("Rituals")}
       </Typography>
       <Paper
         sx={{
@@ -169,7 +170,7 @@ function Rituals() {
         <Grid container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Potency</FormLabel>
+              <FormLabel component="legend">{t("Potency")}</FormLabel>
               <RadioGroup
                 aria-label="power"
                 name="power-group"
@@ -181,29 +182,29 @@ function Rituals() {
                 <FormControlLabel
                   value="minor"
                   control={<Radio />}
-                  label="Minor"
+                  label={t("Minor")}
                 />
                 <FormControlLabel
                   value="medium"
                   control={<Radio />}
-                  label="Medium"
+                  label={t("Medium")}
                 />
                 <FormControlLabel
                   value="major"
                   control={<Radio />}
-                  label="Major"
+                  label={t("Major")}
                 />
                 <FormControlLabel
                   value="extreme"
                   control={<Radio />}
-                  label="Extreme"
+                  label={t("Extreme")}
                 />
               </RadioGroup>
             </FormControl>
           </Grid>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Area</FormLabel>
+              <FormLabel component="legend">{t("Area")}</FormLabel>
               <RadioGroup
                 aria-label="area"
                 name="area-group"
@@ -215,36 +216,36 @@ function Rituals() {
                 <FormControlLabel
                   value="individual"
                   control={<Radio />}
-                  label="Individual"
+                  label={t("Individual")}
                 />
                 <FormControlLabel
                   value="small"
                   control={<Radio />}
-                  label="Small"
+                  label={t("Small")}
                 />
                 <FormControlLabel
                   value="large"
                   control={<Radio />}
-                  label="Large"
+                  label={t("Large")}
                 />
                 <FormControlLabel
                   value="huge"
                   control={<Radio />}
-                  label="Huge"
+                  label={t("Huge")}
                 />
               </RadioGroup>
             </FormControl>
           </Grid>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Reductions</FormLabel>
+              <FormLabel component="legend">{t("Reductions")}</FormLabel>
 
               <FormControlLabel
                 control={<Checkbox value={ingredient} />}
                 onChange={(e) => {
                   setIngredient(e.target.checked);
                 }}
-                label="Using special ingredient"
+                label={t("Using special ingredient")}
               />
 
               <FormControlLabel
@@ -252,11 +253,13 @@ function Rituals() {
                 onChange={(e) => {
                   setItemHeld(e.target.checked);
                 }}
-                label="Relevant item held"
+                label={t("Relevant item held")}
               />
               {itemHeld && (
                 <FormControl variant="standard" fullWidth>
-                  <InputLabel htmlFor="dlReduction">DL Reduction</InputLabel>
+                  <InputLabel htmlFor="dlReduction">
+                    {t("DL Reduction")}
+                  </InputLabel>
                   <Input
                     id="dlReduction"
                     type="number"
@@ -266,13 +269,12 @@ function Rituals() {
                 </FormControl>
               )}
 
-
               <FormControlLabel
                 control={<Checkbox value={fastRitual} />}
                 onChange={(e) => {
                   setFastRitual(e.target.checked);
                 }}
-                label="Fast Ritual"
+                label={t("Fast Ritual")}
               />
             </FormControl>
           </Grid>
@@ -280,13 +282,19 @@ function Rituals() {
         <Divider />
         <Grid container sx={{ m: 1 }}>
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{calcPM()} MP</Typography>
+            <Typography fontWeight="bold">
+              {calcPM()} {t("MP")}
+            </Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{calcLD()} DL</Typography>
+            <Typography fontWeight="bold">
+              {calcLD()} {t("DL")}
+            </Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography fontWeight="bold">Clock {calcClock()}</Typography>
+            <Typography fontWeight="bold">
+              {t("Clock")} {calcClock()}
+            </Typography>
           </Grid>
         </Grid>
       </Paper>
@@ -326,7 +334,7 @@ function Projects() {
         }}
       >
         <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-        Projects
+        {t("Projects")}
       </Typography>
       <Paper
         sx={{
@@ -339,7 +347,7 @@ function Projects() {
         <Grid container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Potency</FormLabel>
+              <FormLabel component="legend">{t("Potency")}</FormLabel>
               <RadioGroup
                 aria-label="power"
                 name="power-group"
@@ -351,29 +359,29 @@ function Projects() {
                 <FormControlLabel
                   value="minor"
                   control={<Radio />}
-                  label="Minor"
+                  label={t("Minor")}
                 />
                 <FormControlLabel
                   value="medium"
                   control={<Radio />}
-                  label="Medium"
+                  label={t("Medium")}
                 />
                 <FormControlLabel
                   value="major"
                   control={<Radio />}
-                  label="Major"
+                  label={t("Major")}
                 />
                 <FormControlLabel
                   value="extreme"
                   control={<Radio />}
-                  label="Extreme"
+                  label={t("Extreme")}
                 />
               </RadioGroup>
             </FormControl>
           </Grid>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Area</FormLabel>
+              <FormLabel component="legend">{t("Area")}</FormLabel>
               <RadioGroup
                 aria-label="area"
                 name="area-group"
@@ -385,29 +393,29 @@ function Projects() {
                 <FormControlLabel
                   value="individual"
                   control={<Radio />}
-                  label="Individual"
+                  label={t("Individual")}
                 />
                 <FormControlLabel
                   value="small"
                   control={<Radio />}
-                  label="Small"
+                  label={t("Small")}
                 />
                 <FormControlLabel
                   value="large"
                   control={<Radio />}
-                  label="Large"
+                  label={t("Large")}
                 />
                 <FormControlLabel
                   value="huge"
                   control={<Radio />}
-                  label="Huge"
+                  label={t("Huge")}
                 />
               </RadioGroup>
             </FormControl>
           </Grid>
           <Grid item xs={4}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Uses</FormLabel>
+              <FormLabel component="legend">{t("Uses")}</FormLabel>
               <RadioGroup
                 aria-label="uses"
                 name="uses-group"
@@ -419,12 +427,12 @@ function Projects() {
                 <FormControlLabel
                   value="consumable"
                   control={<Radio />}
-                  label="Consumable"
+                  label={t("Consumable")}
                 />
                 <FormControlLabel
                   value="permanent"
                   control={<Radio />}
-                  label="Permanent"
+                  label={t("Permanent")}
                 />
               </RadioGroup>
               <br />
@@ -433,7 +441,7 @@ function Projects() {
                 onChange={(e) => {
                   setDefect(e.target.checked);
                 }}
-                label="Has terrible flaw"
+                label={t("Has terrible flaw")}
               />
             </FormControl>
           </Grid>
@@ -444,7 +452,7 @@ function Projects() {
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="tinkerers"
-                label="Number of Tinkerers"
+                label={t("Number of Tinkerers")}
                 type="number"
                 size="small"
                 min={1}
@@ -462,7 +470,7 @@ function Projects() {
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="helpers"
-                label="Number of Hired Helpers"
+                label={t("Number of Hired Helpers")}
                 type="number"
                 size="small"
                 min={1}
@@ -480,7 +488,7 @@ function Projects() {
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="visionary"
-                label="Levels in Visionary"
+                label={t("Levels in Visionary")}
                 type="number"
                 size="small"
                 min={1}
@@ -495,25 +503,30 @@ function Projects() {
             </FormControl>
           </Grid>
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{cost} Zenit</Typography>
+            <Typography fontWeight="bold">
+              {cost} {t("Zenit")}
+            </Typography>
             {visionary > 0 && (
               <Typography fontWeight="bold">
-                {visionary * 100} Cost covered by Visionary
+                {visionary * 100} {t("Cost covered by Visionary")}
               </Typography>
             )}
           </Grid>
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{progress} Progress</Typography>
+            <Typography fontWeight="bold">
+              {progress} {t("Progress")}
+            </Typography>
           </Grid>
           <Grid item xs={4}>
             {days < 1 && (
               <Typography fontWeight="bold">
-                Number of days {Math.ceil(days)}
+                {t("Number of days")} {Math.ceil(days)}
               </Typography>
             )}
             {days >= 1 && (
               <Typography fontWeight="bold">
-                {progressPerDay} progress per day / {Math.ceil(days)} days
+                {progressPerDay} {t("progress per day")}/ {Math.ceil(days)}{" "}
+                {t("days")}
               </Typography>
             )}
           </Grid>
