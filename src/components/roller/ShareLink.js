@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Close, ContentCopy } from "@mui/icons-material";
+import { t } from "../../translation/translate";
 
 export default function ShareLink({ scope }) {
   const url = window.location.origin + "/roller/" + scope;
@@ -26,7 +27,7 @@ export default function ShareLink({ scope }) {
   return (
     <Card sx={{ p: 2, width: "100%", margin: "0 auto" }}>
       <Typography sx={{ mb: 1 }}>
-        Share this url to other players to see rolls:
+        {t("Share this url to other players to see rolls:")}
       </Typography>
       <TextField
         fullWidth
