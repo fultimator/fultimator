@@ -22,7 +22,10 @@ import Techno from "./themes/Techno";
 import Natural from "./themes/Natural";
 import Midnight from "./themes/Midnight";
 
-import { ThemeProvider as AppThemeProvider, useThemeContext } from './ThemeContext';
+import {
+  ThemeProvider as AppThemeProvider,
+  useThemeContext,
+} from "./ThemeContext";
 
 const themes = {
   Fabula,
@@ -48,7 +51,6 @@ const App = () => {
             <Route path="/generate" element={<Generator />} />
             <Route path="/roller" element={<Roller />} />
             <Route path="/roller/:scope" element={<RollerScoped />} />
-            <Route path="/probs" element={<Probs />} />
             <Route path="/combat" element={<Combat />} />
           </Routes>
         </BrowserRouter>

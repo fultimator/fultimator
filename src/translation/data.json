@@ -1,389 +1,5 @@
 [
   {
-    "key": "If you have any feedback, give us your thoughts here",
-    "en": "If you have any feedback, give us your thoughts here",
-    "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
-    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken"
-  },
-  {
-    "key": "Google Form.",
-    "en": "Google Form.",
-    "it": "Modulo di Google.",
-    "de": "Google Form."
-  },
-  {
-    "key": "The wonderful Fultimator Icons are made by Runty! Email:",
-    "en": "The wonderful Fultimator Icons are made by Runty! Email:",
-    "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
-    "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:"
-  },
-  {
-    "key": "Monster Icons are taken from:",
-    "en": "Monster Icons are taken from:",
-    "it": "Le icone dei mostri sono prelevate da:",
-    "de": "Monster -Ikonen stammen aus:"
-  },
-  {
-    "key": "Set name to display here:",
-    "en": "Set name to display here:",
-    "it": "Imposta il nome da visualizzare qui:",
-    "de": "Stellen Sie den Namen fest, um hier anzuzeigen:"
-  },
-  {
-    "key": "Left-click on a die to add it to your pool",
-    "en": "Left-click on a die to add it to your pool",
-    "it": "Fai clic con il tasto sinistro su un dado per aggiungerlo alla piscina",
-    "de": "Klicken Sie mit der linken Maustaste auf einen Würfel, um es Ihrem Pool hinzuzufügen"
-  },
-  {
-    "key": "Rituals",
-    "en": "Rituals",
-    "it": "Rituali",
-    "de": "Rituale"
-  },
-  {
-    "key": "Potency",
-    "en": "Potency",
-    "it": "Potenza",
-    "de": "Potenz"
-  },
-  {
-    "key": "Minor",
-    "en": "Minor",
-    "it": "Minore",
-    "de": "Unerheblich"
-  },
-  {
-    "key": "Medium",
-    "en": "Medium",
-    "it": "medio",
-    "de": "Mittel"
-  },
-  {
-    "key": "Major",
-    "en": "Major",
-    "it": "Maggiore",
-    "de": "Wesentlich"
-  },
-  {
-    "key": "Extreme",
-    "en": "Extreme",
-    "it": "Estremo",
-    "de": "Extrem"
-  },
-  {
-    "key": "Area",
-    "en": "Area",
-    "it": "La zona",
-    "de": "Bereich"
-  },
-  {
-    "key": "Individual",
-    "en": "Individual",
-    "it": "Individuale",
-    "de": "Individuell"
-  },
-  {
-    "key": "Small",
-    "en": "Small",
-    "it": "Piccolo",
-    "de": "Klein"
-  },
-  {
-    "key": "Large",
-    "en": "Large",
-    "it": "Grande",
-    "de": "Groß"
-  },
-  {
-    "key": "Huge",
-    "en": "Huge",
-    "it": "Enorme",
-    "de": "Riesig"
-  },
-  {
-    "key": "Reductions",
-    "en": "Reductions",
-    "it": "Riduzioni",
-    "de": "Reduzierungen"
-  },
-  {
-    "key": "Using special ingredient",
-    "en": "Using special ingredient",
-    "it": "Usando ingrediente speciale",
-    "de": "Mit besonderer Zutat"
-  },
-  {
-    "key": "Relevant item held",
-    "en": "Relevant item held",
-    "it": "Articolo pertinente detenuto",
-    "de": "Relevanter Artikel gehalten"
-  },
-  {
-    "key": "Fast Ritual",
-    "en": "Fast Ritual",
-    "it": "Rituale veloce",
-    "de": "Schnelles Ritual"
-  },
-  {
-    "key": "MP",
-    "en": "MP",
-    "it": "Mp",
-    "de": "MP"
-  },
-  {
-    "key": "DL",
-    "en": "DL",
-    "it": "Dl",
-    "de": "Dl"
-  },
-  {
-    "key": "Clock",
-    "en": "Clock",
-    "it": "Orologio",
-    "de": "Uhr"
-  },
-  {
-    "key": "Rituals",
-    "en": "Rituals",
-    "it": "Rituali",
-    "de": "Rituale"
-  },
-  {
-    "key": "Potency",
-    "en": "Potency",
-    "it": "Potenza",
-    "de": "Potenz"
-  },
-  {
-    "key": "Minor",
-    "en": "Minor",
-    "it": "Minore",
-    "de": "Unerheblich"
-  },
-  {
-    "key": "Medium",
-    "en": "Medium",
-    "it": "medio",
-    "de": "Mittel"
-  },
-  {
-    "key": "Major",
-    "en": "Major",
-    "it": "Maggiore",
-    "de": "Wesentlich"
-  },
-  {
-    "key": "Extreme",
-    "en": "Extreme",
-    "it": "Estremo",
-    "de": "Extrem"
-  },
-  {
-    "key": "Area",
-    "en": "Area",
-    "it": "La zona",
-    "de": "Bereich"
-  },
-  {
-    "key": "Individual",
-    "en": "Individual",
-    "it": "Individuale",
-    "de": "Individuell"
-  },
-  {
-    "key": "Small",
-    "en": "Small",
-    "it": "Piccolo",
-    "de": "Klein"
-  },
-  {
-    "key": "Large",
-    "en": "Large",
-    "it": "Grande",
-    "de": "Groß"
-  },
-  {
-    "key": "Huge",
-    "en": "Huge",
-    "it": "Enorme",
-    "de": "Riesig"
-  },
-  {
-    "key": "Reductions",
-    "en": "Reductions",
-    "it": "Riduzioni",
-    "de": "Reduzierungen"
-  },
-  {
-    "key": "Using special ingredient",
-    "en": "Using special ingredient",
-    "it": "Usando ingrediente speciale",
-    "de": "Mit besonderer Zutat"
-  },
-  {
-    "key": "Relevant item held",
-    "en": "Relevant item held",
-    "it": "Articolo pertinente detenuto",
-    "de": "Relevanter Artikel gehalten"
-  },
-  {
-    "key": "Fast Ritual",
-    "en": "Fast Ritual",
-    "it": "Rituale veloce",
-    "de": "Schnelles Ritual"
-  },
-  {
-    "key": "MP",
-    "en": "MP",
-    "it": "Mp",
-    "de": "MP"
-  },
-  {
-    "key": "DL",
-    "en": "DL",
-    "it": "Dl",
-    "de": "Dl"
-  },
-  {
-    "key": "Clock",
-    "en": "Clock",
-    "it": "Orologio",
-    "de": "Uhr"
-  },
-  {
-    "key": "Projects",
-    "en": "Projects",
-    "it": "Progetti",
-    "de": "Projekte"
-  },
-  {
-    "key": "Potency",
-    "en": "Potency",
-    "it": "Potenza",
-    "de": "Potenz"
-  },
-  {
-    "key": "Minor",
-    "en": "Minor",
-    "it": "Minore",
-    "de": "Unerheblich"
-  },
-  {
-    "key": "Medium",
-    "en": "Medium",
-    "it": "medio",
-    "de": "Mittel"
-  },
-  {
-    "key": "Major",
-    "en": "Major",
-    "it": "Maggiore",
-    "de": "Wesentlich"
-  },
-  {
-    "key": "Extreme",
-    "en": "Extreme",
-    "it": "Estremo",
-    "de": "Extrem"
-  },
-  {
-    "key": "Area",
-    "en": "Area",
-    "it": "La zona",
-    "de": "Bereich"
-  },
-  {
-    "key": "Individual",
-    "en": "Individual",
-    "it": "Individuale",
-    "de": "Individuell"
-  },
-  {
-    "key": "Small",
-    "en": "Small",
-    "it": "Piccolo",
-    "de": "Klein"
-  },
-  {
-    "key": "Large",
-    "en": "Large",
-    "it": "Grande",
-    "de": "Groß"
-  },
-  {
-    "key": "Huge",
-    "en": "Huge",
-    "it": "Enorme",
-    "de": "Riesig"
-  },
-  {
-    "key": "Projects",
-    "en": "Projects",
-    "it": "Progetti",
-    "de": "Projekte"
-  },
-  {
-    "key": "Potency",
-    "en": "Potency",
-    "it": "Potenza",
-    "de": "Potenz"
-  },
-  {
-    "key": "Minor",
-    "en": "Minor",
-    "it": "Minore",
-    "de": "Unerheblich"
-  },
-  {
-    "key": "Medium",
-    "en": "Medium",
-    "it": "medio",
-    "de": "Mittel"
-  },
-  {
-    "key": "Major",
-    "en": "Major",
-    "it": "Maggiore",
-    "de": "Wesentlich"
-  },
-  {
-    "key": "Extreme",
-    "en": "Extreme",
-    "it": "Estremo",
-    "de": "Extrem"
-  },
-  {
-    "key": "Area",
-    "en": "Area",
-    "it": "La zona",
-    "de": "Bereich"
-  },
-  {
-    "key": "Individual",
-    "en": "Individual",
-    "it": "Individuale",
-    "de": "Individuell"
-  },
-  {
-    "key": "Small",
-    "en": "Small",
-    "it": "Piccolo",
-    "de": "Klein"
-  },
-  {
-    "key": "Large",
-    "en": "Large",
-    "it": "Grande",
-    "de": "Groß"
-  },
-  {
-    "key": "Huge",
-    "en": "Huge",
-    "it": "Enorme",
-    "de": "Riesig"
-  },
-  {
     "key": "Accessories",
     "en": "Accessories",
     "it": "Accessori",
@@ -796,6 +412,96 @@
     "en": "Shield",
     "it": "Scudo",
     "de": "Schild"
+  },
+  {
+    "key": "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
+    "en": "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
+    "it": "Ogni bersaglio colpito dall'arma soffre (scegli uno: avvelenato, infuriato)",
+    "de": "Jedes von der Waffe getroffene Ziel leidet (wählen Sie eine: vergiftet, wütend)"
+  },
+  {
+    "key": "Status Plus",
+    "en": "Status Plus",
+    "it": "Stato Plus",
+    "de": "Status plus"
+  },
+  {
+    "key": "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
+    "en": "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
+    "it": "Ogni bersaglio colpito dall'arma soffre (scegli uno: confuso, debole, lento, scosso)",
+    "de": "Jedes von der Waffe getroffene Ziel leidet (wählen Sie eines: verwirrt, schwach, langsam, geschüttelt)"
+  },
+  {
+    "key": "Status",
+    "en": "Status",
+    "it": "Stato",
+    "de": "Status"
+  },
+  {
+    "key": "Weapon attacks have multi (2) property",
+    "en": "Weapon attacks have multi (2) property",
+    "it": "Gli attacchi delle armi hanno proprietà multi (2)",
+    "de": "Waffenangriffe haben Multi (2) Eigentum"
+  },
+  {
+    "key": "Multi",
+    "en": "Multi",
+    "it": "Multi",
+    "de": "Multi"
+  },
+  {
+    "key": "The weapon deals 5 extra damage to the creatures of two particular species",
+    "en": "The weapon deals 5 extra damage to the creatures of two particular species",
+    "it": "L'arma infligge 5 danni extra alle creature di due specie particolari",
+    "de": "Die Waffe verursacht 5 zusätzliche Schäden an die Kreaturen von zwei bestimmten Arten"
+  },
+  {
+    "key": "Dual Hunter",
+    "en": "Dual Hunter",
+    "it": "Dual Hunter",
+    "de": "Dual Hunter"
+  },
+  {
+    "key": "Weapon damage ignores Resistances",
+    "en": "Weapon damage ignores Resistances",
+    "it": "Il danno all'arma ignora le resistenze",
+    "de": "Waffenschäden ignorieren Widerstände"
+  },
+  {
+    "key": "Piercing",
+    "en": "Piercing",
+    "it": "Piercing",
+    "de": "Piercing"
+  },
+  {
+    "key": "The weapon deals 5 extra damage to creatures of a particular species",
+    "en": "The weapon deals 5 extra damage to creatures of a particular species",
+    "it": "L'arma infligge 5 danni extra alle creature di una particolare specie",
+    "de": "Die Waffe verursacht 5 zusätzliche Schäden an Kreaturen einer bestimmten Spezies"
+  },
+  {
+    "key": "Hunter",
+    "en": "Hunter",
+    "it": "Cacciatore",
+    "de": "Jäger"
+  },
+  {
+    "key": "The Weapon targets Magic Defense instead of Defense",
+    "en": "The Weapon targets Magic Defense instead of Defense",
+    "it": "L'arma prende di mira la difesa magica invece della difesa",
+    "de": "Die Waffe zielt auf die magische Verteidigung anstelle der Verteidigung ab"
+  },
+  {
+    "key": "Magical",
+    "en": "Magical",
+    "it": "Magico",
+    "de": "Magisch"
+  },
+  {
+    "key": "Offensive Qualities",
+    "en": "Offensive Qualities",
+    "it": "Qualità offensive",
+    "de": "Offensivqualitäten"
   },
   {
     "key": "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
@@ -1294,6 +1000,120 @@
     "en": "Arcane",
     "it": "Arcano",
     "de": "Arkan"
+  },
+  {
+    "key": "Prepared Rolls",
+    "en": "Prepared Rolls",
+    "it": "Rotoli preparati",
+    "de": "Vorbereitete Brötchen"
+  },
+  {
+    "key": "Prepare",
+    "en": "Prepare",
+    "it": "Preparare",
+    "de": "Vorbereiten"
+  },
+  {
+    "key": "Reset",
+    "en": "Reset",
+    "it": "Ripristina",
+    "de": "Zurücksetzen"
+  },
+  {
+    "key": "Roll",
+    "en": "Roll",
+    "it": "Rotolo",
+    "de": "Rollen"
+  },
+  {
+    "key": "Share this url to other players to see rolls:",
+    "en": "Share this url to other players to see rolls:",
+    "it": "Condividi questo URL ad altri giocatori per vedere i rotoli:",
+    "de": "Teilen Sie diese URL an andere Spieler, um Rollen zu sehen:"
+  },
+  {
+    "key": "Press enter to roll",
+    "en": "Press enter to roll",
+    "it": "Premere INVIO per rotolare",
+    "de": "Drücken Sie die Eingabetaste, um zu rollen"
+  },
+  {
+    "key": "Right-click a die to remove it from your hand",
+    "en": "Right-click a die to remove it from your hand",
+    "it": "Fare clic con il pulsante destro del mouse per rimuoverlo dalla mano",
+    "de": "Klicken Sie mit der rechten Maustaste auf einen Würfel, um ihn aus Ihrer Hand zu entfernen"
+  },
+  {
+    "key": "Left-click on a die to add it to your pool",
+    "en": "Left-click on a die to add it to your pool",
+    "it": "Fai clic con il tasto sinistro su un dado per aggiungerlo alla piscina",
+    "de": "Klicken Sie mit der linken Maustaste auf einen Würfel, um es Ihrem Pool hinzuzufügen"
+  },
+  {
+    "key": "Name:",
+    "en": "Name:",
+    "it": "Nome:",
+    "de": "Name:"
+  },
+  {
+    "key": "Set name to display here:",
+    "en": "Set name to display here:",
+    "it": "Imposta il nome da visualizzare qui:",
+    "de": "Stellen Sie den Namen fest, um hier anzuzeigen:"
+  },
+  {
+    "key": "Monster Icons are taken from:",
+    "en": "Monster Icons are taken from:",
+    "it": "Le icone dei mostri sono prelevate da:",
+    "de": "Monster -Ikonen stammen aus:"
+  },
+  {
+    "key": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "en": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
+    "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:"
+  },
+  {
+    "key": "Google Form.",
+    "en": "Google Form.",
+    "it": "Modulo di Google.",
+    "de": "Google Form."
+  },
+  {
+    "key": "If you have any feedback, give us your thoughts here",
+    "en": "If you have any feedback, give us your thoughts here",
+    "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
+    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken"
+  },
+  {
+    "key": "Monster Icons are taken from:",
+    "en": "Monster Icons are taken from:",
+    "it": "Le icone dei mostri sono prelevate da:",
+    "de": "Monster -Ikonen stammen aus:"
+  },
+  {
+    "key": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "en": "The wonderful Fultimator Icons are made by Runty! Email:",
+    "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
+    "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:"
+  },
+  {
+    "key": "Google Form.",
+    "en": "Google Form.",
+    "it": "Modulo di Google.",
+    "de": "Google Form."
+  },
+  {
+    "key": "If you have any feedback, give us your thoughts here",
+    "en": "If you have any feedback, give us your thoughts here",
+    "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
+    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken"
+  },
+  {
+    "key": "",
+    "en": "",
+    "it": "#VALUE!",
+    "de": "#VALUE!"
   },
   {
     "key": "",

@@ -23,7 +23,7 @@ const debugMode = true;
 
 export const t = (key, noSpan) => {
   if (debugMode) {
-    if (!translate(key) || translate(key)[language]) {
+    if (!translate(key) || !translate(key)[language]) {
       if (!window.allUntranslatedKeys) {
         window.allUntranslatedKeys = [key];
       } else {
