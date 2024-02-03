@@ -13,9 +13,9 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { Fragment } from "react";
 import { baseArmors } from "../../libs/equip";
 import { baseShields } from "../../libs/equip";
+import { t } from "../../translation/translate";
 
 export default function EditExtra({ npc, setNpc }) {
   return (
@@ -113,7 +113,7 @@ function Defenses({ npc, setNpc }) {
 
   return (
     <FormControl>
-      <FormLabel id="extra-defenses">Defenses</FormLabel>
+      <FormLabel id="extra-defenses">{t("Defenses")}</FormLabel>
       <RadioGroup
         size="small"
         aria-labelledby="extra-defenses"
@@ -375,7 +375,7 @@ function SelectShield({ npc, setNpc }) {
   console.debug(shield);
 
   return (
-    <FormControl fullWidth sx={{  mt: 1 }}>
+    <FormControl fullWidth sx={{ mt: 1 }}>
       <InputLabel id="type">Shield</InputLabel>
       <Select
         size="medium"

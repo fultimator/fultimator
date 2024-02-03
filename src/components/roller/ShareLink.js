@@ -41,7 +41,7 @@ export default function ShareLink({ scope }) {
                 onCopy={() => {
                   setSnackbarOpen(true);
                 }}
-                title="Copy"
+                title={t("Copy")}
               >
                 <IconButton>
                   <ContentCopy />
@@ -55,7 +55,7 @@ export default function ShareLink({ scope }) {
         open={snackBarOpen}
         autoHideDuration={5000}
         onClose={snackBarClose}
-        message="Copied to Clipboard"
+        message={t("Copied to Clipboard")}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         action={
           <IconButton

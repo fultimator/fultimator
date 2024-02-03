@@ -11,9 +11,11 @@ import {
   Stack,
   TextField,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
+import ReactMarkdown from "react-markdown";
+import { t } from "../../translation/translate";
 
 export default function EditBasics({ npc, setNpc }) {
   const theme = useTheme();
@@ -71,7 +73,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name:"
+            label={t("Name:")}
             value={npc.name}
             onChange={onChange("name")}
           ></TextField>
@@ -81,7 +83,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="traits"
-            label="Traits:"
+            label={t("Traits:")}
             value={npc.traits}
             onChange={onChange("traits")}
             multiline
@@ -93,43 +95,43 @@ export default function EditBasics({ npc, setNpc }) {
       </Grid>
       <Grid item xs={4} sm={3}>
         <FormControl fullWidth>
-          <InputLabel id="species">Species:</InputLabel>
+          <InputLabel id="species">{t("Species:")}</InputLabel>
           <Select
             labelId="species"
             id="select-species"
             value={npc.species}
-            label="Species:"
+            label={t("Species:")}
             onChange={onChangeSpecies}
           >
-            <MenuItem value={"Beast"}>Beast</MenuItem>
-            <MenuItem value={"Construct"}>Construct</MenuItem>
-            <MenuItem value={"Demon"}>Demon</MenuItem>
-            <MenuItem value={"Elemental"}>Elemental</MenuItem>
-            <MenuItem value={"Monster"}>Monster</MenuItem>
-            <MenuItem value={"Plant"}>Plant</MenuItem>
-            <MenuItem value={"Undead"}>Undead</MenuItem>
-            <MenuItem value={"Humanoid"}>Humanoid</MenuItem>
+            <MenuItem value={"Beast"}>{t("Beast")}</MenuItem>
+            <MenuItem value={"Construct"}>{t("Construct")}</MenuItem>
+            <MenuItem value={"Demon"}>{t("Demon")}</MenuItem>
+            <MenuItem value={"Elemental"}>{t("Elemental")}</MenuItem>
+            <MenuItem value={"Monster"}>{t("Monster")}</MenuItem>
+            <MenuItem value={"Plant"}>{t("Plant")}</MenuItem>
+            <MenuItem value={"Undead"}>{t("Undead")}</MenuItem>
+            <MenuItem value={"Humanoid"}>{t("Humanoid")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs={4} sm={3}>
         <Stack spacing={1}>
           <FormControl fullWidth>
-            <InputLabel id="rank">Rank:</InputLabel>
+            <InputLabel id="rank">{t("Rank:")}</InputLabel>
             <Select
               labelId="rank"
               id="select-rank"
               value={npc.rank}
-              label="Rank:"
+              label={t("Rank:")}
               onChange={onChange("rank")}
             >
-              <MenuItem value={"soldier"}>Soldier</MenuItem>
-              <MenuItem value={"elite"}>Elite</MenuItem>
-              <MenuItem value={"champion2"}>Champion(2)</MenuItem>
-              <MenuItem value={"champion3"}>Champion(3)</MenuItem>
-              <MenuItem value={"champion4"}>Champion(4)</MenuItem>
-              <MenuItem value={"champion5"}>Champion(5)</MenuItem>
-              <MenuItem value={"companion"}>Companion</MenuItem>
+              <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
+              <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
+              <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
+              <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
+              <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
+              <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
+              <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -138,18 +140,18 @@ export default function EditBasics({ npc, setNpc }) {
       {/* Villain & Phase Section*/}
       <Grid item xs={4} sm={3}>
         <FormControl fullWidth>
-          <InputLabel id="villain">Villain:</InputLabel>
+          <InputLabel id="villain">{t("Villain:")}</InputLabel>
           <Select
             labelId="villain"
             id="select-villain"
             value={npc.villain}
-            label="Villain:"
+            label={t("Villain:")}
             onChange={onChange("villain")}
           >
-            <MenuItem value={""}>None</MenuItem>
-            <MenuItem value={"minor"}>Minor</MenuItem>
-            <MenuItem value={"major"}>Major</MenuItem>
-            <MenuItem value={"supreme"}>Supreme</MenuItem>
+            <MenuItem value={""}>{t("None")}</MenuItem>
+            <MenuItem value={"minor"}>{t("Minor")}</MenuItem>
+            <MenuItem value={"major"}>{t("Major")}</MenuItem>
+            <MenuItem value={"supreme"}>{t("Supreme")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
@@ -160,7 +162,7 @@ export default function EditBasics({ npc, setNpc }) {
             labelId="phases"
             id="textfield-phases"
             value={npc.phases || 0}
-            label="Phases:"
+            label={t("Phases:")}
             onChange={onChange("phases")}
             type="number"
           ></TextField>
@@ -175,7 +177,7 @@ export default function EditBasics({ npc, setNpc }) {
               labelId="companionlvl"
               id="select-companionlvl"
               value={npc.companionlvl || 1}
-              label="Skill Level:"
+              label={t("Skill Level:")}
               onChange={onChange("companionlvl")}
             >
               <MenuItem value={1}>1</MenuItem>
@@ -195,7 +197,7 @@ export default function EditBasics({ npc, setNpc }) {
               labelId="companionpclvl"
               id="textfield-companionpclvl"
               value={npc.companionpclvl || 5}
-              label="PC Level:"
+              label={t("PC Level:")}
               onChange={onChange("companionpclvl")}
               type="number"
             ></TextField>
@@ -207,7 +209,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
-            label="Multi-Part:"
+            label={t("Multi-Part:")}
             value={npc.multipart}
             onChange={onChange("multipart")}
             multiline
@@ -224,7 +226,7 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="Description"
-            label="Description:"
+            label={t("Description:")}
             value={npc.description}
             onChange={onChange("description")}
             multiline
@@ -238,24 +240,35 @@ export default function EditBasics({ npc, setNpc }) {
       </Grid>
       <Grid item xs={12} sm={6}>
         <Grid item>
-          <Card sx={{ p: 1.61, background: `linear-gradient(to right, ${ternary}, transparent)`, }}>
+          <Card
+            sx={{
+              p: 1.61,
+              background: `linear-gradient(to right, ${ternary}, transparent)`,
+            }}
+          >
             <Typography>
-              <strong>Jack of All Trades</strong>: d8, d8, d8, d8
+              <strong>{t("Jack of All Trades")}</strong>: d8, d8, d8, d8
             </Typography>
             <Typography>
-              <strong>Standard</strong>: d10, d8, d8, d6
+              <strong>{t("Standard")}</strong>: d10, d8, d8, d6
             </Typography>
             <Typography>
-              <strong>Specialized</strong>: d10, d10, d6, d6
+              <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
             </Typography>
             <Typography>
-              <strong>Super Specialized</strong>: d12, d8, d6, d6
+              <strong>{t("Super Specialized")}</strong>: d12, d8, d6, d6
             </Typography>
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2">
-              Upon reaching levels <strong>20</strong>, <strong>40</strong>, and{" "}
-              <strong>60</strong> , the NPC chooses one of its Attributes and
-              increases it by one die size (to a maximum of d12).
+              <ReactMarkdown
+                allowedElements={["strong"]}
+                unwrapDisallowed={true}
+              >
+                {t(
+                  "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
+                  true
+                )}
+              </ReactMarkdown>
             </Typography>
           </Card>
         </Grid>
@@ -291,7 +304,7 @@ function EditLevel({ npc, setnpc }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
-        label="Level:"
+        label={t("Level:")}
         //type="number"
         min={5}
         max={60}

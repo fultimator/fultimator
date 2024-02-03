@@ -1,5 +1,6 @@
 import React from "react";
 import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
+import { t } from "../../translation/translate";
 
 export function EditAttributes({ npc, setNpc }) {
   const onChange = (key) => {
@@ -13,10 +14,23 @@ export function EditAttributes({ npc, setNpc }) {
   };
 
   const attributeList = [
-    { key: "dexterity", label: "Dex", min: 6, max: 12, step: 2, marks: true },
-    { key: "insight", label: "Ins", min: 6, max: 12, step: 2, marks: true },
-    { key: "might", label: "Mig", min: 6, max: 12, step: 2, marks: true },
-    { key: "will", label: "Wil",  min: 6, max: 12, step: 2, marks: [
+    {
+      key: "dexterity",
+      label: t("Dex"),
+      min: 6,
+      max: 12,
+      step: 2,
+      marks: true,
+    },
+    { key: "insight", label: t("Ins"), min: 6, max: 12, step: 2, marks: true },
+    { key: "might", label: t("Mig"), min: 6, max: 12, step: 2, marks: true },
+    {
+      key: "will",
+      label: t("Wil"),
+      min: 6,
+      max: 12,
+      step: 2,
+      marks: [
         { value: 6, label: "d6" },
         { value: 8, label: "d8" },
         { value: 10, label: "d10" },
@@ -30,8 +44,11 @@ export function EditAttributes({ npc, setNpc }) {
       {attributeList.map((attribute, i) => (
         <React.Fragment key={i}>
           <Grid item xs={2}>
-            <InputLabel id={attribute.key} sx={{ fontSize: "20px", fontWeight: 400 }}>
-             {attribute.label}
+            <InputLabel
+              id={attribute.key}
+              sx={{ fontSize: "20px", fontWeight: 400 }}
+            >
+              {attribute.label}
             </InputLabel>
           </Grid>
           <Grid item xs={10}>

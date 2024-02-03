@@ -128,28 +128,34 @@ export default function NpcEdit() {
     if (!npcTemp.name || npcTemp.name === "") {
       return {
         disabled: true,
-        message: "It must have a name in order to be published.",
+        message: t("It must have a name in order to be published.", true),
       };
     }
 
     if (!npcTemp.description || npcTemp.description === "") {
       return {
         disabled: true,
-        message: "It must have a description in order to be published.",
+        message: t(
+          "It must have a description in order to be published.",
+          true
+        ),
       };
     }
 
     if (!npcTemp.traits || npcTemp.traits === "") {
       return {
         disabled: true,
-        message: "It must have a traits in order to be published.",
+        message: t("It must have a traits in order to be published.", true),
       };
     }
 
     if (!npcTemp.createdBy || npcTemp.createdBy === "") {
       return {
         disabled: true,
-        message: "'Credit By' needs to be filled in order to be published",
+        message: t(
+          "'Credit By' needs to be filled in order to be published",
+          true
+        ),
       };
     }
 
@@ -162,7 +168,10 @@ export default function NpcEdit() {
 
     return {
       disabled: true,
-      message: "It must have at least one attack, in order to be published.",
+      message: t(
+        "It must have at least one attack, in order to be published.",
+        true
+      ),
     };
   };
 
@@ -230,14 +239,14 @@ export default function NpcEdit() {
               <Download />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Share URL">
+          <Tooltip title={t("Share URL")}>
             <IconButton onClick={() => shareNpc(npc.id)}>
               <Share />
             </IconButton>
           </Tooltip>
           <Export name={`${npc.name}`} data={npc} />
           {user && user.uid !== npc.uid && (
-            <Tooltip title="Copy and Edit Sheet" placement="bottom">
+            <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
               <IconButton
                 aria-label="duplicate"
                 onClick={() => {
@@ -268,13 +277,15 @@ export default function NpcEdit() {
               >
                 <TextField
                   id="outlined-basic"
-                  label="Created By:"
+                  label={t("Created By:")}
                   sx={{ marginTop: 2 }}
                   size="small"
                   helperText={
                     npcTemp.published
-                      ? "This NPC is part of the Adversary Compedium."
-                      : "Help the Adversary Compedium grow by publishing your finished work!"
+                      ? t("This NPC is part of the Adversary Compedium.")
+                      : t(
+                          "Help the Adversary Compedium grow by publishing your finished work!"
+                        )
                   }
                   fullWidth
                   value={npcTemp.createdBy}
@@ -290,7 +301,7 @@ export default function NpcEdit() {
                     disabled={canPublish().disabled}
                     onClick={publish}
                   >
-                    Publish to Adversary Compendium
+                    {t("Publish to Adversary Compendium")}
                   </Button>
                 )}
                 {npcTemp.published && (
@@ -299,7 +310,7 @@ export default function NpcEdit() {
                     sx={{ marginTop: 1 }}
                     onClick={unPublish}
                   >
-                    Unpublish
+                    {t("Unpublish")}
                   </Button>
                 )}
                 {canPublish().disabled && (
@@ -337,7 +348,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Basic Information
+              {t("Basic Information")}
             </Typography>
             <Divider
               orientation="horizontal"
@@ -367,7 +378,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Affinity
+              {t("Affinity")}
             </Typography>
             <Divider
               orientation="horizontal"
@@ -405,7 +416,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Attacks
+              {t("Attacks")}
             </Typography>
             <Divider
               orientation="horizontal"
@@ -442,7 +453,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Spells
+              {t("Spells")}
             </Typography>
             <Divider
               orientation="horizontal"
@@ -472,7 +483,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Features
+              {t("Features")}
             </Typography>
             <Divider
               orientation="horizontal"
@@ -515,7 +526,7 @@ export default function NpcEdit() {
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
-              Attacks Chance Generator
+              {t("Attacks Chance Generator")}
             </Typography>
             <Divider
               orientation="horizontal"

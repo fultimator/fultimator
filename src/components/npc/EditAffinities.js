@@ -1,16 +1,12 @@
-import {
-  FormControl,
-  Grid,
-  InputLabel,
-  Slider,
-} from "@mui/material";
+import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
 import { Fragment } from "react";
 import { TypeIcon, typeList, TypeName } from "../../components/types";
+import { t } from "../../translation/translate";
 
 export default function EditAffinities({ npc, setNpc }) {
   const onChangeAffinity = (type) => {
     return (e) => {
-    const value = num2str(e.target.value);
+      const value = num2str(e.target.value);
 
       setNpc((prevState) => {
         const newState = Object.assign({}, prevState);
@@ -21,7 +17,7 @@ export default function EditAffinities({ npc, setNpc }) {
         }
         return newState;
       });
-};
+    };
   };
 
   const str2num = function (value) {
@@ -69,29 +65,29 @@ export default function EditAffinities({ npc, setNpc }) {
         {Object.keys(typeList).map((type, i, arr) => {
           const marks =
             i === arr.length - 1
-            ?  [
-              {
-                value: 0,
-                label: "Vulnerability",
-              },
-              {
-                value: 1,
-                label: " ",
-              },
-              {
-                value: 2,
-                label: "Resistance",
-              },
-              {
-                value: 3,
-                label: "Immunity",
-              },
-              {
-                value: 4,
-                label: "Absorption",
-              },
-            ]
-          : true;
+              ? [
+                  {
+                    value: 0,
+                    label: t("Vulnerability", true),
+                  },
+                  {
+                    value: 1,
+                    label: " ",
+                  },
+                  {
+                    value: 2,
+                    label: t("Resistance", true),
+                  },
+                  {
+                    value: 3,
+                    label: t("Immunity", true),
+                  },
+                  {
+                    value: 4,
+                    label: t("Absorption", true),
+                  },
+                ]
+              : true;
 
           type = typeList[type];
           const value = str2num(npc.affinities[type]);
@@ -99,7 +95,10 @@ export default function EditAffinities({ npc, setNpc }) {
           return (
             <Fragment key={i}>
               <Grid item xs={3}>
-                <InputLabel id={type} sx={{ fontSize: "20px", fontWeight: 400 }}>
+                <InputLabel
+                  id={type}
+                  sx={{ fontSize: "20px", fontWeight: 400 }}
+                >
                   <TypeIcon type={type} /> <TypeName type={type} />
                 </InputLabel>
               </Grid>
