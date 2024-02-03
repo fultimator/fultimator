@@ -1,4 +1,5 @@
 import { FormControl, Grid, TextField } from "@mui/material";
+import { t } from "../../../translation/translate";
 
 function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
   return (
@@ -7,7 +8,7 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="quality"
-            label="Quality"
+            label={t("Quality")}
             value={quality}
             onChange={setQuality}
             multiline
@@ -19,7 +20,7 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
           <TextField
             id="cost"
             type="number"
-            label="Cost of Quality"
+            label={t("Cost of Quality")}
             value={qualityCost}
             onChange={setQualityCost}
           ></TextField>

@@ -1,3 +1,5 @@
+import { t } from "../../../translation/translate";
+
 const qualities = [
   {
     category: "Defensive Qualities",

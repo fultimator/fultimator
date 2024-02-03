@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
 import weapons from "./base";
+import { t } from "../../../translation/translate";
 
 function ChangeBase({ value, onChange }) {
   const groupedWeapons = groupBy(weapons, "category");
@@ -27,7 +28,7 @@ function ChangeBase({ value, onChange }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Basic Weapon</InputLabel>
+      <InputLabel id="type">{t("Weapons")}</InputLabel>
       <Select
         labelId="type"
         id="select-type"

@@ -58,6 +58,7 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { t } from "../../translation/translate";
 
 export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
@@ -586,7 +587,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download as Image">
+      <Tooltip title={t("Download as Image")}>
         <IconButton onClick={downloadImage}>
           <Download />
         </IconButton>

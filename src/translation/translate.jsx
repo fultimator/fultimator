@@ -21,7 +21,7 @@ const debugMode = true;
     - Paste the whole json in ./translation/data.json
 */
 
-export const t = (key) => {
+export const t = (key, noSpan) => {
   if (debugMode) {
     if (!translate(key) || translate(key)[language]) {
       if (!window.allUntranslatedKeys) {
@@ -31,15 +31,25 @@ export const t = (key) => {
       }
     }
 
-    return !translate(key) ? (
-      <span style={{ color: "red" }}>{key}</span>
-    ) : !translate(key)[language] ? (
-      <span style={{ color: "orange" }}>{key}</span>
-    ) : (
-      <span style={{ color: "darkgreen" }}>
-        {translate(key)[language] ? translate(key)[language] : key}
-      </span>
-    );
+    if (noSpan) {
+      return !translate(key)
+        ? key + "***NO_KEY***"
+        : !translate(key)[language]
+        ? key + "**NO_TRANSLATION**"
+        : translate(key)[language]
+        ? translate(key)[language] + "*TRANSLATED*"
+        : key;
+    } else {
+      return !translate(key) ? (
+        <span style={{ color: "red" }}>{key}</span>
+      ) : !translate(key)[language] ? (
+        <span style={{ color: "orange" }}>{key}</span>
+      ) : (
+        <span style={{ color: "darkgreen" }}>
+          {translate(key)[language] ? translate(key)[language] : key}
+        </span>
+      );
+    }
   } else {
     return translate(key) && translate(key)[language]
       ? translate(key)[language]

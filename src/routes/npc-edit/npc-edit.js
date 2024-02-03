@@ -12,7 +12,7 @@ import {
   IconButton,
   Paper,
   Typography,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -25,7 +25,7 @@ import {
   Save,
   Share,
   ArrowUpward,
-  ContentCopy
+  ContentCopy,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useRef, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
@@ -46,7 +46,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { transform } from "typescript";
+import { t } from "../../translation/translate";
 
 export default function NpcEdit() {
   const theme = useTheme();
@@ -221,8 +221,12 @@ export default function NpcEdit() {
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
           <Divider sx={{ my: 1 }} />
-          <Tooltip title="Download as Image">
-            <IconButton onClick={() => { DownloadImage(); }}>
+          <Tooltip title={t("Download as Image")}>
+            <IconButton
+              onClick={() => {
+                DownloadImage();
+              }}
+            >
               <Download />
             </IconButton>
           </Tooltip>
@@ -245,7 +249,15 @@ export default function NpcEdit() {
             </Tooltip>
           )}
           <Divider sx={{ my: 1 }} />
-          <Paper elevation={3} sx={{ p: '10px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: "10px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
             {user && user.uid === npc.uid && (
               <div
                 style={{
@@ -311,17 +323,61 @@ export default function NpcEdit() {
 
       {user && user.uid === npc.uid && (
         <>
-          <Paper elevation={3} sx={{ borderRadius: '16px', border: '3px solid', borderColor: secondary, padding: '20px' }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Basic Information</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+              padding: "20px",
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Basic Information
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <EditBasics npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Affinity</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Affinity
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <ExplainAffinities npc={npcTemp} />
@@ -335,41 +391,141 @@ export default function NpcEdit() {
 
           <Divider sx={{ my: 2 }} />
 
-          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Attacks</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Attacks
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <Grid container>
-              <Grid item xs={12}><EditAttacks npc={npcTemp} setNpc={updateNPC} /></Grid>
-              <Grid item xs={12}><EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12}>
+                <EditAttacks npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12}>
+                <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
             </Grid>
           </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Spells</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Spells
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <EditSpells npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Features</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Features
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <Grid container>
-              <Grid item xs={12} md={6}><EditActions npc={npcTemp} setNpc={updateNPC} /></Grid>
-              <Grid item xs={12} md={6}><EditSpecial npc={npcTemp} setNpc={updateNPC} /></Grid>
-              <Grid item xs={12} md={6}><EditRareGear npc={npcTemp} setNpc={updateNPC} /></Grid>
-              <Grid item xs={12} md={6}><EditNotes npc={npcTemp} setNpc={updateNPC} /></Grid>
+              <Grid item xs={12} md={6}>
+                <EditActions npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditSpecial npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditRareGear npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditNotes npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
             </Grid>
           </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Paper elevation={3} sx={{ p: '20px', borderRadius: '16px', border: '3px solid', borderColor: secondary }}>
-            <Typography variant="h4" component="legend" sx={{ color: primary, textTransform: 'uppercase' }}>Attacks Chance Generator</Typography>
-            <Divider orientation="horizontal" sx={{ color: primary, borderBottom: '3px solid', borderColor: 'secondary', mb: '20px' }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              Attacks Chance Generator
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
             <Probs />
           </Paper>
 
@@ -429,7 +585,6 @@ export default function NpcEdit() {
           </Fab>
         </Fade>
       </Grid>
-
     </Layout>
   );
 }

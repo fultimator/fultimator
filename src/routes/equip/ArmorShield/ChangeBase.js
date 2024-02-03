@@ -6,20 +6,21 @@ import {
   Select,
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
-import weapons from "./base";
+import armors from "./base";
+import { t } from "../../../translation/translate";
 
 function ChangeBase({ value, onChange }) {
-  const groupedWeapons = groupBy(weapons, "category");
+  const groupedArmors = groupBy(armors, "category");
 
   const options = [];
 
-  for (const [category, weapons] of Object.entries(groupedWeapons)) {
+  for (const [category, armors] of Object.entries(groupedArmors)) {
     options.push(<ListSubheader key={category}>{category}</ListSubheader>);
 
-    for (const weapon of weapons) {
+    for (const armor of armors) {
       options.push(
-        <MenuItem key={weapon.name} value={weapon.name}>
-          {weapon.name}
+        <MenuItem key={armor.name} value={armor.name}>
+          {armor.name}
         </MenuItem>
       );
     }
@@ -27,12 +28,12 @@ function ChangeBase({ value, onChange }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Armor/Shield</InputLabel>
+      <InputLabel id="type">{t("Armor/Shield")}</InputLabel>
       <Select
         labelId="type"
         id="select-type"
         value={value}
-        label="Basic Weapon"
+        label={t("Basic Armor/Shield")}
         onChange={onChange}
       >
         {options}

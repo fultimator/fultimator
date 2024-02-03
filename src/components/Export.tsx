@@ -2,6 +2,7 @@ import { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
 import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
+import { t } from "../translation/translate";
 
 type Props = {
   name?: string;
@@ -53,7 +54,7 @@ function Export({ name = "", data = {} }: Props) {
 
   return (
     <>
-      <Tooltip title="Export">
+      <Tooltip title={t("Export")}>
         <IconButton onClick={handleOpenExportMenu}>
           <Code />
         </IconButton>

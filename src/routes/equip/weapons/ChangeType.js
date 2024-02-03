@@ -1,10 +1,11 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import types from "../../../libs/types";
+import { t } from "../../../translation/translate";
 
 function ChangeType({ value, onChange }) {
   return (
     <FormControl variant="outlined" fullWidth>
-      <InputLabel id="type">Change Type</InputLabel>
+      <InputLabel id="type">{t("Change Type")}</InputLabel>
       <Select
         labelId="type"
         id="select-type"

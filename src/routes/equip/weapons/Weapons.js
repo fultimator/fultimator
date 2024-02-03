@@ -1,4 +1,4 @@
-import { Grid, Typography, Paper, useTheme} from "@mui/material";
+import { Grid, Typography, Paper, useTheme } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState } from "react";
 import weapons from "./base";
@@ -6,12 +6,13 @@ import ChangeBase from "./ChangeBase";
 import ChangeAttr from "./ChangeAttr";
 import ChangeBonus from "./ChangeBonus";
 import ChangeHands from "./ChangeHands";
-import ChangeName from "./ChangeName";
+import ChangeName from "../common/ChangeName";
 import ChangeType from "./ChangeType";
 import Pretty from "./Pretty";
-import ChangeQuality from "./ChangeQuality";
-import SelectQuality from "./SelectQuality";
+import ChangeQuality from "../common/ChangeQuality";
+import SelectQuality from "../common/SelectQuality";
 import qualities from "./qualities";
+import { t } from "../../../translation/translate";
 
 function Weapons() {
   const theme = useTheme();
@@ -94,111 +95,110 @@ function Weapons() {
 
   return (
     <Grid container spacing={2}>
-
       {/* Form */}
       <Grid item xs={12} sm={6}>
-      <Grid item xs={12}>
-      <Typography
-        variant="h4"
-        sx={{
-          px: 3,
-          py: 1,
-          color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
-        }}
-      >
-        <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
-        Rare Weapons
-      </Typography>
-      </Grid>
-      <Paper
-        sx={{
-          background: "#ffffff",
-          padding: 2,
-
-        }}
-      >
-        <Grid container spacing={2} alignItems="center">
-          {/* Change Base */}
-          <Grid item xs={6}>
-            <ChangeBase
-              value={base.name}
-              onChange={(e) => {
-                const base = weapons.find((el) => el.name === e.target.value);
-
-                setBase(base);
-                setName(base.name);
-                setType(base.type);
-                setHands(base.hands);
-                setDamageBonus(false);
-                setPrecBonus(false);
-                setAtt1(base.att1);
-                setAtt2(base.att2);
-              }}
-            />
-          </Grid>
-          {/* Change Name */}
-          <Grid item xs={6}>
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          {/* Change Type */}
-          <Grid item xs={4}>
-            <ChangeType
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            />
-          </Grid>
-          {/* Change Hands */}
-          <Grid item xs={4}>
-            <ChangeHands
-              value={hands}
-              onChange={(e) => setHands(e.target.value)}
-            />
-          </Grid>
-          {/* Change Bonus */}
-          <Grid item xs={4}>
-            <ChangeBonus
-              basePrec={base.prec}
-              prec={prec}
-              damageBonus={damageBonus}
-              setPrecBonus={setPrecBonus}
-              setDamageBonus={setDamageBonus}
-            />
-          </Grid>
-          {/* Change Attributes */}
-          <Grid item xs={5}>
-            <ChangeAttr
-              att1={att1}
-              att2={att2}
-              setAtt1={(e) => setAtt1(e.target.value)}
-              setAtt2={(e) => setAtt2(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={7}>
-            <SelectQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const quality = qualities.find(
-                  (el) => el.name === e.target.value
-                );
-                setSelectedQuality(quality.name);
-                setQuality(quality.quality);
-                setQualityCost(quality.cost);
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
+        <Grid item xs={12}>
+          <Typography
+            variant="h4"
+            sx={{
+              px: 3,
+              py: 1,
+              color: "#ffffff",
+              background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
+            }}
+          >
+            <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
+            {t("Rare Weapons")}
+          </Typography>
         </Grid>
+        <Paper
+          sx={{
+            background: "#ffffff",
+            padding: 2,
+          }}
+        >
+          <Grid container spacing={2} alignItems="center">
+            {/* Change Base */}
+            <Grid item xs={6}>
+              <ChangeBase
+                value={base.name}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  const base = weapons.find((el) => el.name === e.target.value);
+
+                  setBase(base);
+                  setName(base.name);
+                  setType(base.type);
+                  setHands(base.hands);
+                  setDamageBonus(false);
+                  setPrecBonus(false);
+                  setAtt1(base.att1);
+                  setAtt2(base.att2);
+                }}
+              />
+            </Grid>
+            {/* Change Name */}
+            <Grid item xs={6}>
+              <ChangeName
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Grid>
+            {/* Change Type */}
+            <Grid item xs={4}>
+              <ChangeType
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              />
+            </Grid>
+            {/* Change Hands */}
+            <Grid item xs={4}>
+              <ChangeHands
+                value={hands}
+                onChange={(e) => setHands(e.target.value)}
+              />
+            </Grid>
+            {/* Change Bonus */}
+            <Grid item xs={4}>
+              <ChangeBonus
+                basePrec={base.prec}
+                prec={prec}
+                damageBonus={damageBonus}
+                setPrecBonus={setPrecBonus}
+                setDamageBonus={setDamageBonus}
+              />
+            </Grid>
+            {/* Change Attributes */}
+            <Grid item xs={5}>
+              <ChangeAttr
+                att1={att1}
+                att2={att2}
+                setAtt1={(e) => setAtt1(e.target.value)}
+                setAtt2={(e) => setAtt2(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={7}>
+              <SelectQuality
+                quality={selectedQuality}
+                setQuality={(e) => {
+                  const quality = qualities.find(
+                    (el) => el.name === e.target.value
+                  );
+                  setSelectedQuality(quality.name);
+                  setQuality(quality.quality);
+                  setQualityCost(quality.cost);
+                }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <ChangeQuality
+                quality={quality}
+                setQuality={(e) => setQuality(e.target.value)}
+                qualityCost={qualityCost}
+                setQualityCost={(e) => setQualityCost(e.target.value)}
+              />
+            </Grid>
+          </Grid>
         </Paper>
       </Grid>
 

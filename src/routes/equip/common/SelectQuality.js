@@ -6,7 +6,8 @@ import {
   Select,
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
-import qualities from "./qualities";
+import qualities from "../Accessories/qualities";
+import { t } from "../../../translation/translate";
 
 function SelectQuality({ quality, setQuality }) {
   const groupedQualities = groupBy(qualities, "category");
@@ -27,7 +28,7 @@ function SelectQuality({ quality, setQuality }) {
 
   return (
     <FormControl variant="outlined" fullWidth>
-      <InputLabel id="quality">Select Quality</InputLabel>
+      <InputLabel id="quality">{t("Select Quality")}</InputLabel>
       <Select
         labelId="quality"
         id="select-quality"

@@ -1,30 +1,32 @@
+import { t } from "../translation/translate";
+
 const types = {
   physical: {
-    long: "physical",
+    long: t("physical", true),
   },
   wind: {
-    long: "wind",
+    long: t("wind", true),
   },
   bolt: {
-    long: "bolt",
+    long: t("bolt", true),
   },
   dark: {
-    long: "dark",
+    long: t("dark", true),
   },
   earth: {
-    long: "earth",
+    long: t("earth", true),
   },
   fire: {
-    long: "fire",
+    long: t("fire", true),
   },
   ice: {
-    long: "ice",
+    long: t("ice", true),
   },
   light: {
-    long: "light",
+    long: t("light", true),
   },
   poison: {
-    long: "poison",
+    long: t("poison", true),
   },
 };
 

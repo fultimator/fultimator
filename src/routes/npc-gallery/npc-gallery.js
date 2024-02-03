@@ -46,6 +46,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { t } from "../../translation/translate";
 
 export default function NpcGallery() {
   const [user, loading] = useAuthState(auth);
@@ -414,11 +415,11 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Tooltip title="Share URL">
-      <IconButton onClick={() => shareNpc(npc.id)}>
+        <IconButton onClick={() => shareNpc(npc.id)}>
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download as Image">
+      <Tooltip title={t("Download as Image")}>
         <IconButton
           onClick={() => {
             expandAndDownloadImage();
