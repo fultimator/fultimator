@@ -14,7 +14,7 @@ const debugMode = true;
 
     How to update translations:
 
-    - Go to console log and run: `console.log(window.allUntranslatedKeys)` to get all untranslated keys and copy it.
+    - Go to console log and run: `console.log([...new Set(window.allUntranslatedKeys)].reduce((item,item2)=>{return item2 + "\n"+ item},""))` to get all untranslated keys and copy it.
     - Go to https://docs.google.com/spreadsheets/d/1H3GQGaND7PuyiWvFlfIUtmKYquJYEbgs5k8gGbqwUbs/edit#gid=0 and paste the untranslated keys on both keys and en column
     - Once machine translated, you can copy the text and repaste them using ctrl+shift+v to their cell to remove the =GOOGLETRANSLATE formula and export the csv
     - Go to https://csvjson.com/csv2json and convert the CSV to json and press copy to clipboard
@@ -25,9 +25,9 @@ export const t = (key, noSpan) => {
   if (debugMode) {
     if (!translate(key) || translate(key)[language]) {
       if (!window.allUntranslatedKeys) {
-        window.allUntranslatedKeys = key + "\n";
+        window.allUntranslatedKeys = [key];
       } else {
-        window.allUntranslatedKeys = window.allUntranslatedKeys + key + "\n";
+        window.allUntranslatedKeys.push(key);
       }
     }
 
@@ -35,7 +35,7 @@ export const t = (key, noSpan) => {
       return !translate(key)
         ? key + "***NO_KEY***"
         : !translate(key)[language]
-        ? key + "**NO_TRANSLATION**"
+        ? key + "***NO_TRANSLATION**"
         : translate(key)[language]
         ? translate(key)[language] + "*TRANSLATED*"
         : key;

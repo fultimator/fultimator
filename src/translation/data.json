@@ -384,6 +384,918 @@
     "de": "Riesig"
   },
   {
+    "key": "Accessories",
+    "en": "Accessories",
+    "it": "Accessori",
+    "de": "Zubehör"
+  },
+  {
+    "key": "M. Defense",
+    "en": "M. Defense",
+    "it": "M. Difesa",
+    "de": "M. Verteidigung"
+  },
+  {
+    "key": "Defense",
+    "en": "Defense",
+    "it": "Difesa",
+    "de": "Verteidigung"
+  },
+  {
+    "key": "Basic Armor/Shield",
+    "en": "Basic Armor/Shield",
+    "it": "Armatura/scudo di base",
+    "de": "Basispanzer/Schild"
+  },
+  {
+    "key": "Armor/Shield",
+    "en": "Armor/Shield",
+    "it": "Armatura/scudo",
+    "de": "Rüstung/Schild"
+  },
+  {
+    "key": "Armor and Shield",
+    "en": "Armor and Shield",
+    "it": "Armatura e scudo",
+    "de": "Rüstung und Schild"
+  },
+  {
+    "key": "Export",
+    "en": "Export",
+    "it": "Esportare",
+    "de": "Export"
+  },
+  {
+    "key": "Download as Image",
+    "en": "Download as Image",
+    "it": "Scarica come immagine",
+    "de": "Download als Bild"
+  },
+  {
+    "key": "No Qualities",
+    "en": "No Qualities",
+    "it": "Nessuna qualità",
+    "de": "Keine Eigenschaften"
+  },
+  {
+    "key": "Melee",
+    "en": "Melee",
+    "it": "Mischia",
+    "de": "Nahkampf"
+  },
+  {
+    "key": "Two-handed",
+    "en": "Two-handed",
+    "it": "Due mani",
+    "de": "Beidhändig"
+  },
+  {
+    "key": "HR +",
+    "en": "HR +",
+    "it": "HR +",
+    "de": "HR +"
+  },
+  {
+    "key": "Cost",
+    "en": "Cost",
+    "it": "Costo",
+    "de": "Kosten"
+  },
+  {
+    "key": "Weapon",
+    "en": "Weapon",
+    "it": "Arma",
+    "de": "Waffe"
+  },
+  {
+    "key": "Cost of Quality",
+    "en": "Cost of Quality",
+    "it": "Costo della qualità",
+    "de": "Qualitätskosten"
+  },
+  {
+    "key": "Quality",
+    "en": "Quality",
+    "it": "Qualità",
+    "de": "Qualität"
+  },
+  {
+    "key": "Select Quality",
+    "en": "Select Quality",
+    "it": "Seleziona qualità",
+    "de": "Qualität auswählen"
+  },
+  {
+    "key": "Change Attr 2",
+    "en": "Change Attr 2",
+    "it": "Cambia ATRT 2",
+    "de": "Wechseln Sie Attr 2"
+  },
+  {
+    "key": "Change Attr 1",
+    "en": "Change Attr 1",
+    "it": "Cambia ATRT 1",
+    "de": "Wechseln Sie Attr 1"
+  },
+  {
+    "key": "Damage",
+    "en": "Damage",
+    "it": "Danno",
+    "de": "Schaden"
+  },
+  {
+    "key": "Accuracy",
+    "en": "Accuracy",
+    "it": "Precisione",
+    "de": "Genauigkeit"
+  },
+  {
+    "key": "Two Hand",
+    "en": "Two Hand",
+    "it": "Due mani",
+    "de": "Zwei Hände"
+  },
+  {
+    "key": "One Hand",
+    "en": "One Hand",
+    "it": "Una mano",
+    "de": "Eine Hand"
+  },
+  {
+    "key": "Change Hands",
+    "en": "Change Hands",
+    "it": "Cambiare le mani",
+    "de": "Den Besitzer wechseln"
+  },
+  {
+    "key": "Change Type",
+    "en": "Change Type",
+    "it": "Cambia tipo",
+    "de": "Typ ändern"
+  },
+  {
+    "key": "Change Name",
+    "en": "Change Name",
+    "it": "Cambia nome",
+    "de": "Namen ändern"
+  },
+  {
+    "key": "Weapons",
+    "en": "Weapons",
+    "it": "Armi",
+    "de": "Waffen"
+  },
+  {
+    "key": "Rare Weapons",
+    "en": "Rare Weapons",
+    "it": "Armi rare",
+    "de": "Seltene Waffen"
+  },
+  {
+    "key": "Number of days",
+    "en": "Number of days",
+    "it": "Numero di giorni",
+    "de": "Anzahl der Tage"
+  },
+  {
+    "key": "Progress",
+    "en": "Progress",
+    "it": "Progresso",
+    "de": "Fortschritt"
+  },
+  {
+    "key": "Zenit",
+    "en": "Zenit",
+    "it": "Zenit",
+    "de": "Zenit"
+  },
+  {
+    "key": "Levels in Visionary",
+    "en": "Levels in Visionary",
+    "it": "Livelli nel visionario",
+    "de": "Niveaus in Visionär"
+  },
+  {
+    "key": "Number of Hired Helpers",
+    "en": "Number of Hired Helpers",
+    "it": "Numero di aiutanti assunti",
+    "de": "Anzahl der angeheuerten Helfer"
+  },
+  {
+    "key": "Number of Tinkerers",
+    "en": "Number of Tinkerers",
+    "it": "Numero di armeggi",
+    "de": "Anzahl der Bastler"
+  },
+  {
+    "key": "Has terrible flaw",
+    "en": "Has terrible flaw",
+    "it": "Ha un terribile difetto",
+    "de": "Hat schrecklichen Fehler"
+  },
+  {
+    "key": "Permanent",
+    "en": "Permanent",
+    "it": "Permanente",
+    "de": "Dauerhaft"
+  },
+  {
+    "key": "Consumable",
+    "en": "Consumable",
+    "it": "Consumabile",
+    "de": "Konsumierbar"
+  },
+  {
+    "key": "Uses",
+    "en": "Uses",
+    "it": "Usi",
+    "de": "Verwendet"
+  },
+  {
+    "key": "Projects",
+    "en": "Projects",
+    "it": "Progetti",
+    "de": "Projekte"
+  },
+  {
+    "key": "Clock",
+    "en": "Clock",
+    "it": "Orologio",
+    "de": "Uhr"
+  },
+  {
+    "key": "DL",
+    "en": "DL",
+    "it": "Dl",
+    "de": "Dl"
+  },
+  {
+    "key": "MP",
+    "en": "MP",
+    "it": "Mp",
+    "de": "MP"
+  },
+  {
+    "key": "Fast Ritual",
+    "en": "Fast Ritual",
+    "it": "Rituale veloce",
+    "de": "Schnelles Ritual"
+  },
+  {
+    "key": "Relevant item held",
+    "en": "Relevant item held",
+    "it": "Articolo pertinente detenuto",
+    "de": "Relevanter Artikel gehalten"
+  },
+  {
+    "key": "Using special ingredient",
+    "en": "Using special ingredient",
+    "it": "Usando ingrediente speciale",
+    "de": "Mit besonderer Zutat"
+  },
+  {
+    "key": "Reductions",
+    "en": "Reductions",
+    "it": "Riduzioni",
+    "de": "Reduzierungen"
+  },
+  {
+    "key": "Huge",
+    "en": "Huge",
+    "it": "Enorme",
+    "de": "Riesig"
+  },
+  {
+    "key": "Large",
+    "en": "Large",
+    "it": "Grande",
+    "de": "Groß"
+  },
+  {
+    "key": "Small",
+    "en": "Small",
+    "it": "Piccolo",
+    "de": "Klein"
+  },
+  {
+    "key": "Individual",
+    "en": "Individual",
+    "it": "Individuale",
+    "de": "Individuell"
+  },
+  {
+    "key": "Area",
+    "en": "Area",
+    "it": "La zona",
+    "de": "Bereich"
+  },
+  {
+    "key": "Extreme",
+    "en": "Extreme",
+    "it": "Estremo",
+    "de": "Extrem"
+  },
+  {
+    "key": "Major",
+    "en": "Major",
+    "it": "Maggiore",
+    "de": "Wesentlich"
+  },
+  {
+    "key": "Medium",
+    "en": "Medium",
+    "it": "medio",
+    "de": "Mittel"
+  },
+  {
+    "key": "Minor",
+    "en": "Minor",
+    "it": "Minore",
+    "de": "Unerheblich"
+  },
+  {
+    "key": "Potency",
+    "en": "Potency",
+    "it": "Potenza",
+    "de": "Potenz"
+  },
+  {
+    "key": "Rituals",
+    "en": "Rituals",
+    "it": "Rituali",
+    "de": "Rituale"
+  },
+  {
+    "key": "Steel Plate",
+    "en": "Steel Plate",
+    "it": "Lamiera di acciaio",
+    "de": "Stahlplatte"
+  },
+  {
+    "key": "Runic Plate",
+    "en": "Runic Plate",
+    "it": "Piastra runica",
+    "de": "Runikplatte"
+  },
+  {
+    "key": "Bronze Plate",
+    "en": "Bronze Plate",
+    "it": "Piatto di bronzo",
+    "de": "Bronzeplatte"
+  },
+  {
+    "key": "Brigadine",
+    "en": "Brigadine",
+    "it": "Brigadina",
+    "de": "Brigadin"
+  },
+  {
+    "key": "Sage Robe",
+    "en": "Sage Robe",
+    "it": "Sage Robe",
+    "de": "Salbei Robe"
+  },
+  {
+    "key": "Combat Tunic",
+    "en": "Combat Tunic",
+    "it": "Tunica da combattimento",
+    "de": "Kampftunika"
+  },
+  {
+    "key": "Travel Garb",
+    "en": "Travel Garb",
+    "it": "Abito da viaggio",
+    "de": "Reisekleid"
+  },
+  {
+    "key": "Silk Shirt",
+    "en": "Silk Shirt",
+    "it": "Maglia di seta",
+    "de": "Seidenhemd"
+  },
+  {
+    "key": "Armor",
+    "en": "Armor",
+    "it": "Armatura",
+    "de": "Rüstung"
+  },
+  {
+    "key": "Runic Shield",
+    "en": "Runic Shield",
+    "it": "Scudo runico",
+    "de": "Runenschild"
+  },
+  {
+    "key": "Bronze Shield",
+    "en": "Bronze Shield",
+    "it": "Scudo di bronzo",
+    "de": "Bronzeschild"
+  },
+  {
+    "key": "Shield",
+    "en": "Shield",
+    "it": "Scudo",
+    "de": "Schild"
+  },
+  {
+    "key": "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
+    "en": "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
+    "it": "I tuoi attacchi con (scegli uno: mischia, a distanza) Armi infliggono 5 danni extra.",
+    "de": "Ihre Angriffe mit (wählen Sie einen: Nahkampf, Fernkampf) Waffen verursachen 5 zusätzliche Schäden."
+  },
+  {
+    "key": "Weapon Up",
+    "en": "Weapon Up",
+    "it": "Arma",
+    "de": "Waffe hoch"
+  },
+  {
+    "key": "Spells you cast deal 5 extra damage.",
+    "en": "Spells you cast deal 5 extra damage.",
+    "it": "Incantesimi che hai lanciato su 5 danni extra.",
+    "de": "Zauber, dass Sie Deal 5 zusätzliche Schäden wirken."
+  },
+  {
+    "key": "Spell Up",
+    "en": "Spell Up",
+    "it": "Si scrive",
+    "de": "Zauber"
+  },
+  {
+    "key": "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
+    "en": "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
+    "it": "Gli incantesimi hai lanciato che i cui effetti ripristinano i punti ferita ripristinano 5 punti ferita extra.",
+    "de": "Zauber, dass Sie gegossen haben, deren Effekte Trefferpunkte wiederherstellen, werden 5 zusätzliche Trefferpunkte wiederherstellen."
+  },
+  {
+    "key": "Healing Up",
+    "en": "Healing Up",
+    "it": "Guarire",
+    "de": "Heilen"
+  },
+  {
+    "key": "When you recover HP, you recover 5 extra HP.",
+    "en": "When you recover HP, you recover 5 extra HP.",
+    "it": "Quando recuperi HP, recuperi 5 HP extra.",
+    "de": "Wenn Sie HP wiederherstellen, erhalten Sie 5 zusätzliche HP."
+  },
+  {
+    "key": "Vitality Up",
+    "en": "Vitality Up",
+    "it": "Vitalità",
+    "de": "Vitalität hoch"
+  },
+  {
+    "key": "You gain a +1 bonus to your Magic Checks.",
+    "en": "You gain a +1 bonus to your Magic Checks.",
+    "it": "Ottieni un bonus +1 ai tuoi controlli magici.",
+    "de": "Sie erhalten einen Bonus von +1 auf Ihre magischen Schecks."
+  },
+  {
+    "key": "Magic Up",
+    "en": "Magic Up",
+    "it": "Magia",
+    "de": "Magie auf"
+  },
+  {
+    "key": "You gain a +1 bonus to your Accuracy Checks.",
+    "en": "You gain a +1 bonus to your Accuracy Checks.",
+    "it": "Ottieni un bonus +1 ai tuoi controlli di precisione.",
+    "de": "Sie erhalten einen Bonus von +1 auf Ihre Genauigkeitsüberprüfungen."
+  },
+  {
+    "key": "Accuracy Up",
+    "en": "Accuracy Up",
+    "it": "Precisione",
+    "de": "Genauigkeit"
+  },
+  {
+    "key": "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
+    "en": "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
+    "it": "Tutti i danni inflitti dalle armi, dagli incantesimi e dalle abilità diventano di un tipo specifico.",
+    "de": "Alle Schäden, die Ihre Waffen, Zauber und Fähigkeiten zu einem bestimmten Typ befördern."
+  },
+  {
+    "key": "Damage Change",
+    "en": "Damage Change",
+    "it": "Cambio di danno",
+    "de": "Schadensänderung"
+  },
+  {
+    "key": "Enhancement Qualities",
+    "en": "Enhancement Qualities",
+    "it": "Qualità di miglioramento",
+    "de": "Verbesserungsqualitäten"
+  },
+  {
+    "key": "You are immune to all status effects",
+    "en": "You are immune to all status effects",
+    "it": "Sei immune a tutti gli effetti dello stato",
+    "de": "Sie sind immun gegen alle Statusffekte"
+  },
+  {
+    "key": "Perfect Health",
+    "en": "Perfect Health",
+    "it": "Salute perfetta",
+    "de": "Perfekte Gesundheit"
+  },
+  {
+    "key": "Get +1 bonus to Defense and to Magic Defense",
+    "en": "Get +1 bonus to Defense and to Magic Defense",
+    "it": "Ottieni +1 bonus in difesa e alla difesa magica",
+    "de": "Holen Sie sich +1 Bonus für die Verteidigung und die magische Verteidigung"
+  },
+  {
+    "key": "Omnishield",
+    "en": "Omnishield",
+    "it": "Omishield",
+    "de": "Omnishield"
+  },
+  {
+    "key": "You are immune to a single type of damage (except physical)",
+    "en": "You are immune to a single type of damage (except physical)",
+    "it": "Sei immune da un singolo tipo di danno (tranne fisico)",
+    "de": "Sie sind immun gegen eine einzelne Art von Schäden (außer physisch)"
+  },
+  {
+    "key": "Immunity",
+    "en": "Immunity",
+    "it": "Immunità",
+    "de": "Immunität"
+  },
+  {
+    "key": "You have Resistance to physical damage",
+    "en": "You have Resistance to physical damage",
+    "it": "Hai resistenza al danno fisico",
+    "de": "Sie haben Widerstand gegen physische Schäden"
+  },
+  {
+    "key": "Swordbreaker",
+    "en": "Swordbreaker",
+    "it": "Swordbreaker",
+    "de": "Schwertbrecher"
+  },
+  {
+    "key": "You have Resistance to two types of damage (except physical)",
+    "en": "You have Resistance to two types of damage (except physical)",
+    "it": "Hai resistenza a due tipi di danno (tranne fisico)",
+    "de": "Sie haben Widerstand gegen zwei Arten von Schäden (außer physisch)"
+  },
+  {
+    "key": "Dual Resistance",
+    "en": "Dual Resistance",
+    "it": "Doppia resistenza",
+    "de": "Doppelwiderstand"
+  },
+  {
+    "key": "You gain a +1 bonus to Defense.",
+    "en": "You gain a +1 bonus to Defense.",
+    "it": "Ottieni un bonus di +1 alla difesa.",
+    "de": "Sie erhalten einen Bonus von +1 für die Verteidigung."
+  },
+  {
+    "key": "Bulwark",
+    "en": "Bulwark",
+    "it": "Murata",
+    "de": "Bollwerk"
+  },
+  {
+    "key": "Get +1 bonus to Magic Defense",
+    "en": "Get +1 bonus to Magic Defense",
+    "it": "Ottieni +1 bonus alla difesa magica",
+    "de": "Holen Sie sich +1 Bonus für die magische Verteidigung"
+  },
+  {
+    "key": "Amulet",
+    "en": "Amulet",
+    "it": "Amuleto",
+    "de": "Amulett"
+  },
+  {
+    "key": "You have Resistance to a single type of damage (except physical)",
+    "en": "You have Resistance to a single type of damage (except physical)",
+    "it": "Hai resistenza a un singolo tipo di danno (tranne fisico)",
+    "de": "Sie haben Widerstand gegen eine einzelne Art von Schäden (außer physisch)"
+  },
+  {
+    "key": "Resistance",
+    "en": "Resistance",
+    "it": "Resistenza",
+    "de": "Widerstand"
+  },
+  {
+    "key": "You are immune to a single status",
+    "en": "You are immune to a single status",
+    "it": "Sei immune da un unico status",
+    "de": "Sie sind immun gegen einen einzelnen Status"
+  },
+  {
+    "key": "Antistatus",
+    "en": "Antistatus",
+    "it": "Antistatus",
+    "de": "Antistatus"
+  },
+  {
+    "key": "Defensive Qualities",
+    "en": "Defensive Qualities",
+    "it": "Qualità difensive",
+    "de": "Verteidigungsqualitäten"
+  },
+  {
+    "key": "poison",
+    "en": "poison",
+    "it": "veleno",
+    "de": "Gift"
+  },
+  {
+    "key": "light",
+    "en": "light",
+    "it": "leggero",
+    "de": "Licht"
+  },
+  {
+    "key": "ice",
+    "en": "ice",
+    "it": "ghiaccio",
+    "de": "Eis"
+  },
+  {
+    "key": "fire",
+    "en": "fire",
+    "it": "fuoco",
+    "de": "Feuer"
+  },
+  {
+    "key": "earth",
+    "en": "earth",
+    "it": "terra",
+    "de": "Erde"
+  },
+  {
+    "key": "dark",
+    "en": "dark",
+    "it": "buio",
+    "de": "dunkel"
+  },
+  {
+    "key": "bolt",
+    "en": "bolt",
+    "it": "bullone",
+    "de": "Bolzen"
+  },
+  {
+    "key": "wind",
+    "en": "wind",
+    "it": "vento",
+    "de": "Wind"
+  },
+  {
+    "key": "physical",
+    "en": "physical",
+    "it": "fisico",
+    "de": "physisch"
+  },
+  {
+    "key": "Willpower",
+    "en": "Willpower",
+    "it": "Forza di volontà",
+    "de": "Willenskraft"
+  },
+  {
+    "key": "WLP",
+    "en": "WLP",
+    "it": "WLP",
+    "de": "WLP"
+  },
+  {
+    "key": "wil",
+    "en": "wil",
+    "it": "Wil",
+    "de": "Wil"
+  },
+  {
+    "key": "Might",
+    "en": "Might",
+    "it": "Potrebbe",
+    "de": "Könnte"
+  },
+  {
+    "key": "MIG",
+    "en": "MIG",
+    "it": "Mig",
+    "de": "MIG"
+  },
+  {
+    "key": "mig",
+    "en": "mig",
+    "it": "mig",
+    "de": "MIG"
+  },
+  {
+    "key": "Insight",
+    "en": "Insight",
+    "it": "Intuizione",
+    "de": "Einblick"
+  },
+  {
+    "key": "INS",
+    "en": "INS",
+    "it": "Ins",
+    "de": "Ins"
+  },
+  {
+    "key": "ins",
+    "en": "ins",
+    "it": "ins",
+    "de": "Ins"
+  },
+  {
+    "key": "Dexterity",
+    "en": "Dexterity",
+    "it": "Destrezza",
+    "de": "Geschicklichkeit"
+  },
+  {
+    "key": "DEX",
+    "en": "DEX",
+    "it": "Dex",
+    "de": "Dex"
+  },
+  {
+    "key": "dex",
+    "en": "dex",
+    "it": "Dex",
+    "de": "Dex"
+  },
+  {
+    "key": "Rapier",
+    "en": "Rapier",
+    "it": "PAPIER",
+    "de": "Rapier"
+  },
+  {
+    "key": "Greatsword",
+    "en": "Greatsword",
+    "it": "Grande spada",
+    "de": "Großschwert"
+  },
+  {
+    "key": "Bronze Sword",
+    "en": "Bronze Sword",
+    "it": "Spada di bronzo",
+    "de": "Bronzeschwert"
+  },
+  {
+    "key": "Katana",
+    "en": "Katana",
+    "it": "Katana",
+    "de": "Katana"
+  },
+  {
+    "key": "Sword",
+    "en": "Sword",
+    "it": "Spada",
+    "de": "Schwert"
+  },
+  {
+    "key": "Iron Knuckle",
+    "en": "Iron Knuckle",
+    "it": "Knuckle di ferro",
+    "de": "Eisenknöchel"
+  },
+  {
+    "key": "Brawling",
+    "en": "Brawling",
+    "it": "Risuona",
+    "de": "Schlägereien"
+  },
+  {
+    "key": "Steel Dagger",
+    "en": "Steel Dagger",
+    "it": "Dagger in acciaio",
+    "de": "Stahldolch"
+  },
+  {
+    "key": "Dagger",
+    "en": "Dagger",
+    "it": "Pugnale",
+    "de": "Dolch"
+  },
+  {
+    "key": "Waraxe",
+    "en": "Waraxe",
+    "it": "Waraxe",
+    "de": "Waraxe"
+  },
+  {
+    "key": "Broadaxe",
+    "en": "Broadaxe",
+    "it": "Broadaxe",
+    "de": "Broadaxe"
+  },
+  {
+    "key": "Iron Hammer",
+    "en": "Iron Hammer",
+    "it": "Martello di ferro",
+    "de": "Eisenhammer"
+  },
+  {
+    "key": "Heavy",
+    "en": "Heavy",
+    "it": "Pesante",
+    "de": "Schwer"
+  },
+  {
+    "key": "Shuriken",
+    "en": "Shuriken",
+    "it": "Shuriken",
+    "de": "Shuriken"
+  },
+  {
+    "key": "Thrown",
+    "en": "Thrown",
+    "it": "Gettato",
+    "de": "Geworfen"
+  },
+  {
+    "key": "Heavy Spear",
+    "en": "Heavy Spear",
+    "it": "Lancia pesante",
+    "de": "Schwerer Speer"
+  },
+  {
+    "key": "Light Spear",
+    "en": "Light Spear",
+    "it": "Lancia leggera",
+    "de": "Leichter Speer"
+  },
+  {
+    "key": "Spear",
+    "en": "Spear",
+    "it": "Lancia",
+    "de": "Speer"
+  },
+  {
+    "key": "Pistol",
+    "en": "Pistol",
+    "it": "Pistola",
+    "de": "Pistole"
+  },
+  {
+    "key": "Firearm",
+    "en": "Firearm",
+    "it": "Arma da fuoco",
+    "de": "Feuerwaffe"
+  },
+  {
+    "key": "Chain Whip",
+    "en": "Chain Whip",
+    "it": "Whip a catena",
+    "de": "Kettenpeitsche"
+  },
+  {
+    "key": "Flail",
+    "en": "Flail",
+    "it": "Flagello",
+    "de": "Drehfutter"
+  },
+  {
+    "key": "Shortbow",
+    "en": "Shortbow",
+    "it": "Corta",
+    "de": "Kurzbogen"
+  },
+  {
+    "key": "Crossbow",
+    "en": "Crossbow",
+    "it": "Balestra",
+    "de": "Armbrust"
+  },
+  {
+    "key": "Bow",
+    "en": "Bow",
+    "it": "Arco",
+    "de": "Bogen"
+  },
+  {
+    "key": "Tome",
+    "en": "Tome",
+    "it": "Per me",
+    "de": "Mir"
+  },
+  {
+    "key": "Staff",
+    "en": "Staff",
+    "it": "Personale",
+    "de": "Personal"
+  },
+  {
+    "key": "Arcane",
+    "en": "Arcane",
+    "it": "Arcano",
+    "de": "Arkan"
+  },
+  {
     "key": "",
     "en": "",
     "it": "#VALUE!",

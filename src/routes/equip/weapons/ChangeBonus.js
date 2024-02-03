@@ -16,7 +16,7 @@ function ChangeBonus({
           onChange={(e) => {
             setPrecBonus(e.target.checked);
           }}
-          label={t("+1 Accuracy")}
+          label={"+1 " + t("Accuracy", true)}
           size="small"
           sx={{ mb: -1 }}
         />
@@ -26,7 +26,7 @@ function ChangeBonus({
         onChange={(e) => {
           setDamageBonus(e.target.checked);
         }}
-        label={t("+4 Damage")}
+        label={"+4 " + t("Damage", true)}
         sx={{ mt: -1 }}
       />
     </FormControl>

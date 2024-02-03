@@ -123,7 +123,6 @@ function Weapons() {
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
-                  console.log(e.target.value);
                   const base = weapons.find((el) => el.name === e.target.value);
 
                   setBase(base);
