@@ -7,9 +7,10 @@ import {
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
 import weapons from "./base";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeBase({ value, onChange }) {
+  const { t } = useTranslate();
   const groupedWeapons = groupBy(weapons, "category");
 
   const options = [];

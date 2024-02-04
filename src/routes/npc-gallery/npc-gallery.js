@@ -46,9 +46,10 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcGallery() {
+  const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
 
   return (
@@ -70,6 +71,7 @@ export default function NpcGallery() {
 }
 
 function Personal({ user }) {
+  const { t } = useTranslate();
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [species, setSpecies] = useState("");
@@ -375,6 +377,7 @@ function Personal({ user }) {
 }
 
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
+  const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 

@@ -7,9 +7,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditActions({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChangeActions = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -76,9 +77,6 @@ export default function EditActions({ npc, setNpc }) {
             <Grid item xs={12} lg={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
-                  multiline
-                  minRows={1}
-                  maxRows={3}
                   id="effect"
                   label={t("Effect:")}
                   value={actions.effect}

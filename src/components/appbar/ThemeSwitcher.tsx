@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 
@@ -23,6 +23,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   selectedTheme,
   onSelectTheme,
 }) => {
+  const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleToggle = (event: React.MouseEvent<HTMLElement>) => {

@@ -14,7 +14,7 @@ import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -32,6 +32,7 @@ function Pretty({ base, custom }) {
 }
 
 function PrettySingle({ armor, showActions }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;

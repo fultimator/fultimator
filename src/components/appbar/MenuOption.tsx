@@ -16,7 +16,7 @@ import {
   Login,
   SwitchAccount,
 } from "@mui/icons-material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 import {
   getAuth,
@@ -38,6 +38,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
   selectedLanguage,
   onSelectLanguage,
 }) => {
+  const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);

@@ -1,8 +1,9 @@
 import { Card, Typography, useTheme } from "@mui/material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 import ReactMarkdown from "react-markdown";
 
 export default function ExplainAffinities({ npc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const ternary = theme.palette.ternary.main;
   return (

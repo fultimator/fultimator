@@ -1,9 +1,10 @@
 import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
 import { Fragment } from "react";
 import { TypeIcon, typeList, TypeName } from "../../components/types";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditAffinities({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChangeAffinity = (type) => {
     return (e) => {
       const value = num2str(e.target.value);

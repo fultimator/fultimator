@@ -21,9 +21,10 @@ import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
 import Roll from "../../components/roller/Roll";
 import ShareLink from "../../components/roller/ShareLink";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 function RollerScoped() {
+  const { t } = useTranslate();
   const [user, loading, error] = useAuthState(auth);
   if (error) {
     console.error(error);
@@ -37,7 +38,7 @@ function RollerScoped() {
     return (
       <Layout>
         <Typography sx={{ my: 1 }}>
-          You have to be logged in to access this feature
+          {t("You have to be logged in to access this feature")}
         </Typography>
         <SignIn />
       </Layout>
@@ -48,6 +49,7 @@ function RollerScoped() {
 }
 
 function RollerScopedAuthenticated({ user }) {
+  const { t } = useTranslate();
   const { scope } = useParams();
   const [name, setName] = useState("");
 
@@ -168,6 +170,7 @@ function RollerScopedAuthenticated({ user }) {
 }
 
 function PreparedRolls({ user, scope, createRoll }) {
+  const { t } = useTranslate();
   const preparedRollsRef = collection(firestore, "rolls-prepared");
   const preparedRollsQuery = query(
     preparedRollsRef,

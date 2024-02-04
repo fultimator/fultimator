@@ -27,9 +27,10 @@ import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
 
 import { ArrowDropDown } from "@mui/icons-material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 function NpcPretty({ npc, study, collapse, onClick = () => {} }, ref) {
+  const { t } = useTranslate();
   return (
     <Card>
       <div ref={ref} onClick={() => onClick()} style={{ cursor: "pointer" }}>
@@ -90,6 +91,7 @@ function NpcPretty({ npc, study, collapse, onClick = () => {} }, ref) {
 }
 
 function Header({ npc }) {
+  const { t } = useTranslate();
   return (
     <Grid container alignItems="stretch">
       <Grid
@@ -146,7 +148,7 @@ function Header({ npc }) {
             fontSize="1.25rem"
             sx={{ textTransform: "uppercase" }}
           >
-            {renderVillainPhase(npc)}
+            {RenderVillainPhase(npc)}
           </Typography>
         </Grid>
       )}
@@ -180,6 +182,7 @@ function Header({ npc }) {
 }
 
 function Rank({ npc }) {
+  const { t } = useTranslate();
   return (
     <>
       {npc.rank === "elite" && t("Elite")}
@@ -192,6 +195,7 @@ function Rank({ npc }) {
 }
 
 function Stats({ npc }) {
+  const { t } = useTranslate();
   const isMobile = window.innerWidth < 900;
   return (
     <Typography
@@ -396,6 +400,7 @@ function Stats({ npc }) {
 }
 
 function Attacks({ npc }) {
+  const { t } = useTranslate();
   return (
     <Grid container>
       <Grid
@@ -563,6 +568,7 @@ function Attacks({ npc }) {
 }
 
 function Spells({ npc }) {
+  const { t } = useTranslate();
   if (!npc.spells || npc.spells.length === 0) {
     return null;
   }
@@ -633,6 +639,7 @@ function Spells({ npc }) {
 }
 
 function Special({ npc }) {
+  const { t } = useTranslate();
   const special = [];
 
   if (npc.special) {
@@ -715,6 +722,7 @@ function Special({ npc }) {
 }
 
 function Actions({ npc }) {
+  const { t } = useTranslate();
   const actions = [];
 
   if (npc.actions) {
@@ -777,6 +785,7 @@ function Actions({ npc }) {
 }
 
 function Notes({ npc }) {
+  const { t } = useTranslate();
   const notes = [];
 
   if (npc.notes) {
@@ -839,6 +848,7 @@ function Notes({ npc }) {
 }
 
 function RareGear({ npc }) {
+  const { t } = useTranslate();
   const raregear = [];
 
   if (npc.raregear) {
@@ -901,6 +911,7 @@ function RareGear({ npc }) {
 }
 
 function Equip({ npc }) {
+  const { t } = useTranslate();
   const weapons = [];
 
   npc.weaponattacks?.forEach((attack) => {
@@ -1019,7 +1030,8 @@ function Equip({ npc }) {
   );
 }
 
-function renderVillainPhase({ villain, phases, multipart }) {
+function RenderVillainPhase({ villain, phases, multipart }) {
+  const { t } = useTranslate();
   const phaseString =
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
 

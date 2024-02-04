@@ -25,7 +25,7 @@ import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 const powerPMs = {
   minor: 20,
@@ -116,6 +116,7 @@ function RitualsProjects() {
 }
 
 function Rituals() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -302,6 +303,7 @@ function Rituals() {
   );
 }
 function Projects() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;

@@ -15,9 +15,10 @@ import {
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
 import ReactMarkdown from "react-markdown";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditBasics({ npc, setNpc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const ternary = theme.palette.ternary.main;
   const onChange = (key) => {
@@ -86,9 +87,6 @@ export default function EditBasics({ npc, setNpc }) {
             label={t("Traits:")}
             value={npc.traits}
             onChange={onChange("traits")}
-            multiline
-            minRows={1}
-            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>
@@ -214,9 +212,6 @@ export default function EditBasics({ npc, setNpc }) {
             label={t("Multi-Part:")}
             value={npc.multipart}
             onChange={onChange("multipart")}
-            multiline
-            minRows={1}
-            maxRows={3}
             helperText={
               npc.multipart
                 ? t(
@@ -235,9 +230,6 @@ export default function EditBasics({ npc, setNpc }) {
             label={t("Description:")}
             value={npc.description}
             onChange={onChange("description")}
-            multiline
-            minRows={1}
-            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>
@@ -285,6 +277,7 @@ export default function EditBasics({ npc, setNpc }) {
 }
 
 function EditLevel({ npc, setnpc }) {
+  const { t } = useTranslate();
   const onRaiseLevel = (e) => {
     setnpc((prevState) => {
       if (prevState.lvl >= 60) {

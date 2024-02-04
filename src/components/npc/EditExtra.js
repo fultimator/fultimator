@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { baseArmors } from "../../libs/equip";
 import { baseShields } from "../../libs/equip";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditExtra({ npc, setNpc }) {
   return (
@@ -40,6 +40,7 @@ export default function EditExtra({ npc, setNpc }) {
 }
 
 function Defenses({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -157,6 +158,7 @@ function Defenses({ npc, setNpc }) {
 }
 
 function HP({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -183,6 +185,7 @@ function HP({ npc, setNpc }) {
 }
 
 function MP({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -208,6 +211,7 @@ function MP({ npc, setNpc }) {
   );
 }
 function Init({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -228,6 +232,7 @@ function Init({ npc, setNpc }) {
   );
 }
 function ExtraInit({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -254,6 +259,7 @@ function ExtraInit({ npc, setNpc }) {
 }
 
 function Precision({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -275,6 +281,7 @@ function Precision({ npc, setNpc }) {
 }
 
 function Magic({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -296,6 +303,7 @@ function Magic({ npc, setNpc }) {
 }
 
 function SelectArmor({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = function (e) {
     const armor = baseArmors.find((armor) => armor.name === e.target.value);
 
@@ -344,6 +352,7 @@ function SelectArmor({ npc, setNpc }) {
 }
 
 function SelectShield({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = function (e) {
     const shield = baseShields.find((shield) => shield.name === e.target.value);
 

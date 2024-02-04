@@ -58,9 +58,10 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcCompedium() {
+  const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
 
   return (
@@ -82,6 +83,7 @@ export default function NpcCompedium() {
 }
 
 function Personal({ user }) {
+  const { t } = useTranslate();
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
@@ -558,6 +560,7 @@ function Personal({ user }) {
 }
 
 function Npc({ npc, copyNpc, shareNpc, collapseGet }) {
+  const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 

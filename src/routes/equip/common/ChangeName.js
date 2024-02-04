@@ -1,7 +1,8 @@
 import { FormControl, TextField } from "@mui/material";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeName({ value, onChange }) {
+  const { t } = useTranslate();
   return (
     <FormControl variant="standard" fullWidth>
       <TextField

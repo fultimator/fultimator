@@ -36,7 +36,7 @@ import {
   calcUsedSkillsFromOtherActions,
   calcUsedSkillsFromEquip,
 } from "../../libs/npcs";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 const SkillTableRow = ({ label, value, isHeader }) => (
   <TableRow>
@@ -50,6 +50,7 @@ const SkillTableRow = ({ label, value, isHeader }) => (
 );
 
 export default function ExplainSkillsSimplified({ npc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const totalAvailableSkills = calcAvailableSkills(npc);
@@ -86,22 +87,31 @@ export default function ExplainSkillsSimplified({ npc }) {
             },
           }}
         >
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
-          >
-            <span>
+          <span>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               {t("Available:")} {totalAvailableSkills}
-            </span>
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ mx: 1, height: 24, background: "white" }}
-            />
-            <span>
+            </Typography>
+          </span>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ mx: 1, height: 24, background: "white" }}
+          />
+          <span>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+            >
               {t("Used:")} {totalUsedSkills}
-            </span>
-          </Typography>
+            </Typography>
+          </span>
         </AccordionSummary>
         <AccordionDetails
           sx={{

@@ -1,7 +1,8 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeHands({ value, onChange }) {
+  const { t } = useTranslate();
   return (
     <FormControl variant="outlined" fullWidth>
       <InputLabel id="hands">{t("Change Hands")}</InputLabel>

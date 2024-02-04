@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 function calcHit(firstResult, secondResult, bonus, dl) {
   // Calculate Critical Failure
@@ -86,6 +86,7 @@ function DamageCell({ firstResult, secondResult, bonus, damage, dl }) {
 }
 
 export default function Probs() {
+  const { t } = useTranslate();
   const [firstDie, setFirstDie] = useState(6);
   const [secondDie, setSecondDie] = useState(6);
   const [bonus, setBonus] = useState(0);

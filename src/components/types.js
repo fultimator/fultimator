@@ -10,9 +10,10 @@ import {
   PoisonIcon,
   WindIcon,
 } from "./icons";
-import { t } from "../translation/translate";
+import { useTranslate } from "../translation/translate";
 
 export function TypeName({ type }) {
+  const { t } = useTranslate();
   return (
     <>
       {type === "physical" && t("Physical")}

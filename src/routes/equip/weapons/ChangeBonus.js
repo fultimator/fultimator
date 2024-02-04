@@ -1,5 +1,5 @@
 import { Checkbox, FormControl, FormControlLabel } from "@mui/material";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeBonus({
   basePrec,
@@ -8,6 +8,7 @@ function ChangeBonus({
   setPrecBonus,
   setDamageBonus,
 }) {
+  const { t } = useTranslate();
   return (
     <FormControl variant="outlined" fullWidth>
       {basePrec === 0 && (

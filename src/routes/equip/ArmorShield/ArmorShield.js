@@ -8,9 +8,10 @@ import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "../common/SelectQuality";
 import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ArmorShield() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const quaternary = theme.palette.quaternary.main;

@@ -7,9 +7,10 @@ import {
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
 import qualities from "../Accessories/qualities";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function SelectQuality({ quality, setQuality }) {
+  const { t } = useTranslate();
   const groupedQualities = groupBy(qualities, "category");
 
   const options = [];

@@ -20,9 +20,10 @@ import {
 import { useState } from "react";
 import types from "../../libs/types";
 import { DistanceIcon, MeleeIcon } from "../icons";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditAttacks({ npc, setNpc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -102,6 +103,7 @@ export default function EditAttacks({ npc, setNpc }) {
 }
 
 function EditAttack({ attack, setAttack, removeAttack, i }) {
+  const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
       <Grid item sx={{ mx: -1 }}>
@@ -230,6 +232,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
 }
 
 function EditAttackSpecial({ attack, setAttack }) {
+  const { t } = useTranslate();
   const [specials, setSpecials] = useState(attack.special[0]);
 
   const onChange = (e) => {
@@ -250,9 +253,6 @@ function EditAttackSpecial({ attack, setAttack }) {
           <TextField
             id="special"
             label={t("Special:")}
-            multiline
-            minRows={1}
-            maxRows={3}
             value={specials}
             onChange={onChange}
             size="small"

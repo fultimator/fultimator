@@ -29,9 +29,10 @@ import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function Combat() {
+  const { t } = useTranslate();
   const [user, loading, error] = useAuthState(auth);
   console.debug("user, loading, error", user, loading, error);
 
@@ -59,6 +60,7 @@ interface AuthCombatProps {
 }
 
 function AuthCombat({ user }: AuthCombatProps) {
+  const { t } = useTranslate();
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -123,6 +125,7 @@ interface NpcProps {
 }
 
 function NpcCombatant({ npc }: NpcProps) {
+  const { t } = useTranslate();
   const [hp, setHp] = useState(calcHP(npc));
   const [mp, setMp] = useState(calcMP(npc));
   const [attributes, setAttributes] = useState(npc.attributes);

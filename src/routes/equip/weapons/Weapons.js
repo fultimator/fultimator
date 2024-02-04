@@ -12,9 +12,10 @@ import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "../common/SelectQuality";
 import qualities from "./qualities";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function Weapons() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const quaternary = theme.palette.quaternary.main;

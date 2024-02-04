@@ -15,9 +15,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditSpells({ npc, setNpc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -91,6 +92,7 @@ export default function EditSpells({ npc, setNpc }) {
 }
 
 function EditSpell({ spell, setSpell, removeSpell, i }) {
+  const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
       <Grid item>
@@ -198,9 +200,6 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             onChange={(e) => {
               return setSpell("target", e.target.value);
             }}
-            multiline
-            minRows={1}
-            maxRows={3}
             size="small"
           ></TextField>
         </FormControl>
@@ -227,9 +226,6 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             onChange={(e) => {
               return setSpell("effect", e.target.value);
             }}
-            multiline
-            minRows={1}
-            maxRows={3}
             size="small"
           ></TextField>
         </FormControl>

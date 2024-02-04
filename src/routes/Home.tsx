@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import sublogo200 from "./../components/sublogo_200.webp";
 import sublogo834 from "./../components/sublogo_834.webp";
 import sublogo1400 from "./../components/sublogo_1400.webp";
-import { t } from "../translation/translate";
+import { useTranslate } from "../translation/translate";
 
 const SubLogo = ({ src, alt }) => (
   <Grid container justifyContent="center" alignItems="center" sx={{}}>
@@ -38,6 +38,7 @@ const SubLogo = ({ src, alt }) => (
 function Home() {
   const navigate = useNavigate();
   const [hover, setHover] = useState("");
+  const { t } = useTranslate();
   return (
     <Layout>
       <SubLogo

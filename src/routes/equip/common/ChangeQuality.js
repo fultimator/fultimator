@@ -1,7 +1,8 @@
 import { FormControl, Grid, TextField } from "@mui/material";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
+  const { t } = useTranslate();
   return (
     <Grid container spacing={1}>
       <Grid item xs={8}>
@@ -11,9 +12,6 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
             label={t("Quality")}
             value={quality}
             onChange={setQuality}
-            multiline
-            minRows={1}
-            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>

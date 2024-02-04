@@ -1,8 +1,9 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import attributes from "../../../libs/attributes";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
+  const { t } = useTranslate();
   return (
     <Grid container spacing={1}>
       <Grid item xs={6}>

@@ -1,8 +1,9 @@
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import types from "../../../libs/types";
-import { t } from "../../../translation/translate";
+import { useTranslate } from "../../../translation/translate";
 
 function ChangeType({ value, onChange }) {
+  const { t } = useTranslate();
   return (
     <FormControl variant="outlined" fullWidth>
       <InputLabel id="type">{t("Change Type")}</InputLabel>

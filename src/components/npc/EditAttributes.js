@@ -1,8 +1,9 @@
 import React from "react";
 import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export function EditAttributes({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (key) => {
     return (e, value) => {
       setNpc((prevState) => {

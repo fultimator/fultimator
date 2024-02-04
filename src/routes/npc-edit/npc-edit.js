@@ -46,9 +46,10 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcEdit() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;

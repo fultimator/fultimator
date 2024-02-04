@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export interface LanguageMenuProps {
   selectedLanguage: string;
@@ -12,6 +12,7 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
   selectedLanguage,
   onSelectLanguage,
 }) => {
+  const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -31,6 +32,9 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
     { code: "en", label: "English" },
     { code: "it", label: "Italiano (Italian)" },
     { code: "es", label: "Español (Spanish)" },
+    { code: "de", label: "German" },
+    { code: "pl", label: "Polish" },
+    { code: "fr", label: "French" },
     // Continue?
   ];
 
@@ -86,6 +90,12 @@ const getLanguageName = (languageCode: string): string => {
       return "Italiano";
     case "es":
       return "Español";
+    case "de":
+      return "German";
+    case "pl":
+      return "Polish";
+    case "fr":
+      return "French";
     default:
       return languageCode;
   }

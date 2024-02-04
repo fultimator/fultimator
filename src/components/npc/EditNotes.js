@@ -7,9 +7,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { t } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditNotes({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChangeNotes = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -62,9 +63,6 @@ export default function EditNotes({ npc, setNpc }) {
             <Grid item xs={10} lg={4}>
               <FormControl variant="standard" fullWidth>
                 <TextField
-                  multiline
-                  minRows={1}
-                  maxRows={3}
                   id="name"
                   label={t("Name:")}
                   value={notes.name}
@@ -79,9 +77,6 @@ export default function EditNotes({ npc, setNpc }) {
             <Grid item xs={12} lg={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
-                  multiline
-                  minRows={1}
-                  maxRows={3}
                   id="effect"
                   label={t("Details:")}
                   value={notes.effect}

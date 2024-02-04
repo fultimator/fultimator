@@ -1,11 +1,5 @@
+import { useEffect, useState } from "react";
 import data from "./data.json";
-
-const translate = (key) => {
-  return data.find((item) => item.key === key);
-};
-
-const language = localStorage.getItem("selectedLanguage") || "en";
-const debugMode = true;
 
 /*
     - Green is with key and with translated text on selected language
@@ -21,7 +15,13 @@ const debugMode = true;
     - Paste the whole json in ./translation/data.json
 */
 
-export const t = (key, noSpan) => {
+const debugMode = true;
+
+const translate = (key) => {
+  return data.find((item) => item.key === key);
+};
+
+const replaceKey = (key, noSpan, language) => {
   if (debugMode) {
     if (!translate(key) || !translate(key)[language]) {
       if (!window.allUntranslatedKeys) {
@@ -55,4 +55,22 @@ export const t = (key, noSpan) => {
       ? translate(key)[language]
       : key;
   }
+};
+
+export const useTranslate = () => {
+  const [language, setLanguage] = useState("en");
+
+  useEffect(() => {
+    setLanguage(localStorage.getItem("selectedLanguage") || "en");
+  });
+  const t = (key, noSpan) => {
+    return replaceKey(key, noSpan, language);
+  };
+
+  return { t };
+};
+
+export const t = (key, noSpan) => {
+  const language = localStorage.getItem("selectedLanguage") || "en";
+  return replaceKey(key, noSpan, language);
 };
