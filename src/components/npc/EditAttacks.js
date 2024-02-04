@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import types from "../../libs/types";
 import { DistanceIcon, MeleeIcon } from "../icons";
+import { t } from "../../translation/translate";
 
 export default function EditAttacks({ npc, setNpc }) {
   const theme = useTheme();
@@ -66,7 +67,7 @@ export default function EditAttacks({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Basic Attacks
+        {t("Basic Attacks")}
         <IconButton onClick={addAttack}>
           <AddCircleOutline />
         </IconButton>
@@ -112,7 +113,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name:"
+            label={t("Name:")}
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -143,52 +144,56 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr1label"}>Attr 1:</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr1label"}>
+            {t("Attr 1:")}
+          </InputLabel>
           <Select
             value={attack.attr1}
             labelId={"attack-" + i + "-attr1label"}
             id={"attack-" + i + "-attr1"}
-            label="Attr 1:"
+            label={t("Attr 1:")}
             size="small"
             onChange={(e) => {
               return setAttack("attr1", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>Dex</MenuItem>
-            <MenuItem value={"insight"}>Ins</MenuItem>
-            <MenuItem value={"might"}>Mig</MenuItem>
-            <MenuItem value={"will"}>Wil</MenuItem>
+            <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
+            <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
+            <MenuItem value={"might"}>{t("Mig")}</MenuItem>
+            <MenuItem value={"will"}>{t("Wil")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-attr2label"}>Attr 2:</InputLabel>
+          <InputLabel id={"attack-" + i + "-attr2label"}>
+            {t("Attr 2:")}
+          </InputLabel>
           <Select
             value={attack.attr2}
             labelId={"attack-" + i + "-attr2label"}
             id={"attack-" + i + "-attr2"}
-            label="Attr 2:"
+            label={t("Attr 2:")}
             size="small"
             onChange={(e, value) => {
               return setAttack("attr2", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>Dex</MenuItem>
-            <MenuItem value={"insight"}>Ins</MenuItem>
-            <MenuItem value={"might"}>Mig</MenuItem>
-            <MenuItem value={"will"}>Wil</MenuItem>
+            <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
+            <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
+            <MenuItem value={"might"}>{t("Mig")}</MenuItem>
+            <MenuItem value={"will"}>{t("Wil")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs={8} lg={3}>
         <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-type"}>Type:</InputLabel>
+          <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
             value={attack.type}
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
-            label="Ab 1:"
+            label={t("Ab 1:")}
             size="small"
             onChange={(e, value) => {
               return setAttack("type", e.target.value);
@@ -216,7 +221,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 }}
               />
             }
-            label="Extra Damage"
+            label={t("Extra Damage")}
           />
         </FormGroup>
       </Grid>
@@ -244,12 +249,14 @@ function EditAttackSpecial({ attack, setAttack }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="special"
-            label="Special:"
+            label={t("Special:")}
             multiline
+            minRows={1}
+            maxRows={3}
             value={specials}
             onChange={onChange}
             size="small"
-            helperText="Adding a special effect cost 1 skill point"
+            helperText={t("Adding a special effect cost 1 skill point")}
           ></TextField>
         </FormControl>
       </Grid>

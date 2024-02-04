@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { t } from "../../translation/translate";
 
 export default function EditActions({ npc, setNpc }) {
   const onChangeActions = (i, key, value) => {
@@ -44,7 +45,7 @@ export default function EditActions({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Other Actions
+        {t("Other Actions")}
         <IconButton onClick={addActions}>
           <AddCircleOutline />
         </IconButton>
@@ -61,9 +62,8 @@ export default function EditActions({ npc, setNpc }) {
             <Grid item xs={10} lg={4}>
               <FormControl variant="standard" fullWidth>
                 <TextField
-                  multiline
                   id="name"
-                  label="Name:"
+                  label={t("Name:")}
                   value={actions.name}
                   onChange={(e) => {
                     return onChangeActions(i, "name", e.target.value);
@@ -77,8 +77,10 @@ export default function EditActions({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline
+                  minRows={1}
+                  maxRows={3}
                   id="effect"
-                  label="Effect:"
+                  label={t("Effect:")}
                   value={actions.effect}
                   onChange={(e) => {
                     return onChangeActions(i, "effect", e.target.value);

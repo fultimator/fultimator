@@ -1,7 +1,9 @@
+import { t } from "../translation/translate";
+
 export const baseWeapons = [
   {
     category: "Arcane",
-    name: "Staff",
+    name: t("Staff", true),
     cost: 100,
     att1: "will",
     att2: "will",
@@ -13,7 +15,7 @@ export const baseWeapons = [
   },
   {
     category: "Arcane",
-    name: "Tome",
+    name: t("Tome", true),
     cost: 100,
     att1: "insight",
     att2: "insight",
@@ -25,7 +27,7 @@ export const baseWeapons = [
   },
   {
     category: "Bow",
-    name: "Crossbow",
+    name: t("Crossbow", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -37,7 +39,7 @@ export const baseWeapons = [
   },
   {
     category: "Bow",
-    name: "Shortbow",
+    name: t("Shortbow", true),
     cost: 200,
     att1: "dexterity",
     att2: "dexterity",
@@ -49,7 +51,7 @@ export const baseWeapons = [
   },
   {
     category: "Flail",
-    name: "Chain Whip",
+    name: t("Chain Whip", true),
     cost: 150,
     att1: "dexterity",
     att2: "dexterity",
@@ -61,7 +63,7 @@ export const baseWeapons = [
   },
   {
     category: "Firearm",
-    name: "Pistol",
+    name: t("Pistol", true),
     cost: 250,
     att1: "dexterity",
     att2: "insight",
@@ -73,7 +75,7 @@ export const baseWeapons = [
   },
   {
     category: "Spear",
-    name: "Light Spear",
+    name: t("Light Spear", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -85,7 +87,7 @@ export const baseWeapons = [
   },
   {
     category: "Spear",
-    name: "Heavy Spear",
+    name: t("Heavy Spear", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -97,7 +99,7 @@ export const baseWeapons = [
   },
   {
     category: "Thrown",
-    name: "Shuriken",
+    name: t("Shuriken", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -109,7 +111,7 @@ export const baseWeapons = [
   },
   {
     category: "Heavy",
-    name: "Iron Hammer",
+    name: t("Iron Hammer", true),
     cost: 200,
     att1: "might",
     att2: "might",
@@ -121,7 +123,7 @@ export const baseWeapons = [
   },
   {
     category: "Heavy",
-    name: "Broadaxe",
+    name: t("Broadaxe", true),
     cost: 250,
     att1: "might",
     att2: "might",
@@ -133,7 +135,7 @@ export const baseWeapons = [
   },
   {
     category: "Heavy",
-    name: "Waraxe",
+    name: t("Waraxe", true),
     cost: 250,
     att1: "might",
     att2: "might",
@@ -145,7 +147,7 @@ export const baseWeapons = [
   },
   {
     category: "Dagger",
-    name: "Steel Dagger",
+    name: t("Steel Dagger", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -157,7 +159,7 @@ export const baseWeapons = [
   },
   {
     category: "Brawling",
-    name: "Iron Knuckle",
+    name: t("Iron Knuckle", true),
     cost: 150,
     att1: "dexterity",
     att2: "might",
@@ -169,7 +171,7 @@ export const baseWeapons = [
   },
   {
     category: "Sword",
-    name: "Katana",
+    name: t("Katana", true),
     cost: 200,
     att1: "dexterity",
     att2: "insight",
@@ -181,7 +183,7 @@ export const baseWeapons = [
   },
   {
     category: "Sword",
-    name: "Bronze Sword",
+    name: t("Bronze Sword", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -193,7 +195,7 @@ export const baseWeapons = [
   },
   {
     category: "Sword",
-    name: "Greatsword",
+    name: t("Greatsword", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -205,7 +207,7 @@ export const baseWeapons = [
   },
   {
     category: "Sword",
-    name: "Rapier",
+    name: t("Rapier", true),
     cost: 200,
     att1: "dexterity",
     att2: "insight",
@@ -219,7 +221,7 @@ export const baseWeapons = [
 
 export const baseArmors = [
   {
-    name: "No Armor",
+    name: t("No Armor", true),
     cost: 0,
     def: 0,
     defbonus: 0,
@@ -228,7 +230,7 @@ export const baseArmors = [
     init: 0,
   },
   {
-    name: "Travel Garb",
+    name: t("Travel Garb", true),
     cost: 100,
     def: 0,
     defbonus: 1,
@@ -237,7 +239,7 @@ export const baseArmors = [
     init: -1,
   },
   {
-    name: "Silk Shirt",
+    name: t("Silk Shirt", true),
     cost: 100,
     def: 0,
     defbonus: 0,
@@ -246,7 +248,7 @@ export const baseArmors = [
     init: -1,
   },
   {
-    name: "Combat Tunic",
+    name: t("Combat Tunic", true),
     cost: 150,
     def: 0,
     defbonus: 1,
@@ -255,7 +257,7 @@ export const baseArmors = [
     init: 0,
   },
   {
-    name: "Sage Robe",
+    name: t("Sage Robe", true),
     cost: 200,
     def: 0,
     defbonus: 1,
@@ -264,7 +266,7 @@ export const baseArmors = [
     init: -2,
   },
   {
-    name: "Brigandine",
+    name: t("Brigandine", true),
     cost: 150,
     def: 10,
     defbonus: 0,
@@ -273,7 +275,7 @@ export const baseArmors = [
     init: -2,
   },
   {
-    name: "Bronze Plate",
+    name: t("Bronze Plate", true),
     cost: 200,
     def: 11,
     defbonus: 0,
@@ -282,7 +284,7 @@ export const baseArmors = [
     init: -3,
   },
   {
-    name: "Runic Plate",
+    name: t("Runic Plate", true),
     cost: 250,
     def: 11,
     defbonus: 0,
@@ -291,7 +293,7 @@ export const baseArmors = [
     init: -3,
   },
   {
-    name: "Steel Plate",
+    name: t("Steel Plate", true),
     cost: 300,
     def: 12,
     defbonus: 0,
@@ -303,7 +305,7 @@ export const baseArmors = [
 
 export const baseShields = [
   {
-    name: "No Shield",
+    name: t("No Shield", true),
     cost: 0,
     def: 0,
     defbonus: 0,
@@ -312,7 +314,7 @@ export const baseShields = [
     init: 0,
   },
   {
-    name: "Bronze Shield",
+    name: t("Bronze Shield", true),
     cost: 100,
     def: 0,
     defbonus: 2,
@@ -321,7 +323,7 @@ export const baseShields = [
     init: 0,
   },
   {
-    name: "Runic Shield",
+    name: t("Runic Shield", true),
     cost: 150,
     def: 0,
     defbonus: 2,

@@ -16,8 +16,14 @@ import {
   Login,
   SwitchAccount,
 } from "@mui/icons-material";
+import { t } from "../../translation/translate";
 
-import { getAuth, onAuthStateChanged, signOut as firebaseSignOut, UserCredential } from "firebase/auth";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  UserCredential,
+} from "firebase/auth";
 import { auth, googleAuthProvider } from "../../firebase";
 import { signInWithPopup } from "@firebase/auth";
 
@@ -70,42 +76,48 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         setIsSnackbarOpen(true);
         setIsAuthenticated(true);
       } else {
-        setMessage("Signed Out");
+        setMessage(t("Signed Out", true));
         setIsSnackbarOpen(true);
         setIsAuthenticated(false);
       }
     } catch (error) {
-      const errorMessage = (error as { message?: string })?.message || 'An error occurred';
+      const errorMessage =
+        (error as { message?: string })?.message ||
+        t("An error occurred", true);
       setMessage(`${errorMessagePrefix}: ${errorMessage}`);
       setIsSnackbarOpen(true);
     }
   };
 
   const handleSignOut = async () => {
-    await handleAuthentication(() => firebaseSignOut(auth), "Signed Out", "Sign-out Error");
+    await handleAuthentication(
+      () => firebaseSignOut(auth),
+      t("Signed Out", true),
+      t("Sign-out Error", true)
+    );
   };
 
   const signInWithGoogle = async () => {
     googleAuthProvider.setCustomParameters({
-      prompt: 'select_account'
+      prompt: "select_account",
     });
 
     await handleAuthentication(
       () => signInWithPopup(auth, googleAuthProvider),
-      "Signed In",
-      "Sign-in Error"
+      t("Signed In", true),
+      t("Sign-in Error", true)
     );
   };
 
   const switchGoogleAccount = async () => {
     googleAuthProvider.setCustomParameters({
-      prompt: 'select_account'
+      prompt: "select_account",
     });
 
     await handleAuthentication(
       () => signInWithPopup(auth, googleAuthProvider),
-      "Switched Google Account",
-      "Account Switch Error"
+      t("Switched Google Account", true),
+      t("Account Switch Error", true)
     );
   };
 
@@ -133,21 +145,22 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         }}
       >
         {/* User Info */}
-        {[(
+        {[
           <MenuItem key="user-info">
             <ListItemIcon>
               <AccountCircle />
             </ListItemIcon>
-            <ListItemText primary="Username" />
-          </MenuItem>
-        ), <Divider key="user-info-divider" />]}
+            <ListItemText primary={t("Username")} />
+          </MenuItem>,
+          <Divider key="user-info-divider" />,
+        ]}
 
         {/* Switch Account */}
         <MenuItem onClick={handleSwitchAccount}>
           <ListItemIcon>
             <SwitchAccount />
           </ListItemIcon>
-          <ListItemText primary="Switch Account" />
+          <ListItemText primary={t("Switch Account")} />
         </MenuItem>
 
         {/* Sign Out/Sign In */}
@@ -156,14 +169,14 @@ const MenuOption: React.FC<MenuOptionProps> = ({
             <ListItemIcon>
               <Logout />
             </ListItemIcon>
-            <ListItemText primary="Sign Out" />
+            <ListItemText primary={t("Sign Out")} />
           </MenuItem>
         ) : (
           <MenuItem onClick={signInWithGoogle}>
             <ListItemIcon>
               <Login />
             </ListItemIcon>
-            <ListItemText primary="Sign In" />
+            <ListItemText primary={t("Sign In")} />
           </MenuItem>
         )}
         <Divider key="sign-in-out-divider" />
@@ -175,7 +188,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
             selectedTheme={selectedTheme}
             onSelectTheme={onSelectTheme}
           />,
-          <Divider key="theme-switcher-divider" />
+          <Divider key="theme-switcher-divider" />,
         ]}
 
         {/* LanguageMenu */}
@@ -185,7 +198,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
             selectedLanguage={selectedLanguage}
             onSelectLanguage={onSelectLanguage}
           />,
-          <Divider key="language-menu-divider" />
+          <Divider key="language-menu-divider" />,
         ]}
 
         {/* Help & Feedback */}
@@ -193,7 +206,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
           <ListItemIcon>
             <Help />
           </ListItemIcon>
-          <ListItemText primary="Help & Feedback" />
+          <ListItemText primary={t("Help & Feedback")} />
         </MenuItem>
       </Menu>
 

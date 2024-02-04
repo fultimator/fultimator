@@ -124,32 +124,32 @@ function Defenses({ npc, setNpc }) {
         <FormControlLabel
           value="00"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+0 Def / +0 M. Def"
+          label={`+0 ${t("DEF", true)} / +0 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="12"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+1 Def / +2 M. Def"
+          label={`+1 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="21"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+2 Def / +1 M. Def"
+          label={`+2 ${t("DEF", true)} / +1 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="33"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+3 Def / +3 M. Def"
+          label={`+3 ${t("DEF", true)} / +3 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="24"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+2 Def / +4 M. Def"
+          label={`+2 ${t("DEF", true)} / +4 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="42"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+4 Def / +2 M. Def"
+          label={`+4 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
         />
       </RadioGroup>
     </FormControl>
@@ -174,7 +174,7 @@ function HP({ npc, setNpc }) {
         id="HP"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra HP:"
+        label={t("Extra HP:")}
         value={npc.extra?.hp || 0}
         onChange={onChange}
       ></TextField>
@@ -200,7 +200,7 @@ function MP({ npc, setNpc }) {
         id="mp"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra MP:"
+        label={t("Extra MP:")}
         value={npc.extra?.mp || 0}
         onChange={onChange}
       ></TextField>
@@ -222,7 +222,7 @@ function Init({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.init} onChange={onChange} />}
-        label="+4 Initiative"
+        label={`+4 ${t("Initiative", true)}`}
       />
     </FormGroup>
   );
@@ -245,7 +245,7 @@ function ExtraInit({ npc, setNpc }) {
         id="extrainit"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        label="Extra Init:"
+        label={t("Extra Init:")}
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
       ></TextField>
@@ -268,7 +268,7 @@ function Precision({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.precision} onChange={onChange} />}
-        label="+3 bonus to all Accuracy Checks"
+        label={`+3 ${t("bonus to all Accuracy Checks", true)}`}
       />
     </FormGroup>
   );
@@ -289,7 +289,7 @@ function Magic({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.magic} onChange={onChange} />}
-        label="+3 bonus to all Magic Checks."
+        label={`+3 ${t("bonus to all Magic Checks", true)}`}
       />
     </FormGroup>
   );
@@ -328,13 +328,13 @@ function SelectArmor({ npc, setNpc }) {
 
   return (
     <FormControl fullWidth sx={{ mt: 1 }}>
-      <InputLabel id="type">Armor</InputLabel>
+      <InputLabel id="type">{t("Armor")}</InputLabel>
       <Select
         size="medium"
         labelId="armor"
         id="select-armor"
         value={armor.name}
-        label="Armor"
+        label={t("Armor")}
         onChange={onChange}
       >
         {options}
@@ -376,13 +376,13 @@ function SelectShield({ npc, setNpc }) {
 
   return (
     <FormControl fullWidth sx={{ mt: 1 }}>
-      <InputLabel id="type">Shield</InputLabel>
+      <InputLabel id="type">{t("Shield")}</InputLabel>
       <Select
         size="medium"
         labelId="shield"
         id="select-shield"
         value={shield.name}
-        label="Shield"
+        label={t("Shield")}
         onChange={onChange}
       >
         {options}

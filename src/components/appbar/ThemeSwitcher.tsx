@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { t } from "../../translation/translate";
 
 type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 
@@ -51,7 +52,9 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
             <Brightness7Icon />
           )}
         </ListItemIcon>
-        <ListItemText primary={`Theme: ${getThemeName(selectedTheme)}`} />
+        <ListItemText
+          primary={`${t("Theme:", true)} ${getThemeName(selectedTheme)}`}
+        />
       </MenuItem>
 
       <Menu
@@ -70,9 +73,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         {themes.map((themeOption) => (
           <MenuItem
             key={themeOption.value}
-            onClick={() =>
-              handleToggleTheme(themeOption.value as ThemeValue)
-            }
+            onClick={() => handleToggleTheme(themeOption.value as ThemeValue)}
           >
             {getThemeName(themeOption.value as ThemeValue)}
           </MenuItem>

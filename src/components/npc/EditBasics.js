@@ -87,6 +87,8 @@ export default function EditBasics({ npc, setNpc }) {
             value={npc.traits}
             onChange={onChange("traits")}
             multiline
+            minRows={1}
+            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>
@@ -213,9 +215,13 @@ export default function EditBasics({ npc, setNpc }) {
             value={npc.multipart}
             onChange={onChange("multipart")}
             multiline
+            minRows={1}
+            maxRows={3}
             helperText={
               npc.multipart
-                ? "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                ? t(
+                    "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                  )
                 : ""
             }
           ></TextField>
@@ -230,7 +236,8 @@ export default function EditBasics({ npc, setNpc }) {
             value={npc.description}
             onChange={onChange("description")}
             multiline
-            rows={5}
+            minRows={1}
+            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>

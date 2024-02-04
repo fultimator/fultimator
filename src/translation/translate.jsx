@@ -4,7 +4,7 @@ const translate = (key) => {
   return data.find((item) => item.key === key);
 };
 
-const language = "it";
+const language = localStorage.getItem("selectedLanguage") || "en";
 const debugMode = true;
 
 /*

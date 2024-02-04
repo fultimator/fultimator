@@ -15,6 +15,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
+import { t } from "../../translation/translate";
 
 export default function EditSpells({ npc, setNpc }) {
   const theme = useTheme();
@@ -61,7 +62,7 @@ export default function EditSpells({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Spells
+        {t("Spells")}
         <IconButton onClick={addSpell}>
           <AddCircleOutline />
         </IconButton>
@@ -101,7 +102,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name:"
+            label={t("Name:")}
             value={spell.name}
             onChange={(e) => {
               return setSpell("name", e.target.value);
@@ -130,21 +131,23 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       {spell.type === "offensive" && (
         <Grid item xs={5} sm={4} md={2} lg={1}>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"spell-" + i + "-attr1label"}>Attr 1:</InputLabel>
+            <InputLabel id={"spell-" + i + "-attr1label"}>
+              {t("Attr 1:")}
+            </InputLabel>
             <Select
               value={spell.attr1}
               labelId={"spell-" + i + "-attr1label"}
               id={"spell-" + i + "-attr1"}
-              label="Attr 1"
+              label={t("Attr 1")}
               size="small"
               onChange={(e) => {
                 return setSpell("attr1", e.target.value);
               }}
             >
-              <MenuItem value={"dexterity"}>Dex</MenuItem>
-              <MenuItem value={"insight"}>Ins</MenuItem>
-              <MenuItem value={"might"}>Mig</MenuItem>
-              <MenuItem value={"will"}>Wil</MenuItem>
+              <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
+              <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
+              <MenuItem value={"might"}>{t("Mig")}</MenuItem>
+              <MenuItem value={"will"}>{t("Wil")}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -152,21 +155,23 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       {spell.type === "offensive" && (
         <Grid item xs={5} sm={4} md={2} lg={1}>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"spell-" + i + "-attr2label"}>Attr 2:</InputLabel>
+            <InputLabel id={"spell-" + i + "-attr2label"}>
+              {t("Attr 2:")}
+            </InputLabel>
             <Select
               value={spell.attr2}
               labelId={"spell-" + i + "-attr2label"}
               id={"spell-" + i + "-attr2"}
-              label="Attr 2"
+              label={t("Attr 2:")}
               size="small"
               onChange={(e, value) => {
                 return setSpell("attr2", e.target.value);
               }}
             >
-              <MenuItem value={"dexterity"}>Dex</MenuItem>
-              <MenuItem value={"insight"}>Ins</MenuItem>
-              <MenuItem value={"might"}>Mig</MenuItem>
-              <MenuItem value={"will"}>Wil</MenuItem>
+              <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
+              <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
+              <MenuItem value={"might"}>{t("Mig")}</MenuItem>
+              <MenuItem value={"will"}>{t("Wil")}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -175,7 +180,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="mp"
-            label="MP:"
+            label={t("MP:")}
             value={spell.mp}
             onChange={(e) => {
               return setSpell("mp", e.target.value);
@@ -188,12 +193,14 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="target"
-            label="Target:"
+            label={t("Target:")}
             value={spell.target}
             onChange={(e) => {
               return setSpell("target", e.target.value);
             }}
             multiline
+            minRows={1}
+            maxRows={3}
             size="small"
           ></TextField>
         </FormControl>
@@ -202,7 +209,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="duration"
-            label="Duration:"
+            label={t("Duration:")}
             value={spell.duration}
             onChange={(e) => {
               return setSpell("duration", e.target.value);
@@ -215,12 +222,14 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         <FormControl variant="outlined" fullWidth>
           <TextField
             id="effect"
-            label="Effect:"
+            label={t("Effect:")}
             value={spell.effect}
             onChange={(e) => {
               return setSpell("effect", e.target.value);
             }}
             multiline
+            minRows={1}
+            maxRows={3}
             size="small"
           ></TextField>
         </FormControl>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
+import { t } from "../../translation/translate";
 
 export interface LanguageMenuProps {
   selectedLanguage: string;
@@ -35,11 +36,20 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
 
   return (
     <>
-      <MenuItem onClick={handleClick} aria-label={`Change Language to ${getLanguageName(selectedLanguage)}`}>
+      <MenuItem
+        onClick={handleClick}
+        aria-label={`${t("Change Language to:", true)} ${getLanguageName(
+          selectedLanguage
+        )}`}
+      >
         <ListItemIcon>
           <LanguageIcon />
         </ListItemIcon>
-        <ListItemText primary={`Language: ${getLanguageName(selectedLanguage)}`} />
+        <ListItemText
+          primary={`${t("Language:", true)} ${getLanguageName(
+            selectedLanguage
+          )}`}
+        />
       </MenuItem>
 
       <Menu
@@ -56,7 +66,10 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
         }}
       >
         {languageOptions.map((option) => (
-          <MenuItem key={option.code} onClick={() => handleLanguageChange(option.code)}>
+          <MenuItem
+            key={option.code}
+            onClick={() => handleLanguageChange(option.code)}
+          >
             {option.label}
           </MenuItem>
         ))}

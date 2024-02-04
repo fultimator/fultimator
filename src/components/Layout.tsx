@@ -19,9 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
     // Fetch theme from localStorage
-    return (
-      (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula"
-    );
+    return (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula";
   });
 
   const location = useLocation();
@@ -63,7 +61,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         selectedTheme={selectedTheme}
         handleSelectTheme={handleSelectTheme}
       />
-      <Container style={{ marginTop: "8em", alignItems: "center" }}>
+      <Container
+        style={{ marginTop: "8em", alignItems: "center" }}
+        key={selectedLanguage}
+      >
         {children}
       </Container>
     </>

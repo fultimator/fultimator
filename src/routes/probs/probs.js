@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import Layout from "../../components/Layout";
+import { t } from "../../translation/translate";
 
 function calcHit(firstResult, secondResult, bonus, dl) {
   // Calculate Critical Failure
@@ -111,12 +111,12 @@ export default function Probs() {
         {/* First die */}
         <Grid item xs>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"firstdie"}>Die 1</InputLabel>
+            <InputLabel id={"firstdie"}>{t("Die 1")}</InputLabel>
             <Select
               value={firstDie}
               labelId={"firstdie"}
               id={"firstdie"}
-              label="Die 1"
+              label={t("Die 1")}
               size="small"
               onChange={(e) => {
                 return setFirstDie(e.target.value);
@@ -133,12 +133,12 @@ export default function Probs() {
         {/* Second die */}
         <Grid item xs>
           <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"seconddie"}>Die 2</InputLabel>
+            <InputLabel id={"seconddie"}>{t("Die 2")}</InputLabel>
             <Select
               value={secondDie}
               labelId={"seconddie"}
               id={"seconddie"}
-              label="Die 2"
+              label={t("Die 2")}
               size="small"
               onChange={(e) => {
                 return setSecondDie(e.target.value);
@@ -157,7 +157,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="bonus"
-              label="Bonus"
+              label={t("Bonus")}
               type="number"
               min={0}
               max={60}
@@ -197,7 +197,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
-              label="Damage"
+              label={t("Damage")}
               type="number"
               min={0}
               max={60}
@@ -236,7 +236,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
-              label="DL"
+              label={t("DL")}
               type="number"
               min={7}
               max={20}
@@ -275,7 +275,7 @@ export default function Probs() {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"
-              label="HP"
+              label={t("HP")}
               type="number"
               min={30}
               max={300}
@@ -362,10 +362,14 @@ export default function Probs() {
           </TableBody>
         </Table>
       </div>
-      <Typography>Probability to hit: {probHit.toFixed(2)}%</Typography>
-      <Typography>Expected damage: {Math.floor(expectedDamage)}</Typography>
       <Typography>
-        Number of attacks needed: {Math.ceil(hp / expectedDamage)}
+        {t("Probability to hit:")} {probHit.toFixed(2)}%
+      </Typography>
+      <Typography>
+        {t("Expected damage:")} {Math.floor(expectedDamage)}
+      </Typography>
+      <Typography>
+        {t("Number of attacks needed:")} {Math.ceil(hp / expectedDamage)}
       </Typography>
     </div>
   );

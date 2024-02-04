@@ -12,6 +12,8 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
             value={quality}
             onChange={setQuality}
             multiline
+            minRows={1}
+            maxRows={3}
           ></TextField>
         </FormControl>
       </Grid>

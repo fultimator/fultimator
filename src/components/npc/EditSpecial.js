@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { t } from "../../translation/translate";
 
 export default function EditSpecial({ npc, setNpc }) {
   const onChangeSpecial = (i, key, value) => {
@@ -44,7 +45,7 @@ export default function EditSpecial({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Special Rules
+        {t("Special Rules")}
         <IconButton onClick={addSpecial}>
           <AddCircleOutline />
         </IconButton>
@@ -62,8 +63,10 @@ export default function EditSpecial({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline
+                  minRows={1}
+                  maxRows={3}
                   id="name"
-                  label="Name:"
+                  label={t("Name:")}
                   value={special.name}
                   onChange={(e) => {
                     return onChangeSpecial(i, "name", e.target.value);
@@ -77,8 +80,10 @@ export default function EditSpecial({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline
+                  minRows={1}
+                  maxRows={3}
                   id="effect"
-                  label="Effect:"
+                  label={t("Effect:")}
                   value={special.effect}
                   onChange={(e) => {
                     return onChangeSpecial(i, "effect", e.target.value);

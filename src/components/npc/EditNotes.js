@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { t } from "../../translation/translate";
 
 export default function EditNotes({ npc, setNpc }) {
   const onChangeNotes = (i, key, value) => {
@@ -44,7 +45,7 @@ export default function EditNotes({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Notes
+        {t("Notes")}
         <IconButton onClick={addNotes}>
           <AddCircleOutline />
         </IconButton>
@@ -62,8 +63,10 @@ export default function EditNotes({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline
+                  minRows={1}
+                  maxRows={3}
                   id="name"
-                  label="Name:"
+                  label={t("Name:")}
                   value={notes.name}
                   onChange={(e) => {
                     return onChangeNotes(i, "name", e.target.value);
@@ -77,8 +80,10 @@ export default function EditNotes({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   multiline
+                  minRows={1}
+                  maxRows={3}
                   id="effect"
-                  label="Details:"
+                  label={t("Details:")}
                   value={notes.effect}
                   onChange={(e) => {
                     return onChangeNotes(i, "effect", e.target.value);
