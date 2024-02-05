@@ -22,10 +22,8 @@ import Techno from "./themes/Techno";
 import Natural from "./themes/Natural";
 import Midnight from "./themes/Midnight";
 
-import {
-  ThemeProvider as AppThemeProvider,
-  useThemeContext,
-} from "./ThemeContext";
+import { ThemeProvider as AppThemeProvider, useThemeContext } from "./ThemeContext";
+import { LanguageProvider as AppLanguageProvider} from "./LanguageContext";
 
 const themes = {
   Fabula,
@@ -60,9 +58,11 @@ const App = () => {
 };
 
 const Root = () => (
-  <AppThemeProvider>
-    <App />
-  </AppThemeProvider>
+  <AppLanguageProvider>
+    <AppThemeProvider>
+      <App />
+    </AppThemeProvider>
+  </AppLanguageProvider>
 );
 
 const root = document.getElementById("root");

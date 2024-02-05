@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "./appbar/AppBar";
 
 import { useThemeContext } from "../ThemeContext";
+import { useLanguageContext } from "../LanguageContext";
 
 type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 
@@ -12,28 +13,18 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(() => {
-    // Fetch language from localStorage
-    return localStorage.getItem("selectedLanguage") || "en";
-  });
+  const { selectedLanguage, setLanguage } = useLanguageContext();
+  const { setTheme } = useThemeContext();
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
-    // Fetch theme from localStorage
     return (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula";
   });
 
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const { setTheme } = useThemeContext();
-
   const handleSelectLanguage = (language: string) => {
-    console.log(`Theme changed to: ${language}`);
-    setSelectedLanguage(language);
+    setLanguage(language);
   };
 
   const handleSelectTheme = (theme: ThemeValue) => {
-    console.log(`Theme changed to: ${theme}`);
     setSelectedTheme(theme);
   };
 
@@ -43,6 +34,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     localStorage.setItem("selectedLanguage", selectedLanguage);
     setTheme(selectedTheme);
   }, [selectedTheme, selectedLanguage, setTheme]);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleGoBack = () => {
     navigate(-1);
