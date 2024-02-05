@@ -195,7 +195,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             value={attack.type}
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
-            label={t("Ab 1:")}
+            label={t("Type:")}
             size="small"
             onChange={(e, value) => {
               return setAttack("type", e.target.value);

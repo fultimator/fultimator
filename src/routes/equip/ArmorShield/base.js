@@ -55,7 +55,7 @@ const shield = [
   },
   {
     category: t("Armor", true),
-    name: t("Brigadine", true),
+    name: t("Brigandine", true),
     cost: 150,
     def: 10,
     mdef: 0,
