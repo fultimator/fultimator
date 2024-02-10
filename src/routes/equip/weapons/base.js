@@ -74,7 +74,7 @@ const weapons = [
     ranged: true,
   },
   {
-    category: t("Spear", true),
+    category: t("spear_category", true),
     name: t("Light Spear", true),
     cost: 200,
     att1: "dexterity",
@@ -86,7 +86,7 @@ const weapons = [
     melee: true,
   },
   {
-    category: t("Spear", true),
+    category: t("spear_category", true),
     name: t("Heavy Spear", true),
     cost: 200,
     att1: "dexterity",

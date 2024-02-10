@@ -149,8 +149,8 @@ export default function EditBasics({ npc, setNpc }) {
             onChange={onChange("villain")}
           >
             <MenuItem value={""}>{t("None")}</MenuItem>
-            <MenuItem value={"minor"}>{t("Minor")}</MenuItem>
-            <MenuItem value={"major"}>{t("Major")}</MenuItem>
+            <MenuItem value={"minor"}>{t("minor_villain")}</MenuItem>
+            <MenuItem value={"major"}>{t("major_villain")}</MenuItem>
             <MenuItem value={"supreme"}>{t("Supreme")}</MenuItem>
           </Select>
         </FormControl>
