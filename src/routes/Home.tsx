@@ -16,15 +16,12 @@ import sublogo1400 from "./../components/sublogo_1400.webp";
 import { useTranslate } from "../translation/translate";
 
 const SubLogo = ({ src, alt }) => (
-  <Grid container justifyContent="center" alignItems="center" sx={{}}>
+  <Grid container justifyContent="center" alignItems="center">
     <Grid item xs={12} md={6}>
-      <Paper
-        elevation={3}
-        sx={{ borderRadius: "16px", textAlign: "center", p: "16px" }}
-      >
-        <Typography variant="subtitle1" sx={{ p: 0, m: 0 }}>
+      <Paper elevation={3} sx={{ borderRadius: "16px", textAlign: "center" }}>
+        <Typography variant="subtitle1" sx={{ p: 0, m: 0, display: 'flex', flexDirection: 'column'}}>
           <img
-            style={{ width: "100%", height: "auto", maxWidth: "400px" }}
+            style={{ width: "100%", height: "auto", maxWidth: "400px", margin: "auto" }}
             sizes="(max-width: 1400px) 100vw, 1400px"
             srcSet={src}
             alt={alt}
@@ -43,7 +40,7 @@ function Home() {
     <Layout>
       <SubLogo
         src={`${sublogo200} 200w, ${sublogo834} 929w, ${sublogo1400} 1400w`}
-        alt="An Unofficial Fabula Ultima Tool"
+        alt="Unofficial Fabula Ultima Tool"
       />
       <div
         style={{

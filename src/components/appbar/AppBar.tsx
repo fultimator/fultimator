@@ -80,7 +80,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 >
                   <Typography variant="h1" textAlign="center">
                     <img
-                      style={{ maxWidth: '75%', height: 'auto', maxHeight: '120px' }}
+                      style={{ maxWidth: '75%', height: '100%', maxHeight: '94px' }}
                       sizes="(max-width: 1400px) 100vw, 1400px"
                       srcSet={`${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
                       src={logo1400}
