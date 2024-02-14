@@ -146,7 +146,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         }}
       >
         {/* User Info */}
-        {[
+        {/* {[
           <MenuItem key="user-info">
             <ListItemIcon>
               <AccountCircle />
@@ -154,7 +154,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
             <ListItemText primary={t("Username")} />
           </MenuItem>,
           <Divider key="user-info-divider" />,
-        ]}
+        ]} */}
 
         {/* Switch Account */}
         <MenuItem onClick={handleSwitchAccount}>
@@ -193,14 +193,14 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         ]}
 
         {/* LanguageMenu */}
-        {[
+        {/* {[
           <LanguageMenu
             key="language-menu"
             selectedLanguage={selectedLanguage}
             onSelectLanguage={onSelectLanguage}
           />,
           <Divider key="language-menu-divider" />,
-        ]}
+        ]} */}
 
         {/* Help & Feedback */}
         <MenuItem onClick={handleClose}>
