@@ -1,6 +1,9 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { firestore } from "../../firebase";
-
+import { firestore, auth } from "../../firebase";
+import { useDocumentData } from "react-firebase-hooks/firestore";
+import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   Grid,
   Divider,
@@ -14,11 +17,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
-import EditBasics from "../../components/npc/EditBasics";
 import {
   Download,
   Publish,
@@ -27,8 +25,10 @@ import {
   ArrowUpward,
   ContentCopy,
 } from "@mui/icons-material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import Layout from "../../components/Layout";
+import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
+import EditBasics from "../../components/npc/EditBasics";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import ExplainSkillsSimplified from "../../components/npc/ExplainSkillsSimplified";
 import EditAttacks from "../../components/npc/EditAttacks";
@@ -42,8 +42,6 @@ import EditActions from "../../components/npc/EditActions";
 import EditNotes from "../../components/npc/EditNotes";
 import EditRareGear from "../../components/npc/EditRareGear";
 import Probs from "../../routes/probs/probs";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
@@ -262,9 +260,10 @@ export default function NpcEdit() {
           <Paper
             elevation={3}
             sx={{
+              mt: "4px",
               p: "10px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -338,8 +337,8 @@ export default function NpcEdit() {
           <Paper
             elevation={3}
             sx={{
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
               padding: "20px",
             }}
@@ -369,8 +368,8 @@ export default function NpcEdit() {
             elevation={3}
             sx={{
               p: "20px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -407,8 +406,8 @@ export default function NpcEdit() {
             elevation={3}
             sx={{
               p: "20px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -444,8 +443,8 @@ export default function NpcEdit() {
             elevation={3}
             sx={{
               p: "20px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -474,8 +473,8 @@ export default function NpcEdit() {
             elevation={3}
             sx={{
               p: "20px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -517,8 +516,8 @@ export default function NpcEdit() {
             elevation={3}
             sx={{
               p: "20px",
-              borderRadius: "16px",
-              border: "3px solid",
+              borderRadius: "8px",
+              border: "2px solid",
               borderColor: secondary,
             }}
           >
@@ -546,7 +545,8 @@ export default function NpcEdit() {
       )}
 
       {/* <NpcUgly npc={npcTemp} /> */}
-
+      
+      {/* SP Tracker Field */}
       <Grid
         sx={{
           position: "fixed",

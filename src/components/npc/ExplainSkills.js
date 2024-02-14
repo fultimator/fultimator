@@ -5,6 +5,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  useTheme
 } from "@mui/material";
 import {
   calcAvailableSkills,
@@ -33,8 +34,16 @@ import { useTranslate } from "../../translation/translate";
 
 export default function ExplainSkills({ npc }) {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
   return (
-    <Card>
+    <Card                   
+      sx={{
+      borderRadius: "8px",
+      border: "2px solid ",
+      borderColor: secondary,
+    }}>
       <Table size="small">
         <TableHead>
           <TableRow>

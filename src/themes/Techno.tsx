@@ -16,7 +16,7 @@ const Techno = createTheme({
       main: "#607989",
     },
     background: {
-      default: "#dce9f2",
+      default: "#e3edf4",
     },
     red: {
       main: "#d1232a",
