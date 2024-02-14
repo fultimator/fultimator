@@ -20,6 +20,7 @@ import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
+import { useTranslate } from "../../../translation/translate";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -39,6 +40,7 @@ function Pretty({ base, custom }) {
 }
 
 function PrettySingle({ weapon, showActions }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -72,22 +74,22 @@ function PrettySingle({ weapon, showActions }) {
               <Grid item xs={1}></Grid>
               <Grid item xs={3}>
                 <Typography variant="h4" textAlign="left">
-                  Weapon
+                  {t("Weapon")}
                 </Typography>
               </Grid>
               <Grid item xs={1}>
                 <Typography variant="h4" textAlign="center">
-                  Cost
+                  {t("Cost")}
                 </Typography>
               </Grid>
               <Grid item xs={3}>
                 <Typography variant="h4" textAlign="center">
-                  Accuracy
+                  {t("Accuracy")}
                 </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h4" textAlign="center">
-                  Damage
+                  {t("Damage")}
                 </Typography>
               </Grid>
             </Grid>
@@ -136,7 +138,7 @@ function PrettySingle({ weapon, showActions }) {
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
-                      HR + {weapon.damage}
+                      {t("HR +")} {weapon.damage}
                       <CloseBracket />
                       {types[weapon.type].long}
                     </Typography>
@@ -161,8 +163,8 @@ function PrettySingle({ weapon, showActions }) {
                   </Grid>
                   <Grid item xs={4}>
                     <Typography textAlign="center">
-                      {weapon.hands === 1 && "One-handed"}
-                      {weapon.hands === 2 && "Two-handed"}
+                      {weapon.hands === 1 && t("One-handed")}
+                      {weapon.hands === 2 && t("Two-handed")}
                     </Typography>
                   </Grid>
                   <Grid item xs={1}>
@@ -170,8 +172,8 @@ function PrettySingle({ weapon, showActions }) {
                   </Grid>
                   <Grid item xs={3}>
                     <Typography textAlign="center">
-                      {weapon.melee && "Melee"}
-                      {weapon.ranged && "Ranged"}
+                      {weapon.melee && t("Melee")}
+                      {weapon.ranged && t("Ranged")}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -185,7 +187,7 @@ function PrettySingle({ weapon, showActions }) {
                 py: 1,
               }}
             >
-              {!weapon.quality && "No Qualities"}{" "}
+              {!weapon.quality && t("No Qualities")}{" "}
               <ReactMarkdown
                 allowedElements={["strong"]}
                 unwrapDisallowed={true}
@@ -198,7 +200,7 @@ function PrettySingle({ weapon, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download as Image">
+          <Tooltip title={t("Download as Image")}>
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>

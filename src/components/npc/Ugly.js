@@ -19,7 +19,6 @@ export default function NpcUgly({ npc }) {
     <>
       <TextField
         fullWidth
-        multiline
         value={npcJson}
         onChange={(e) => {
           setNpcJson(e.target.value);

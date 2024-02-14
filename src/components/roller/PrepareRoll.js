@@ -17,8 +17,10 @@ import {
 import { D10Icon, D12Icon, D20Icon, D4Icon, D6Icon, D8Icon } from "../icons";
 import { useCallback, useEffect, useState } from "react";
 import { prepareDice } from "../../libs/rolls";
+import { useTranslate } from "../../translation/translate";
 
 export default function PrepareRoll({ savePreparedRoll, createRoll }) {
+  const { t } = useTranslate();
   const [d4, setd4] = useState(0);
   const [d6, setd6] = useState(0);
   const [d8, setd8] = useState(0);
@@ -266,7 +268,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
               }
               onClick={onRoll}
             >
-              Roll
+              {t("Roll")}
             </Button>
           </Grid>
           <Grid item>
@@ -277,7 +279,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
               }
               onClick={onReset}
             >
-              Reset
+              {t("Reset")}
             </Button>
           </Grid>
           <Grid item>
@@ -288,7 +290,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
               }
               onClick={onSave}
             >
-              Prepare
+              {t("Prepare")}
             </Button>
           </Grid>
         </Grid>

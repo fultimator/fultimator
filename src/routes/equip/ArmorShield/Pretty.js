@@ -14,6 +14,7 @@ import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
+import { useTranslate } from "../../../translation/translate";
 
 function Pretty({ base, custom }) {
   const theme = useTheme();
@@ -31,6 +32,7 @@ function Pretty({ base, custom }) {
 }
 
 function PrettySingle({ armor, showActions }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -69,17 +71,17 @@ function PrettySingle({ armor, showActions }) {
               </Grid>
               <Grid item xs={1}>
                 <Typography variant="h4" textAlign="center">
-                  Cost
+                  {t("Cost")}
                 </Typography>
               </Grid>
               <Grid item xs={3}>
                 <Typography variant="h4" textAlign="center">
-                  Defense
+                  {t("Defense")}
                 </Typography>
               </Grid>
               <Grid item xs={4}>
                 <Typography variant="h4" textAlign="center">
-                  M. Defense
+                  {t("M. Defense")}
                 </Typography>
               </Grid>
             </Grid>
@@ -152,7 +154,7 @@ function PrettySingle({ armor, showActions }) {
                   }}
                 >
                   <Typography>
-                    {!armor.quality && "No Qualities"} {armor.quality}
+                    {!armor.quality && t("No Qualities")} {armor.quality}
                   </Typography>
                 </Grid>
               </Grid>
@@ -162,7 +164,7 @@ function PrettySingle({ armor, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download as Image">
+          <Tooltip title={t("Download as Image")}>
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>

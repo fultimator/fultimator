@@ -14,7 +14,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
-import {useRef, useState} from "react";
+import { useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { collection, orderBy, query, where } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -29,20 +29,22 @@ import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
 import useDownloadImage from "../../hooks/useDownloadImage";
+import { useTranslate } from "../../translation/translate";
 
 export default function Combat() {
+  const { t } = useTranslate();
   const [user, loading, error] = useAuthState(auth);
   console.debug("user, loading, error", user, loading, error);
 
   return (
     <Layout>
-      <Typography variant="h4">Combat</Typography>
+      <Typography variant="h4">{t("Combat")}</Typography>
       {loading && <Skeleton />}
 
       {!loading && !user && (
         <>
           <Typography sx={{ my: 1 }}>
-            You must be logged in to use this feature
+            {t("You must be logged in to use this feature")}
           </Typography>
           <SignIn />
         </>
@@ -58,6 +60,7 @@ interface AuthCombatProps {
 }
 
 function AuthCombat({ user }: AuthCombatProps) {
+  const { t } = useTranslate();
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -76,16 +79,6 @@ function AuthCombat({ user }: AuthCombatProps) {
       return newValue ? [...prevState, newValue as TypeNpc] : prevState;
     });
   };
-
-  // const removeAttack = (i) => {
-  //   return () => {
-  //     setNpc((prevState) => {
-  //       const newState = Object.assign({}, prevState);
-  //       newState.attacks.splice(i, 1);
-  //       return newState;
-  //     });
-  //   };
-  // };
 
   if (loading) {
     return null;
@@ -118,7 +111,9 @@ function AuthCombat({ user }: AuthCombatProps) {
           options={personalList || []}
           sx={{ width: 300, mb: 10 }}
           onChange={addNpc}
-          renderInput={(params) => <TextField {...params} label="Adversary" />}
+          renderInput={(params) => (
+            <TextField {...params} label={t("Adversary")} />
+          )}
         />
       </Grid>
     </Grid>
@@ -130,6 +125,7 @@ interface NpcProps {
 }
 
 function NpcCombatant({ npc }: NpcProps) {
+  const { t } = useTranslate();
   const [hp, setHp] = useState(calcHP(npc));
   const [mp, setMp] = useState(calcMP(npc));
   const [attributes, setAttributes] = useState(npc.attributes);
@@ -253,20 +249,15 @@ function NpcCombatant({ npc }: NpcProps) {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty
-          npc={npc}
-          study={selectedStudy}
-          ref={ref}
-          collapse={true}
-        />
+        <NpcPretty npc={npc} study={selectedStudy} ref={ref} collapse={true} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
           <Grid item xs={2}>
             <Typography variant="h5" color="red">
-              HP: {hp}
+              {t("HP:")} {hp}
             </Typography>
-            {crisis && "Crisis!"}
+            {crisis && t("Crisis!")}
           </Grid>
           <Grid item xs={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
@@ -288,7 +279,7 @@ function NpcCombatant({ npc }: NpcProps) {
           </Grid>
           <Grid item xs={2}>
             <Typography variant="h5" color="cyan">
-              MP: {mp}
+              {t("MP:")} {mp}
             </Typography>
           </Grid>
           <Grid item xs={5}>
@@ -311,21 +302,29 @@ function NpcCombatant({ npc }: NpcProps) {
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs>
-              <Typography variant="h5">DEX: d{attributes.dexterity}</Typography>
+              <Typography variant="h5">
+                {t("DEX:")} d{attributes.dexterity}
+              </Typography>
             </Grid>
             <Grid item xs>
-              <Typography variant="h5">INS: d{attributes.insight}</Typography>
+              <Typography variant="h5">
+                {t("INS:")} d{attributes.insight}
+              </Typography>
             </Grid>
             <Grid item xs>
-              <Typography variant="h5">MIG: d{attributes.might}</Typography>
+              <Typography variant="h5">
+                {t("MIG:")} d{attributes.might}
+              </Typography>
             </Grid>
             <Grid item xs>
-              <Typography variant="h5">WIL: d{attributes.will}</Typography>
+              <Typography variant="h5">
+                {t("WIL:")} d{attributes.will}
+              </Typography>
             </Grid>
           </Grid>
           <Grid item container xs={12}>
             <Grid item xs={2}>
-              <Typography variant="h5">Study Roll:</Typography>
+              <Typography variant="h5">{t("Study Roll:")}</Typography>
             </Grid>
             <Grid item xs={2}>
               <Select
@@ -366,7 +365,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Slow"
+                label={t("Slow")}
                 labelPlacement="top"
               />
             </Grid>
@@ -382,7 +381,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Dazed"
+                label={t("Dazed")}
                 labelPlacement="top"
               />
             </Grid>
@@ -398,7 +397,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Weak"
+                label={t("Weak")}
                 labelPlacement="top"
               />
             </Grid>
@@ -414,7 +413,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Shaken"
+                label={t("Shaken")}
                 labelPlacement="top"
               />
             </Grid>
@@ -432,7 +431,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Enraged"
+                label={t("Enraged")}
                 labelPlacement="top"
               />
             </Grid>
@@ -448,7 +447,7 @@ function NpcCombatant({ npc }: NpcProps) {
                     }}
                   />
                 }
-                label="Poisoned"
+                label={t("Poisoned")}
                 labelPlacement="top"
               />
             </Grid>

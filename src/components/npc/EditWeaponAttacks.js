@@ -19,8 +19,10 @@ import { useState } from "react";
 import attributes from "../../libs/attributes";
 import { baseWeapons } from "../../libs/equip";
 import { CloseBracket, OpenBracket } from "../Bracket";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -62,7 +64,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem">
-        Attacks with Weapons
+        {t("Attacks with Weapons")}
         <IconButton onClick={addAttack}>
           <AddCircleOutline />
         </IconButton>
@@ -97,6 +99,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 }
 
 function EditAttack({ attack, setAttack, removeAttack, i }) {
+  const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
       <Grid item sx={{ mx: -1 }}>
@@ -108,7 +111,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
-            label="Name:"
+            label={t("Name:")}
             value={attack.name}
             onChange={(e) => {
               return setAttack("name", e.target.value);
@@ -132,7 +135,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             id="flathit"
             type="number"
             inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label="Acc."
+            label={t("Acc.")}
             value={attack.flathit || 0}
             onChange={(e) => {
               return setAttack("flathit", e.target.value);
@@ -147,7 +150,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             id="flatdmg"
             type="number"
             inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label="Dmg."
+            label={t("Dmg.")}
             value={attack.flatdmg || 0}
             onChange={(e) => {
               return setAttack("flatdmg", e.target.value);
@@ -168,7 +171,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 }}
               />
             }
-            label="Extra Damage"
+            label={t("Extra Damage")}
           />
         </FormGroup>
       </Grid>
@@ -177,6 +180,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
 }
 
 function EditAttackSpecial({ attack, setAttack }) {
+  const { t } = useTranslate();
   const [specials, setSpecials] = useState(attack.special[0]);
 
   const onChange = (e) => {
@@ -196,12 +200,11 @@ function EditAttackSpecial({ attack, setAttack }) {
         <FormControl variant="standard" fullWidth>
           <TextField
             id="special"
-            label="Special:"
-            multiline
+            label={t("Special:")}
             value={specials}
             onChange={onChange}
             size="small"
-            helperText="Adding a special effect cost 1 skill point"
+            helperText={t("Adding a special effect cost 1 skill point")}
           ></TextField>
         </FormControl>
       </Grid>
@@ -210,6 +213,7 @@ function EditAttackSpecial({ attack, setAttack }) {
 }
 
 function SelectWeapon({ weapon, setWeapon }) {
+  const { t } = useTranslate();
   const onChange = function (e) {
     const weapon = baseWeapons.find((weapon) => weapon.name === e.target.value);
 
@@ -225,7 +229,7 @@ function SelectWeapon({ weapon, setWeapon }) {
         {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
         {weapon.prec > 0 && `+${weapon.prec}`}
         <CloseBracket /> <OpenBracket />
-        HR + {weapon.damage}
+        {t("HR +")} {weapon.damage}
         <CloseBracket />
       </MenuItem>
     );
@@ -233,12 +237,12 @@ function SelectWeapon({ weapon, setWeapon }) {
 
   return (
     <FormControl fullWidth>
-      <InputLabel id="type">Weapon:</InputLabel>
+      <InputLabel id="type">{t("Weapon:")}</InputLabel>
       <Select
         labelId="type"
         id="select-type"
         value={weapon.name}
-        label="Weapon"
+        label={t("Weapon:")}
         onChange={onChange}
         size="small"
       >

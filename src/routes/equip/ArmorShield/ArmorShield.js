@@ -4,12 +4,14 @@ import { useState } from "react";
 import armor from "./base";
 import ChangeBase from "./ChangeBase";
 import Pretty from "./Pretty";
-import ChangeQuality from "./ChangeQuality";
-import SelectQuality from "./SelectQuality";
-import ChangeName from "./ChangeName";
+import ChangeQuality from "../common/ChangeQuality";
+import SelectQuality from "../common/SelectQuality";
+import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
+import { useTranslate } from "../../../translation/translate";
 
 function ArmorShield() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const quaternary = theme.palette.quaternary.main;
@@ -45,7 +47,7 @@ function ArmorShield() {
             }}
           >
             <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
-            Armor and Shield
+            {t("Armor and Shield")}
           </Typography>
         </Grid>
         <Paper

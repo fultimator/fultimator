@@ -1,4 +1,4 @@
-import { CardMedia, Typography, Paper } from "@mui/material";
+import { CardMedia, Typography, Paper, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import Layout from "../components/Layout";
@@ -10,17 +10,48 @@ import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
 import React, { useState } from "react";
 
+import sublogo200 from "./../components/sublogo_200.webp";
+import sublogo834 from "./../components/sublogo_834.webp";
+import sublogo1400 from "./../components/sublogo_1400.webp";
+import { useTranslate } from "../translation/translate";
+
+const SubLogo = ({ src, alt }) => (
+  <Grid container justifyContent="center" alignItems="center" sx={{}}>
+    <Grid item xs={12} md={6}>
+      <Paper
+        elevation={3}
+        sx={{ borderRadius: "16px", textAlign: "center", p: "16px" }}
+      >
+        <Typography variant="subtitle1" sx={{ p: 0, m: 0 }}>
+          <img
+            style={{ width: "100%", height: "auto", maxWidth: "400px" }}
+            sizes="(max-width: 1400px) 100vw, 1400px"
+            srcSet={src}
+            alt={alt}
+          />
+        </Typography>
+      </Paper>
+    </Grid>
+  </Grid>
+);
+
 function Home() {
   const navigate = useNavigate();
   const [hover, setHover] = useState("");
+  const { t } = useTranslate();
   return (
     <Layout>
+      <SubLogo
+        src={`${sublogo200} 200w, ${sublogo834} 929w, ${sublogo1400} 1400w`}
+        alt="An Unofficial Fabula Ultima Tool"
+      />
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           flexWrap: "wrap",
-          gap: 10,
+          gap: "1em",
+          margin: "1em",
         }}
       >
         <CardMedia
@@ -130,12 +161,13 @@ function Home() {
         />
       </div>
       <Typography sx={{ p: 3, textAlign: "center" }}>
-        If you have any feedback, give us your thoughts here:{" "}
-        <a href=" https://forms.gle/3P7Bq1CtZrnFwQsm8">Google Form.</a> <br />
-        The wonderful Fultimator Icons are made by Runty! Email:{" "}
+        {t("If you have any feedback, give us your thoughts here")}{" "}
+        <a href=" https://forms.gle/3P7Bq1CtZrnFwQsm8">{t("Google Form.")}</a>{" "}
+        <br />
+        {t("The wonderful Fultimator Icons are made by Runty! Email:")}{" "}
         <a href="mailto:contactrunty@iCloud.com">contactrunty@iCloud.com</a>
         <br />
-        Monster Icons are taken from{" "}
+        {t("Monster Icons are taken from:")}{" "}
         <a href="http://www.akashics.moe/" target="_blank" rel="noreferrer">
           http://www.akashics.moe/
         </a>

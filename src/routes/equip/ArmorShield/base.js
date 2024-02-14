@@ -1,23 +1,25 @@
+import { t } from "../../../translation/translate";
+
 const shield = [
   {
-    category: "Shield",
-    name: "Bronze Shield",
+    category: t("Shield", true),
+    name: t("Bronze Shield", true),
     cost: 100,
     def: 2,
     mdef: 0,
     martial: false,
   },
   {
-    category: "Shield",
-    name: "Runic Shield",
+    category: t("Shield", true),
+    name: t("Runic Shield", true),
     cost: 150,
     def: 2,
     mdef: 2,
     martial: true,
   },
   {
-    category: "Armor",
-    name: "Silk Shirt",
+    category: t("Armor", true),
+    name: t("Silk Shirt", true),
     cost: 100,
     def: 0,
     mdef: 2,
@@ -25,8 +27,8 @@ const shield = [
     martial: false,
   },
   {
-    category: "Armor",
-    name: "Travel Garb",
+    category: t("Armor", true),
+    name: t("Travel Garb", true),
     cost: 100,
     def: 1,
     mdef: 1,
@@ -34,8 +36,8 @@ const shield = [
     martial: false,
   },
   {
-    category: "Armor",
-    name: "Combat Tunic",
+    category: t("Armor", true),
+    name: t("Combat Tunic", true),
     cost: 150,
     def: 2,
     mdef: 0,
@@ -43,8 +45,8 @@ const shield = [
     martial: false,
   },
   {
-    category: "Armor",
-    name: "Sage Robe",
+    category: t("Armor", true),
+    name: t("Sage Robe", true),
     cost: 200,
     def: 1,
     mdef: 2,
@@ -52,8 +54,8 @@ const shield = [
     martial: false,
   },
   {
-    category: "Armor",
-    name: "Brigadine",
+    category: t("Armor", true),
+    name: t("Brigandine", true),
     cost: 150,
     def: 10,
     mdef: 0,
@@ -61,8 +63,8 @@ const shield = [
     martial: true,
   },
   {
-    category: "Armor",
-    name: "Bronze Plate",
+    category: t("Armor", true),
+    name: t("Bronze Plate", true),
     cost: 200,
     def: 11,
     mdef: 0,
@@ -70,8 +72,8 @@ const shield = [
     martial: true,
   },
   {
-    category: "Armor",
-    name: "Runic Plate",
+    category: t("Armor", true),
+    name: t("Runic Plate", true),
     cost: 250,
     def: 11,
     mdef: 1,
@@ -79,8 +81,8 @@ const shield = [
     martial: true,
   },
   {
-    category: "Armor",
-    name: "Steel Plate",
+    category: t("Armor", true),
+    name: t("Steel Plate", true),
     cost: 300,
     def: 12,
     mdef: 0,

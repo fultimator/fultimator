@@ -7,9 +7,12 @@ import {
   Fab,
   Fade,
   Tooltip,
-  Snackbar,
   Button,
   TextField,
+  IconButton,
+  Paper,
+  Typography,
+  useTheme,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -20,13 +23,9 @@ import {
   Download,
   Publish,
   Save,
-  Code,
   Share,
   ArrowUpward,
-  Menu,
   ContentCopy,
-  Close,
-  ContentPaste,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useRef, useState } from "react";
 // import NpcUgly from "../../components/npc/Ugly";
@@ -46,24 +45,21 @@ import Probs from "../../routes/probs/probs";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
 import useDownloadImage from "../../hooks/useDownloadImage";
-import useDownloadJSON from "../../hooks/useDownloadJSON";
+import Export from "../../components/Export";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcEdit() {
+  const { t } = useTranslate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
+  const quaternary = theme.palette.quaternary.main;
   let params = useParams();
   const ref = doc(firestore, "npc-personal", params.npcId);
 
   const [user] = useAuthState(auth);
   const [showScrollTop, setShowScrollTop] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-
-  function handleSnackbarOpen() {
-    setIsSnackbarOpen(true);
-  }
-
-  function handleSnackbarClose() {
-    setIsSnackbarOpen(false);
-  }
 
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -124,34 +120,6 @@ export default function NpcEdit() {
   // Download
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
-  const [downloadJSON, copyJSONToClipboard] = useDownloadJSON(npc?.name, npc);
-
-  const copyNpc = async (npc) => {
-    const data = Object.assign({}, npc);
-    data.uid = user.uid;
-    delete data.id;
-    data.published = false;
-
-    const ref = collection(firestore, "npc-personal");
-
-    addDoc(ref, data)
-      .then(function (docRef) {
-        window.location.href = `/npc-gallery/${docRef.id}`;
-      })
-      .catch(function (error) {
-        console.error("Error adding document: ", error);
-      });
-  };
-
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleClick = () => {
-    setOpen(true);
-  };
 
   if (!npcTemp) {
     return null;
@@ -161,28 +129,34 @@ export default function NpcEdit() {
     if (!npcTemp.name || npcTemp.name === "") {
       return {
         disabled: true,
-        message: "It must have a name in order to be published.",
+        message: t("It must have a name in order to be published.", true),
       };
     }
 
     if (!npcTemp.description || npcTemp.description === "") {
       return {
         disabled: true,
-        message: "It must have a description in order to be published.",
+        message: t(
+          "It must have a description in order to be published.",
+          true
+        ),
       };
     }
 
     if (!npcTemp.traits || npcTemp.traits === "") {
       return {
         disabled: true,
-        message: "It must have a traits in order to be published.",
+        message: t("It must have a traits in order to be published.", true),
       };
     }
 
     if (!npcTemp.createdBy || npcTemp.createdBy === "") {
       return {
         disabled: true,
-        message: "'Credit By' needs to be filled in order to be published",
+        message: t(
+          "'Credit By' needs to be filled in order to be published",
+          true
+        ),
       };
     }
 
@@ -195,7 +169,10 @@ export default function NpcEdit() {
 
     return {
       disabled: true,
-      message: "It must have at least one attack, in order to be published.",
+      message: t(
+        "It must have at least one attack, in order to be published.",
+        true
+      ),
     };
   };
 
@@ -220,9 +197,29 @@ export default function NpcEdit() {
     });
   };
 
-  function copyToClipboard() {
-    copyJSONToClipboard();
-    handleSnackbarOpen();
+  const copyNpc = async (npc) => {
+    const data = Object.assign({}, npc);
+    data.uid = user.uid;
+    delete data.id;
+    data.published = false;
+
+    const ref = collection(firestore, "npc-personal");
+
+    addDoc(ref, data)
+      .then(function (docRef) {
+        window.location.href = `/npc-gallery/${docRef.id}`;
+      })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
+  };
+
+  const shareNpc = async (id) => {
+    await navigator.clipboard.writeText(window.location.href + "/");
+  };
+
+  function DownloadImage() {
+    setTimeout(downloadImage, 100);
   }
 
   return (
@@ -233,112 +230,318 @@ export default function NpcEdit() {
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
-          {user && user.uid === npc.uid && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
+          <Divider sx={{ my: 1 }} />
+          <Tooltip title={t("Download as Image")}>
+            <IconButton
+              onClick={() => {
+                DownloadImage();
               }}
             >
-              <TextField
-                id="outlined-basic"
-                label="Created By:"
-                sx={{ marginTop: 2 }}
-                size="small"
-                helperText={
-                  npcTemp.published
-                    ? "This NPC is part of the Adversary Compedium."
-                    : "Help the Adversary Compedium grow by publishing your finished work!"
-                }
-                fullWidth
-                value={npcTemp.createdBy}
-                onChange={(evt) => {
-                  updateNPC({ ...npcTemp, createdBy: evt.target.value });
+              <Download />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Share URL")}>
+            <IconButton onClick={() => shareNpc(npc.id)}>
+              <Share />
+            </IconButton>
+          </Tooltip>
+          <Export name={`${npc.name}`} data={npc} />
+          {user && user.uid !== npc.uid && (
+            <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
+              <IconButton
+                aria-label="duplicate"
+                onClick={() => {
+                  copyNpc(npcTemp);
                 }}
-              />
-              {!npcTemp.published && (
-                <Button
-                  variant="contained"
-                  sx={{ marginTop: 1 }}
-                  startIcon={<Publish />}
-                  disabled={canPublish().disabled}
-                  onClick={publish}
-                >
-                  Publish to Adversary Compendium
-                </Button>
-              )}
-              {npcTemp.published && (
-                <Button
-                  variant="outlined"
-                  sx={{ marginTop: 1 }}
-                  onClick={unPublish}
-                >
-                  Unpublish
-                </Button>
-              )}
-              {canPublish().disabled && (
-                <div
-                  style={{
-                    fontSize: 12,
-                    textAlign: "center",
-                    marginTop: 4,
-                    color: "red",
-                  }}
-                >
-                  {canPublish().message}
-                </div>
-              )}
-            </div>
+              >
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
           )}
+          <Divider sx={{ my: 1 }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "10px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            {user && user.uid === npc.uid && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
+                <TextField
+                  id="outlined-basic"
+                  label={t("Created By:")}
+                  sx={{ marginTop: 2 }}
+                  size="small"
+                  helperText={
+                    npcTemp.published
+                      ? t("This NPC is part of the Adversary Compedium.")
+                      : t(
+                          "Help the Adversary Compedium grow by publishing your finished work!"
+                        )
+                  }
+                  fullWidth
+                  value={npcTemp.createdBy}
+                  onChange={(evt) => {
+                    updateNPC({ ...npcTemp, createdBy: evt.target.value });
+                  }}
+                />
+                {!npcTemp.published && (
+                  <Button
+                    variant="contained"
+                    sx={{ marginTop: 1 }}
+                    startIcon={<Publish />}
+                    disabled={canPublish().disabled}
+                    onClick={publish}
+                  >
+                    {t("Publish to Adversary Compendium")}
+                  </Button>
+                )}
+                {npcTemp.published && (
+                  <Button
+                    variant="outlined"
+                    sx={{ marginTop: 1 }}
+                    onClick={unPublish}
+                  >
+                    {t("Unpublish")}
+                  </Button>
+                )}
+                {canPublish().disabled && (
+                  <div
+                    style={{
+                      fontSize: 12,
+                      textAlign: "center",
+                      marginTop: 4,
+                      color: "red",
+                    }}
+                  >
+                    {canPublish().message}
+                  </div>
+                )}
+              </div>
+            )}
+          </Paper>
         </Grid>
       </Grid>
       <Divider sx={{ my: 2 }} />
 
       {user && user.uid === npc.uid && (
         <>
-          <EditBasics npc={npcTemp} setNpc={updateNPC} />
+          <Paper
+            elevation={3}
+            sx={{
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+              padding: "20px",
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Basic Information")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <EditBasics npc={npcTemp} setNpc={updateNPC} />
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <EditAffinities npc={npcTemp} setNpc={updateNPC} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Affinity")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <ExplainAffinities npc={npcTemp} />
+                <EditAffinities npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditExtra npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <ExplainAffinities npc={npcTemp} />
-              <EditExtra npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-          </Grid>
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <EditAttacks npc={npcTemp} setNpc={updateNPC} />
-          <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Attacks")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <Grid container>
+              <Grid item xs={12}>
+                <EditAttacks npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12}>
+                <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+            </Grid>
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <EditSpells npc={npcTemp} setNpc={updateNPC} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Spells")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <EditSpells npc={npcTemp} setNpc={updateNPC} />
+          </Paper>
 
           <Divider sx={{ my: 2 }} />
 
-          <Grid container>
-            <Grid item xs={12} md={6}>
-              <EditActions npc={npcTemp} setNpc={updateNPC} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Features")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <Grid container>
+              <Grid item xs={12} md={6}>
+                <EditActions npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditSpecial npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditRareGear npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <EditNotes npc={npcTemp} setNpc={updateNPC} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <EditSpecial npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <EditRareGear npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <EditNotes npc={npcTemp} setNpc={updateNPC} />
-            </Grid>
-          </Grid>
+          </Paper>
+
           <Divider sx={{ my: 2 }} />
-          <Probs />
-          <Divider sx={{ my: 2, marginBottom: 20 }} />
+
+          <Paper
+            elevation={3}
+            sx={{
+              p: "20px",
+              borderRadius: "16px",
+              border: "3px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="legend"
+              sx={{ color: primary, textTransform: "uppercase" }}
+            >
+              {t("Attacks Chance Generator")}
+            </Typography>
+            <Divider
+              orientation="horizontal"
+              sx={{
+                color: primary,
+                borderBottom: "3px solid",
+                borderColor: "secondary",
+                mb: "20px",
+              }}
+            />
+            <Probs />
+          </Paper>
+
+          <Divider sx={{ my: 2, mb: 20 }} />
         </>
       )}
 
@@ -347,7 +550,7 @@ export default function NpcEdit() {
       <Grid
         sx={{
           position: "fixed",
-          top: 10,
+          top: 120,
           right: 10,
           display: "flex",
           flexDirection: "row",
@@ -357,112 +560,10 @@ export default function NpcEdit() {
       >
         {/* SP Tracker Field */}
         <ExplainSkillsSimplified npc={npcTemp} />
-        {/* Collapse for the Buttons */}
-        {!isCollapsed && (
-          <div
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              zIndex: 1000,
-            }}
-          >
-            {/* Export Buttons */}
-            <Tooltip
-              title="Copy JSON to Clipboard"
-              placement="bottom"
-              sx={{ marginLeft: "5px" }}
-            >
-              <Fab
-                color="primary"
-                aria-label="export"
-                onClick={copyToClipboard}
-                size="medium"
-              >
-                <ContentPaste />
-              </Fab>
-            </Tooltip>
-            <Tooltip
-              title="Export JSON File"
-              placement="bottom"
-              sx={{ marginLeft: "5px" }}
-            >
-              <Fab
-                color="primary"
-                aria-label="export"
-                onClick={downloadJSON}
-                size="medium"
-              >
-                <Code />
-              </Fab>
-            </Tooltip>
-            {/* Share Button */}
-            <Tooltip title="Share URL" placement="bottom">
-              <Fab
-                color="primary"
-                aria-label="Share"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(window.location.href);
-                  handleClick();
-                }}
-                size="medium"
-                style={{ marginLeft: "5px" }}
-              >
-                <Share />
-              </Fab>
-            </Tooltip>
-            {/* Download Button */}
-            <Tooltip title="Download Sheet" placement="bottom">
-              <Fab
-                color="primary"
-                aria-label="download"
-                onClick={downloadImage}
-                size="medium"
-                style={{ marginLeft: "5px", zIndex: 1000 }}
-              >
-                <Download />
-              </Fab>
-            </Tooltip>
-
-            {user && user.uid !== npc.uid && (
-              <Tooltip title="Copy and Edit Sheet" placement="bottom">
-                <Fab
-                  color="primary"
-                  aria-label="duplicate"
-                  onClick={() => {
-                    copyNpc(npcTemp);
-                  }}
-                  size="medium"
-                  style={{ marginLeft: "5px", zIndex: 1000 }}
-                >
-                  <ContentCopy />
-                </Fab>
-              </Tooltip>
-            )}
-          </div>
-        )}
-        {/* Collapse Toggle Button */}
-        <Fab
-          color="primary"
-          aria-label="toggle-collapse"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          size="medium"
-          style={{ marginLeft: "5px" }}
-        >
-          {isCollapsed ? <Menu /> : <Close />}
-        </Fab>
       </Grid>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={open}
-        autoHideDuration={2000}
-        onClose={handleClose}
-        message="Copied to Clipboard!"
-      />
-
       {isUpdated && (
-        <Grid style={{ position: "fixed", top: 65, right: 10, zIndex: 100 }}>
+        <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">
               <Fab
@@ -483,29 +584,19 @@ export default function NpcEdit() {
         </Grid>
       )}
 
-      <Grid style={{ position: "fixed", bottom: 10, right: 10 }}>
+      <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
         {/* Move to Top Button */}
         <Fade in={showScrollTop} timeout={300}>
-          <div style={{ marginBottom: "5px", zIndex: 100 }}>
-            <Fab
-              color="primary"
-              aria-label="move-to-top"
-              onClick={handleMoveToTop}
-              size="medium"
-            >
-              <ArrowUpward />
-            </Fab>
-          </div>
+          <Fab
+            color="primary"
+            aria-label="move-to-top"
+            onClick={handleMoveToTop}
+            size="medium"
+          >
+            <ArrowUpward />
+          </Fab>
         </Fade>
       </Grid>
-
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={isSnackbarOpen}
-        autoHideDuration={2000}
-        onClose={handleSnackbarClose}
-        message="Copied to Clipboard!"
-      />
     </Layout>
   );
 }

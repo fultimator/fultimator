@@ -1,24 +1,38 @@
-import { Card, Typography } from "@mui/material";
+import { Card, Typography, useTheme } from "@mui/material";
+import { useTranslate } from "../../translation/translate";
+import ReactMarkdown from "react-markdown";
 
 export default function ExplainAffinities({ npc }) {
+  const { t } = useTranslate();
+  const theme = useTheme();
+  const ternary = theme.palette.ternary.main;
   return (
-    <Card sx={{ p: 2 }}>
-      <Typography>Gain 1 skill per vulnerability.</Typography>
-      <Typography>Gain 2 skills per physical vulnerability.</Typography>
-      <Typography>Use 0.5 skill per Resistance </Typography>
-      <Typography>Use 1 skill per Immunity</Typography>
-      <Typography>Use 2 skill per Absorption</Typography>
+    <Card
+      sx={{
+        p: 1.61,
+        background: `linear-gradient(to right, ${ternary}, transparent)`,
+      }}
+    >
+      <Typography>{t("Gain 1 skill per vulnerability.")}</Typography>
+      <Typography>{t("Gain 2 skills per physical vulnerability.")}</Typography>
+      <Typography>{t("Use 0.5 skill per Resistance")}</Typography>
+      <Typography>{t("Use 1 skill per Immunity")}</Typography>
+      <Typography>{t("Use 2 skill per Absorption")}</Typography>
       {npc.species === "Construct" && (
         <>
           <Typography
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Construct
+            {t("Species: Construct")}
           </Typography>
           <Typography>
-            <strong>Constructs</strong> are Immune to <strong>poison</strong>{" "}
-            damage and Resistant to <strong>earth</strong> damage.
+            <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+              {t(
+                "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage.",
+                true
+              )}
+            </ReactMarkdown>
           </Typography>
         </>
       )}
@@ -28,11 +42,15 @@ export default function ExplainAffinities({ npc }) {
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Demon
+            {t("Species: Demon")}
           </Typography>
           <Typography>
-            <strong>Demons</strong> are Resistant to two damage types of your
-            choice.
+            <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+              {t(
+                "**Demons** are Resistant to two damage types of your choice.",
+                true
+              )}
+            </ReactMarkdown>
           </Typography>
         </>
       )}
@@ -42,12 +60,15 @@ export default function ExplainAffinities({ npc }) {
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Elemental
+            {t("Species: Elemental")}
           </Typography>
           <Typography>
-            <strong>Elementals</strong> are Immune to <strong>poison</strong>{" "}
-            damage, Immune to a second damage type of your choice, and immune to{" "}
-            <strong>poisoned</strong>.
+            <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+              {t(
+                "**Elementals** are Immune to **poison** damage, Immune to a second damage type of your choice, and immune to **poisoned**.",
+                true
+              )}
+            </ReactMarkdown>
           </Typography>
         </>
       )}
@@ -57,12 +78,15 @@ export default function ExplainAffinities({ npc }) {
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Undead
+            {t("Species: Undead")}
           </Typography>
           <Typography>
-            <strong>Undead</strong> are Immune to <strong>dark</strong> and{" "}
-            <strong>poison</strong> damage, and Vulnerable to{" "}
-            <strong>light</strong> damage.
+            <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+              {t(
+                "**Undead** are Immune to **dark** and **poison** damage, and Vulnerable to **light** damage.",
+                true
+              )}
+            </ReactMarkdown>
           </Typography>
         </>
       )}
@@ -72,12 +96,15 @@ export default function ExplainAffinities({ npc }) {
             fontFamily="Antonio"
             sx={{ mt: 2, textTransform: "uppercase" }}
           >
-            Species: Plant
+            {t("Species: Plant")}
           </Typography>
           <Typography>
-            <strong>Plants</strong> are Vulnerable to (choose one:{" "}
-            <strong>air</strong>, <strong>bolt</strong>, <strong>fire</strong>,{" "}
-            <strong>ice</strong>) damage.
+            <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+              {t(
+                "  **Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
+                true
+              )}
+            </ReactMarkdown>
           </Typography>
         </>
       )}

@@ -1,7 +1,9 @@
+import { t } from "../../../translation/translate";
+
 const weapons = [
   {
-    category: "Arcane",
-    name: "Staff",
+    category: t("Arcane", true),
+    name: t("Staff", true),
     cost: 100,
     att1: "will",
     att2: "will",
@@ -12,8 +14,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Arcane",
-    name: "Tome",
+    category: t("Arcane", true),
+    name: t("Tome", true),
     cost: 100,
     att1: "insight",
     att2: "insight",
@@ -24,8 +26,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Bow",
-    name: "Crossbow",
+    category: t("Bow", true),
+    name: t("Crossbow", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -36,8 +38,8 @@ const weapons = [
     ranged: true,
   },
   {
-    category: "Bow",
-    name: "Shortbow",
+    category: t("Bow", true),
+    name: t("Shortbow", true),
     cost: 200,
     att1: "dexterity",
     att2: "dexterity",
@@ -48,8 +50,8 @@ const weapons = [
     ranged: true,
   },
   {
-    category: "Flail",
-    name: "Chain Whip",
+    category: t("Flail", true),
+    name: t("Chain Whip", true),
     cost: 150,
     att1: "dexterity",
     att2: "dexterity",
@@ -60,8 +62,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Firearm",
-    name: "Pistol",
+    category: t("Firearm", true),
+    name: t("Pistol", true),
     cost: 250,
     att1: "dexterity",
     att2: "insight",
@@ -72,8 +74,8 @@ const weapons = [
     ranged: true,
   },
   {
-    category: "Spear",
-    name: "Light Spear",
+    category: t("spear_category", true),
+    name: t("Light Spear", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -84,8 +86,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Spear",
-    name: "Heavy Spear",
+    category: t("spear_category", true),
+    name: t("Heavy Spear", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -96,8 +98,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Thrown",
-    name: "Shuriken",
+    category: t("Thrown", true),
+    name: t("Shuriken", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -108,8 +110,8 @@ const weapons = [
     ranged: true,
   },
   {
-    category: "Heavy",
-    name: "Iron Hammer",
+    category: t("Heavy", true),
+    name: t("Iron Hammer", true),
     cost: 200,
     att1: "might",
     att2: "might",
@@ -120,8 +122,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Heavy",
-    name: "Broadaxe",
+    category: t("Heavy", true),
+    name: t("Broadaxe", true),
     cost: 250,
     att1: "might",
     att2: "might",
@@ -132,8 +134,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Heavy",
-    name: "Waraxe",
+    category: t("Heavy", true),
+    name: t("Waraxe", true),
     cost: 250,
     att1: "might",
     att2: "might",
@@ -144,8 +146,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Dagger",
-    name: "Steel Dagger",
+    category: t("Dagger", true),
+    name: t("Steel Dagger", true),
     cost: 150,
     att1: "dexterity",
     att2: "insight",
@@ -156,8 +158,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Brawling",
-    name: "Iron Knuckle",
+    category: t("Brawling", true),
+    name: t("Iron Knuckle", true),
     cost: 150,
     att1: "dexterity",
     att2: "might",
@@ -168,8 +170,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Sword",
-    name: "Katana",
+    category: t("Sword", true),
+    name: t("Katana", true),
     cost: 200,
     att1: "dexterity",
     att2: "insight",
@@ -180,8 +182,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Sword",
-    name: "Bronze Sword",
+    category: t("Sword", true),
+    name: t("Bronze Sword", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -192,8 +194,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Sword",
-    name: "Greatsword",
+    category: t("Sword", true),
+    name: t("Greatsword", true),
     cost: 200,
     att1: "dexterity",
     att2: "might",
@@ -204,8 +206,8 @@ const weapons = [
     melee: true,
   },
   {
-    category: "Sword",
-    name: "Rapier",
+    category: t("Sword", true),
+    name: t("Rapier", true),
     cost: 200,
     att1: "dexterity",
     att2: "insight",

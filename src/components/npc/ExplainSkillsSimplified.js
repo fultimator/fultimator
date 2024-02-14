@@ -11,7 +11,7 @@ import {
   Typography,
   Divider,
   useTheme,
-  ThemeProvider
+  ThemeProvider,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -36,15 +36,21 @@ import {
   calcUsedSkillsFromOtherActions,
   calcUsedSkillsFromEquip,
 } from "../../libs/npcs";
+import { useTranslate } from "../../translation/translate";
 
 const SkillTableRow = ({ label, value, isHeader }) => (
   <TableRow>
-    <TableCell sx={{ fontWeight: isHeader ? "bold" : "normal" }}>{label}</TableCell>
-    <TableCell sx={{ fontWeight: isHeader ? "bold" : "normal" }}>{value}</TableCell>
+    <TableCell sx={{ fontWeight: isHeader ? "bold" : "normal" }}>
+      {label}
+    </TableCell>
+    <TableCell sx={{ fontWeight: isHeader ? "bold" : "normal" }}>
+      {value}
+    </TableCell>
   </TableRow>
 );
 
 export default function ExplainSkillsSimplified({ npc }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const totalAvailableSkills = calcAvailableSkills(npc);
@@ -70,7 +76,7 @@ export default function ExplainSkillsSimplified({ npc }) {
         }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ color: '#ffffff' }} />}
+          expandIcon={<ExpandMoreIcon sx={{ color: "#ffffff" }} />}
           sx={{
             backgroundColor: `${primary}`,
             color: "#ffffff",
@@ -81,11 +87,31 @@ export default function ExplainSkillsSimplified({ npc }) {
             },
           }}
         >
-          <Typography variant="body2" sx={{ fontWeight: "bold", display: 'flex', alignItems: 'center' }}>
-            <span>Available: {totalAvailableSkills}</span>
-            <Divider  orientation="vertical" flexItem sx={{ mx: 1, height: 24, background: 'white' }} />
-            <span>Used: {totalUsedSkills}</span>
-          </Typography>
+          <span>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {t("Available:")} {totalAvailableSkills}
+            </Typography>
+          </span>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ mx: 1, height: 24, background: "white" }}
+          />
+          <span>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
+            >
+              {t("Used:")} {totalUsedSkills}
+            </Typography>
+          </span>
         </AccordionSummary>
         <AccordionDetails
           sx={{
@@ -101,44 +127,62 @@ export default function ExplainSkillsSimplified({ npc }) {
         >
           <Table size="small">
             <TableHead>
-              <SkillTableRow label="Total SP Available" value={totalAvailableSkills} isHeader={true} />
+              <SkillTableRow
+                label={t("Total SP Available")}
+                value={totalAvailableSkills}
+                isHeader={true}
+              />
             </TableHead>
             <TableBody>
               {[
-                ["Species", calcAvailableSkillsFromSpecies],
-                ["Levels", calcAvailableSkillsFromLevel],
-                ["Vulnerabilities", calcAvailableSkillsFromVulnerabilities],
-                ["Rank", calcAvailableSkillsFromRank],
-              ].map(([innerLabel, calculator]) => (
-                calculator(npc) > 0 && (
-                  <SkillTableRow key={innerLabel} label={innerLabel} value={calculator(npc)} />
-                )
-              ))}
+                [t("Species"), calcAvailableSkillsFromSpecies],
+                [t("Levels"), calcAvailableSkillsFromLevel],
+                [t("Vulnerabilities"), calcAvailableSkillsFromVulnerabilities],
+                [t("Rank"), calcAvailableSkillsFromRank],
+              ].map(
+                ([innerLabel, calculator]) =>
+                  calculator(npc) > 0 && (
+                    <SkillTableRow
+                      key={innerLabel}
+                      label={innerLabel}
+                      value={calculator(npc)}
+                    />
+                  )
+              )}
             </TableBody>
             <TableHead>
-              <SkillTableRow label="Total SP Used" value={totalUsedSkills} isHeader={true} />
+              <SkillTableRow
+                label={t("Total SP Used")}
+                value={totalUsedSkills}
+                isHeader={true}
+              />
             </TableHead>
             <TableBody>
               {[
-                ["Special Attacks", calcUsedSkillsFromSpecialAttacks],
-                ["Spells", calcUsedSkillsFromSpells],
-                ["Extra Defense", calcUsedSkillsFromExtraDefs],
-                ["Extra HP", calcUsedSkillsFromExtraHP],
-                ["Extra MP", calcUsedSkillsFromExtraMP],
-                ["Extra Initiative", calcUsedSkillsFromExtraInit],
-                ["Extra Accuracy", calcUsedSkillsFromExtraPrecision],
-                ["Extra Magic", calcUsedSkillsFromExtraMagic],
-                ["Resistances", calcUsedSkillsFromResistances],
-                ["Immunities", calcUsedSkillsFromImmunities],
-                ["Absorption", calcUsedSkillsFromAbsorbs],
-                ["Special Rules", calcUsedSkillsFromSpecial],
-                ["Other Actions", calcUsedSkillsFromOtherActions],
-                ["Equipment", calcUsedSkillsFromEquip],
-              ].map(([innerLabel, calculator]) => (
-                calculator(npc) > 0 && (
-                  <SkillTableRow key={innerLabel} label={innerLabel} value={calculator(npc)} />
-                )
-              ))}
+                [t("Special Attacks"), calcUsedSkillsFromSpecialAttacks],
+                [t("Spells"), calcUsedSkillsFromSpells],
+                [t("Extra Defense"), calcUsedSkillsFromExtraDefs],
+                [t("Extra HP"), calcUsedSkillsFromExtraHP],
+                [t("Extra MP"), calcUsedSkillsFromExtraMP],
+                [t("Extra Initiative"), calcUsedSkillsFromExtraInit],
+                [t("Extra Accuracy"), calcUsedSkillsFromExtraPrecision],
+                [t("Extra Magic"), calcUsedSkillsFromExtraMagic],
+                [t("Resistances"), calcUsedSkillsFromResistances],
+                [t("Immunities"), calcUsedSkillsFromImmunities],
+                [t("Absorption"), calcUsedSkillsFromAbsorbs],
+                [t("Special Rules"), calcUsedSkillsFromSpecial],
+                [t("Other Actions"), calcUsedSkillsFromOtherActions],
+                [t("Equipment"), calcUsedSkillsFromEquip],
+              ].map(
+                ([innerLabel, calculator]) =>
+                  calculator(npc) > 0 && (
+                    <SkillTableRow
+                      key={innerLabel}
+                      label={innerLabel}
+                      value={calculator(npc)}
+                    />
+                  )
+              )}
             </TableBody>
           </Table>
         </AccordionDetails>

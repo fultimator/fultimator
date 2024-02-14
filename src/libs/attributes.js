@@ -1,23 +1,25 @@
+import { t } from "../translation/translate";
+
 const attributes = {
   dexterity: {
-    short: "dex",
-    shortcaps: "DEX",
-    long: "Dexterity",
+    short: t("dex", true),
+    shortcaps: t("DEX", true),
+    long: t("Dexterity", true),
   },
   insight: {
-    short: "ins",
-    shortcaps: "INS",
-    long: "Insight",
+    short: t("ins", true),
+    shortcaps: t("INS", true),
+    long: t("Insight", true),
   },
   might: {
-    short: "mig",
-    shortcaps: "MIG",
-    long: "Might",
+    short: t("mig", true),
+    shortcaps: t("MIG", true),
+    long: t("Might", true),
   },
   will: {
-    short: "wil",
-    shortcaps: "WLP",
-    long: "Willpower",
+    short: t("wil", true),
+    shortcaps: t("WLP", true),
+    long: t("Willpower", true),
   },
 };
 

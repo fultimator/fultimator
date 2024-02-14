@@ -46,8 +46,10 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcGallery() {
+  const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
 
   return (
@@ -57,7 +59,7 @@ export default function NpcGallery() {
       {!loading && !user && (
         <>
           <Typography sx={{ my: 1 }}>
-            You have to be logged in to access this feature
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
         </>
@@ -69,6 +71,7 @@ export default function NpcGallery() {
 }
 
 function Personal({ user }) {
+  const { t } = useTranslate();
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [sort, setSort] = useState("name");
@@ -157,8 +160,9 @@ function Personal({ user }) {
   if (err?.code === "resource-exhausted") {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        Apologies, fultimator has reached its read quota at the moment, please
-        try again tomorrow. (Around 12-24 hours)
+        {t(
+          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+        )}
       </Paper>
     );
   }
@@ -217,8 +221,8 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <Typography variant="h4">
-                NPCs
-                <Tooltip title="Create NPC">
+                {t("NPCs")}
+                <Tooltip title={t("Create NPC")}>
                   <IconButton onClick={addNpc}>
                     <AddCircle />
                   </IconButton>
@@ -236,7 +240,7 @@ function Personal({ user }) {
             >
               <TextField
                 id="outlined-basic"
-                label="Adversary Name"
+                label={t("Adversary Name")}
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -256,23 +260,23 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="rank">Rank:</InputLabel>
+                <InputLabel id="rank">{t("Rank:")}</InputLabel>
                 <Select
                   labelId="rank"
                   id="select-rank"
                   value={rank}
-                  label="Rank:"
+                  label={t("Rank:")}
                   onChange={(evt, val2) => {
                     setRank(evt.target.value);
                   }}
                 >
-                  <MenuItem value={""}>All</MenuItem>
-                  <MenuItem value={"soldier"}>Soldier</MenuItem>
-                  <MenuItem value={"elite"}>Elite</MenuItem>
-                  <MenuItem value={"champion2"}>Champion(2)</MenuItem>
-                  <MenuItem value={"champion3"}>Champion(3)</MenuItem>
-                  <MenuItem value={"champion4"}>Champion(4)</MenuItem>
-                  <MenuItem value={"champion5"}>Champion(5)</MenuItem>
+                  <MenuItem value={""}>{t("All")}</MenuItem>
+                  <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
+                  <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
+                  <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
+                  <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
+                  <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
+                  <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -285,25 +289,25 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="rank">Species:</InputLabel>
+                <InputLabel id="rank">{t("Species:")}</InputLabel>
                 <Select
                   labelId="species"
                   id="select-species"
                   value={species}
-                  label="Species:"
+                  label={t("Species:")}
                   onChange={(evt, val2) => {
                     setSpecies(evt.target.value);
                   }}
                 >
-                  <MenuItem value={""}>All</MenuItem>
-                  <MenuItem value={"Beast"}>Beast</MenuItem>
-                  <MenuItem value={"Construct"}>Construct</MenuItem>
-                  <MenuItem value={"Demon"}>Demon</MenuItem>
-                  <MenuItem value={"Elemental"}>Elemental</MenuItem>
-                  <MenuItem value={"Humanoid"}>Humanoid</MenuItem>
-                  <MenuItem value={"Monster"}>Monster</MenuItem>
-                  <MenuItem value={"Plant"}>Plant</MenuItem>
-                  <MenuItem value={"Undead"}>Undead</MenuItem>
+                  <MenuItem value={""}>{t("All")}</MenuItem>
+                  <MenuItem value={"Beast"}>{t("Beast")}</MenuItem>
+                  <MenuItem value={"Construct"}>{t("Construct")}</MenuItem>
+                  <MenuItem value={"Demon"}>{t("Demon")}</MenuItem>
+                  <MenuItem value={"Elemental"}>{t("Elemental")}</MenuItem>
+                  <MenuItem value={"Humanoid"}>{t("Humanoid")}</MenuItem>
+                  <MenuItem value={"Monster"}>{t("Monster")}</MenuItem>
+                  <MenuItem value={"Plant"}>{t("Plant")}</MenuItem>
+                  <MenuItem value={"Undead"}>{t("Undead")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -370,7 +374,7 @@ function Personal({ user }) {
                   setCollapse(!collapse);
                 }}
               >
-                {collapse ? "Collapse" : "Expand"}
+                {collapse ? t("Collapse") : t("Expand")}
               </Button>
             </Grid>
           </Grid>
@@ -443,13 +447,14 @@ function Personal({ user }) {
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
-        message="Copied to Clipboard!"
+        message={t("Copied to Clipboard!")}
       />
     </>
   );
 }
 
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
+  const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
@@ -475,27 +480,27 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         }}
       />
       {/* <NpcUgly npc={npc} /> */}
-      <Tooltip title="Copy">
+      <Tooltip title={t("Copy")}>
         <IconButton onClick={copyNpc(npc)}>
           <ContentCopy />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Edit">
+      <Tooltip title={t("Edit")}>
         <IconButton component={RouterLink} to={`/npc-gallery/${npc.id}`}>
           <Edit />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Delete">
+      <Tooltip title={t("Delete")}>
         <IconButton onClick={deleteNpc(npc)}>
           <Delete />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Share URL">
+      <Tooltip title={t("Share URL")}>
         <IconButton onClick={() => shareNpc(npc.id)}>
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download as Image">
+      <Tooltip title={t("Download as Image")}>
         <IconButton
           onClick={() => {
             expandAndDownloadImage();

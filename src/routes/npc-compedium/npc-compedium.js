@@ -58,8 +58,10 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { useTranslate } from "../../translation/translate";
 
 export default function NpcCompedium() {
+  const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
 
   return (
@@ -69,7 +71,7 @@ export default function NpcCompedium() {
       {!loading && !user && (
         <>
           <Typography sx={{ my: 1 }}>
-            You have to be logged in to access this feature
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
         </>
@@ -81,6 +83,7 @@ export default function NpcCompedium() {
 }
 
 function Personal({ user }) {
+  const { t } = useTranslate();
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
@@ -256,27 +259,27 @@ function Personal({ user }) {
   const marks = [
     {
       value: 10,
-      label: "Lvl 10",
+      label: t("Lvl 10"),
     },
     {
       value: 20,
-      label: "Lvl 20",
+      label: t("Lvl 20"),
     },
     {
       value: 30,
-      label: "Lvl 30",
+      label: t("Lvl 30"),
     },
     {
       value: 40,
-      label: "Lvl 40",
+      label: t("Lvl 40"),
     },
     {
       value: 50,
-      label: "Lvl 50",
+      label: t("Lvl 50"),
     },
     {
       value: 60,
-      label: "Lvl 60",
+      label: t("Lvl 60"),
     },
   ];
 
@@ -285,8 +288,9 @@ function Personal({ user }) {
   if (err?.code === "resource-exhausted") {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        Apologies, fultimator has reached its read quota at the moment, please
-        try again tomorrow. (Around 12-24 hours)
+        {t(
+          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+        )}
       </Paper>
     );
   }
@@ -295,15 +299,15 @@ function Personal({ user }) {
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
-          {enemyType(allToken, "All")}
-          {enemyType(beastToken, "Beast")}
-          {enemyType(constructToken, "Construct")}
-          {enemyType(demonToken, "Demon")}
-          {enemyType(elementalToken, "Elemental")}
-          {enemyType(humanToken, "Humanoid")}
-          {enemyType(monsterToken, "Monster")}
-          {enemyType(plantToken, "Plant")}
-          {enemyType(undeadToken, "Undead")}
+          {enemyType(allToken, t("All"))}
+          {enemyType(beastToken, t("Beast"))}
+          {enemyType(constructToken, t("Construct"))}
+          {enemyType(demonToken, t("Demon"))}
+          {enemyType(elementalToken, t("Elemental"))}
+          {enemyType(humanToken, t("Humanoid"))}
+          {enemyType(monsterToken, t("Monster"))}
+          {enemyType(plantToken, t("Plant"))}
+          {enemyType(undeadToken, t("Undead"))}
         </Grid>
 
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
@@ -315,7 +319,7 @@ function Personal({ user }) {
             justifyContent="center"
             sx={{ display: "flex" }}
           >
-            <Typography fontWeight={700}>Search:</Typography>
+            <Typography fontWeight={700}>{t("Search:")}</Typography>
           </Grid>
           <Grid
             item
@@ -327,7 +331,7 @@ function Personal({ user }) {
           >
             <TextField
               id="outlined-basic"
-              label="Adversary Name"
+              label={t("Adversary Name")}
               variant="outlined"
               size="small"
               fullWidth
@@ -349,7 +353,6 @@ function Personal({ user }) {
             <Slider
               getAriaLabel={() => "Level"}
               value={levels}
-              aria-label="Always visible"
               step={5}
               min={5}
               marks={marks}
@@ -360,7 +363,7 @@ function Personal({ user }) {
               max={60}
               valueLabelDisplay="auto"
               getAriaValueText={(value) => {
-                return `Lvl:${value}`;
+                return `${t("Lvl:")}${value}`;
               }}
             />
           </Grid>
@@ -373,23 +376,23 @@ function Personal({ user }) {
             sx={{ display: "flex" }}
           >
             <FormControl fullWidth size="small">
-              <InputLabel id="rank">Rank:</InputLabel>
+              <InputLabel id="rank">{t("Rank:")}</InputLabel>
               <Select
                 labelId="rank"
                 id="select-rank"
                 value={rank}
-                label="Rank:"
+                label={t("Rank:")}
                 onChange={(evt, val2) => {
                   setRank(evt.target.value);
                 }}
               >
-                <MenuItem value={""}>All</MenuItem>
-                <MenuItem value={"soldier"}>Soldier</MenuItem>
-                <MenuItem value={"elite"}>Elite</MenuItem>
-                <MenuItem value={"champion2"}>Champion(2)</MenuItem>
-                <MenuItem value={"champion3"}>Champion(3)</MenuItem>
-                <MenuItem value={"champion4"}>Champion(4)</MenuItem>
-                <MenuItem value={"champion5"}>Champion(5)</MenuItem>
+                <MenuItem value={""}>{t("All")}</MenuItem>
+                <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
+                <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
+                <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
+                <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
+                <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
+                <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -416,7 +419,7 @@ function Personal({ user }) {
                 });
               }}
             >
-              Search
+              {t("Search")}
             </Button>
           </Grid>
           <Grid item xs={4} md={1} alignItems="center" sx={{ display: "flex" }}>
@@ -427,7 +430,7 @@ function Personal({ user }) {
                 setCollapse(!collapse);
               }}
             >
-              {collapse ? "Collapse" : "Expand"}
+              {collapse ? t("Collapse") : t("Expand")}
             </Button>
           </Grid>
         </Grid>
@@ -504,7 +507,7 @@ function Personal({ user }) {
                     onClick={prevPage}
                     size="large"
                   >
-                    Prev Items
+                    {t("Prev Items")}
                   </Button>
                 ) : (
                   ""
@@ -516,13 +519,13 @@ function Personal({ user }) {
                   onClick={nextPage}
                   size="large"
                 >
-                  Next Items
+                  {t("Next Items")}
                 </Button>
               </>
             ) : (
               <div style={{ textAlign: "center" }}>
                 <Typography fontWeight={700} marginBottom={4}>
-                  No more adversaries found.
+                  {t(" No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
                   <Button
@@ -532,7 +535,7 @@ function Personal({ user }) {
                     onClick={prevPage}
                     size="large"
                   >
-                    Prev Items
+                    {t("Prev Items")}
                   </Button>
                 ) : (
                   ""
@@ -550,13 +553,14 @@ function Personal({ user }) {
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
-        message="Copied to Clipboard!"
+        message={t("Copied to Clipboard!")}
       />
     </>
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
+function Npc({ npc, copyNpc, shareNpc, collapseGet }) {
+  const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
@@ -577,23 +581,25 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           setCollapse(!collapse);
         }}
       />
-      <Tooltip title="Copy to adversary designer">
+      <Tooltip title={t("Copy to adversary designer")}>
         <IconButton onClick={copyNpc(npc)}>
           <ContentCopy />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Share URL">
+      <Tooltip title={t("Share URL")}>
         <IconButton onClick={() => shareNpc(npc.id)}>
           <Share />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Download as Image">
+      <Tooltip title={t("Download as Image")}>
         <IconButton onClick={downloadImage}>
           <Download />
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} data={npc} />
-      <span style={{ fontSize: 14 }}>Created By: {npc.createdBy}</span>
+      <span style={{ fontSize: 14 }}>
+        {t("Created By:")} {npc.createdBy}
+      </span>
     </Grid>
   );
 }

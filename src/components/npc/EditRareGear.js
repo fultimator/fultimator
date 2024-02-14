@@ -7,8 +7,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditRareGear({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChangeRareGear = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -44,7 +46,7 @@ export default function EditRareGear({ npc, setNpc }) {
   return (
     <>
       <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        Rare Equipment
+        {t("Rare Equipment")}
         <IconButton onClick={addRareGear}>
           <AddCircleOutline />
         </IconButton>
@@ -62,21 +64,21 @@ export default function EditRareGear({ npc, setNpc }) {
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
-                  label="Name:"
+                  label={t("Name:")}
                   value={raregear.name}
                   onChange={(e) => {
                     return onChangeRareGear(i, "name", e.target.value);
                   }}
                   size="small"
+                  sx={{ mb: 2 }}
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12} lg={7}>
+            <Grid item xs={12} lg={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
-                  multiline
                   id="effect"
-                  label="Effect:"
+                  label={t("Effect:")}
                   value={raregear.effect}
                   onChange={(e) => {
                     return onChangeRareGear(i, "effect", e.target.value);

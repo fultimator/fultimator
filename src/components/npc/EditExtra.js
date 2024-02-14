@@ -13,21 +13,19 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { Fragment } from "react";
 import { baseArmors } from "../../libs/equip";
 import { baseShields } from "../../libs/equip";
+import { useTranslate } from "../../translation/translate";
 
 export default function EditExtra({ npc, setNpc }) {
   return (
     <>
       <Grid container sx={{ mt: 2 }}>
-        <Grid item xs={6}>
-          <Defenses npc={npc} setNpc={setNpc} />
-          <SelectArmor npc={npc} setNpc={setNpc} />
-          <SelectShield npc={npc} setNpc={setNpc} />
-        </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Stack spacing={1}>
+            <Defenses npc={npc} setNpc={setNpc} />
+            <SelectArmor npc={npc} setNpc={setNpc} />
+            <SelectShield npc={npc} setNpc={setNpc} />
             <HP npc={npc} setNpc={setNpc} />
             <MP npc={npc} setNpc={setNpc} />
             <ExtraInit npc={npc} setNpc={setNpc} />
@@ -42,6 +40,7 @@ export default function EditExtra({ npc, setNpc }) {
 }
 
 function Defenses({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -115,7 +114,7 @@ function Defenses({ npc, setNpc }) {
 
   return (
     <FormControl>
-      <FormLabel id="extra-defenses">Defenses</FormLabel>
+      <FormLabel id="extra-defenses">{t("Defenses")}</FormLabel>
       <RadioGroup
         size="small"
         aria-labelledby="extra-defenses"
@@ -126,32 +125,32 @@ function Defenses({ npc, setNpc }) {
         <FormControlLabel
           value="00"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+0 Def / +0 M. Def"
+          label={`+0 ${t("DEF", true)} / +0 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="12"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+1 Def / +2 M. Def"
+          label={`+1 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="21"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+2 Def / +1 M. Def"
+          label={`+2 ${t("DEF", true)} / +1 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="33"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+3 Def / +3 M. Def"
+          label={`+3 ${t("DEF", true)} / +3 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="24"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+2 Def / +4 M. Def"
+          label={`+2 ${t("DEF", true)} / +4 ${t("M.DEF", true)}`}
         />
         <FormControlLabel
           value="42"
           control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label="+4 Def / +2 M. Def"
+          label={`+4 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
         />
       </RadioGroup>
     </FormControl>
@@ -159,6 +158,7 @@ function Defenses({ npc, setNpc }) {
 }
 
 function HP({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -176,7 +176,7 @@ function HP({ npc, setNpc }) {
         id="HP"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra HP:"
+        label={t("Extra HP:")}
         value={npc.extra?.hp || 0}
         onChange={onChange}
       ></TextField>
@@ -185,6 +185,7 @@ function HP({ npc, setNpc }) {
 }
 
 function MP({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -202,7 +203,7 @@ function MP({ npc, setNpc }) {
         id="mp"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
-        label="Extra MP:"
+        label={t("Extra MP:")}
         value={npc.extra?.mp || 0}
         onChange={onChange}
       ></TextField>
@@ -210,6 +211,7 @@ function MP({ npc, setNpc }) {
   );
 }
 function Init({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -224,12 +226,13 @@ function Init({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.init} onChange={onChange} />}
-        label="+4 Initiative"
+        label={`+4 ${t("Initiative", true)}`}
       />
     </FormGroup>
   );
 }
 function ExtraInit({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -247,7 +250,7 @@ function ExtraInit({ npc, setNpc }) {
         id="extrainit"
         type="number"
         inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-        label="Extra Init:"
+        label={t("Extra Init:")}
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
       ></TextField>
@@ -256,6 +259,7 @@ function ExtraInit({ npc, setNpc }) {
 }
 
 function Precision({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -270,13 +274,14 @@ function Precision({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.precision} onChange={onChange} />}
-        label="+3 bonus to all Accuracy Checks"
+        label={`+3 ${t("bonus to all Accuracy Checks", true)}`}
       />
     </FormGroup>
   );
 }
 
 function Magic({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = (e) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -291,13 +296,14 @@ function Magic({ npc, setNpc }) {
     <FormGroup>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.magic} onChange={onChange} />}
-        label="+3 bonus to all Magic Checks."
+        label={`+3 ${t("bonus to all Magic Checks", true)}`}
       />
     </FormGroup>
   );
 }
 
 function SelectArmor({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = function (e) {
     const armor = baseArmors.find((armor) => armor.name === e.target.value);
 
@@ -329,14 +335,14 @@ function SelectArmor({ npc, setNpc }) {
   console.debug(armor);
 
   return (
-    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
-      <InputLabel id="type">Armor</InputLabel>
+    <FormControl fullWidth sx={{ mt: 1 }}>
+      <InputLabel id="type">{t("Armor")}</InputLabel>
       <Select
-        size="small"
+        size="medium"
         labelId="armor"
         id="select-armor"
         value={armor.name}
-        label="Armor"
+        label={t("Armor")}
         onChange={onChange}
       >
         {options}
@@ -346,6 +352,7 @@ function SelectArmor({ npc, setNpc }) {
 }
 
 function SelectShield({ npc, setNpc }) {
+  const { t } = useTranslate();
   const onChange = function (e) {
     const shield = baseShields.find((shield) => shield.name === e.target.value);
 
@@ -377,14 +384,14 @@ function SelectShield({ npc, setNpc }) {
   console.debug(shield);
 
   return (
-    <FormControl fullWidth sx={{ pr: 3, mt: 1 }}>
-      <InputLabel id="type">Shield</InputLabel>
+    <FormControl fullWidth sx={{ mt: 1 }}>
+      <InputLabel id="type">{t("Shield")}</InputLabel>
       <Select
-        size="small"
+        size="medium"
         labelId="shield"
         id="select-shield"
         value={shield.name}
-        label="Shield"
+        label={t("Shield")}
         onChange={onChange}
       >
         {options}

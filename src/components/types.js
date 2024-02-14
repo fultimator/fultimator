@@ -10,19 +10,21 @@ import {
   PoisonIcon,
   WindIcon,
 } from "./icons";
+import { useTranslate } from "../translation/translate";
 
 export function TypeName({ type }) {
+  const { t } = useTranslate();
   return (
     <>
-      {type === "physical" && "Physical"}
-      {type === "wind" && "Air"}
-      {type === "bolt" && "Bolt"}
-      {type === "dark" && "Dark"}
-      {type === "earth" && "Earth"}
-      {type === "fire" && "Fire"}
-      {type === "ice" && "Ice"}
-      {type === "light" && "Light"}
-      {type === "poison" && "Poison"}
+      {type === "physical" && t("Physical")}
+      {type === "wind" && t("Air")}
+      {type === "bolt" && t("Bolt")}
+      {type === "dark" && t("Dark")}
+      {type === "earth" && t("Earth")}
+      {type === "fire" && t("Fire")}
+      {type === "ice" && t("Ice")}
+      {type === "light" && t("Light")}
+      {type === "poison" && t("Poison")}
     </>
   );
 }

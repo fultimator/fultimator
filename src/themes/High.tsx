@@ -1,21 +1,22 @@
 import {createTheme} from "@mui/material/styles";
+import ExtendedTheme from "./../types/Theme";
 
-const Natural = createTheme({
+const High = createTheme({
   palette: {
     primary: {
-      main: "#765f43",
+      main: "#861628",
     },
     secondary: {
-      main: "#dccdc4",
+      main: "#cd9c9f",
     },
     ternary: {
-      main: "#fff3ec",
+      main: "#fdeae1",
     },
     quaternary: {
-      main: "#756449",
+      main: "#a24b4d",
     },
     background: {
-      default: "#fdf6eb",
+      default: "#fef3ee",
     },
     red: {
       main: "#d1232a",
@@ -32,7 +33,7 @@ const Natural = createTheme({
     purple: {
       main: "#794a75",
     },
-  },
+  } as ExtendedTheme['palette'],
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     h1: {
@@ -57,4 +58,4 @@ const Natural = createTheme({
   },
 });
 
-export default Natural;
+export default High;

@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Close, ContentCopy } from "@mui/icons-material";
+import { useTranslate } from "../../translation/translate";
 
 export default function ShareLink({ scope }) {
+  const { t } = useTranslate();
   const url = window.location.origin + "/roller/" + scope;
 
   const [snackBarOpen, setSnackbarOpen] = useState(false);
@@ -26,7 +28,7 @@ export default function ShareLink({ scope }) {
   return (
     <Card sx={{ p: 2, width: "100%", margin: "0 auto" }}>
       <Typography sx={{ mb: 1 }}>
-        Share this url to other players to see rolls:
+        {t("Share this url to other players to see rolls:")}
       </Typography>
       <TextField
         fullWidth
@@ -40,7 +42,7 @@ export default function ShareLink({ scope }) {
                 onCopy={() => {
                   setSnackbarOpen(true);
                 }}
-                title="Copy"
+                title={t("Copy")}
               >
                 <IconButton>
                   <ContentCopy />
@@ -54,7 +56,7 @@ export default function ShareLink({ scope }) {
         open={snackBarOpen}
         autoHideDuration={5000}
         onClose={snackBarClose}
-        message="Copied to Clipboard"
+        message={t("Copied to Clipboard")}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         action={
           <IconButton

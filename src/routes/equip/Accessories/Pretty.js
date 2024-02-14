@@ -14,6 +14,7 @@ import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
+import { useTranslate } from "../../../translation/translate";
 
 function Pretty({ custom }) {
   const theme = useTheme();
@@ -27,6 +28,7 @@ function Pretty({ custom }) {
 }
 
 function PrettySingle({ accessory, showActions }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -60,12 +62,12 @@ function PrettySingle({ accessory, showActions }) {
               <Grid item xs={1}></Grid>
               <Grid item xs={6}>
                 <Typography variant="h4" textAlign="left">
-                  Accessory
+                  {t("Accessories")}
                 </Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography variant="h4" textAlign="center">
-                  Cost
+                  {t("Cost")}
                 </Typography>
               </Grid>
             </Grid>
@@ -112,7 +114,8 @@ function PrettySingle({ accessory, showActions }) {
                   }}
                 >
                   <Typography>
-                    {!accessory.quality && "No Qualities"} {accessory.quality}
+                    {!accessory.quality && t("No Qualities")}{" "}
+                    {accessory.quality}
                   </Typography>
                 </Grid>
               </Grid>
@@ -122,7 +125,7 @@ function PrettySingle({ accessory, showActions }) {
       </Card>
       {showActions && (
         <div style={{ display: "flex" }}>
-          <Tooltip title="Download as Image">
+          <Tooltip title={t("Download as Image")}>
             <IconButton onClick={downloadImage}>
               <Download />
             </IconButton>

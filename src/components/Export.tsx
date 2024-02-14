@@ -2,6 +2,7 @@ import { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
 import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
+import { useTranslate } from "../translation/translate";
 
 type Props = {
   name?: string;
@@ -14,6 +15,7 @@ enum ExportAction {
 }
 
 function Export({ name = "", data = {} }: Props) {
+  const { t } = useTranslate();
   const [downloadJSON, copyToClipboard] = useDownloadJSON(name, data);
 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
@@ -53,7 +55,7 @@ function Export({ name = "", data = {} }: Props) {
 
   return (
     <>
-      <Tooltip title="Export">
+      <Tooltip title={t("Export")}>
         <IconButton onClick={handleOpenExportMenu}>
           <Code />
         </IconButton>
