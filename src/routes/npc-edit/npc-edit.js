@@ -330,21 +330,21 @@ export default function NpcEdit() {
           </Paper>
         </Grid>
       </Grid>
-      <Divider sx={{ my: 2 }} />
+      <Divider sx={{ my: 1 }} />
 
       {user && user.uid === npc.uid && (
         <>
           <Paper
             elevation={3}
             sx={{
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
-              padding: "20px",
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -354,27 +354,27 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <EditBasics npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
           <Paper
             elevation={3}
             sx={{
-              p: "20px",
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -384,9 +384,9 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <Grid container spacing={2}>
@@ -400,19 +400,19 @@ export default function NpcEdit() {
             </Grid>
           </Paper>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
           <Paper
             elevation={3}
             sx={{
-              p: "20px",
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -422,9 +422,9 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <Grid container>
@@ -437,19 +437,19 @@ export default function NpcEdit() {
             </Grid>
           </Paper>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
           <Paper
             elevation={3}
             sx={{
-              p: "20px",
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -459,27 +459,27 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <EditSpells npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
           <Paper
             elevation={3}
             sx={{
-              p: "20px",
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -489,9 +489,9 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <Grid container>
@@ -510,19 +510,19 @@ export default function NpcEdit() {
             </Grid>
           </Paper>
 
-          <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 1 }} />
 
           <Paper
             elevation={3}
             sx={{
-              p: "20px",
+              p: "15px",
               borderRadius: "8px",
               border: "2px solid",
               borderColor: secondary,
             }}
           >
             <Typography
-              variant="h4"
+              variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
             >
@@ -532,9 +532,9 @@ export default function NpcEdit() {
               orientation="horizontal"
               sx={{
                 color: primary,
-                borderBottom: "3px solid",
+                borderBottom: "2px solid",
                 borderColor: "secondary",
-                mb: "20px",
+                mb: "10px",
               }}
             />
             <Probs />
