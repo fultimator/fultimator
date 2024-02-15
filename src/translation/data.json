@@ -3,88 +3,79 @@
     "key": "(but beast shouldn't have equipment)",
     "en": "(but beast shouldn't have equipment)",
     "it": "(ma la bestia non dovrebbe avere attrezzature)",
-    "de": "(aber Biest sollte keine Ausrüstung haben)",
-    "pl": "(Ale Bestia nie powinna mieć sprzętu)",
-    "fr": "(mais la bête ne devrait pas avoir d'équipement)",
-    "es": "(Pero Beast no debería tener equipo)"
+    "de": "(aber Tiere sollten keine Ausrüstung nutzen)",
+    "pl": "(Bestie nie mogą zdobyć umiejętności **Korzystania z wyposażenia**)",
+    "fr": "(mais les **bêtes** ne devraient pas avoir d'équipement)",
+    "es": "(Pero las Bestias no deberían tener equipo)"
   },
   {
     "key": "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage.",
     "en": "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage.",
     "it": "** I costrutti ** sono immuni a ** veleno ** danni e resistenti a ** Earth ** Danno.",
-    "de": "** Konstrukte ** sind immun gegen ** Gift ** Beschädigung und resistent gegen ** Erde ** Schaden.",
-    "pl": "** Konstrukty ** są odporne na ** truciznę ** Obrażenia i odporne na ** Ziemi ** Obrażenia.",
-    "fr": "** Les constructions ** sont à l'abri de ** Poison ** Dommages et résistants à ** Terre ** Dommages.",
-    "es": "** Las construcciones ** son inmunes a ** veneno ** daño y resistente a ** tierra ** daño."
+    "de": "** Konstrukte ** sind Immun gegen ** Gift- ** Schaden und Resistent gegen ** Erd- ** Schaden.",
+    "pl": "**Konstrukty** są Nietykalne na  obrażenia ** trujące**, odporne na **ziemne** obrażenia i nie mogą ulec **zatruciu**.",
+    "fr": "** Les créatures artificielles ** sont immunisées aux dégâts de **poison** et résistantes aux dégâts de **terre**.",
+    "es": "Los ** Constructos** son inmunes al daño de ** veneno ** y resistentes al daño de ** tierra **."
   },
   {
     "key": "**Demons** are Resistant to two damage types of your choice.",
     "en": "**Demons** are Resistant to two damage types of your choice.",
     "it": "** I demoni ** sono resistenti a due tipi di danno a tua scelta.",
-    "de": "** Dämonen ** sind gegen zwei Schadenstypen Ihrer Wahl resistent.",
-    "pl": "** Demony ** są odporne na dwa wybrane rodzaje obrażeń.",
+    "de": "** Dämonen ** sind gegen zwei Schadenstypen Ihrer Wahl Resistent.",
+    "pl": "**Demony** są Odporne na dwa wybrane rodzaje obrażeń.",
     "fr": "** Les démons ** sont résistants à deux types de dégâts de votre choix.",
-    "es": "** Los demonios ** son resistentes a dos tipos de daño de su elección."
+    "es": "Los ** Demonios ** son resistentes a dos tipos de daño de tu elección."
   },
   {
     "key": "**Elementals** are Immune to **poison** damage, Immune to a second damage type of your choice, and immune to **poisoned**.",
     "en": "**Elementals** are Immune to **poison** damage, Immune to a second damage type of your choice, and immune to **poisoned**.",
     "it": "** Elementali ** sono immuni da ** veleno ** danno, immune a un secondo tipo di danno a tua scelta e immune a ** avvelenato **.",
-    "de": "** Elementare ** sind immun gegen ** Gift ** Schaden, immun gegen einen zweiten Schadensart Ihrer Wahl und immun gegen ** vergiftet **.",
-    "pl": "** Elementalności ** są odporne na ** Truciznę ** Uszkodzenie, odporne na drugi typ obrażeń wyboru i odporne na ** zatrute **.",
-    "fr": "** Les élémentaires ** sont à l'abri de ** Poison ** Dommages, immunisés contre un deuxième type de dommage de votre choix et à l'abri de ** empoisonné **.",
-    "es": "** Elementales ** son inmunes a ** veneno ** daño, inmune a un segundo tipo de daño de su elección e inmune a ** envenenado **."
+    "de": "** Elementare ** sind Immun gegen ** Gift- ** Schaden, Immun gegen eine zweite Schadensart Ihrer Wahl und Immun gegen ** Vergiftet **.",
+    "pl": "**Żywiołaki** są Nietykalne na obrażenia ** trujące **, odporne na inny, wybrany typ obrażeń i nie mogą ulec **zatruciu**.",
+    "fr": "** Les élémentaires ** sont immunisées aux dégâts de  ** Poison ** , immunisés contre un deuxième type de dommage de votre choix et sont immunisées contre l'état  ** empoisonné **.",
+    "es": "Los ** Elementales ** son inmunes al daño de** veneno **, inmunes a un segundo tipo de daño de tu elección e inmunes a ** envenenado **."
   },
   {
     "key": "**Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
     "en": "**Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
     "it": "** Le piante ** sono vulnerabili a (scegli una: ** aria **, ** bullone **, ** fuoco **, ** ghiaccio **) danno.",
-    "de": "** Pflanzen ** sind anfällig für (wählen Sie einen: ** Air **, ** Bolt **, ** Feuer **, ** ICE **) Schaden.",
-    "pl": "** Rośliny ** są podatne na (wybierz jeden: ** Air **, ** Bolt **, ** Fire **, ** Ice **) Obrażenia.",
+    "de": "** Pflanzen ** sind Verwundbar gegen eine Schadensart (wähle aus: ** Luft- **, ** Blitz- **, ** Feuer- ** oder ** Eis- ** Schaden).",
+    "pl": "**Rośliny** są podatne na (wybierz jeden: ** Air **, ** Bolt **, ** Fire **, ** Ice **) Obrażenia.",
     "fr": "** Les plantes ** sont vulnérables à (Choisissez-en un: ** air **, ** Bolt **, ** Fire **, ** Ice **) Dommages.",
-    "es": "** Las plantas ** son vulnerables a (elige uno: ** aire **, ** Bolt **, ** Fuego **, ** Ice **) Daño."
+    "es": "Las ** Plantas ** son vulnerables al daño (elige uno: ** Aire **, ** Rayo**, ** Fuego **, ** Hielo**)."
   },
   {
     "key": "**Undead** are Immune to **dark** and **poison** damage, and Vulnerable to **light** damage.",
     "en": "**Undead** are Immune to **dark** and **poison** damage, and Vulnerable to **light** damage.",
     "it": "** I non morti ** sono immuni da ** scuro ** e ** veleno ** danno e vulnerabili a ** luce ** danni.",
-    "de": "** Untote ** sind immun gegen ** dunkel ** und ** gift ** schaden und anfällig für ** hell ** schaden.",
-    "pl": "** Nieumarłe ** są odporne na ** ciemne ** i ** trucizny ** Obrażenia i podatne na ** lekkie ** Obrażenia.",
-    "fr": "** Les morts-vivants ** sont à l'abri de ** Dark ** et ** Poison ** Dommages et vulnérables aux dommages de la lumière **.",
-    "es": "** Unde -muerto ** son inmunes a ** oscuro ** y ** veneno ** daño, y vulnerables a ** luz ** daño."
+    "de": "** Untote ** sind Immun gegen ** Schatten- ** und ** Gift- ** Schaden und Verwundbar gegen ** Licht- ** Schaden.",
+    "pl": "**Nieumarli** są Nietykalni względem **mrocznych** oraz **trujących** obrażeń, nie mogą ulec **zatruciu** i są podatni na **świetliste** obrażenia.",
+    "fr": "** Les morts-vivants ** sont immunisées aux dégâts de  ** Ténèbres** et  de ** Poison ** et vulnérables aux dégâts de  **lumière **.",
+    "es": "Los ** No muertos ** son inmunes al daño de ** Oscuro ** y ** Veneno **, y vulnerables al daño de ** Luz **."
   },
   {
     "key": "1 handed",
     "en": "1 handed",
     "it": "1 mano",
-    "de": "1 Handge",
-    "pl": "1 wręczony",
-    "fr": "1 remis",
-    "es": "1 con la mano"
+    "de": "Einhändig",
+    "pl": "Jednoręczne",
+    "fr": "À 1 Main",
+    "es": "1 mano"
   },
   {
     "key": "2 handed",
     "en": "2 handed",
     "it": "2 mani",
-    "de": "2 Hand",
-    "pl": "2 wręczone",
-    "fr": "2 mains",
+    "de": "Zweihändig",
+    "pl": "Dwuręczne",
+    "fr": "À 2 Mains",
     "es": "2 manos"
-  },
-  {
-    "key": "Ab 1:",
-    "en": "Ab 1:",
-    "it": "AB 1:",
-    "de": "AB 1:",
-    "pl": "AB 1:",
-    "fr": "AB 1:",
-    "es": "AB 1:"
   },
   {
     "key": "Absorption",
     "en": "Absorption",
     "it": "Assorbimento",
-    "de": "Absorption",
+    "de": "Absorbiert",
     "pl": "Wchłanianie",
     "fr": "Absorption",
     "es": "Absorción"
@@ -94,15 +85,15 @@
     "en": "Acc.",
     "it": "Acc.",
     "de": "Acc.",
-    "pl": "Acc.",
-    "fr": "Acc.",
-    "es": "Accado"
+    "pl": "Cel.",
+    "fr": "Pré.",
+    "es": "Precis."
   },
   {
     "key": "Accessories",
     "en": "Accessories",
     "it": "Accessori",
-    "de": "Zubehör",
+    "de": "Accessoires",
     "pl": "Akcesoria",
     "fr": "Accessoires",
     "es": "Accesorios"
@@ -112,36 +103,27 @@
     "en": "Accuracy",
     "it": "Precisione",
     "de": "Genauigkeit",
-    "pl": "Dokładność",
+    "pl": "Celność",
     "fr": "Précision",
-    "es": "Exactitud"
+    "es": "Precisión"
   },
   {
     "key": "Accuracy Up",
     "en": "Accuracy Up",
     "it": "Precisione",
-    "de": "Genauigkeit",
-    "pl": "Dokładność",
-    "fr": "Précision",
-    "es": "Precisión"
+    "de": "Erhöhte Genauigkeit",
+    "pl": "Większa celność",
+    "fr": "Précision accrue",
+    "es": "Precisión mejorada"
   },
   {
     "key": "Adding a special effect cost 1 skill point",
     "en": "Adding a special effect cost 1 skill point",
     "it": "Aggiunta di un effetto speciale costo 1 punto di abilità",
-    "de": "Das Hinzufügen eines Spezialeffekts kostet 1 Skill Point",
+    "de": "Das Hinzufügen eines Spezialeffekts kostet 1 Fähigkeitspunkt",
     "pl": "Dodanie efektu specjalnego kosztuje 1 punkt umiejętności",
-    "fr": "Ajout d'un effet d'effet spécial 1 point de compétence",
-    "es": "Agregar un efecto especial costo 1 punto de habilidad"
-  },
-  {
-    "key": "Adversary",
-    "en": "Adversary",
-    "it": "Avversario",
-    "de": "Gegner",
-    "pl": "Przeciwnik",
-    "fr": "Adversaire",
-    "es": "Adversario"
+    "fr": "Ajout d'un effet d'effet spécial coûte 1 point de compétence",
+    "es": "Agrega un efecto especial a cambio de 1 punto de habilidad"
   },
   {
     "key": "Adversary",
@@ -158,7 +140,7 @@
     "it": "Nome avversario",
     "de": "Gegnername",
     "pl": "Nazwa przeciwnika",
-    "fr": "Nom adversaire",
+    "fr": "Nom de l'adversaire",
     "es": "Nombre de adversario"
   },
   {
@@ -166,7 +148,7 @@
     "en": "Affinity",
     "it": "Affinità",
     "de": "Affinität",
-    "pl": "Podobieństwo",
+    "pl": "Podatność na obrażenia",
     "fr": "Affinité",
     "es": "Afinidad"
   },
@@ -175,7 +157,7 @@
     "en": "Air",
     "it": "Aria",
     "de": "Luft",
-    "pl": "Powietrze",
+    "pl": "Powietrzne",
     "fr": "Air",
     "es": "Aire"
   },
@@ -184,7 +166,7 @@
     "en": "All",
     "it": "Tutto",
     "de": "Alle",
-    "pl": "Wszystko",
+    "pl": "Wszystkie",
     "fr": "Tous",
     "es": "Todo"
   },
@@ -192,7 +174,7 @@
     "key": "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
     "en": "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
     "it": "Tutti i danni inflitti dalle armi, dagli incantesimi e dalle abilità diventano di un tipo specifico.",
-    "de": "Alle Schäden, die Ihre Waffen, Zauber und Fähigkeiten zu einem bestimmten Typ befördern.",
+    "de": "Aller Schaden, der von Waffen, Zaubern und Fähigkeiten verursacht wird, wird auf einen bestimmten Typ geändert.",
     "pl": "Wszystkie obrażenia zadawane przez twoją broń, zaklęcia i umiejętności stają się określonym typem.",
     "fr": "Tous les dégâts infligés par vos armes, sorts et compétences deviennent d'un type spécifique.",
     "es": "Todo el daño infligido por tus armas, hechizos y habilidades se convierte en un tipo específico."
@@ -211,24 +193,33 @@
     "en": "Antistatus",
     "it": "Antistatus",
     "de": "Antistatus",
-    "pl": "Antistatus",
-    "fr": "Antistatus",
-    "es": "Antistato"
+    "pl": "Antystan",
+    "fr": "Anti-État",
+    "es": "Antiestado"
+  },
+  {
+    "key": "arcane_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Mistyczne",
+    "fr": "Catégorie_arcanique",
+    "es": ""
   },
   {
     "key": "Arcane",
     "en": "Arcane",
     "it": "Arcano",
     "de": "Arkan",
-    "pl": "Tajemna",
-    "fr": "Ésotérique",
+    "pl": "Mistyczne",
+    "fr": "Arcanique",
     "es": "Arcano"
   },
   {
     "key": "Area",
     "en": "Area",
     "it": "La zona",
-    "de": "Bereich",
+    "de": "Wirkungsbereich",
     "pl": "Obszar",
     "fr": "Zone",
     "es": "Área"
@@ -247,7 +238,7 @@
     "en": "Armor and Shield",
     "it": "Armatura e scudo",
     "de": "Rüstung und Schild",
-    "pl": "Zbroja i tarcza",
+    "pl": "Zbroje i tarcze",
     "fr": "Armure et bouclier",
     "es": "Armadura y escudo"
   },
@@ -265,15 +256,15 @@
     "en": "Armor/Shield",
     "it": "Armatura/scudo",
     "de": "Rüstung/Schild",
-    "pl": "Zbroja/tarcza",
+    "pl": "Zbroja/Tarcza",
     "fr": "Armure / bouclier",
-    "es": "Armadura"
+    "es": "Armadura/Escudo"
   },
   {
     "key": "Attacks",
     "en": "Attacks",
     "it": "Attacchi",
-    "de": "Anschläge",
+    "de": "Angriffe",
     "pl": "Ataki",
     "fr": "Attaques",
     "es": "Ataques"
@@ -282,10 +273,10 @@
     "key": "Attacks Chance Generator",
     "en": "Attacks Chance Generator",
     "it": "Attacchi Generatore di possibilità",
-    "de": "Angreift Chance Generator",
-    "pl": "Ataki generator szansy",
-    "fr": "Attaque le générateur de hasard",
-    "es": "Attaca el generador de casas"
+    "de": "Trefferchance Generator",
+    "pl": "Generator szansy ataku",
+    "fr": "Générateur aléatoire d'attaque",
+    "es": "Generador de probabilidades de ataques"
   },
   {
     "key": "Attacks with Weapons",
@@ -301,70 +292,70 @@
     "en": "Attr 1",
     "it": "ATRT 1",
     "de": "Attr 1",
-    "pl": "Attr 1",
-    "fr": "Att 1",
-    "es": "Attr 1"
+    "pl": "Atr 1",
+    "fr": "Attr 1",
+    "es": "Atr 1"
   },
   {
     "key": "Attr 1:",
     "en": "Attr 1:",
     "it": "ATRT 1:",
     "de": "Attr 1:",
-    "pl": "Attr 1:",
-    "fr": "Att 1:",
-    "es": "Attr 1:"
+    "pl": "Atr 1:",
+    "fr": "Attr 1:",
+    "es": "Atr 1:"
   },
   {
     "key": "Attr 2:",
     "en": "Attr 2:",
     "it": "ATTER 2:",
     "de": "Attr 2:",
-    "pl": "Attr 2:",
-    "fr": "Att 2:",
-    "es": "Attr 2:"
+    "pl": "Atr 2:",
+    "fr": "Attr 2:",
+    "es": "Atr 2:"
   },
   {
     "key": "Available skills from levels",
     "en": "Available skills from levels",
     "it": "Abilità disponibili dai livelli",
     "de": "Verfügbare Fähigkeiten von Levels",
-    "pl": "Dostępne umiejętności z poziomów",
-    "fr": "Compétences disponibles à partir de niveaux",
-    "es": "Habilidades disponibles de los niveles"
+    "pl": "Umiejętności dostępne za poziomy",
+    "fr": "Compétences disponibles à partir du niveau",
+    "es": "Habilidades disponibles por niveles"
   },
   {
     "key": "Available Skills from rank",
     "en": "Available Skills from rank",
     "it": "Abilità disponibili dal rango",
     "de": "Verfügbare Fähigkeiten aus dem Rang",
-    "pl": "Dostępne umiejętności z rangi",
-    "fr": "Compétences disponibles du rang",
-    "es": "Habilidades disponibles de rango"
+    "pl": "Umiejętności dostępne za rangę",
+    "fr": "Compétences disponibles à partir du rang",
+    "es": "Habilidades disponibles por rango"
   },
   {
     "key": "Available skills from Species",
     "en": "Available skills from Species",
     "it": "Abilità disponibili dalle specie",
     "de": "Verfügbare Fähigkeiten von Arten",
-    "pl": "Dostępne umiejętności od gatunków",
-    "fr": "Compétences disponibles d'espèces",
-    "es": "Habilidades disponibles de especies"
+    "pl": "Umiejętności dostępne za gatunek",
+    "fr": "Compétences disponibles pour les espèces",
+    "es": "Habilidades disponibles por especies"
   },
   {
     "key": "Available skills from vulnerabilities",
     "en": "Available skills from vulnerabilities",
     "it": "Competenze disponibili dalle vulnerabilità",
     "de": "Verfügbare Fähigkeiten aus Schwachstellen aus Schwachstellen",
-    "pl": "Dostępne umiejętności z luk w zabezpieczeniach",
-    "fr": "Compétences disponibles de vulnérabilités",
-    "es": "Habilidades disponibles de vulnerabilidades"
+    "pl": "Umiejętności dostępne za Wrażliwości",
+    "fr": "Compétences disponibles pour les vulnérabilités",
+    "es": "Habilidades disponibles por vulnerabilidades"
   },
   {
     "key": "Available:",
     "en": "Available:",
     "it": "Disponibile:",
     "de": "Verfügbar:",
-    "pl": "Dostępny:",
+    "pl": "Dostępne:",
     "fr": "Disponible:",
     "es": "Disponible:"
   },
@@ -373,9 +364,9 @@
     "en": "Basic Armor/Shield",
     "it": "Armatura/scudo di base",
     "de": "Basispanzer/Schild",
-    "pl": "Podstawowa zbroja/tarcza",
+    "pl": "Podstawowe zbroje/tarcze",
     "fr": "Armure / bouclier de base",
-    "es": "Armadura/escudo básico"
+    "es": "Armadura/Escudo básico"
   },
   {
     "key": "Basic Attacks",
@@ -409,18 +400,18 @@
     "en": "bolt",
     "it": "bullone",
     "de": "Bolzen",
-    "pl": "śruba",
-    "fr": "boulon",
-    "es": "tornillo"
+    "pl": "elektryczne",
+    "fr": "foudre",
+    "es": "rayo"
   },
   {
     "key": "Bolt",
     "en": "Bolt",
     "it": "Bullone",
     "de": "Bolzen",
-    "pl": "Śruba",
-    "fr": "Boulon",
-    "es": "Tornillo"
+    "pl": "Elektryczne",
+    "fr": "Foudre",
+    "es": "Rayo"
   },
   {
     "key": "Bonus",
@@ -428,35 +419,44 @@
     "it": "Bonus",
     "de": "Bonus",
     "pl": "Premia",
-    "fr": "Prime",
-    "es": "Prima"
+    "fr": "Bonus",
+    "es": "Bonificación"
   },
   {
     "key": "bonus to all Accuracy Checks",
     "en": "bonus to all Accuracy Checks",
     "it": "Bonus a tutti i controlli di precisione",
     "de": "Bonus auf alle Genauigkeitsüberprüfungen",
-    "pl": "Bonus do wszystkich kontroli dokładności",
-    "fr": "bonus à toutes les contrôles de précision",
-    "es": "Bonificación a todos los controles de precisión"
+    "pl": "premia do wszystkich testów celności",
+    "fr": "bonus à toutes les test de précision",
+    "es": "Bonificación a todas las pruebas de precisión"
   },
   {
     "key": "bonus to all Magic Checks",
     "en": "bonus to all Magic Checks",
     "it": "Bonus a tutti i controlli magici",
     "de": "Bonus für alle magischen Schecks",
-    "pl": "Bonus do wszystkich magicznych czeków",
-    "fr": "bonus à tous les chèques magiques",
-    "es": "Bonificación a todos los cheques mágicos"
+    "pl": "premia do wszystkich testów magicznych",
+    "fr": "bonus à tous les tests magiques",
+    "es": "Bonificación a todas las pruebas mágicas"
   },
   {
     "key": "Bow",
     "en": "Bow",
     "it": "Arco",
     "de": "Bogen",
-    "pl": "Ukłon",
+    "pl": "Łuk",
     "fr": "Arc",
     "es": "Arco"
+  },
+  {
+    "key": "brawling_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "Catégorie_lutte",
+    "es": ""
   },
   {
     "key": "Brawling",
@@ -464,51 +464,42 @@
     "it": "Risuona",
     "de": "Schlägereien",
     "pl": "Brawling",
-    "fr": "Bagarre",
+    "fr": "Lutte",
     "es": "Pelea"
-  },
-  {
-    "key": "Brigadine",
-    "en": "Brigadine",
-    "it": "Brigadina",
-    "de": "Brigadin",
-    "pl": "Brygadyna",
-    "fr": "Brigadine",
-    "es": "Brigadina"
   },
   {
     "key": "Brigandine",
     "en": "Brigandine",
     "it": "Briganda",
     "de": "Brigandine",
-    "pl": "Brigandine",
+    "pl": "Brygantyna",
     "fr": "Brigandine",
-    "es": "Brigándine"
+    "es": "Brigantina"
   },
   {
     "key": "Broadaxe",
     "en": "Broadaxe",
     "it": "Broadaxe",
     "de": "Broadaxe",
-    "pl": "Broadaxe",
-    "fr": "Broadaxe",
-    "es": "Broadaxe"
+    "pl": "Topór Bojowy",
+    "fr": "Hache large",
+    "es": "Hacha ancha"
   },
   {
     "key": "Bronze Plate",
     "en": "Bronze Plate",
     "it": "Piatto di bronzo",
     "de": "Bronzeplatte",
-    "pl": "Brązowy płyt",
-    "fr": "Assiette de bronze",
-    "es": "Placa de bronce"
+    "pl": "Zbroja Płytowa z Brązu",
+    "fr": "Plates de bronze",
+    "es": "Armadura de placas de bronce"
   },
   {
     "key": "Bronze Shield",
     "en": "Bronze Shield",
     "it": "Scudo di bronzo",
     "de": "Bronzeschild",
-    "pl": "Brązowa tarcza",
+    "pl": "Tarcza z Brązu",
     "fr": "Bouclier de bronze",
     "es": "Escudo de bronce"
   },
@@ -517,7 +508,7 @@
     "en": "Bronze Sword",
     "it": "Spada di bronzo",
     "de": "Bronzeschwert",
-    "pl": "Brązowy miecz",
+    "pl": "Miecz z Brązu",
     "fr": "Épée en bronze",
     "es": "Espada de bronce"
   },
@@ -535,16 +526,16 @@
     "en": "Chain Whip",
     "it": "Whip a catena",
     "de": "Kettenpeitsche",
-    "pl": "Bat łańcuchowy",
-    "fr": "Whip de chaîne",
-    "es": "Látigo de la cadena"
+    "pl": "Bicz łańcuchowy",
+    "fr": "Chaîne-Fouet",
+    "es": "Látigo de cadena"
   },
   {
     "key": "Champion (2)",
     "en": "Champion (2)",
     "it": "Campione (2)",
     "de": "Champion (2)",
-    "pl": "Mistrz (2)",
+    "pl": "Czempion (2)",
     "fr": "Champion (2)",
     "es": "Campeón (2)"
   },
@@ -553,7 +544,7 @@
     "en": "Champion (3)",
     "it": "Campione (3)",
     "de": "Champion (3)",
-    "pl": "Mistrz (3)",
+    "pl": "Czempion (3)",
     "fr": "Champion (3)",
     "es": "Campeón (3)"
   },
@@ -562,7 +553,7 @@
     "en": "Champion (4)",
     "it": "Campione (4)",
     "de": "Champion (4)",
-    "pl": "Mistrz (4)",
+    "pl": "Czempion (4)",
     "fr": "Champion (4)",
     "es": "Campeón (4)"
   },
@@ -571,43 +562,7 @@
     "en": "Champion (5)",
     "it": "Campione (5)",
     "de": "Champion (5)",
-    "pl": "Mistrz (5)",
-    "fr": "Champion (5)",
-    "es": "Campeón (5)"
-  },
-  {
-    "key": "Champion(2)",
-    "en": "Champion(2)",
-    "it": "Campione (2)",
-    "de": "Champion (2)",
-    "pl": "Mistrz (2)",
-    "fr": "Champion (2)",
-    "es": "Campeón (2)"
-  },
-  {
-    "key": "Champion(3)",
-    "en": "Champion(3)",
-    "it": "Campione (3)",
-    "de": "Champion (3)",
-    "pl": "Mistrz (3)",
-    "fr": "Champion (3)",
-    "es": "Campeón (3)"
-  },
-  {
-    "key": "Champion(4)",
-    "en": "Champion(4)",
-    "it": "Campione (4)",
-    "de": "Champion (4)",
-    "pl": "Mistrz (4)",
-    "fr": "Champion (4)",
-    "es": "Campeón (4)"
-  },
-  {
-    "key": "Champion(5)",
-    "en": "Champion(5)",
-    "it": "Campione (5)",
-    "de": "Champion (5)",
-    "pl": "Mistrz (5)",
+    "pl": "Czempion (5)",
     "fr": "Champion (5)",
     "es": "Campeón (5)"
   },
@@ -616,18 +571,18 @@
     "en": "Change Attr 1",
     "it": "Cambia ATRT 1",
     "de": "Wechseln Sie Attr 1",
-    "pl": "Zmień attr 1",
-    "fr": "Changer ATR 1",
-    "es": "Cambiar attr 1"
+    "pl": "Zmień atr 1",
+    "fr": "Changer Attr 1",
+    "es": "Cambiar atr 1"
   },
   {
     "key": "Change Attr 2",
     "en": "Change Attr 2",
     "it": "Cambia ATRT 2",
     "de": "Wechseln Sie Attr 2",
-    "pl": "Zmień attr 2",
-    "fr": "Changer Att 2",
-    "es": "Cambiar attr 2"
+    "pl": "Zmień atr 2",
+    "fr": "Changer Attr 2",
+    "es": "Cambiar atr 2"
   },
   {
     "key": "Change Hands",
@@ -644,7 +599,7 @@
     "it": "Cambia lingua in:",
     "de": "Sprache ändern in:",
     "pl": "Zmień język na:",
-    "fr": "Changer la langue en:",
+    "fr": "Changer le langage en:",
     "es": "Cambiar el idioma a:"
   },
   {
@@ -653,7 +608,7 @@
     "it": "Cambia nome",
     "de": "Namen ändern",
     "pl": "Zmień nazwę",
-    "fr": "Changer de nom",
+    "fr": "Changer le nom",
     "es": "Cambiar nombre"
   },
   {
@@ -663,7 +618,7 @@
     "de": "Typ ändern",
     "pl": "Zmień typ",
     "fr": "Changer le type",
-    "es": "Tipo de cambio"
+    "es": "Cambiar tipo"
   },
   {
     "key": "Clock",
@@ -679,18 +634,9 @@
     "en": "Collapse",
     "it": "Crollo",
     "de": "Zusammenbruch",
-    "pl": "Zawalić się",
+    "pl": "Zwiń",
     "fr": "Effondrement",
-    "es": "Colapsar"
-  },
-  {
-    "key": "Combat",
-    "en": "Combat",
-    "it": "Combattere",
-    "de": "Kampf",
-    "pl": "Walka",
-    "fr": "Combat",
-    "es": "Combate"
+    "es": "Cerrar"
   },
   {
     "key": "Combat",
@@ -706,7 +652,7 @@
     "en": "Combat Tunic",
     "it": "Tunica da combattimento",
     "de": "Kampftunika",
-    "pl": "Tunik bojowy",
+    "pl": "Tunika bojowa",
     "fr": "Tunique de combat",
     "es": "Túnica de combate"
   },
@@ -724,16 +670,16 @@
     "en": "Construct",
     "it": "Costruire",
     "de": "Bauen",
-    "pl": "Skonstruować",
-    "fr": "Construction",
-    "es": "Construir"
+    "pl": "Konstrukt",
+    "fr": "Créature artificielle",
+    "es": "Constructo"
   },
   {
     "key": "Consumable",
     "en": "Consumable",
     "it": "Consumabile",
     "de": "Konsumierbar",
-    "pl": "Zużywalne",
+    "pl": "Jednorazowe",
     "fr": "Consommable",
     "es": "Consumible"
   },
@@ -742,7 +688,7 @@
     "en": "Copied to Clipboard",
     "it": "Copiato negli appunti",
     "de": "In die Zwischenablage kopiert",
-    "pl": "Skopiowane do schowka",
+    "pl": "Skopiowano do schowka",
     "fr": "Copié dans le presse-papier",
     "es": "Copiado al portapapeles"
   },
@@ -751,7 +697,7 @@
     "en": "Copied to Clipboard!",
     "it": "Copiato negli appunti!",
     "de": "In die Zwischenablage kopiert!",
-    "pl": "Skopiowane do schowka!",
+    "pl": "Skopiowano do schowka!",
     "fr": "Copié dans le presse-papier!",
     "es": "¡Copiado al portapapeles!"
   },
@@ -761,7 +707,7 @@
     "it": "copia",
     "de": "Kopieren",
     "pl": "Kopiuj",
-    "fr": "Copie",
+    "fr": "Copier à un concepteur adversaire",
     "es": "Copiar"
   },
   {
@@ -769,9 +715,9 @@
     "en": "Copy to adversary designer",
     "it": "Copia su Avversario Designer",
     "de": "Kopieren Sie an den Gegnerdesigner",
-    "pl": "Kopiuj do projektanta przeciwnika",
-    "fr": "Copier à un concepteur adversaire",
-    "es": "Copiar al diseñador adversario"
+    "pl": "Kopiuj do Projektanta Przeciwników",
+    "fr": "Copier dans le génerateur d'adversaire",
+    "es": "Copiar al diseñador de adversarios"
   },
   {
     "key": "Cost",
@@ -780,25 +726,25 @@
     "de": "Kosten",
     "pl": "Koszt",
     "fr": "Coût",
-    "es": "Costo"
+    "es": "Coste"
   },
   {
     "key": "Cost of Quality",
     "en": "Cost of Quality",
     "it": "Costo della qualità",
     "de": "Qualitätskosten",
-    "pl": "Koszt jakości",
-    "fr": "Coût de qualité",
-    "es": "Costo de calidad"
+    "pl": "Koszt Waloru",
+    "fr": "Coût de la qualité",
+    "es": "Coste de calidad"
   },
   {
     "key": "Create NPC",
     "en": "Create NPC",
     "it": "Crea NPC",
     "de": "NPC erstellen",
-    "pl": "Utwórz NPC",
-    "fr": "Créer des PNJ",
-    "es": "Crear NPC"
+    "pl": "Utwórz BNa",
+    "fr": "Créer le PNJ",
+    "es": "Crear PNJ"
   },
   {
     "key": "Created By:",
@@ -813,10 +759,10 @@
     "key": "Credit By' needs to be filled in order to be published",
     "en": "Credit By' needs to be filled in order to be published",
     "it": "Il merito di \"deve essere riempito per essere pubblicato",
-    "de": "Gutschrift von 'muss gefüllt werden, um veröffentlicht zu werden",
-    "pl": "Kredyt przez „należy wypełnić, aby zostać opublikowanym",
-    "fr": "Le crédit par «doit être rempli pour être publié",
-    "es": "El crédito por 'debe completarse para ser publicado"
+    "de": "Erstellt von' muss gefüllt werden, um veröffentlichen zu können",
+    "pl": "Należy wypełnić \"Stworzone przez\" aby opublikować",
+    "fr": "Le \"crédit à\" doit être rempli pour être publié",
+    "es": "«Creado por:» debe completarse para ser publicado"
   },
   {
     "key": "Crossbow",
@@ -826,6 +772,15 @@
     "pl": "Kusza",
     "fr": "Arbalète",
     "es": "Ballesta"
+  },
+  {
+    "key": "dagger_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Sztylety",
+    "fr": "Catégorie_dague",
+    "es": ""
   },
   {
     "key": "Dagger",
@@ -841,8 +796,8 @@
     "en": "Damage",
     "it": "Danno",
     "de": "Schaden",
-    "pl": "Szkoda",
-    "fr": "Dommage",
+    "pl": "Obrażenia",
+    "fr": "Dégâts",
     "es": "Daño"
   },
   {
@@ -850,8 +805,8 @@
     "en": "damage",
     "it": "danno",
     "de": "Schaden",
-    "pl": "szkoda",
-    "fr": "dommage",
+    "pl": "obrażenia",
+    "fr": "dégâts",
     "es": "daño"
   },
   {
@@ -859,7 +814,7 @@
     "en": "Damage Change",
     "it": "Cambio di danno",
     "de": "Schadensänderung",
-    "pl": "Zmiana szkód",
+    "pl": "Zmiana typu obrażeń",
     "fr": "Changement de dégâts",
     "es": "Cambio de daño"
   },
@@ -867,46 +822,37 @@
     "key": "dark",
     "en": "dark",
     "it": "buio",
-    "de": "dunkel",
-    "pl": "ciemny",
-    "fr": "sombre",
-    "es": "oscuro"
+    "de": "Schatten",
+    "pl": "mroczne",
+    "fr": "ténèbres",
+    "es": "oscuridad"
   },
   {
     "key": "Dark",
     "en": "Dark",
     "it": "Buio",
-    "de": "Dunkel",
-    "pl": "Ciemny",
-    "fr": "Sombre",
-    "es": "Oscuro"
+    "de": "Schatten",
+    "pl": "Mroczne",
+    "fr": "Ténèbres",
+    "es": "Oscuridad"
   },
   {
     "key": "Dazed",
     "en": "Dazed",
     "it": "Stordito",
     "de": "Benommen",
-    "pl": "Oszołomiony",
+    "pl": "Oszołomienie",
     "fr": "Étourdi",
-    "es": "Aturdido"
-  },
-  {
-    "key": "Dazed",
-    "en": "Dazed",
-    "it": "Stordito",
-    "de": "Benommen",
-    "pl": "Oszołomiony",
-    "fr": "Étourdi",
-    "es": "Aturdido"
+    "es": "Confuso"
   },
   {
     "key": "DEF",
     "en": "DEF",
     "it": "Def",
     "de": "Def",
-    "pl": "Def",
+    "pl": "Obr",
     "fr": "Def",
-    "es": "Defensor"
+    "es": "DEF"
   },
   {
     "key": "Defense",
@@ -914,7 +860,7 @@
     "it": "Difesa",
     "de": "Verteidigung",
     "pl": "Obrona",
-    "fr": "La défense",
+    "fr": "Défense",
     "es": "Defensa"
   },
   {
@@ -922,7 +868,7 @@
     "en": "Defenses",
     "it": "Difese",
     "de": "Verteidigung",
-    "pl": "Obrona",
+    "pl": "Obrony",
     "fr": "Défenses",
     "es": "Defensas"
   },
@@ -930,8 +876,8 @@
     "key": "Defensive Qualities",
     "en": "Defensive Qualities",
     "it": "Qualità difensive",
-    "de": "Verteidigungsqualitäten",
-    "pl": "Cechy obronne",
+    "de": "Defensive Eigenschaften",
+    "pl": "Walory obronne",
     "fr": "Qualités défensives",
     "es": "Cualidades defensivas"
   },
@@ -940,7 +886,7 @@
     "en": "Delete",
     "it": "Eliminare",
     "de": "Löschen",
-    "pl": "Usuwać",
+    "pl": "Usuń",
     "fr": "Supprimer",
     "es": "Borrar"
   },
@@ -966,8 +912,8 @@
     "key": "Details:",
     "en": "Details:",
     "it": "Dettagli:",
-    "de": "Einzelheiten:",
-    "pl": "Detale:",
+    "de": "Details:",
+    "pl": "Szczegóły:",
     "fr": "Détails:",
     "es": "Detalles:"
   },
@@ -976,45 +922,27 @@
     "en": "DEX",
     "it": "Dex",
     "de": "Dex",
-    "pl": "Dex",
+    "pl": "ZR",
     "fr": "Dex",
-    "es": "Dex"
+    "es": "DES"
   },
   {
     "key": "dex",
     "en": "dex",
     "it": "Dex",
     "de": "Dex",
-    "pl": "Dex",
+    "pl": "ZR",
     "fr": "dex",
-    "es": "dex"
-  },
-  {
-    "key": "Dex",
-    "en": "Dex",
-    "it": "Dex",
-    "de": "Dex",
-    "pl": "Dex",
-    "fr": "Dex",
-    "es": "Dex"
+    "es": "des"
   },
   {
     "key": "DEX:",
     "en": "DEX:",
     "it": "Dex:",
     "de": "Dex:",
-    "pl": "Dex:",
+    "pl": "ZR:",
     "fr": "Dex:",
-    "es": "Dex:"
-  },
-  {
-    "key": "DEX:",
-    "en": "DEX:",
-    "it": "Dex:",
-    "de": "Dex:",
-    "pl": "Dex:",
-    "fr": "Dex:",
-    "es": "Dex:"
+    "es": "Des:"
   },
   {
     "key": "Dexterity",
@@ -1029,45 +957,45 @@
     "key": "Die 1",
     "en": "Die 1",
     "it": "Morire 1",
-    "de": "Sterben 1",
-    "pl": "Die 1",
-    "fr": "Mourir 1",
-    "es": "Morir 1"
+    "de": "Würfel 1",
+    "pl": "Kość 1",
+    "fr": "Dé1",
+    "es": "Dado 1"
   },
   {
     "key": "Die 2",
     "en": "Die 2",
     "it": "Morire 2",
-    "de": "Sterben 2",
-    "pl": "Die 2",
-    "fr": "Mourir 2",
-    "es": "Morir 2"
+    "de": "Würfel 2",
+    "pl": "Kość 2",
+    "fr": "Dé 2",
+    "es": "Dado 2"
   },
   {
     "key": "DL",
     "en": "DL",
     "it": "Dl",
     "de": "Dl",
-    "pl": "Dl",
-    "fr": "Dl",
-    "es": "DL"
+    "pl": "PT",
+    "fr": "ND",
+    "es": "ND"
   },
   {
     "key": "Dmg.",
     "en": "Dmg.",
     "it": "Dmg.",
-    "de": "DMG.",
-    "pl": "DMG.",
-    "fr": "Dmg.",
-    "es": "Dmg."
+    "de": "Schaden",
+    "pl": "Obr.",
+    "fr": "Dgts",
+    "es": "Daño"
   },
   {
     "key": "Download as Image",
     "en": "Download as Image",
     "it": "Scarica come immagine",
-    "de": "Download als Bild",
+    "de": "Als Bild herunterladen",
     "pl": "Pobierz jako obraz",
-    "fr": "Télécharger comme image",
+    "fr": "Télécharger en tant qu'image",
     "es": "Descargar como imagen"
   },
   {
@@ -1075,17 +1003,17 @@
     "en": "Dual Hunter",
     "it": "Dual Hunter",
     "de": "Dual Hunter",
-    "pl": "Dual Hunter",
-    "fr": "Double chasseur",
+    "pl": "Podwójna Obława",
+    "fr": "Chasseresse double",
     "es": "Cazador dual"
   },
   {
     "key": "Dual Resistance",
     "en": "Dual Resistance",
     "it": "Doppia resistenza",
-    "de": "Doppelwiderstand",
+    "de": "Doppelresistenz",
     "pl": "Podwójny opór",
-    "fr": "Double résistance",
+    "fr": "Résistance double",
     "es": "Resistencia dual"
   },
   {
@@ -1101,26 +1029,26 @@
     "key": "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
     "en": "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
     "it": "Ogni bersaglio colpito dall'arma soffre (scegli uno: confuso, debole, lento, scosso)",
-    "de": "Jedes von der Waffe getroffene Ziel leidet (wählen Sie eines: verwirrt, schwach, langsam, geschüttelt)",
-    "pl": "Każdy cel uderzony przez broń cierpi (wybierz jeden: zdezorientowany, słaby, powolny, wstrząśnięty)",
-    "fr": "Chaque cible frappée par l'arme souffre (en choisir une: confuse, faible, lente, secouée)",
-    "es": "Cada objetivo alcanzado por el arma sufre (elija uno: confundido, débil, lento, sacudido)"
+    "de": "Jedes von der Waffe getroffene Ziel erleidet den Statuseffekt (wählen einen: Verwirrt, Schwach, Langsam, Erschüttert)",
+    "pl": "Każdy cel uderzony przy użyciu broni ulega (wybierz jedno: **oszołomieniu, roztrzęsieniu, spowolnieniu, osłabieniu**).",
+    "fr": "Chaque cible frappée par l'arme subit (au choix: confus, affaibli, ralenti , traumatisé)",
+    "es": "Cada objetivo alcanzado por el arma sufre (elije uno: confuso, débil, lento, aturdido)"
   },
   {
     "key": "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
     "en": "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
     "it": "Ogni bersaglio colpito dall'arma soffre (scegli uno: avvelenato, infuriato)",
-    "de": "Jedes von der Waffe getroffene Ziel leidet (wählen Sie eine: vergiftet, wütend)",
-    "pl": "Każdy cel uderzony przez broń cierpi (wybierz jeden: zatruty, rozwścieczony)",
-    "fr": "Chaque cible frappée par l'arme souffre (en choisir une: empoisonnée, enragée)",
-    "es": "Cada objetivo golpeado por el arma sufre (elija uno: envenenado, enfurecido)"
+    "de": "Jedes von der Waffe getroffene Ziel erleidet den Statuseffekt (wählen einen: Vergiftet, Wütend)",
+    "pl": "Każdy cel uderzony przy użyciu broni ulega (wybierz jedno: **rozwścieczeniu, zatruciu**).",
+    "fr": "Chaque cible frappée par l'arme subit (au choix: empoisonné, enragé)",
+    "es": "Cada objetivo alcanzado por el arma sufre (elije uno: envenenado, furioso)"
   },
   {
     "key": "earth",
     "en": "earth",
     "it": "terra",
     "de": "Erde",
-    "pl": "ziemia",
+    "pl": "ziemne",
     "fr": "Terre",
     "es": "tierra"
   },
@@ -1129,7 +1057,7 @@
     "en": "Earth",
     "it": "Terra",
     "de": "Erde",
-    "pl": "Ziemia",
+    "pl": "Ziemne",
     "fr": "Terre",
     "es": "Tierra"
   },
@@ -1138,7 +1066,7 @@
     "en": "Edit",
     "it": "Modificare",
     "de": "Bearbeiten",
-    "pl": "Edytować",
+    "pl": "Edycja",
     "fr": "Modifier",
     "es": "Editar"
   },
@@ -1156,7 +1084,7 @@
     "en": "Elemental",
     "it": "Elementare",
     "de": "Elementar",
-    "pl": "Pierwiastkowy",
+    "pl": "Żywiołak",
     "fr": "Élémentaire",
     "es": "Elemental"
   },
@@ -1173,8 +1101,8 @@
     "key": "Enhancement Qualities",
     "en": "Enhancement Qualities",
     "it": "Qualità di miglioramento",
-    "de": "Verbesserungsqualitäten",
-    "pl": "Cechy wzmocnienia",
+    "de": "Hilfreiche Eigenschaften",
+    "pl": "Walory wzmacniające",
     "fr": "Qualités d'amélioration",
     "es": "Cualidades de mejora"
   },
@@ -1184,24 +1112,15 @@
     "it": "Infuriato",
     "de": "Wütend",
     "pl": "Rozwścieczony",
-    "fr": "Furieux",
-    "es": "Enfurecido"
-  },
-  {
-    "key": "Enraged",
-    "en": "Enraged",
-    "it": "Infuriato",
-    "de": "Wütend",
-    "pl": "Rozwścieczony",
-    "fr": "Furieux",
-    "es": "Enfurecido"
+    "fr": "Enragé",
+    "es": "Furioso"
   },
   {
     "key": "Equipment",
     "en": "Equipment",
     "it": "Attrezzatura",
     "de": "Ausrüstung",
-    "pl": "Sprzęt",
+    "pl": "Korzystanie z wyposażenia",
     "fr": "Équipement",
     "es": "Equipo"
   },
@@ -1209,9 +1128,9 @@
     "key": "Expand",
     "en": "Expand",
     "it": "Espandere",
-    "de": "Expandieren",
-    "pl": "Zwiększać",
-    "fr": "Développer",
+    "de": "Erweitern",
+    "pl": "Rozwiń",
+    "fr": "Étendre",
     "es": "Expandir"
   },
   {
@@ -1219,8 +1138,8 @@
     "en": "Expected damage:",
     "it": "Danno atteso:",
     "de": "Erwarteten Schaden:",
-    "pl": "Oczekiwane szkody:",
-    "fr": "Dommages attendus:",
+    "pl": "Przewidywane obrażenia:",
+    "fr": "Dégâts attendus:",
     "es": "Daño esperado:"
   },
   {
@@ -1228,7 +1147,7 @@
     "en": "Export",
     "it": "Esportare",
     "de": "Export",
-    "pl": "Eksport",
+    "pl": "Eksportuj",
     "fr": "Exporter",
     "es": "Exportar"
   },
@@ -1237,25 +1156,25 @@
     "en": "Extra Accuracy",
     "it": "Precisione extra",
     "de": "Zusätzliche Genauigkeit",
-    "pl": "Dodatkowa dokładność",
+    "pl": "Większa celność",
     "fr": "Précision supplémentaire",
-    "es": "Extra precisión"
+    "es": "Precisión extra"
   },
   {
     "key": "Extra Damage",
     "en": "Extra Damage",
     "it": "Danno extra",
-    "de": "Extra Schaden",
-    "pl": "Dodatkowe obrażenia",
-    "fr": "Dommage supplémentaire",
-    "es": "Daño adicional"
+    "de": "Erhöhter Schaden",
+    "pl": "Większe obrażenia",
+    "fr": "Dégâts supplémentaires",
+    "es": "Daño extra"
   },
   {
     "key": "Extra Defense",
     "en": "Extra Defense",
     "it": "Difesa extra",
-    "de": "Zusätzliche Verteidigung",
-    "pl": "Dodatkowa obrona",
+    "de": "Erhöhte Verteidigung",
+    "pl": "Większa ochrona",
     "fr": "Défense supplémentaire",
     "es": "Defensa extra"
   },
@@ -1263,43 +1182,43 @@
     "key": "Extra HP",
     "en": "Extra HP",
     "it": "HP extra",
-    "de": "Zusätzliche HP",
-    "pl": "Dodatkowy HP",
+    "de": "Erhöhte LP",
+    "pl": "Więcej PŻ",
     "fr": "HP supplémentaire",
-    "es": "HP extra"
+    "es": "PV extra"
   },
   {
     "key": "Extra HP:",
     "en": "Extra HP:",
     "it": "HP extra:",
-    "de": "Zusätzliche HP:",
-    "pl": "Dodatkowy HP:",
+    "de": "Erhöhte LP:",
+    "pl": "Więcej PŻ:",
     "fr": "HP supplémentaire:",
-    "es": "HP adicional:"
+    "es": "PV extra:"
   },
   {
     "key": "Extra Init:",
     "en": "Extra Init:",
     "it": "Extra Init:",
-    "de": "Zusätzliche init:",
-    "pl": "Extra Init:",
+    "de": "Większa Inic.",
+    "pl": "Większa Inic.",
     "fr": "Init supplémentaire:",
-    "es": "Init más:"
+    "es": "Ini. extra:"
   },
   {
     "key": "Extra Initiative",
     "en": "Extra Initiative",
     "it": "Iniziativa extra",
-    "de": "Zusätzliche Initiative",
-    "pl": "Dodatkowa inicjatywa",
+    "de": "Erhöhte Init.:",
+    "pl": "Większa Inicjatywa",
     "fr": "Initiative supplémentaire",
-    "es": "Iniciativa adicional"
+    "es": "Iniciativa extra"
   },
   {
     "key": "Extra Magic",
     "en": "Extra Magic",
     "it": "Magia extra",
-    "de": "Zusätzliche Magie",
+    "de": "Erhöhte Magie",
     "pl": "Dodatkowa magia",
     "fr": "Magie supplémentaire",
     "es": "Magia extra"
@@ -1308,26 +1227,26 @@
     "key": "Extra MP",
     "en": "Extra MP",
     "it": "MP extra",
-    "de": "Zusätzlicher Abgeordneter",
-    "pl": "Dodatkowy MP",
+    "de": "Erhöhte MP",
+    "pl": "Więcej PM",
     "fr": "MP supplémentaire",
-    "es": "MP extra"
+    "es": "PM extra"
   },
   {
     "key": "Extra MP:",
     "en": "Extra MP:",
     "it": "MP extra:",
-    "de": "Zusätzlicher Abgeordneter:",
-    "pl": "Dodatkowy MP:",
+    "de": "Erhöhte MP:",
+    "pl": "Więcej PM:",
     "fr": "MP supplémentaire:",
-    "es": "MP adicional:"
+    "es": "PM extra:"
   },
   {
     "key": "Extreme",
     "en": "Extreme",
     "it": "Estremo",
     "de": "Extrem",
-    "pl": "Skrajny",
+    "pl": "Olbrzymi",
     "fr": "Extrême",
     "es": "Extremo"
   },
@@ -1354,7 +1273,7 @@
     "en": "fire",
     "it": "fuoco",
     "de": "Feuer",
-    "pl": "ogień",
+    "pl": "ogniste",
     "fr": "feu",
     "es": "fuego"
   },
@@ -1363,9 +1282,18 @@
     "en": "Fire",
     "it": "Fuoco",
     "de": "Feuer",
-    "pl": "Ogień",
+    "pl": "Ogniste",
     "fr": "Feu",
     "es": "Fuego"
+  },
+  {
+    "key": "firearm_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Broń palna",
+    "fr": "Catégorie_Armes_à_feu",
+    "es": ""
   },
   {
     "key": "Firearm",
@@ -1380,46 +1308,55 @@
     "key": "Flail",
     "en": "Flail",
     "it": "Flagello",
-    "de": "Drehfutter",
+    "de": "Flegel",
     "pl": "Cep",
     "fr": "Fléau",
     "es": "Mayal"
   },
   {
+    "key": "flail_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Cepy i Bicze",
+    "fr": "Catégorie_articulée",
+    "es": ""
+  },
+  {
     "key": "Gain 1 skill per vulnerability.",
     "en": "Gain 1 skill per vulnerability.",
     "it": "Ottieni 1 abilità per vulnerabilità.",
-    "de": "Erwerben Sie 1 Fertigkeit pro Sicherheitsanfälligkeit.",
-    "pl": "Zdobądź 1 umiejętność na podatność.",
+    "de": "1 zusätzlicher Fertigkeitspunkt pro Verwundbarkeit.",
+    "pl": "Otrzymasz 1 Punkt Umiejętności za Wrażliwość",
     "fr": "Gagnez 1 compétence par vulnérabilité.",
-    "es": "Ganar 1 habilidad por vulnerabilidad."
+    "es": "Gana 1 habilidad por vulnerabilidad."
   },
   {
     "key": "Gain 2 skills per physical vulnerability.",
     "en": "Gain 2 skills per physical vulnerability.",
     "it": "Ottieni 2 abilità per vulnerabilità fisica.",
-    "de": "Erwerben Sie 2 Fähigkeiten pro körperlicher Verletzlichkeit.",
-    "pl": "Zdobądź 2 umiejętności na podatność fizyczną.",
+    "de": "2 zusätzliche Fähigkeitspunkte für Verwundbarkeit gegen physischen Schaden.",
+    "pl": "Otrzymasz 2 Punkt Umiejętności za Wrażliwość na obrażenia fizyczne",
     "fr": "Gagnez 2 compétences par vulnérabilité physique.",
-    "es": "Obtenga 2 habilidades por vulnerabilidad física."
+    "es": "Gana 2 habilidades por vulnerabilidad física."
   },
   {
     "key": "Get +1 bonus to Defense and to Magic Defense",
     "en": "Get +1 bonus to Defense and to Magic Defense",
     "it": "Ottieni +1 bonus in difesa e alla difesa magica",
-    "de": "Holen Sie sich +1 Bonus für die Verteidigung und die magische Verteidigung",
-    "pl": "Uzyskaj +1 bonusu do obrony i obrony magicznej",
+    "de": "+1' Bonus für Verteidigung und magische Verteidigung",
+    "pl": "Otrzymasz +1 bonusu do obrony i obrony magicznej",
     "fr": "Obtenez +1 bonus à la défense et à la défense magique",
-    "es": "Obtenga +1 bonificación a la defensa y a la defensa mágica"
+    "es": "Gana +1 a la defensa y a la defensa mágica"
   },
   {
     "key": "Get +1 bonus to Magic Defense",
     "en": "Get +1 bonus to Magic Defense",
     "it": "Ottieni +1 bonus alla difesa magica",
-    "de": "Holen Sie sich +1 Bonus für die magische Verteidigung",
-    "pl": "Uzyskaj +1 bonusu do obrony magicznej",
+    "de": "+1' Bonus für magische Verteidigung",
+    "pl": "Otrzymasz +1 bonusu do obrony magicznej",
     "fr": "Obtenez +1 bonus à la défense magique",
-    "es": "Obtener +1 bono a la defensa mágica"
+    "es": "Gana +1 a la defensa mágica"
   },
   {
     "key": "Google Form.",
@@ -1428,59 +1365,59 @@
     "de": "Google Form.",
     "pl": "Formularz Google.",
     "fr": "Formulaire Google.",
-    "es": "Forma de Google."
-  },
-  {
-    "key": "Google Form.",
-    "en": "Google Form.",
-    "it": "Modulo di Google.",
-    "de": "Google Form.",
-    "pl": "Formularz Google.",
-    "fr": "Formulaire Google.",
-    "es": "Forma de Google."
+    "es": "Formulario de Google"
   },
   {
     "key": "Greatsword",
     "en": "Greatsword",
     "it": "Grande spada",
     "de": "Großschwert",
-    "pl": "Wielki Mieszkanie",
-    "fr": "Épée",
-    "es": "Gran espada"
+    "pl": "Wielki Miecz",
+    "fr": "Épée à deux mains",
+    "es": "Mandoble"
   },
   {
     "key": "Has terrible flaw",
     "en": "Has terrible flaw",
     "it": "Ha un terribile difetto",
-    "de": "Hat schrecklichen Fehler",
-    "pl": "Ma straszną wadę",
-    "fr": "A un terrible défaut",
+    "de": "Hat fatale Schwachstelle",
+    "pl": "Ma poważną wadę",
+    "fr": "A un défaut grave",
     "es": "Tiene un defecto terrible"
   },
   {
     "key": "Healing Up",
     "en": "Healing Up",
     "it": "Guarire",
-    "de": "Heilen",
-    "pl": "Uzdrowienie",
-    "fr": "Guérison",
-    "es": "Curando"
+    "de": "Verbesserte Heilung",
+    "pl": "Skok Zdrowia",
+    "fr": "Gain de soin",
+    "es": "Curación Mejorada"
+  },
+  {
+    "key": "heavy_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Ciężkie",
+    "fr": "Catégorie_lourde",
+    "es": ""
   },
   {
     "key": "Heavy",
     "en": "Heavy",
     "it": "Pesante",
-    "de": "Schwer",
-    "pl": "Ciężki",
+    "de": "Schwere Waffe",
+    "pl": "Ciężkie",
     "fr": "Lourd",
-    "es": "Pesado"
+    "es": "Pesada"
   },
   {
     "key": "Heavy Spear",
     "en": "Heavy Spear",
     "it": "Lancia pesante",
     "de": "Schwerer Speer",
-    "pl": "Ciężka włócznia",
+    "pl": "Ciężka Włócznia",
     "fr": "Lance lourde",
     "es": "Lanza pesada"
   },
@@ -1497,64 +1434,55 @@
     "key": "Help the Adversary Compedium grow by publishing your finished work!",
     "en": "Help the Adversary Compedium grow by publishing your finished work!",
     "it": "Aiuta l'avversario Compedium a crescere pubblicando il tuo lavoro finito!",
-    "de": "Helfen Sie dem Gegner -Kompedium, indem Sie Ihre fertige Arbeit veröffentlichen!",
-    "pl": "Pomóż przeciwnikowi kompedium rozwijać się, publikując gotową pracę!",
-    "fr": "Aidez l'adversaire à se développer en publiant votre travail fini!",
-    "es": "¡Ayude al Adversary Compedium a crecer publicando su trabajo terminado!"
+    "de": "Helfen Sie dem Gegnerkompedium, indem Sie Ihre fertige Arbeit veröffentlichen!",
+    "pl": "Pomóż rozwijać się Kompendium Przeciwników, publikując gotową pracę!",
+    "fr": "Aidez à développer le bestiaire en publiant votre travail fini!",
+    "es": "¡Ayuda al Compendio de Adversarios a crecer publicando tu trabajo terminado!"
   },
   {
     "key": "HP",
     "en": "HP",
     "it": "HP",
-    "de": "HP",
-    "pl": "HP",
-    "fr": "HP",
-    "es": "HP"
+    "de": "LP",
+    "pl": "PŻ",
+    "fr": "PV",
+    "es": "PV"
   },
   {
     "key": "HP:",
     "en": "HP:",
     "it": "HP:",
-    "de": "HP:",
-    "pl": "HP:",
-    "fr": "HP:",
-    "es": "HP:"
-  },
-  {
-    "key": "HP:",
-    "en": "HP:",
-    "it": "HP:",
-    "de": "HP:",
-    "pl": "HP:",
-    "fr": "HP:",
-    "es": "HP:"
+    "de": "LP:",
+    "pl": "PŻ:",
+    "fr": "PV:",
+    "es": "PV:"
   },
   {
     "key": "HR",
     "en": "HR",
     "it": "Hr",
     "de": "HR",
-    "pl": "Hr",
-    "fr": "HEURE",
-    "es": "HORA"
+    "pl": "WW",
+    "fr": "VH",
+    "es": "TA"
   },
   {
     "key": "HR +",
     "en": "HR +",
     "it": "HR +",
     "de": "HR +",
-    "pl": "HR +",
-    "fr": "Hr +",
-    "es": "HR +"
+    "pl": "WW+",
+    "fr": "VH +",
+    "es": "TA +"
   },
   {
     "key": "HR:",
     "en": "HR:",
     "it": "HR:",
     "de": "HR:",
-    "pl": "HR:",
-    "fr": "HEURE:",
-    "es": "HORA:"
+    "pl": "WW:",
+    "fr": "VH :",
+    "es": "TA:"
   },
   {
     "key": "Huge",
@@ -1579,7 +1507,7 @@
     "en": "Hunter",
     "it": "Cacciatore",
     "de": "Jäger",
-    "pl": "myśliwy",
+    "pl": "Obława",
     "fr": "Chasseur",
     "es": "Cazador"
   },
@@ -1588,7 +1516,7 @@
     "en": "ice",
     "it": "ghiaccio",
     "de": "Eis",
-    "pl": "lód",
+    "pl": "lodowe",
     "fr": "glace",
     "es": "hielo"
   },
@@ -1597,7 +1525,7 @@
     "en": "Ice",
     "it": "Ghiaccio",
     "de": "Eis",
-    "pl": "lód",
+    "pl": "Lodowe",
     "fr": "Glace",
     "es": "Hielo"
   },
@@ -1605,53 +1533,44 @@
     "key": "If you have any feedback, give us your thoughts here",
     "en": "If you have any feedback, give us your thoughts here",
     "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
-    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken",
-    "pl": "Jeśli masz jakieś informacje zwrotne, daj nam swoje przemyślenia tutaj",
-    "fr": "Si vous avez des commentaires, donnez-nous vos pensées ici",
-    "es": "Si tiene algún comentario, danos tus pensamientos aquí"
-  },
-  {
-    "key": "If you have any feedback, give us your thoughts here",
-    "en": "If you have any feedback, give us your thoughts here",
-    "it": "Se hai qualche feedback, dai i tuoi pensieri qui",
-    "de": "Wenn Sie Feedback haben, geben Sie uns hier Ihre Gedanken",
-    "pl": "Jeśli masz jakieś informacje zwrotne, daj nam swoje przemyślenia tutaj",
-    "fr": "Si vous avez des commentaires, donnez-nous vos pensées ici",
-    "es": "Si tiene algún comentario, danos tus pensamientos aquí"
+    "de": "Wenn Sie Feedback haben, hinterlassen Sie es hier",
+    "pl": "Jeśli masz sugestie, podziel się tutaj swoimi przemyśleniami:",
+    "fr": "Écrivez vos commentaires ici",
+    "es": "Si tienes algún comentario, comunícanoslo aquí"
   },
   {
     "key": "Immune to **dazed**, **shaken**, **enraged** status",
     "en": "Immune to **dazed**, **shaken**, **enraged** status",
     "it": "Immune a ** Dazed **, ** scosso **, ** Stato ** **",
-    "de": "Immun gegen ** benommen **, ** geschüttelt **, ** wütend ** Status",
-    "pl": "Odporne na ** oszołomione **, ** wstrząśnięte **, ** Rozwścieczony status",
-    "fr": "Immuno-contre ** Dazed **, ** secoué **, ** Enragé ** Statut",
-    "es": "Inmune a ** aturdido **, ** Sacudido **, ** enfurecido ** estado"
+    "de": "Immun gegen die Statuseffekte ** Benommen **, ** Erschüttert ** und ** Wütend **",
+    "pl": "Odporność na stany **Oszołomienie**, **Roztrzęsienie**, **Wściekłość**.",
+    "fr": "Immunisé contre l'état ** Étourdi**, ** Traunatisé**, ** Enragé **",
+    "es": "Inmune a ** Aturdido **, ** Confuso**, ** Furioso**"
   },
   {
     "key": "Immune to **poisoned** status",
     "en": "Immune to **poisoned** status",
     "it": "Stato immune a ** avvelenato **",
-    "de": "Immun gegen ** vergiftet ** Status",
-    "pl": "Status odporności na ** zatruty **",
-    "fr": "Immuno-contre ** Statut d'empoisonnement **",
-    "es": "Inmune a ** envenenado ** estado"
+    "de": "Immun gegen den Statuseffekt ** Vergiftet **",
+    "pl": "Odporność na stan **Zatrucie**",
+    "fr": "Immunisé contre l'état ** Empoisonné**",
+    "es": "Inmune a ** Envenenado **"
   },
   {
     "key": "Immune to **poisoned** status and additionally, when an effect (such as an Arcanum, a potion or a spell) would cause an undead creature to recover Hit Points, whoever controls that effect may instead have the undead lose half as many Hit Points.",
     "en": "Immune to **poisoned** status and additionally, when an effect (such as an Arcanum, a potion or a spell) would cause an undead creature to recover Hit Points, whoever controls that effect may instead have the undead lose half as many Hit Points.",
     "it": "Stato immune a ** avvelenato ** e inoltre, quando un effetto (come un arco Punti.",
-    "de": "Immun gegen ** vergiftet ** Status und zusätzlich, wenn ein Effekt (wie ein Arkanum, ein Trank oder ein Zauber) dazu führen würde, dass eine untote Kreatur Trefferpunkte wiederherstellt, wer diesen Effekt steuert Punkte.",
-    "pl": "Odporny na ** Status zatruty **, a dodatkowo, gdy efekt (taki jak łuk, mikstura lub zaklęcie) spowodowałby odzyskanie nieumarłych stworzeń, ktokolwiek kontroluje ten efekt, może zamiast tego nieumarły utracić połowę. Zwrotnica.",
-    "fr": "Immunitaire contre ** Statut ** Empoisonné et en outre, lorsqu'un effet (comme un arcanum, une potion ou un sort) entraînerait une créature morte-vivante à récupérer les points de vie, quiconque contrôle cet effet peut plutôt faire perdre à la moitié des morts-vivants, autant de coups Points.",
-    "es": "Inmune a ** envenenado ** estado y además, cuando un efecto (como un arcano, una poción o un hechizo) haría que una criatura no muerta recupere los puntos de golpe, quien controla ese efecto puede tener a los muertos muertos perder la mitad Puntos."
+    "de": "Immun gegen den Statuseffekt ** Vergiftet **. Wenn ein Effekt (wie ein Arkanum, ein Trank oder ein Zauber) dazu führen würde, dass eine untote Kreatur Lebenspunkte wiederherstellt, kann der Verursacher des Effekt bestimmen das die untote Kreatur stattdessen halb so viele Lebenspunkte verliert.",
+    "pl": "Odporność na stan **Zatrucie**. Ponadto, jeśli jakiś efekt (np. Arkanum, mikstura lub zaklęcie) miałby przywrócić nieumarłemu Punkty Życia, ktokolwiek kontroluje ten efekt może zamiast tego sprawić, że nieumarły straci połowę wartości Punktów Życia.",
+    "fr": "Immunisé contre l'état ** Empoisonné** de plus, lorsqu'un effet (comme un arcanum, une potion ou un sort) permet à une créature morte-vivante de récupérer des points de vie, quiconque contrôle cet effet peut faire perdre  jusau'à la moitié de ces PV au mort-vivant.",
+    "es": "Inmune a ** Envenenado ** y además, cuando un efecto (como un arcano, una poción o un hechizo) fuese a hacer que una criatura no muerta recuperase puntos de vida, quien controle ese efecto puede hacer que en su lugar pierda la mitad de PV."
   },
   {
     "key": "Immunities",
     "en": "Immunities",
     "it": "Immunità",
     "de": "Immunitäten",
-    "pl": "Odporności",
+    "pl": "Nietykalności",
     "fr": "Immunités",
     "es": "Inmunidades"
   },
@@ -1660,7 +1579,7 @@
     "en": "Immunity",
     "it": "Immunità",
     "de": "Immunität",
-    "pl": "Odporność",
+    "pl": "Nietykalność",
     "fr": "Immunité",
     "es": "Inmunidad"
   },
@@ -1669,7 +1588,7 @@
     "en": "Individual",
     "it": "Individuale",
     "de": "Individuell",
-    "pl": "Indywidualny",
+    "pl": "Jednostka",
     "fr": "Individuel",
     "es": "Individual"
   },
@@ -1677,10 +1596,10 @@
     "key": "Init.",
     "en": "Init.",
     "it": "Dentro.",
-    "de": "Drin.",
-    "pl": "W tym.",
+    "de": "Init.",
+    "pl": "Inic.",
     "fr": "Init.",
-    "es": "En eso."
+    "es": "Ini."
   },
   {
     "key": "Initiative",
@@ -1696,62 +1615,53 @@
     "en": "INS",
     "it": "Ins",
     "de": "Ins",
-    "pl": "Ins",
-    "fr": "Insouffisants",
-    "es": "EN S"
+    "pl": "WJ",
+    "fr": "INT",
+    "es": "PER"
   },
   {
     "key": "ins",
     "en": "ins",
     "it": "ins",
     "de": "Ins",
-    "pl": "ins",
-    "fr": "insouffisants",
-    "es": "En s"
+    "pl": "WJ",
+    "fr": "Int",
+    "es": "per"
   },
   {
     "key": "Ins",
     "en": "Ins",
     "it": "Ins",
     "de": "Ins",
-    "pl": "Ins",
-    "fr": "Insouffisants",
-    "es": "En s"
+    "pl": "WJ",
+    "fr": "Int",
+    "es": "Per"
   },
   {
     "key": "INS:",
     "en": "INS:",
     "it": "Ins:",
     "de": "INS:",
-    "pl": "Ins:",
-    "fr": "INS:",
-    "es": "EN S:"
-  },
-  {
-    "key": "INS:",
-    "en": "INS:",
-    "it": "Ins:",
-    "de": "INS:",
-    "pl": "Ins:",
-    "fr": "INS:",
-    "es": "EN S:"
+    "pl": "WJ:",
+    "fr": "INT:",
+    "es": "PER:"
   },
   {
     "key": "Insight",
     "en": "Insight",
     "it": "Intuizione",
     "de": "Einblick",
-    "pl": "Wgląd",
-    "fr": "Aperçu",
-    "es": "Conocimiento"
+    "pl": "Wejrzenie",
+    "fr": "Intuition",
+    "es": "Intuición"
   },
   {
     "key": "Iron Hammer",
     "en": "Iron Hammer",
     "it": "Martello di ferro",
     "de": "Eisenhammer",
-    "pl": "Żelazny młot",
-    "fr": "Marteau",
+    "pl": "Żelazny Młot",
+    "fr": "Marteau de fer",
     "es": "Martillo de hierro"
   },
   {
@@ -1759,17 +1669,17 @@
     "en": "Iron Knuckle",
     "it": "Knuckle di ferro",
     "de": "Eisenknöchel",
-    "pl": "Żelazny kostek",
-    "fr": "Articulations de fer",
-    "es": "Nudillo de hierro"
+    "pl": "Żelazny Kastet",
+    "fr": "Coup-de-poing en fer",
+    "es": "Nudillos de hierro"
   },
   {
     "key": "It must have a description in order to be published.",
     "en": "It must have a description in order to be published.",
     "it": "Deve avere una descrizione per essere pubblicata.",
     "de": "Es muss eine Beschreibung haben, um veröffentlicht zu werden.",
-    "pl": "Musi mieć opis do opublikowania.",
-    "fr": "Il doit avoir une description pour être publiée.",
+    "pl": "By opublikować wpis musi mieć Opis.",
+    "fr": "Une description est nécessaire pour être publié.",
     "es": "Debe tener una descripción para ser publicado."
   },
   {
@@ -1777,9 +1687,9 @@
     "en": "Jack of All Trades",
     "it": "Tuttofare",
     "de": "Jack aller Geschäfte",
-    "pl": "Jack of All Trades",
-    "fr": "Homme à tout faire",
-    "es": "Un mil usos"
+    "pl": "Człowiek renesansu",
+    "fr": "Touche-à-tout",
+    "es": "Factótum"
   },
   {
     "key": "Katana",
@@ -1813,9 +1723,9 @@
     "en": "Left-click on a die to add it to your pool",
     "it": "Fai clic con il tasto sinistro su un dado per aggiungerlo alla piscina",
     "de": "Klicken Sie mit der linken Maustaste auf einen Würfel, um es Ihrem Pool hinzuzufügen",
-    "pl": "Kliknij lewą kliknięcie, aby dodać go do basenu",
-    "fr": "Cliquez à gauche sur un dé",
-    "es": "Haga clic a la izquierda en un dado para agregarlo a su piscina"
+    "pl": "Kliknij lewym przyciskiem myszy na kość aby dodać ją do puli.",
+    "fr": "Clic-gauche sur un dé pour l'ajouter à votre pool de dés",
+    "es": "Haz clic izquiero en un dado para agregarlo a tu reserva"
   },
   {
     "key": "Level:",
@@ -1832,24 +1742,24 @@
     "it": "Livelli",
     "de": "Ebenen",
     "pl": "Poziomy",
-    "fr": "Les niveaux",
-    "es": "Nivel"
+    "fr": "Niveaux",
+    "es": "Niveles"
   },
   {
     "key": "Levels in Visionary",
     "en": "Levels in Visionary",
     "it": "Livelli nel visionario",
     "de": "Niveaus in Visionär",
-    "pl": "Poziomy w wizjonerskim",
-    "fr": "Niveaux de visionnaire",
-    "es": "Niveles en visionario"
+    "pl": "Poziomy w **Wizjonerze**",
+    "fr": "Niveaux dans la compétence  **visionnaire**",
+    "es": "Niveles en Visionario"
   },
   {
     "key": "light",
     "en": "light",
     "it": "leggero",
     "de": "Licht",
-    "pl": "światło",
+    "pl": "świetliste",
     "fr": "lumière",
     "es": "luz"
   },
@@ -1858,7 +1768,7 @@
     "en": "Light",
     "it": "Leggero",
     "de": "Licht",
-    "pl": "Światło",
+    "pl": "Świetliste",
     "fr": "Lumière",
     "es": "Luz"
   },
@@ -1867,7 +1777,7 @@
     "en": "Light Spear",
     "it": "Lancia leggera",
     "de": "Leichter Speer",
-    "pl": "Lekka włócznia",
+    "pl": "Lekka Włócznia",
     "fr": "Lance légère",
     "es": "Lanza ligera"
   },
@@ -1876,81 +1786,72 @@
     "en": "Lvl",
     "it": "Lvl",
     "de": "Lvl",
-    "pl": "Lvl",
-    "fr": "LVL",
-    "es": "Lvl"
+    "pl": "Poz.",
+    "fr": "NIV",
+    "es": "Nv"
   },
   {
     "key": "Lvl 10",
     "en": "Lvl 10",
     "it": "LVL 10",
     "de": "LVL 10",
-    "pl": "LVL 10",
-    "fr": "Lvl 10",
-    "es": "LVL 10"
+    "pl": "Poz. 10",
+    "fr": "Niv 10",
+    "es": "Nv 10"
   },
   {
     "key": "Lvl 20",
     "en": "Lvl 20",
     "it": "LVL 20",
     "de": "LVL 20",
-    "pl": "LVL 20",
-    "fr": "Lvl 20",
-    "es": "LVL 20"
+    "pl": "Poz. 20",
+    "fr": "Niv 20",
+    "es": "Nv 20"
   },
   {
     "key": "Lvl 30",
     "en": "Lvl 30",
     "it": "LVL 30",
     "de": "LVL 30",
-    "pl": "LVL 30",
-    "fr": "Lvl 30",
-    "es": "Lvl 30"
+    "pl": "Poz. 30",
+    "fr": "Niv 30",
+    "es": "Nv 30"
   },
   {
     "key": "Lvl 40",
     "en": "Lvl 40",
     "it": "LVL 40",
     "de": "LVL 40",
-    "pl": "LVL 40",
-    "fr": "Lvl 40",
-    "es": "LVL 40"
+    "pl": "Poz. 40",
+    "fr": "Niv 40",
+    "es": "Nv 40"
   },
   {
     "key": "Lvl 50",
     "en": "Lvl 50",
     "it": "LVL 50",
     "de": "LVL 50",
-    "pl": "LVL 50",
-    "fr": "Lvl 50",
-    "es": "Lvl 50"
+    "pl": "Poz. 50",
+    "fr": "Niv 50",
+    "es": "Nv 50"
   },
   {
     "key": "Lvl 60",
     "en": "Lvl 60",
     "it": "LVL 60",
     "de": "LVL 60",
-    "pl": "LVL 60",
-    "fr": "LVL 60",
-    "es": "LVL 60"
+    "pl": "Poz. 60",
+    "fr": "Niv 60",
+    "es": "Nv 60"
   },
   {
     "key": "Lvl:",
     "en": "Lvl:",
     "it": "LVL:",
     "de": "LVL:",
-    "pl": "LVL:",
-    "fr": "LVL:",
-    "es": "Lvl:"
-  },
-  {
-    "key": "M. DEF",
-    "en": "M. DEF",
-    "it": "M. def",
-    "de": "M. def",
-    "pl": "M. def",
-    "fr": "M. Def",
-    "es": "M. DEF"
+    "pl": "Poz:",
+    "fr": "NIV:",
+    "es": "Nv:"
   },
   {
     "key": "M. Defense",
@@ -1958,26 +1859,26 @@
     "it": "M. Difesa",
     "de": "M. Verteidigung",
     "pl": "M. Obrona",
-    "fr": "M. Défense",
-    "es": "M. Defensa"
+    "fr": "Défense Magique",
+    "es": "Defensa M."
   },
   {
     "key": "M.DEF",
     "en": "M.DEF",
     "it": "M.Def",
     "de": "M.Def",
-    "pl": "M.Def",
-    "fr": "M.def",
-    "es": "M.Def"
+    "pl": "M.Obr",
+    "fr": "Def M.",
+    "es": "DEF. M."
   },
   {
     "key": "Magic Up",
     "en": "Magic Up",
     "it": "Magia",
     "de": "Magie auf",
-    "pl": "Magia",
-    "fr": "Magie",
-    "es": "Magia"
+    "pl": "Skok Magii",
+    "fr": "Gain de Magie",
+    "es": "Magia Mejorada"
   },
   {
     "key": "Magical",
@@ -1989,11 +1890,20 @@
     "es": "Mágico"
   },
   {
+    "key": "major_villain",
+    "en": "Major",
+    "it": "",
+    "de": "",
+    "pl": "Główny Złoczyńca",
+    "fr": "Méchant_Majeur",
+    "es": ""
+  },
+  {
     "key": "Major",
     "en": "Major",
     "it": "Maggiore",
     "de": "Wesentlich",
-    "pl": "Główny",
+    "pl": "Wielki",
     "fr": "Majeur",
     "es": "Importante"
   },
@@ -2002,7 +1912,7 @@
     "en": "Medium",
     "it": "medio",
     "de": "Mittel",
-    "pl": "Średni",
+    "pl": "Przeciętny",
     "fr": "Moyen",
     "es": "Medio"
   },
@@ -2011,71 +1921,80 @@
     "en": "Melee",
     "it": "Mischia",
     "de": "Nahkampf",
-    "pl": "Bijatyka",
+    "pl": "Broń Biała",
     "fr": "Mêlée",
-    "es": "Pelea confusa"
+    "es": "Cuerpo a Cuerpo"
   },
   {
     "key": "MIG",
     "en": "MIG",
     "it": "Mig",
     "de": "MIG",
-    "pl": "Mig",
-    "fr": "Mig",
-    "es": "Migas"
+    "pl": "PO",
+    "fr": "PUI",
+    "es": "VIG"
   },
   {
     "key": "mig",
     "en": "mig",
     "it": "mig",
     "de": "MIG",
-    "pl": "mig",
-    "fr": "mig",
-    "es": "migas"
+    "pl": "PO",
+    "fr": "pui",
+    "es": "vig"
   },
   {
     "key": "Mig",
     "en": "Mig",
     "it": "Mig",
     "de": "MiG",
-    "pl": "Mig",
-    "fr": "Mig",
-    "es": "Migas"
+    "pl": "PO",
+    "fr": "Pui",
+    "es": "Vig"
   },
   {
     "key": "MIG:",
     "en": "MIG:",
     "it": "Mig:",
     "de": "Mig:",
-    "pl": "Mig:",
-    "fr": "MIG:",
-    "es": "MIG:"
+    "pl": "PO:",
+    "fr": "PUI",
+    "es": "VIG:"
   },
   {
     "key": "MIG:",
     "en": "MIG:",
     "it": "Mig:",
     "de": "Mig:",
-    "pl": "Mig:",
-    "fr": "MIG:",
-    "es": "MIG:"
+    "pl": "PO:",
+    "fr": "PUI:",
+    "es": "VIG:"
   },
   {
     "key": "Might",
     "en": "Might",
     "it": "Potrebbe",
     "de": "Könnte",
-    "pl": "Móc",
-    "fr": "Pourrait",
-    "es": "Podría"
+    "pl": "Potęga",
+    "fr": "Puissance",
+    "es": "Vigor"
+  },
+  {
+    "key": "minor_villain",
+    "en": "Minor",
+    "it": "",
+    "de": "",
+    "pl": "Pomniejszy Złoczyńca",
+    "fr": "Méchant_Mineurajeur",
+    "es": ""
   },
   {
     "key": "Minor",
     "en": "Minor",
     "it": "Minore",
     "de": "Unerheblich",
-    "pl": "Drobny",
-    "fr": "Mineure",
+    "pl": "Niewielki",
+    "fr": "Mineur",
     "es": "Menor"
   },
   {
@@ -2092,16 +2011,7 @@
     "en": "Monster Icons are taken from:",
     "it": "Le icone dei mostri sono prelevate da:",
     "de": "Monster -Ikonen stammen aus:",
-    "pl": "Ikony potwora są pobierane z:",
-    "fr": "Les icônes de monstre sont tirées de:",
-    "es": "Los iconos de monstruos se toman de:"
-  },
-  {
-    "key": "Monster Icons are taken from:",
-    "en": "Monster Icons are taken from:",
-    "it": "Le icone dei mostri sono prelevate da:",
-    "de": "Monster -Ikonen stammen aus:",
-    "pl": "Ikony potwora są pobierane z:",
+    "pl": "Ikony potworów pozyskano z:",
     "fr": "Les icônes de monstre sont tirées de:",
     "es": "Los iconos de monstruos se toman de:"
   },
@@ -2110,34 +2020,34 @@
     "en": "MP",
     "it": "Mp",
     "de": "MP",
-    "pl": "poseł",
-    "fr": "Député",
-    "es": "Diputado"
+    "pl": "PM",
+    "fr": "PM",
+    "es": "PM"
   },
   {
     "key": "MP:",
     "en": "MP:",
     "it": "MP:",
     "de": "MP:",
-    "pl": "POSEŁ:",
-    "fr": "MP:",
-    "es": "MP:"
+    "pl": "PM:",
+    "fr": "PM:",
+    "es": "PM:"
   },
   {
     "key": "MP:",
     "en": "MP:",
     "it": "MP:",
     "de": "MP:",
-    "pl": "POSEŁ:",
-    "fr": "MP:",
-    "es": "MP:"
+    "pl": "PM:",
+    "fr": "PM:",
+    "es": "PM:"
   },
   {
     "key": "Multi",
     "en": "Multi",
     "it": "Multi",
     "de": "Multi",
-    "pl": "Wielo",
+    "pl": "Wieloatak",
     "fr": "Multi",
     "es": "Multi"
   },
@@ -2148,7 +2058,7 @@
     "de": "Mehrpartner:",
     "pl": "Wieloczęściowy:",
     "fr": "Multi-parties:",
-    "es": "Multi-Part:"
+    "es": "Multipartes:"
   },
   {
     "key": "Name:",
@@ -2164,26 +2074,26 @@
     "en": "Next Items",
     "it": "Articoli successivi",
     "de": "Nächste Artikel",
-    "pl": "Następne przedmioty",
+    "pl": "Następna strona",
     "fr": "Articles suivants",
-    "es": "Siguientes artículos"
+    "es": "Entradas siguientes"
   },
   {
     "key": "No Armor",
     "en": "No Armor",
     "it": "Nessuna armatura",
     "de": "Keine Rüstung",
-    "pl": "Bez zbroi",
+    "pl": "Brak zbroi",
     "fr": "Pas d'armure",
-    "es": "No hay armadura"
+    "es": "Sin Armadura"
   },
   {
     "key": "No more adversaries found.",
     "en": "No more adversaries found.",
     "it": "Niente più avversari trovati.",
     "de": "Keine Gegner mehr gefunden.",
-    "pl": "Nigdy więcej nie znaleziono przeciwników.",
-    "fr": "Plus d'adversaires trouvés.",
+    "pl": "Nie znaleziono więcej przeciwników.",
+    "fr": "Plus d'autres adversaires .",
     "es": "No se encontraron más adversarios."
   },
   {
@@ -2191,7 +2101,7 @@
     "en": "No Qualities",
     "it": "Nessuna qualità",
     "de": "Keine Eigenschaften",
-    "pl": "Brak cech",
+    "pl": "Brak waloru",
     "fr": "Pas de qualités",
     "es": "Sin cualidades"
   },
@@ -2209,7 +2119,7 @@
     "en": "None",
     "it": "Nessuno",
     "de": "Keiner",
-    "pl": "Nic",
+    "pl": "Nie",
     "fr": "Aucun",
     "es": "Ninguno"
   },
@@ -2227,16 +2137,16 @@
     "en": "NPCs",
     "it": "NPCS",
     "de": "NPCS",
-    "pl": "NPC",
-    "fr": "PNJ",
-    "es": "NPCS"
+    "pl": "BNy",
+    "fr": "PNJs",
+    "es": "PNJs"
   },
   {
     "key": "Number of attacks needed:",
     "en": "Number of attacks needed:",
     "it": "Numero di attacchi necessari:",
     "de": "Anzahl der benötigten Angriffe:",
-    "pl": "Potrzebna liczba ataków:",
+    "pl": "Potrzeba ataków:",
     "fr": "Nombre d'attaques nécessaires:",
     "es": "Número de ataques necesarios:"
   },
@@ -2245,7 +2155,7 @@
     "en": "Number of days",
     "it": "Numero di giorni",
     "de": "Anzahl der Tage",
-    "pl": "Liczba dni",
+    "pl": "Dni:",
     "fr": "Nombre de jours",
     "es": "Número de días"
   },
@@ -2254,8 +2164,8 @@
     "en": "Number of Hired Helpers",
     "it": "Numero di aiutanti assunti",
     "de": "Anzahl der angeheuerten Helfer",
-    "pl": "Liczba zatrudnionych pomocników",
-    "fr": "Nombre d'aides embauchées",
+    "pl": "Zatrudniona pomoc:",
+    "fr": "Nombre d'aides embauchés",
     "es": "Número de ayudantes contratados"
   },
   {
@@ -2263,16 +2173,16 @@
     "en": "Number of Tinkerers",
     "it": "Numero di armeggi",
     "de": "Anzahl der Bastler",
-    "pl": "Liczba majsterkowców",
-    "fr": "Nombre de briseurs",
-    "es": "Número de jugadores"
+    "pl": "Liczba Złotych Rączek",
+    "fr": "Nombre de bricoleurs",
+    "es": "Número de Manitas"
   },
   {
     "key": "Offensive Qualities",
     "en": "Offensive Qualities",
     "it": "Qualità offensive",
     "de": "Offensivqualitäten",
-    "pl": "Cechy ofensywne",
+    "pl": "Walory ofensywne",
     "fr": "Qualités offensives",
     "es": "Cualidades ofensivas"
   },
@@ -2281,16 +2191,16 @@
     "en": "Omnishield",
     "it": "Omishield",
     "de": "Omnishield",
-    "pl": "OMINSHIELD",
-    "fr": "Omnishield",
-    "es": "Omnishield"
+    "pl": "Wszechtarcza",
+    "fr": "Omnibouclier",
+    "es": "Omniescudo"
   },
   {
     "key": "One Hand",
     "en": "One Hand",
     "it": "Una mano",
     "de": "Eine Hand",
-    "pl": "Jedna ręka",
+    "pl": "Jednoręczne",
     "fr": "Une main",
     "es": "Una mano"
   },
@@ -2300,7 +2210,7 @@
     "it": "Altre azioni",
     "de": "Andere Aktionen",
     "pl": "Inne akcje",
-    "fr": "D'autres actions",
+    "fr": "Autres actions",
     "es": "Otras acciones"
   },
   {
@@ -2308,8 +2218,8 @@
     "en": "Perfect Health",
     "it": "Salute perfetta",
     "de": "Perfekte Gesundheit",
-    "pl": "Idealne zdrowie",
-    "fr": "Santé parfaite",
+    "pl": "Końskie zdrowie",
+    "fr": "Santé absolue",
     "es": "Salud perfecta"
   },
   {
@@ -2317,7 +2227,7 @@
     "en": "Permanent",
     "it": "Permanente",
     "de": "Dauerhaft",
-    "pl": "Stały",
+    "pl": "Trwałe",
     "fr": "Permanent",
     "es": "Permanente"
   },
@@ -2337,14 +2247,14 @@
     "de": "Phasen:",
     "pl": "Fazy:",
     "fr": "Phases:",
-    "es": "Etapas:"
+    "es": "Fases:"
   },
   {
     "key": "physical",
     "en": "physical",
     "it": "fisico",
     "de": "physisch",
-    "pl": "fizyczny",
+    "pl": "fizyczne",
     "fr": "physique",
     "es": "físico"
   },
@@ -2353,7 +2263,7 @@
     "en": "Physical",
     "it": "Fisico",
     "de": "Physisch",
-    "pl": "Fizyczny",
+    "pl": "Fizyczne",
     "fr": "Physique",
     "es": "Físico"
   },
@@ -2362,9 +2272,9 @@
     "en": "Piercing",
     "it": "Piercing",
     "de": "Piercing",
-    "pl": "Przeszywający",
-    "fr": "Perçant",
-    "es": "Perforación"
+    "pl": "Przebijający",
+    "fr": "Perforante",
+    "es": "Perforante"
   },
   {
     "key": "Pistol",
@@ -2380,8 +2290,8 @@
     "en": "Plant",
     "it": "Pianta",
     "de": "Anlage",
-    "pl": "Zakład",
-    "fr": "Usine",
+    "pl": "Roślina",
+    "fr": "Plante",
     "es": "Planta"
   },
   {
@@ -2389,7 +2299,7 @@
     "en": "poison",
     "it": "veleno",
     "de": "Gift",
-    "pl": "zatruć",
+    "pl": "trujące",
     "fr": "poison",
     "es": "veneno"
   },
@@ -2398,7 +2308,7 @@
     "en": "Poison",
     "it": "Veleno",
     "de": "Gift",
-    "pl": "Zatruć",
+    "pl": "Trujące",
     "fr": "Poison",
     "es": "Veneno"
   },
@@ -2407,7 +2317,7 @@
     "en": "Poisoned",
     "it": "Avvelenato",
     "de": "Vergiftet",
-    "pl": "Zatruty",
+    "pl": "Zatrucie",
     "fr": "Empoisonné",
     "es": "Envenenado"
   },
@@ -2416,7 +2326,7 @@
     "en": "Poisoned",
     "it": "Avvelenato",
     "de": "Vergiftet",
-    "pl": "Zatruty",
+    "pl": "Zatrucie",
     "fr": "Empoisonné",
     "es": "Envenenado"
   },
@@ -2425,7 +2335,7 @@
     "en": "Potency",
     "it": "Potenza",
     "de": "Potenz",
-    "pl": "Moc",
+    "pl": "Potencjał",
     "fr": "Puissance",
     "es": "Potencia"
   },
@@ -2434,7 +2344,7 @@
     "en": "Prepare",
     "it": "Preparare",
     "de": "Vorbereiten",
-    "pl": "Przygotowywać",
+    "pl": "Przygotuj",
     "fr": "Préparer",
     "es": "Preparar"
   },
@@ -2443,9 +2353,9 @@
     "en": "Prepared Rolls",
     "it": "Rotoli preparati",
     "de": "Vorbereitete Brötchen",
-    "pl": "Przygotowane bułki",
-    "fr": "Rolls préparés",
-    "es": "Rollos preparados"
+    "pl": "Przygotowane rzuty",
+    "fr": "Jets préparés",
+    "es": "Tiradas Preparadas"
   },
   {
     "key": "Press enter to roll",
@@ -2453,17 +2363,17 @@
     "it": "Premere INVIO per rotolare",
     "de": "Drücken Sie die Eingabetaste, um zu rollen",
     "pl": "Naciśnij Enter, aby rzucić",
-    "fr": "Appuyez sur Entrée pour rouler",
-    "es": "Presione Entrar para rodar"
+    "fr": "Appuyez sur Entrée pour lancer les dés",
+    "es": "Pulsa Enter para tirar los dados"
   },
   {
     "key": "Prev Items",
     "en": "Prev Items",
     "it": "Articoli prev",
     "de": "Vorherige Elemente",
-    "pl": "Przedmioty",
-    "fr": "Articles prévisionnels",
-    "es": "Artículos previos"
+    "pl": "Poprzednia strona",
+    "fr": "Articles précédents",
+    "es": "Entradas previas"
   },
   {
     "key": "Probability to hit:",
@@ -2471,8 +2381,8 @@
     "it": "Probabilità di colpire:",
     "de": "Wahrscheinlichkeit zu treffen:",
     "pl": "Prawdopodobieństwo trafienia:",
-    "fr": "Probabilité de frapper:",
-    "es": "Probabilidad de golpear:"
+    "fr": "Probabilité de toucher:",
+    "es": "Probabilidad de impactar:"
   },
   {
     "key": "Progress",
@@ -2488,7 +2398,7 @@
     "en": "Projects",
     "it": "Progetti",
     "de": "Projekte",
-    "pl": "Projektowanie",
+    "pl": "Projekty",
     "fr": "Projets",
     "es": "Proyectos"
   },
@@ -2497,16 +2407,16 @@
     "en": "Publish to Adversary Compendium",
     "it": "Pubblica al Compendio avversario",
     "de": "Veröffentlichen Sie im Gegnerkompendium",
-    "pl": "Publikuj dla koncertów przeciwników",
-    "fr": "Publier dans Adversary Compendium",
-    "es": "Publicar en el Compendio Adversario"
+    "pl": "Publikuj do Kompendium Przeciwników",
+    "fr": "Publier dans le bestiaire",
+    "es": "Publicar en el Compendio de Adversarios"
   },
   {
     "key": "Quality",
     "en": "Quality",
     "it": "Qualità",
     "de": "Qualität",
-    "pl": "Jakość",
+    "pl": "Walor",
     "fr": "Qualité",
     "es": "Calidad"
   },
@@ -2542,7 +2452,7 @@
     "en": "Rare Equipment",
     "it": "Attrezzatura rara",
     "de": "Seltene Ausrüstung",
-    "pl": "Rzadki sprzęt",
+    "pl": "Rzadkie wyposażenie",
     "fr": "Équipement rare",
     "es": "Equipo raro"
   },
@@ -2551,7 +2461,7 @@
     "en": "Rare Weapons",
     "it": "Armi rare",
     "de": "Seltene Waffen",
-    "pl": "Rzadka broń",
+    "pl": "Rzadkie bronie",
     "fr": "Armes rares",
     "es": "Armas raras"
   },
@@ -2569,16 +2479,16 @@
     "en": "Relevant item held",
     "it": "Articolo pertinente detenuto",
     "de": "Relevanter Artikel gehalten",
-    "pl": "Odpowiedni przedmiot",
-    "fr": "Article pertinent détenu",
-    "es": "Artículo relevante mantenido"
+    "pl": "Posiada odpowiedni przedmiot",
+    "fr": "Objet pertinent tenu",
+    "es": "Artículo relevante sostenido"
   },
   {
     "key": "Reset",
     "en": "Reset",
     "it": "Ripristina",
     "de": "Zurücksetzen",
-    "pl": "Resetowanie",
+    "pl": "Resetuj",
     "fr": "Réinitialiser",
     "es": "Reiniciar"
   },
@@ -2587,7 +2497,7 @@
     "en": "Resistance",
     "it": "Resistenza",
     "de": "Widerstand",
-    "pl": "Opór",
+    "pl": "Odporność",
     "fr": "Résistance",
     "es": "Resistencia"
   },
@@ -2596,7 +2506,7 @@
     "en": "Resistances",
     "it": "Resistenze",
     "de": "Widerstände",
-    "pl": "Oporności",
+    "pl": "Odporności",
     "fr": "Résistances",
     "es": "Resistencia"
   },
@@ -2605,9 +2515,9 @@
     "en": "Right-click a die to remove it from your hand",
     "it": "Fare clic con il pulsante destro del mouse per rimuoverlo dalla mano",
     "de": "Klicken Sie mit der rechten Maustaste auf einen Würfel, um ihn aus Ihrer Hand zu entfernen",
-    "pl": "Kliknij prawym przyciskiem myszy matrycę, aby usunąć ją z dłoni",
-    "fr": "Cliquez avec le bouton droit sur un dé",
-    "es": "Haga clic derecho en un dado para eliminarlo de su mano"
+    "pl": "Kliknij prawym przyciskiem myszy aby usunąć ją z dłoni",
+    "fr": "Clic-droit sur un dé pour l'ôter de votre pool",
+    "es": "Haz clic derecho en un dado para eliminarlo de tu reserva"
   },
   {
     "key": "Rituals",
@@ -2623,36 +2533,36 @@
     "en": "Roll",
     "it": "Rotolo",
     "de": "Rollen",
-    "pl": "Rolka",
-    "fr": "Rouler",
-    "es": "Rollo"
+    "pl": "Rzuć",
+    "fr": "Jet de dé",
+    "es": "Tirada"
   },
   {
     "key": "Runic Plate",
     "en": "Runic Plate",
     "it": "Piastra runica",
     "de": "Runikplatte",
-    "pl": "Płyta Runic",
-    "fr": "Assiette runique",
-    "es": "Placa rúcica"
+    "pl": "Runiczna Zbroja Płytowa",
+    "fr": "Plates runiques",
+    "es": "Armaduras de placas rúnica"
   },
   {
     "key": "Runic Shield",
     "en": "Runic Shield",
     "it": "Scudo runico",
     "de": "Runenschild",
-    "pl": "Tarcza Runic",
+    "pl": "Runiczna Tarcza",
     "fr": "Bouclier runique",
-    "es": "Escudo rún"
+    "es": "Escudo rúnico"
   },
   {
     "key": "Sage Robe",
     "en": "Sage Robe",
     "it": "Sage Robe",
     "de": "Salbei Robe",
-    "pl": "Szałwia",
+    "pl": "Szata Mędrca",
     "fr": "Robe de sauge",
-    "es": "Bata de salvia"
+    "es": "Túnica de Sabio"
   },
   {
     "key": "Search",
@@ -2677,7 +2587,7 @@
     "en": "Select Quality",
     "it": "Seleziona qualità",
     "de": "Qualität auswählen",
-    "pl": "Wybierz jakość",
+    "pl": "Wybierz Walor",
     "fr": "Sélectionner la qualité",
     "es": "Seleccionar calidad"
   },
@@ -2686,36 +2596,27 @@
     "en": "Set name to display here:",
     "it": "Imposta il nome da visualizzare qui:",
     "de": "Stellen Sie den Namen fest, um hier anzuzeigen:",
-    "pl": "Ustaw nazwę na wyświetlenie tutaj:",
+    "pl": "Tutaj ustaw wyświetlaną nazwę:",
     "fr": "Définissez le nom pour afficher ici:",
-    "es": "Establezca el nombre para mostrar aquí:"
+    "es": "Establecer nombre para mostrar aquí:"
   },
   {
     "key": "Shaken",
     "en": "Shaken",
     "it": "Scosso",
     "de": "Erschüttert",
-    "pl": "Przygotowany w shakerze",
-    "fr": "Secoué",
-    "es": "Agitado"
-  },
-  {
-    "key": "Shaken",
-    "en": "Shaken",
-    "it": "Scosso",
-    "de": "Erschüttert",
-    "pl": "Przygotowany w shakerze",
-    "fr": "Secoué",
-    "es": "Agitado"
+    "pl": "Roztrzęsienie",
+    "fr": "Traumatisé",
+    "es": "Aturdido"
   },
   {
     "key": "Share this url to other players to see rolls:",
     "en": "Share this url to other players to see rolls:",
     "it": "Condividi questo URL ad altri giocatori per vedere i rotoli:",
     "de": "Teilen Sie diese URL an andere Spieler, um Rollen zu sehen:",
-    "pl": "Podziel się tym adresem URL innym graczom, aby zobaczyć bułki:",
-    "fr": "Partagez cette URL avec d'autres joueurs pour voir les rouleaux:",
-    "es": "Comparta esta URL a otros jugadores para ver rollos:"
+    "pl": "Podziel się tym adresem URL z innymi graczami, aby widzieć swoje rzuty:",
+    "fr": "Partagez cette URL avec d'autres joueurs pour voir les jets:",
+    "es": "Comparte esta URL con otros jugadores para ver las tiradas:"
   },
   {
     "key": "Share URL",
@@ -2723,7 +2624,7 @@
     "it": "Condividi l'URL",
     "de": "URL teilen",
     "pl": "Udostępnij adres URL",
-    "fr": "URL de partage",
+    "fr": "Partager l'URL",
     "es": "Compartir URL"
   },
   {
@@ -2733,7 +2634,7 @@
     "de": "Schild",
     "pl": "Tarcza",
     "fr": "Bouclier",
-    "es": "Blindaje"
+    "es": "Escudo"
   },
   {
     "key": "Shield:",
@@ -2742,14 +2643,14 @@
     "de": "Schild:",
     "pl": "Tarcza:",
     "fr": "Bouclier:",
-    "es": "Blindaje:"
+    "es": "Escudo:"
   },
   {
     "key": "Shortbow",
     "en": "Shortbow",
     "it": "Corta",
     "de": "Kurzbogen",
-    "pl": "Kobieta",
+    "pl": "Krótki Łuk",
     "fr": "Arc court",
     "es": "Arco corto"
   },
@@ -2759,7 +2660,7 @@
     "it": "Shuriken",
     "de": "Shuriken",
     "pl": "Shuriken",
-    "fr": "Brillant",
+    "fr": "Shuriken",
     "es": "Shuriken"
   },
   {
@@ -2767,7 +2668,7 @@
     "en": "Sign In",
     "it": "Registrazione",
     "de": "Anmelden",
-    "pl": "Zalogować się",
+    "pl": "Zaloguj się",
     "fr": "Se connecter",
     "es": "Iniciar sesión"
   },
@@ -2785,7 +2686,7 @@
     "en": "Silk Shirt",
     "it": "Maglia di seta",
     "de": "Seidenhemd",
-    "pl": "Jedwabna koszula",
+    "pl": "Jedwabna Koszula",
     "fr": "Chemise en soie",
     "es": "Camisa de seda"
   },
@@ -2794,16 +2695,7 @@
     "en": "Slow",
     "it": "Lento",
     "de": "Langsam",
-    "pl": "Powolny",
-    "fr": "Lent",
-    "es": "Lento"
-  },
-  {
-    "key": "Slow",
-    "en": "Slow",
-    "it": "Lento",
-    "de": "Langsam",
-    "pl": "Powolny",
+    "pl": "Spowolnienie",
     "fr": "Lent",
     "es": "Lento"
   },
@@ -2826,11 +2718,20 @@
     "es": "Soldado"
   },
   {
+    "key": "spear_category",
+    "en": "Spear",
+    "it": "",
+    "de": "",
+    "pl": "Włócznie",
+    "fr": "Catégorie_lance",
+    "es": ""
+  },
+  {
     "key": "Spear",
     "en": "Spear",
     "it": "Lancia",
     "de": "Speer",
-    "pl": "Włócznia",
+    "pl": "",
     "fr": "Lance",
     "es": "Lanza"
   },
@@ -2839,7 +2740,7 @@
     "en": "Special Attacks",
     "it": "Attacchi speciali",
     "de": "Besondere Angriffe",
-    "pl": "Specjalne ataki",
+    "pl": "Ataki specjalne",
     "fr": "Attaques spéciales",
     "es": "Ataques especiales"
   },
@@ -2848,7 +2749,7 @@
     "en": "Special Rules",
     "it": "Regole speciali",
     "de": "Besondere Regeln",
-    "pl": "Specjalne zasady",
+    "pl": "Umiejętności Specjalne",
     "fr": "Règles spéciales",
     "es": "Reglas especiales"
   },
@@ -2857,7 +2758,7 @@
     "en": "Special:",
     "it": "Speciale:",
     "de": "Besonders:",
-    "pl": "Specjalny:",
+    "pl": "Specjalny efekt:",
     "fr": "Spécial:",
     "es": "Especial:"
   },
@@ -2866,7 +2767,7 @@
     "en": "Specialized",
     "it": "Specializzato",
     "de": "Spezialisiert",
-    "pl": "Wyspecjalizowane",
+    "pl": "Specjalista",
     "fr": "Spécialisé",
     "es": "Especializado"
   },
@@ -2875,44 +2776,44 @@
     "en": "Species",
     "it": "Specie",
     "de": "Spezies",
-    "pl": "Gatunek",
+    "pl": "Rodzaj",
     "fr": "Espèces",
-    "es": "Especies"
+    "es": "Especie"
   },
   {
     "key": "Species:",
     "en": "Species:",
     "it": "Specie:",
     "de": "Spezies:",
-    "pl": "Gatunek:",
+    "pl": "Rodzaj:",
     "fr": "Espèces:",
-    "es": "Especies:"
+    "es": "Especie:"
   },
   {
     "key": "Species: Construct",
     "en": "Species: Construct",
     "it": "Specie: costrutto",
     "de": "Spezies: Konstrukt",
-    "pl": "Gatunek: konstrukt",
-    "fr": "Espèce: construire",
-    "es": "Especie: construcción"
+    "pl": "Rodzaj: Konstrukt",
+    "fr": "Espèce: Créature artificielle",
+    "es": "Especie: Constructo"
   },
   {
     "key": "Species: Demon",
     "en": "Species: Demon",
     "it": "Specie: demone",
     "de": "Spezies: Dämon",
-    "pl": "Gatunek: demon",
-    "fr": "Espèce: démon",
-    "es": "Especie: demonio"
+    "pl": "Rodzaj: Demon",
+    "fr": "Espèce: Démon",
+    "es": "Especie: Demonio"
   },
   {
     "key": "Species: Elemental",
     "en": "Species: Elemental",
     "it": "Specie: elementare",
     "de": "Spezies: Elementar",
-    "pl": "Gatunek: elementarny",
-    "fr": "Espèce: élémentaire",
+    "pl": "Rodzaj: Żywiołak",
+    "fr": "Espèce: Élémentaire",
     "es": "Especie: Elemental"
   },
   {
@@ -2920,27 +2821,27 @@
     "en": "Species: Plant",
     "it": "Specie: pianta",
     "de": "Spezies: Pflanze",
-    "pl": "Gatunek: roślina",
-    "fr": "Espèce: plante",
-    "es": "Especie: planta"
+    "pl": "Rodzaj: Roślina",
+    "fr": "Espèce: Plante",
+    "es": "Especie: Planta"
   },
   {
     "key": "Species: Undead",
     "en": "Species: Undead",
     "it": "Specie: non morti",
     "de": "Spezies: untoten",
-    "pl": "Gatunek: nieumarły",
-    "fr": "Espèce: morts-vivants",
-    "es": "Especie: no muerto"
+    "pl": "Rodzaj: Nieumarły",
+    "fr": "Espèce: Morts-Vivant",
+    "es": "Especie: No muerto"
   },
   {
     "key": "Spell Up",
     "en": "Spell Up",
     "it": "Si scrive",
     "de": "Zauber",
-    "pl": "Przeliterować",
-    "fr": "Épeler",
-    "es": "Deletrear"
+    "pl": "Skok Zaklęcia",
+    "fr": "Gain d'incantation",
+    "es": "Hechizo mejorado"
   },
   {
     "key": "Spells",
@@ -2949,33 +2850,33 @@
     "de": "Zauber",
     "pl": "Zaklęcia",
     "fr": "Sorts",
-    "es": "Hechizo"
+    "es": "Hechizos"
   },
   {
     "key": "Spells you cast deal 5 extra damage.",
     "en": "Spells you cast deal 5 extra damage.",
     "it": "Incantesimi che hai lanciato su 5 danni extra.",
     "de": "Zauber, dass Sie Deal 5 zusätzliche Schäden wirken.",
-    "pl": "Zaklęcia, które rzucisz 5 dodatkowych obrażeń.",
+    "pl": "Twoje zaklęcia zadają 5 dodatkowych obrażeń.",
     "fr": "Les sorts que vous lancez infligent 5 dégâts supplémentaires.",
-    "es": "Los hechizos que lanzarás otorgan 5 daños adicionales."
+    "es": "Los hechizos lanzados otorgan 5 puntos de daño adicionales."
   },
   {
     "key": "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
     "en": "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
     "it": "Gli incantesimi hai lanciato che i cui effetti ripristinano i punti ferita ripristinano 5 punti ferita extra.",
     "de": "Zauber, dass Sie gegossen haben, deren Effekte Trefferpunkte wiederherstellen, werden 5 zusätzliche Trefferpunkte wiederherstellen.",
-    "pl": "Czary, które rzucisz, których efekty Przywróć punkty uderzenia, przywrócą 5 dodatkowych punktów trafienia.",
+    "pl": "Twoje zaklęcia przywracające PŻ przywracają 5 dodatkowych PŻ",
     "fr": "Les sorts que vous lancez, dont les effets rétablissant les points de vie restaureront 5 points de vie supplémentaires.",
-    "es": "Hechizos que lanzarás aquellos cuyos efectos restauran los puntos de golpe restaurará 5 puntos de golpe adicionales."
+    "es": "Hechizos que lanzarás aquellos cuyos efectos restauran los Puntos de Vida restaurará 5 Puntos de Vida adicionales."
   },
   {
     "key": "Staff",
     "en": "Staff",
     "it": "Personale",
     "de": "Personal",
-    "pl": "Personel",
-    "fr": "Personnel",
+    "pl": "Laska",
+    "fr": "Bâton",
     "es": "Personal"
   },
   {
@@ -2983,7 +2884,7 @@
     "en": "Standard",
     "it": "Standard",
     "de": "Standard",
-    "pl": "Standard",
+    "pl": "Przeciętniak",
     "fr": "Standard",
     "es": "Estándar"
   },
@@ -2992,8 +2893,8 @@
     "en": "Status",
     "it": "Stato",
     "de": "Status",
-    "pl": "Status",
-    "fr": "Statut",
+    "pl": "Stan",
+    "fr": "État",
     "es": "Estado"
   },
   {
@@ -3001,8 +2902,8 @@
     "en": "Status Plus",
     "it": "Stato Plus",
     "de": "Status plus",
-    "pl": "Status plus",
-    "fr": "Statut Plus",
+    "pl": "Stan Plus",
+    "fr": "État plus",
     "es": "Estado más"
   },
   {
@@ -3010,8 +2911,8 @@
     "en": "Steel Dagger",
     "it": "Dagger in acciaio",
     "de": "Stahldolch",
-    "pl": "Stalowy sztylet",
-    "fr": "Poignard en acier",
+    "pl": "Stalowy Sztylet",
+    "fr": "Dague en acier",
     "es": "Daga de acero"
   },
   {
@@ -3019,34 +2920,25 @@
     "en": "Steel Plate",
     "it": "Lamiera di acciaio",
     "de": "Stahlplatte",
-    "pl": "Blachy stalowej",
-    "fr": "Plaque d'acier",
-    "es": "Placa de acero"
+    "pl": "Stalowa Zbroja Płytowa",
+    "fr": "Plates d'acier",
+    "es": "Armadura de placas de acero"
   },
   {
     "key": "Study Roll:",
     "en": "Study Roll:",
     "it": "Rotolo di studio:",
     "de": "Lernrolle:",
-    "pl": "ROLL STUDY:",
-    "fr": "Racon d'étude:",
-    "es": "Rollo de estudio:"
-  },
-  {
-    "key": "Study Roll:",
-    "en": "Study Roll:",
-    "it": "Rotolo di studio:",
-    "de": "Lernrolle:",
-    "pl": "ROLL STUDY:",
-    "fr": "Racon d'étude:",
-    "es": "Rollo de estudio:"
+    "pl": "Rzut Obserwacji:",
+    "fr": "Test d'Analyse",
+    "es": "Tirada de estudio:"
   },
   {
     "key": "Super Specialized",
     "en": "Super Specialized",
     "it": "Super specializzato",
     "de": "Super spezialisiert",
-    "pl": "Super wyspecjalizowane",
+    "pl": "Ekspert",
     "fr": "Super spécialisé",
     "es": "Super especializado"
   },
@@ -3069,11 +2961,20 @@
     "es": "Cambiar cuenta"
   },
   {
+    "key": "sword_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Miecze",
+    "fr": "Catégorie_épée",
+    "es": ""
+  },
+  {
     "key": "Sword",
     "en": "Sword",
     "it": "Spada",
     "de": "Schwert",
-    "pl": "Miecz",
+    "pl": "",
     "fr": "Épée",
     "es": "Espada"
   },
@@ -3082,9 +2983,9 @@
     "en": "Swordbreaker",
     "it": "Swordbreaker",
     "de": "Schwertbrecher",
-    "pl": "Mieczbreaker",
-    "fr": "Briseur d'épée",
-    "es": "Rompedor de espadas"
+    "pl": "Mieczołamacz",
+    "fr": "Brise-lame",
+    "es": "Rompeespadas"
   },
   {
     "key": "Target:",
@@ -3100,43 +3001,34 @@
     "en": "The weapon deals 5 extra damage to creatures of a particular species",
     "it": "L'arma infligge 5 danni extra alle creature di una particolare specie",
     "de": "Die Waffe verursacht 5 zusätzliche Schäden an Kreaturen einer bestimmten Spezies",
-    "pl": "Broń zadaje 5 dodatkowych szkód stworzeniom określonego gatunku",
+    "pl": "Broń zadaje 5 dodatkowych obrażeń istotom wybranego rodzaju.",
     "fr": "L'arme inflige 5 dommages supplémentaires aux créatures d'une espèce particulière",
-    "es": "El arma inflige 5 daños adicionales a las criaturas de una especie en particular"
+    "es": "El arma inflige 5 puntos de daño adicionales a las criaturas de una especie en particular"
   },
   {
     "key": "The weapon deals 5 extra damage to the creatures of two particular species",
     "en": "The weapon deals 5 extra damage to the creatures of two particular species",
     "it": "L'arma infligge 5 danni extra alle creature di due specie particolari",
     "de": "Die Waffe verursacht 5 zusätzliche Schäden an die Kreaturen von zwei bestimmten Arten",
-    "pl": "Broń zadaje 5 dodatkowych szkód stworzeniom dwóch konkretnych gatunków",
+    "pl": "Broń zadaje 5 dodatkowych obrażeń istotom dwóch wybranych rodzajów.",
     "fr": "L'arme inflige 5 dégâts supplémentaires aux créatures de deux espèces particulières",
-    "es": "El arma inflige 5 daños adicionales a las criaturas de dos especies particulares"
+    "es": "El arma inflige 5 puntos de daño adicionales a las criaturas de dos especies particulares"
   },
   {
     "key": "The Weapon targets Magic Defense instead of Defense",
     "en": "The Weapon targets Magic Defense instead of Defense",
     "it": "L'arma prende di mira la difesa magica invece della difesa",
     "de": "Die Waffe zielt auf die magische Verteidigung anstelle der Verteidigung ab",
-    "pl": "Broń kieruje obronę magiczną zamiast obrony",
+    "pl": "Broń celuje w Obronę Magiczną zamiast w Obronę.",
     "fr": "L'arme cible la défense magique au lieu de la défense",
-    "es": "El arma apunta a la defensa mágica en lugar de la defensa"
+    "es": "El arma apunta a la Defensa Mágica en lugar de la Defensa"
   },
   {
     "key": "The wonderful Fultimator Icons are made by Runty! Email:",
     "en": "The wonderful Fultimator Icons are made by Runty! Email:",
     "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
     "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:",
-    "pl": "Cudowne ikony fultimatora są wykonane przez Runty! E-mail:",
-    "fr": "Les merveilleuses icônes Fultimator sont faites par Runty! E-mail:",
-    "es": "¡Los maravillosos íconos de fultimator están hechos por Runty! Correo electrónico:"
-  },
-  {
-    "key": "The wonderful Fultimator Icons are made by Runty! Email:",
-    "en": "The wonderful Fultimator Icons are made by Runty! Email:",
-    "it": "Le meravigliose icone di Fultimator sono realizzate da Runty! E-mail:",
-    "de": "Die wunderbaren Fultimator -Ikonen werden von Runty hergestellt! Email:",
-    "pl": "Cudowne ikony fultimatora są wykonane przez Runty! E-mail:",
+    "pl": "Wspaniałe ikony na Fultimatorze stworzyła Runty! Jej E-mail:",
     "fr": "Les merveilleuses icônes Fultimator sont faites par Runty! E-mail:",
     "es": "¡Los maravillosos íconos de fultimator están hechos por Runty! Correo electrónico:"
   },
@@ -3145,7 +3037,7 @@
     "en": "Theme:",
     "it": "Tema:",
     "de": "Thema:",
-    "pl": "Temat:",
+    "pl": "Motyw:",
     "fr": "Thème:",
     "es": "Tema:"
   },
@@ -3154,34 +3046,43 @@
     "en": "This NPC is part of the Adversary Compedium.",
     "it": "Questo NPC fa parte dell'avversario Compendium.",
     "de": "Dieser NPC ist Teil des Gegner -Kompediums.",
-    "pl": "Ta NPC jest częścią kompedium przeciwnika.",
-    "fr": "Ce PNJ fait partie de l'adversaire Compedium.",
-    "es": "Este NPC es parte del Compalidad del Adversario."
+    "pl": "Ta NPC jest częścią Kompedium Przeciwników.",
+    "fr": "Ce PNJ fait partie du bestiaire.",
+    "es": "Este PNJ es parte del Compendio de Adversarios."
+  },
+  {
+    "key": "thrown_category",
+    "en": "",
+    "it": "",
+    "de": "",
+    "pl": "Miotane",
+    "fr": "Catégorie_jet",
+    "es": ""
   },
   {
     "key": "Thrown",
     "en": "Thrown",
     "it": "Gettato",
     "de": "Geworfen",
-    "pl": "Rzucony",
-    "fr": "Jeté",
-    "es": "Lanzado"
+    "pl": "",
+    "fr": "Jet",
+    "es": "Arrojadizo"
   },
   {
     "key": "Tome",
     "en": "Tome",
     "it": "Per me",
     "de": "Mir",
-    "pl": "Dla mnie",
+    "pl": "Tomiszcze",
     "fr": "tome",
-    "es": "A mi"
+    "es": "Tomo"
   },
   {
     "key": "Total Available Skills",
     "en": "Total Available Skills",
     "it": "Competenze disponibili totali",
     "de": "Gesamt verfügbare Fähigkeiten",
-    "pl": "Całkowite dostępne umiejętności",
+    "pl": "Wszystkie dostępne umiejętności",
     "fr": "Total des compétences disponibles",
     "es": "Habilidades totales disponibles"
   },
@@ -3190,8 +3091,8 @@
     "en": "Total SP Available",
     "it": "SP totale disponibile",
     "de": "Total SP verfügbar",
-    "pl": "Dostępny całkowity SP",
-    "fr": "Total SP disponible",
+    "pl": "Wszystkie dostępne PU",
+    "fr": "Total PC disponible",
     "es": "Total SP disponible"
   },
   {
@@ -3199,8 +3100,8 @@
     "en": "Total SP Used",
     "it": "SP totale utilizzato",
     "de": "Gesamt -SP verwendet",
-    "pl": "Całkowity użyty SP",
-    "fr": "SP total utilisé",
+    "pl": "Wszystkie wykorzystane PU",
+    "fr": "Total  PC utilisé",
     "es": "Total SP utilizado"
   },
   {
@@ -3208,8 +3109,8 @@
     "en": "Total Used Skills",
     "it": "Abilità usate totali",
     "de": "Gesamtgebrauchte Fähigkeiten",
-    "pl": "Całkowite umiejętności używane",
-    "fr": "Compétences totales utilisées",
+    "pl": "Wszystkie wykorzystane umiejętności",
+    "fr": "Total Compétences utilisées",
     "es": "Total de habilidades usadas"
   },
   {
@@ -3217,17 +3118,17 @@
     "en": "Traits:",
     "it": "Tratti:",
     "de": "Züge:",
-    "pl": "Cechy:",
-    "fr": "Caractéristiques:",
+    "pl": "Przymioty:",
+    "fr": "Traits",
     "es": "Rasgos:"
   },
   {
     "key": "Travel Garb",
     "en": "Travel Garb",
     "it": "Abito da viaggio",
-    "de": "Reisekleid",
-    "pl": "Strój podróżny",
-    "fr": "Voyage",
+    "de": "Reisekleidung",
+    "pl": "Strój Podróżny",
+    "fr": "Tenue de voyage",
     "es": "Atuendo de viaje"
   },
   {
@@ -3235,7 +3136,7 @@
     "en": "Two Hand",
     "it": "Due mani",
     "de": "Zwei Hände",
-    "pl": "Dwie ręce",
+    "pl": "Dwuręczne",
     "fr": "Deux mains",
     "es": "Dos manos"
   },
@@ -3244,7 +3145,7 @@
     "en": "Two-handed",
     "it": "Due mani",
     "de": "Beidhändig",
-    "pl": "Dwuręczny",
+    "pl": "Dwuręczne",
     "fr": "À deux mains",
     "es": "Dos manos"
   },
@@ -3253,7 +3154,7 @@
     "en": "Type:",
     "it": "Tipo:",
     "de": "Typ:",
-    "pl": "Typ:",
+    "pl": "Rodzaj:",
     "fr": "Taper:",
     "es": "Tipo:"
   },
@@ -3261,8 +3162,8 @@
     "key": "Typical Traits:",
     "en": "Typical Traits:",
     "it": "Tratti tipici:",
-    "de": "Typische Eigenschaften:",
-    "pl": "Typowe cechy:",
+    "de": "Typische Charakterzüge:",
+    "pl": "Typowe Przymioty:",
     "fr": "Traits typiques:",
     "es": "Rasgos típicos:"
   },
@@ -3270,7 +3171,7 @@
     "key": "Undead",
     "en": "Undead",
     "it": "Non morti",
-    "de": "Untoten",
+    "de": "Untot",
     "pl": "Nieumarły",
     "fr": "Mort-vivant",
     "es": "No muerto"
@@ -3280,153 +3181,126 @@
     "en": "Unpublish",
     "it": "Non pubblicato",
     "de": "Unveröffentlicht",
-    "pl": "Niepublikowane",
-    "fr": "Inébranlable",
-    "es": "Inútil"
+    "pl": "Cofnij Publikację",
+    "fr": "Dépublier",
+    "es": "No publicado"
   },
   {
     "key": "Upon reaching levels ***20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
     "en": "Upon reaching levels ***20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
     "it": "Al raggiungimento dei livelli *** 20 **, ** 40 ** e ** 60 **, l'NPC sceglie uno dei suoi attributi e lo aumenta di una dimensione di una matrice (fino a un massimo di D12).",
-    "de": "Nach Erreichen von Ebenen *** 20 **, ** 40 ** und ** 60 ** wählt der NPC eines seiner Attribute und erhöht es um eine Würfelgröße (auf maximal D12).",
-    "pl": "Po osiągnięciu poziomów *** 20 **, ** 40 ** i ** 60 ** NPC wybiera jeden z jego atrybutów i zwiększa go o jeden rozmiar matrycy (do maksymalnie D12).",
-    "fr": "En atteignant les niveaux *** 20 **, ** 40 **, et ** 60 **, le NPC choisit l'un de ses attributs et l'augmente d'une taille de matrice (à un maximum de D12).",
-    "es": "Al alcanzar los niveles *** 20 **, ** 40 ** y ** 60 **, el NPC elige uno de sus atributos y lo aumenta por un tamaño de dado (hasta un máximo de D12)."
-  },
-  {
-    "key": "Upon reaching levels **20*, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "en": "Upon reaching levels **20*, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "it": "Al raggiungimento dei livelli ** 20*, ** 40 ** e ** 60 **, l'NPC sceglie uno dei suoi attributi e lo aumenta di una dimensione di una matrice (fino a un massimo di D12).",
-    "de": "Nach Erreichen von Ebenen ** 20*, ** 40 ** und ** 60 ** wählt der NPC eines seiner Attribute und erhöht es um eine Würfelgröße (auf ein Maximum von D12).",
-    "pl": "Po osiągnięciu poziomów ** 20*, ** 40 ** i ** 60 ** NPC wybiera jeden z jego atrybutów i zwiększa go o jeden rozmiar matrycy (do maksymalnie D12).",
-    "fr": "En atteignant les niveaux ** 20 *, ** 40 ** et ** 60 **, le NPC choisit l'un de ses attributs et l'augmente d'une taille de matrice (à un maximum de D12).",
-    "es": "Al alcanzar los niveles ** 20*, ** 40 ** y ** 60 **, el NPC elige uno de sus atributos y lo aumenta por un tamaño de dado (hasta un máximo de D12)."
-  },
-  {
-    "key": "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "en": "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "it": "Al raggiungimento dei livelli ** 20 **, ** 40 ** e ** 60 **, l'NPC sceglie uno dei suoi attributi e lo aumenta di una dimensione da dado (fino a un massimo di D12).",
-    "de": "Nach Erreichung von Ebenen ** 20 **, ** 40 ** und ** 60 ** wählt der NPC eines seiner Attribute und erhöht es um eine Würfelgröße (auf maximal D12).",
-    "pl": "Po osiągnięciu poziomów ** 20 **, ** 40 ** i ** 60 ** NPC wybiera jeden z jego atrybutów i zwiększa go o jeden rozmiar matrycy (do maksymalnie D12).",
-    "fr": "En atteignant les niveaux ** 20 **, ** 40 **, et ** 60 **, le NPC choisit l'un de ses attributs et l'augmente d'une taille de matrice (à un maximum de D12).",
-    "es": "Al alcanzar los niveles ** 20 **, ** 40 ** y ** 60 **, el NPC elige uno de sus atributos y lo aumenta por un tamaño de dado (hasta un máximo de D12)."
-  },
-  {
-    "key": "Upon reaching levels *20*, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "en": "Upon reaching levels *20*, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-    "it": "Al raggiungimento dei livelli*20*, ** 40 ** e ** 60 **, l'NPC sceglie uno dei suoi attributi e lo aumenta di una dimensione da dado (fino a un massimo di D12).",
-    "de": "Nach Erreichung von Ebenen*20*, ** 40 ** und ** 60 ** wählt der NPC eines seiner Attribute und erhöht es um eine Würfelgröße (auf ein Maximum von D12).",
-    "pl": "Po osiągnięciu poziomów*20*, ** 40 ** i ** 60 ** NPC wybiera jeden z jego atrybutów i zwiększa go o jeden rozmiar matrycy (do maksymalnie D12).",
-    "fr": "En atteignant les niveaux * 20 *, ** 40 **, et ** 60 **, le NPC choisit l'un de ses attributs et l'augmente d'une taille de matrice (à un maximum de D12).",
-    "es": "Al alcanzar los niveles*20*, ** 40 ** y ** 60 **, el NPC elige uno de sus atributos y lo aumenta por un tamaño de dado (hasta un máximo de D12)."
+    "de": "Auf Stufe * 20 **, ** 40 ** und ** 60 ** wählt der NPC eines seiner Attribute und erhöht es um eine Würfelgröße (auf maximal W12).",
+    "pl": "Po osiągnięciu 20, 40 oraz 60 poziomu wybierz jedną cechę BN-a i zwiększ jej rodzaj kości o jeden (maksymalnie k12).",
+    "fr": "En atteignant les niveaux *** 20 **, ** 40 **, et ** 60 **, le NPC choisit l'un de ses attributs et l'augmente d'une taille (jusqu'à un maximum de D12).",
+    "es": "Al alcanzar los niveles *** 20 **, ** 40 ** y ** 60 **, el PNJ elige uno de sus atributos y lo aumenta por un tamaño de dado (hasta un máximo de D12)."
   },
   {
     "key": "Use 0.5 skill per Resistance",
     "en": "Use 0.5 skill per Resistance",
     "it": "Usa 0,5 abilità per resistenza",
-    "de": "Verwenden Sie 0,5 Fähigkeiten pro Widerstand",
-    "pl": "Użyj 0,5 umiejętności na opór",
+    "de": "-0,5 Fähigkeitspunkte pro Resistenz",
+    "pl": "Wykorzystuje 0,5 Punktu Umiejętności na Odporność",
     "fr": "Utilisez 0,5 compétence par résistance",
-    "es": "Use 0.5 habilidad por resistencia"
+    "es": "Utiliza 0.5 de habilidad por resistencia"
   },
   {
     "key": "Use 1 skill per Immunity",
     "en": "Use 1 skill per Immunity",
     "it": "Usa 1 abilità per immunità",
-    "de": "Verwenden Sie 1 Fertigkeit pro Immunität",
-    "pl": "Użyj 1 umiejętności na odporność",
+    "de": "-1 Fähigkeitspunkt pro Immunität",
+    "pl": "Wykorzystuje 1 Punkt Umiejętności na Nietykalność",
     "fr": "Utilisez 1 compétence par immunité",
-    "es": "Use 1 habilidad por inmunidad"
+    "es": "Utiliza 1 de habilidad por inmunidad"
   },
   {
     "key": "Use 2 skill per Absorption",
     "en": "Use 2 skill per Absorption",
     "it": "Usa 2 abilità per assorbimento",
-    "de": "Verwenden Sie 2 Fähigkeiten pro Absorption",
-    "pl": "Użyj 2 umiejętności na absorpcję",
+    "de": "-2 Fähigkeitspunkte pro Absorption",
+    "pl": "Wykorzystuje 2 Punkty Umiejętności na Absorpcję",
     "fr": "Utilisez 2 compétences par absorption",
-    "es": "Use 2 habilidades por absorción"
+    "es": "Utiliza 2 de habilidades por absorción"
   },
   {
     "key": "Used skills from equipment",
     "en": "Used skills from equipment",
     "it": "Skills usate dall'attrezzatura",
-    "de": "Gebrauchte Fähigkeiten von Geräten",
-    "pl": "Używane umiejętności z sprzętu",
-    "fr": "Compétences utilisées de l'équipement",
-    "es": "Habilidades usadas del equipo"
+    "de": "Genutze Fähigkeitspunkte von Ausrüstung",
+    "pl": "Punkty Umiejętności wykorzystane na Wyposażenie",
+    "fr": "Compétences utilisées pour l'équipement",
+    "es": "Habilidades utilizadas para el equipo"
   },
   {
     "key": "Used skills from extra defense",
     "en": "Used skills from extra defense",
     "it": "Abilità usate dalla difesa extra",
     "de": "Gebrauchte Fähigkeiten aus zusätzlicher Verteidigung",
-    "pl": "Używane umiejętności z dodatkowej obrony",
-    "fr": "Compétences utilisées de la défense supplémentaire",
-    "es": "Habilidades usadas de defensa adicional"
+    "pl": "Punkty Umiejętności wykorzystane na Większą Ochronę",
+    "fr": "Compétences utilisées pour la défense supplémentaire",
+    "es": "Habilidades utilizadas para defensa adicional"
   },
   {
     "key": "Used skills from extra magic check",
     "en": "Used skills from extra magic check",
     "it": "Abilità usate dal controllo extra magico",
-    "de": "Gebrauchte Fähigkeiten von Extra Magic Check",
-    "pl": "Używane umiejętności z Extra Magic Check",
-    "fr": "Compétences utilisées de Extra Magic Check",
-    "es": "Habilidades usadas de Magic Extra Check"
+    "de": "Genutze Fähigkeitspunkte von Verbesserten Magieproben",
+    "pl": "Punkty Umiejętności wykorzystane na Specjalizację: Magia",
+    "fr": "Compétences utilisées pour Extra Magic Check",
+    "es": "Habilidades utilizadas para pruebas mágicas adicionales"
   },
   {
     "key": "Used skills from extra MP",
     "en": "Used skills from extra MP",
     "it": "Abilità usate da MP extra",
-    "de": "Gebrauchte Fähigkeiten von zusätzlichem MP",
-    "pl": "Używane umiejętności z dodatkowego MP",
-    "fr": "Compétences utilisées de MP supplémentaire",
-    "es": "Habilidades usadas de MP adicional"
+    "de": "Genutze Fähigkeitspunkte von Erhöhten MP",
+    "pl": "Punkty Umiejętności wykorzystane na Dodatkowe PM",
+    "fr": "Compétences utilisées pour des MP supplémentaire",
+    "es": "Habilidades utilizadas para PM adicionales"
   },
   {
     "key": "Used skills from immunities",
     "en": "Used skills from immunities",
     "it": "Abilità usate dalle immunità",
-    "de": "Gebrauchte Fähigkeiten aus Immunitäten",
-    "pl": "Używane umiejętności z odporności",
-    "fr": "Les compétences utilisées des immunités",
-    "es": "Habilidades usadas de inmunidades"
+    "de": "Genutze Fähigkeitspunkte von Immunitäten",
+    "pl": "Punkty Umiejętności wykorzystane na Nietykalności",
+    "fr": "Les compétences utilisées pour des immunités",
+    "es": "Habilidades utilizadas para inmunidades"
   },
   {
     "key": "Used skills from resistances",
     "en": "Used skills from resistances",
     "it": "Abilità usate dalle resistenze",
-    "de": "Gebrauchte Fähigkeiten durch Widerstände",
-    "pl": "Używane umiejętności z oporu",
-    "fr": "Les compétences utilisées des résistances",
-    "es": "Habilidades usadas de resistencias"
+    "de": "Genutze Fähigkeitspunkte von Resistenzen",
+    "pl": "Punkty Umiejętności wykorzystane na Odporności",
+    "fr": "Les compétences utilisées pour des résistances",
+    "es": "Habilidades utilizadas para resistencias"
   },
   {
     "key": "Used skills from special rules",
     "en": "Used skills from special rules",
     "it": "Competenze usate da regole speciali",
-    "de": "Gebrauchte Fähigkeiten aus besonderen Regeln",
-    "pl": "Używane umiejętności ze specjalnych zasad",
-    "fr": "Compétences utilisées à partir de règles spéciales",
-    "es": "Habilidades usadas de reglas especiales"
+    "de": "Genutze Fähigkeitspunkte von Sonderregeln",
+    "pl": "Punkty Umiejętności wykorzystane na Umiejętności Specjalne",
+    "fr": "Compétences utilisées pour des règles spéciales",
+    "es": "Habilidades utilizadas para reglas especiales"
   },
   {
     "key": "Used skills from spells",
     "en": "Used skills from spells",
     "it": "Abilità usate dagli incantesimi",
-    "de": "Gebrauchte Fähigkeiten aus Zaubersprüchen",
-    "pl": "Używane umiejętności z zaklęć",
-    "fr": "Les compétences utilisées des sorts",
-    "es": "Habilidades usadas de hechizos"
+    "de": "Genutze Fähigkeitspunkte von Zaubersprüchen",
+    "pl": "Punkty Umiejętności wykorzystane na Zaklęcia",
+    "fr": "Les compétences utilisées pour des sorts",
+    "es": "Habilidades utilizadas para hechizos"
   },
   {
     "key": "Used:",
     "en": "Used:",
     "it": "Usato:",
-    "de": "Gebraucht:",
+    "de": "Genutzt:",
     "pl": "Używany:",
     "fr": "Utilisé:",
-    "es": "Usado:"
+    "es": "Utilizado:"
   },
   {
     "key": "Username",
@@ -3441,9 +3315,9 @@
     "key": "Uses",
     "en": "Uses",
     "it": "Usi",
-    "de": "Verwendet",
+    "de": "Nutzung",
     "pl": "Użycie",
-    "fr": "Les usages",
+    "fr": "Utilisations",
     "es": "Usos"
   },
   {
@@ -3452,7 +3326,7 @@
     "it": "Usando ingrediente speciale",
     "de": "Mit besonderer Zutat",
     "pl": "Za pomocą specjalnego składnika",
-    "fr": "Utilisation d'ingrédient spécial",
+    "fr": "Utilise un ingrédient spécial",
     "es": "Usando ingrediente especial"
   },
   {
@@ -3477,9 +3351,9 @@
     "key": "Vitality Up",
     "en": "Vitality Up",
     "it": "Vitalità",
-    "de": "Vitalität hoch",
-    "pl": "Witalność",
-    "fr": "Vitalité",
+    "de": "Verbesserte Heilung",
+    "pl": "Skok Witalności",
+    "fr": "Gain de vitalité",
     "es": "Vitalidad"
   },
   {
@@ -3487,7 +3361,7 @@
     "en": "Vulnerabilities",
     "it": "Vulnerabilità",
     "de": "Schwachstellen",
-    "pl": "Słabości",
+    "pl": "Wrażliwości",
     "fr": "Vulnérabilités",
     "es": "Vulnerabilidades"
   },
@@ -3495,8 +3369,8 @@
     "key": "Vulnerability",
     "en": "Vulnerability",
     "it": "Vulnerabilità",
-    "de": "Verletzlichkeit",
-    "pl": "Słaby punkt",
+    "de": "Schwächen",
+    "pl": "Wrażliwość",
     "fr": "Vulnérabilité",
     "es": "Vulnerabilidad"
   },
@@ -3504,9 +3378,9 @@
     "key": "Waraxe",
     "en": "Waraxe",
     "it": "Waraxe",
-    "de": "Waraxe",
-    "pl": "Waraxe",
-    "fr": "Waraxe",
+    "de": "Kriegsaxt",
+    "pl": "Topór Bojowy",
+    "fr": "Hache de guerre",
     "es": "Hacha de guerra"
   },
   {
@@ -3514,16 +3388,7 @@
     "en": "Weak",
     "it": "Debole",
     "de": "Schwach",
-    "pl": "Słaby",
-    "fr": "Faible",
-    "es": "Débil"
-  },
-  {
-    "key": "Weak",
-    "en": "Weak",
-    "it": "Debole",
-    "de": "Schwach",
-    "pl": "Słaby",
+    "pl": "Osłabienie",
     "fr": "Faible",
     "es": "Débil"
   },
@@ -3540,8 +3405,8 @@
     "key": "Weapon attacks have multi (2) property",
     "en": "Weapon attacks have multi (2) property",
     "it": "Gli attacchi delle armi hanno proprietà multi (2)",
-    "de": "Waffenangriffe haben Multi (2) Eigentum",
-    "pl": "Ataki broni mają właściwość Multi (2)",
+    "de": "Waffenangriffe haben die Eigenschaft Multi (2)",
+    "pl": "Ataki przeprowadzane przy użyciu broni zyskują właściwość wieloataku (2).",
     "fr": "Les attaques d'armes ont une propriété multi (2)",
     "es": "Los ataques de armas tienen propiedades múltiples (2)"
   },
@@ -3550,7 +3415,7 @@
     "en": "Weapon damage ignores Resistances",
     "it": "Il danno all'arma ignora le resistenze",
     "de": "Waffenschäden ignorieren Widerstände",
-    "pl": "Uszkodzenie broni ignorują opór",
+    "pl": "Wszelkie obrażenia zadawane przy użyciu broni ignorują Odporności",
     "fr": "Les dégâts d'armes ignorent les résistances",
     "es": "El daño del arma ignora las resistencias"
   },
@@ -3558,10 +3423,10 @@
     "key": "Weapon Up",
     "en": "Weapon Up",
     "it": "Arma",
-    "de": "Waffe hoch",
+    "de": "Verbesserter Schaden",
     "pl": "Broń w górę",
-    "fr": "Armer",
-    "es": "Arma"
+    "fr": "Gain d'armement",
+    "es": "Arma mejorada"
   },
   {
     "key": "Weapon:",
@@ -3585,53 +3450,53 @@
     "key": "When you recover HP, you recover 5 extra HP.",
     "en": "When you recover HP, you recover 5 extra HP.",
     "it": "Quando recuperi HP, recuperi 5 HP extra.",
-    "de": "Wenn Sie HP wiederherstellen, erhalten Sie 5 zusätzliche HP.",
-    "pl": "Po odzyskaniu HP odzyskasz 5 dodatkowych HP.",
-    "fr": "Lorsque vous récupérez HP, vous récupérez 5 HP supplémentaires.",
-    "es": "Cuando recuperas HP, recuperas 5 HP adicionales."
+    "de": "Wenn Sie LP wiederherstellen, stellen Sie 5 zusätzliche LP wieder her.",
+    "pl": "Ilekroć odzyskujesz PŻ, odzyskujesz 5 dodatkowych PŻ.",
+    "fr": "Lorsque vous récupérez des HP, vous récupérez 5 HP supplémentaires.",
+    "es": "Cuando recuperas PV, recuperas 5 PV adicionales."
   },
   {
     "key": "wil",
     "en": "wil",
     "it": "Wil",
-    "de": "Wil",
-    "pl": "Wil",
-    "fr": "wil",
-    "es": "Wil"
+    "de": "WLP",
+    "pl": "SW",
+    "fr": "vol",
+    "es": "Vol."
   },
   {
     "key": "Wil",
     "en": "Wil",
     "it": "Wil",
-    "de": "Wil",
-    "pl": "Wil",
-    "fr": "Wil",
-    "es": "Wil"
+    "de": "WLP",
+    "pl": "SW",
+    "fr": "Vol",
+    "es": "VOL"
   },
   {
     "key": "WIL:",
     "en": "WIL:",
     "it": "Wil:",
-    "de": "Wil:",
-    "pl": "Wil:",
-    "fr": "Wil:",
-    "es": "WIL:"
+    "de": "WLP:",
+    "pl": "SW:",
+    "fr": "VOL:",
+    "es": "VOL:"
   },
   {
     "key": "WIL:",
     "en": "WIL:",
     "it": "Wil:",
-    "de": "Wil:",
-    "pl": "Wil:",
-    "fr": "Wil:",
-    "es": "WIL:"
+    "de": "WLP:",
+    "pl": "SW:",
+    "fr": "VOL:",
+    "es": "VOL:"
   },
   {
     "key": "Willpower",
     "en": "Willpower",
     "it": "Forza di volontà",
     "de": "Willenskraft",
-    "pl": "Siła woli",
+    "pl": "Siła Woli",
     "fr": "Volonté",
     "es": "Fuerza de voluntad"
   },
@@ -3649,70 +3514,70 @@
     "en": "WLP",
     "it": "WLP",
     "de": "WLP",
-    "pl": "WLP",
-    "fr": "WLP",
-    "es": "WLP"
+    "pl": "SW",
+    "fr": "VOL",
+    "es": "VOL"
   },
   {
     "key": "You are immune to a single status",
     "en": "You are immune to a single status",
     "it": "Sei immune da un unico status",
-    "de": "Sie sind immun gegen einen einzelnen Status",
-    "pl": "Jesteś odporny na jeden status",
-    "fr": "Vous êtes à l'abri d'un seul statut",
+    "de": "Immunität gegen einen bestimmten Statuseffekt",
+    "pl": "Zyskujesz nietykalność na jeden stan",
+    "fr": "Vous êtes immunisé à un statut",
     "es": "Eres inmune a un solo estado"
   },
   {
     "key": "You are immune to a single type of damage (except physical)",
     "en": "You are immune to a single type of damage (except physical)",
     "it": "Sei immune da un singolo tipo di danno (tranne fisico)",
-    "de": "Sie sind immun gegen eine einzelne Art von Schäden (außer physisch)",
-    "pl": "Jesteś odporny na pojedynczy rodzaj uszkodzeń (z wyjątkiem fizycznego)",
-    "fr": "Vous êtes à l'abri d'un seul type de dommages (sauf physique)",
+    "de": "Immunität gegen eine bestimmte Art von Schaden (nicht physisch)",
+    "pl": "Zyskujesz Nietykalność na jeden rodzaj obrażeń (nie fizyczne)",
+    "fr": "Vous êtes immunisé à un type de dommages (sauf physique)",
     "es": "Eres inmune a un solo tipo de daño (excepto físico)"
   },
   {
     "key": "You are immune to all status effects",
     "en": "You are immune to all status effects",
     "it": "Sei immune a tutti gli effetti dello stato",
-    "de": "Sie sind immun gegen alle Statusffekte",
-    "pl": "Jesteś odporny na wszystkie efekty statusu",
-    "fr": "Vous êtes à l'abri de tous les effets de statut",
+    "de": "Immunität gegen alle Statusffekte",
+    "pl": "Zyskujesz nietykalność na wszystkie stany",
+    "fr": "Vous êtes immunisé à tous les effets de statut",
     "es": "Eres inmune a todos los efectos de estado"
   },
   {
     "key": "You gain a +1 bonus to Defense.",
     "en": "You gain a +1 bonus to Defense.",
     "it": "Ottieni un bonus di +1 alla difesa.",
-    "de": "Sie erhalten einen Bonus von +1 für die Verteidigung.",
-    "pl": "Zyskujesz premię +1 do obrony.",
+    "de": "+1 Bonus auf Verteidigung.",
+    "pl": "Zyskujesz +1 do Obrony",
     "fr": "Vous gagnez un bonus de +1 à la défense.",
-    "es": "Obtienes un bono de +1 a la defensa."
+    "es": "Obtienes una bonificación de +1 a la Defensa."
   },
   {
     "key": "You gain a +1 bonus to your Accuracy Checks.",
     "en": "You gain a +1 bonus to your Accuracy Checks.",
     "it": "Ottieni un bonus +1 ai tuoi controlli di precisione.",
-    "de": "Sie erhalten einen Bonus von +1 auf Ihre Genauigkeitsüberprüfungen.",
-    "pl": "Zyskujesz premię +1 do kontroli dokładności.",
-    "fr": "Vous gagnez un bonus de +1 à vos contrôles de précision.",
-    "es": "Obtienes un bono +1 a tus controles de precisión."
+    "de": "+1 Bonus auf Angriffsproben.",
+    "pl": "Zyskujesz premię +1 do Testów Celności",
+    "fr": "Vous gagnez un bonus de +1 à vos tests de précision.",
+    "es": "Obtienes una bonificación  +1 a tus Pruebas de Precisión."
   },
   {
     "key": "You gain a +1 bonus to your Magic Checks.",
     "en": "You gain a +1 bonus to your Magic Checks.",
     "it": "Ottieni un bonus +1 ai tuoi controlli magici.",
-    "de": "Sie erhalten einen Bonus von +1 auf Ihre magischen Schecks.",
-    "pl": "Zyskujesz bonus +1 do swoich magicznych czeków.",
-    "fr": "Vous gagnez un bonus de +1 à vos chèques magiques.",
-    "es": "Obtienes un bono +1 a tus cheques mágicos."
+    "de": "+1 Bonus auf Magieproben.",
+    "pl": "Zyskujesz premię +1 do Testów Magii",
+    "fr": "Vous gagnez un bonus de +1 à vos tests de  magie.",
+    "es": "Obtienes una bonificación  +1 a tus Pruebas Mágicas"
   },
   {
     "key": "You have Resistance to a single type of damage (except physical)",
     "en": "You have Resistance to a single type of damage (except physical)",
     "it": "Hai resistenza a un singolo tipo di danno (tranne fisico)",
-    "de": "Sie haben Widerstand gegen eine einzelne Art von Schäden (außer physisch)",
-    "pl": "Masz odporność na pojedynczy rodzaj uszkodzeń (z wyjątkiem fizycznego)",
+    "de": "Resistenz gegen eine bestimmte Art von Schaden (nicht physisch)",
+    "pl": "Zyskujesz Odporność na obrażenia jednego rodzaju (nie fizyczne).",
     "fr": "Vous avez une résistance à un seul type de dégâts (sauf physique)",
     "es": "Tienes resistencia a un solo tipo de daño (excepto físico)"
   },
@@ -3720,8 +3585,8 @@
     "key": "You have Resistance to physical damage",
     "en": "You have Resistance to physical damage",
     "it": "Hai resistenza al danno fisico",
-    "de": "Sie haben Widerstand gegen physische Schäden",
-    "pl": "Masz odporność na fizyczne uszkodzenia",
+    "de": "Resistenz gegen physischen Schaden",
+    "pl": "Zyskujesz Odporność na fizyczne obrażenia",
     "fr": "Vous avez une résistance aux dommages physiques",
     "es": "Tienes resistencia al daño físico"
   },
@@ -3729,8 +3594,8 @@
     "key": "You have Resistance to two types of damage (except physical)",
     "en": "You have Resistance to two types of damage (except physical)",
     "it": "Hai resistenza a due tipi di danno (tranne fisico)",
-    "de": "Sie haben Widerstand gegen zwei Arten von Schäden (außer physisch)",
-    "pl": "Masz odporność na dwa rodzaje uszkodzeń (z wyjątkiem fizycznego)",
+    "de": "Resistenz gegen zwei Arten von Schaden (nicht physisch)",
+    "pl": "Zyskujesz Odporność na obrażenia dwóch rodzajów (nie fizyczne).",
     "fr": "Vous avez une résistance à deux types de dégâts (sauf physique)",
     "es": "Tienes resistencia a dos tipos de daño (excepto físico)"
   },
@@ -3738,17 +3603,17 @@
     "key": "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
     "en": "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
     "it": "I tuoi attacchi con (scegli uno: mischia, a distanza) Armi infliggono 5 danni extra.",
-    "de": "Ihre Angriffe mit (wählen Sie einen: Nahkampf, Fernkampf) Waffen verursachen 5 zusätzliche Schäden.",
-    "pl": "Twoje ataki (wybierz jeden: walka w zwarciu) broń zadają 5 dodatkowych obrażeń.",
+    "de": "Angriffe mit Waffen einer Art (Nahkampf oder Fernkampf) verursachen 5 Punkte zusätzlichen Schaden.",
+    "pl": "Twoje ataki przy użyciu broni (wybierz jedno: białych, dystansowych) zadają 5 dodatkowych obrażeń.",
     "fr": "Vos attaques avec (choisissez-en une: mêlée, à distance), les armes infligent 5 dégâts supplémentaires.",
-    "es": "Tus ataques con las armas (eligen uno: cuerpo a cuerpo, a distancia) infligen 5 daños adicionales."
+    "es": "Tus ataques con armas (elige uno: cuerpo a cuerpo o a distancia) infligen 5 puntos de daño adicionales."
   },
   {
     "key": "Zenit",
     "en": "Zenit",
     "it": "Zenit",
     "de": "Zenit",
-    "pl": "Zenit",
+    "pl": "ZNT",
     "fr": "Zénit",
     "es": "Zenit"
   },
@@ -3757,7 +3622,7 @@
     "en": "zenit",
     "it": "Zenit",
     "de": "Zenit",
-    "pl": "Zenit",
+    "pl": "ZNT",
     "fr": "zénit",
     "es": "zenit"
   },
