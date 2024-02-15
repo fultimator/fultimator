@@ -27,7 +27,7 @@ import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
 
 import { ArrowDropDown } from "@mui/icons-material";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, t } from "../../translation/translate";
 
 function NpcPretty({ npc, study, collapse, onClick = () => {} }, ref) {
   const { t } = useTranslate();
@@ -1031,7 +1031,6 @@ function Equip({ npc }) {
 }
 
 function RenderVillainPhase({ villain, phases, multipart }) {
-  const { t } = useTranslate();
   const phaseString =
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
 

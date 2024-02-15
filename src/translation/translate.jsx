@@ -15,7 +15,7 @@ import data from "./data.json";
     - Paste the whole json in ./translation/data.json
 */
 
-const debugMode = true;
+const debugMode = false;
 
 const translate = (key) => {
   return data.find((item) => item.key === key);
