@@ -45,6 +45,8 @@ const AppBar: React.FC<AppBarProps> = ({
   selectedTheme,
   handleSelectTheme,
 }) => {
+  const viewportWidth = window.innerWidth;
+  const isSmallViewport = viewportWidth <= 600;
   return (
     <HideOnScroll>
       <MuiAppBar position="fixed">
@@ -92,9 +94,9 @@ const AppBar: React.FC<AppBarProps> = ({
                   <Typography variant="h1" textAlign="center">
                     <img
                       style={{ height: '100%', maxHeight: '120px' }}
-                      src={logo}
-                      sizes="(max-width: 600px) 100vw, (max-width: 929px) 100vw, (max-width: 1400px) 100vw, 1400px"
-                      srcSet={`${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
+                      src={isSmallViewport ? logo : undefined}
+                      srcSet={isSmallViewport ? undefined : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
+                      sizes={isSmallViewport ? undefined : '100vw'}
                       alt="Fultimator"
                     />
                   </Typography>
