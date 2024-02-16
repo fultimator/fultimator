@@ -52,7 +52,7 @@ const AppBar: React.FC<AppBarProps> = ({
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid
               item
-              xs={3}
+              xs={2}
               textAlign="left"
               sx={{
                 display: "flex",
@@ -69,7 +69,18 @@ const AppBar: React.FC<AppBarProps> = ({
             </Grid>
 
             {!isNpcEdit && (
-              <Grid item xs={6} textAlign="center">
+              <Grid
+                item
+                xs={8}
+                textAlign="center"
+                sx={{
+                  height: "90px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "16px 0",
+                }}
+              >
                 <RouterLink
                   to="/"
                   style={{
@@ -80,10 +91,10 @@ const AppBar: React.FC<AppBarProps> = ({
                 >
                   <Typography variant="h1" textAlign="center">
                     <img
-                      style={{ maxWidth: '75%', height: '100%', maxHeight: '94px' }}
-                      sizes="(max-width: 1400px) 100vw, 1400px"
+                      style={{ height: '100%', maxHeight: '120px' }}
+                      src={logo}
+                      sizes="(max-width: 600px) 100vw, (max-width: 929px) 100vw, (max-width: 1400px) 100vw, 1400px"
                       srcSet={`${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
-                      src={logo1400}
                       alt="Fultimator"
                     />
                   </Typography>
@@ -91,7 +102,11 @@ const AppBar: React.FC<AppBarProps> = ({
               </Grid>
             )}
 
-            <Grid item xs={3} sx={{ textAlign: "right" }}>
+            <Grid
+              item
+              xs={2}
+              sx={{ textAlign: "right" }}
+            >
               <Grid
                 container
                 sx={{

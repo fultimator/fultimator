@@ -56,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         handleSelectTheme={handleSelectTheme}
       />
       <Container
-        style={{ marginTop: "7em", alignItems: "center" }}
+        style={{ marginTop: "8em", alignItems: "center" }}
         key={selectedLanguage}
       >
         {children}

@@ -38,10 +38,10 @@ function Home() {
   const { t } = useTranslate();
   return (
     <Layout>
-      <SubLogo
+      {/* <SubLogo
         src={`${sublogo200} 200w, ${sublogo834} 929w, ${sublogo1400} 1400w`}
         alt="Unofficial Fabula Ultima Tool"
-      />
+      /> */}
       <div
         style={{
           display: "flex",
