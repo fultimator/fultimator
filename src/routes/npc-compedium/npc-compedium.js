@@ -95,6 +95,10 @@ function Personal({ user }) {
   const [language, setLanguage] = useState("en");
   const [levels, setLevels] = useState([5, 60]);
 
+  useEffect(() => {
+    console.log("User ID: ", user.uid);
+  }, []);
+
   const [searchParams, setSearchParams] = useState({
     type: "All",
     name: "",
