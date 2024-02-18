@@ -8,6 +8,7 @@ import {
   addDoc,
   deleteDoc,
   startAfter,
+  setDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -58,7 +59,7 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, languageOptions } from "../../translation/translate";
 
 export default function NpcCompedium() {
   const { t } = useTranslate();
@@ -91,6 +92,7 @@ function Personal({ user }) {
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
+  const [language, setLanguage] = useState("en");
   const [levels, setLevels] = useState([5, 60]);
 
   const [searchParams, setSearchParams] = useState({
@@ -98,6 +100,7 @@ function Personal({ user }) {
     name: "",
     level: [5, 60],
     rank: "",
+    language: "en",
   });
 
   const constraints = [where("published", "==", true)];
@@ -126,6 +129,8 @@ function Personal({ user }) {
   if (searchParams.type !== "All") {
     constraints.push(where("species", "==", searchParams.type));
   }
+
+  constraints.push(where("language", "==", searchParams.language));
 
   constraints.push(orderBy("publishedAt", "desc"));
 
@@ -396,6 +401,38 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
+
+          <Grid item xs={4} md={2} alignItems="center" sx={{ display: "flex" }}>
+            <FormControl fullWidth size="small">
+              <InputLabel id="Language">{t("Language:")}</InputLabel>
+              <Select
+                labelId="language"
+                id="select-language"
+                value={language}
+                label={t("Language:")}
+                onChange={(evt) => {
+                  setLanguage(evt.target.value);
+                }}
+              >
+                {languageOptions.map((option) => (
+                  <MenuItem key={option.code} value={option.code}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={4} md={2} alignItems="center" sx={{ display: "flex" }}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => {
+                setCollapse(!collapse);
+              }}
+            >
+              {collapse ? t("Collapse") : t("Expand")}
+            </Button>
+          </Grid>
           <Grid
             item
             xs={12}
@@ -416,21 +453,11 @@ function Personal({ user }) {
                   name: name.toLowerCase(),
                   level: levels,
                   rank: rank ? rank : "",
+                  language: language,
                 });
               }}
             >
               {t("Search")}
-            </Button>
-          </Grid>
-          <Grid item xs={4} md={1} alignItems="center" sx={{ display: "flex" }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={() => {
-                setCollapse(!collapse);
-              }}
-            >
-              {collapse ? t("Collapse") : t("Expand")}
             </Button>
           </Grid>
         </Grid>

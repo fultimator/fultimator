@@ -15,6 +15,9 @@ import {
   IconButton,
   Paper,
   Typography,
+  Select,
+  MenuItem,
+  FormHelperText,
   useTheme,
 } from "@mui/material";
 import {
@@ -41,10 +44,10 @@ import EditSpells from "../../components/npc/EditSpells";
 import EditActions from "../../components/npc/EditActions";
 import EditNotes from "../../components/npc/EditNotes";
 import EditRareGear from "../../components/npc/EditRareGear";
-import Probs from "../../routes/probs/probs";
+import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, languageOptions } from "../../translation/translate";
 
 export default function NpcEdit() {
   const { t } = useTranslate();
@@ -155,6 +158,13 @@ export default function NpcEdit() {
           "'Credit By' needs to be filled in order to be published",
           true
         ),
+      };
+    }
+
+    if (!npcTemp.language || npcTemp.language === "") {
+      return {
+        disabled: true,
+        message: t("Language need to be set in order to be published", true),
       };
     }
 
@@ -293,6 +303,26 @@ export default function NpcEdit() {
                     updateNPC({ ...npcTemp, createdBy: evt.target.value });
                   }}
                 />
+                <Select
+                  labelId="study"
+                  id="study"
+                  size="small"
+                  value={npcTemp.language}
+                  onChange={(evt) => {
+                    updateNPC({ ...npcTemp, language: evt.target.value });
+                  }}
+                  fullWidth
+                >
+                  {languageOptions.map((option) => (
+                    <MenuItem key={option.code} value={option.code}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+
+                <FormHelperText sx={{ textAlign: "center" }}>
+                  {t("Select language to publish with.")}
+                </FormHelperText>
                 {!npcTemp.published && (
                   <Button
                     variant="contained"
@@ -545,7 +575,7 @@ export default function NpcEdit() {
       )}
 
       {/* <NpcUgly npc={npcTemp} /> */}
-      
+
       {/* SP Tracker Field */}
       <Grid
         sx={{

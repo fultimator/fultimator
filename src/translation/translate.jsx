@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import data from "./data.json";
 
+export const languageOptions = [
+  { code: "en", label: "English" },
+  { code: "it", label: "Italiano (Italian)" },
+  { code: "es", label: "Español (Spanish)" },
+  { code: "de", label: "German" },
+  { code: "pl", label: "Polish" },
+  { code: "fr", label: "French" },
+  // Continue?
+];
+
 /*
     - Green is with key and with translated text on selected language
     - Yellow is with key but no translated text on selected language
