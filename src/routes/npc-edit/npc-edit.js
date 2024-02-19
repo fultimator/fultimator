@@ -373,28 +373,35 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
-              variant="h5"
-              component="legend"
-              sx={{ color: primary, textTransform: "uppercase" }}
-            >
-              {t("Affinity")}
-            </Typography>
-            <Divider
-              orientation="horizontal"
-              sx={{
-                color: primary,
-                borderBottom: "2px solid",
-                borderColor: "secondary",
-                mb: "10px",
-              }}
-            />
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
+                <Typography
+                variant="h5"
+                component="legend"
+                sx={{ color: primary, textTransform: "uppercase" }}
+                >
+                  {t("Affinity")}
+                </Typography>
+                <Divider
+                  orientation="horizontal"
+                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
+                />
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+
               <Grid item xs={12} md={6}>
+                <Typography
+                  variant="h5"
+                  component="legend"
+                  sx={{ color: primary, textTransform: "uppercase" }}
+                  >
+                    {t("Bonuses")}
+                </Typography>
+                <Divider
+                  orientation="horizontal"
+                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
+                />
                 <EditExtra npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
@@ -411,27 +418,34 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
-              variant="h5"
-              component="legend"
-              sx={{ color: primary, textTransform: "uppercase" }}
-            >
-              {t("Attacks")}
-            </Typography>
-            <Divider
-              orientation="horizontal"
-              sx={{
-                color: primary,
-                borderBottom: "2px solid",
-                borderColor: "secondary",
-                mb: "10px",
-              }}
-            />
+
             <Grid container>
               <Grid item xs={12}>
+                <Typography
+                variant="h5"
+                component="legend"
+                sx={{ color: primary, textTransform: "uppercase" }}
+                >
+                {t("Basic Attacks")}
+                </Typography>
+                <Divider
+                  orientation="horizontal"
+                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
+                />
                 <EditAttacks npc={npcTemp} setNpc={updateNPC} />
               </Grid>
               <Grid item xs={12}>
+                <Typography
+                  variant="h5"
+                  component="legend"
+                  sx={{ color: primary, textTransform: "uppercase" }}
+                >
+                {t("Attacks with Weapons")}
+                </Typography>
+                <Divider
+                  orientation="horizontal"
+                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
+                />
                 <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>

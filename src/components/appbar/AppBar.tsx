@@ -60,7 +60,6 @@ const AppBar: React.FC<AppBarProps> = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "flex-start",
-                height: "96px",
               }}
             >
               {!isNpcEdit && (
@@ -76,11 +75,11 @@ const AppBar: React.FC<AppBarProps> = ({
                 xs={8}
                 textAlign="center"
                 sx={{
-                  height: "90px",
+                  height: "100px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "16px 0",
+                  margin: "2px 0",
                 }}
               >
                 <RouterLink
@@ -93,7 +92,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 >
                   <Typography variant="h1" textAlign="center">
                     <img
-                      style={{ height: '100%', maxHeight: '120px' }}
+                      style={{ height: '100%', maxHeight: '90px' }}
                       src={isSmallViewport ? logo : undefined}
                       srcSet={isSmallViewport ? undefined : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
                       sizes={isSmallViewport ? undefined : '100vw'}

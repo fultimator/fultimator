@@ -20,20 +20,28 @@ import { useTranslate } from "../../translation/translate";
 export default function EditExtra({ npc, setNpc }) {
   return (
     <>
-      <Grid container sx={{ mt: 2 }}>
-        <Grid item xs={12}>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
           <Stack spacing={1}>
             <Defenses npc={npc} setNpc={setNpc} />
             <SelectArmor npc={npc} setNpc={setNpc} />
             <SelectShield npc={npc} setNpc={setNpc} />
-            <HP npc={npc} setNpc={setNpc} />
-            <MP npc={npc} setNpc={setNpc} />
-            <ExtraInit npc={npc} setNpc={setNpc} />
+
+
+          </Stack>
+        </Grid>
+        <Grid item xs={6}>
+          <Stack spacing={1}>
             <Init npc={npc} setNpc={setNpc} />
             <Precision npc={npc} setNpc={setNpc} />
             <Magic npc={npc} setNpc={setNpc} />
+            <HP npc={npc} setNpc={setNpc} />
+            <MP npc={npc} setNpc={setNpc} />
+            <ExtraInit npc={npc} setNpc={setNpc} />
+
           </Stack>
         </Grid>
+
       </Grid>
     </>
   );
@@ -224,6 +232,7 @@ function Init({ npc, setNpc }) {
   };
   return (
     <FormGroup>
+      <FormLabel id="extra-defenses">{t("Bonuses")}</FormLabel>
       <FormControlLabel
         control={<Checkbox value={npc.extra?.init} onChange={onChange} />}
         label={`+4 ${t("Initiative", true)}`}
