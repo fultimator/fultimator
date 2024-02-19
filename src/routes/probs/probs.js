@@ -108,9 +108,9 @@ export default function Probs() {
 
   return (
     <div>
-      <Grid container sx={{ mt: 2, gap: 2 }}>
+      <Grid sx={{ mt: 1 }} container spacing={2}>
         {/* First die */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"firstdie"}>{t("Die 1")}</InputLabel>
             <Select
@@ -132,7 +132,7 @@ export default function Probs() {
         </Grid>
 
         {/* Second die */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"seconddie"}>{t("Die 2")}</InputLabel>
             <Select
@@ -154,7 +154,7 @@ export default function Probs() {
         </Grid>
 
         {/* Bonus */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="bonus"
@@ -194,7 +194,7 @@ export default function Probs() {
         </Grid>
 
         {/* Damage */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
@@ -233,7 +233,7 @@ export default function Probs() {
           </FormControl>
         </Grid>
         {/* LD */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
@@ -272,7 +272,7 @@ export default function Probs() {
           </FormControl>
         </Grid>
         {/* HP */}
-        <Grid item xs>
+        <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"

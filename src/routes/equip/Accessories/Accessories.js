@@ -12,6 +12,7 @@ function Accessories() {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+  const ternary = theme.palette.ternary.main;
   const quaternary = theme.palette.quaternary.main;
 
   const [name, setName] = useState("");
@@ -29,27 +30,34 @@ function Accessories() {
     <Grid container spacing={2}>
       {/* Form */}
       <Grid item xs={12} sm={6}>
-        <Grid item xs={12}>
-          <Typography
-            variant="h4"
-            sx={{
-              px: 3,
-              py: 1,
-              color: "#ffffff",
-              background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
-            }}
-          >
-            <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
-            {t("Accessories")}
-          </Typography>
-        </Grid>
-        <Paper
+      <Paper
+        elevation={3}
+        sx={{
+          padding: 2,
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: `${ternary}`
+        }}
+        >
+        <Typography
+          variant="h4"
           sx={{
-            background: "#ffffff",
-            padding: 2,
+            px: 3,
+            py: 1,
+            mx: -2,
+            mt: -2,
+            color: "#ffffff",
+            background: `linear-gradient(to right, ${primary}, ${quaternary})`,
+            borderRadius: "8px 8px 0 0",
           }}
         >
-          <Grid container spacing={2} alignItems="center">
+          <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
+          {t("Accessories")}
+        </Typography>
+          <Grid container sx={{mt: 0 }} spacing={2} alignItems="center">
             <Grid item xs={6}>
               <ChangeName
                 value={name}

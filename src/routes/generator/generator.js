@@ -148,27 +148,34 @@ function Rituals() {
   }
   return (
     <>
+    <Paper
+      elevation={3}
+      sx={{
+        padding: 2,
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 1,
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: `${ternary}`
+      }}
+    >
       <Typography
         variant="h4"
         sx={{
           px: 3,
           py: 1,
+          mx: -2,
+          mt: -2,
           color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary},  transparent)`,
+          background: `linear-gradient(to right, ${primary}, ${quaternary})`,
+          borderRadius: "8px 8px 0 0",
         }}
       >
         <Spa sx={{ fontSize: 36, marginRight: 1 }} />
         {t("Rituals")}
       </Typography>
-      <Paper
-        sx={{
-          padding: 2,
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1,
-        }}
-      >
-        <Grid container>
+        <Grid sx={{mt: 1 }} container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
@@ -326,27 +333,34 @@ function Projects() {
 
   return (
     <>
+    <Paper
+      elevation={3}
+      sx={{
+        padding: 2,
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 1,
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: `${ternary}`
+      }}
+    >
       <Typography
         variant="h4"
         sx={{
           px: 3,
           py: 1,
+          mx: -2,
+          mt: -2,
           color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
+          background: `linear-gradient(to right, ${primary}, ${quaternary})`,
+          borderRadius: "8px 8px 0 0",
         }}
       >
         <Spa sx={{ fontSize: 36, marginRight: 1 }} />
         {t("Projects")}
       </Typography>
-      <Paper
-        sx={{
-          padding: 2,
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1,
-        }}
-      >
-        <Grid container>
+        <Grid sx={{mt: 1 }}  container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
@@ -566,6 +580,7 @@ const attributes = ["dexterity", "insight", "strength", "willpower"];
 const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 
 function QualitiesGenerator() {
+  const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -680,27 +695,34 @@ function QualitiesGenerator() {
 
   return (
     <>
-      <Typography
-        variant="h4"
-        sx={{
-          px: 3,
-          py: 1,
-          color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary}, transparent)`,
-        }}
-      >
-        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-        Qualities Generator
-      </Typography>
       <Paper
+        elevation={3}
         sx={{
-          background: "#ffffff",
           padding: 2,
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: `${ternary}`
         }}
       >
+        <Typography
+          variant="h4"
+          sx={{
+            px: 3,
+            py: 1,
+            mx: -2,
+            mt: -2,
+            color: "#ffffff",
+            background: `linear-gradient(to right, ${primary}, ${quaternary})`,
+            borderRadius: "8px 8px 0 0",
+          }}
+        >
+          <Spa sx={{ fontSize: 36, marginRight: 1 }} />
+          {t("Qualities Generator")}
+        </Typography>
+
         <Grid container spacing={1} sx={{ my: 1 }}>
           <Grid item xs={3}>
             <Autocomplete
