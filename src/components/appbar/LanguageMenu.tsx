@@ -77,15 +77,17 @@ const getLanguageName = (languageCode: string): string => {
     case "en":
       return "English";
     case "it":
-      return "Italiano";
+      return "Italiano (Italian)";
     case "es":
-      return "Español";
+      return "Español (Spanish)";
     case "de":
-      return "German";
+      return "Deutsch (German)";
     case "pl":
-      return "Polish";
+      return "Polski (Polish)";
     case "fr":
-      return "French";
+      return "Française (French)";
+    case "bt-BR":
+      return "Português (Brasil)";
     default:
       return languageCode;
   }

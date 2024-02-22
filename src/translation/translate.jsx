@@ -5,9 +5,10 @@ export const languageOptions = [
   { code: "en", label: "English" },
   { code: "it", label: "Italiano (Italian)" },
   { code: "es", label: "Español (Spanish)" },
-  { code: "de", label: "German" },
-  { code: "pl", label: "Polish" },
-  { code: "fr", label: "French" },
+  { code: "de", label: "Deutsch (German)" },
+  { code: "pl", label: "Polski (Polish)" },
+  { code: "fr", label: "Française (French)" },
+  { code: "pt-BR", label: "Português (Brasil)" },
   // Continue?
 ];
 
