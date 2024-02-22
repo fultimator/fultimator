@@ -440,9 +440,10 @@ function Attacks({ npc }) {
                   <OpenBracket />
                   {attributes[attack.attr1].shortcaps}+
                   {attributes[attack.attr2].shortcaps}
+                  <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                  <CloseBracket /> <Diamond /> <OpenBracket />
+                   <Diamond /> <OpenBracket />
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
@@ -525,9 +526,10 @@ function Attacks({ npc }) {
                   <OpenBracket />
                   {attributes[attack.weapon.att1].shortcaps}+
                   {attributes[attack.weapon.att2].shortcaps}
+                  <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                  <CloseBracket /> <Diamond /> <OpenBracket />
+                   <Diamond /> <OpenBracket />
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
@@ -613,8 +615,9 @@ function Spells({ npc }) {
                       <OpenBracket />
                       {attributes[spell.attr1].shortcaps}+
                       {attributes[spell.attr2].shortcaps}
+                      <CloseBracket />
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}
-                      <CloseBracket /> <Diamond />
+                      <Diamond />
                     </>
                   )}{" "}
                   {spell.mp} MP <Diamond /> {spell.target} <Diamond />{" "}
@@ -963,8 +966,9 @@ function Equip({ npc }) {
               <OpenBracket />
               {attributes[weapon.att1].shortcaps}+
               {attributes[weapon.att2].shortcaps}
+              <CloseBracket />
               {weapon.prec > 0 && `+${weapon.prec}`}
-              <CloseBracket /> <Diamond /> <OpenBracket />
+              <Diamond /> <OpenBracket />
               {t("HR:")} + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
