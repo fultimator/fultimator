@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
-import { useTranslate } from "../../translation/translate";
+import { languageOptions, useTranslate } from "../../translation/translate";
 
 export interface LanguageMenuProps {
   selectedLanguage: string;
@@ -27,16 +27,6 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
     onSelectLanguage(language);
     handleClose();
   };
-
-  const languageOptions = [
-    { code: "en", label: "English" },
-    { code: "it", label: "Italiano (Italian)" },
-    { code: "es", label: "Español (Spanish)" },
-    { code: "de", label: "German" },
-    { code: "pl", label: "Polish" },
-    { code: "fr", label: "French" },
-    // Continue?
-  ];
 
   return (
     <>
@@ -97,7 +87,7 @@ const getLanguageName = (languageCode: string): string => {
     case "fr":
       return "Française (French)";
     case "bt-BR":
-      return "Português (Brasil)"
+      return "Português (Brasil)";
     default:
       return languageCode;
   }
