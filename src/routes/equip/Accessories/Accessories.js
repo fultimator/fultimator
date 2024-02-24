@@ -3,7 +3,7 @@ import { AutoAwesome } from "@mui/icons-material";
 import { useState } from "react";
 import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
-import SelectQuality from "../common/SelectQuality";
+import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";

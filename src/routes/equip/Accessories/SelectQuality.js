@@ -6,7 +6,7 @@ import {
   Select,
 } from "@mui/material";
 import groupBy from "../../../libs/groupby";
-import qualities from "../Accessories/qualities";
+import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
 
 function SelectQuality({ quality, setQuality }) {
