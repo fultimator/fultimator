@@ -86,7 +86,7 @@ const getLanguageName = (languageCode: string): string => {
       return "Polski (Polish)";
     case "fr":
       return "Française (French)";
-    case "bt-BR":
+    case "pt-BR":
       return "Português (Brasil)";
     default:
       return languageCode;
