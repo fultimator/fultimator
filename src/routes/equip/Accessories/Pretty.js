@@ -33,6 +33,7 @@ function PrettySingle({ accessory, showActions }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+  const white = theme.palette.white.main;
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(accessory.name, ref);
@@ -91,7 +92,7 @@ function PrettySingle({ accessory, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, transparent)`,
+                    background: `linear-gradient(to right, ${ternary}, ${white})`,
                     borderBottom: `1px solid ${secondary}`,
                     padding: "5px",
                   }}
