@@ -23,7 +23,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
     return (
         <>
             {isTop && (
-                <div>
+                <div style={{width: '100%'}}>
                     <Typography
                         variant="h2"
                         component="legend"
@@ -34,6 +34,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             padding: '5px 10px',
                             borderRadius: '8px 8px 0 0',
                             margin: '-15px -15px 0px -15px',
+                            fontSize: '1.5em',
                         }}
                     >
                         <IconButton
@@ -77,6 +78,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             padding: '5px 10px',
                             borderRadius: 0,
                             margin: '-15px -15px 0px -15px',
+                            fontSize: '1.5em',
                         }}
                     >
                         <IconButton

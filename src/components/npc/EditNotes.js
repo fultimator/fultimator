@@ -50,12 +50,12 @@ export default function EditNotes({ npc, setNpc }) {
       {npc.notes?.map((notes, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={1}>
+            <Grid item sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeNotes(i)}>
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item xs={11}>
+            <Grid item xs>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
