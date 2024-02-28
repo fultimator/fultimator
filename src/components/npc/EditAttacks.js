@@ -101,7 +101,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={7}>
+      <Grid item xs={8}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -114,25 +114,21 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={2}>
-        <FormControl variant="standard" fullWidth>
-          <ToggleButtonGroup
-            size="medium"
-            value={attack.range}
-            exclusive
-            onChange={(e, value) => {
-              return setAttack("range", value);
-            }}
-            aria-label="text alignment"
-          >
-            <ToggleButton value="melee" aria-label="left aligned">
-              <MeleeIcon />
-            </ToggleButton>
-            <ToggleButton value="distance" aria-label="right">
-              <DistanceIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </FormControl>
+      <Grid item xs>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="medium"
+                value={attack.extraDamage}
+                onChange={(e, value) => {
+                  return setAttack("extraDamage", e.target.checked);
+                }}
+              />
+            }
+            label={t("Extra Damage")}
+          />
+        </FormGroup>
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
@@ -201,21 +197,25 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={4} lg={3}>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="medium"
-                value={attack.extraDamage}
-                onChange={(e, value) => {
-                  return setAttack("extraDamage", e.target.checked);
-                }}
-              />
-            }
-            label={t("Extra Damage")}
-          />
-        </FormGroup>
+      <Grid item xs={2}>
+        <FormControl variant="standard" fullWidth>
+          <ToggleButtonGroup
+            size="medium"
+            value={attack.range}
+            exclusive
+            onChange={(e, value) => {
+              return setAttack("range", value);
+            }}
+            aria-label="text alignment"
+          >
+            <ToggleButton value="melee" aria-label="left aligned">
+              <MeleeIcon />
+            </ToggleButton>
+            <ToggleButton value="distance" aria-label="right">
+              <DistanceIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </FormControl>
       </Grid>
     </Grid>
   );

@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import { useTheme } from '@mui/system';
+import { Grid } from "@mui/material";
 
 interface CustomHeaderProps {
     addItem: () => void;
@@ -23,7 +24,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
     return (
         <>
             {isTop && (
-                <div style={{width: '100%'}}>
+                <Grid item xs={12} sx={{width:'100%', margin:'15px'}}>
                     <Typography
                         variant="h2"
                         component="legend"
@@ -33,7 +34,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             textTransform: 'uppercase',
                             padding: '5px 10px',
                             borderRadius: '8px 8px 0 0',
-                            margin: '-15px -15px 0px -15px',
+                            margin: '-30px 0 0 -30px',
                             fontSize: '1.5em',
                         }}
                     >
@@ -51,21 +52,21 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             color: secondary,
                             borderBottom: '2px solid',
                             borderColor: secondary,
-                            margin: '0px -15px 15px',
+                            margin: '0 0 0 -30px',
                         }}
                     />
-                </div>
+                </Grid>
             )}
 
             {isMiddle && (
-                <div>
+                <Grid item xs={12} sx={{width:'100%', margin:'15px'}}>
                     <Divider
                         orientation="horizontal"
                         sx={{
                             color: secondary,
                             borderBottom: '2px solid',
                             borderColor: secondary,
-                            margin: '0px -15px 15px',
+                            margin: '0 0 0 -30px',
                         }}
                     />
                     <Typography
@@ -77,7 +78,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             textTransform: 'uppercase',
                             padding: '5px 10px',
                             borderRadius: 0,
-                            margin: '-15px -15px 0px -15px',
+                            margin: '0 0 0 -30px',
                             fontSize: '1.5em',
                         }}
                     >
@@ -95,10 +96,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             color: secondary,
                             borderBottom: '2px solid',
                             borderColor: 'secondary',
-                            margin: '0px -15px 15px',
+                            margin: '0 0 0 -30px',
                         }}
                     />
-                </div>
+                </Grid>
             )}
         </>
     );
