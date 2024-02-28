@@ -29,7 +29,7 @@ import Study from "./Study";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 
-function NpcPretty({ npc, study, collapse, onClick = () => {} }, ref) {
+function NpcPretty({ npc, study, collapse, onClick = () => { } }, ref) {
   const { t } = useTranslate();
   return (
     <Card>
@@ -162,7 +162,11 @@ function Header({ npc }) {
           borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
         }}
       >
-        <Typography>{npc.description}</Typography>
+        <Typography>
+          <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+            {npc.description}
+          </ReactMarkdown>
+        </Typography>
       </Grid>
       <Grid
         item
@@ -443,7 +447,7 @@ function Attacks({ npc }) {
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                   <Diamond /> <OpenBracket />
+                  <Diamond /> <OpenBracket />
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
@@ -465,10 +469,7 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <ReactMarkdown
-                        allowedElements={["strong"]}
-                        unwrapDisallowed={true}
-                      >
+                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {effect}
                       </ReactMarkdown>
                     </Typography>
@@ -477,28 +478,11 @@ function Attacks({ npc }) {
                 {typeof myVar === "string" ||
                   (attack.special instanceof String && (
                     <Typography component="span" key={i}>
-                      <ReactMarkdown
-                        allowedElements={["strong"]}
-                        unwrapDisallowed={true}
-                      >
+                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {attack.special}
                       </ReactMarkdown>
                     </Typography>
                   ))}
-                {/* {attack.special?.map((effect, i) => {
-                  return (
-                    <Typography component="span" key={i}>
-                      {" "}
-                      -{" "}
-                      <ReactMarkdown
-                        allowedElements={["strong"]}
-                        unwrapDisallowed={true}
-                      >
-                        {effect}
-                      </ReactMarkdown>
-                    </Typography>
-                  );
-                })} */}
               </Typography>
             </Grid>
           </Fragment>
@@ -529,7 +513,7 @@ function Attacks({ npc }) {
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}
-                   <Diamond /> <OpenBracket />
+                  <Diamond /> <OpenBracket />
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
@@ -551,10 +535,7 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <ReactMarkdown
-                        allowedElements={["strong"]}
-                        unwrapDisallowed={true}
-                      >
+                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {effect}
                       </ReactMarkdown>{" "}
                     </Typography>
@@ -625,10 +606,7 @@ function Spells({ npc }) {
                 </strong>
                 <br />
                 <Typography component="span" key={i}>
-                  <ReactMarkdown
-                    allowedElements={["strong"]}
-                    unwrapDisallowed={true}
-                  >
+                  <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                     {spell.effect}
                   </ReactMarkdown>{" "}
                 </Typography>
@@ -709,10 +687,7 @@ function Special({ npc }) {
             <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
               <Typography>
                 <strong>{special.name}</strong> <Diamond />{" "}
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
-                >
+                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {special.effect}
                 </ReactMarkdown>
               </Typography>
@@ -772,10 +747,7 @@ function Actions({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{actions.name}</strong> <Diamond />{" "}
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
-                >
+                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {actions.effect}
                 </ReactMarkdown>
               </Typography>
@@ -835,10 +807,7 @@ function Notes({ npc }) {
             <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
               <Typography>
                 <strong>{notes.name}</strong> <Diamond />{" "}
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
-                >
+                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {notes.effect}
                 </ReactMarkdown>
               </Typography>
@@ -898,10 +867,7 @@ function RareGear({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{raregear.name}</strong> <Diamond />{" "}
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
-                >
+                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {raregear.effect}
                 </ReactMarkdown>
               </Typography>

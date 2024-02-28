@@ -1,18 +1,26 @@
 import { FormControl, Grid, TextField } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-
+import CustomTextarea from "../../../components/common/CustomTextarea"
 function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1}>
       <Grid item xs={8}>
         <FormControl variant="standard" fullWidth>
-          <TextField
+          {/* <TextField
             id="quality"
             label={t("Quality")}
             value={quality}
             onChange={setQuality}
-          ></TextField>
+          ></TextField> */}
+
+          <CustomTextarea
+            id="effect"
+            label={t("Quality:")}
+            value={quality}
+            onChange={setQuality}
+          />
+
         </FormControl>
       </Grid>
       <Grid item xs={4}>

@@ -10,6 +10,7 @@ import {
   IconButton,
 } from "@mui/material";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
+import ReactMarkdown from "react-markdown";
 import { Download } from "@mui/icons-material";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
@@ -154,7 +155,10 @@ function PrettySingle({ armor, showActions }) {
                   }}
                 >
                   <Typography>
-                    {!armor.quality && t("No Qualities")} {armor.quality}
+                    {!armor.quality && t("No Qualities")}{" "}
+                    <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      {armor.quality}
+                    </ReactMarkdown>
                   </Typography>
                 </Grid>
               </Grid>

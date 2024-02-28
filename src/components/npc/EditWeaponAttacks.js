@@ -1,4 +1,4 @@
-import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutline } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -7,25 +7,21 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
   Divider,
   FormGroup,
   FormControlLabel,
   Checkbox,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import { useState } from "react";
 import attributes from "../../libs/attributes";
 import { baseWeapons } from "../../libs/equip";
 import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
+import CustomTextarea from '../common/CustomTextarea';
+import CustomHeader from '../common/CustomHeader';
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -63,31 +59,25 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 
   return (
     <>
-      <Typography fontFamily="Antonio" fontSize="1.3rem">
-        {t("Attacks with Weapons")}
-        <IconButton onClick={addAttack}>
-          <AddCircleOutline />
-        </IconButton>
-      </Typography>
-
+      <CustomHeader type="middle" addItem={addAttack} headerText={t("Attacks with Weapons")} />
       {npc.weaponattacks?.map((attack, i) => {
         return (
-          <Grid container key={i} spacing={isSmallScreen ? 0 : 1}>
-            <Grid item xs={isSmallScreen ? 12 : isMediumScreen ? 10 : 5}>
+          <Grid container key={i} spacing={1}>
+            <Grid item xs={12} md={6}>
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
                 removeAttack={removeAttack(i)}
               />
             </Grid>
-            <Grid item xs={12} md={7}>
+            <Grid item xs={12} md={6}>
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.weaponattacks.length - 1 && (
-              <Grid item xs={12} sx={{ py: isSmallScreen ? 1 : 2 }}>
+              <Grid item xs={12}>
                 <Divider />
               </Grid>
             )}
@@ -102,12 +92,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item sx={{ mx: -1 }}>
+      <Grid item sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={11}>
+      <Grid item xs={8}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -120,46 +110,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <SelectWeapon
-          weapon={attack.weapon}
-          setWeapon={(value) => {
-            return setAttack("weapon", value);
-          }}
-          size="small"
-        />
-      </Grid>
-      <Grid item xs={3} sm={3}>
-        <FormControl variant="standard">
-          <TextField
-            id="flathit"
-            type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label={t("Acc.")}
-            value={attack.flathit || 0}
-            onChange={(e) => {
-              return setAttack("flathit", e.target.value);
-            }}
-            size="small"
-          ></TextField>
-        </FormControl>
-      </Grid>
-      <Grid item xs={3} sm={3}>
-        <FormControl variant="standard">
-          <TextField
-            id="flatdmg"
-            type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-            label={t("Dmg.")}
-            value={attack.flatdmg || 0}
-            onChange={(e) => {
-              return setAttack("flatdmg", e.target.value);
-            }}
-            size="small"
-          ></TextField>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4} lg={2}>
+      <Grid item xs>
         <FormGroup>
           <FormControlLabel
             control={
@@ -174,6 +125,45 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             label={t("Extra Damage")}
           />
         </FormGroup>
+      </Grid>
+      <Grid item xs={6}>
+        <SelectWeapon
+          weapon={attack.weapon}
+          setWeapon={(value) => {
+            return setAttack("weapon", value);
+          }}
+          size="small"
+        />
+      </Grid>
+      <Grid item xs={3}>
+        <FormControl variant="standard">
+          <TextField
+            id="flathit"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label={t("Acc.")}
+            value={attack.flathit || 0}
+            onChange={(e) => {
+              return setAttack("flathit", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
+      </Grid>
+      <Grid item xs={3}>
+        <FormControl variant="standard">
+          <TextField
+            id="flatdmg"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label={t("Dmg.")}
+            value={attack.flatdmg || 0}
+            onChange={(e) => {
+              return setAttack("flatdmg", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
       </Grid>
     </Grid>
   );
@@ -198,14 +188,22 @@ function EditAttackSpecial({ attack, setAttack }) {
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
       <Grid item xs={12}>
         <FormControl variant="standard" fullWidth>
-          <TextField
+          {/* <TextField
             id="special"
             label={t("Special:")}
             value={specials}
             onChange={onChange}
             size="small"
             helperText={t("Adding a special effect cost 1 skill point")}
-          ></TextField>
+          ></TextField> */}
+
+          <CustomTextarea
+            id="special"
+            label={t("Special:")}
+            value={specials}
+            onChange={onChange}
+            helperText={t("Adding a special effect cost 1 skill point")}
+          />
         </FormControl>
       </Grid>
     </Grid>

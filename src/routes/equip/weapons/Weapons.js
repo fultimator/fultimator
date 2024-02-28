@@ -1,4 +1,4 @@
-import { Grid, Typography, Paper, useTheme } from "@mui/material";
+import { Grid, Paper, useTheme } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState } from "react";
 import weapons from "./base";
@@ -13,13 +13,12 @@ import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
+import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
 
 function Weapons() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
+  const secondary = theme.palette.secondary.main;
   const [base, setBase] = useState(weapons[0]);
   const [name, setName] = useState(weapons[0].name);
   const [type, setType] = useState(weapons[0].type);
@@ -102,31 +101,15 @@ function Weapons() {
         <Paper
           elevation={3}
           sx={{
-            padding: 2,
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
+            p: "14px",
             borderRadius: "8px",
             border: "2px solid",
-            borderColor: `${ternary}`
+            borderColor: secondary,
           }}
         >
-          <Typography
-            variant="h4"
-            sx={{
-              px: 3,
-              py: 1,
-              mx: -2,
-              mt: -2,
-              color: "#ffffff",
-              background: `linear-gradient(to right, ${primary}, ${quaternary})`,
-              borderRadius: "8px 8px 0 0",
-            }}
-          >
-            <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
-            {t("Rare Weapons")}
-        </Typography>
-          <Grid container sx={{mt: 0 }} spacing={2} alignItems="center">
+          {/* Header */}
+          <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
+          <Grid container sx={{ mt: 0 }} spacing={2} alignItems="center">
             {/* Change Base */}
             <Grid item xs={6}>
               <ChangeBase
@@ -185,6 +168,7 @@ function Weapons() {
                 setAtt2={(e) => setAtt2(e.target.value)}
               />
             </Grid>
+            {/* Change Quality */}
             <Grid item xs={7}>
               <SelectQuality
                 quality={selectedQuality}

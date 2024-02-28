@@ -14,11 +14,11 @@ import {
   TextField,
   IconButton,
   Paper,
-  Typography,
   Select,
   MenuItem,
   FormHelperText,
   useTheme,
+  useMediaQuery 
 } from "@mui/material";
 import {
   Download,
@@ -33,7 +33,6 @@ import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import EditBasics from "../../components/npc/EditBasics";
 import ExplainSkills from "../../components/npc/ExplainSkills";
-import ExplainSkillsSimplified from "../../components/npc/ExplainSkillsSimplified";
 import EditAttacks from "../../components/npc/EditAttacks";
 import EditWeaponAttacks from "../../components/npc/EditWeaponAttacks";
 import EditAffinities from "../../components/npc/EditAffinities";
@@ -48,14 +47,13 @@ import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
+import CustomHeader from '../../components/common/CustomHeader';
 
 export default function NpcEdit() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
+  const isSmallScreen = useMediaQuery('(max-width: 899px)');
   let params = useParams();
   const ref = doc(firestore, "npc-personal", params.npcId);
 
@@ -294,8 +292,8 @@ export default function NpcEdit() {
                     npcTemp.published
                       ? t("This NPC is part of the Adversary Compedium.")
                       : t(
-                          "Help the Adversary Compedium grow by publishing your finished work!"
-                        )
+                        "Help the Adversary Compedium grow by publishing your finished work!"
+                      )
                   }
                   fullWidth
                   value={npcTemp.createdBy}
@@ -373,22 +371,6 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
-              variant="h5"
-              component="legend"
-              sx={{ color: primary, textTransform: "uppercase" }}
-            >
-              {t("Basic Information")}
-            </Typography>
-            <Divider
-              orientation="horizontal"
-              sx={{
-                color: primary,
-                borderBottom: "2px solid",
-                borderColor: "secondary",
-                mb: "10px",
-              }}
-            />
             <EditBasics npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
@@ -405,33 +387,13 @@ export default function NpcEdit() {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <Typography
-                variant="h5"
-                component="legend"
-                sx={{ color: primary, textTransform: "uppercase" }}
-                >
-                  {t("Affinity")}
-                </Typography>
-                <Divider
-                  orientation="horizontal"
-                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
-                />
+                <CustomHeader type="top" headerText={t("Affinity")} />
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
 
               <Grid item xs={12} md={6}>
-                <Typography
-                  variant="h5"
-                  component="legend"
-                  sx={{ color: primary, textTransform: "uppercase" }}
-                  >
-                    {t("Bonuses")}
-                </Typography>
-                <Divider
-                  orientation="horizontal"
-                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
-                />
+                <CustomHeader type={isSmallScreen ? 'middle' : 'top'} headerText={t("Bonuses")} />
                 <EditExtra npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
@@ -451,31 +413,9 @@ export default function NpcEdit() {
 
             <Grid container>
               <Grid item xs={12}>
-                <Typography
-                variant="h5"
-                component="legend"
-                sx={{ color: primary, textTransform: "uppercase" }}
-                >
-                {t("Basic Attacks")}
-                </Typography>
-                <Divider
-                  orientation="horizontal"
-                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
-                />
                 <EditAttacks npc={npcTemp} setNpc={updateNPC} />
               </Grid>
               <Grid item xs={12}>
-                <Typography
-                  variant="h5"
-                  component="legend"
-                  sx={{ color: primary, textTransform: "uppercase" }}
-                >
-                {t("Attacks with Weapons")}
-                </Typography>
-                <Divider
-                  orientation="horizontal"
-                  sx={{ color: primary, borderBottom: "2px solid", borderColor: "secondary", mb: "10px" }}
-                />
                 <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
@@ -492,22 +432,6 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
-              variant="h5"
-              component="legend"
-              sx={{ color: primary, textTransform: "uppercase" }}
-            >
-              {t("Spells")}
-            </Typography>
-            <Divider
-              orientation="horizontal"
-              sx={{
-                color: primary,
-                borderBottom: "2px solid",
-                borderColor: "secondary",
-                mb: "10px",
-              }}
-            />
             <EditSpells npc={npcTemp} setNpc={updateNPC} />
           </Paper>
 
@@ -522,7 +446,7 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
+            {/* <Typography
               variant="h5"
               component="legend"
               sx={{ color: primary, textTransform: "uppercase" }}
@@ -537,8 +461,8 @@ export default function NpcEdit() {
                 borderColor: "secondary",
                 mb: "10px",
               }}
-            />
-            <Grid container>
+            /> */}
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <EditActions npc={npcTemp} setNpc={updateNPC} />
               </Grid>
@@ -565,22 +489,6 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <Typography
-              variant="h5"
-              component="legend"
-              sx={{ color: primary, textTransform: "uppercase" }}
-            >
-              {t("Attacks Chance Generator")}
-            </Typography>
-            <Divider
-              orientation="horizontal"
-              sx={{
-                color: primary,
-                borderBottom: "2px solid",
-                borderColor: "secondary",
-                mb: "10px",
-              }}
-            />
             <Probs />
           </Paper>
 
@@ -591,7 +499,7 @@ export default function NpcEdit() {
       {/* <NpcUgly npc={npcTemp} /> */}
 
       {/* SP Tracker Field */}
-      <Grid
+      {/* <Grid
         sx={{
           position: "fixed",
           top: 120,
@@ -601,10 +509,10 @@ export default function NpcEdit() {
           alignItems: "flex-start",
           zIndex: 10,
         }}
-      >
+      > */}
         {/* SP Tracker Field */}
-        <ExplainSkillsSimplified npc={npcTemp} />
-      </Grid>
+        {/* <ExplainSkillsSimplified npc={npcTemp} />
+      </Grid> */}
 
       {isUpdated && (
         <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
