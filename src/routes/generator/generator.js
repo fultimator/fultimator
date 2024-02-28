@@ -591,7 +591,8 @@ function QualitiesGenerator() {
   const [selectedAttributes, setSelectedAttributes] = useState("All");
   const [selectedStatuses, setSelectedStatues] = useState("All");
   const [generate, setGenerate] = useState(0);
-
+  const [currentGeneratedText, setCurrentGeneratedText] = useState('');
+  
   const generatePrefixes = () => {
     const prefixes = [];
     randomQualities.forEach((item) => {
@@ -691,6 +692,12 @@ function QualitiesGenerator() {
 
   const getRandomSuffix = () => {
     return suffixes[Math.floor(Math.random() * suffixes.length)];
+  };
+
+  const generateRandomValues = () => {
+    const prefix = getRandomPrefix();
+    const suffix = getRandomSuffix();
+    setCurrentGeneratedText(`${prefix}, ${suffix}`);
   };
 
   return (
@@ -816,21 +823,24 @@ function QualitiesGenerator() {
             }}
           >
             {" "}
-            {`${getRandomPrefix()}, ${getRandomSuffix()}`}
+            {currentGeneratedText}
           </Typography>
           <Button
             variant="contained"
             startIcon={<RestartAltOutlined />}
             onClick={() => {
               setGenerate(generate + 1);
+              generateRandomValues(); 
             }}
             sx={{
               minWidth: 100,
               fontWeight: "bold",
+              mr: 1,
             }}
           >
             Generate
           </Button>
+          <CopyToClipboard textToCopy={currentGeneratedText} />
         </Paper>
         <Typography sx={{ fontSize: 14, marginLeft: 1 }}>
           Warning: Some effects are imbalanced, use with caution!
