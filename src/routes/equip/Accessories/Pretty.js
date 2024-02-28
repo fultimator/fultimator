@@ -63,7 +63,7 @@ function PrettySingle({ accessory, showActions }) {
               <Grid item xs={1}></Grid>
               <Grid item xs={6}>
                 <Typography variant="h4" textAlign="left">
-                  {t("Accessories")}
+                  {t("Accessory")}
                 </Typography>
               </Grid>
               <Grid item xs={2}>

@@ -134,9 +134,7 @@ function PrettySingle({ armor, showActions }) {
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       {armor.category === "Shield" ? "+" + armor.mdef : ""}
-                      {armor.category === "Armor" && armor.martial
-                        ? armor.def
-                        : ""}
+
                       {armor.category === "Armor"
                         ? armor.mdef === 0
                           ? "INS die"
