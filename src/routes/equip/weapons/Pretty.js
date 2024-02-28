@@ -45,6 +45,7 @@ function PrettySingle({ weapon, showActions }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+  const white = theme.palette.white.main;
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(weapon.name, ref);
@@ -113,7 +114,7 @@ function PrettySingle({ weapon, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, transparent)`,
+                    background: `linear-gradient(to right, ${ternary}, ${white})`,
                     borderBottom: `1px solid ${secondary}`,
                     padding: "5px",
                   }}
