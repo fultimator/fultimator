@@ -3,6 +3,7 @@ import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/system';
+import { Grid } from "@mui/material";
 
 interface CustomHeaderAltProps {
     headerText: string;
@@ -17,7 +18,7 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({ headerText, icon }) =
 
     return (
         <>
-            <div>
+            <Grid item xs={12} sx={{width:'100%', margin:'15px'}}>
                 <Typography
                     variant="h1"
                     component="legend"
@@ -27,9 +28,10 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({ headerText, icon }) =
                         textTransform: 'uppercase',
                         padding: '2px',
                         borderRadius: '8px 8px 0 0',
-                        margin: '-15px -15px 0px -15px',
+                        margin: '-30px 0 0 -30px',
                         display: 'flex',
                         alignItems: 'center',
+                        
                     }}
                 >
                     <IconButton sx={{ px: 1, color: white }}>
@@ -43,10 +45,10 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({ headerText, icon }) =
                         color: secondary,
                         borderBottom: '2px solid',
                         borderColor: secondary,
-                        margin: '0px -15px 5px',
+                        margin: '0 0 0 -30px',
                     }}
                 />
-            </div>
+            </Grid>
         </>
     );
 };
