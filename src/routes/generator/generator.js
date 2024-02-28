@@ -26,6 +26,7 @@ import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
 import { useTranslate } from "../../translation/translate";
+import CopyToClipboard from '../../components/common/CopyToClipboard';
 
 const powerPMs = {
   minor: 20,
