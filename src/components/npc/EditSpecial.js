@@ -77,6 +77,19 @@ export default function EditSpecial({ npc, setNpc }) {
             <Grid item xs={12} lg={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
+                  id="spCost"
+                  label={t("SP Cost:")}
+                  type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  value={special?.spCost ?? 1}
+                  onChange={(e) => onChangeSpecial(i, "spCost", e.target.value)}
+                  size="small"
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="standard" fullWidth>
+              <TextField
                   id="effect"
                   label={t("Effect:")}
                   value={special.effect}
