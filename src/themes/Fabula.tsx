@@ -1,4 +1,4 @@
-import {createTheme} from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import ExtendedTheme from "./../types/Theme";
 
 const Fabula = createTheme({
@@ -37,7 +37,7 @@ const Fabula = createTheme({
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     body1: {
-      lineHeight: 1.618,
+      lineHeight: 1.45,
     },
     h1: {
       fontFamily: ["Antonio", "sans-serif"].join(","),
