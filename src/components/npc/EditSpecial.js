@@ -52,12 +52,12 @@ export default function EditSpecial({ npc, setNpc }) {
       {npc.special?.map((special, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={1}>
+            <Grid item sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeSpecial(i)}>
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"

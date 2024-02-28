@@ -84,7 +84,8 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 
   const textareaStyle: React.CSSProperties = {
     width: '100%',
-    padding: '10px 14px',
+    padding: '14px',
+    fontSize: '1rem',
     fontFamily: 'inherit',
     borderRadius: '4px',
     border: isFocused ? 'none' : '1px solid #c4c4c4',
@@ -96,7 +97,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const labelStyle: React.CSSProperties = {
     position: 'absolute',
     padding: '0 2px',
-    top: isFocused || value ? '-8px' : '8px',
+    top: isFocused || value ? '-8px' : '12px',
     background: 'white',
     left: '14px',
     transition: 'top 0.2s ease, font-size 0.2s ease',

@@ -101,7 +101,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={8}>
+      <Grid item xs={7}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
