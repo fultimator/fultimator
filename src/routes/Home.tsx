@@ -1,4 +1,4 @@
-import { CardMedia, Typography, Paper, Grid } from "@mui/material";
+import { CardMedia, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import Layout from "../components/Layout";
@@ -10,27 +10,7 @@ import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
 import React, { useState } from "react";
 
-import sublogo200 from "./../components/sublogo_200.webp";
-import sublogo834 from "./../components/sublogo_834.webp";
-import sublogo1400 from "./../components/sublogo_1400.webp";
 import { useTranslate } from "../translation/translate";
-
-const SubLogo = ({ src, alt }) => (
-  <Grid container justifyContent="center" alignItems="center">
-    <Grid item xs={12} md={6}>
-      <Paper elevation={3} sx={{ borderRadius: "16px", textAlign: "center" }}>
-        <Typography variant="subtitle1" sx={{ p: 0, m: 0, display: 'flex', flexDirection: 'column'}}>
-          <img
-            style={{ width: "100%", height: "auto", maxWidth: "400px", margin: "auto" }}
-            sizes="(max-width: 1400px) 100vw, 1400px"
-            srcSet={src}
-            alt={alt}
-          />
-        </Typography>
-      </Paper>
-    </Grid>
-  </Grid>
-);
 
 function Home() {
   const navigate = useNavigate();
@@ -38,10 +18,6 @@ function Home() {
   const { t } = useTranslate();
   return (
     <Layout>
-      {/* <SubLogo
-        src={`${sublogo200} 200w, ${sublogo834} 929w, ${sublogo1400} 1400w`}
-        alt="Unofficial Fabula Ultima Tool"
-      /> */}
       <div
         style={{
           display: "flex",

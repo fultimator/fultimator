@@ -55,7 +55,8 @@ export interface NpcAction {
 
 export interface NpcSpecial {
     name: string,
-    effect: string
+    effect: string,
+    spCost: number
 }
 
 export interface NpcRareGear {

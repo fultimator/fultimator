@@ -1,4 +1,4 @@
-import { Grid, Typography, Paper, useTheme } from "@mui/material";
+import { Grid, Paper, useTheme } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState } from "react";
 import Pretty from "./Pretty";
@@ -7,13 +7,12 @@ import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
+import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
 
 function Accessories() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
+  const secondary = theme.palette.secondary.main;
 
   const [name, setName] = useState("");
   const [quality, setQuality] = useState("");
@@ -30,34 +29,18 @@ function Accessories() {
     <Grid container spacing={2}>
       {/* Form */}
       <Grid item xs={12} sm={6}>
-      <Paper
-        elevation={3}
-        sx={{
-          padding: 2,
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1,
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: `${ternary}`
-        }}
-        >
-        <Typography
-          variant="h4"
+        <Paper
+          elevation={3}
           sx={{
-            px: 3,
-            py: 1,
-            mx: -2,
-            mt: -2,
-            color: "#ffffff",
-            background: `linear-gradient(to right, ${primary}, ${quaternary})`,
-            borderRadius: "8px 8px 0 0",
+            p: "14px",
+            borderRadius: "8px",
+            border: "2px solid",
+            borderColor: secondary,
           }}
         >
-          <AutoAwesome sx={{ fontSize: 36, marginRight: 1 }} />
-          {t("Accessories")}
-        </Typography>
-          <Grid container sx={{mt: 0 }} spacing={2} alignItems="center">
+          {/* Header */}
+          <CustomHeaderAlt headerText={t("Accessories")} icon={<AutoAwesome fontSize="large" />} />
+          <Grid container sx={{ mt: 0 }} spacing={2} alignItems="center">
             <Grid item xs={6}>
               <ChangeName
                 value={name}

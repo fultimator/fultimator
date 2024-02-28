@@ -461,7 +461,14 @@ export function calcUsedSkillsFromAbsorbs(npc) {
 }
 
 export function calcUsedSkillsFromSpecial(npc) {
-  return npc.special?.length || 0;
+  let sum = 0;
+
+  npc.special?.forEach((specialItem) => {
+    const spCost = specialItem.spCost ?? 1;
+    sum += parseFloat(spCost);
+  });
+
+  return sum;
 }
 
 export function calcUsedSkillsFromSpells(npc) {

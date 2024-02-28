@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
+import CustomHeader from '../../components/common/CustomHeader';
 
 function calcHit(firstResult, secondResult, bonus, dl) {
   // Calculate Critical Failure
@@ -108,7 +109,11 @@ export default function Probs() {
 
   return (
     <div>
-      <Grid sx={{ mt: 1 }} container spacing={2}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <CustomHeader type="top" headerText={t("Affinity")} />
+        </Grid>
+
         {/* First die */}
         <Grid item xs={6} sm={4} lg={2}>
           <FormControl variant="outlined" fullWidth>

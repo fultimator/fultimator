@@ -29,18 +29,19 @@ import {
   Select,
   MenuItem,
   Button,
+  useTheme
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
-  AddCircle,
   ContentCopy,
   Delete,
   Share,
   Download,
   Edit,
+  HistoryEdu
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -72,6 +73,10 @@ export default function NpcGallery() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [sort, setSort] = useState("name");
@@ -169,43 +174,43 @@ function Personal({ user }) {
 
   const filteredList = personalList
     ? personalList
-        .filter((item) => {
-          if (
-            name !== "" &&
-            !item.name.toLowerCase().includes(name.toLocaleLowerCase())
-          )
-            return false;
+      .filter((item) => {
+        if (
+          name !== "" &&
+          !item.name.toLowerCase().includes(name.toLocaleLowerCase())
+        )
+          return false;
 
-          if (species && item.species !== species) return false;
+        if (species && item.species !== species) return false;
 
-          if (rank && item.rank !== rank) return false;
-          return true;
-        })
-        .sort((item1, item2) => {
-          if (direction === "accending") {
-            if (sort === "name") {
-              return item1.name - item2.name;
-            } else if (sort === "level") {
-              return item1.lvl - item2.lvl;
-            } else if (sort === "publishedAt") {
-              return (
-                (item1.publishedAt ? item1.publishedAt : 0) -
-                (item2.publishedAt ? item2.publishedAt : 0)
-              );
-            }
-          } else {
-            if (sort === "name") {
-              return item2.name - item1.name;
-            } else if (sort === "level") {
-              return item2.lvl - item1.lvl;
-            } else if (sort === "publishedAt") {
-              return (
-                (item2.publishedAt ? item2.publishedAt : 0) -
-                (item1.publishedAt ? item1.publishedAt : 0)
-              );
-            }
+        if (rank && item.rank !== rank) return false;
+        return true;
+      })
+      .sort((item1, item2) => {
+        if (direction === "accending") {
+          if (sort === "name") {
+            return item1.name - item2.name;
+          } else if (sort === "level") {
+            return item1.lvl - item2.lvl;
+          } else if (sort === "publishedAt") {
+            return (
+              (item1.publishedAt ? item1.publishedAt : 0) -
+              (item2.publishedAt ? item2.publishedAt : 0)
+            );
           }
-        })
+        } else {
+          if (sort === "name") {
+            return item2.name - item1.name;
+          } else if (sort === "level") {
+            return item2.lvl - item1.lvl;
+          } else if (sort === "publishedAt") {
+            return (
+              (item2.publishedAt ? item2.publishedAt : 0) -
+              (item1.publishedAt ? item1.publishedAt : 0)
+            );
+          }
+        }
+      })
     : [];
 
   return (
@@ -220,13 +225,24 @@ function Personal({ user }) {
               alignItems="center"
               sx={{ display: "flex" }}
             >
-              <Typography variant="h4">
-                {t("NPCs")}
+              <Typography
+                variant="h1"
+                component="legend"
+                sx={{
+                  color: primary,
+                  textTransform: 'uppercase',
+                  borderRadius: 0,
+                }}
+              >
                 <Tooltip title={t("Create NPC")}>
-                  <IconButton onClick={addNpc}>
-                    <AddCircle />
+                  <IconButton
+                    sx={{ px: 1, '&:hover': { color: primary } }}
+                    onClick={addNpc}
+                  >
+                    <HistoryEdu fontSize="large" />
                   </IconButton>
                 </Tooltip>
+                {t("NPCs")}
               </Typography>
             </Grid>
 

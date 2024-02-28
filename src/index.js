@@ -14,7 +14,6 @@ import NpcCompedium from "./routes/npc-compedium/npc-compedium";
 import NpcEdit from "./routes/npc-edit/npc-edit";
 import Roller from "./routes/roller/roller";
 import RollerScoped from "./routes/roller/roller-scoped";
-import Probs from "./routes/probs/probs";
 import Combat from "./routes/combat/combat";
 import Fabula from "./themes/Fabula";
 import High from "./themes/High";

@@ -127,9 +127,8 @@ function PrettySingle({ weapon, showActions }) {
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
-                      {`${attributes[weapon.att1].shortcaps} + ${
-                        attributes[weapon.att2].shortcaps
-                      }`}
+                      {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
+                        }`}
                       <CloseBracket />
                       {weapon.prec !== 0 ? `+${weapon.prec}` : ""}
                     </Typography>
@@ -188,10 +187,7 @@ function PrettySingle({ weapon, showActions }) {
               }}
             >
               {!weapon.quality && t("No Qualities")}{" "}
-              <ReactMarkdown
-                allowedElements={["strong"]}
-                unwrapDisallowed={true}
-              >
+              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                 {weapon.quality}
               </ReactMarkdown>
             </Typography>

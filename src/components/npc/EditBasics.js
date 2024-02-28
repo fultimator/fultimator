@@ -16,6 +16,8 @@ import {
 import { EditAttributes } from "./EditAttributes";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../translation/translate";
+import CustomTextarea from '../common/CustomTextarea';
+import CustomHeader from '../common/CustomHeader';
 
 export default function EditBasics({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -70,6 +72,9 @@ export default function EditBasics({ npc, setNpc }) {
 
   return (
     <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <CustomHeader type="top" headerText={t("Basic Information")} />
+      </Grid>
       <Grid item xs={12} sm={4}>
         <FormControl variant="standard" fullWidth>
           <TextField
@@ -90,10 +95,10 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={4} sm={3}>
+      <Grid item xs={4}>
         <EditLevel npc={npc} setnpc={setNpc} />
       </Grid>
-      <Grid item xs={4} sm={3}>
+      <Grid item xs={4}>
         <FormControl fullWidth>
           <InputLabel id="species">{t("Species:")}</InputLabel>
           <Select
@@ -114,7 +119,7 @@ export default function EditBasics({ npc, setNpc }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={4} sm={3}>
+      <Grid item xs={4}>
         <Stack spacing={1}>
           <FormControl fullWidth>
             <InputLabel id="rank">{t("Rank:")}</InputLabel>
@@ -138,25 +143,8 @@ export default function EditBasics({ npc, setNpc }) {
       </Grid>
 
       {/* Villain & Phase Section*/}
-      <Grid item xs={4} sm={3}>
-        <FormControl fullWidth>
-          <InputLabel id="villain">{t("Villain:")}</InputLabel>
-          <Select
-            labelId="villain"
-            id="select-villain"
-            value={npc.villain}
-            label={t("Villain:")}
-            onChange={onChange("villain")}
-          >
-            <MenuItem value={""}>{t("None")}</MenuItem>
-            <MenuItem value={"minor"}>{t("minor_villain")}</MenuItem>
-            <MenuItem value={"major"}>{t("major_villain")}</MenuItem>
-            <MenuItem value={"supreme"}>{t("Supreme")}</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
 
-      <Grid item xs={3} sm={3}>
+      <Grid item xs={4}>
         <FormControl fullWidth>
           <TextField
             labelId="phases"
@@ -169,8 +157,28 @@ export default function EditBasics({ npc, setNpc }) {
         </FormControl>
       </Grid>
 
+      {npc.rank !== "companion" && (
+        <Grid item xs={8}>
+          <FormControl fullWidth>
+            <InputLabel id="villain">{t("Villain:")}</InputLabel>
+            <Select
+              labelId="villain"
+              id="select-villain"
+              value={npc.villain}
+              label={t("Villain:")}
+              onChange={onChange("villain")}
+            >
+              <MenuItem value={""}>{t("None")}</MenuItem>
+              <MenuItem value={"minor"}>{t("minor_villain")}</MenuItem>
+              <MenuItem value={"major"}>{t("major_villain")}</MenuItem>
+              <MenuItem value={"supreme"}>{t("Supreme")}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
+
       {npc.rank === "companion" && (
-        <Grid item xs={2} sm={2}>
+        <Grid item xs={4}>
           <FormControl fullWidth>
             <InputLabel id="companionlvl">SL</InputLabel>
             <Select
@@ -191,7 +199,7 @@ export default function EditBasics({ npc, setNpc }) {
       )}
 
       {npc.rank === "companion" && (
-        <Grid item xs={3} sm={2}>
+        <Grid item xs={4}>
           <FormControl fullWidth>
             <TextField
               labelId="companionpclvl"
@@ -205,7 +213,7 @@ export default function EditBasics({ npc, setNpc }) {
         </Grid>
       )}
 
-      <Grid item xs={12} sm={5} md>
+      <Grid item xs={12}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
@@ -215,8 +223,8 @@ export default function EditBasics({ npc, setNpc }) {
             helperText={
               npc.multipart
                 ? t(
-                    "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
-                  )
+                  "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                )
                 : ""
             }
           ></TextField>
@@ -225,12 +233,19 @@ export default function EditBasics({ npc, setNpc }) {
 
       <Grid item xs={12}>
         <FormControl variant="standard" fullWidth>
-          <TextField
+          {/* <TextField
             id="Description"
             label={t("Description:")}
             value={npc.description}
             onChange={onChange("description")}
-          ></TextField>
+          ></TextField> */}
+
+          <CustomTextarea
+            id="Description"
+            label={t("Description:")}
+            value={npc.description}
+            onChange={onChange("description")}
+          />
         </FormControl>
       </Grid>
 

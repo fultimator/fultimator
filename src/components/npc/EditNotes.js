@@ -1,13 +1,14 @@
-import { AddCircleOutline, RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutline } from "@mui/icons-material";
 
 import {
   Grid,
   FormControl,
   IconButton,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
+import CustomTextarea from '../common/CustomTextarea';
+import CustomHeader from '../common/CustomHeader';
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -45,22 +46,16 @@ export default function EditNotes({ npc, setNpc }) {
 
   return (
     <>
-      <Typography fontFamily="Antonio" fontSize="1.3rem" sx={{ mb: 1 }}>
-        {t("Notes")}
-        <IconButton onClick={addNotes}>
-          <AddCircleOutline />
-        </IconButton>
-      </Typography>
-
+      <CustomHeader type="middle" addItem={addNotes} headerText={t("Notes")} />
       {npc.notes?.map((notes, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item>
+            <Grid item xs={1}>
               <IconButton onClick={removeNotes(i)}>
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item xs={10} lg={4}>
+            <Grid item xs={11}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -70,13 +65,12 @@ export default function EditNotes({ npc, setNpc }) {
                     return onChangeNotes(i, "name", e.target.value);
                   }}
                   size="small"
-                  sx={{ mb: 2 }}
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12} lg={6}>
+            <Grid item xs={12}>
               <FormControl variant="standard" fullWidth>
-                <TextField
+                {/* <TextField
                   id="effect"
                   label={t("Details:")}
                   value={notes.effect}
@@ -85,7 +79,15 @@ export default function EditNotes({ npc, setNpc }) {
                   }}
                   size="small"
                   sx={{ mb: 2 }}
-                ></TextField>
+                ></TextField> */}
+
+                <CustomTextarea
+                  label={t("Details:")}
+                  value={notes.effect}
+                  onChange={(e) => {
+                    return onChangeNotes(i, "effect", e.target.value);
+                  }}
+                />
               </FormControl>
             </Grid>
           </Grid>

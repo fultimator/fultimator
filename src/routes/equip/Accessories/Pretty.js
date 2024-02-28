@@ -10,7 +10,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
-
+import ReactMarkdown from "react-markdown";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
@@ -115,7 +115,9 @@ function PrettySingle({ accessory, showActions }) {
                 >
                   <Typography>
                     {!accessory.quality && t("No Qualities")}{" "}
-                    {accessory.quality}
+                    <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      {accessory.quality}
+                    </ReactMarkdown>
                   </Typography>
                 </Grid>
               </Grid>

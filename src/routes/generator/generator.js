@@ -17,15 +17,17 @@ import {
   useTheme,
   ThemeProvider,
 } from "@mui/material";
-
-import { RestartAltOutlined, Spa } from "@mui/icons-material";
-import { useState, useMemo } from "react";
+import { AutoAwesome, Spa } from '@mui/icons-material'
+import { RestartAltOutlined } from "@mui/icons-material";
+import { useState, useMemo, useEffect } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
 import { useTranslate } from "../../translation/translate";
+import CustomHeaderAlt from '../../components/common/CustomHeaderAlt';
+import CopyToClipboard from '../../components/common/CopyToClipboard';
 
 const powerPMs = {
   minor: 20,
@@ -78,7 +80,7 @@ function RitualsProjects() {
   const theme = useTheme();
   return (
     <ThemeProvider theme={theme}>
-      <Layout sx={{ marginBottom: 40 }}>
+      <Layout spacing>
         <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
           <Grid item xs={12} sm={6}>
             <Rituals />
@@ -88,24 +90,36 @@ function RitualsProjects() {
           </Grid>
         </Grid>
 
-        <Grid container spacing={2} sx={{ marginBottom: 10, marginTop: 1 }}>
+        {/* <Grid container spacing={2} sx={{ marginBottom: 3, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <Rituals />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} sx={{ marginBottom: 3, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <Projects />
+          </Grid>
+        </Grid> */}
+
+        <Grid container spacing={2} sx={{ marginBottom: 3, marginTop: 1 }}>
           <Grid item xs={12}>
             <QualitiesGenerator />
           </Grid>
         </Grid>
-        <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 1 }}>
+        <Grid container spacing={1} sx={{ marginBottom: 3, marginTop: 1 }}>
           <Grid item xs={12}>
             <Weapons />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ marginBottom: 10, marginTop: 1 }}>
+        <Grid container spacing={1} sx={{ marginBottom: 3, marginTop: 1 }}>
           <Grid item xs={12}>
             <ArmorShield />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ marginBottom: 20, marginTop: 1 }}>
+        <Grid container spacing={1} sx={{ marginBottom: 5, marginTop: 1 }}>
           <Grid item xs={12}>
             <Accessories />
           </Grid>
@@ -118,10 +132,7 @@ function RitualsProjects() {
 function Rituals() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [ingredient, setIngredient] = useState(false);
@@ -148,34 +159,18 @@ function Rituals() {
   }
   return (
     <>
-    <Paper
-      elevation={3}
-      sx={{
-        padding: 2,
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 1,
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: `${ternary}`
-      }}
-    >
-      <Typography
-        variant="h4"
+      <Paper
+        elevation={3}
         sx={{
-          px: 3,
-          py: 1,
-          mx: -2,
-          mt: -2,
-          color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary})`,
-          borderRadius: "8px 8px 0 0",
+          p: "14px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
         }}
       >
-        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-        {t("Rituals")}
-      </Typography>
-        <Grid sx={{mt: 1 }} container>
+        {/* Header */}
+        <CustomHeaderAlt headerText={t("Rituals")} icon={<Spa fontSize="large" />} />
+        <Grid container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
@@ -312,10 +307,7 @@ function Rituals() {
 function Projects() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
@@ -333,34 +325,18 @@ function Projects() {
 
   return (
     <>
-    <Paper
-      elevation={3}
-      sx={{
-        padding: 2,
-        justifyContent: "space-between",
-        alignItems: "center",
-        mb: 1,
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: `${ternary}`
-      }}
-    >
-      <Typography
-        variant="h4"
+      <Paper
+        elevation={3}
         sx={{
-          px: 3,
-          py: 1,
-          mx: -2,
-          mt: -2,
-          color: "#ffffff",
-          background: `linear-gradient(to right, ${primary}, ${quaternary})`,
-          borderRadius: "8px 8px 0 0",
+          p: "14px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
         }}
       >
-        <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-        {t("Projects")}
-      </Typography>
-        <Grid sx={{mt: 1 }}  container>
+        {/* Header */}
+        <CustomHeaderAlt headerText={t("Projects")} icon={<Spa fontSize="large" />} />
+        <Grid container>
           <Grid item xs={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
@@ -582,16 +558,15 @@ const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 function QualitiesGenerator() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  const quaternary = theme.palette.quaternary.main;
   const [selectedDamageType, setSelectedDamageType] = useState("All");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
   const [selectedAttributes, setSelectedAttributes] = useState("All");
   const [selectedStatuses, setSelectedStatues] = useState("All");
   const [generate, setGenerate] = useState(0);
-
+  const [currentGeneratedText, setCurrentGeneratedText] = useState('');
+  
   const generatePrefixes = () => {
     const prefixes = [];
     randomQualities.forEach((item) => {
@@ -693,36 +668,30 @@ function QualitiesGenerator() {
     return suffixes[Math.floor(Math.random() * suffixes.length)];
   };
 
+  const generateRandomValues = () => {
+    const prefix = getRandomPrefix();
+    const suffix = getRandomSuffix();
+    setCurrentGeneratedText(`${prefix}, ${suffix}`);
+  };
+  
+  useEffect(() => {
+    generateRandomValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generate]); 
+
   return (
     <>
       <Paper
         elevation={3}
         sx={{
-          padding: 2,
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1,
+          p: "14px",
           borderRadius: "8px",
           border: "2px solid",
-          borderColor: `${ternary}`
+          borderColor: secondary,
         }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            px: 3,
-            py: 1,
-            mx: -2,
-            mt: -2,
-            color: "#ffffff",
-            background: `linear-gradient(to right, ${primary}, ${quaternary})`,
-            borderRadius: "8px 8px 0 0",
-          }}
-        >
-          <Spa sx={{ fontSize: 36, marginRight: 1 }} />
-          {t("Qualities Generator")}
-        </Typography>
-
+        {/* Header */}
+        <CustomHeaderAlt headerText={t("Qualities Generator")} icon={<AutoAwesome fontSize="large" />} />
         <Grid container spacing={1} sx={{ my: 1 }}>
           <Grid item xs={3}>
             <Autocomplete
@@ -816,21 +785,24 @@ function QualitiesGenerator() {
             }}
           >
             {" "}
-            {`${getRandomPrefix()}, ${getRandomSuffix()}`}
+            {currentGeneratedText}
           </Typography>
           <Button
             variant="contained"
             startIcon={<RestartAltOutlined />}
             onClick={() => {
               setGenerate(generate + 1);
+              generateRandomValues(); 
             }}
             sx={{
               minWidth: 100,
               fontWeight: "bold",
+              mr: 1,
             }}
           >
             Generate
           </Button>
+          <CopyToClipboard textToCopy={currentGeneratedText} />
         </Paper>
         <Typography sx={{ fontSize: 14, marginLeft: 1 }}>
           Warning: Some effects are imbalanced, use with caution!
