@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import { useTheme } from '@mui/system';
-import { Grid } from "@mui/material";
+import { Grid, Tooltip } from "@mui/material";
 
 interface CustomHeaderProps {
     addItem: () => void;
@@ -24,7 +24,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
     return (
         <>
             {isTop && (
-                <Grid item xs={12} sx={{width:'100%', margin:'15px'}}>
+                <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
                     <Typography
                         variant="h2"
                         component="legend"
@@ -38,12 +38,14 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             fontSize: '1.5em',
                         }}
                     >
-                        <IconButton
-                            sx={{ px: 1, '&:hover': { color: primary } }}
-                            onClick={addItem}
-                        >
-                            <HistoryEduIcon fontSize="large" />
-                        </IconButton>
+                        <Tooltip title={"Add " + headerText}>
+                            <IconButton
+                                sx={{ px: 1, '&:hover': { color: primary } }}
+                                onClick={addItem}
+                            >
+                                <HistoryEduIcon fontSize="large" />
+                            </IconButton>
+                        </Tooltip>
                         {headerText}
                     </Typography>
                     <Divider
@@ -59,7 +61,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
             )}
 
             {isMiddle && (
-                <Grid item xs={12} sx={{width:'100%', margin:'15px'}}>
+                <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
                     <Divider
                         orientation="horizontal"
                         sx={{
@@ -82,12 +84,14 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             fontSize: '1.5em',
                         }}
                     >
-                        <IconButton
-                            sx={{ px: 1, '&:hover': { color: primary } }}
-                            onClick={addItem}
-                        >
-                            <HistoryEduIcon fontSize="large" />
-                        </IconButton>
+                        <Tooltip title={"Add " + headerText}>
+                            <IconButton
+                                sx={{ px: 1, '&:hover': { color: primary } }}
+                                onClick={addItem}
+                            >
+                                <HistoryEduIcon fontSize="large" />
+                            </IconButton>
+                        </Tooltip>
                         {headerText}
                     </Typography>
                     <Divider

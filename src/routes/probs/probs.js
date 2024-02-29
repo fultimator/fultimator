@@ -111,7 +111,7 @@ export default function Probs() {
     <div>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <CustomHeader type="top" headerText={t("Affinity")} />
+          <CustomHeader type="top" headerText={t("Attacks Chance Generator")} />
         </Grid>
 
         {/* First die */}
