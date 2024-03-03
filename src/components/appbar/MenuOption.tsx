@@ -193,14 +193,14 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         ]}
 
         {/* LanguageMenu */}
-        {/* {[
+        {[
           <LanguageMenu
             key="language-menu"
             selectedLanguage={selectedLanguage}
             onSelectLanguage={onSelectLanguage}
           />,
           <Divider key="language-menu-divider" />,
-        ]} */}
+        ]}
 
         {/* Help & Feedback */}
         <MenuItem onClick={handleClose}>
