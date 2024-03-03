@@ -955,7 +955,7 @@
   },
   {
     "key": "Die 1",
-    "en": "Dado 1",
+    "en": "Die 1",
     "it": "Morire 1",
     "de": "Würfel 1",
     "pl": "Kość 1",
@@ -973,7 +973,7 @@
   },
   {
     "key": "DL",
-    "en": "LD",
+    "en": "DL",
     "it": "Dl",
     "de": "Dl",
     "pl": "PT",
