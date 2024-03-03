@@ -16,7 +16,7 @@ function ChangeQuality({ quality, setQuality, qualityCost, setQualityCost }) {
 
           <CustomTextarea
             id="effect"
-            label={t("Quality:")}
+            label={t("Quality")}
             value={quality}
             onChange={setQuality}
           />
