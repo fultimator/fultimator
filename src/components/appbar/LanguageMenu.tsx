@@ -1,17 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
 import { languageOptions, useTranslate } from "../../translation/translate";
 
-export interface LanguageMenuProps {
-  selectedLanguage: string;
-  onSelectLanguage: (language: string) => void;
-}
-
-const LanguageMenu: React.FC<LanguageMenuProps> = ({
-  selectedLanguage,
-  onSelectLanguage,
-}) => {
+const LanguageMenu = () => {
   const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -23,9 +15,25 @@ const LanguageMenu: React.FC<LanguageMenuProps> = ({
     setAnchorEl(null);
   };
 
-  const handleLanguageChange = (language: string) => {
-    onSelectLanguage(language);
-    handleClose();
+  const selectedLanguage =
+    useRef(localStorage.getItem("selectedLanguage")).current ?? "en";
+
+  const handleLanguageChange = async (languageCode: string) => {
+    await localStorage.setItem("selectedLanguage", languageCode);
+
+    if (window.location.href.includes("npc-gallery")) {
+      if (
+        window.confirm(
+          t(
+            "Switching language will clear out all your unsaved progress, would you like to continue?"
+          )
+        )
+      ) {
+        window.location.reload();
+      } else return;
+    } else {
+      window.location.reload();
+    }
   };
 
   return (

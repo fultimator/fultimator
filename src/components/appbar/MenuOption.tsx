@@ -28,15 +28,13 @@ import { auth, googleAuthProvider } from "../../firebase";
 import { signInWithPopup } from "@firebase/auth";
 
 import ThemeSwitcher, { ThemeSwitcherProps } from "./ThemeSwitcher";
-import LanguageMenu, { LanguageMenuProps } from "./LanguageMenu";
+import LanguageMenu from "./LanguageMenu";
 
-interface MenuOptionProps extends ThemeSwitcherProps, LanguageMenuProps {}
+interface MenuOptionProps extends ThemeSwitcherProps {}
 
 const MenuOption: React.FC<MenuOptionProps> = ({
   selectedTheme,
   onSelectTheme,
-  selectedLanguage,
-  onSelectLanguage,
 }) => {
   const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -194,11 +192,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
 
         {/* LanguageMenu */}
         {[
-          <LanguageMenu
-            key="language-menu"
-            selectedLanguage={selectedLanguage}
-            onSelectLanguage={onSelectLanguage}
-          />,
+          <LanguageMenu key="language-menu" />,
           <Divider key="language-menu-divider" />,
         ]}
 

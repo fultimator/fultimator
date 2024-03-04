@@ -21,13 +21,13 @@ type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 interface AppBarProps {
   isNpcEdit: boolean;
   handleGoBack: () => void;
-  selectedLanguage: string;
-  handleSelectLanguage: (language: string) => void;
   selectedTheme: ThemeValue;
   handleSelectTheme: (theme: ThemeValue) => void;
 }
 
-const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
+  children,
+}) => {
   const trigger = useScrollTrigger();
 
   return (
@@ -40,8 +40,6 @@ const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({ children }) 
 const AppBar: React.FC<AppBarProps> = ({
   isNpcEdit,
   handleGoBack,
-  selectedLanguage,
-  handleSelectLanguage,
   selectedTheme,
   handleSelectTheme,
 }) => {
@@ -92,10 +90,14 @@ const AppBar: React.FC<AppBarProps> = ({
                 >
                   <Typography variant="h1" textAlign="center">
                     <img
-                      style={{ height: '100%', maxHeight: '90px' }}
+                      style={{ height: "100%", maxHeight: "90px" }}
                       src={isSmallViewport ? logo : undefined}
-                      srcSet={isSmallViewport ? undefined : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`}
-                      sizes={isSmallViewport ? undefined : '100vw'}
+                      srcSet={
+                        isSmallViewport
+                          ? undefined
+                          : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`
+                      }
+                      sizes={isSmallViewport ? undefined : "100vw"}
                       alt="Fultimator"
                     />
                   </Typography>
@@ -103,11 +105,7 @@ const AppBar: React.FC<AppBarProps> = ({
               </Grid>
             )}
 
-            <Grid
-              item
-              xs={2}
-              sx={{ textAlign: "right" }}
-            >
+            <Grid item xs={2} sx={{ textAlign: "right" }}>
               <Grid
                 container
                 sx={{
@@ -117,8 +115,6 @@ const AppBar: React.FC<AppBarProps> = ({
                 }}
               >
                 <MenuOption
-                  selectedLanguage={selectedLanguage}
-                  onSelectLanguage={handleSelectLanguage}
                   selectedTheme={selectedTheme}
                   onSelectTheme={handleSelectTheme}
                 />
