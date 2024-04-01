@@ -80,7 +80,7 @@ function Personal({ user }) {
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [sort, setSort] = useState("name");
-  const [direction, setDirection] = useState("accending");
+  const [direction, setDirection] = useState("ascending");
   const [species, setSpecies] = useState("");
   const [collapse, setCollapse] = useState(false);
 
@@ -187,7 +187,7 @@ function Personal({ user }) {
         return true;
       })
       .sort((item1, item2) => {
-        if (direction === "accending") {
+        if (direction === "ascending") {
           if (sort === "name") {
             return item1.name - item2.name;
           } else if (sort === "level") {
@@ -371,7 +371,7 @@ function Personal({ user }) {
                     setDirection(evt.target.value);
                   }}
                 >
-                  <MenuItem value={"accending"}>Accending</MenuItem>
+                  <MenuItem value={"ascending"}>Ascending</MenuItem>
                   <MenuItem value={"descending"}>Descending</MenuItem>
                 </Select>
               </FormControl>
