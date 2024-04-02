@@ -94,7 +94,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                   }}
                 >
                   <Grid item xs={12}>
-                    <Typography>
+                    <Typography fontStyle="italic">
                       {!arcana.description ? t("No Description") : (
                         <div style={{ display: 'inline' }}>
                           <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
@@ -130,7 +130,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                 </Grid>
               </Grid>
             </Grid>
-            
+
             <Grid container>
               {/* Merge Benefit */}
               <Grid
@@ -151,7 +151,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                   alignItems: 'center',
                 }}>
                   <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                    MERGE
+                    {t("MERGE")}
                   </Typography>
                 </Grid>
 
@@ -206,7 +206,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                       alignItems: 'center',
                     }}>
                       <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                        PULSE
+                        {t("PULSE")}
                       </Typography>
                     </Grid>
 
@@ -261,7 +261,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                   alignItems: 'center',
                 }}>
                   <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                    DISMISS
+                    {t("DISMISS")}
                   </Typography>
                 </Grid>
 
