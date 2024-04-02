@@ -25,6 +25,7 @@ import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import randomQualities from "./randomqualities.json";
+import Arcana from "../equip/Arcana/Arcana";
 import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from '../../components/common/CustomHeaderAlt';
 import CopyToClipboard from '../../components/common/CopyToClipboard';
@@ -124,6 +125,13 @@ function RitualsProjects() {
             <Accessories />
           </Grid>
         </Grid>
+
+        <Grid container spacing={1} sx={{ marginBottom: 5, marginTop: 1 }}>
+          <Grid item xs={12}>
+            <Arcana />
+          </Grid>
+        </Grid>
+
       </Layout>
     </ThemeProvider>
   );
