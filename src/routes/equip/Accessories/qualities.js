@@ -115,6 +115,15 @@ const qualities = [
     ),
     cost: 2000,
   },
+  {
+    category: t("Enhancement Qualities", true),
+    name: t("Initiative Up", true),
+    quality: t(
+      "You gain a +4 bonus to your Initiative modifier.",
+      true
+    ),
+    cost: 500,
+  },
 ];
 
 export default qualities;
