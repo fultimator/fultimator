@@ -46,7 +46,15 @@ const qualities = [
     quality: t("You are immune to all status effects", true),
     cost: 2000,
   },
-
+  {
+    category: t("Enhancement Qualities", true),
+    name: t("Initiative Up", true),
+    quality: t(
+      "You gain a +4 bonus to your Initiative modifier.",
+      true
+    ),
+    cost: 500,
+  },
   {
     category: t("Enhancement Qualities", true),
     name: t("Accuracy Up", true),
@@ -88,15 +96,6 @@ const qualities = [
       true
     ),
     cost: 2000,
-  },
-  {
-    category: t("Enhancement Qualities", true),
-    name: t("Initiative Up", true),
-    quality: t(
-      "You gain a +4 bonus to your Initiative modifier.",
-      true
-    ),
-    cost: 500,
   },
 ];
 

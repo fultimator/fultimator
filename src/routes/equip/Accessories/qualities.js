@@ -75,6 +75,15 @@ const qualities = [
   },
   {
     category: t("Enhancement Qualities", true),
+    name: t("Initiative Up", true),
+    quality: t(
+      "You gain a +4 bonus to your Initiative modifier.",
+      true
+    ),
+    cost: 500,
+  },
+  {
+    category: t("Enhancement Qualities", true),
     name: t("Accuracy Up", true),
     quality: t("You gain a +1 bonus to your Accuracy Checks.", true),
     cost: 1000,
@@ -114,15 +123,6 @@ const qualities = [
       true
     ),
     cost: 2000,
-  },
-  {
-    category: t("Enhancement Qualities", true),
-    name: t("Initiative Up", true),
-    quality: t(
-      "You gain a +4 bonus to your Initiative modifier.",
-      true
-    ),
-    cost: 500,
   },
 ];
 
