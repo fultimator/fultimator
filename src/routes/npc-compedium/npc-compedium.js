@@ -107,6 +107,8 @@ function Personal({ user }) {
     language: "en",
   });
 
+  console.log(searchParams);
+
   const constraints = [where("published", "==", true)];
 
   if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
@@ -210,7 +212,7 @@ function Personal({ user }) {
     setOpen(true);
   };
 
-  const enemyType = (token, name) => {
+  const enemyType = (token, name, label) => {
     const isMobile = window.innerWidth < 900;
     return (
       <Grid
@@ -259,7 +261,7 @@ function Personal({ user }) {
             fontWeight: selectedType === name ? 700 : 400,
           }}
         >
-          {name}
+          {label}
         </div>
       </Grid>
     );
@@ -308,15 +310,15 @@ function Personal({ user }) {
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
-          {enemyType(allToken, t("All"))}
-          {enemyType(beastToken, t("Beast"))}
-          {enemyType(constructToken, t("Construct"))}
-          {enemyType(demonToken, t("Demon"))}
-          {enemyType(elementalToken, t("Elemental"))}
-          {enemyType(humanToken, t("Humanoid"))}
-          {enemyType(monsterToken, t("Monster"))}
-          {enemyType(plantToken, t("Plant"))}
-          {enemyType(undeadToken, t("Undead"))}
+          {enemyType(allToken, "All", t("All"))}
+          {enemyType(beastToken, "Beast", t("Beast"))}
+          {enemyType(constructToken, "Construct", t("Construct"))}
+          {enemyType(demonToken, "Demon", t("Demon"))}
+          {enemyType(elementalToken, "Elemental", t("Elemental"))}
+          {enemyType(humanToken, "Humanoid", t("Humanoid"))}
+          {enemyType(monsterToken, "Monster", t("Monster"))}
+          {enemyType(plantToken, "Plant", t("Plant"))}
+          {enemyType(undeadToken, "Undead", t("Undead"))}
         </Grid>
 
         <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
