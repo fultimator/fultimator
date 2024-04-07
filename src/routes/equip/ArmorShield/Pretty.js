@@ -120,11 +120,11 @@ function PrettySingle({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + armor.def : ""}
-                      {armor.category === "Armor" && armor.martial
+                      {armor.category === t("Shield") ? "+" + armor.def : ""}
+                      {armor.category === t("Armor") && armor.martial
                         ? armor.def
                         : ""}
-                      {armor.category === "Armor" && !armor.martial
+                      {armor.category === t("Armor") && !armor.martial
                         ? armor.def === 0
                           ? "DEX die"
                           : "DEX die +" + armor.def
@@ -133,9 +133,9 @@ function PrettySingle({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + armor.mdef : ""}
+                      {armor.category === t("Shield") ? "+" + armor.mdef : ""}
 
-                      {armor.category === "Armor"
+                      {armor.category === t("Armor")
                         ? armor.mdef === 0
                           ? "INS die"
                           : "INS die +" + armor.mdef
@@ -155,7 +155,10 @@ function PrettySingle({ armor, showActions }) {
                 >
                   <Typography>
                     {!armor.quality && t("No Qualities")}{" "}
-                    <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                    <ReactMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed={true}
+                    >
                       {armor.quality}
                     </ReactMarkdown>
                   </Typography>
