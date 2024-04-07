@@ -75,7 +75,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                     },
                   }}
                 >
-                  <Grid item xs={5}>
+                  <Grid item xs>
                     <Typography variant="h1" textAlign="left" sx={{ lineHeight: 1.2 }}>
                       {arcana.name}
                     </Typography>
