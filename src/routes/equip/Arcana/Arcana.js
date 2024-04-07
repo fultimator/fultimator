@@ -55,7 +55,7 @@ function Arcana() {
                                 ></TextField>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={10}>
+                        <Grid item xs={9}>
                             <FormControl variant="standard" fullWidth>
                                 <TextField
                                     id="description"
@@ -66,10 +66,10 @@ function Arcana() {
                                 ></TextField>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={2}>
+                        <Grid item xs={3}>
                             <FormControlLabel
                                 control={<Checkbox checked={reworkEnabled} onChange={(e) => setReworkEnabled(e.target.checked)} />}
-                                label="Rework Enabled"
+                                label={t("Rework Enabled?")}
                             />
                         </Grid>
                         <Grid item xs={12}>
