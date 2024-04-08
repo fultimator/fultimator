@@ -405,6 +405,18 @@ function Stats({ npc }) {
 
 function Attacks({ npc }) {
   const { t } = useTranslate();
+  const damageTypeLabels = {
+    physical: "physical_damage",
+    air: "air_damage",
+    bolt: "bolt_damage",
+    dark: "dark_damage",
+    earth: "earth_damage",
+    fire: "fire_damage",
+    ice: "ice_damage",
+    light: "light_damage",
+    poison: "poison_damage",
+  };
+
   return (
     <Grid container>
       <Grid
@@ -451,17 +463,19 @@ function Attacks({ npc }) {
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.type === "physical" && (
+                {attack.type === "physical" ? (
+                  <span>
+                    <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                      {t(damageTypeLabels[attack.type])}
+                    </ReactMarkdown>
+                  </span>
+                ) : (
                   <>
-                    <strong>{t("physical")}</strong> {t("damage")}
-                  </>
-                )}
-                {attack.type !== "physical" && (
-                  <>
-                    <strong style={{ textTransform: "lowercase" }}>
-                      <TypeName type={attack.type} />
-                    </strong>{" "}
-                    {t("damage")}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                        {t(damageTypeLabels[attack.type])}
+                      </ReactMarkdown>
+                    </span>
                   </>
                 )}{" "}
                 {attack.special?.map((effect, i) => {
@@ -517,17 +531,19 @@ function Attacks({ npc }) {
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.weapon.type === "physical" && (
+                {attack.weapon.type === "physical" ? (
+                  <span>
+                    <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                      {t(damageTypeLabels[attack.weapon.type])}
+                    </ReactMarkdown>
+                  </span>
+                ) : (
                   <>
-                    <strong>{t("physical")}</strong> {t("damage")}{" "}
-                  </>
-                )}
-                {attack.weapon.type !== "physical" && (
-                  <>
-                    <strong style={{ textTransform: "lowercase" }}>
-                      <TypeName type={attack.type} />
-                    </strong>{" "}
-                    {t("damage")}
+                    <span style={{ textTransform: "lowercase" }}>
+                      <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                        {t(damageTypeLabels[attack.weapon.type])}
+                      </ReactMarkdown>
+                    </span>
                   </>
                 )}{" "}
                 {attack.special?.map((effect, i) => {
@@ -893,6 +909,17 @@ function Equip({ npc }) {
   const hasWeapons = weapons.length !== 0;
   const hasArmor = npc.armor && npc.armor.name !== t("No Armor", true);
   const hasShield = npc.shield && npc.shield.name !== t("No Shield", true);
+  const damageTypeLabels = {
+    physical: "physical_damage",
+    air: "air_damage",
+    bolt: "bolt_damage",
+    dark: "dark_damage",
+    earth: "earth_damage",
+    fire: "fire_damage",
+    ice: "ice_damage",
+    light: "light_damage",
+    poison: "poison_damage",
+  };
 
   if (!hasWeapons && !hasArmor && !hasShield) {
     return null;
@@ -938,14 +965,19 @@ function Equip({ npc }) {
               {t("HR:")} + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
-            {t("damage")}{" "}
-            {weapon.type === "physical" && <strong>{t("physical")}</strong>}
-            {weapon.type !== "physical" && (
+            {weapon.type === "physical" ? (
+              <span>
+                <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                  {t(damageTypeLabels[weapon.type])}
+                </ReactMarkdown>
+              </span>
+            ) : (
               <>
-                <strong style={{ textTransform: "lowercase" }}>
-                  <TypeName type={weapon.type} />
-                </strong>{" "}
-                {t("damage")}
+                <span style={{ textTransform: "lowercase" }}>
+                  <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                    {t(damageTypeLabels[weapon.type])}
+                  </ReactMarkdown>
+                </span>
               </>
             )}{" "}
             <Diamond /> <strong>{weapon.cost}</strong> {t("zenit")}
@@ -1001,7 +1033,6 @@ function Equip({ npc }) {
 }
 
 function RenderVillainPhase({ villain, phases, multipart }) {
-  const { t } = useTranslate();
 
   const getVillainLabel = (villainType) => {
     switch (villainType) {
