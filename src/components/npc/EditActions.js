@@ -68,6 +68,19 @@ export default function EditActions({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
+            <Grid item xs={3}>
+              <FormControl variant="standard" fullWidth>
+                <TextField
+                  id="spCost"
+                  label={t("SP Cost:")}
+                  type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  value={actions?.spCost ?? 1}
+                  onChange={(e) => onChangeActions(i, "spCost", e.target.value)}
+                  size="small"
+                />
+              </FormControl>
+            </Grid>
             <Grid item xs={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={actions.effect}

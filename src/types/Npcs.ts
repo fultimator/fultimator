@@ -50,7 +50,8 @@ export interface NpcSpell {
 
 export interface NpcAction {
     name: string,
-    effect: string
+    effect: string,
+    spCost: number
 }
 
 export interface NpcSpecial {
@@ -95,7 +96,6 @@ export interface TypeNpc {
     affinities: NpcAffinities,
     attributes: NpcAttributes,
     species: string,
-
     traits?: string,
     actions?: NpcAction[],
     extra?: NpcExtra,

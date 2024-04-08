@@ -321,7 +321,14 @@ export function calcUsedSkills(npc) {
 }
 
 export function calcUsedSkillsFromOtherActions(npc) {
-  return npc.actions?.length || 0;
+  let sum = 0;
+
+  npc.actions?.forEach((actionItem) => {
+    const spCost = actionItem.spCost ?? 1;
+    sum += parseFloat(spCost);
+  });
+
+  return sum;
 }
 
 export function calcUsedSkillsFromSpecialAttacks(npc) {
