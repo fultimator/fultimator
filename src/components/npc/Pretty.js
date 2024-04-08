@@ -1001,11 +1001,26 @@ function Equip({ npc }) {
 }
 
 function RenderVillainPhase({ villain, phases, multipart }) {
+  const { t } = useTranslate();
+
+  const getVillainLabel = (villainType) => {
+    switch (villainType) {
+      case "minor":
+        return t("minor_villain");
+      case "major":
+        return t("major_villain");
+      case "supreme":
+        return t("supreme_villain");
+      default:
+        return "";
+    }
+  };
+
   const phaseString =
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
 
   const values = [
-    villain && `${villain} ${t("Villain", true)}`,
+    getVillainLabel(villain),
     phaseString,
     multipart,
   ].filter(Boolean);
