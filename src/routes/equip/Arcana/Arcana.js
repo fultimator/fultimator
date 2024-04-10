@@ -1,9 +1,9 @@
-import { Grid, Paper, useTheme, FormControlLabel, Checkbox } from "@mui/material";
-import { FormControl, TextField } from "@mui/material";
+import { Grid, Paper, useTheme, Button, FormControl, TextField, Divider } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Pretty from "./Pretty";
 import ChangeName from "../common/ChangeName";
+import ApplyRework from '../common/ApplyRework';
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../../components/common/CustomTextarea"
 import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
@@ -13,7 +13,6 @@ function Arcana() {
     const theme = useTheme();
     const secondary = theme.palette.secondary.main;
 
-    const [reworkEnabled, setReworkEnabled] = useState(false);
     const [name, setName] = useState("Arcanum");
     const [description, setDescription] = useState("");
     const [domain, setDomain] = useState("");
@@ -23,6 +22,70 @@ function Arcana() {
     const [pulseBenefit, setPulseBenefit] = useState("");
     const [dismissName, setDismissName] = useState("");
     const [dismissBenefit, setDismissBenefit] = useState("");
+    const [rework, setRework] = useState(false);
+
+    const fileInputRef = useRef(null);
+
+    const handleFileUpload = (data) => {
+        if (data) {
+            const {
+                name: uploadedName,
+                description: uploadedDescription,
+                domain: uploadedDomain,
+                mergeName: uploadedMergeName,
+                mergeBenefit: uploadedMergeBenefit,
+                pulseName: uploadedPulseName,
+                pulseBenefit: uploadedPulseBenefit,
+                dismissName: uploadedDismissName,
+                dismissBenefit: uploadedDismissBenefit,
+                rework: uploadedRework,
+            } = data;
+
+            if (uploadedName) {
+                setName(uploadedName);
+            }
+            if (uploadedDescription) {
+                setDescription(uploadedDescription);
+            }
+            if (uploadedDomain) {
+                setDomain(uploadedDomain);
+            }
+            if (uploadedMergeName) {
+                setMergeName(uploadedMergeName);
+            }
+            if (uploadedMergeBenefit) {
+                setMergeBenefit(uploadedMergeBenefit);
+            }
+            if (uploadedPulseName) {
+                setPulseName(uploadedPulseName);
+            }
+            if (uploadedPulseBenefit) {
+                setPulseBenefit(uploadedPulseBenefit);
+            }
+            if (uploadedDismissName) {
+                setDismissName(uploadedDismissName);
+            }
+            if (uploadedDismissBenefit) {
+                setDismissBenefit(uploadedDismissBenefit);
+            }
+            if (uploadedRework) {
+                setRework(uploadedRework);
+            }
+        }
+    };
+
+    const handleClearFields = () => {
+        setName("Arcanum");
+        setDescription("");
+        setDomain("");
+        setMergeName("");
+        setMergeBenefit("");
+        setPulseName("");
+        setPulseBenefit("");
+        setDismissName("");
+        setDismissBenefit("");
+    };
+
     return (
         <Grid container spacing={2}>
             {/* Form */}
@@ -38,7 +101,7 @@ function Arcana() {
                 >
                     {/* Header */}
                     <CustomHeaderAlt headerText={t("Arcana")} icon={<AutoAwesome fontSize="large" />} />
-                    <Grid container sx={{ mt: 0 }} spacing={1} alignItems="center">
+                    <Grid container spacing={1} alignItems="center">
                         <Grid item xs={6}>
                             <ChangeName
                                 value={name}
@@ -55,7 +118,7 @@ function Arcana() {
                                 ></TextField>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={9}>
+                        <Grid item xs={12}>
                             <FormControl variant="standard" fullWidth>
                                 <TextField
                                     id="description"
@@ -65,12 +128,6 @@ function Arcana() {
                                     size="small"
                                 ></TextField>
                             </FormControl>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <FormControlLabel
-                                control={<Checkbox checked={reworkEnabled} onChange={(e) => setReworkEnabled(e.target.checked)} />}
-                                label={t("Rework Enabled?")}
-                            />
                         </Grid>
                         <Grid item xs={12}>
                             <FormControl variant="standard" fullWidth>
@@ -95,7 +152,7 @@ function Arcana() {
                         </Grid>
 
                         {/* Pulse fields */}
-                        {reworkEnabled && (
+                        {rework && (
                             <>
                                 <Grid item xs={12}>
                                     <FormControl variant="standard" fullWidth>
@@ -142,6 +199,44 @@ function Arcana() {
                                 />
                             </FormControl>
                         </Grid>
+                        <Grid item xs={12}>
+                        <Divider />
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => fileInputRef.current.click()}
+                                    >
+                                        Upload JSON
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button variant="outlined" onClick={handleClearFields}>
+                                        Clear All Fields
+                                    </Button>
+                                </Grid>
+                                <Grid item xs>
+                                    <ApplyRework rework={rework} setRework={setRework} />
+                                </Grid>
+                            </Grid>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".json"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = () => {
+                                            const result = JSON.parse(reader.result);
+                                            handleFileUpload(result);
+                                        };
+                                        reader.readAsText(file);
+                                    }
+                                }}
+                                style={{ display: "none" }}
+                            />
+                        </Grid>
                     </Grid>
                 </Paper>
             </Grid>
@@ -159,8 +254,9 @@ function Arcana() {
                         pulseBenefit: pulseBenefit,
                         dismissName: dismissName,
                         dismissBenefit: dismissBenefit,
+                        rework: rework,
                     }}
-                    reworkEnabled={reworkEnabled}
+                    rework={rework}
                 />
             </Grid>
         </Grid>

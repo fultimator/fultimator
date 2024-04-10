@@ -1,13 +1,13 @@
-import { Grid, Paper, useTheme } from "@mui/material";
+import { Grid, Paper, Button, useTheme, Divider } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
-import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
+import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 
 function Accessories() {
   const { t } = useTranslate();
@@ -25,6 +25,37 @@ function Accessories() {
 
   const cost = calcCost();
 
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = (data) => {
+    if (data) {
+      const {
+        name,
+        quality,
+        cost
+      } = data;
+
+      if (name) {
+        setName(name);
+      }
+      if (quality) {
+        setSelectedQuality("");
+        setQuality(quality);
+      }
+      if (cost) {
+        setQualityCost(cost);
+      }
+    }
+  };
+
+
+  const handleClearFields = () => {
+    setName("");
+    setQuality("");
+    setQualityCost(0);
+    setSelectedQuality("");
+  };
+
   return (
     <Grid container spacing={2}>
       {/* Form */}
@@ -40,7 +71,7 @@ function Accessories() {
         >
           {/* Header */}
           <CustomHeaderAlt headerText={t("Accessories")} icon={<AutoAwesome fontSize="large" />} />
-          <Grid container sx={{ mt: 0 }} spacing={2} alignItems="center">
+          <Grid container spacing={2} alignItems="center">
             <Grid item xs={6}>
               <ChangeName
                 value={name}
@@ -60,13 +91,47 @@ function Accessories() {
                 }}
               />
             </Grid>
-
             <Grid item xs={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
                 qualityCost={qualityCost}
                 setQualityCost={(e) => setQualityCost(e.target.value)}
+              />
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    Upload JSON
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="outlined" onClick={handleClearFields}>
+                    Clear All Fields
+                  </Button>
+                </Grid>
+              </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const result = JSON.parse(reader.result);
+                      handleFileUpload(result);
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                style={{ display: "none" }}
               />
             </Grid>
           </Grid>

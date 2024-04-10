@@ -1,6 +1,6 @@
-import { Grid, Paper, useTheme } from "@mui/material";
+import { Grid, Paper, useTheme, Button, Divider } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import armor from "./base";
 import ChangeBase from "./ChangeBase";
 import Pretty from "./Pretty";
@@ -10,6 +10,7 @@ import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
+import useUploadJSON from "../../../hooks/useUploadJSON";
 
 function ArmorShield() {
   const { t } = useTranslate();
@@ -32,6 +33,41 @@ function ArmorShield() {
 
   const cost = calcCost();
 
+  const fileInputRef = useRef(null);
+
+  const { handleFileUpload } = useUploadJSON((data) => {
+    if (data) {
+      const {
+        base,
+        name,
+        quality,
+        cost
+      } = data;
+
+      if (base) {
+        setBase(base);
+      }
+      if (name) {
+        setName(name);
+      }
+      if (quality) {
+        setQuality(quality);
+      }
+      if (cost) {
+        setQualityCost(cost);
+      }
+    }
+  });
+
+
+  const handleClearFields = () => {
+    setBase(armor[0]);
+    setName(armor[0].name);
+    setQuality("");
+    setQualityCost(0);
+    setSelectedQuality("");
+  };
+
   return (
     <Grid container spacing={2}>
       {/* Form */}
@@ -47,7 +83,7 @@ function ArmorShield() {
         >
           {/* Header */}
           <CustomHeaderAlt headerText={t("Armor and Shield")} icon={<AutoAwesome fontSize="large" />} />
-          <Grid container sx={{ mt: 0 }} spacing={2} alignItems="center">
+          <Grid container spacing={2} alignItems="center">
             {/* Change Base */}
             <Grid item xs={4}>
               <ChangeBase
@@ -88,6 +124,28 @@ function ArmorShield() {
                 qualityCost={qualityCost}
                 setQualityCost={(e) => setQualityCost(e.target.value)}
               />
+              <Divider />
+            </Grid>
+            <Grid item xs={12} sx={{ py: 0 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item>
+                  <Button variant="outlined" onClick={() => fileInputRef.current.click()}>
+                    Upload JSON
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="outlined" onClick={handleClearFields}>
+                    Clear All Fields
+                  </Button>
+                </Grid>
+              </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
             </Grid>
           </Grid>
         </Paper>
@@ -98,6 +156,7 @@ function ArmorShield() {
         <Pretty
           base={base}
           custom={{
+            base,
             ...base,
             name: name,
             cost: cost,

@@ -17,18 +17,18 @@ import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
 import { useTranslate } from "../../../translation/translate";
 
-function Pretty({ custom, reworkEnabled }) {
+function Pretty({ custom, rework }) {
   const theme = useTheme();
   return (
     <ThemeProvider theme={theme}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <PrettySingle arcana={custom} showActions reworkEnabled={reworkEnabled} />
+        <PrettySingle arcana={custom} showActions rework={rework} />
       </div>
     </ThemeProvider>
   );
 }
 
-function PrettySingle({ arcana, showActions, reworkEnabled }) {
+function PrettySingle({ arcana, showActions, rework }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -185,7 +185,7 @@ function PrettySingle({ arcana, showActions, reworkEnabled }) {
                 </Grid>
               </Grid>
 
-              {reworkEnabled && (
+              {rework && (
                 <>
                   {/* Pulse Benefit */}
                   <Grid

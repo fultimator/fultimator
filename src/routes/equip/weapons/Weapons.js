@@ -1,6 +1,6 @@
-import { Grid, Paper, useTheme } from "@mui/material";
+import { Grid, Paper, Button, useTheme, Divider } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import weapons from "./base";
 import ChangeBase from "./ChangeBase";
 import ChangeAttr from "./ChangeAttr";
@@ -12,6 +12,7 @@ import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
+import ApplyRework from '../common/ApplyRework';
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
 
@@ -26,10 +27,88 @@ function Weapons() {
   const [att1, setAtt1] = useState(weapons[0].att1);
   const [att2, setAtt2] = useState(weapons[0].att2);
   const [damageBonus, setDamageBonus] = useState(false);
+  const [damageReworkBonus, setDamageReworkBonus] = useState(false);
   const [precBonus, setPrecBonus] = useState(false);
+  const [rework, setRework] = useState(false);
   const [quality, setQuality] = useState("");
   const [qualityCost, setQualityCost] = useState(0);
+  const [totalBonus, setTotalBonus] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
+
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = (data) => {
+    if (data) {
+      const {
+        base,
+        name,
+        att1,
+        att2,
+        type,
+        hand,
+        quality,
+        qualityCost,
+        damageBonus,
+        damageReworkBonus,
+        precBonus,
+        rework
+      } = data;
+
+      if (base) {
+        setBase(base);
+      }
+      if (name) {
+        setName(name);
+      }
+      if (att1) {
+        setAtt1(att1);
+      }
+      if (att2) {
+        setAtt2(att2);
+      }
+      if (type) {
+        setType(type);
+      }
+      if (hand) {
+        setHands(hand);
+      }
+      if (quality) {
+        setSelectedQuality("");
+        setQuality(quality);
+      }
+      if (qualityCost) {
+        setQualityCost(qualityCost);
+      }
+      if (damageBonus) {
+        setDamageBonus(damageBonus);
+      }
+      if (damageReworkBonus) {
+        setDamageReworkBonus(damageReworkBonus);
+      }
+      if (precBonus) {
+        setPrecBonus(precBonus);
+      }
+      if (rework) {
+        setRework(rework);
+      }
+    }
+  };
+
+  const handleClearFields = () => {
+    setBase(weapons[0]);
+    setName(weapons[0].name);
+    setType(weapons[0].type);
+    setHands(weapons[0].hands);
+    setAtt1(weapons[0].att1);
+    setAtt2(weapons[0].att2);
+    setDamageBonus(false);
+    setDamageReworkBonus(false);
+    setPrecBonus(false);
+    setRework(false);
+    setQuality("");
+    setQualityCost(0);
+    setSelectedQuality("");
+  };
 
   function calcCost() {
     let cost = base.cost;
@@ -52,7 +131,10 @@ function Weapons() {
     }
 
     // Bonus prec
-    if (base.prec !== 1 && precBonus) {
+    if (!rework && base.prec !== 1 && precBonus) {
+      cost += 100;
+      // Bonus prec (rework)
+    } else if (rework && base.prec === 1 && precBonus) {
       cost += 100;
     }
 
@@ -73,8 +155,12 @@ function Weapons() {
     }
 
     // Bonus damage
-    if (damageBonus) {
+    if (!rework && damageBonus) {
       damage += 4;
+    }
+    if (rework && damageReworkBonus) {
+      const bonus = Math.floor(calcCost() / 1000) * 2;
+      damage += bonus;
     }
 
     return damage;
@@ -84,15 +170,30 @@ function Weapons() {
     let prec = base.prec;
 
     // Bonus prec
-    if (prec !== 1 && precBonus) {
+    if (!rework && prec !== 1 && precBonus) {
       prec = 1;
     }
+    // Bonus prec (rework)
+    if (rework && prec === 0 && precBonus) {
+      prec = 1;
+    } else if (rework && prec === 1 && precBonus) {
+      prec = 2;
+    }
+
     return prec;
   }
 
   const cost = calcCost();
   const damage = calcDamage();
   const prec = calcPrec();
+
+  // Calculate totalBonus when damageReworkBonus changes
+  useEffect(() => {
+    if (damageReworkBonus) {
+      const bonus = Math.floor(cost / 1000) * 2;
+      setTotalBonus(bonus);
+    }
+  }, [damageReworkBonus, cost]);
 
   return (
     <Grid container spacing={2}>
@@ -109,7 +210,7 @@ function Weapons() {
         >
           {/* Header */}
           <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
-          <Grid container sx={{ mt: 0 }} spacing={2} alignItems="center">
+          <Grid container spacing={2} alignItems="center">
             {/* Change Base */}
             <Grid item xs={6}>
               <ChangeBase
@@ -122,6 +223,7 @@ function Weapons() {
                   setType(base.type);
                   setHands(base.hands);
                   setDamageBonus(false);
+                  setDamageReworkBonus(false);
                   setPrecBonus(false);
                   setAtt1(base.att1);
                   setAtt2(base.att2);
@@ -136,27 +238,17 @@ function Weapons() {
               />
             </Grid>
             {/* Change Type */}
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               <ChangeType
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               />
             </Grid>
             {/* Change Hands */}
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               <ChangeHands
                 value={hands}
                 onChange={(e) => setHands(e.target.value)}
-              />
-            </Grid>
-            {/* Change Bonus */}
-            <Grid item xs={4}>
-              <ChangeBonus
-                basePrec={base.prec}
-                prec={prec}
-                damageBonus={damageBonus}
-                setPrecBonus={setPrecBonus}
-                setDamageBonus={setDamageBonus}
               />
             </Grid>
             {/* Change Attributes */}
@@ -169,7 +261,7 @@ function Weapons() {
               />
             </Grid>
             {/* Change Quality */}
-            <Grid item xs={7}>
+            <Grid item xs={6}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
@@ -182,12 +274,65 @@ function Weapons() {
                 }}
               />
             </Grid>
+            {/* Change Bonus */}
+            <Grid item xs={6}>
+              <ChangeBonus
+                basePrec={base.prec}
+                prec={prec}
+                damageBonus={damageBonus}
+                damageReworkBonus={damageReworkBonus}
+                setPrecBonus={setPrecBonus}
+                setDamageBonus={setDamageBonus}
+                setDamageReworkBonus={setDamageReworkBonus}
+                rework={rework}
+                totalBonus={totalBonus}
+              />
+            </Grid>
             <Grid item xs={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
                 qualityCost={qualityCost}
                 setQualityCost={(e) => setQualityCost(e.target.value)}
+              />
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container spacing={1} alignItems="center">
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    Upload JSON
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button variant="outlined" onClick={handleClearFields}>
+                    Clear All Fields
+                  </Button>
+                </Grid>
+                {/* Rework */}
+                <Grid item xs>
+                  <ApplyRework rework={rework} setRework={setRework} />
+                </Grid>
+              </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const result = JSON.parse(reader.result);
+                      handleFileUpload(result);
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                style={{ display: "none" }}
               />
             </Grid>
           </Grid>
@@ -199,6 +344,7 @@ function Weapons() {
         <Pretty
           base={base}
           custom={{
+            base: base,
             name: name,
             att1: att1,
             att2: att2,
@@ -211,6 +357,11 @@ function Weapons() {
             damage: damage,
             prec: prec,
             quality: quality,
+            qualityCost: qualityCost,
+            damageBonus: damageBonus,
+            damageReworkBonus: damageReworkBonus,
+            precBonus: precBonus,
+            rework: rework,
           }}
         />
       </Grid>
