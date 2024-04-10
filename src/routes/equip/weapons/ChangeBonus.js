@@ -14,22 +14,22 @@ function ChangeBonus({
 }) {
   const { t } = useTranslate();
   const handlePrecChange = (e) => {
-    setPrecBonus(e.target.value);
+    setPrecBonus(e.target.checked);
   };
 
   const handleDamageChange = (e) => {
-    setDamageBonus(e.target.value);
+    setDamageBonus(e.target.checked);
   };
 
   const handleDamageReworkChange = (e) => {
-    setDamageReworkBonus(e.target.value);
+    setDamageReworkBonus(e.target.checked);
   };
 
   return (
     <FormControl variant="outlined" fullWidth>
       {((rework && basePrec < 2) || (!rework && basePrec === 0)) && (
         <FormControlLabel
-          control={<Checkbox value={prec} onChange={handlePrecChange} />}
+          control={<Checkbox checked={prec} onChange={handlePrecChange} />}
           label={"+1 " + t("Accuracy", true)}
           size="small"
           sx={{ mb: -1 }}
@@ -37,7 +37,7 @@ function ChangeBonus({
       )}
       {!rework && (
         <FormControlLabel
-          control={<Checkbox value={damageBonus} onChange={handleDamageChange} />}
+          control={<Checkbox checked={damageBonus} onChange={handleDamageChange} />}
           label={"+4 " + t("Damage", true)}
           size="small"
           sx={{ mt: -1 }}
@@ -45,7 +45,7 @@ function ChangeBonus({
       )}
       {rework && (
         <FormControlLabel
-          control={<Checkbox value={damageReworkBonus} onChange={handleDamageReworkChange} />}
+          control={<Checkbox checked={damageReworkBonus} onChange={handleDamageReworkChange} />}
           label={"+" + totalBonus + " " + t("Damage", true)}
           size="small"
           sx={{ mt: -1 }}

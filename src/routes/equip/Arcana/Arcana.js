@@ -198,9 +198,9 @@ function Arcana() {
                                     onChange={(e) => setDismissBenefit(e.target.value)}
                                 />
                             </FormControl>
+                            <Divider />
                         </Grid>
                         <Grid item xs={12}>
-                        <Divider />
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item>
                                     <Button
