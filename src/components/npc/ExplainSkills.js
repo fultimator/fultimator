@@ -35,7 +35,6 @@ import { useTranslate } from "../../translation/translate";
 export default function ExplainSkills({ npc }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   return (
     <Card                   

@@ -7,6 +7,10 @@ export function calcHP(npc) {
   }
 
   // Rank
+  if (npc.rank === "champion1") {
+    hp = hp * 1;
+  }
+
   if (npc.rank === "elite" || npc.rank === "champion2") {
     hp = hp * 2;
   }
@@ -21,6 +25,10 @@ export function calcHP(npc) {
 
   if (npc.rank === "champion5") {
     hp = hp * 5;
+  }
+
+  if (npc.rank === "champion6") {
+    hp = hp * 6;
   }
 
   if (npc.rank === "companion") {
@@ -41,10 +49,12 @@ export function calcMP(npc) {
   }
   // Rank
   if (
+    npc.rank === "champion1" ||
     npc.rank === "champion2" ||
     npc.rank === "champion3" ||
     npc.rank === "champion4" ||
-    npc.rank === "champion5"
+    npc.rank === "champion5" ||
+    npc.rank === "champion6"
   ) {
     mp = mp * 2;
   }
@@ -66,6 +76,9 @@ export function calcInit(npc) {
   }
 
   // Rank
+  if (npc.rank === "champion1") {
+    init = init + 1;
+  }
   if (npc.rank === "elite" || npc.rank === "champion2") {
     init = init + 2;
   }
@@ -77,6 +90,9 @@ export function calcInit(npc) {
   }
   if (npc.rank === "champion5") {
     init = init + 5;
+  }
+  if (npc.rank === "champion6") {
+    init = init + 6;
   }
 
   // Armor
@@ -284,6 +300,10 @@ export function calcAvailableSkillsFromRank(npc) {
     return 1;
   }
 
+  if (npc.rank === "champion1") {
+    return 1;
+  }
+
   if (npc.rank === "champion2") {
     return 2;
   }
@@ -295,9 +315,15 @@ export function calcAvailableSkillsFromRank(npc) {
   if (npc.rank === "champion4") {
     return 4;
   }
+
   if (npc.rank === "champion5") {
     return 5;
   }
+
+  if (npc.rank === "champion6") {
+    return 6;
+  }
+
   return 0;
 }
 

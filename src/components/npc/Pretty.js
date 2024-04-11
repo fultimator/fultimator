@@ -190,10 +190,12 @@ function Rank({ npc }) {
   return (
     <>
       {npc.rank === "elite" && t("Elite")}
+      {npc.rank === "champion1" && t("Champion (1)")}
       {npc.rank === "champion2" && t("Champion (2)")}
       {npc.rank === "champion3" && t("Champion (3)")}
       {npc.rank === "champion4" && t("Champion (4)")}
       {npc.rank === "champion5" && t("Champion (5)")}
+      {npc.rank === "champion6" && t("Champion (6)")}
     </>
   );
 }
