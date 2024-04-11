@@ -407,7 +407,7 @@ function Attacks({ npc }) {
   const { t } = useTranslate();
   const damageTypeLabels = {
     physical: "physical_damage",
-    air: "air_damage",
+    wind: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
@@ -911,7 +911,7 @@ function Equip({ npc }) {
   const hasShield = npc.shield && npc.shield.name !== t("No Shield", true);
   const damageTypeLabels = {
     physical: "physical_damage",
-    air: "air_damage",
+    wind: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
