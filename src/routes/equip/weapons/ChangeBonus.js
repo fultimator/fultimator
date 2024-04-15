@@ -3,7 +3,7 @@ import { useTranslate } from "../../../translation/translate";
 
 function ChangeBonus({
   basePrec,
-  prec,
+  precBonus,
   damageBonus,
   damageReworkBonus,
   setPrecBonus,
@@ -27,9 +27,9 @@ function ChangeBonus({
 
   return (
     <FormControl variant="outlined" fullWidth>
-      {((rework && basePrec < 2) || (!rework && basePrec === 0)) && (
+      {((rework && basePrec <= 1) || (!rework && basePrec === 0)) && (
         <FormControlLabel
-          control={<Checkbox checked={prec} onChange={handlePrecChange} />}
+          control={<Checkbox checked={precBonus} onChange={handlePrecChange} />}
           label={"+1 " + t("Accuracy", true)}
           size="small"
           sx={{ mb: -1 }}

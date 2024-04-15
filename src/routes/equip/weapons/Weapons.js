@@ -174,10 +174,10 @@ function Weapons() {
       prec = 1;
     }
     // Bonus prec (rework)
-    if (rework && prec === 0 && precBonus) {
-      prec = 1;
-    } else if (rework && prec === 1 && precBonus) {
+    if (rework && prec === 1 && precBonus) {
       prec = 2;
+    } else if (rework && prec === 0 && precBonus) {
+      prec = 1;
     }
 
     return prec;
@@ -278,7 +278,7 @@ function Weapons() {
             <Grid item xs={6}>
               <ChangeBonus
                 basePrec={base.prec}
-                prec={prec}
+                precBonus={precBonus}
                 damageBonus={damageBonus}
                 damageReworkBonus={damageReworkBonus}
                 setPrecBonus={setPrecBonus}
