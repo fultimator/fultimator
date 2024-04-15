@@ -23,6 +23,7 @@ import {
   RareItemIcon,
   SpellIcon,
 } from "../icons";
+import { Martial } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
 
@@ -518,6 +519,7 @@ function Attacks({ npc }) {
               <Typography>
                 <strong>
                   {attack.name} ({attack.weapon.name}){" "}
+                  {/* {attack.martial && <Martial />}{" "} */}
                 </strong>{" "}
                 <Diamond />{" "}
                 {attack.weapon.hands === 1 ? t("1 handed") : t("2 handed")}{" "}
@@ -954,7 +956,9 @@ function Equip({ npc }) {
       {weapons.map((weapon, i) => (
         <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
           <Typography>
-            <strong>{t("Weapon:")}</strong> {weapon.name} <Diamond />{" "}
+            <strong>{t("Weapon:")}</strong> {weapon.name}{" "}
+            {weapon.martial && <Martial />}
+            <Diamond />{" "}
             {weapon.hands === 1 ? t("1 handed") : t("2 handed")} <Diamond />{" "}
             <strong>
               {" "}
@@ -989,8 +993,10 @@ function Equip({ npc }) {
 
       {/* Armor */}
       {npc.armor && npc.armor.name !== "No Armor" && (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
-          <strong>{t("Armor:")}</strong> {npc.armor.name} <Diamond />{" "}
+        <Grid item xs={12} sx={{ px: 2, py: 0 }} alignItems="center">
+          <strong>{t("Armor:")}</strong> {npc.armor.name}{" "}
+          {npc.armor.martial && <Martial />}
+          <Diamond />{" "}
           {npc.armor.def > 0 ? (
             <strong>
               {t("DEF")} {npc.armor.def}
@@ -1012,7 +1018,9 @@ function Equip({ npc }) {
       {/* Shield */}
       {npc.shield && npc.shield.name !== "No Shield" && (
         <Grid item xs={12} sx={{ px: 2, py: 0 }}>
-          <strong>{t("Shield:")}</strong> {npc.shield.name} <Diamond />{" "}
+          <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
+          {npc.armor.martial && <Martial />}
+          <Diamond />{" "}
           {npc.shield.def > 0 ? (
             <strong>
               {t("DEF")} {npc.shield.def}

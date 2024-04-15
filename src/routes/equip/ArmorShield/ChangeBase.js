@@ -5,6 +5,7 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
+import { Martial } from "../../../components/icons";
 import groupBy from "../../../libs/groupby";
 import armors from "./base";
 import { useTranslate } from "../../../translation/translate";
@@ -21,7 +22,8 @@ function ChangeBase({ value, onChange }) {
     for (const armor of armors) {
       options.push(
         <MenuItem key={armor.name} value={armor.name}>
-          {armor.name}
+          {armor.name} {" "}
+          {armor.martial && <Martial />}{" "}
         </MenuItem>
       );
     }

@@ -510,3 +510,46 @@ export function RareItemIcon() {
     </svg>
   );
 }
+
+export function MartialOutline() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 408.98 412.19" width="16" height="16">
+      <defs>
+        <style>
+          {`.martialOuline {
+            fill: none;
+            stroke: #000;
+            stroke-width: 25px;
+            viewBox="-60 -120 1200 1200"
+            width="1.2em"
+            
+          }`}
+        </style>
+      </defs>
+      <g id="martialOuline" data-name="martialOutline">
+        <path className="martialOuline" d="M380.29,206.1c-69,33.4-137.3,100.5-175.8,178-38.5-77.5-106.8-144.6-175.8-178C97.69,172.7,165.99,105.6,204.49,28.1c38.5,77.5,106.8,144.6,175.8,178Z" />
+      </g>
+    </svg>
+  );
+}
+
+export function Martial() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 408.98 412.19" width="16" height="16">
+      <defs>
+        <style>
+          {`.martialFilled {
+            fill: #b63401;
+            stroke: #000;
+            stroke-width: 25px;
+            viewBox="-60 -120 1200 1200"
+            width="1.2em"
+          }`}
+        </style>
+      </defs>
+      <g id="martialFilled" data-name="martialFilled">
+        <path className="martialFilled" d="M380.29,206.1c-69,33.4-137.3,100.5-175.8,178-38.5-77.5-106.8-144.6-175.8-178C97.69,172.7,165.99,105.6,204.49,28.1c38.5,77.5,106.8,144.6,175.8,178Z" />
+      </g>
+    </svg>
+  );
+}

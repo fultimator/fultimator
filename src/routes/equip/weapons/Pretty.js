@@ -9,6 +9,7 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
+import { Martial } from "../../../components/icons";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
 import ReactMarkdown from "react-markdown";
 import attributes from "../../../libs/attributes";
@@ -119,8 +120,11 @@ function PrettySingle({ weapon, showActions }) {
                     padding: "5px",
                   }}
                 >
-                  <Grid item xs={3}>
-                    <Typography fontWeight="bold">{weapon.name}</Typography>
+                  <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+                    <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
+                      {weapon.name}
+                    </Typography>
+                    {weapon.martial && <Martial />}
                   </Grid>
                   <Grid item xs={1}>
                     <Typography textAlign="center">{`${weapon.cost}z`}</Typography>

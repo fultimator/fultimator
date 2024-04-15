@@ -12,6 +12,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: false
   },
   {
     category: t("Arcane", true),
@@ -24,6 +25,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: false
   },
   {
     category: t("Bow", true),
@@ -36,6 +38,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     ranged: true,
+    martial: false
   },
   {
     category: t("Bow", true),
@@ -48,6 +51,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     ranged: true,
+    martial: false
   },
   {
     category: t("Flail", true),
@@ -60,6 +64,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: false
   },
   {
     category: t("Firearm", true),
@@ -72,6 +77,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     ranged: true,
+    martial: true
   },
   {
     category: t("spear_category", true),
@@ -84,6 +90,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: true
   },
   {
     category: t("spear_category", true),
@@ -96,6 +103,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: true
   },
   {
     category: t("Thrown", true),
@@ -108,6 +116,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     ranged: true,
+    martial: false
   },
   {
     category: t("Heavy", true),
@@ -120,6 +129,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: false
   },
   {
     category: t("Heavy", true),
@@ -132,6 +142,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: true
   },
   {
     category: t("Heavy", true),
@@ -144,6 +155,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: true
   },
   {
     category: t("Dagger", true),
@@ -156,6 +168,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: false
   },
   {
     category: t("Brawling", true),
@@ -168,6 +181,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: false
   },
   {
     category: t("Sword", true),
@@ -180,6 +194,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: true
   },
   {
     category: t("Sword", true),
@@ -192,6 +207,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: true
   },
   {
     category: t("Sword", true),
@@ -204,6 +220,7 @@ const weapons = [
     type: "physical",
     hands: 2,
     melee: true,
+    martial: true
   },
   {
     category: t("Sword", true),
@@ -216,6 +233,7 @@ const weapons = [
     type: "physical",
     hands: 1,
     melee: true,
+    martial: true
   },
 ];
 

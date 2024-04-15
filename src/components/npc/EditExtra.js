@@ -13,6 +13,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import {  Martial } from "../icons";
 import { baseArmors } from "../../libs/equip";
 import { baseShields } from "../../libs/equip";
 import { useTranslate } from "../../translation/translate";
@@ -332,6 +333,7 @@ function SelectArmor({ npc, setNpc }) {
     options.push(
       <MenuItem key={armor.name} value={armor.name}>
         {armor.name}
+        {armor.martial && <Martial />}{" "}
       </MenuItem>
     );
   }
@@ -381,6 +383,7 @@ function SelectShield({ npc, setNpc }) {
     options.push(
       <MenuItem key={shield.name} value={shield.name}>
         {shield.name}
+        {shield.martial && <Martial />}{" "}
       </MenuItem>
     );
   }

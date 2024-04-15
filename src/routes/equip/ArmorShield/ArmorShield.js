@@ -19,8 +19,8 @@ function ArmorShield() {
 
   const [base, setBase] = useState(armor[0]);
   const [name, setName] = useState(armor[0].name);
-
   const [quality, setQuality] = useState("");
+  const [martial, setMartial] = useState(false);
   const [qualityCost, setQualityCost] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
 
@@ -41,6 +41,7 @@ function ArmorShield() {
         base,
         name,
         quality,
+        martial,
         cost
       } = data;
 
@@ -53,6 +54,9 @@ function ArmorShield() {
       if (quality) {
         setQuality(quality);
       }
+      if (martial) {
+        setMartial(martial);
+      }
       if (cost) {
         setQualityCost(cost);
       }
@@ -63,6 +67,7 @@ function ArmorShield() {
   const handleClearFields = () => {
     setBase(armor[0]);
     setName(armor[0].name);
+    setMartial(armor[0].martial)
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
@@ -93,10 +98,13 @@ function ArmorShield() {
 
                   setBase(base);
                   setName(base.name);
+                  setMartial(base.martial)
                 }}
               />
             </Grid>
-
+            {/* <Grid item xs={2}>
+              <ChangeMartial martial={martial} setMartial={setMartial} />
+            </Grid> */}
             <Grid item xs={4}>
               <SelectQuality
                 quality={selectedQuality}
@@ -160,6 +168,7 @@ function ArmorShield() {
             ...base,
             name: name,
             cost: cost,
+            martial: martial,
             quality: quality,
           }}
         />

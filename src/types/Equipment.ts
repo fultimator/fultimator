@@ -13,4 +13,5 @@ export interface Weapon {
     hands: number,
     damage: number,
     type: string,
+    martial: boolean
 }

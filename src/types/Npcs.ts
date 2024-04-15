@@ -15,7 +15,8 @@ export interface NpcArmor {
     mdefbonus: number,
     cost: number,
     mdef: number,
-    defbonus: number
+    defbonus: number,
+    martial: boolean
 }
 
 export interface NpcAttack {

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import weapons from "./base";
 import ChangeBase from "./ChangeBase";
 import ChangeAttr from "./ChangeAttr";
+import ChangeMartial from "../common/ChangeMartial";
 import ChangeBonus from "./ChangeBonus";
 import ChangeHands from "./ChangeHands";
 import ChangeName from "../common/ChangeName";
@@ -26,6 +27,7 @@ function Weapons() {
   const [hands, setHands] = useState(weapons[0].hands);
   const [att1, setAtt1] = useState(weapons[0].att1);
   const [att2, setAtt2] = useState(weapons[0].att2);
+  const [martial, setMartial] = useState(false);
   const [damageBonus, setDamageBonus] = useState(false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(false);
   const [precBonus, setPrecBonus] = useState(false);
@@ -44,6 +46,7 @@ function Weapons() {
         name,
         att1,
         att2,
+        martial,
         type,
         hand,
         quality,
@@ -65,6 +68,9 @@ function Weapons() {
       }
       if (att2) {
         setAtt2(att2);
+      }
+      if (martial) {
+        setMartial(martial);
       }
       if (type) {
         setType(type);
@@ -101,6 +107,7 @@ function Weapons() {
     setHands(weapons[0].hands);
     setAtt1(weapons[0].att1);
     setAtt2(weapons[0].att2);
+    setMartial(weapons[0].martial)
     setDamageBonus(false);
     setDamageReworkBonus(false);
     setPrecBonus(false);
@@ -210,9 +217,9 @@ function Weapons() {
         >
           {/* Header */}
           <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={1} alignItems="center">
             {/* Change Base */}
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
@@ -227,8 +234,13 @@ function Weapons() {
                   setPrecBonus(false);
                   setAtt1(base.att1);
                   setAtt2(base.att2);
+                  setMartial(base.martial)
                 }}
               />
+            </Grid>
+            {/* Change Martial */}
+            <Grid item xs={2}>
+              <ChangeMartial martial={martial} setMartial={setMartial} />
             </Grid>
             {/* Change Name */}
             <Grid item xs={6}>
@@ -252,7 +264,7 @@ function Weapons() {
               />
             </Grid>
             {/* Change Attributes */}
-            <Grid item xs={5}>
+            <Grid item xs={6}>
               <ChangeAttr
                 att1={att1}
                 att2={att2}
@@ -348,6 +360,7 @@ function Weapons() {
             name: name,
             att1: att1,
             att2: att2,
+            martial: martial,
             type: type,
             hands: hands,
             category: base.category,

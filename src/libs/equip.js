@@ -12,6 +12,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: false
   },
   {
     category: "Arcane",
@@ -24,6 +25,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: false
   },
   {
     category: "Bow",
@@ -36,6 +38,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "distance",
+    martial: false
   },
   {
     category: "Bow",
@@ -48,6 +51,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "distance",
+    martial: false
   },
   {
     category: "Flail",
@@ -60,6 +64,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: false
   },
   {
     category: "Firearm",
@@ -72,6 +77,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "distance",
+    martial: true
   },
   {
     category: "Spear",
@@ -84,6 +90,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: true
   },
   {
     category: "Spear",
@@ -96,6 +103,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: true
   },
   {
     category: "Thrown",
@@ -108,6 +116,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "distance",
+    martial: false
   },
   {
     category: "Heavy",
@@ -120,6 +129,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: false
   },
   {
     category: "Heavy",
@@ -132,6 +142,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: true
   },
   {
     category: "Heavy",
@@ -144,6 +155,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: true
   },
   {
     category: "Dagger",
@@ -156,6 +168,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: false
   },
   {
     category: "Brawling",
@@ -168,6 +181,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: false
   },
   {
     category: "Sword",
@@ -180,6 +194,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: true
   },
   {
     category: "Sword",
@@ -192,6 +207,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: true
   },
   {
     category: "Sword",
@@ -204,6 +220,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 2,
     range: "melee",
+    martial: true
   },
   {
     category: "Sword",
@@ -216,6 +233,7 @@ export const baseWeapons = [
     type: "physical",
     hands: 1,
     range: "melee",
+    martial: true
   },
 ];
 
@@ -228,6 +246,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 0,
     init: 0,
+    martial: false
   },
   {
     name: t("Travel Garb", true),
@@ -237,6 +256,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 1,
     init: -1,
+    martial: false
   },
   {
     name: t("Silk Shirt", true),
@@ -246,6 +266,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 2,
     init: -1,
+    martial: false
   },
   {
     name: t("Combat Tunic", true),
@@ -255,6 +276,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 1,
     init: 0,
+    martial: false
   },
   {
     name: t("Sage Robe", true),
@@ -264,6 +286,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 2,
     init: -2,
+    martial: false
   },
   {
     name: t("Brigandine", true),
@@ -273,6 +296,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 0,
     init: -2,
+    martial: true
   },
   {
     name: t("Bronze Plate", true),
@@ -282,6 +306,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 0,
     init: -3,
+    martial: true
   },
   {
     name: t("Runic Plate", true),
@@ -291,6 +316,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 1,
     init: -3,
+    martial: true
   },
   {
     name: t("Steel Plate", true),
@@ -300,6 +326,7 @@ export const baseArmors = [
     mdef: 0,
     mdefbonus: 0,
     init: -4,
+    martial: true
   },
 ];
 
@@ -312,6 +339,7 @@ export const baseShields = [
     mdef: 0,
     mdefbonus: 0,
     init: 0,
+    martial: false
   },
   {
     name: t("Bronze Shield", true),
@@ -321,6 +349,7 @@ export const baseShields = [
     mdef: 0,
     mdefbonus: 0,
     init: 0,
+    martial: false
   },
   {
     name: t("Runic Shield", true),
@@ -330,5 +359,6 @@ export const baseShields = [
     mdef: 0,
     mdefbonus: 2,
     init: 0,
+    martial: true
   },
 ];

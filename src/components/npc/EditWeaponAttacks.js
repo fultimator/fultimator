@@ -11,7 +11,10 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  ToggleButtonGroup,
+  ToggleButton
 } from "@mui/material";
+import {  Martial } from "../icons";
 import { useState } from "react";
 import attributes from "../../libs/attributes";
 import { baseWeapons } from "../../libs/equip";
@@ -97,7 +100,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={7}>
+      <Grid item xs={5}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -110,23 +113,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="medium"
-                value={attack.extraDamage}
-                onChange={(e, value) => {
-                  return setAttack("extraDamage", e.target.checked);
-                }}
-              />
-            }
-            label={t("Extra Damage")}
-          />
-        </FormGroup>
-      </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={5}>
         <SelectWeapon
           weapon={attack.weapon}
           setWeapon={(value) => {
@@ -164,6 +151,45 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             size="small"
           ></TextField>
         </FormControl>
+      </Grid>
+      {/* <Grid item xs={8} lg={3}>
+        <FormControl variant="outlined" fullWidth>
+          <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
+          <Select
+            value={attack.type}
+            labelId={"attack-" + i + "-type"}
+            id={"attack-" + i + "-type"}
+            label={t("Type:")}
+            size="small"
+            onChange={(e, value) => {
+              return setAttack("type", e.target.value);
+            }}
+          >
+            {Object.keys(types).map((type) => {
+              return (
+                <MenuItem key={type} value={type}>
+                  {types[type].long}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </Grid> */}
+      <Grid item xs>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="medium"
+                value={attack.extraDamage}
+                onChange={(e, value) => {
+                  return setAttack("extraDamage", e.target.checked);
+                }}
+              />
+            }
+            label={t("Extra Damage")}
+          />
+        </FormGroup>
       </Grid>
     </Grid>
   );
@@ -223,7 +249,9 @@ function SelectWeapon({ weapon, setWeapon }) {
   for (const weapon of baseWeapons) {
     options.push(
       <MenuItem key={weapon.name} value={weapon.name}>
-        {weapon.name} <OpenBracket />
+        {weapon.name} {" "}
+        {weapon.martial && <Martial />}{" "}
+        <OpenBracket />
         {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
         {weapon.prec > 0 && `+${weapon.prec}`}
         <CloseBracket /> <OpenBracket />
