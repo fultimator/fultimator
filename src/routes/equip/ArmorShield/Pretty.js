@@ -130,8 +130,8 @@ function PrettySingle({ armor, showActions }) {
                         : ""}
                       {armor.category === t("Armor") && !armor.martial
                         ? armor.def === 0
-                          ? "DEX die"
-                          : "DEX die +" + armor.def
+                          ? t("DEX die")
+                          : t("DEX die") + "+" + armor.def
                         : ""}
                     </Typography>
                   </Grid>
@@ -141,8 +141,8 @@ function PrettySingle({ armor, showActions }) {
 
                       {armor.category === t("Armor")
                         ? armor.mdef === 0
-                          ? "INS die"
-                          : "INS die +" + armor.mdef
+                          ? t("INS die")
+                          : t("INS die") + "+" + armor.mdef
                         : ""}
                     </Typography>
                   </Grid>
