@@ -11,6 +11,7 @@ import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
 import useUploadJSON from "../../../hooks/useUploadJSON";
+import ApplyRework from '../common/ApplyRework';
 
 function ArmorShield() {
   const { t } = useTranslate();
@@ -23,6 +24,8 @@ function ArmorShield() {
   const [martial, setMartial] = useState(false);
   const [qualityCost, setQualityCost] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
+  const [init, setInit] = useState(0);
+  const [rework, setRework] = useState(false);
 
   function calcCost() {
     let cost = base.cost;
@@ -30,7 +33,7 @@ function ArmorShield() {
     cost += parseInt(qualityCost);
     return cost;
   }
-
+  
   const cost = calcCost();
 
   const fileInputRef = useRef(null);
@@ -42,7 +45,9 @@ function ArmorShield() {
         name,
         quality,
         martial,
-        cost
+        cost,
+        init,
+        rework
       } = data;
 
       if (base) {
@@ -60,6 +65,12 @@ function ArmorShield() {
       if (cost) {
         setQualityCost(cost);
       }
+      if (init) {
+        setInit(init);
+      }
+      if (rework) {
+        setRework(rework);
+      }
     }
   });
 
@@ -71,6 +82,8 @@ function ArmorShield() {
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
+    setInit(armor[0].init);
+    setRework(false);
   };
 
   return (
@@ -99,6 +112,7 @@ function ArmorShield() {
                   setBase(base);
                   setName(base.name);
                   setMartial(base.martial)
+                  setInit(base.init)
                 }}
               />
             </Grid>
@@ -146,6 +160,10 @@ function ArmorShield() {
                     Clear All Fields
                   </Button>
                 </Grid>
+                {/* Rework */}
+                <Grid item xs>
+                  <ApplyRework rework={rework} setRework={setRework} />
+                </Grid>
               </Grid>
               <input
                 ref={fileInputRef}
@@ -170,6 +188,8 @@ function ArmorShield() {
             cost: cost,
             martial: martial,
             quality: quality,
+            init: init,
+            rework: rework,
           }}
         />
       </Grid>

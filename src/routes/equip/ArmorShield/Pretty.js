@@ -77,16 +77,23 @@ function PrettySingle({ armor, showActions }) {
                   {t("Cost")}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={2}>
                 <Typography variant="h4" textAlign="center">
                   {t("Defense")}
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={2}>
                 <Typography variant="h4" textAlign="center">
                   {t("M. Defense")}
                 </Typography>
               </Grid>
+              {!armor.rework && (
+                <Grid item xs={2}>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Initiative")}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
             <Grid container>
               <Grid
@@ -122,7 +129,7 @@ function PrettySingle({ armor, showActions }) {
                   <Grid item xs={1}>
                     <Typography textAlign="center">{`${armor.cost}z`}</Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
                       {armor.category === t("Shield") ? "+" + armor.def : ""}
                       {armor.category === t("Armor") && armor.martial
@@ -135,7 +142,7 @@ function PrettySingle({ armor, showActions }) {
                         : ""}
                     </Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
                       {armor.category === t("Shield") ? "+" + armor.mdef : ""}
 
@@ -146,6 +153,17 @@ function PrettySingle({ armor, showActions }) {
                         : ""}
                     </Typography>
                   </Grid>
+                  {!armor.rework && (
+                    <Grid item xs={2}>
+                      <Typography fontWeight="bold" textAlign="center">
+                        {armor.category === t("Armor") || armor.category === t("Shield")
+                          ? armor.init === 0
+                            ? "-"
+                            : armor.init
+                          : ""}
+                      </Typography>
+                    </Grid>
+                  )}
                 </Grid>
 
                 {/* Second Row */}

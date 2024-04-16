@@ -8,6 +8,7 @@ const shield = [
     def: 2,
     mdef: 0,
     martial: false,
+    init: 0
   },
   {
     category: t("Shield", true),
@@ -16,6 +17,7 @@ const shield = [
     def: 2,
     mdef: 2,
     martial: true,
+    init: 0
   },
   {
     category: t("Armor", true),
@@ -25,6 +27,7 @@ const shield = [
     mdef: 2,
     armor: true,
     martial: false,
+    init: -1
   },
   {
     category: t("Armor", true),
@@ -34,6 +37,7 @@ const shield = [
     mdef: 1,
     armor: true,
     martial: false,
+    init: -1
   },
   {
     category: t("Armor", true),
@@ -43,6 +47,7 @@ const shield = [
     mdef: 1,
     armor: true,
     martial: false,
+    init: 0
   },
   {
     category: t("Armor", true),
@@ -52,6 +57,7 @@ const shield = [
     mdef: 0,
     armor: true,
     martial: false,
+    init: 0
   },
   {
     category: t("Armor", true),
@@ -61,6 +67,7 @@ const shield = [
     mdef: 2,
     armor: true,
     martial: false,
+    init: -2
   },
   {
     category: t("Armor", true),
@@ -70,6 +77,7 @@ const shield = [
     mdef: 0,
     armor: true,
     martial: true,
+    init: -2
   },
   {
     category: t("Armor", true),
@@ -79,6 +87,7 @@ const shield = [
     mdef: 0,
     armor: true,
     martial: true,
+    init: -3
   },
   {
     category: t("Armor", true),
@@ -88,6 +97,7 @@ const shield = [
     mdef: 1,
     armor: true,
     martial: true,
+    init: -3
   },
   {
     category: t("Armor", true),
@@ -97,6 +107,7 @@ const shield = [
     mdef: 0,
     armor: true,
     martial: true,
+    init: -4
   },
 ];
 
