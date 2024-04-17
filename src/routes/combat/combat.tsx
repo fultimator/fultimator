@@ -249,7 +249,7 @@ function NpcCombatant({ npc }: NpcProps) {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} ref={ref} collapse={true} />
+        <NpcPretty npc={npc} study={selectedStudy} ref={ref} collapse={true} includeImage={false} />
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>

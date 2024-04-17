@@ -18,7 +18,7 @@ import {
   MenuItem,
   FormHelperText,
   useTheme,
-  useMediaQuery 
+  useMediaQuery
 } from "@mui/material";
 import {
   Download,
@@ -27,6 +27,8 @@ import {
   Share,
   ArrowUpward,
   ContentCopy,
+  Image,
+  HideImage
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -119,6 +121,12 @@ export default function NpcEdit() {
   // Download
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
+
+  // Upload Temporary Image
+  const [includeImage, setIncludeImage] = useState(false);
+  const toggleIncludeImage = () => {
+    setIncludeImage(!includeImage);
+  };
 
   if (!npcTemp) {
     return null;
@@ -232,11 +240,16 @@ export default function NpcEdit() {
     <Layout>
       <Grid container spacing={2}>
         <Grid item xs={12} md={8}>
-          <NpcPretty npc={npcTemp} ref={prettyRef} collapse={true} />
+          <NpcPretty npc={npcTemp} ref={prettyRef} collapse={true} includeImage={includeImage} />
         </Grid>
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
           <Divider sx={{ my: 1 }} />
+          <Tooltip title={t("Upload Image: Images are temporarily stored and will reset on page refresh.")}>
+            <IconButton onClick={toggleIncludeImage}>
+              {includeImage ? <Image /> : <HideImage />}
+            </IconButton>
+          </Tooltip>
           <Tooltip title={t("Download as Image")}>
             <IconButton
               onClick={() => {
@@ -510,8 +523,8 @@ export default function NpcEdit() {
           zIndex: 10,
         }}
       > */}
-        {/* SP Tracker Field */}
-        {/* <ExplainSkillsSimplified npc={npcTemp} />
+      {/* SP Tracker Field */}
+      {/* <ExplainSkillsSimplified npc={npcTemp} />
       </Grid> */}
 
       {isUpdated && (

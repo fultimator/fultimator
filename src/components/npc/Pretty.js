@@ -1,4 +1,4 @@
-import { Card, Grid, Typography } from "@mui/material";
+import { Card, Grid, Typography, Box } from "@mui/material";
 import React, { Fragment } from "react";
 import ReactMarkdown from "react-markdown";
 import attributes from "../../libs/attributes";
@@ -26,11 +26,11 @@ import {
 import { Martial } from "../icons";
 import { TypeAffinity, TypeName } from "../types";
 import Study from "./Study";
-
+import EditableImage from "../EditableImage";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 
-function NpcPretty({ npc, study, collapse, onClick = () => { } }, ref) {
+function NpcPretty({ npc, study, collapse, includeImage, onClick = () => { } }, ref) {
   const { t } = useTranslate();
   return (
     <Card>
@@ -42,7 +42,7 @@ function NpcPretty({ npc, study, collapse, onClick = () => { } }, ref) {
                 boxShadow: collapse ? "none" : "1px 1px 5px",
               }}
             >
-              <Header npc={npc} />
+              <Header npc={npc} includeImage={includeImage} />
             </div>
             {collapse ? (
               <>
@@ -91,97 +91,118 @@ function NpcPretty({ npc, study, collapse, onClick = () => { } }, ref) {
   );
 }
 
-function Header({ npc }) {
+function Header({ npc, includeImage }) {
   const { t } = useTranslate();
   return (
     <Grid container alignItems="stretch">
-      <Grid
-        item
-        xs
-        sx={{
-          background: "linear-gradient(90deg, #674168 0%, #b9a9be 100%);",
-          borderRight: "4px solid white",
-          px: 2,
-        }}
-      >
-        <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.5rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
-          {npc.name}
-        </Typography>
-      </Grid>
-      <Grid
-        item
-        sx={{
-          px: 2,
-          py: 0.5,
-          borderLeft: "2px solid #b9a9be",
-          borderBottom: "2px solid #b9a9be",
-          borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
-        }}
-      >
-        <Typography
-          fontFamily="Antonio"
-          fontSize="1.25rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
-          {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
-        </Typography>
-      </Grid>
-      {(npc.villain || npc.phases || npc.multipart) && (
+      <Grid container>
         <Grid
           item
-          xs={12}
+          xs
+          sx={{
+            background: "linear-gradient(90deg, #674168 0%, #b9a9be 100%);",
+            borderRight: "4px solid white",
+            px: 2,
+          }}
+        >
+          <Typography
+            color="white.main"
+            fontFamily="Antonio"
+            fontSize="1.5rem"
+            fontWeight="medium"
+            sx={{ textTransform: "uppercase" }}
+          >
+            {npc.name}
+          </Typography>
+        </Grid>
+        <Grid
+          item
           sx={{
             px: 2,
             py: 0.5,
-            borderBottom: "1px solid #b9a9be",
-            borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+            borderLeft: "2px solid #b9a9be",
+            borderBottom: "2px solid #b9a9be",
+            borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
           }}
         >
           <Typography
             fontFamily="Antonio"
             fontSize="1.25rem"
+            fontWeight="medium"
             sx={{ textTransform: "uppercase" }}
           >
-            {RenderVillainPhase(npc)}
+            {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
           </Typography>
         </Grid>
-      )}
-      <Grid
-        item
-        xs={12}
-        sx={{
-          px: 2,
-          py: 0.5,
-          borderBottom: "1px solid #b9a9be",
-          borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
-        }}
-      >
-        <Typography>
-          <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
-            {npc.description}
-          </ReactMarkdown>
-        </Typography>
       </Grid>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          px: 2,
-          py: 0.5,
-        }}
-      >
-        <Typography>
-          <strong>{t("Typical Traits:")} </strong>
-          {npc.traits}
-        </Typography>
-      </Grid>
+      <Box sx={{ display: 'flex' }}>
+        {/* EditableImage */}
+        {includeImage && (
+          <Box
+            sx={{
+              flex: "0 0 120px",
+              minWidth: "120px",
+              minHeight: "120px",
+              background: "white",
+              border: "1px solid #684268",
+              borderTop: "none",
+              overflow: "hidden"
+            }}
+          >
+            <EditableImage size={120} />
+          </Box>
+        )}
+        {/* Rows */}
+        <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+          {/* Row 1 */}
+          {(npc.villain || npc.phases || npc.multipart) && (
+            <Box
+              sx={{
+                px: 2,
+                py: 0.5,
+                borderBottom: "1px solid #b9a9be",
+                borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+              }}
+            >
+              <Typography
+                fontFamily="Antonio"
+                fontSize="1.25rem"
+                sx={{ textTransform: "uppercase" }}
+              >
+                {RenderVillainPhase(npc)}
+              </Typography>
+            </Box>
+          )}
+          {/* Row 2 */}
+          <Box
+            sx={{
+              px: 2,
+              py: 0.5,
+              borderBottom: "1px solid #b9a9be",
+              borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+              flexGrow: 1,
+            }}
+          >
+            <Typography>
+              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                {npc.description}
+              </ReactMarkdown>
+            </Typography>
+          </Box>
+          {/* Row 3 */}
+          <Box
+            sx={{
+              px: 2,
+              py: 0.5,
+            }}
+          >
+            <Typography>
+              <strong>{t("Typical Traits:")} </strong>
+              {npc.traits}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
     </Grid>
   );
 }
@@ -1019,7 +1040,7 @@ function Equip({ npc }) {
       {npc.shield && npc.shield.name !== "No Shield" && (
         <Grid item xs={12} sx={{ px: 2, py: 0 }}>
           <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
-          {npc.armor.martial && <Martial />}
+          {npc.shield.martial && <Martial />}
           <Diamond />{" "}
           {npc.shield.def > 0 ? (
             <strong>
