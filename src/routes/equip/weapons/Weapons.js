@@ -141,7 +141,7 @@ function Weapons() {
     if (!rework && base.prec !== 1 && precBonus) {
       cost += 100;
       // Bonus prec (rework)
-    } else if (rework && base.prec === 1 && precBonus) {
+    } else if (rework && base.prec <= 1 && precBonus) {
       cost += 100;
     }
 
