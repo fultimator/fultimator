@@ -246,6 +246,97 @@ function NpcCombatant({ npc }: NpcProps) {
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
+
+  /************ ATTACK ROLL ************/
+  // Initialize states for dice, hit throw, damage results, critical success and critical failure
+  const [diceResults, setDiceResults] = useState({ attribute1: 0, attribute2: 0 });
+  const [hitThrowResult, setHitThrowResult] = useState({ totalHitScore: 0 });
+  const [damageResult, setDamageResult] = useState({ damage: 0 }); 
+  const [isCriticalSuccess, setIsCriticalSuccess] = useState(false);
+  const [isCriticalFailure, setIsCriticalFailure] = useState(false);
+
+  // Handle Attack Roll
+  const rollAttackDice = (attack) => {
+    let attribute1, attribute2, extraDamage;
+  
+    if (attack.weapon) {
+      // For weapon attacks
+      const { att1, att2 } = attack.weapon;
+      attribute1 = npc.attributes[att1];
+      attribute2 = npc.attributes[att2];
+      extraDamage = attack.weapon.damage;
+
+    } else {
+      // For base attacks
+      const { attr1, attr2 } = attack;
+      attribute1 = npc.attributes[attr1];
+      attribute2 = npc.attributes[attr2];
+      extraDamage = attack.extraDamage ? 10 : 5;
+
+    }
+  
+    // Simulate rolling the dice for each attribute
+    const rollDice = (attribute) => Math.floor(Math.random() * attribute) + 1;
+    const roll1 = rollDice(attribute1);
+    const roll2 = rollDice(attribute2);
+  
+    // Check for critical success / failure
+    const isCriticalSuccess = roll1 === roll2 && roll1 >= 6 && roll2 >= 6;
+    const isCriticalFailure = roll1 === 1 && roll2 === 1;
+    setIsCriticalSuccess(isCriticalSuccess);
+    setIsCriticalFailure(isCriticalFailure);
+  
+    // Update dice results state
+    setDiceResults({ attribute1: roll1, attribute2: roll2 });
+  
+    // Calculate results
+    const totalHitScore = roll1 + roll2;
+    let baseDamage = Math.max(roll1, roll2);
+    const damage = baseDamage + extraDamage;
+  
+    // Update results
+    setHitThrowResult({ totalHitScore });
+    setDamageResult({ damage });
+  
+    return { totalHitScore, damage };
+  };  
+
+  // Handle the Attack Button Label
+  const generateButtonLabel = (attack) => {
+    let translatedAttribute1, translatedAttribute2;
+  
+    if (attack.weapon) {
+      // For weapon attacks
+      const { name, weapon } = attack;
+      const { att1, att2 } = weapon;
+      const attributeMap = {
+        dexterity: "DEX",
+        insight: "INS",
+        might: "MIG",
+        will: "WLP",
+      };
+  
+      translatedAttribute1 = `${attributeMap[att1]} d${npc.attributes[att1]}`;
+      translatedAttribute2 = `${attributeMap[att2]} d${npc.attributes[att2]}`;
+      
+      return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
+    } else {
+      // For base attacks
+      const { name, attr1, attr2 } = attack;
+      const attributeMap = {
+        dexterity: "DEX",
+        insight: "INS",
+        might: "MIG",
+        will: "WLP",
+      };
+  
+      translatedAttribute1 = `${attributeMap[attr1]} d${npc.attributes[attr1]}`;
+      translatedAttribute2 = `${attributeMap[attr2]} d${npc.attributes[attr2]}`;
+      
+      return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
+    }
+  };
+
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
@@ -452,7 +543,80 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item flex="1"></Grid>
+          {/**ATTACK ROLL SIMULATOR**/}
+          <Grid item flex="1">
+            {npc.attacks.map((attack, index) => (
+              <Grid item key={index}>
+                <Button
+                  variant="contained"
+                  onClick={() => rollAttackDice(attack)}
+                  sx={{
+                    width: "100%",
+                    textAlign: "center",
+                    padding: "8px",
+                    margin: "4px 0",
+                  }}
+                >
+                  {generateButtonLabel(attack)}
+                </Button>
+              </Grid>
+            ))}
+            {npc.weaponattacks?.map((wattack, index) => (
+            <Grid item key={index}>
+              <Button
+                variant="outlined"
+                onClick={() => rollAttackDice(wattack)}
+                sx={{
+                  width: "100%",
+                  textAlign: "center",
+                  padding: "8px",
+                  margin: "4px 0",
+                }}
+              >
+                {generateButtonLabel(wattack)}
+              </Button>
+            </Grid>
+          ))}
+            <Grid item container pb={1} mt={2} xs={12} spacing={1} border={1} borderRadius={1}>
+              <Grid item xs={4}>
+                <Typography variant="h6">Dice Results</Typography>
+                <Typography variant="body1">First Die 1: <b>{diceResults.attribute1}</b></Typography>
+                <Typography variant="body1">Second Die 2: <b>{diceResults.attribute2}</b></Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6">Hit Throw Result</Typography>
+                <Typography variant="body1">Hit Score: <b>{hitThrowResult.totalHitScore}</b></Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6">Damage Result</Typography>
+                <Typography variant="body1">Damage: <b>{damageResult.damage}</b></Typography>
+              </Grid>
+              {isCriticalSuccess && (
+                <Grid item xs={12}>
+                  <Typography variant="h4" color="green" 
+                    sx={{
+                      width: "100%",
+                      textAlign: "center"
+                    }}>
+                    {t("Critical Success!")}
+                  </Typography>
+                </Grid>
+              )}
+              {isCriticalFailure && (
+                <Grid item xs={12}>
+                  <Typography variant="h4" color="error"
+                    sx={{
+                      width: "100%",
+                      textAlign: "center"
+                    }}>
+                    {t("Critical Failure!")}
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+            {/*********************/}     
+            {/*<Button variant="outlined" onClick={() => console.log(npc)}>LOG NPC OBJECT</Button>*/}
+          </Grid> 
         </Grid>
       </Grid>
       <Divider flexItem sx={{ p: 1, my: 2, width: "100%" }} />
