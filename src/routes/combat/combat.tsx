@@ -255,87 +255,110 @@ function NpcCombatant({ npc }: NpcProps) {
   const [isCriticalSuccess, setIsCriticalSuccess] = useState(false);
   const [isCriticalFailure, setIsCriticalFailure] = useState(false);
 
-  // Handle Attack Roll
-  const rollAttackDice = (attack) => {
-    let attribute1, attribute2, extraDamage;
-  
-    if (attack.weapon) {
-      // For weapon attacks
-      const { att1, att2 } = attack.weapon;
-      attribute1 = npc.attributes[att1];
-      attribute2 = npc.attributes[att2];
-      extraDamage = attack.weapon.damage;
+// Handle Attack Roll
+const rollAttackDice = (attack, attackType) => {
+  let attribute1, attribute2, extraDamage, extraPrecision;
 
-    } else {
-      // For base attacks
-      const { attr1, attr2 } = attack;
-      attribute1 = npc.attributes[attr1];
-      attribute2 = npc.attributes[attr2];
-      extraDamage = attack.extraDamage ? 10 : 5;
+  if (attackType == "weapon") {
+    // For weapon attacks
+    const { att1, att2 } = attack.weapon;
+    attribute1 = attributes[att1]; 
+    attribute2 = attributes[att2]; 
+    extraDamage = attack.weapon.damage;
+    extraPrecision = (npc.extra?.precision ? 3 : 0) + attack.weapon.prec;
+  } else if (attackType == "spell") {
+    // For spells
+    const { attr1, attr2 } = attack.spell;
+    attribute1 = attributes[attr1];
+    attribute2 = attributes[attr2];
+    extraDamage = 0;
+    extraPrecision = npc.extra?.magic ? 3 : 0;
+  } else {
+    // For base attacks
+    const { attr1, attr2 } = attack;
+    attribute1 = attributes[attr1];
+    attribute2 = attributes[attr2];
+    extraDamage = attack.extraDamage ? 10 : 5;
+    extraPrecision = npc.extra?.precision ? 3 : 0;
+  }
 
-    }
-  
-    // Simulate rolling the dice for each attribute
-    const rollDice = (attribute) => Math.floor(Math.random() * attribute) + 1;
-    const roll1 = rollDice(attribute1);
-    const roll2 = rollDice(attribute2);
-  
-    // Check for critical success / failure
-    const isCriticalSuccess = roll1 === roll2 && roll1 >= 6 && roll2 >= 6;
-    const isCriticalFailure = roll1 === 1 && roll2 === 1;
-    setIsCriticalSuccess(isCriticalSuccess);
-    setIsCriticalFailure(isCriticalFailure);
-  
-    // Update dice results state
-    setDiceResults({ attribute1: roll1, attribute2: roll2 });
-  
-    // Calculate results
-    const totalHitScore = roll1 + roll2;
-    let baseDamage = Math.max(roll1, roll2);
-    const damage = baseDamage + extraDamage;
-  
-    // Update results
-    setHitThrowResult({ totalHitScore });
-    setDamageResult({ damage });
-  
-    return { totalHitScore, damage };
-  };  
+  // Simulate rolling the dice for each attribute
+  const rollDice = (attribute) => Math.floor(Math.random() * attribute) + 1;
+  const roll1 = rollDice(attribute1);
+  const roll2 = rollDice(attribute2);
 
-  // Handle the Attack Button Label
-  const generateButtonLabel = (attack) => {
-    let translatedAttribute1, translatedAttribute2;
-  
-    if (attack.weapon) {
-      // For weapon attacks
-      const { name, weapon } = attack;
-      const { att1, att2 } = weapon;
-      const attributeMap = {
-        dexterity: "DEX",
-        insight: "INS",
-        might: "MIG",
-        will: "WLP",
-      };
-  
-      translatedAttribute1 = `${attributeMap[att1]} d${npc.attributes[att1]}`;
-      translatedAttribute2 = `${attributeMap[att2]} d${npc.attributes[att2]}`;
-      
-      return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
-    } else {
-      // For base attacks
-      const { name, attr1, attr2 } = attack;
-      const attributeMap = {
-        dexterity: "DEX",
-        insight: "INS",
-        might: "MIG",
-        will: "WLP",
-      };
-  
-      translatedAttribute1 = `${attributeMap[attr1]} d${npc.attributes[attr1]}`;
-      translatedAttribute2 = `${attributeMap[attr2]} d${npc.attributes[attr2]}`;
-      
-      return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
-    }
-  };
+  // Check for critical success / failure
+  const isCriticalSuccess = roll1 === roll2 && roll1 >= 6 && roll2 >= 6;
+  const isCriticalFailure = roll1 === 1 && roll2 === 1;
+  setIsCriticalSuccess(isCriticalSuccess);
+  setIsCriticalFailure(isCriticalFailure);
+
+  // Update dice results state
+  setDiceResults({ attribute1: roll1, attribute2: roll2 });
+
+  // Calculate results
+  const totalHitScore = roll1 + roll2 + extraPrecision;
+  let baseDamage = Math.max(roll1, roll2);
+  const damage = baseDamage + extraDamage;
+
+  // Update results
+  setHitThrowResult({ totalHitScore });
+  setDamageResult({ damage });
+
+  return { totalHitScore, damage };
+};
+
+
+// Handle the Attack Button Label
+const generateButtonLabel = (attack) => {
+  let translatedAttribute1, translatedAttribute2;
+
+  if (attack.weapon) {
+    // For weapon attacks
+    const { name, weapon } = attack;
+    const { att1, att2 } = weapon;
+    const attributeMap = {
+      dexterity: "DEX",
+      insight: "INS",
+      might: "MIG",
+      will: "WLP",
+    };
+
+    translatedAttribute1 = `${attributeMap[att1]} d${attributes[att1]}`;
+    translatedAttribute2 = `${attributeMap[att2]} d${attributes[att2]}`;
+
+    return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
+  } else if (attack.spell){
+    // For spells
+    const { name, spell } = attack;
+    const { attr1, attr2 } = spell;
+    const attributeMap = {
+      dexterity: "DEX",
+      insight: "INS",
+      might: "MIG",
+      will: "WLP",
+    };
+
+    translatedAttribute1 = `${attributeMap[attr1]} d${attributes[attr1]}`; // Use attributes state here
+    translatedAttribute2 = `${attributeMap[attr2]} d${attributes[attr2]}`; // Use attributes state here
+
+    return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
+  } {
+    // For base attacks
+    const { name, attr1, attr2 } = attack;
+    const attributeMap = {
+      dexterity: "DEX",
+      insight: "INS",
+      might: "MIG",
+      will: "WLP",
+    };
+
+    translatedAttribute1 = `${attributeMap[attr1]} d${attributes[attr1]}`; // Use attributes state here
+    translatedAttribute2 = `${attributeMap[attr2]} d${attributes[attr2]}`; // Use attributes state here
+
+    return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
+  }
+};
 
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
@@ -549,7 +572,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Grid item key={index}>
                 <Button
                   variant="contained"
-                  onClick={() => rollAttackDice(attack)}
+                  onClick={() => rollAttackDice(attack, "baseattack")}
                   sx={{
                     width: "100%",
                     textAlign: "center",
@@ -565,7 +588,7 @@ function NpcCombatant({ npc }: NpcProps) {
             <Grid item key={index}>
               <Button
                 variant="outlined"
-                onClick={() => rollAttackDice(wattack)}
+                onClick={() => rollAttackDice(wattack, "weapon")}
                 sx={{
                   width: "100%",
                   textAlign: "center",
@@ -574,6 +597,23 @@ function NpcCombatant({ npc }: NpcProps) {
                 }}
               >
                 {generateButtonLabel(wattack)}
+              </Button>
+            </Grid>
+          ))}
+          {npc.spells?.map((spell, index) => (
+            <Grid item key={index}>
+              <Button
+                variant="contained"
+                color = "info"
+                onClick={() => rollAttackDice(spell, "spell")}
+                sx={{
+                  width: "100%",
+                  textAlign: "center",
+                  padding: "8px",
+                  margin: "4px 0",
+                }}
+              >
+                {generateButtonLabel(spell)}
               </Button>
             </Grid>
           ))}
@@ -615,7 +655,7 @@ function NpcCombatant({ npc }: NpcProps) {
               )}
             </Grid>
             {/*********************/}     
-            {/*<Button variant="outlined" onClick={() => console.log(npc)}>LOG NPC OBJECT</Button>*/}
+            <Button variant="outlined" onClick={() => console.log(npc)}>LOG NPC OBJECT</Button>
           </Grid> 
         </Grid>
       </Grid>
