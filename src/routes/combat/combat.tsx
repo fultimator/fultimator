@@ -24,6 +24,7 @@ import { SignIn } from "../../components/auth";
 import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
+import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
 import { useEffect } from "react";
 import React from "react";
@@ -370,14 +371,49 @@ const generateButtonLabel = (attack) => {
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
         <NpcPretty npc={npc} study={selectedStudy} ref={ref} collapse={true} includeImage={false} />
+        <Grid item container xs={12} mt={5}>
+            <Grid item xs={2}>
+              <Typography variant="h5">{t("Study Roll:")}</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Select
+                labelId="study"
+                id="study"
+                value={selectedStudy}
+                onChange={handleStudyChange}
+                fullWidth
+              >
+                <MenuItem value={0}>-</MenuItem>
+                <MenuItem value={1}>7+</MenuItem>
+                <MenuItem value={2}>10+</MenuItem>
+                <MenuItem value={3}>13+</MenuItem>
+              </Select>
+            </Grid>
+            {/* Download Button */}
+            <Button
+              color="primary"
+              aria-label="download"
+              onClick={downloadImage}
+              style={{ cursor: "pointer" }}
+            >
+              <Tooltip title="Download Sheet" placement="bottom">
+                <Download />
+              </Tooltip>
+            </Button>
+          </Grid>
       </Grid>
       <Grid xs={6} item>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
-          <Grid item xs={2}>
-            <Typography variant="h5" color="red">
-              {t("HP:")} {hp}
-            </Typography>
-            {crisis && t("Crisis!")}
+          <Grid item xs={10} container alignItems="center">
+            <Grid item xs={2}>
+              <Typography variant="h5" color="red">
+                {t("HP:")} {hp}
+              </Typography>
+              {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
+            </Grid>
+            <Grid item xs={10}>
+              <PointBar pt={hp} maxPt={calcHP(npc)} color1={'green'} color2={'red'} />
+            </Grid>       
           </Grid>
           <Grid item xs={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
@@ -397,10 +433,16 @@ const generateButtonLabel = (attack) => {
               <Button onClick={changeHp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h5" color="cyan">
-              {t("MP:")} {mp}
-            </Typography>
+          <Grid item xs={10} container alignItems="center">
+            <Grid item xs={2}>
+              <Typography variant="h5" color="red">
+                {t("MP:")} {mp}
+              </Typography>
+              {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
+            </Grid>
+            <Grid item xs={10}>
+              <PointBar pt={mp} maxPt={calcMP(npc)} color1={'blue'} color2={'darkBlue'} />
+            </Grid>       
           </Grid>
           <Grid item xs={5}>
             <ButtonGroup variant="outlined" size="small" color="info">
@@ -442,36 +484,7 @@ const generateButtonLabel = (attack) => {
               </Typography>
             </Grid>
           </Grid>
-          <Grid item container xs={12}>
-            <Grid item xs={2}>
-              <Typography variant="h5">{t("Study Roll:")}</Typography>
-            </Grid>
-            <Grid item xs={2}>
-              <Select
-                labelId="study"
-                id="study"
-                value={selectedStudy}
-                onChange={handleStudyChange}
-                fullWidth
-              >
-                <MenuItem value={0}>-</MenuItem>
-                <MenuItem value={1}>7+</MenuItem>
-                <MenuItem value={2}>10+</MenuItem>
-                <MenuItem value={3}>13+</MenuItem>
-              </Select>
-            </Grid>
-            {/* Download Button */}
-            <Button
-              color="primary"
-              aria-label="download"
-              onClick={downloadImage}
-              style={{ cursor: "pointer" }}
-            >
-              <Tooltip title="Download Sheet" placement="bottom">
-                <Download />
-              </Tooltip>
-            </Button>
-          </Grid>
+          
           <Grid item container xs={12}>
             <Grid item xs>
               <FormControlLabel
