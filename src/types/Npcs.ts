@@ -69,7 +69,8 @@ export interface NpcRareGear {
 export interface NpcExtra {
     init?: boolean,
     precision?: boolean,
-    hp?: string
+    hp?: string,
+    magic?: boolean
 }
 
 export interface NpcAffinities {
