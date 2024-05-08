@@ -259,16 +259,16 @@ function NpcCombatant({ npc }: NpcProps) {
 const rollAttackDice = (attack, attackType) => {
   let attribute1, attribute2, extraDamage, extraPrecision;
 
-  if (attackType == "weapon") {
+  if (attackType === "weapon") {
     // For weapon attacks
     const { att1, att2 } = attack.weapon;
     attribute1 = attributes[att1]; 
     attribute2 = attributes[att2]; 
-    extraDamage = attack.weapon.damage;
-    extraPrecision = (npc.extra?.precision ? 3 : 0) + attack.weapon.prec;
-  } else if (attackType == "spell") {
+    extraDamage = attack.weapon.damage + parseInt(attack.flatdmg) + (attack.extraDamage ? 5 : 0);
+    extraPrecision = (npc.extra?.precision ? 3 : 0) + attack.weapon.prec + parseInt(attack.flathit);
+  } else if (attackType === "spell") {
     // For spells
-    const { attr1, attr2 } = attack.spell;
+    const { attr1, attr2 } = attack;
     attribute1 = attributes[attr1];
     attribute2 = attributes[attr2];
     extraDamage = 0;
@@ -280,6 +280,12 @@ const rollAttackDice = (attack, attackType) => {
     attribute2 = attributes[attr2];
     extraDamage = attack.extraDamage ? 10 : 5;
     extraPrecision = npc.extra?.precision ? 3 : 0;
+  }
+
+  if (attribute1 === undefined || attribute2 === undefined) {
+    // Handle the case where attributes are not defined
+    console.error("Attributes not defined");
+    return;
   }
 
   // Simulate rolling the dice for each attribute
@@ -617,17 +623,17 @@ const generateButtonLabel = (attack) => {
               </Button>
             </Grid>
           ))}
-            <Grid item container pb={1} mt={2} xs={12} spacing={1} border={1} borderRadius={1}>
-              <Grid item xs={4}>
+            <Grid item container pb={1} mt={2} border={1} borderRadius={1}>
+              <Grid item xs={4} pt={1} pl={1}>
                 <Typography variant="h6">Dice Results</Typography>
-                <Typography variant="body1">First Die 1: <b>{diceResults.attribute1}</b></Typography>
-                <Typography variant="body1">Second Die 2: <b>{diceResults.attribute2}</b></Typography>
+                <Typography variant="body1">First Die: <b>{diceResults.attribute1}</b></Typography>
+                <Typography variant="body1">Second Die: <b>{diceResults.attribute2}</b></Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} pt={1} pl={1}>
                 <Typography variant="h6">Hit Throw Result</Typography>
                 <Typography variant="body1">Hit Score: <b>{hitThrowResult.totalHitScore}</b></Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} pt={1} pl={1}>
                 <Typography variant="h6">Damage Result</Typography>
                 <Typography variant="body1">Damage: <b>{damageResult.damage}</b></Typography>
               </Grid>
@@ -655,7 +661,7 @@ const generateButtonLabel = (attack) => {
               )}
             </Grid>
             {/*********************/}     
-            <Button variant="outlined" onClick={() => console.log(npc)}>LOG NPC OBJECT</Button>
+            {/*<Button variant="outlined" onClick={() => console.log(npc)}>LOG NPC OBJECT</Button>*/}
           </Grid> 
         </Grid>
       </Grid>
