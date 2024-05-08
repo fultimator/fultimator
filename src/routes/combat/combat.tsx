@@ -330,8 +330,8 @@ const generateButtonLabel = (attack) => {
       will: "WLP",
     };
 
-    translatedAttribute1 = `${attributeMap[att1]} d${attributes[att1]}`;
-    translatedAttribute2 = `${attributeMap[att2]} d${attributes[att2]}`;
+    translatedAttribute1 = `${t(attributeMap[att1])} d${attributes[att1]}`;
+    translatedAttribute2 = `${t(attributeMap[att2])} d${attributes[att2]}`;
 
     return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
   } else if (attack.spell){
@@ -345,8 +345,8 @@ const generateButtonLabel = (attack) => {
       will: "WLP",
     };
 
-    translatedAttribute1 = `${attributeMap[attr1]} d${attributes[attr1]}`; // Use attributes state here
-    translatedAttribute2 = `${attributeMap[attr2]} d${attributes[attr2]}`; // Use attributes state here
+    translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
+    translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
 
     return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
   } {
@@ -359,8 +359,8 @@ const generateButtonLabel = (attack) => {
       will: "WLP",
     };
 
-    translatedAttribute1 = `${attributeMap[attr1]} d${attributes[attr1]}`; // Use attributes state here
-    translatedAttribute2 = `${attributeMap[attr2]} d${attributes[attr2]}`; // Use attributes state here
+    translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
+    translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
 
     return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
   }
@@ -606,11 +606,13 @@ const generateButtonLabel = (attack) => {
               </Button>
             </Grid>
           ))}
-          {npc.spells?.map((spell, index) => (
+          {npc.spells
+          ?.filter((spell) => spell.type === 'offensive')
+          .map((spell, index) => (
             <Grid item key={index}>
               <Button
                 variant="contained"
-                color = "info"
+                color="info"
                 onClick={() => rollAttackDice(spell, "spell")}
                 sx={{
                   width: "100%",
@@ -625,17 +627,17 @@ const generateButtonLabel = (attack) => {
           ))}
             <Grid item container pb={1} mt={2} border={1} borderRadius={1}>
               <Grid item xs={4} pt={1} pl={1}>
-                <Typography variant="h6">Dice Results</Typography>
-                <Typography variant="body1">First Die: <b>{diceResults.attribute1}</b></Typography>
-                <Typography variant="body1">Second Die: <b>{diceResults.attribute2}</b></Typography>
+                <Typography variant="h6">{t("Dice Results")}</Typography>
+                <Typography variant="body1">{t("Die 1")}: <b>{diceResults.attribute1}</b></Typography>
+                <Typography variant="body1">{t("Die 2")}: <b>{diceResults.attribute2}</b></Typography>
               </Grid>
               <Grid item xs={4} pt={1} pl={1}>
-                <Typography variant="h6">Hit Throw Result</Typography>
-                <Typography variant="body1">Hit Score: <b>{hitThrowResult.totalHitScore}</b></Typography>
+                <Typography variant="h6">{t("Hit Throw Result")}</Typography>
+                <Typography variant="body1">{t("Hit Score")}: <b>{hitThrowResult.totalHitScore}</b></Typography>
               </Grid>
               <Grid item xs={4} pt={1} pl={1}>
-                <Typography variant="h6">Damage Result</Typography>
-                <Typography variant="body1">Damage: <b>{damageResult.damage}</b></Typography>
+                <Typography variant="h6">{t("Damage Result")}</Typography>
+                <Typography variant="body1">{t("Damage")}: <b>{damageResult.damage}</b></Typography>
               </Grid>
               {isCriticalSuccess && (
                 <Grid item xs={12}>
