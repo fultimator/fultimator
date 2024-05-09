@@ -236,7 +236,7 @@ function NpcCombatant({ npc }: NpcProps) {
     }
   };
 
-  const crisis = hp < calcHP(npc) / 2;
+  const crisis = hp <= calcHP(npc) / 2;
 
   const [selectedStudy, setSelectedStudy] = useState(0);
 
@@ -412,7 +412,7 @@ const generateButtonLabel = (attack) => {
               {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
             </Grid>
             <Grid item xs={10}>
-              <PointBar pt={hp} maxPt={calcHP(npc)} color1={'green'} color2={'red'} />
+              <PointBar pt={hp} maxPt={calcHP(npc)} color1={'#17b924'} color2={'#d1232a'} />
             </Grid>       
           </Grid>
           <Grid item xs={5}>
@@ -438,10 +438,9 @@ const generateButtonLabel = (attack) => {
               <Typography variant="h5" color="red">
                 {t("MP:")} {mp}
               </Typography>
-              {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
             </Grid>
             <Grid item xs={10}>
-              <PointBar pt={mp} maxPt={calcMP(npc)} color1={'blue'} color2={'darkBlue'} />
+              <PointBar pt={mp} maxPt={calcMP(npc)} color1={'#16aad6'} color2={'#0e8aae'} />
             </Grid>       
           </Grid>
           <Grid item xs={5}>
