@@ -235,7 +235,7 @@ function Init({ npc, setNpc }) {
     <FormGroup>
       <FormLabel id="extra-defenses">{t("Bonuses")}</FormLabel>
       <FormControlLabel
-        control={<Checkbox value={npc.extra?.init} onChange={onChange} />}
+        control={<Checkbox checked={npc.extra?.init} value={npc.extra?.init} onChange={onChange} />}
         label={`+4 ${t("Initiative", true)}`}
       />
     </FormGroup>
@@ -283,7 +283,7 @@ function Precision({ npc, setNpc }) {
   return (
     <FormGroup>
       <FormControlLabel
-        control={<Checkbox value={npc.extra?.precision} onChange={onChange} />}
+        control={<Checkbox checked={npc.extra?.precision} value={npc.extra?.precision} onChange={onChange} />}
         label={`+3 ${t("bonus to all Accuracy Checks", true)}`}
       />
     </FormGroup>
@@ -305,7 +305,7 @@ function Magic({ npc, setNpc }) {
   return (
     <FormGroup>
       <FormControlLabel
-        control={<Checkbox value={npc.extra?.magic} onChange={onChange} />}
+        control={<Checkbox checked={npc.extra?.magic} value={npc.extra?.magic} onChange={onChange} />}
         label={`+3 ${t("bonus to all Magic Checks", true)}`}
       />
     </FormGroup>
