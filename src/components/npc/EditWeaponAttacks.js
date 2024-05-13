@@ -181,6 +181,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             control={
               <Checkbox
                 size="medium"
+                checked={attack.extraDamage}
                 value={attack.extraDamage}
                 onChange={(e, value) => {
                   return setAttack("extraDamage", e.target.checked);
