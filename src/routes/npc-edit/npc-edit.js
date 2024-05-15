@@ -50,7 +50,6 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
 import CustomHeader from '../../components/common/CustomHeader';
-import TagList from "../../components/TagList";
 
 export default function NpcEdit() {
   const { t } = useTranslate();
@@ -93,18 +92,6 @@ export default function NpcEdit() {
     },
     [ref, npcTemp]
   );
-
-    /* TAGS HANDLING */
-    const [tags, setTags] = useState([]);
-
-    const handleAddTag = (newTag) => {
-      setTags(newTag);
-    };
-  
-    const handleLogTags = () => {
-      console.log("Current Tags:", tags);
-    };
-    /*****************/
 
   useEffect(() => {
     const handleScroll = () => {
@@ -384,15 +371,6 @@ export default function NpcEdit() {
           </Paper>
         </Grid>
       </Grid>
-
-      {/* TAGS BEGIN */}
-      <Divider sx={{ my: 1 }} />
-          <>
-            <TagList tags={tags} onAddTag={handleAddTag} />
-            {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
-          </>
-      {/* TAGS END */}
-
       <Divider sx={{ my: 1 }} />
 
       {user && user.uid === npc.uid && (
