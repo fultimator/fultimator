@@ -29,7 +29,8 @@ import {
   Select,
   MenuItem,
   Button,
-  useTheme
+  useTheme,
+  Autocomplete,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -41,7 +42,7 @@ import {
   Share,
   Download,
   Edit,
-  HistoryEdu
+  HistoryEdu,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -83,6 +84,7 @@ function Personal({ user }) {
   const [direction, setDirection] = useState("ascending");
   const [species, setSpecies] = useState("");
   const [tagSearch, setTagSearch] = useState("");
+  const [tagSort, setTagSort] = useState("");
   const [collapse, setCollapse] = useState(false);
 
   const personalRef = collection(firestore, "npc-personal");
@@ -96,6 +98,23 @@ function Personal({ user }) {
     idField: "id",
   });
 
+  const tagCounts = personalList
+    ? personalList.reduce((accumulator, npc) => {
+        if (npc.tags) {
+          npc.tags.forEach((tag) => {
+            if (tag.name) {
+              const tagName = tag.name.toUpperCase(); // Convert to UpperCase
+              accumulator[tagName] = (accumulator[tagName] || 0) + 1;
+            }
+          });
+        }
+        return accumulator;
+      }, {})
+    : {};
+
+  const sortedTags = Object.keys(tagCounts).sort(
+    (a, b) => tagCounts[b] - tagCounts[a]
+  );
 
   const addNpc = async function () {
     const data = {
@@ -176,53 +195,68 @@ function Personal({ user }) {
 
   const filteredList = personalList
     ? personalList
-      .filter((item) => {
-        if (
-          name !== "" &&
-          !item.name.toLowerCase().includes(name.toLocaleLowerCase())
-        )
-          return false;
-
-        if (
-          tagSearch !== "" &&
-          !item.tags?.some(
-            (tag) =>
-              tag.name &&
-              tag.name.toLowerCase().includes(tagSearch.toLocaleLowerCase())
+        .filter((item) => {
+          // Filter based on name, species, and rank
+          if (
+            name !== "" &&
+            !item.name.toLowerCase().includes(name.toLowerCase())
           )
-        )
-          return false;
+            return false;
 
-        if (species && item.species !== species) return false;
+          if (
+            tagSearch !== "" &&
+            !item.tags?.some(
+              (tag) =>
+                tag.name &&
+                tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+            )
+          )
+            return false;
 
-        if (rank && item.rank !== rank) return false;
-        return true;
-      })
-      .sort((item1, item2) => {
-        if (direction === "ascending") {
-          if (sort === "name") {
-            return item1.name - item2.name;
-          } else if (sort === "level") {
-            return item1.lvl - item2.lvl;
-          } else if (sort === "publishedAt") {
-            return (
-              (item1.publishedAt ? item1.publishedAt : 0) -
-              (item2.publishedAt ? item2.publishedAt : 0)
-            );
+          if (species && item.species !== species) return false;
+
+          if (rank && item.rank !== rank) return false;
+
+          return true;
+        })
+        .sort((item1, item2) => {
+          // Sort based on selected sort and direction
+          if (direction === "ascending") {
+            if (sort === "name") {
+              return item1.name.localeCompare(item2.name);
+            } else if (sort === "level") {
+              return item1.lvl - item2.lvl;
+            } else if (sort === "publishedAt") {
+              return (
+                (item1.publishedAt ? item1.publishedAt : 0) -
+                (item2.publishedAt ? item2.publishedAt : 0)
+              );
+            }
+          } else {
+            if (sort === "name") {
+              return item2.name.localeCompare(item1.name);
+            } else if (sort === "level") {
+              return item2.lvl - item1.lvl;
+            } else if (sort === "publishedAt") {
+              return (
+                (item2.publishedAt ? item2.publishedAt : 0) -
+                (item1.publishedAt ? item1.publishedAt : 0)
+              );
+            }
           }
-        } else {
-          if (sort === "name") {
-            return item2.name - item1.name;
-          } else if (sort === "level") {
-            return item2.lvl - item1.lvl;
-          } else if (sort === "publishedAt") {
-            return (
-              (item2.publishedAt ? item2.publishedAt : 0) -
-              (item1.publishedAt ? item1.publishedAt : 0)
-            );
+        })
+        .filter((item) => {
+          // Filter based on selected tag sort
+          if (
+            tagSort !== "" &&
+            !item.tags?.some(
+              (tag) => tag.name.toUpperCase() === tagSort.toUpperCase()
+            )
+          ) {
+            return false;
           }
-        }
-      })
+          return true;
+        })
     : [];
 
   return (
@@ -242,13 +276,13 @@ function Personal({ user }) {
                 component="legend"
                 sx={{
                   color: primary,
-                  textTransform: 'uppercase',
+                  textTransform: "uppercase",
                   borderRadius: 0,
                 }}
               >
                 <Tooltip title={t("Create NPC")}>
                   <IconButton
-                    sx={{ px: 1, '&:hover': { color: primary } }}
+                    sx={{ px: 1, "&:hover": { color: primary } }}
                     onClick={addNpc}
                   >
                     <HistoryEdu fontSize="large" />
@@ -398,16 +432,32 @@ function Personal({ user }) {
               justifyContent="center"
               sx={{ display: "flex" }}
             >
-              <TextField
-                id="outlined-basic"
-                label={t("Tag Search")}
-                variant="outlined"
-                size="small"
+              <Autocomplete
                 fullWidth
-                value={tagSearch}
-                onChange={(evt) => {
-                  setTagSearch(evt.target.value);
+                size="small"
+                options={sortedTags}
+                value={tagSort}
+                onChange={(event, newValue) => {
+                  if (newValue) {
+                    setTagSort(newValue);
+                  } else {
+                    setTagSort("");
+                  }
                 }}
+                filterOptions={(options, { inputValue }) => {
+                  const inputValueUpper = inputValue.toUpperCase();
+                  return options.filter((option) =>
+                    option.toUpperCase().includes(inputValueUpper)
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("Tag Search")}
+                    variant="outlined"
+                    fullWidth
+                  />
+                )}
               />
             </Grid>
             <Grid
