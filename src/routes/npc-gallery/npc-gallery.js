@@ -103,7 +103,8 @@ function Personal({ user }) {
         if (npc.tags) {
           npc.tags.forEach((tag) => {
             if (tag.name) {
-              accumulator[tag.name] = (accumulator[tag.name] || 0) + 1;
+              const tagName = tag.name.toUpperCase(); // Convert to UpperCase
+              accumulator[tagName] = (accumulator[tagName] || 0) + 1;
             }
           });
         }
@@ -246,8 +247,14 @@ function Personal({ user }) {
         })
         .filter((item) => {
           // Filter based on selected tag sort
-          if (tagSort !== "" && !item.tags?.some((tag) => tag.name === tagSort))
+          if (
+            tagSort !== "" &&
+            !item.tags?.some(
+              (tag) => tag.name.toUpperCase() === tagSort.toUpperCase()
+            )
+          ) {
             return false;
+          }
           return true;
         })
     : [];
@@ -431,12 +438,17 @@ function Personal({ user }) {
                 options={sortedTags}
                 value={tagSort}
                 onChange={(event, newValue) => {
-                  if(newValue){
+                  if (newValue) {
                     setTagSort(newValue);
                   } else {
-                    setTagSort("")
+                    setTagSort("");
                   }
-                  
+                }}
+                filterOptions={(options, { inputValue }) => {
+                  const inputValueUpper = inputValue.toUpperCase();
+                  return options.filter((option) =>
+                    option.toUpperCase().includes(inputValueUpper)
+                  );
                 }}
                 renderInput={(params) => (
                   <TextField

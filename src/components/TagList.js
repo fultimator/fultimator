@@ -17,12 +17,16 @@ const TagList = ({ npc, setNpc }) => {
   const maxTags = 5; // Maximum tag count
   const maxTagLength = 50; // Maximum tag length
 
+  console.log(npc.tags);
+
   // Function to handle deletion of a tag
   const handleDelete = (i) => {
     return () => {
       setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.tags.splice(i, 1);
+        const newState = {
+          ...prevState,
+          tags: [...prevState.tags.slice(0, i), ...prevState.tags.slice(i + 1)]
+        };
         return newState;
       });
     };
@@ -48,22 +52,18 @@ const TagList = ({ npc, setNpc }) => {
 
   // Function to handle adding a tag
   const handleAddTag = () => {
-    const trimmedValue = inputValue.trim();
+    const trimmedValue = inputValue.trim().toUpperCase();
     if (trimmedValue && (npc.tags?.length < maxTags || !npc.tags) && !npc.tags?.some(tag => tag.name.toUpperCase() === trimmedValue.toUpperCase())) {
       setNpc(prevState => {
-        const newState = Object.assign({}, prevState);
-        if (!newState.tags) {
-          newState.tags = [];
-        }
-        newState.tags.push({
-          name: trimmedValue
-        });
+        const newState = {
+          ...prevState,
+          tags: prevState.tags ? [...prevState.tags, { name: trimmedValue }] : [{ name: trimmedValue }]
+        };
         return newState;
       });
       setInputValue('');
     }
   };
-
 
   // Check if the input field is disabled
   const isInputDisabled = npc.tags?.length >= maxTags;
@@ -115,7 +115,7 @@ const TagList = ({ npc, setNpc }) => {
         {npc.tags?.map((tag, i) => (
           <Chip
             key={i}
-            label={tag.name}
+            label={tag.name.toUpperCase()}
             onDelete={handleDelete(i)}
             color="primary"
             variant="outlined"
