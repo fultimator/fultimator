@@ -18,7 +18,7 @@ import {
   MenuItem,
   FormHelperText,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import {
   Download,
@@ -28,7 +28,7 @@ import {
   ArrowUpward,
   ContentCopy,
   Image,
-  HideImage
+  HideImage,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -49,41 +49,43 @@ import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
-import CustomHeader from '../../components/common/CustomHeader';
+import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 
 export default function NpcEdit() {
-  const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const isSmallScreen = useMediaQuery('(max-width: 899px)');
-  let params = useParams();
-  const ref = doc(firestore, "npc-personal", params.npcId);
+  const { t } = useTranslate(); // Translation hook
+  const theme = useTheme(); // Theme hook for MUI
+  const secondary = theme.palette.secondary.main; // Secondary color from theme
+  const isSmallScreen = useMediaQuery('(max-width: 899px)'); // Media query hook for screen size
 
-  const [user] = useAuthState(auth);
-  const [showScrollTop, setShowScrollTop] = useState(true);
+  let params = useParams(); // URL parameters hook
+  const ref = doc(firestore, "npc-personal", params.npcId); // Firestore document reference
 
+  const [user] = useAuthState(auth); // Authentication state hook
+  const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+
+  // Scroll-to-top handler
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const [npc] = useDocumentData(ref, {
-    idField: "id",
-  });
+  const [npc] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
 
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
 
-  const [npcTemp, setNpcTemp] = useState(npc);
-
+  // Update NPC handler
   const updateNPC = (data) => {
     setIsUpdated(true);
     setNpcTemp(data);
   };
 
+  // Effect to update temporary NPC state when NPC data changes
   useEffect(() => {
     setNpcTemp(npc);
   }, [npc]);
 
+  // Handler for Ctrl+S to save NPC
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
@@ -94,8 +96,8 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
-  /* TAGS HANDLING */
-  const [tags, setTags] = useState([]);
+  // Tags Handling
+  const [tags, setTags] = useState([]); // State for tags
 
   const handleAddTag = (newTag) => {
     setTags(newTag);
@@ -104,8 +106,8 @@ export default function NpcEdit() {
   const handleLogTags = () => {
     console.log("Current Tags:", tags);
   };
-  /*****************/
 
+  // Effect for scroll, focus, and blur events, and keyboard shortcuts
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 200);
@@ -131,11 +133,11 @@ export default function NpcEdit() {
     };
   }, [handleCtrlS]);
 
-  // Download
+  // Download image hook and reference
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
 
-  // Upload Temporary Image
+  // State and handler for including image
   const [includeImage, setIncludeImage] = useState(false);
   const toggleIncludeImage = () => {
     setIncludeImage(!includeImage);
@@ -145,6 +147,7 @@ export default function NpcEdit() {
     return null;
   }
 
+  // Function to check if NPC can be published
   const canPublish = () => {
     if (!npcTemp.name || npcTemp.name === "") {
       return {
@@ -156,10 +159,7 @@ export default function NpcEdit() {
     if (!npcTemp.description || npcTemp.description === "") {
       return {
         disabled: true,
-        message: t(
-          "It must have a description in order to be published.",
-          true
-        ),
+        message: t("It must have a description in order to be published.", true),
       };
     }
 
@@ -173,10 +173,7 @@ export default function NpcEdit() {
     if (!npcTemp.createdBy || npcTemp.createdBy === "") {
       return {
         disabled: true,
-        message: t(
-          "'Credit By' needs to be filled in order to be published",
-          true
-        ),
+        message: t("'Credit By' needs to be filled in order to be published", true),
       };
     }
 
@@ -187,35 +184,28 @@ export default function NpcEdit() {
       };
     }
 
-    if (
-      (npcTemp.weaponattacks && npcTemp.weaponattacks.length) ||
-      (npcTemp.attacks && npcTemp.attacks.length)
-    ) {
+    if ((npcTemp.weaponattacks && npcTemp.weaponattacks.length) || (npcTemp.attacks && npcTemp.attacks.length)) {
       return { disabled: false };
     }
 
     return {
       disabled: true,
-      message: t(
-        "It must have at least one attack, in order to be published.",
-        true
-      ),
+      message: t("It must have at least one attack, in order to be published.", true),
     };
   };
 
+  // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
     setDoc(ref, {
       ...npcTemp,
       published: true,
-      searchString: npcTemp.name
-        .replace(/[\W_]+/g, " ")
-        .toLowerCase()
-        .split(" "),
+      searchString: npcTemp.name.replace(/[\W_]+/g, " ").toLowerCase().split(" "),
       publishedAt: Date.now(),
     });
   };
 
+  // Function to unpublish NPC
   const unPublish = () => {
     setIsUpdated(false);
     setDoc(ref, {
@@ -224,6 +214,7 @@ export default function NpcEdit() {
     });
   };
 
+  // Function to copy NPC
   const copyNpc = async (npc) => {
     const data = Object.assign({}, npc);
     data.uid = user.uid;
@@ -241,10 +232,12 @@ export default function NpcEdit() {
       });
   };
 
+  // Function to share NPC link
   const shareNpc = async (id) => {
     await navigator.clipboard.writeText(window.location.href + "/");
   };
 
+  // Function to download NPC as image
   function DownloadImage() {
     setTimeout(downloadImage, 100);
   }
@@ -260,6 +253,7 @@ export default function NpcEdit() {
 
         {/* Skills, Controls and Publish (Right-side Grid Item) */}
         <Grid item xs={12} md={4}>
+          {/* Skill Points */}
           <ExplainSkills npc={npcTemp} />
           <Divider sx={{ my: 1 }} />
 
@@ -379,15 +373,15 @@ export default function NpcEdit() {
               </div>
             )}
           </Paper>
+          {/* Tags Section */}
+          <Divider sx={{ my: 1 }} />
+          <>
+            <TagList tags={tags} onAddTag={handleAddTag} />
+            {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
+          </>
         </Grid>
       </Grid>
 
-      {/* Tags Section */}
-      <Divider sx={{ my: 1 }} />
-      <>
-        <TagList tags={tags} onAddTag={handleAddTag} />
-        {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
-      </>
       <Divider sx={{ my: 1 }} />
 
       {/* NPC Edit Options for Creator */}
