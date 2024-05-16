@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
@@ -37,6 +38,10 @@ function PrettySingle({ accessory, showActions }) {
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(accessory.name, ref);
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
 
   return (
     <>
@@ -116,9 +121,9 @@ function PrettySingle({ accessory, showActions }) {
                 >
                   <Typography>
                     {!accessory.quality && t("No Qualities")}{" "}
-                    <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                       {accessory.quality}
-                    </ReactMarkdown>
+                    </StyledMarkdown>
                   </Typography>
                 </Grid>
               </Grid>

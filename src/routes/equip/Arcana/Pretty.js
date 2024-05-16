@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
@@ -38,6 +39,10 @@ function PrettySingle({ arcana, showActions, rework }) {
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(arcana.name, ref);
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
 
   return (
     <>
@@ -176,9 +181,9 @@ function PrettySingle({ arcana, showActions, rework }) {
                   <Typography>
                     {!arcana.mergeBenefit ? t("No Merge Benefit") : (
                       <div style={{ display: 'inline' }}>
-                        <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
+                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
                           {arcana.mergeBenefit}
-                        </ReactMarkdown>
+                        </StyledMarkdown>
                       </div>
                     )}
                   </Typography>
@@ -231,9 +236,9 @@ function PrettySingle({ arcana, showActions, rework }) {
                       <Typography>
                         {!arcana.pulseBenefit ? t("No Pulse Benefit") : (
                           <div style={{ display: 'inline' }}>
-                            <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
+                            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
                               {arcana.pulseBenefit}
-                            </ReactMarkdown>
+                            </StyledMarkdown>
                           </div>
                         )}
                       </Typography>
@@ -286,9 +291,9 @@ function PrettySingle({ arcana, showActions, rework }) {
                   <Typography>
                     {!arcana.dismissBenefit ? t("No Dismiss Benefit") : (
                       <div style={{ display: 'inline' }}>
-                        <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
+                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
                           {arcana.dismissBenefit}
-                        </ReactMarkdown>
+                        </StyledMarkdown>
                       </div>
                     )}
                   </Typography>

@@ -1,6 +1,7 @@
 import { Card, Grid, Typography, Box } from "@mui/material";
 import React, { Fragment } from "react";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import attributes from "../../libs/attributes";
 import {
   calcDamage,
@@ -93,6 +94,9 @@ function NpcPretty({ npc, study, collapse, includeImage, onClick = () => { } }, 
 
 function Header({ npc, includeImage }) {
   const { t } = useTranslate();
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
   return (
     <Grid container alignItems="stretch">
       <Grid container>
@@ -184,9 +188,9 @@ function Header({ npc, includeImage }) {
             }}
           >
             <Typography>
-              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                 {npc.description}
-              </ReactMarkdown>
+              </StyledMarkdown>
             </Typography>
           </Box>
           {/* Row 3 */}
@@ -441,6 +445,11 @@ function Attacks({ npc }) {
     poison: "poison_damage",
   };
 
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
+
   return (
     <Grid container>
       <Grid
@@ -507,18 +516,18 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {effect}
-                      </ReactMarkdown>
+                      </StyledMarkdown>{" "}
                     </Typography>
                   );
                 })}
                 {typeof myVar === "string" ||
                   (attack.special instanceof String && (
                     <Typography component="span" key={i}>
-                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {attack.special}
-                      </ReactMarkdown>
+                      </StyledMarkdown>
                     </Typography>
                   ))}
               </Typography>
@@ -576,9 +585,9 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                         {effect}
-                      </ReactMarkdown>{" "}
+                      </StyledMarkdown>{" "}
                     </Typography>
                   );
                 })}
@@ -596,6 +605,10 @@ function Spells({ npc }) {
   if (!npc.spells || npc.spells.length === 0) {
     return null;
   }
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
   return (
     <Grid container>
       <Grid
@@ -647,9 +660,9 @@ function Spells({ npc }) {
                 </strong>
                 <br />
                 <Typography component="span" key={i}>
-                  <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                  <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                     {spell.effect}
-                  </ReactMarkdown>{" "}
+                  </StyledMarkdown>{" "}
                 </Typography>
               </Typography>
             </Grid>
@@ -699,6 +712,11 @@ function Special({ npc }) {
     return null;
   }
 
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
+
   return (
     <Grid container>
       <Grid
@@ -727,10 +745,12 @@ function Special({ npc }) {
           <Fragment key={i}>
             <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
               <Typography>
-                <strong>{special.name}</strong> <Diamond />{" "}
-                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <span style={{ display: "inline" }}>
+                  <strong>{special.name}</strong> <Diamond />{" "}
+                </span>
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {special.effect}
-                </ReactMarkdown>
+                </StyledMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -753,6 +773,11 @@ function Actions({ npc }) {
   if (actions.length === 0) {
     return null;
   }
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
 
   return (
     <Grid container>
@@ -788,9 +813,9 @@ function Actions({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{actions.name}</strong> <Diamond />{" "}
-                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {actions.effect}
-                </ReactMarkdown>
+                </StyledMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -813,6 +838,11 @@ function Notes({ npc }) {
   if (notes.length === 0) {
     return null;
   }
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
 
   return (
     <Grid container>
@@ -848,9 +878,9 @@ function Notes({ npc }) {
             <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
               <Typography>
                 <strong>{notes.name}</strong> <Diamond />{" "}
-                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {notes.effect}
-                </ReactMarkdown>
+                </StyledMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -873,6 +903,11 @@ function RareGear({ npc }) {
   if (raregear.length === 0) {
     return null;
   }
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+    display: "inline",
+  });
 
   return (
     <Grid container>
@@ -908,9 +943,9 @@ function RareGear({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{raregear.name}</strong> <Diamond />{" "}
-                <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                   {raregear.effect}
-                </ReactMarkdown>
+                </StyledMarkdown>
               </Typography>
             </Grid>
           </Fragment>

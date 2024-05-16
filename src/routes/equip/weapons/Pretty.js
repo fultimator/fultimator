@@ -12,6 +12,7 @@ import {
 import { Martial } from "../../../components/icons";
 import ArrowDownward from "@mui/icons-material/ArrowDownward";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import attributes from "../../../libs/attributes";
 import types from "../../../libs/types";
 import { OpenBracket, CloseBracket } from "../../../components/Bracket";
@@ -50,6 +51,10 @@ function PrettySingle({ weapon, showActions }) {
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(weapon.name, ref);
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
 
   return (
     <>
@@ -192,9 +197,9 @@ function PrettySingle({ weapon, showActions }) {
               }}
             >
               {!weapon.quality && t("No Qualities")}{" "}
-              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                 {weapon.quality}
-              </ReactMarkdown>
+              </StyledMarkdown>
             </Typography>
           </Stack>
         </div>
