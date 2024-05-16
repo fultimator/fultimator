@@ -82,6 +82,7 @@ function Personal({ user }) {
   const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
   const [species, setSpecies] = useState("");
+  const [tagSearch, setTagSearch] = useState("");
   const [collapse, setCollapse] = useState(false);
 
   const personalRef = collection(firestore, "npc-personal");
@@ -94,6 +95,7 @@ function Personal({ user }) {
   const [personalList, loading, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
+
 
   const addNpc = async function () {
     const data = {
@@ -178,6 +180,16 @@ function Personal({ user }) {
         if (
           name !== "" &&
           !item.name.toLowerCase().includes(name.toLocaleLowerCase())
+        )
+          return false;
+
+        if (
+          tagSearch !== "" &&
+          !item.tags?.some(
+            (tag) =>
+              tag.name &&
+              tag.name.toLowerCase().includes(tagSearch.toLocaleLowerCase())
+          )
         )
           return false;
 
@@ -377,6 +389,26 @@ function Personal({ user }) {
                   <MenuItem value={"descending"}>Descending</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={3}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <TextField
+                id="outlined-basic"
+                label={t("Tag Search")}
+                variant="outlined"
+                size="small"
+                fullWidth
+                value={tagSearch}
+                onChange={(evt) => {
+                  setTagSearch(evt.target.value);
+                }}
+              />
             </Grid>
             <Grid
               item
