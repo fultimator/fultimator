@@ -238,16 +238,16 @@ function Personal({ user }) {
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             height:
               selectedType === name
                 ? isMobile
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             border: selectedType === name ? "6px solid purple" : "none",
             cursor: "pointer",
           }}
@@ -321,21 +321,12 @@ function Personal({ user }) {
           {enemyType(undeadToken, "Undead", t("Undead"))}
         </Grid>
 
-        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+        <Grid container spacing={1} sx={{ py: 0 }} justifyContent="center">
           <Grid
             item
             xs={12}
-            md={1}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
-            <Typography fontWeight={700}>{t("Search:")}</Typography>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={2}
+            md={3}
+            lg={4}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex" }}
@@ -380,7 +371,7 @@ function Personal({ user }) {
           </Grid>
           <Grid
             item
-            xs={12}
+            xs={6}
             md={2}
             alignItems="center"
             justifyContent="center"
@@ -410,7 +401,7 @@ function Personal({ user }) {
             </FormControl>
           </Grid>
 
-          <Grid item xs={4} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
             <FormControl fullWidth size="small">
               <InputLabel id="Language">{t("Language:")}</InputLabel>
               <Select
@@ -430,7 +421,7 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={4} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
             <Button
               variant="outlined"
               fullWidth
@@ -443,15 +434,15 @@ function Personal({ user }) {
           </Grid>
           <Grid
             item
-            xs={12}
+            xs={6}
             md={2}
-            sx={{ display: "flex" }}
+            sx={{}}
             alignItems="center"
             justifyContent="center"
           >
             <Button
+              fullWidth
               variant="contained"
-              sx={{}}
               startIcon={<Search />}
               onClick={() => {
                 setPrevLastItem([]);
