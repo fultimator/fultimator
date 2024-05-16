@@ -89,6 +89,10 @@ export interface NpcNotes {
     effect: string
 }
 
+export interface NpcTags {
+    name: string,
+}
+
 export interface TypeNpc {
     id: string,
     uid: string,
@@ -109,6 +113,7 @@ export interface TypeNpc {
     armor?: NpcArmor,
     sheild?: NpcArmor,
     raregear?: NpcRareGear[],
-    label?: string
-    notes?: NpcNotes[]
+    label?: string,
+    notes?: NpcNotes[],
+    tags?: NpcTags[]
 }

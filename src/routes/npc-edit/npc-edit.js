@@ -96,17 +96,6 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
-  // Tags Handling
-  const [tags, setTags] = useState([]); // State for tags
-
-  const handleAddTag = (newTag) => {
-    setTags(newTag);
-  };
-
-  const handleLogTags = () => {
-    console.log("Current Tags:", tags);
-  };
-
   // Effect for scroll, focus, and blur events, and keyboard shortcuts
   useEffect(() => {
     const handleScroll = () => {
@@ -376,8 +365,8 @@ export default function NpcEdit() {
           {/* Tags Section */}
           <Divider sx={{ my: 1 }} />
           <>
-            <TagList tags={tags} onAddTag={handleAddTag} />
-            {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
+            <TagList npc={npcTemp} setNpc={updateNPC} />
+            {/*TEST BUTTON <Button onClick={() => console.log(npcTemp)} variant="contained">Log Temp NPC Object</Button>*/}
           </>
         </Grid>
       </Grid>
