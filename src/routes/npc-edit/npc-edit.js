@@ -94,17 +94,17 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
-    /* TAGS HANDLING */
-    const [tags, setTags] = useState([]);
+  /* TAGS HANDLING */
+  const [tags, setTags] = useState([]);
 
-    const handleAddTag = (newTag) => {
-      setTags(newTag);
-    };
-  
-    const handleLogTags = () => {
-      console.log("Current Tags:", tags);
-    };
-    /*****************/
+  const handleAddTag = (newTag) => {
+    setTags(newTag);
+  };
+
+  const handleLogTags = () => {
+    console.log("Current Tags:", tags);
+  };
+  /*****************/
 
   useEffect(() => {
     const handleScroll = () => {
@@ -251,46 +251,54 @@ export default function NpcEdit() {
 
   return (
     <Layout>
+      {/* Main Grid Container */}
       <Grid container spacing={2}>
+        {/* NPC Pretty Display (Left-side Grid Item) */}
         <Grid item xs={12} md={8}>
           <NpcPretty npc={npcTemp} ref={prettyRef} collapse={true} includeImage={includeImage} />
         </Grid>
+
+        {/* Skills, Controls and Publish (Right-side Grid Item) */}
         <Grid item xs={12} md={4}>
           <ExplainSkills npc={npcTemp} />
           <Divider sx={{ my: 1 }} />
+
+          {/* Upload NPC Image Button */}
           <Tooltip title={t("Upload Image: Images are temporarily stored and will reset on page refresh.")}>
             <IconButton onClick={toggleIncludeImage}>
               {includeImage ? <Image /> : <HideImage />}
             </IconButton>
           </Tooltip>
+
+          {/* Download NPC Sheet Button */}
           <Tooltip title={t("Download as Image")}>
-            <IconButton
-              onClick={() => {
-                DownloadImage();
-              }}
-            >
+            <IconButton onClick={DownloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
+
+          {/* Share URL Button */}
           <Tooltip title={t("Share URL")}>
             <IconButton onClick={() => shareNpc(npc.id)}>
               <Share />
             </IconButton>
           </Tooltip>
+
+          {/* Export NPC Data */}
           <Export name={`${npc.name}`} data={npc} />
+
+          {/* Copy and Edit Button, shown only if user is not the creator */}
           {user && user.uid !== npc.uid && (
             <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
-              <IconButton
-                aria-label="duplicate"
-                onClick={() => {
-                  copyNpc(npcTemp);
-                }}
-              >
+              <IconButton aria-label="duplicate" onClick={() => copyNpc(npcTemp)}>
                 <ContentCopy />
               </IconButton>
             </Tooltip>
           )}
+
           <Divider sx={{ my: 1 }} />
+
+          {/* NPC sharing options */}
           <Paper
             elevation={3}
             sx={{
@@ -301,14 +309,10 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
+            {/* Show editing options only if user is the creator */}
             {user && user.uid === npc.uid && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                {/* Input for "Created By" */}
                 <TextField
                   id="outlined-basic"
                   label={t("Created By:")}
@@ -316,25 +320,21 @@ export default function NpcEdit() {
                   size="small"
                   helperText={
                     npcTemp.published
-                      ? t("This NPC is part of the Adversary Compedium.")
-                      : t(
-                        "Help the Adversary Compedium grow by publishing your finished work!"
-                      )
+                      ? t("This NPC is part of the Adversary Compendium.")
+                      : t("Help the Adversary Compendium grow by publishing your finished work!")
                   }
                   fullWidth
                   value={npcTemp.createdBy}
-                  onChange={(evt) => {
-                    updateNPC({ ...npcTemp, createdBy: evt.target.value });
-                  }}
+                  onChange={(evt) => updateNPC({ ...npcTemp, createdBy: evt.target.value })}
                 />
+
+                {/* Language Selection */}
                 <Select
                   labelId="study"
                   id="study"
                   size="small"
                   value={npcTemp.language}
-                  onChange={(evt) => {
-                    updateNPC({ ...npcTemp, language: evt.target.value });
-                  }}
+                  onChange={(evt) => updateNPC({ ...npcTemp, language: evt.target.value })}
                   fullWidth
                 >
                   {languageOptions.map((option) => (
@@ -347,6 +347,8 @@ export default function NpcEdit() {
                 <FormHelperText sx={{ textAlign: "center" }}>
                   {t("Select language to publish with.")}
                 </FormHelperText>
+
+                {/* Publish/Unpublish Buttons */}
                 {!npcTemp.published && (
                   <Button
                     variant="contained"
@@ -367,15 +369,10 @@ export default function NpcEdit() {
                     {t("Unpublish")}
                   </Button>
                 )}
+
+                {/* Message for Publish Criteria */}
                 {canPublish().disabled && (
-                  <div
-                    style={{
-                      fontSize: 12,
-                      textAlign: "center",
-                      marginTop: 4,
-                      color: "red",
-                    }}
-                  >
+                  <div style={{ fontSize: 12, textAlign: "center", marginTop: 4, color: "red" }}>
                     {canPublish().message}
                   </div>
                 )}
@@ -385,18 +382,18 @@ export default function NpcEdit() {
         </Grid>
       </Grid>
 
-      {/* TAGS BEGIN */}
+      {/* Tags Section */}
       <Divider sx={{ my: 1 }} />
-          <>
-            <TagList tags={tags} onAddTag={handleAddTag} />
-            {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
-          </>
-      {/* TAGS END */}
-
+      <>
+        <TagList tags={tags} onAddTag={handleAddTag} />
+        {/* TEST BUTTON <Button onClick={handleLogTags} variant="contained">Log Tags</Button>*/}
+      </>
       <Divider sx={{ my: 1 }} />
 
+      {/* NPC Edit Options for Creator */}
       {user && user.uid === npc.uid && (
         <>
+          {/* Edit Basic Information */}
           <Paper
             elevation={3}
             sx={{
@@ -408,9 +405,9 @@ export default function NpcEdit() {
           >
             <EditBasics npc={npcTemp} setNpc={updateNPC} />
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Affinities and Bonuses */}
           <Paper
             elevation={3}
             sx={{
@@ -426,16 +423,15 @@ export default function NpcEdit() {
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <CustomHeader type={isSmallScreen ? 'middle' : 'top'} headerText={t("Bonuses")} />
                 <EditExtra npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Base Attacks and Weapon Attacks */}
           <Paper
             elevation={3}
             sx={{
@@ -445,7 +441,6 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-
             <Grid container>
               <Grid item xs={12}>
                 <EditAttacks npc={npcTemp} setNpc={updateNPC} />
@@ -455,9 +450,9 @@ export default function NpcEdit() {
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Spells */}
           <Paper
             elevation={3}
             sx={{
@@ -469,9 +464,9 @@ export default function NpcEdit() {
           >
             <EditSpells npc={npcTemp} setNpc={updateNPC} />
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Extra Features */}
           <Paper
             elevation={3}
             sx={{
@@ -497,24 +492,29 @@ export default function NpcEdit() {
                 mb: "10px",
               }}
             /> */}
+
             <Grid container spacing={2}>
+              {/* Edit Other Actions */}
               <Grid item xs={12} md={6}>
                 <EditActions npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Special Rules */}
               <Grid item xs={12} md={6}>
                 <EditSpecial npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Rare Gear */}
               <Grid item xs={12} md={6}>
                 <EditRareGear npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Notes */}
               <Grid item xs={12} md={6}>
                 <EditNotes npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Attack Chance Generator Section */}
           <Paper
             elevation={3}
             sx={{
@@ -526,7 +526,6 @@ export default function NpcEdit() {
           >
             <Probs />
           </Paper>
-
           <Divider sx={{ my: 2, mb: 20 }} />
         </>
       )}
@@ -549,6 +548,7 @@ export default function NpcEdit() {
       {/* <ExplainSkillsSimplified npc={npcTemp} />
       </Grid> */}
 
+      {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && (
         <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
@@ -571,8 +571,8 @@ export default function NpcEdit() {
         </Grid>
       )}
 
+      {/* Move to Top Button */}
       <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
-        {/* Move to Top Button */}
         <Fade in={showScrollTop} timeout={300}>
           <Fab
             color="primary"
@@ -585,5 +585,6 @@ export default function NpcEdit() {
         </Fade>
       </Grid>
     </Layout>
+
   );
 }
