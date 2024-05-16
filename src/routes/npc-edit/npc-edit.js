@@ -18,7 +18,7 @@ import {
   MenuItem,
   FormHelperText,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import {
   Download,
@@ -28,7 +28,7 @@ import {
   ArrowUpward,
   ContentCopy,
   Image,
-  HideImage
+  HideImage,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -49,40 +49,43 @@ import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
-import CustomHeader from '../../components/common/CustomHeader';
+import CustomHeader from "../../components/common/CustomHeader";
+import TagList from "../../components/TagList";
 
 export default function NpcEdit() {
-  const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const isSmallScreen = useMediaQuery('(max-width: 899px)');
-  let params = useParams();
-  const ref = doc(firestore, "npc-personal", params.npcId);
+  const { t } = useTranslate(); // Translation hook
+  const theme = useTheme(); // Theme hook for MUI
+  const secondary = theme.palette.secondary.main; // Secondary color from theme
+  const isSmallScreen = useMediaQuery('(max-width: 899px)'); // Media query hook for screen size
 
-  const [user] = useAuthState(auth);
-  const [showScrollTop, setShowScrollTop] = useState(true);
+  let params = useParams(); // URL parameters hook
+  const ref = doc(firestore, "npc-personal", params.npcId); // Firestore document reference
 
+  const [user] = useAuthState(auth); // Authentication state hook
+  const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+
+  // Scroll-to-top handler
   const handleMoveToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const [npc] = useDocumentData(ref, {
-    idField: "id",
-  });
+  const [npc] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
 
-  const [isUpdated, setIsUpdated] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
 
-  const [npcTemp, setNpcTemp] = useState(npc);
-
+  // Update NPC handler
   const updateNPC = (data) => {
     setIsUpdated(true);
     setNpcTemp(data);
   };
 
+  // Effect to update temporary NPC state when NPC data changes
   useEffect(() => {
     setNpcTemp(npc);
   }, [npc]);
 
+  // Handler for Ctrl+S to save NPC
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
@@ -93,6 +96,7 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
+  // Effect for scroll, focus, and blur events, and keyboard shortcuts
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 200);
@@ -118,11 +122,11 @@ export default function NpcEdit() {
     };
   }, [handleCtrlS]);
 
-  // Download
+  // Download image hook and reference
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
 
-  // Upload Temporary Image
+  // State and handler for including image
   const [includeImage, setIncludeImage] = useState(false);
   const toggleIncludeImage = () => {
     setIncludeImage(!includeImage);
@@ -132,6 +136,7 @@ export default function NpcEdit() {
     return null;
   }
 
+  // Function to check if NPC can be published
   const canPublish = () => {
     if (!npcTemp.name || npcTemp.name === "") {
       return {
@@ -143,10 +148,7 @@ export default function NpcEdit() {
     if (!npcTemp.description || npcTemp.description === "") {
       return {
         disabled: true,
-        message: t(
-          "It must have a description in order to be published.",
-          true
-        ),
+        message: t("It must have a description in order to be published.", true),
       };
     }
 
@@ -160,10 +162,7 @@ export default function NpcEdit() {
     if (!npcTemp.createdBy || npcTemp.createdBy === "") {
       return {
         disabled: true,
-        message: t(
-          "'Credit By' needs to be filled in order to be published",
-          true
-        ),
+        message: t("'Credit By' needs to be filled in order to be published", true),
       };
     }
 
@@ -174,35 +173,28 @@ export default function NpcEdit() {
       };
     }
 
-    if (
-      (npcTemp.weaponattacks && npcTemp.weaponattacks.length) ||
-      (npcTemp.attacks && npcTemp.attacks.length)
-    ) {
+    if ((npcTemp.weaponattacks && npcTemp.weaponattacks.length) || (npcTemp.attacks && npcTemp.attacks.length)) {
       return { disabled: false };
     }
 
     return {
       disabled: true,
-      message: t(
-        "It must have at least one attack, in order to be published.",
-        true
-      ),
+      message: t("It must have at least one attack, in order to be published.", true),
     };
   };
 
+  // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
     setDoc(ref, {
       ...npcTemp,
       published: true,
-      searchString: npcTemp.name
-        .replace(/[\W_]+/g, " ")
-        .toLowerCase()
-        .split(" "),
+      searchString: npcTemp.name.replace(/[\W_]+/g, " ").toLowerCase().split(" "),
       publishedAt: Date.now(),
     });
   };
 
+  // Function to unpublish NPC
   const unPublish = () => {
     setIsUpdated(false);
     setDoc(ref, {
@@ -211,6 +203,7 @@ export default function NpcEdit() {
     });
   };
 
+  // Function to copy NPC
   const copyNpc = async (npc) => {
     const data = Object.assign({}, npc);
     data.uid = user.uid;
@@ -228,56 +221,67 @@ export default function NpcEdit() {
       });
   };
 
+  // Function to share NPC link
   const shareNpc = async (id) => {
     await navigator.clipboard.writeText(window.location.href + "/");
   };
 
+  // Function to download NPC as image
   function DownloadImage() {
     setTimeout(downloadImage, 100);
   }
 
   return (
     <Layout>
+      {/* Main Grid Container */}
       <Grid container spacing={2}>
+        {/* NPC Pretty Display (Left-side Grid Item) */}
         <Grid item xs={12} md={8}>
           <NpcPretty npc={npcTemp} ref={prettyRef} collapse={true} includeImage={includeImage} />
         </Grid>
+
+        {/* Skills, Controls and Publish (Right-side Grid Item) */}
         <Grid item xs={12} md={4}>
+          {/* Skill Points */}
           <ExplainSkills npc={npcTemp} />
           <Divider sx={{ my: 1 }} />
+
+          {/* Upload NPC Image Button */}
           <Tooltip title={t("Upload Image: Images are temporarily stored and will reset on page refresh.")}>
             <IconButton onClick={toggleIncludeImage}>
               {includeImage ? <Image /> : <HideImage />}
             </IconButton>
           </Tooltip>
+
+          {/* Download NPC Sheet Button */}
           <Tooltip title={t("Download as Image")}>
-            <IconButton
-              onClick={() => {
-                DownloadImage();
-              }}
-            >
+            <IconButton onClick={DownloadImage}>
               <Download />
             </IconButton>
           </Tooltip>
+
+          {/* Share URL Button */}
           <Tooltip title={t("Share URL")}>
             <IconButton onClick={() => shareNpc(npc.id)}>
               <Share />
             </IconButton>
           </Tooltip>
+
+          {/* Export NPC Data */}
           <Export name={`${npc.name}`} data={npc} />
+
+          {/* Copy and Edit Button, shown only if user is not the creator */}
           {user && user.uid !== npc.uid && (
             <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
-              <IconButton
-                aria-label="duplicate"
-                onClick={() => {
-                  copyNpc(npcTemp);
-                }}
-              >
+              <IconButton aria-label="duplicate" onClick={() => copyNpc(npcTemp)}>
                 <ContentCopy />
               </IconButton>
             </Tooltip>
           )}
+
           <Divider sx={{ my: 1 }} />
+
+          {/* NPC sharing options */}
           <Paper
             elevation={3}
             sx={{
@@ -288,14 +292,10 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
+            {/* Show editing options only if user is the creator */}
             {user && user.uid === npc.uid && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                {/* Input for "Created By" */}
                 <TextField
                   id="outlined-basic"
                   label={t("Created By:")}
@@ -303,25 +303,21 @@ export default function NpcEdit() {
                   size="small"
                   helperText={
                     npcTemp.published
-                      ? t("This NPC is part of the Adversary Compedium.")
-                      : t(
-                        "Help the Adversary Compedium grow by publishing your finished work!"
-                      )
+                      ? t("This NPC is part of the Adversary Compendium.")
+                      : t("Help the Adversary Compendium grow by publishing your finished work!")
                   }
                   fullWidth
                   value={npcTemp.createdBy}
-                  onChange={(evt) => {
-                    updateNPC({ ...npcTemp, createdBy: evt.target.value });
-                  }}
+                  onChange={(evt) => updateNPC({ ...npcTemp, createdBy: evt.target.value })}
                 />
+
+                {/* Language Selection */}
                 <Select
                   labelId="study"
                   id="study"
                   size="small"
                   value={npcTemp.language}
-                  onChange={(evt) => {
-                    updateNPC({ ...npcTemp, language: evt.target.value });
-                  }}
+                  onChange={(evt) => updateNPC({ ...npcTemp, language: evt.target.value })}
                   fullWidth
                 >
                   {languageOptions.map((option) => (
@@ -334,6 +330,8 @@ export default function NpcEdit() {
                 <FormHelperText sx={{ textAlign: "center" }}>
                   {t("Select language to publish with.")}
                 </FormHelperText>
+
+                {/* Publish/Unpublish Buttons */}
                 {!npcTemp.published && (
                   <Button
                     variant="contained"
@@ -354,27 +352,31 @@ export default function NpcEdit() {
                     {t("Unpublish")}
                   </Button>
                 )}
+
+                {/* Message for Publish Criteria */}
                 {canPublish().disabled && (
-                  <div
-                    style={{
-                      fontSize: 12,
-                      textAlign: "center",
-                      marginTop: 4,
-                      color: "red",
-                    }}
-                  >
+                  <div style={{ fontSize: 12, textAlign: "center", marginTop: 4, color: "red" }}>
                     {canPublish().message}
                   </div>
                 )}
               </div>
             )}
           </Paper>
+          {/* Tags Section */}
+          <Divider sx={{ my: 1 }} />
+          <>
+            <TagList npc={npcTemp} setNpc={updateNPC} />
+            {/*TEST BUTTON <Button onClick={() => console.log(npcTemp)} variant="contained">Log Temp NPC Object</Button>*/}
+          </>
         </Grid>
       </Grid>
+
       <Divider sx={{ my: 1 }} />
 
+      {/* NPC Edit Options for Creator */}
       {user && user.uid === npc.uid && (
         <>
+          {/* Edit Basic Information */}
           <Paper
             elevation={3}
             sx={{
@@ -386,9 +388,9 @@ export default function NpcEdit() {
           >
             <EditBasics npc={npcTemp} setNpc={updateNPC} />
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Affinities and Bonuses */}
           <Paper
             elevation={3}
             sx={{
@@ -404,16 +406,15 @@ export default function NpcEdit() {
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <CustomHeader type={isSmallScreen ? 'middle' : 'top'} headerText={t("Bonuses")} />
                 <EditExtra npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Base Attacks and Weapon Attacks */}
           <Paper
             elevation={3}
             sx={{
@@ -423,7 +424,6 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-
             <Grid container>
               <Grid item xs={12}>
                 <EditAttacks npc={npcTemp} setNpc={updateNPC} />
@@ -433,9 +433,9 @@ export default function NpcEdit() {
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Spells */}
           <Paper
             elevation={3}
             sx={{
@@ -447,9 +447,9 @@ export default function NpcEdit() {
           >
             <EditSpells npc={npcTemp} setNpc={updateNPC} />
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Edit Extra Features */}
           <Paper
             elevation={3}
             sx={{
@@ -475,24 +475,29 @@ export default function NpcEdit() {
                 mb: "10px",
               }}
             /> */}
+
             <Grid container spacing={2}>
+              {/* Edit Other Actions */}
               <Grid item xs={12} md={6}>
                 <EditActions npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Special Rules */}
               <Grid item xs={12} md={6}>
                 <EditSpecial npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Rare Gear */}
               <Grid item xs={12} md={6}>
                 <EditRareGear npc={npcTemp} setNpc={updateNPC} />
               </Grid>
+              {/* Edit Notes */}
               <Grid item xs={12} md={6}>
                 <EditNotes npc={npcTemp} setNpc={updateNPC} />
               </Grid>
             </Grid>
           </Paper>
-
           <Divider sx={{ my: 1 }} />
 
+          {/* Attack Chance Generator Section */}
           <Paper
             elevation={3}
             sx={{
@@ -504,7 +509,6 @@ export default function NpcEdit() {
           >
             <Probs />
           </Paper>
-
           <Divider sx={{ my: 2, mb: 20 }} />
         </>
       )}
@@ -527,6 +531,7 @@ export default function NpcEdit() {
       {/* <ExplainSkillsSimplified npc={npcTemp} />
       </Grid> */}
 
+      {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && (
         <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
@@ -549,8 +554,8 @@ export default function NpcEdit() {
         </Grid>
       )}
 
+      {/* Move to Top Button */}
       <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
-        {/* Move to Top Button */}
         <Fade in={showScrollTop} timeout={300}>
           <Fab
             color="primary"
@@ -563,5 +568,6 @@ export default function NpcEdit() {
         </Fade>
       </Grid>
     </Layout>
+
   );
 }
