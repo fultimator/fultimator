@@ -196,7 +196,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               );
             })}
             <MenuItem value={"nodmg"}>
-              no damage
+              {t("no damage")}
             </MenuItem>
           </Select>
         </FormControl>
