@@ -4,6 +4,7 @@ import { firestore, auth } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Grid,
   Divider,
@@ -17,8 +18,10 @@ import {
   Select,
   MenuItem,
   FormHelperText,
-  useTheme,
-  useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import {
   Download,
@@ -93,17 +96,57 @@ export default function PlayerEdit() {
   };
 
   const [playerTemp, setPlayerTemp] = useState(player); // Temporary PLAYER state
+  const [openTab, setOpenTab] = useState(0); // State to track active tab index
+  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state for mobile menu
+
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
+  };
+
+  const handleTabChange = (event, newTab) => {
+    setOpenTab(newTab);
+    setDrawerOpen(false); // Close the drawer after selecting a tab
+  };
 
   return (
     <Layout>
-      <Tabs defaultValue={0}>
-        <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
-          <Tab value={0}>{t("Informations")}</Tab>
-          <Tab value={1}>{t("Stats")}</Tab>
-          <Tab value={2}>{t("Skills")}</Tab>
-          <Tab value={3}>{t("Spells")}</Tab>
-          <Tab value={4}>{t("Equipment")}</Tab>
-        </TabsList>
+      <Tabs value={openTab} onChange={handleTabChange}>
+        {isSmallScreen ? (
+          <>
+            <Button onClick={toggleDrawer(true)}>{t("Menu")}</Button>
+            <Drawer
+              anchor="left"
+              open={drawerOpen}
+              onClose={toggleDrawer(false)}
+            >
+              <List>
+                <ListItem onClick={(e) => handleTabChange(e, 0)}>
+                  <ListItemText primary={t("Informations")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 1)}>
+                  <ListItemText primary={t("Stats")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 2)}>
+                  <ListItemText primary={t("Skills")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 3)}>
+                  <ListItemText primary={t("Spells")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 4)}>
+                  <ListItemText primary={t("Equipment")} />
+                </ListItem>
+              </List>
+            </Drawer>
+          </>
+        ) : (
+          <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
+            <Tab value={0}>{t("Informations")}</Tab>
+            <Tab value={1}>{t("Stats")}</Tab>
+            <Tab value={2}>{t("Skills")}</Tab>
+            <Tab value={3}>{t("Spells")}</Tab>
+            <Tab value={4}>{t("Equipment")}</Tab>
+          </TabsList>
+        )}
         <TabPanel value={0}>
           {/* Edit Basic Information */}
           <EditPlayerBasics player={playerTemp} setPlayer={setPlayerTemp} />
