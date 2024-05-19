@@ -31,7 +31,10 @@ import EditableImage from "../EditableImage";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 
-function NpcPretty({ npc, study, collapse, includeImage, onClick = () => { } }, ref) {
+function NpcPretty(
+  { npc, study, collapse, includeImage, onClick = () => {} },
+  ref
+) {
   const { t } = useTranslate();
   return (
     <Card>
@@ -139,7 +142,7 @@ function Header({ npc, includeImage }) {
           </Typography>
         </Grid>
       </Grid>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: "flex" }}>
         {/* EditableImage */}
         {includeImage && (
           <Box
@@ -150,7 +153,7 @@ function Header({ npc, includeImage }) {
               background: "white",
               border: "1px solid #684268",
               borderTop: "none",
-              overflow: "hidden"
+              overflow: "hidden",
             }}
           >
             <EditableImage size={120} />
@@ -188,7 +191,10 @@ function Header({ npc, includeImage }) {
             }}
           >
             <Typography>
-              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+              <StyledMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed={true}
+              >
                 {npc.description}
               </StyledMarkdown>
             </Typography>
@@ -487,28 +493,38 @@ function Attacks({ npc }) {
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
                   <OpenBracket />
-                  {attributes[attack.attr1].shortcaps}+
+                  {attributes[attack.attr1].shortcaps} {" + "}
                   {attributes[attack.attr2].shortcaps}
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
-                    `+${calcPrecision(attack, npc)}`}
-                  <Diamond /> <OpenBracket />
-                  {t("HR")} + {calcDamage(attack, npc)}
-                  <CloseBracket />
-                </strong>{" "}
-                {attack.type === "physical" ? (
-                  <span>
-                    <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
-                      {t(damageTypeLabels[attack.type])}
-                    </ReactMarkdown>
-                  </span>
-                ) : (
+                    `+${calcPrecision(attack, npc)}`}{" "}
+                </strong>
+                {attack.type !== "nodmg" && (
                   <>
-                    <span style={{ textTransform: "lowercase" }}>
-                      <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
-                        {t(damageTypeLabels[attack.type])}
-                      </ReactMarkdown>
-                    </span>
+                    <strong>
+                      <Diamond /> <OpenBracket />
+                      {t("HR") + " + " + calcDamage(attack, npc)}
+                      <CloseBracket />{" "}
+                    </strong>
+                    {attack.type === "physical" ? (
+                      <span>
+                        <ReactMarkdown
+                          allowedElements={["strong"]}
+                          unwrapDisallowed={true}
+                        >
+                          {t(damageTypeLabels[attack.type])}
+                        </ReactMarkdown>
+                      </span>
+                    ) : (
+                      <span style={{ textTransform: "lowercase" }}>
+                        <ReactMarkdown
+                          allowedElements={["strong"]}
+                          unwrapDisallowed={true}
+                        >
+                          {t(damageTypeLabels[attack.type])}
+                        </ReactMarkdown>
+                      </span>
+                    )}
                   </>
                 )}{" "}
                 {attack.special?.map((effect, i) => {
@@ -516,7 +532,10 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed={true}
+                      >
                         {effect}
                       </StyledMarkdown>{" "}
                     </Typography>
@@ -525,7 +544,10 @@ function Attacks({ npc }) {
                 {typeof myVar === "string" ||
                   (attack.special instanceof String && (
                     <Typography component="span" key={i}>
-                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed={true}
+                      >
                         {attack.special}
                       </StyledMarkdown>
                     </Typography>
@@ -556,25 +578,31 @@ function Attacks({ npc }) {
                 <Diamond />{" "}
                 <strong>
                   <OpenBracket />
-                  {attributes[attack.weapon.att1].shortcaps}+
+                  {attributes[attack.weapon.att1].shortcaps}{" + "}
                   {attributes[attack.weapon.att2].shortcaps}
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
-                    `+${calcPrecision(attack, npc)}`}
+                    `+${calcPrecision(attack, npc)}`}{" "}
                   <Diamond /> <OpenBracket />
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
                 {attack.weapon.type === "physical" ? (
                   <span>
-                    <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                    <ReactMarkdown
+                      allowedElements={["strong"]}
+                      unwrapDisallowed={true}
+                    >
                       {t(damageTypeLabels[attack.weapon.type])}
                     </ReactMarkdown>
                   </span>
                 ) : (
                   <>
                     <span style={{ textTransform: "lowercase" }}>
-                      <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                      <ReactMarkdown
+                        allowedElements={["strong"]}
+                        unwrapDisallowed={true}
+                      >
                         {t(damageTypeLabels[attack.weapon.type])}
                       </ReactMarkdown>
                     </span>
@@ -585,7 +613,10 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed={true}
+                      >
                         {effect}
                       </StyledMarkdown>{" "}
                     </Typography>
@@ -648,10 +679,10 @@ function Spells({ npc }) {
                   {spell.type === "offensive" && (
                     <>
                       <OpenBracket />
-                      {attributes[spell.attr1].shortcaps}+
+                      {attributes[spell.attr1].shortcaps}{" + "}
                       {attributes[spell.attr2].shortcaps}
                       <CloseBracket />
-                      {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}
+                      {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}{" "}
                       <Diamond />
                     </>
                   )}{" "}
@@ -660,7 +691,10 @@ function Spells({ npc }) {
                 </strong>
                 <br />
                 <Typography component="span" key={i}>
-                  <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed={true}
+                  >
                     {spell.effect}
                   </StyledMarkdown>{" "}
                 </Typography>
@@ -748,7 +782,10 @@ function Special({ npc }) {
                 <span style={{ display: "inline" }}>
                   <strong>{special.name}</strong> <Diamond />{" "}
                 </span>
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
                   {special.effect}
                 </StyledMarkdown>
               </Typography>
@@ -813,7 +850,10 @@ function Actions({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{actions.name}</strong> <Diamond />{" "}
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
                   {actions.effect}
                 </StyledMarkdown>
               </Typography>
@@ -878,7 +918,10 @@ function Notes({ npc }) {
             <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
               <Typography>
                 <strong>{notes.name}</strong> <Diamond />{" "}
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
                   {notes.effect}
                 </StyledMarkdown>
               </Typography>
@@ -943,7 +986,10 @@ function RareGear({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography>
                 <strong>{raregear.name}</strong> <Diamond />{" "}
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
                   {raregear.effect}
                 </StyledMarkdown>
               </Typography>
@@ -1013,30 +1059,38 @@ function Equip({ npc }) {
         <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
           <Typography>
             <strong>{t("Weapon:")}</strong> {weapon.name}{" "}
-            {weapon.martial && <Martial />}
+            {weapon.martial && <Martial />}{" "}
+            <Diamond /> {weapon.hands === 1
+              ? t("1 handed")
+              : t("2 handed")}{" "}
             <Diamond />{" "}
-            {weapon.hands === 1 ? t("1 handed") : t("2 handed")} <Diamond />{" "}
             <strong>
               {" "}
               <OpenBracket />
-              {attributes[weapon.att1].shortcaps}+
+              {attributes[weapon.att1].shortcaps}{" + "}
               {attributes[weapon.att2].shortcaps}
               <CloseBracket />
-              {weapon.prec > 0 && `+${weapon.prec}`}
+              {weapon.prec > 0 && `+${weapon.prec}`}{" "}
               <Diamond /> <OpenBracket />
-              {t("HR:")} + {weapon.damage}
+              {t("HR")} + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
             {weapon.type === "physical" ? (
               <span>
-                <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
                   {t(damageTypeLabels[weapon.type])}
                 </ReactMarkdown>
               </span>
             ) : (
               <>
                 <span style={{ textTransform: "lowercase" }}>
-                  <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
+                  <ReactMarkdown
+                    allowedElements={["strong"]}
+                    unwrapDisallowed={true}
+                  >
                     {t(damageTypeLabels[weapon.type])}
                   </ReactMarkdown>
                 </span>
@@ -1064,7 +1118,7 @@ function Equip({ npc }) {
           )}{" "}
           <Diamond />{" "}
           <strong>
-            {t("M.DEF")} +{npc.armor.mdefbonus}
+            {t("M.DEF")} + {npc.armor.mdefbonus}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.armor.init}</strong> <Diamond />{" "}
           <strong>{npc.armor.cost}</strong> {t("zenit")}
@@ -1088,7 +1142,7 @@ function Equip({ npc }) {
           )}{" "}
           <Diamond />{" "}
           <strong>
-            {t("M.DEF")} +{npc.shield.mdefbonus}
+            {t("M.DEF")} + {npc.shield.mdefbonus}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.shield.init}</strong>{" "}
           <Diamond /> <strong>{npc.shield.cost}</strong> {t("zenit")}
@@ -1099,7 +1153,6 @@ function Equip({ npc }) {
 }
 
 function RenderVillainPhase({ villain, phases, multipart }) {
-
   const getVillainLabel = (villainType) => {
     switch (villainType) {
       case "minor":
@@ -1116,11 +1169,9 @@ function RenderVillainPhase({ villain, phases, multipart }) {
   const phaseString =
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
 
-  const values = [
-    getVillainLabel(villain),
-    phaseString,
-    multipart,
-  ].filter(Boolean);
+  const values = [getVillainLabel(villain), phaseString, multipart].filter(
+    Boolean
+  );
 
   const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
 

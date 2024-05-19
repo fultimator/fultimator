@@ -258,7 +258,7 @@ function NpcCombatant({ npc }: NpcProps) {
 
 // Handle Attack Roll
 const rollAttackDice = (attack, attackType) => {
-  let attribute1, attribute2, extraDamage, extraPrecision;
+  let attribute1, attribute2, extraDamage, extraPrecision, type;
 
   if (attackType === "weapon") {
     // For weapon attacks
@@ -267,6 +267,7 @@ const rollAttackDice = (attack, attackType) => {
     attribute2 = attributes[att2]; 
     extraDamage = attack.weapon.damage + parseInt(attack.flatdmg) + (attack.extraDamage ? 5 : 0);
     extraPrecision = (npc.extra?.precision ? 3 : 0) + attack.weapon.prec + parseInt(attack.flathit);
+    type = attack.weapon.type;
   } else if (attackType === "spell") {
     // For spells
     const { attr1, attr2 } = attack;
@@ -274,6 +275,7 @@ const rollAttackDice = (attack, attackType) => {
     attribute2 = attributes[attr2];
     extraDamage = 0;
     extraPrecision = npc.extra?.magic ? 3 : 0;
+    type = "spell";
   } else {
     // For base attacks
     const { attr1, attr2 } = attack;
@@ -281,6 +283,7 @@ const rollAttackDice = (attack, attackType) => {
     attribute2 = attributes[attr2];
     extraDamage = attack.extraDamage ? 10 : 5;
     extraPrecision = npc.extra?.precision ? 3 : 0;
+    type = attack.type;
   }
 
   if (attribute1 === undefined || attribute2 === undefined) {
@@ -306,7 +309,12 @@ const rollAttackDice = (attack, attackType) => {
   // Calculate results
   const totalHitScore = roll1 + roll2 + extraPrecision;
   let baseDamage = Math.max(roll1, roll2);
-  const damage = baseDamage + extraDamage;
+
+  let damage = 0;
+  if (type !== "nodmg"){
+    damage = baseDamage + extraDamage;
+  };
+  
 
   // Update results
   setHitThrowResult({ totalHitScore });

@@ -195,6 +195,9 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 </MenuItem>
               );
             })}
+            <MenuItem value={"nodmg"}>
+              no damage
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>

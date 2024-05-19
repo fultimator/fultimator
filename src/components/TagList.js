@@ -17,7 +17,7 @@ const TagList = ({ npc, setNpc }) => {
   const maxTags = 5; // Maximum tag count
   const maxTagLength = 50; // Maximum tag length
 
-  console.log(npc.tags);
+  //console.log(npc.tags);
 
   // Function to handle deletion of a tag
   const handleDelete = (i) => {
