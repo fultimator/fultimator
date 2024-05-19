@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/system';
+import React, { useState } from "react";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/system";
 import { useTranslate } from "../translation/translate";
+import AddIcon from "@mui/icons-material/Add";
 
 const TagList = ({ npc, setNpc }) => {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const maxTags = 5; // Maximum tag count
   const maxTagLength = 50; // Maximum tag length
 
@@ -25,13 +26,12 @@ const TagList = ({ npc, setNpc }) => {
       setNpc((prevState) => {
         const newState = {
           ...prevState,
-          tags: [...prevState.tags.slice(0, i), ...prevState.tags.slice(i + 1)]
+          tags: [...prevState.tags.slice(0, i), ...prevState.tags.slice(i + 1)],
         };
         return newState;
       });
     };
   };
-
 
   // Function to handle input change in the text field
   const handleInputChange = (e) => {
@@ -43,25 +43,32 @@ const TagList = ({ npc, setNpc }) => {
 
   // Function to handle key down events in the text field
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag();
     }
   };
 
-
   // Function to handle adding a tag
   const handleAddTag = () => {
     const trimmedValue = inputValue.trim().toUpperCase();
-    if (trimmedValue && (npc.tags?.length < maxTags || !npc.tags) && !npc.tags?.some(tag => tag.name.toUpperCase() === trimmedValue.toUpperCase())) {
-      setNpc(prevState => {
+    if (
+      trimmedValue &&
+      (npc.tags?.length < maxTags || !npc.tags) &&
+      !npc.tags?.some(
+        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase()
+      )
+    ) {
+      setNpc((prevState) => {
         const newState = {
           ...prevState,
-          tags: prevState.tags ? [...prevState.tags, { name: trimmedValue }] : [{ name: trimmedValue }]
+          tags: prevState.tags
+            ? [...prevState.tags, { name: trimmedValue }]
+            : [{ name: trimmedValue }],
         };
         return newState;
       });
-      setInputValue('');
+      setInputValue("");
     }
   };
 
@@ -69,7 +76,15 @@ const TagList = ({ npc, setNpc }) => {
   const isInputDisabled = npc.tags?.length >= maxTags;
 
   return (
-    <Paper elevation={3} sx={{ p: "10px", borderRadius: "8px", border: "2px solid", borderColor: secondary }}>
+    <Paper
+      elevation={3}
+      sx={{
+        p: "10px",
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: secondary,
+      }}
+    >
       {/* Label for the tag list */}
       <Typography
         mb={1}
@@ -78,7 +93,9 @@ const TagList = ({ npc, setNpc }) => {
           textTransform: "uppercase",
           fontSize: "1.3rem",
         }}
-      >{t("Personal Tags")}</Typography>
+      >
+        {t("Personal Tags")}
+      </Typography>
       {/* Stack for input field and add button */}
       <Stack direction="row" spacing={1} alignItems="flex-start">
         {/* Text field for adding tags */}
@@ -92,7 +109,7 @@ const TagList = ({ npc, setNpc }) => {
           fullWidth
           disabled={isInputDisabled}
           inputProps={{ maxLength: maxTagLength }} // Limit input to maxTagLength characters
-          sx={{ height: '40px' }} // Set fixed height for the TextField
+          sx={{ height: "40px" }} // Set fixed height for the TextField
         />
         {/* Button to add tags */}
         <Button
@@ -102,16 +119,18 @@ const TagList = ({ npc, setNpc }) => {
           onClick={handleAddTag}
           disabled={isInputDisabled}
           sx={{
-            height: '40px', // Match the height of the TextField
-            display: isInputDisabled ? 'none' : 'block',
-            padding: '0 16px' // Adjust padding for the button
+            height: "40px",
+            display: isInputDisabled ? "none" : "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "0 16px",
           }}
         >
-          {t("Add")}
+          <AddIcon />
         </Button>
       </Stack>
       {/* Container for displaying added tags */}
-      <div style={{ marginTop: '8px' }}>
+      <div style={{ marginTop: "8px" }}>
         {npc.tags?.map((tag, i) => (
           <Chip
             key={i}
@@ -119,7 +138,7 @@ const TagList = ({ npc, setNpc }) => {
             onDelete={handleDelete(i)}
             color="primary"
             variant="outlined"
-            style={{ marginRight: '5px', marginBottom: '5px' }}
+            style={{ marginRight: "5px", marginBottom: "5px" }}
           />
         ))}
       </div>
