@@ -2,6 +2,7 @@ export enum Affinities {
     Resistance = 'rs',
     Vulnerability = 'vu',
     Absorpbtion = 'ab',
+    Immunity = 'im',
     None = 'no'
 }
 

@@ -25,6 +25,8 @@ import {
   ThemeProvider as AppThemeProvider,
   useThemeContext,
 } from "./ThemeContext";
+import PlayerGallery from "./routes/player-gallery/player-gallery";
+import PlayerEdit from "./routes/player-edit/player-edit";
 
 const themes = {
   Fabula,
@@ -44,6 +46,8 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/player-gallery" element={<PlayerGallery />} />
+            <Route path="/player-edit/" element={<PlayerEdit />} />
             <Route path="/npc-gallery/:npcId" element={<NpcEdit />} />
             <Route path="/npc-gallery" element={<NpcGallery />} />
             <Route path="/npc-compedium" element={<NpcCompedium />} />
