@@ -22,6 +22,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Box
 } from "@mui/material";
 import {
   Download,
@@ -40,6 +41,7 @@ import EditPlayerBasics from "../../components/player/EditPlayerBasics";
 import EditPlayerTraits from "../../components/player/EditPlayerTraits";
 import EditPlayerNotes from "../../components/player/EditPlayerNotes";
 import EditPlayerBonds from "../../components/player/EditPlayerBonds";
+import EditPlayerAttributes from "../../components/player/EditPlayerAttributes";
 import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
@@ -167,8 +169,18 @@ export default function PlayerEdit() {
           <Divider sx={{ my: 1 }} />
           {/* Edit Notes */}
           <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
+
+          {/* End of page space */}
+          <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={1}>Stats</TabPanel>
+        <TabPanel value={1}>
+          {/* Edit Attributes */}
+          <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
+
+          {/* End of page space */}
+          <Box sx={{ height: "5vh" }} />
+        </TabPanel>
         <TabPanel value={2}>Skills</TabPanel>
         <TabPanel value={3}>Spells</TabPanel>
         <TabPanel value={4}>Equipment</TabPanel>
