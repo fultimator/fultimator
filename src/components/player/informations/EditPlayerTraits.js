@@ -15,9 +15,9 @@ import {
   Paper,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
-import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
-import CustomHeader from "../common/CustomHeader";
+import { useTranslate } from "../../../translation/translate";
+import CustomTextarea from "../../common/CustomTextarea";
+import CustomHeader from "../../common/CustomHeader";
 
 export default function EditPlayerTraits({ player, setPlayer }) {
   const { t } = useTranslate();

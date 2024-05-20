@@ -22,6 +22,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Box
 } from "@mui/material";
 import {
   Download,
@@ -36,9 +37,12 @@ import {
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
-import EditPlayerBasics from "../../components/player/EditPlayerBasics";
-import EditPlayerTraits from "../../components/player/EditPlayerTraits";
-import EditPlayerNotes from "../../components/player/EditPlayerNotes";
+import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
+import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
+import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
+import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
+import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
+import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
@@ -62,9 +66,6 @@ export default function PlayerEdit() {
   const isSmallScreen = useMediaQuery("(max-width: 899px)"); // Media query hook for screen size
 
   const player = {
-    /*
-        Object like TypePlayer interface from Players.ts
-    */
     id: "",
     uid: "",
     name: "",
@@ -74,7 +75,17 @@ export default function PlayerEdit() {
       identity: "",
       theme: "",
       origin: "",
-      //bonds: Bonds[],
+      bonds: [
+        {
+          name: "",
+          admiration: false,
+          loyality: false,
+          affection: false,
+          inferiority: false,
+          mistrust: false,
+          hatred: false,
+        },
+      ],
       description: "",
       fabulapoints: 3,
       exp: 0,
@@ -86,6 +97,20 @@ export default function PlayerEdit() {
       insight: 8,
       might: 8,
       willpower: 8,
+    },
+    stats: {
+      hp: {
+        max: 45,
+        current: 45,
+      },
+      mp: {
+        max: 45,
+        current: 45,
+      },
+      ip: {
+        max: 6,
+        current: 6,
+      },
     },
     notes: [
       {
@@ -154,10 +179,26 @@ export default function PlayerEdit() {
           {/* Edit Traits */}
           <EditPlayerTraits player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
+          {/* Edit Bonds */}
+          <EditPlayerBonds player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
           {/* Edit Notes */}
           <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
+
+          {/* End of page space */}
+          <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={1}>Stats</TabPanel>
+        <TabPanel value={1}>
+          {/* Edit Attributes */}
+          <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
+          {/* Edit Stats */}
+          <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
+
+          {/* End of page space */}
+          <Box sx={{ height: "5vh" }} />
+        </TabPanel>
         <TabPanel value={2}>Skills</TabPanel>
         <TabPanel value={3}>Spells</TabPanel>
         <TabPanel value={4}>Equipment</TabPanel>

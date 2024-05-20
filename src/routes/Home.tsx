@@ -6,6 +6,7 @@ import Layout from "../components/Layout";
 import adversary_compedium from "./adversary_compedium.webp";
 import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
+import player_designer from "./custom_class_no_title.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
 import React, { useState } from "react";
@@ -29,7 +30,7 @@ function Home() {
       >
         <CardMedia
           component="img"
-          image={adversary_designer}
+          image={player_designer}
           alt=""
           sx={{
             objectFit: "contain",
