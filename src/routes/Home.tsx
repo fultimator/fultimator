@@ -35,6 +35,26 @@ function Home() {
             objectFit: "contain",
             width: 360,
             cursor: "pointer",
+            transform: hover === "player_designer" ? " scale(1.1)" : "none",
+          }}
+          onMouseEnter={() => {
+            setHover("player_designer");
+          }}
+          onMouseLeave={() => {
+            setHover("");
+          }}
+          onClick={() => {
+            navigate("/player-gallery");
+          }}
+        />
+        <CardMedia
+          component="img"
+          image={adversary_designer}
+          alt=""
+          sx={{
+            objectFit: "contain",
+            width: 360,
+            cursor: "pointer",
             transform: hover === "adversary_designer" ? " scale(1.1)" : "none",
           }}
           onMouseEnter={() => {
