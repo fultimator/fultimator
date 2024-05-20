@@ -1,3 +1,4 @@
+import React from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   Card,
@@ -26,7 +27,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  
+
   const handleNoteNameChange = (key) => {
     return (e) => {
       setPlayer((prevState) => {
@@ -68,13 +69,13 @@ export default function EditPlayerNotes({ player, setPlayer }) {
       }}
     >
       <Grid container>
-              <Grid item xs={12}>
+        <Grid item xs={12}>
           <CustomHeader
             type="top"
             headerText={t("Notes")}
             addItem={() =>
               setPlayer((prevState) => {
-                const newState = Object.assign({}, prevState);
+                const newState = { ...prevState };
                 newState.notes.push({
                   name: "",
                   description: "",
@@ -85,32 +86,40 @@ export default function EditPlayerNotes({ player, setPlayer }) {
           />
         </Grid>
         {player.notes.map((note, index) => (
-          <>
-            {index > 0 && <Divider variant="middle" sx={{ my: 1 }} />}
-            <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-              <Grid item sx={{ p: 0, m: 0 }}>
-                <IconButton onClick={removeItem(index)}>
-                  <RemoveCircleOutline />
-                </IconButton>
-              </Grid>
-              <Grid item xs={7}>
-                <TextField
-                  id="name"
-                  label={t("Note Name:")}
-                  value={note.name}
-                  onChange={handleNoteNameChange(index)}
-                ></TextField>
-              </Grid>
-              <Grid item xs={12} sm={12}>
-                <CustomTextarea
-                  id="description"
-                  label={t("Description:")}
-                  value={note.description}
-                  onChange={handleNoteDescriptionChange(index)}
-                />
-              </Grid>
+          <Grid
+            container
+            spacing={1}
+            sx={{ py: 1 }}
+            alignItems="center"
+            key={index}
+          >
+            <Grid item sx={{ p: 0, m: 0 }}>
+              <IconButton onClick={removeItem(index)}>
+                <RemoveCircleOutline />
+              </IconButton>
             </Grid>
-          </>
+            <Grid item xs={7}>
+              <TextField
+                id="name"
+                label={t("Note Name:")}
+                value={note.name}
+                onChange={handleNoteNameChange(index)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <CustomTextarea
+                id="description"
+                label={t("Description:")}
+                value={note.description}
+                onChange={handleNoteDescriptionChange(index)}
+              />
+            </Grid>
+            {index !== player.notes.length - 1 && (
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+            )}
+          </Grid>
         ))}
       </Grid>
     </Paper>
