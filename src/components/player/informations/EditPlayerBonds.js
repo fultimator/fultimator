@@ -16,9 +16,9 @@ import {
   FormControlLabel,
   Box,
 } from "@mui/material";
-import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
-import CustomHeader from "../common/CustomHeader";
+import { useTranslate } from "../../../translation/translate";
+import CustomTextarea from "../../common/CustomTextarea";
+import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
 import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
 

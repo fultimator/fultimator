@@ -37,11 +37,12 @@ import {
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
-import EditPlayerBasics from "../../components/player/EditPlayerBasics";
-import EditPlayerTraits from "../../components/player/EditPlayerTraits";
-import EditPlayerNotes from "../../components/player/EditPlayerNotes";
-import EditPlayerBonds from "../../components/player/EditPlayerBonds";
-import EditPlayerAttributes from "../../components/player/EditPlayerAttributes";
+import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
+import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
+import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
+import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
+import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
+import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
@@ -96,6 +97,20 @@ export default function PlayerEdit() {
       insight: 8,
       might: 8,
       willpower: 8,
+    },
+    stats: {
+      hp: {
+        max: 45,
+        current: 45,
+      },
+      mp: {
+        max: 45,
+        current: 45,
+      },
+      ip: {
+        max: 6,
+        current: 6,
+      },
     },
     notes: [
       {
@@ -176,6 +191,9 @@ export default function PlayerEdit() {
         <TabPanel value={1}>
           {/* Edit Attributes */}
           <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
+          {/* Edit Stats */}
+          <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
 
           {/* End of page space */}

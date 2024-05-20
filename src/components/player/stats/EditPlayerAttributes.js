@@ -17,9 +17,10 @@ import {
   Slider,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
-import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
-import CustomHeader from "../common/CustomHeader";
+import { useTranslate } from "../../../translation/translate";
+import CustomTextarea from "../../common/CustomTextarea";
+import CustomHeader from "../../common/CustomHeader";
+import ExplainPlayerAttributes from "./ExplainPlayerAttributes";
 
 export default function EditPlayerAttributes({ player, setPlayer }) {
   const { t } = useTranslate();
@@ -128,39 +129,7 @@ export default function EditPlayerAttributes({ player, setPlayer }) {
         </Grid>
         {/* Attributes Explanation Card */}
         <Grid item xs={12} sm={6}>
-          <Grid item>
-            <Card
-              sx={{
-                p: 1.61,
-                background: `linear-gradient(to right, ${ternary}, transparent)`,
-              }}
-            >
-              <Typography>
-                <strong>{t("Jack of All Trades")}</strong>: d8, d8, d8, d8
-              </Typography>
-              <Typography>
-                <strong>{t("Standard")}</strong>: d10, d8, d8, d6
-              </Typography>
-              <Typography>
-                <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
-              </Typography>
-              <Typography>
-                <strong>{t("Super Specialized")}</strong>: d12, d8, d6, d6
-              </Typography>
-              <Divider sx={{ my: 1 }} />
-              <Typography variant="body2">
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
-                >
-                  {t(
-                    "Upon reaching levels **20**, **40**, and **60**, the Player chooses one of its Attributes and increases it by one die size (to a maximum of d12).",
-                    true
-                  )}
-                </ReactMarkdown>
-              </Typography>
-            </Card>
-          </Grid>
+          <ExplainPlayerAttributes />
         </Grid>
       </Grid>
     </Paper>
