@@ -126,54 +126,36 @@ export default function EditPlayerBasics({ player, setPlayer }) {
 
 function EditPlayerLevel({ player, setPlayer }) {
   const { t } = useTranslate();
-  const onRaiseLevel = (e) => {
-    setPlayer((prevState) => {
-      if (prevState.lvl >= 60) {
-        return prevState;
-      }
 
-      const newState = Object.assign({}, prevState);
-      newState.lvl = prevState.lvl + 1;
-      return newState;
+  const onRaiseLevel = () => {
+    setPlayer(prevState => {
+      if (prevState.lvl >= 60) return prevState;
+      return { ...prevState, lvl: prevState.lvl + 1 };
     });
   };
-  const onLowerLevel = (e) => {
-    setPlayer((prevState) => {
-      if (prevState.lvl <= 5) {
-        return prevState;
-      }
 
-      const newState = Object.assign({}, prevState);
-      newState.lvl = prevState.lvl - 1;
-      return newState;
+  const onLowerLevel = () => {
+    setPlayer(prevState => {
+      if (prevState.lvl <= 5) return prevState;
+      return { ...prevState, lvl: prevState.lvl - 1 };
     });
   };
+
   return (
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
         label={t("Level:")}
-        //type="number"
-        min={5}
-        max={60}
         value={player.lvl}
         InputProps={{
           readOnly: true,
           startAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="start"
-              onClick={onLowerLevel}
-            >
+            <IconButton aria-label="decrease level" edge="start" onClick={onLowerLevel}>
               <Remove />
             </IconButton>
           ),
           endAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="end"
-              onClick={onRaiseLevel}
-            >
+            <IconButton aria-label="increase level" edge="end" onClick={onRaiseLevel}>
               <Add />
             </IconButton>
           ),
