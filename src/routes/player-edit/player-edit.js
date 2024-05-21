@@ -37,6 +37,7 @@ import {
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
+import PlayerCard from "../../components/player/PlayerCard";
 import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
 import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
@@ -173,6 +174,8 @@ export default function PlayerEdit() {
           </TabsList>
         )}
         <TabPanel value={0}>
+          <PlayerCard player={playerTemp} />
+          <Divider sx={{ my: 1 }} />
           {/* Edit Basic Information */}
           <EditPlayerBasics player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />

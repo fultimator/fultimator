@@ -1,94 +1,41 @@
 import React from "react";
-import { Add, Remove } from "@mui/icons-material";
 import {
-  Card,
-  Divider,
-  FormControl,
   Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
-  useTheme,
   Paper,
-  Slider,
   Button,
   ButtonGroup,
 } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import ExplainPlayerAttributes from "./ExplainPlayerAttributes";
 
 export default function EditPlayerStats({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-
-  /* Statistics
-  hp: {
-    max: player.lvl + (player.attributes.might * 5),
-    current: // Editable field that shows the current HP of the player,
-  }
-  mp: {
-    max: player.lvl + (player.attributes.insight * 5),
-    current: // Editable field that shows the current MP of the player,
-  }
-  ip: {
-    max: 6,
-    current: // Editable field that shows the current IP of the player,
-  }
-  */
+  const { secondary } = theme.palette;
 
   const updateMaxStats = () => {
-    setPlayer((prevPlayer) => ({
-      ...prevPlayer,
-      stats: {
-        ...prevPlayer.stats,
-        hp: {
-          ...prevPlayer.stats.hp,
-          max: prevPlayer.lvl + prevPlayer.attributes.might * 5,
-          current: Math.min(
-            prevPlayer.stats.hp.current,
-            prevPlayer.lvl + prevPlayer.attributes.might * 5
-          ),
+    setPlayer((prevPlayer) => {
+      const maxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
+      const maxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
+      return {
+        ...prevPlayer,
+        stats: {
+          hp: { ...prevPlayer.stats.hp, max: maxHP, current: Math.min(prevPlayer.stats.hp.current, maxHP) },
+          mp: { ...prevPlayer.stats.mp, max: maxMP, current: Math.min(prevPlayer.stats.mp.current, maxMP) },
+          ip: { ...prevPlayer.stats.ip, max: 6, current: Math.min(prevPlayer.stats.ip.current, 6) },
         },
-        mp: {
-          ...prevPlayer.stats.mp,
-          max: prevPlayer.lvl + prevPlayer.attributes.insight * 5,
-          current: Math.min(
-            prevPlayer.stats.mp.current,
-            prevPlayer.lvl + prevPlayer.attributes.insight * 5
-          ),
-        },
-        ip: {
-          ...prevPlayer.stats.ip,
-          max: 6,
-          current: Math.min(prevPlayer.stats.ip.current, 6),
-        },
-      },
-    }));
+      };
+    });
   };
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {
-      const current = prevPlayer.stats[stat].current + value;
-      return {
-        ...prevPlayer,
-        stats: {
-          ...prevPlayer.stats,
-          [stat]: {
-            ...prevPlayer.stats[stat],
-            current: Math.max(0, Math.min(current, prevPlayer.stats[stat].max)),
-          },
-        },
-      };
+      const current = Math.max(0, Math.min(prevPlayer.stats[stat].current + value, prevPlayer.stats[stat].max));
+      return { ...prevPlayer, stats: { ...prevPlayer.stats, [stat]: { ...prevPlayer.stats[stat], current } } };
     });
   };
 
@@ -96,174 +43,54 @@ export default function EditPlayerStats({ player, setPlayer }) {
     updateMaxStats();
   }, [player.lvl, player.attributes.might, player.attributes.insight]);
 
+  const renderStatControls = (stat, label, color, increments) => (
+    <Stack direction="row" spacing={2} sx={{ mt: 1 }} alignItems="center">
+      <Typography variant="h3" sx={{ minWidth: '50px' }}>{t(label)}</Typography>
+      <TextField
+        label={t("Max")}
+        value={player.stats[stat].max}
+        variant="outlined"
+        InputProps={{ readOnly: true }}
+        sx={{ width: '80px' }}
+      />
+      <TextField
+        label={t("Current")}
+        value={player.stats[stat].current}
+        error={stat === "hp" && player.stats.hp.current <= Math.floor(player.stats.hp.max / 2)}
+        variant="outlined"
+        sx={{ width: '80px' }}
+      />
+      <ButtonGroup variant="outlined" size="small" color={color}>
+        {increments.map((val) => (
+          <Button key={val} onClick={changeStat(stat, val)}>{val > 0 ? `+${val}` : val}</Button>
+        ))}
+      </ButtonGroup>
+      <Button onClick={changeStat(stat, player.stats[stat].max)}>{t("Full")}</Button>
+      {stat === "hp" && (
+        <Button onClick={changeStat("hp", Math.floor(player.stats.hp.max / 2) - player.stats.hp.current)}>
+          {t("Half")}
+        </Button>
+      )}
+      {stat === "hp" && player.stats.hp.current <= Math.floor(player.stats.hp.max / 2) && (
+        <Typography variant="h6" color="error">CRISIS</Typography>
+      )}
+    </Stack>
+  );
+
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: `2px solid ${secondary}` }}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Statistics")}
-            addItem={() => console.log(player)}
-          />
+          <CustomHeader type="top" headerText={t("Statistics")} addItem={() => console.log(player)} />
         </Grid>
-        {/* HP Statistic */}
-        <Grid item xs={12} md={12}>
-          <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-            <Stack direction="column">
-              <Typography variant="h3">{t("HP")}</Typography>
-              <Typography variant="h4" color="error">
-                {player.stats.hp.current <= Math.floor(player.stats.hp.max / 2)
-                  ? "CRYSYS"
-                  : null}
-              </Typography>
-            </Stack>
-            <TextField
-              id="outlined-basic"
-              label={t("Max")}
-              value={player.stats.hp.max}
-              variant="outlined"
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-            <TextField
-              id="outlined-basic"
-              label={t("Current")}
-              value={player.stats.hp.current}
-              error={
-                player.stats.hp.current <= Math.floor(player.stats.hp.max / 2)
-              }
-              //onChange={onChangeInfo("hp.current")}
-              variant="outlined"
-            />
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="error">
-                <Button onClick={changeStat("hp", -1)}>-1</Button>
-                <Button onClick={changeStat("hp", -2)}>-2</Button>
-                <Button onClick={changeStat("hp", -5)}>-5</Button>
-                <Button onClick={changeStat("hp", -10)}>-10</Button>
-                <Button onClick={changeStat("hp", -20)}>-20</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="error">
-                <Button onClick={changeStat("hp", +1)}>+1</Button>
-                <Button onClick={changeStat("hp", +2)}>+2</Button>
-                <Button onClick={changeStat("hp", +5)}>+5</Button>
-                <Button onClick={changeStat("hp", +10)}>+10</Button>
-                <Button onClick={changeStat("hp", +20)}>+20</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={2}>
-              <Button onClick={changeStat("hp", player.stats.hp.max)}>
-                {t("Full")}
-              </Button>
-            </Grid>
-            <Grid item xs={2}>
-              <Button
-                onClick={changeStat(
-                  "hp",
-                  Math.floor(player.stats.hp.max / 2) - player.stats.hp.current
-                )}
-              >
-                {t("Half")}
-              </Button>
-            </Grid>
-          </Stack>
+        <Grid item xs={12}>
+          {renderStatControls("hp", "HP", "error", [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20])}
         </Grid>
-        {/* MP Statistic */}
-        <Grid item xs={12} md={12}>
-          <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-            <Typography variant="h3">{t("MP")}</Typography>
-            <TextField
-              id="outlined-basic"
-              label={t("Max")}
-              value={player.stats.mp.max}
-              variant="outlined"
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-            <TextField
-              id="outlined-basic"
-              label={t("Current")}
-              value={player.stats.mp.current}
-              //onChange={onChangeInfo("mp.current")}
-              variant="outlined"
-            />
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="info">
-                <Button onClick={changeStat("mp", -1)}>-1</Button>
-                <Button onClick={changeStat("mp", -2)}>-2</Button>
-                <Button onClick={changeStat("mp", -5)}>-5</Button>
-                <Button onClick={changeStat("mp", -10)}>-10</Button>
-                <Button onClick={changeStat("mp", -20)}>-20</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="info">
-                <Button onClick={changeStat("mp", +1)}>+1</Button>
-                <Button onClick={changeStat("mp", +2)}>+2</Button>
-                <Button onClick={changeStat("mp", +5)}>+5</Button>
-                <Button onClick={changeStat("mp", +10)}>+10</Button>
-                <Button onClick={changeStat("mp", +20)}>+20</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={2}>
-              <Button onClick={changeStat("mp", player.stats.mp.max)}>
-                {t("Full")}
-              </Button>
-            </Grid>
-          </Stack>
+        <Grid item xs={12}>
+          {renderStatControls("mp", "MP", "info", [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20])}
         </Grid>
-        {/* IP Statistic */}
-        <Grid item xs={12} md={12}>
-          <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-            <Typography variant="h3">{t("IP")}</Typography>
-            <TextField
-              id="outlined-basic"
-              label={t("Max")}
-              value={player.stats.ip.max}
-              variant="outlined"
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-            <TextField
-              id="outlined-basic"
-              label={t("Current")}
-              value={player.stats.ip.current}
-              //onChange={onChangeInfo("ip.current")}
-              variant="outlined"
-            />
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="info">
-                <Button onClick={changeStat("ip", -3)}>-3</Button>
-                <Button onClick={changeStat("ip", -2)}>-2</Button>
-                <Button onClick={changeStat("ip", -1)}>-1</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={5}>
-              <ButtonGroup variant="outlined" size="small" color="info">
-                <Button onClick={changeStat("ip", +1)}>+1</Button>
-                <Button onClick={changeStat("ip", +2)}>+2</Button>
-                <Button onClick={changeStat("ip", +3)}>+3</Button>
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={2}>
-              <Button onClick={changeStat("ip", player.stats.ip.max)}>
-                {t("Full")}
-              </Button>
-            </Grid>
-          </Stack>
+        <Grid item xs={12}>
+          {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
         </Grid>
       </Grid>
     </Paper>

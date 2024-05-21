@@ -1,3 +1,4 @@
+import React from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   Card,
@@ -12,7 +13,8 @@ import {
   TextField,
   Typography,
   useTheme,
-  Paper
+  Paper,
+  Button,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
@@ -25,6 +27,8 @@ export default function EditPlayerBasics({ player, setPlayer }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+
+  const [imgUrlTemp, setImgUrlTemp] = React.useState("");
 
   const onChange = (key) => {
     return (e) => {
@@ -119,6 +123,36 @@ export default function EditPlayerBasics({ player, setPlayer }) {
             ></TextField>
           </FormControl>
         </Grid>
+        <Grid item xs={12} sm={12}>
+          <FormControl variant="standard" fullWidth>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                id="imgurl"
+                label={t(
+                  "Image URL (needs to end with .png, .jpg, .jpeg, etc...):"
+                )}
+                value={imgUrlTemp}
+                onChange={(e) => {
+                  setImgUrlTemp(e.target.value);
+                }}
+                fullWidth
+              ></TextField>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setPlayer((prevState) => {
+                    const newState = { ...prevState };
+                    newState.info.imgurl = imgUrlTemp;
+                    return newState;
+                  });
+                }}
+                sx={{ height: "56px" }}
+              >
+                {t("Update Image")}
+              </Button>
+            </Stack>
+          </FormControl>
+        </Grid>
       </Grid>
     </Paper>
   );
@@ -128,14 +162,14 @@ function EditPlayerLevel({ player, setPlayer }) {
   const { t } = useTranslate();
 
   const onRaiseLevel = () => {
-    setPlayer(prevState => {
+    setPlayer((prevState) => {
       if (prevState.lvl >= 60) return prevState;
       return { ...prevState, lvl: prevState.lvl + 1 };
     });
   };
 
   const onLowerLevel = () => {
-    setPlayer(prevState => {
+    setPlayer((prevState) => {
       if (prevState.lvl <= 5) return prevState;
       return { ...prevState, lvl: prevState.lvl - 1 };
     });
@@ -150,12 +184,20 @@ function EditPlayerLevel({ player, setPlayer }) {
         InputProps={{
           readOnly: true,
           startAdornment: (
-            <IconButton aria-label="decrease level" edge="start" onClick={onLowerLevel}>
+            <IconButton
+              aria-label="decrease level"
+              edge="start"
+              onClick={onLowerLevel}
+            >
               <Remove />
             </IconButton>
           ),
           endAdornment: (
-            <IconButton aria-label="increase level" edge="end" onClick={onRaiseLevel}>
+            <IconButton
+              aria-label="increase level"
+              edge="end"
+              onClick={onRaiseLevel}
+            >
               <Add />
             </IconButton>
           ),
