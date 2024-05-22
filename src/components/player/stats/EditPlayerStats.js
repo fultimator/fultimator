@@ -17,31 +17,12 @@ export default function EditPlayerStats({ player, setPlayer }) {
   const theme = useTheme();
   const { secondary } = theme.palette;
 
-  const updateMaxStats = () => {
-    setPlayer((prevPlayer) => {
-      const maxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
-      const maxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
-      return {
-        ...prevPlayer,
-        stats: {
-          hp: { ...prevPlayer.stats.hp, max: maxHP, current: Math.min(prevPlayer.stats.hp.current, maxHP) },
-          mp: { ...prevPlayer.stats.mp, max: maxMP, current: Math.min(prevPlayer.stats.mp.current, maxMP) },
-          ip: { ...prevPlayer.stats.ip, max: 6, current: Math.min(prevPlayer.stats.ip.current, 6) },
-        },
-      };
-    });
-  };
-
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {
       const current = Math.max(0, Math.min(prevPlayer.stats[stat].current + value, prevPlayer.stats[stat].max));
       return { ...prevPlayer, stats: { ...prevPlayer.stats, [stat]: { ...prevPlayer.stats[stat], current } } };
     });
   };
-
-  React.useEffect(() => {
-    updateMaxStats();
-  }, [player.lvl, player.attributes.might, player.attributes.insight]);
 
   const renderStatControls = (stat, label, color, increments) => (
     <Stack direction="row" spacing={2} sx={{ mt: 1 }} alignItems="center">

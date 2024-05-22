@@ -37,10 +37,10 @@ export default function EditPlayerTraits({ player, setPlayer }) {
   ];
 
   const onChangeInfo = (key) => {
-    return (e, value) => {
+    return (event, value) => {
       setPlayer((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.info[key] = value;
+        const newState = { ...prevState };
+        newState.info[key] = event.target ? event.target.value : value;
         return newState;
       });
     };
@@ -67,7 +67,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
               label={t("Identity:")}
               value={player.info.identity}
               onChange={onChangeInfo("identity")}
-            ></TextField>
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -83,7 +83,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
                 label={t("Theme:")}
                 fullWidth
               />
-            )}            
+            )}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -93,7 +93,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
               label={t("Origin:")}
               value={player.info.origin}
               onChange={onChangeInfo("origin")}
-            ></TextField>
+            />
           </FormControl>
         </Grid>
       </Grid>
