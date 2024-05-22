@@ -1,42 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { firestore, auth } from "../../firebase";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
+import React, { useEffect, useState } from "react";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
-  Grid,
   Divider,
-  Fab,
-  Fade,
-  Tooltip,
+  Paper,
   Button,
   TextField,
-  IconButton,
-  Paper,
-  Select,
-  MenuItem,
-  FormHelperText,
   Drawer,
   List,
   ListItem,
   ListItemText,
-  Box
+  Box,
 } from "@mui/material";
-import {
-  Download,
-  Publish,
-  Save,
-  Share,
-  ArrowUpward,
-  ContentCopy,
-  Image,
-  HideImage,
-} from "@mui/icons-material";
+import { Tabs } from "@mui/base/Tabs";
+import { TabsList as BaseTabsList } from "@mui/base/TabsList";
+import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
+import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
-// import NpcUgly from "../../components/npc/Ugly";
 import PlayerCard from "../../components/player/PlayerCard";
 import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
 import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
@@ -45,27 +24,17 @@ import EditPlayerBonds from "../../components/player/informations/EditPlayerBond
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
-import Probs from "../probs/probs";
-import useDownloadImage from "../../hooks/useDownloadImage";
-import Export from "../../components/Export";
-import { useTranslate, languageOptions } from "../../translation/translate";
-import CustomHeader from "../../components/common/CustomHeader";
-import TagList from "../../components/TagList";
-import attributes from "../../libs/attributes";
+import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
+import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { Tabs } from "@mui/base/Tabs";
-import { TabsList as BaseTabsList } from "@mui/base/TabsList";
-import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
-import { buttonClasses } from "@mui/base/Button";
-import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 
 export default function PlayerEdit() {
-  const { t } = useTranslate(); // Translation hook
-  const theme = useTheme(); // Theme hook for MUI
-  const primary = theme.palette.primary.main; // Primary color from theme
-  const secondary = theme.palette.secondary.main; // Secondary color from theme
+  const { t } = useTranslate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  const isSmallScreen = useMediaQuery("(max-width: 899px)"); // Media query hook for screen size
+  const isSmallScreen = useMediaQuery("(max-width: 899px)");
 
   const player = {
     id: "",
@@ -81,7 +50,7 @@ export default function PlayerEdit() {
         {
           name: "",
           admiration: false,
-          loyality: false,
+          loyalty: false,
           affection: false,
           inferiority: false,
           mistrust: false,
@@ -114,7 +83,7 @@ export default function PlayerEdit() {
         current: 6,
       },
     },
-    statuses:{
+    statuses: {
       slow: false,
       dazed: false,
       enraged: false,
@@ -124,8 +93,9 @@ export default function PlayerEdit() {
       dexUp: false,
       insUp: false,
       migUp: false,
-      wlpUp: false
+      wlpUp: false,
     },
+    classes: [],
     notes: [
       {
         name: "",
@@ -134,9 +104,9 @@ export default function PlayerEdit() {
     ],
   };
 
-  const [playerTemp, setPlayerTemp] = useState(player); // Temporary PLAYER state
-  const [openTab, setOpenTab] = useState(0); // State to track active tab index
-  const [drawerOpen, setDrawerOpen] = useState(false); // Drawer state for mobile menu
+  const [playerTemp, setPlayerTemp] = useState(player);
+  const [openTab, setOpenTab] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -144,27 +114,61 @@ export default function PlayerEdit() {
 
   const handleTabChange = (event, newTab) => {
     setOpenTab(newTab);
-    setDrawerOpen(false); // Close the drawer after selecting a tab
+    setDrawerOpen(false);
   };
 
   const updateMaxStats = () => {
     setPlayerTemp((prevPlayer) => {
-      const maxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
-      const maxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
+      const baseMaxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
+      const baseMaxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
+
+      let hpBonus = 0;
+      let mpBonus = 0;
+      let ipBonus = 0;
+
+      prevPlayer.classes.forEach((cls) => {
+        if (cls.benefits) {
+          hpBonus += cls.benefits.hpplus || 0;
+          mpBonus += cls.benefits.mpplus || 0;
+          ipBonus += cls.benefits.ipplus || 0;
+        }
+      });
+
+      const maxHP = baseMaxHP + hpBonus;
+      const maxMP = baseMaxMP + mpBonus;
+      const maxIP = 6 + ipBonus;
+
       return {
         ...prevPlayer,
         stats: {
-          hp: { ...prevPlayer.stats.hp, max: maxHP, current: Math.min(prevPlayer.stats.hp.current, maxHP) },
-          mp: { ...prevPlayer.stats.mp, max: maxMP, current: Math.min(prevPlayer.stats.mp.current, maxMP) },
-          ip: { ...prevPlayer.stats.ip, max: 6, current: Math.min(prevPlayer.stats.ip.current, 6) },
+          hp: {
+            ...prevPlayer.stats.hp,
+            max: maxHP,
+            current: Math.min(prevPlayer.stats.hp.current, maxHP),
+          },
+          mp: {
+            ...prevPlayer.stats.mp,
+            max: maxMP,
+            current: Math.min(prevPlayer.stats.mp.current, maxMP),
+          },
+          ip: {
+            ...prevPlayer.stats.ip,
+            max: maxIP,
+            current: Math.min(prevPlayer.stats.ip.current, maxIP),
+          },
         },
       };
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateMaxStats();
-  }, [playerTemp.lvl, playerTemp.attributes.might, playerTemp.attributes.insight]);
+  }, [
+    playerTemp.lvl,
+    playerTemp.attributes.might,
+    playerTemp.attributes.insight,
+    playerTemp.classes,
+  ]);
 
   return (
     <Layout>
@@ -185,12 +189,15 @@ export default function PlayerEdit() {
                   <ListItemText primary={t("Stats")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 2)}>
-                  <ListItemText primary={t("Skills")} />
+                  <ListItemText primary={t("Classes")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 3)}>
-                  <ListItemText primary={t("Spells")} />
+                  <ListItemText primary={t("Skills")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 4)}>
+                  <ListItemText primary={t("Spells")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <ListItemText primary={t("Equipment")} />
                 </ListItem>
               </List>
@@ -200,46 +207,43 @@ export default function PlayerEdit() {
           <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
             <Tab value={0}>{t("Informations")}</Tab>
             <Tab value={1}>{t("Stats")}</Tab>
-            <Tab value={2}>{t("Skills")}</Tab>
-            <Tab value={3}>{t("Spells")}</Tab>
-            <Tab value={4}>{t("Equipment")}</Tab>
+            <Tab value={2}>{t("Classes")}</Tab>
+            <Tab value={3}>{t("Skills")}</Tab>
+            <Tab value={4}>{t("Spells")}</Tab>
+            <Tab value={5}>{t("Equipment")}</Tab>
           </TabsList>
         )}
         <TabPanel value={0}>
           <PlayerCard player={playerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Basic Information */}
           <EditPlayerBasics player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Traits */}
           <EditPlayerTraits player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Bonds */}
           <EditPlayerBonds player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Notes */}
           <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
-
-          {/* End of page space */}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={1}>
-          {/* Edit Attributes */}
           <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Stats */}
           <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          {/* Edit Statuses */}
           <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} />
-          <Divider sx={{ my: 1 }} />
-
-          {/* End of page space */}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={2}>Skills</TabPanel>
-        <TabPanel value={3}>Spells</TabPanel>
-        <TabPanel value={4}>Equipment</TabPanel>
+        <TabPanel value={2}>
+          <EditPlayerClasses
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            updateMaxStats={updateMaxStats} 
+          />
+          <Box sx={{ height: "5vh" }} />
+        </TabPanel>
+        <TabPanel value={3}>Skills</TabPanel>
+        <TabPanel value={4}>Spells</TabPanel>
+        <TabPanel value={5}>Equipment</TabPanel>
       </Tabs>
     </Layout>
   );

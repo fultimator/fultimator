@@ -11,6 +11,7 @@ import {
   Paper,
   Autocomplete,
 } from "@mui/material";
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
@@ -21,7 +22,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
+  const ternary = theme.palette.ternary ? theme.palette.ternary.main : "#000"; // Default to black if ternary is undefined
 
   const themes = [
     t("Ambition"),
@@ -36,6 +37,8 @@ export default function EditPlayerTraits({ player, setPlayer }) {
     t("Vengeance"),
   ];
 
+  const [inputTheme, setInputTheme] = useState(player.info.theme || "");
+
   const onChangeInfo = (key) => {
     return (event, value) => {
       setPlayer((prevState) => {
@@ -44,6 +47,15 @@ export default function EditPlayerTraits({ player, setPlayer }) {
         return newState;
       });
     };
+  };
+
+  const handleThemeInputChange = (event, newInputValue) => {
+    setInputTheme(newInputValue);
+    setPlayer((prevState) => {
+      const newState = { ...prevState };
+      newState.info.theme = newInputValue;
+      return newState;
+    });
   };
 
   return (
@@ -74,8 +86,9 @@ export default function EditPlayerTraits({ player, setPlayer }) {
           <Autocomplete
             id="theme-autocomplete"
             options={themes}
-            value={player.info.theme}
-            onInputChange={onChangeInfo("theme")}
+            value={inputTheme}
+            onChange={(event, newValue) => onChangeInfo("theme")(event, newValue)}
+            onInputChange={handleThemeInputChange}
             freeSolo
             renderInput={(params) => (
               <TextField
