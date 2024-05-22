@@ -44,6 +44,7 @@ import EditPlayerNotes from "../../components/player/informations/EditPlayerNote
 import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
+import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
 import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
@@ -113,6 +114,18 @@ export default function PlayerEdit() {
         current: 6,
       },
     },
+    statuses:{
+      slow: false,
+      dazed: false,
+      enraged: false,
+      weak: false,
+      shaken: false,
+      poisoned: false,
+      dexUp: false,
+      insUp: false,
+      migUp: false,
+      wlpUp: false
+    },
     notes: [
       {
         name: "",
@@ -133,6 +146,25 @@ export default function PlayerEdit() {
     setOpenTab(newTab);
     setDrawerOpen(false); // Close the drawer after selecting a tab
   };
+
+  const updateMaxStats = () => {
+    setPlayerTemp((prevPlayer) => {
+      const maxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
+      const maxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
+      return {
+        ...prevPlayer,
+        stats: {
+          hp: { ...prevPlayer.stats.hp, max: maxHP, current: Math.min(prevPlayer.stats.hp.current, maxHP) },
+          mp: { ...prevPlayer.stats.mp, max: maxMP, current: Math.min(prevPlayer.stats.mp.current, maxMP) },
+          ip: { ...prevPlayer.stats.ip, max: 6, current: Math.min(prevPlayer.stats.ip.current, 6) },
+        },
+      };
+    });
+  };
+
+  React.useEffect(() => {
+    updateMaxStats();
+  }, [playerTemp.lvl, playerTemp.attributes.might, playerTemp.attributes.insight]);
 
   return (
     <Layout>
@@ -197,6 +229,9 @@ export default function PlayerEdit() {
           <Divider sx={{ my: 1 }} />
           {/* Edit Stats */}
           <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
+          <Divider sx={{ my: 1 }} />
+          {/* Edit Statuses */}
+          <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
 
           {/* End of page space */}

@@ -1,32 +1,85 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Paper, Grid, Typography, LinearProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useTranslate } from "../../translation/translate";
+import avatar_image from "../avatar.jpg";
 
 export default function PlayerCard({ player }) {
+  const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-  /* Player Example
-  const player = {
-    name: "Hero",
-    lvl: 5,
-    info: {
-        pronouns: "He/Him",
-        imgurl: "https://i.imgur.com/OsdL3nE.jpeg"
-    },
-    stats: {
-      hp: { current: 80, max: 100 },
-      mp: { current: 50, max: 100 },
-      ip: { current: 4, max: 6 },
-    },
-    attributes: {
-        dexterity: 8,
-        insight: 8,
-        might: 8,
-        willpower: 8,
-    }
-  };
+  /* STATUS LIST
+    Slow - Dexterity attribute is lowered by 2 points to maximum 6
+    Dazed - Insight attribute is lowered by 2 points to maximum 6
+    Enraged - Both Dexterity and Insight attributes are lowered by 2 points to maximum 6
+    Weak - Might attribute is lowered by 2 points to maximum 6
+    Shaken - Willpower attribute is lowered by 2 points to maximum 6
+    Poisoned - Both Might and Willpower attributes are lowered by 2 points to maximum 6
+    
+    Dex Up - Dexterity attribute is increased by 2 points to maximum 12
+    Ins Up - Insight attribute is increased by 2 points to maximum 12
+    Mig Up - Might attribute is increased by 2 points to maximum 12
+    Wlp Up - Willpower attribute is increased by 2 points to maximum 12
   */
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+  const calculateAttribute = (
+    base,
+    decreaseStatuses,
+    increaseStatuses,
+    min,
+    max
+  ) => {
+    let adjustedValue = base;
+
+    decreaseStatuses.forEach((status) => {
+      if (player.statuses[status]) adjustedValue -= 2;
+    });
+
+    increaseStatuses.forEach((status) => {
+      if (player.statuses[status]) adjustedValue += 2;
+    });
+
+    return clamp(adjustedValue, min, max);
+  };
+
+  const currDex = calculateAttribute(
+    player.attributes.dexterity,
+    ["slow", "enraged"],
+    ["dexUp"],
+    6,
+    12
+  );
+  const currInsight = calculateAttribute(
+    player.attributes.insight,
+    ["dazed", "enraged"],
+    ["insUp"],
+    6,
+    12
+  );
+  const currMight = calculateAttribute(
+    player.attributes.might,
+    ["weak", "poisoned"],
+    ["migUp"],
+    6,
+    12
+  );
+  const currWillpower = calculateAttribute(
+    player.attributes.willpower,
+    ["shaken", "poisoned"],
+    ["wlpUp"],
+    6,
+    12
+  );
+
+  // Function to determine the color
+  const getAttributeColor = (base, current) => {
+    if (current < base) return theme.palette.error.main;
+    if (current > base) return theme.palette.success.main;
+    return theme.palette.text.primary;
+  };
 
   const renderStatBar = (label, value, max, color) => (
     <div style={{ display: "flex", alignItems: "center", marginBottom: 5 }}>
@@ -82,8 +135,8 @@ export default function PlayerCard({ player }) {
       <Grid container spacing={2} alignItems="flex-start">
         <Grid item xs={4}>
           <img
-            src={player.info.imgurl}
-            alt={player.name}
+            src={player.info.imgurl ? player.info.imgurl : avatar_image}
+            alt={"Player Avatar"}
             style={{
               width: "100%",
               aspectRatio: "1",
@@ -141,33 +194,89 @@ export default function PlayerCard({ player }) {
             <Grid item xs={6}>
               <Typography
                 variant="body2"
-                style={{ fontFamily: "fantasy", fontSize: "0.8rem" }}
+                style={{ fontFamily: "fantasy", fontSize: "1rem" }}
               >
-                Dexterity: {player.attributes.dexterity}
+                {t("DEX")}:{" "}
+                <Typography
+                  component="span"
+                  variant="body2"
+                  style={{
+                    fontFamily: "fantasy",
+                    fontSize: "1.3rem",
+                    color: getAttributeColor(
+                      player.attributes.dexterity,
+                      currDex
+                    ),
+                  }}
+                >
+                  d{currDex}
+                </Typography>
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography
                 variant="body2"
-                style={{ fontFamily: "fantasy", fontSize: "0.8rem" }}
+                style={{ fontFamily: "fantasy", fontSize: "1rem" }}
               >
-                Insight: {player.attributes.insight}
+                {t("INS")}:{" "}
+                <Typography
+                  component="span"
+                  variant="body2"
+                  style={{
+                    fontFamily: "fantasy",
+                    fontSize: "1.3rem",
+                    color: getAttributeColor(
+                      player.attributes.insight,
+                      currInsight
+                    ),
+                  }}
+                >
+                  d{currInsight}
+                </Typography>
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography
                 variant="body2"
-                style={{ fontFamily: "fantasy", fontSize: "0.8rem" }}
+                style={{ fontFamily: "fantasy", fontSize: "1rem" }}
               >
-                Might: {player.attributes.might}
+                {t("MIG")}:{" "}
+                <Typography
+                  component="span"
+                  variant="body2"
+                  style={{
+                    fontFamily: "fantasy",
+                    fontSize: "1.3rem",
+                    color: getAttributeColor(
+                      player.attributes.might,
+                      currMight
+                    ),
+                  }}
+                >
+                  d{currMight}
+                </Typography>
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography
                 variant="body2"
-                style={{ fontFamily: "fantasy", fontSize: "0.8rem" }}
+                style={{ fontFamily: "fantasy", fontSize: "1rem" }}
               >
-                Willpower: {player.attributes.willpower}
+                {t("WLP")}:{" "}
+                <Typography
+                  component="span"
+                  variant="body2"
+                  style={{
+                    fontFamily: "fantasy",
+                    fontSize: "1.3rem",
+                    color: getAttributeColor(
+                      player.attributes.willpower,
+                      currWillpower
+                    ),
+                  }}
+                >
+                  d{currWillpower}
+                </Typography>
               </Typography>
             </Grid>
           </Grid>

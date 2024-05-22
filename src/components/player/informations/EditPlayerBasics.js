@@ -101,7 +101,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="fabulapoints"
@@ -112,7 +112,18 @@ export default function EditPlayerBasics({ player, setPlayer }) {
             ></TextField>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
+          <FormControl variant="standard" fullWidth>
+            <TextField
+              id="exp"
+              label={t("Exp:")}
+              value={player.info.exp}
+              onChange={onChangeInfo("exp")}
+              type="number"
+            ></TextField>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={4}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="zenit"
@@ -149,6 +160,19 @@ export default function EditPlayerBasics({ player, setPlayer }) {
                 sx={{ height: "56px" }}
               >
                 {t("Update Image")}
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setPlayer((prevState) => {
+                    const newState = { ...prevState };
+                    newState.info.imgurl = null;
+                    return newState;
+                  });
+                }}
+                sx={{ height: "56px" }}
+              >
+                {t("Remove Image")}
               </Button>
             </Stack>
           </FormControl>
