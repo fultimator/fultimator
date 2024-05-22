@@ -150,6 +150,19 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               >
                 {t("Update Image")}
               </Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setPlayer((prevState) => {
+                    const newState = { ...prevState };
+                    newState.info.imgurl = null;
+                    return newState;
+                  });
+                }}
+                sx={{ height: "56px" }}
+              >
+                {t("Remove Image")}
+              </Button>
             </Stack>
           </FormControl>
         </Grid>

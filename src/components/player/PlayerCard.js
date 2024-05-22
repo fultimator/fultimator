@@ -1,6 +1,7 @@
 import React from "react";
 import { Paper, Grid, Typography, LinearProgress } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import avatar_image from "../avatar.jpg";
 
 export default function PlayerCard({ player }) {
   const theme = useTheme();
@@ -82,8 +83,8 @@ export default function PlayerCard({ player }) {
       <Grid container spacing={2} alignItems="flex-start">
         <Grid item xs={4}>
           <img
-            src={player.info.imgurl}
-            alt={player.name}
+            src={player.info.imgurl ? player.info.imgurl : avatar_image}
+            alt={"Player Avatar"}
             style={{
               width: "100%",
               aspectRatio: "1",

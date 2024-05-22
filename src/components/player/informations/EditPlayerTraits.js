@@ -5,14 +5,11 @@ import {
   FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
   TextField,
   Typography,
   useTheme,
   Paper,
+  Autocomplete,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
@@ -40,10 +37,10 @@ export default function EditPlayerTraits({ player, setPlayer }) {
   ];
 
   const onChangeInfo = (key) => {
-    return (e) => {
+    return (e, value) => {
       setPlayer((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.info[key] = e.target.value;
+        newState.info[key] = value;
         return newState;
       });
     };
@@ -74,22 +71,20 @@ export default function EditPlayerTraits({ player, setPlayer }) {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel id="companionlvl">Theme:</InputLabel>
-            <Select
-              labelId="theme"
-              id="select-theme"
-              value={player.info.theme}
-              label={t("Theme:")}
-              onChange={onChangeInfo("theme")}
-            >
-              {themes.map((theme, i) => (
-                <MenuItem key={i} value={theme}>
-                  {theme}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            id="theme-autocomplete"
+            options={themes}
+            value={player.info.theme}
+            onInputChange={onChangeInfo("theme")}
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("Theme:")}
+                fullWidth
+              />
+            )}            
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl variant="standard" fullWidth>
