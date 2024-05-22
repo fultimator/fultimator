@@ -1,5 +1,5 @@
-const classes = {
-  arcanist: {
+const classList = [
+  {
     name: "Arcanist",
     book: "core",
     benefits: {
@@ -24,7 +24,7 @@ const classes = {
       spellClasses: ["arcanist"],
     },
   },
-  chimerist: {
+  {
     name: "Chimerist",
     book: "core",
     benefits: {
@@ -49,7 +49,7 @@ const classes = {
       spellClasses: ["default"],
     },
   },
-  darkblade: {
+  {
     name: "Darkblade",
     book: "core",
     benefits: {
@@ -74,7 +74,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  elementalist: {
+  {
     name: "Elementalist",
     book: "core",
     benefits: {
@@ -99,7 +99,7 @@ const classes = {
       spellClasses: ["default"],
     },
   },
-  entropist: {
+  {
     name: "Entropist",
     book: "core",
     benefits: {
@@ -124,7 +124,7 @@ const classes = {
       spellClasses: ["default"],
     },
   },
-  fury: {
+  {
     name: "Fury",
     book: "core",
     benefits: {
@@ -149,7 +149,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  guardian: {
+  {
     name: "Guardian",
     book: "core",
     benefits: {
@@ -174,7 +174,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  loremaster: {
+  {
     name: "Loremaster",
     book: "core",
     benefits: {
@@ -199,7 +199,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  orator: {
+  {
     name: "Orator",
     book: "core",
     benefits: {
@@ -224,7 +224,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  rogue: {
+  {
     name: "Rogue",
     book: "core",
     benefits: {
@@ -249,7 +249,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  sharpshooter: {
+  {
     name: "Sharpshooter",
     book: "core",
     benefits: {
@@ -274,7 +274,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  spiritist: {
+  {
     name: "Spiritist",
     book: "core",
     benefits: {
@@ -299,7 +299,7 @@ const classes = {
       spellClasses: ["default"],
     },
   },
-  tinkerer: {
+  {
     name: "Tinkerer",
     book: "core",
     benefits: {
@@ -328,7 +328,7 @@ const classes = {
       ],
     },
   },
-  wayfarer: {
+  {
     name: "Wayfarer",
     book: "core",
     benefits: {
@@ -353,7 +353,7 @@ const classes = {
       spellClasses: [],
     },
   },
-  weaponmaster: {
+  {
     name: "Weaponmaster",
     book: "core",
     benefits: {
@@ -378,4 +378,32 @@ const classes = {
       spellClasses: [],
     },
   },
-};
+  {
+    name: "Arcanist-Rework",
+    book: "rework",
+    benefits: {
+      hpplus: 0,
+      mpplus: 5,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+        arcanism: false,
+        chimerism: false,
+        elementalism: false,
+        entropism: false,
+        spiritism: false,
+      },
+      spellClasses: ["arcanist-rework"],
+    },
+  },
+];
+
+
+export default classList;

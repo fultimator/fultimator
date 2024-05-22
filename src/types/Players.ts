@@ -209,7 +209,7 @@ export interface TypePlayer {
     stats: PlayerStats,
     statuses: PlayerStatuses,
     affinities: PlayerAffinities,
-    class: PlayerClass[],
+    classes: PlayerClass[],
     equipment: PlayerEquipment[],
     martials: Martials,
     rituals: Rituals,
