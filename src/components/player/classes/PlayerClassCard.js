@@ -1,12 +1,21 @@
+import React from "react";
 import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, Typography, Button } from "@mui/material";
+import { Paper, Grid, Typography, Button, TextField } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function PlayerClassCard({ classItem, onRemove }) {
+export default function PlayerClassCard({
+  classItem,
+  onRemove,
+  onLevelChange,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+
+  const handleLevelChange = (newValue) => {
+    onLevelChange(newValue);
+  };
 
   return (
     <Paper
@@ -79,7 +88,15 @@ export default function PlayerClassCard({ classItem, onRemove }) {
           </Grid>
         )}
         <Grid item xs={12}>
-          {/* Button to remove class */}
+          <TextField
+            label="Level"
+            type="number"
+            value={classItem.lvl}
+            InputProps={{ inputProps: { min: 1, max: 10 } }}
+            onChange={(e) => handleLevelChange(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
           <Button variant="contained" color="secondary" onClick={onRemove}>
             {t("Remove")}
           </Button>

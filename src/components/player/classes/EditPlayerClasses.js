@@ -1,23 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
+import {
+  Paper,
+  Grid,
+  TextField,
+  Button,
+  Divider,
+  Typography,
+} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
 import PlayerClassCard from "./PlayerClassCard";
 
-export default function EditPlayerClasses({ player, setPlayer, updateMaxStats }) {
-  const [selectedClass, setSelectedClass] = useState(null); 
+export default function EditPlayerClasses({
+  player,
+  setPlayer,
+  updateMaxStats,
+}) {
+  const [selectedClass, setSelectedClass] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
+  const [warnings, setWarnings] = useState([]);
+
+  useEffect(() => {
+    checkWarnings();
+  }, [player, player.classes, player.lvl]);
+
+  const checkWarnings = () => {
+    const newWarnings = [];
+
+    // Check if player has at least 2 classes
+    if (!player.classes || player.classes.length < 2) {
+      newWarnings.push("Player must have at least 2 classes.");
+    }
+
+    // Check if class count exceeds 3 beyond the number of classes at level 10
+    const maxLevelClasses = player.classes
+      ? player.classes.filter((cls) => cls.lvl >= 10).length
+      : 0;
+    if (player.classes && player.classes.length - maxLevelClasses > 3) {
+      newWarnings.push(
+        "The number of classes exceeds the limit beyond the number of classes at level 10."
+      );
+    }
+
+    // Calculate total levels of classes
+    const totalLevels = player.classes
+      ? player.classes.reduce((acc, cls) => acc + parseInt(cls.lvl), 0)
+      : 0;
+
+    // Check if sum of levels isn't equal to player level
+    if (totalLevels !== player.lvl) {
+      newWarnings.push("Sum of class levels isn't equal to player level.");
+    }
+
+    setWarnings(newWarnings);
+  };
 
   const handleAddClass = () => {
     if (selectedClass) {
+      // Check if the selected class type already exists in player's classes
+      const classExists = player.classes.some(
+        (cls) => cls.name === selectedClass.name
+      );
+  
+      if (classExists) {
+        // Display an error message or handle the case where the class type already exists
+        console.error("This class type already exists for the player");
+        return;
+      }
+  
       const updatedPlayer = {
         ...player,
         classes: Array.isArray(player.classes) ? player.classes : [],
       };
-
+  
       updatedPlayer.classes.push({
         name: selectedClass.name,
         lvl: 1,
@@ -26,12 +84,13 @@ export default function EditPlayerClasses({ player, setPlayer, updateMaxStats })
         heroic: null,
         spells: [],
       });
-
+  
       setPlayer(updatedPlayer);
-      updateMaxStats(); 
+      updateMaxStats();
       setSelectedClass(null);
     }
   };
+  
 
   const handleRemoveClass = (index) => {
     const updatedPlayer = {
@@ -40,7 +99,22 @@ export default function EditPlayerClasses({ player, setPlayer, updateMaxStats })
     };
 
     setPlayer(updatedPlayer);
-    updateMaxStats(); 
+    updateMaxStats();
+  };
+
+  const handleLevelChange = (index, newLevel) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === index) {
+          return { ...cls, lvl: newLevel };
+        }
+        return cls;
+      }),
+    };
+
+    setPlayer(updatedPlayer);
+    updateMaxStats();
   };
 
   const { t } = useTranslate();
@@ -66,15 +140,25 @@ export default function EditPlayerClasses({ player, setPlayer, updateMaxStats })
           <Grid item xs={12}>
             <CustomHeader type="top" headerText={t("Classes")} />
           </Grid>
+          {warnings.map((warning, index) => (
+            <Grid item xs={12} key={index}>
+              <Typography color="error" variant="body1">
+                {warning}
+              </Typography>
+            </Grid>
+          ))}
           <Grid item xs={12} sm={5}>
             <Autocomplete
               id="book-select"
-              options={Object.values(classList).reduce((books, currentClass) => {
-                if (!books.includes(currentClass.book)) {
-                  books.push(currentClass.book);
-                }
-                return books;
-              }, [])}
+              options={Object.values(classList).reduce(
+                (books, currentClass) => {
+                  if (!books.includes(currentClass.book)) {
+                    books.push(currentClass.book);
+                  }
+                  return books;
+                },
+                []
+              )}
               getOptionLabel={(book) => book || ""}
               value={selectedBook}
               onChange={(event, newValue) => setSelectedBook(newValue)}
@@ -116,7 +200,11 @@ export default function EditPlayerClasses({ player, setPlayer, updateMaxStats })
       {player.classes &&
         player.classes.map((cls, index) => (
           <React.Fragment key={index}>
-            <PlayerClassCard classItem={cls} onRemove={() => handleRemoveClass(index)} />
+            <PlayerClassCard
+              classItem={cls}
+              onRemove={() => handleRemoveClass(index)}
+              onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
+            />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
         ))}
