@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { firestore, auth } from "../../firebase";
+import { useDocumentData } from "react-firebase-hooks/firestore";
+import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
@@ -10,6 +15,10 @@ import {
   ListItem,
   ListItemText,
   Box,
+  Grid,
+  Fade,
+  Tooltip,
+  Fab
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -28,6 +37,7 @@ import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
+import { Save } from "@mui/icons-material";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -37,7 +47,34 @@ export default function PlayerEdit() {
   const ternary = theme.palette.ternary.main;
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
 
-  const player = {
+  let params = useParams(); // URL parameters hook
+  const ref = doc(firestore, "player-personal", params.playerId); // Firestore document reference
+
+  const [user] = useAuthState(auth); // Authentication state hook
+
+  const [player] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
+
+  const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const [showScrollTop, setShowScrollTop] = useState(true);
+  const [playerTemp, setPlayerTemp] = useState(player);
+  const [openTab, setOpenTab] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Effect to update temporary Player state when Player data changes
+  useEffect(() => {
+    setPlayerTemp(player);
+  }, [player]);
+
+  useEffect(() => {
+    if (playerTemp!== player) {
+      setIsUpdated(true);
+    } else {
+      setIsUpdated(false);
+    }
+  }, [playerTemp]);
+
+
+  /*const player = {
     id: "",
     uid: "",
     name: "",
@@ -103,11 +140,7 @@ export default function PlayerEdit() {
         description: "",
       },
     ],
-  };
-
-  const [playerTemp, setPlayerTemp] = useState(player);
-  const [openTab, setOpenTab] = useState(0);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  };*/
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -119,57 +152,57 @@ export default function PlayerEdit() {
   };
 
   const updateMaxStats = () => {
-    setPlayerTemp((prevPlayer) => {
-      const baseMaxHP = prevPlayer.lvl + prevPlayer.attributes.might * 5;
-      const baseMaxMP = prevPlayer.lvl + prevPlayer.attributes.insight * 5;
+    if (playerTemp) {
+      setPlayerTemp((prevPlayer) => {
+        const baseMaxHP =
+          prevPlayer.lvl + (prevPlayer.attributes?.might || 0) * 5;
+        const baseMaxMP =
+          prevPlayer.lvl + (prevPlayer.attributes?.insight || 0) * 5;
 
-      let hpBonus = 0;
-      let mpBonus = 0;
-      let ipBonus = 0;
+        let hpBonus = 0;
+        let mpBonus = 0;
+        let ipBonus = 0;
 
-      prevPlayer.classes.forEach((cls) => {
-        if (cls.benefits) {
-          hpBonus += cls.benefits.hpplus || 0;
-          mpBonus += cls.benefits.mpplus || 0;
-          ipBonus += cls.benefits.ipplus || 0;
-        }
+        playerTemp.classes.forEach((cls) => {
+          // Ensure playerTemp.classes exists and is an array
+          if (cls.benefits) {
+            hpBonus += cls.benefits.hpplus || 0;
+            mpBonus += cls.benefits.mpplus || 0;
+            ipBonus += cls.benefits.ipplus || 0;
+          }
+        });
+
+        const maxHP = baseMaxHP + hpBonus;
+        const maxMP = baseMaxMP + mpBonus;
+        const maxIP = 6 + ipBonus;
+
+        return {
+          ...prevPlayer,
+          stats: {
+            hp: {
+              ...prevPlayer.stats.hp,
+              max: maxHP,
+              current: Math.min(prevPlayer.stats.hp.current, maxHP),
+            },
+            mp: {
+              ...prevPlayer.stats.mp,
+              max: maxMP,
+              current: Math.min(prevPlayer.stats.mp.current, maxMP),
+            },
+            ip: {
+              ...prevPlayer.stats.ip,
+              max: maxIP,
+              current: Math.min(prevPlayer.stats.ip.current, maxIP),
+            },
+          },
+        };
       });
-
-      const maxHP = baseMaxHP + hpBonus;
-      const maxMP = baseMaxMP + mpBonus;
-      const maxIP = 6 + ipBonus;
-
-      return {
-        ...prevPlayer,
-        stats: {
-          hp: {
-            ...prevPlayer.stats.hp,
-            max: maxHP,
-            current: Math.min(prevPlayer.stats.hp.current, maxHP),
-          },
-          mp: {
-            ...prevPlayer.stats.mp,
-            max: maxMP,
-            current: Math.min(prevPlayer.stats.mp.current, maxMP),
-          },
-          ip: {
-            ...prevPlayer.stats.ip,
-            max: maxIP,
-            current: Math.min(prevPlayer.stats.ip.current, maxIP),
-          },
-        },
-      };
-    });
+    }
   };
 
-  useEffect(() => {
-    updateMaxStats();
-  }, [
-    playerTemp.lvl,
-    playerTemp.attributes.might,
-    playerTemp.attributes.insight,
-    playerTemp.classes,
-  ]);
+  if (!playerTemp) {
+    return null;
+  }
 
   return (
     <Layout>
@@ -247,7 +280,11 @@ export default function PlayerEdit() {
         <TabPanel value={2}>
           <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerStats
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            updateMaxStats={updateMaxStats}
+          />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} />
           <Box sx={{ height: "5vh" }} />
@@ -264,6 +301,28 @@ export default function PlayerEdit() {
         <TabPanel value={5}>Spells</TabPanel>
         <TabPanel value={6}>Equipment</TabPanel>
       </Tabs>
+      {/* Save Button, shown if there are unsaved changes */}
+      {isUpdated && (
+        <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
+          <Fade in={showScrollTop} timeout={300}>
+            <Tooltip title="Save" placement="bottom">
+              <Fab
+                color="primary"
+                aria-label="save"
+                onClick={() => {
+                  setIsUpdated(false);
+                  setDoc(ref, playerTemp);
+                }}
+                disabled={!isUpdated}
+                size="medium"
+                style={{ marginLeft: "5px" }}
+              >
+                <Save />
+              </Fab>
+            </Tooltip>
+          </Fade>
+        </Grid>
+      )}
     </Layout>
   );
 }

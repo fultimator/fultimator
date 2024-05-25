@@ -50,6 +50,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
 import { useNavigate } from "react-router-dom";
+import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 
 export default function PlayerGallery() {
   const { t } = useTranslate();
@@ -80,12 +81,7 @@ function Personal({ user }) {
   const [name, setName] = useState("");
 
   const personalRef = collection(firestore, "player-personal");
-  const personalQuery = query(
-    personalRef,
-    where("uid", "==", user.uid),
-    orderBy("lvl", "asc"),
-    orderBy("name", "asc")
-  );
+  const personalQuery = query(personalRef, where("uid", "==", user.uid));
   const [personalList, loading, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
@@ -114,6 +110,105 @@ function Personal({ user }) {
         return true;
       })
     : [];
+
+  const addPlayer = async function () {
+    const data = {
+      uid: user.uid,
+      name: "-",
+      lvl: 5,
+      info: {
+        pronouns: "",
+        identity: "",
+        theme: "",
+        origin: "",
+        bonds: [
+          {
+            name: "",
+            admiration: false,
+            loyalty: false,
+            affection: false,
+            inferiority: false,
+            mistrust: false,
+            hatred: false,
+          },
+        ],
+        description: "",
+        fabulapoints: 3,
+        exp: 0,
+        zenit: 0,
+        imgurl: "",
+      },
+      attributes: {
+        dexterity: 8,
+        insight: 8,
+        might: 8,
+        willpower: 8,
+      },
+      stats: {
+        hp: {
+          max: 45,
+          current: 45,
+        },
+        mp: {
+          max: 45,
+          current: 45,
+        },
+        ip: {
+          max: 6,
+          current: 6,
+        },
+      },
+      statuses: {
+        slow: false,
+        dazed: false,
+        enraged: false,
+        weak: false,
+        shaken: false,
+        poisoned: false,
+        dexUp: false,
+        insUp: false,
+        migUp: false,
+        wlpUp: false,
+      },
+      classes: [],
+      notes: [],
+    };
+    const ref = collection(firestore, "player-personal");
+
+    try {
+      const res = await addDoc(ref, data);
+      console.debug(res);
+    } catch (e) {
+      console.debug(e);
+    }
+  };
+
+  const copyPlayer = function (player) {
+    return async function () {
+      const data = Object.assign({}, player);
+      data.uid = user.uid;
+      delete data.id;
+      data.published = false;
+
+      const ref = collection(firestore, "player-personal");
+
+      addDoc(ref, data)
+        .then(function (docRef) {
+          window.location.href = `/player-gallery/${docRef.id}`;
+        })
+        .catch(function (error) {
+          console.error("Error adding document: ", error);
+        });
+    };
+  };
+
+  const deletePlayer = function (player) {
+    return function () {
+      if (window.confirm("Are you sure you want to delete?")) {
+        deleteDoc(doc(firestore, "player-personal", player.id));
+      }
+    };
+  };
 
   return (
     <>
@@ -152,10 +247,7 @@ function Personal({ user }) {
                 fullWidth
                 variant="contained"
                 startIcon={<HistoryEdu />}
-                //onClick={addPlayer}
-                onClick={() => {
-                    navigate("/player-edit");
-                  }}
+                onClick={addPlayer}
               >
                 {t("Create Player")}
               </Button>
@@ -163,6 +255,43 @@ function Personal({ user }) {
           </Grid>
         </Paper>
       </div>
+      <Grid container spacing={1} sx={{ py: 1 }}>
+        {filteredList.map((player, index) => (
+          <Grid
+            item
+            xs={12}
+            md={6}
+            alignItems="center"
+            justifyContent="center"
+            key={index}
+          >
+            <PlayerCard
+              player={player}
+              setPlayer={null}
+              isEditMode={false}
+              sx={{ marginBottom: 1 }}
+            />
+            <Tooltip title={t("Copy")}>
+              <IconButton onClick={copyPlayer(player)}>
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Edit")}>
+              <IconButton
+                component={RouterLink}
+                to={`/player-gallery/${player.id}`}
+              >
+                <Edit />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={deletePlayer(player)}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          </Grid>
+        ))}
+      </Grid>
     </>
   );
 }

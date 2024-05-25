@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Grid,
   Stack,
@@ -12,7 +12,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerStats({ player, setPlayer }) {
+export default function EditPlayerStats({ player, setPlayer, updateMaxStats }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -36,7 +36,12 @@ export default function EditPlayerStats({ player, setPlayer }) {
         },
       };
     });
+    updateMaxStats();
   };
+
+  useEffect(() => {
+    updateMaxStats();
+  }, [player]);
 
   const renderStatControls = (stat, label, color, increments) => {
     const negativeIncrements = increments.filter((val) => val < 0);

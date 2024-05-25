@@ -259,6 +259,8 @@ function Personal({ user }) {
       })
     : [];
 
+    console.log(personalList);
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
