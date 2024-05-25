@@ -16,7 +16,7 @@ import { TabsList as BaseTabsList } from "@mui/base/TabsList";
 import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import Layout from "../../components/Layout";
-import PlayerCard from "../../components/player/PlayerCard";
+import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
 import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
@@ -25,6 +25,7 @@ import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttrib
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
 import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
+import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 
@@ -175,7 +176,13 @@ export default function PlayerEdit() {
       <Tabs value={openTab} onChange={handleTabChange}>
         {isSmallScreen ? (
           <>
-            <Button onClick={toggleDrawer(true)}>{t("Menu")}</Button>
+            <Button
+              variant="contained"
+              onClick={toggleDrawer(true)}
+              sx={{ width: "100%", marginBottom: 1 }}
+            >
+              {t("Menu")}
+            </Button>
             <Drawer
               anchor="left"
               open={drawerOpen}
@@ -183,21 +190,24 @@ export default function PlayerEdit() {
             >
               <List>
                 <ListItem onClick={(e) => handleTabChange(e, 0)}>
-                  <ListItemText primary={t("Informations")} />
+                  <ListItemText primary={t("Player Sheet")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 1)}>
-                  <ListItemText primary={t("Stats")} />
+                  <ListItemText primary={t("Informations")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 2)}>
-                  <ListItemText primary={t("Classes")} />
+                  <ListItemText primary={t("Stats")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 3)}>
-                  <ListItemText primary={t("Skills")} />
+                  <ListItemText primary={t("Classes")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 4)}>
-                  <ListItemText primary={t("Spells")} />
+                  <ListItemText primary={t("Skills")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 5)}>
+                  <ListItemText primary={t("Spells")} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 6)}>
                   <ListItemText primary={t("Equipment")} />
                 </ListItem>
               </List>
@@ -205,17 +215,26 @@ export default function PlayerEdit() {
           </>
         ) : (
           <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
-            <Tab value={0}>{t("Informations")}</Tab>
-            <Tab value={1}>{t("Stats")}</Tab>
-            <Tab value={2}>{t("Classes")}</Tab>
-            <Tab value={3}>{t("Skills")}</Tab>
-            <Tab value={4}>{t("Spells")}</Tab>
-            <Tab value={5}>{t("Equipment")}</Tab>
+            <Tab value={0}>{t("Player Sheet")}</Tab>
+            <Tab value={1}>{t("Informations")}</Tab>
+            <Tab value={2}>{t("Stats")}</Tab>
+            <Tab value={3}>{t("Classes")}</Tab>
+            <Tab value={4}>{t("Skills")}</Tab>
+            <Tab value={5}>{t("Spells")}</Tab>
+            <Tab value={6}>{t("Equipment")}</Tab>
           </TabsList>
         )}
         <TabPanel value={0}>
-          <PlayerCard player={playerTemp} />
+          <PlayerCard
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={true}
+          />
           <Divider sx={{ my: 1 }} />
+          <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
+          <Box sx={{ height: "5vh" }} />
+        </TabPanel>
+        <TabPanel value={1}>
           <EditPlayerBasics player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits player={playerTemp} setPlayer={setPlayerTemp} />
@@ -225,7 +244,7 @@ export default function PlayerEdit() {
           <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={1}>
+        <TabPanel value={2}>
           <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStats player={playerTemp} setPlayer={setPlayerTemp} />
@@ -233,17 +252,17 @@ export default function PlayerEdit() {
           <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={2}>
+        <TabPanel value={3}>
           <EditPlayerClasses
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            updateMaxStats={updateMaxStats} 
+            updateMaxStats={updateMaxStats}
           />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={3}>Skills</TabPanel>
-        <TabPanel value={4}>Spells</TabPanel>
-        <TabPanel value={5}>Equipment</TabPanel>
+        <TabPanel value={4}>Skills</TabPanel>
+        <TabPanel value={5}>Spells</TabPanel>
+        <TabPanel value={6}>Equipment</TabPanel>
       </Tabs>
     </Layout>
   );
