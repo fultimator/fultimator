@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { firestore, auth } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
@@ -59,6 +59,7 @@ export default function NpcEdit() {
   const isSmallScreen = useMediaQuery("(max-width: 899px)"); // Media query hook for screen size
 
   let params = useParams(); // URL parameters hook
+  const location = useLocation(); // Location hook for getting URL
   const ref = doc(firestore, "npc-personal", params.npcId); // Firestore document reference
 
   const [user] = useAuthState(auth); // Authentication state hook
@@ -131,6 +132,12 @@ export default function NpcEdit() {
   const toggleIncludeImage = () => {
     setIncludeImage(!includeImage);
   };
+
+  // Check if the 'json' query parameter is true and return the JSON response
+  const urlParams = new URLSearchParams(location.search);
+  if (urlParams.get("json") === "true" && npc) {
+    return <pre>{JSON.stringify(npc, null, 2)}</pre>;
+  }
 
   if (!npcTemp) {
     return null;
