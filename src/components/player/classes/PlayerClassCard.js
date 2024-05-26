@@ -8,6 +8,7 @@ export default function PlayerClassCard({
   classItem,
   onRemove,
   onLevelChange,
+  isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -55,7 +56,9 @@ export default function PlayerClassCard({
               <>
                 {classItem.benefits.rituals.ritualism && (
                   <Typography>
-                    {t("You may perform Rituals whose effects fall within the Ritualism discipline.")}
+                    {t(
+                      "You may perform Rituals whose effects fall within the Ritualism discipline."
+                    )}
                   </Typography>
                 )}
               </>
@@ -91,15 +94,20 @@ export default function PlayerClassCard({
             label="Level"
             type="number"
             value={classItem.lvl}
-            InputProps={{ inputProps: { min: 1, max: 10 } }}
+            InputProps={{
+              inputProps: { min: 1, max: 10 },
+              readOnly: !isEditMode,
+            }}
             onChange={(e) => handleLevelChange(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained" color="secondary" onClick={onRemove}>
-            {t("Remove")}
-          </Button>
-        </Grid>
+        {isEditMode ? (
+          <Grid item xs={12}>
+            <Button variant="contained" color="secondary" onClick={onRemove}>
+              {t("Remove")}
+            </Button>
+          </Grid>
+        ) : null}
       </Grid>
     </Paper>
   );

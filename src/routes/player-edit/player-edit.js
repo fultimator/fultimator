@@ -18,7 +18,7 @@ import {
   Grid,
   Fade,
   Tooltip,
-  Fab
+  Fab,
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -66,13 +66,14 @@ export default function PlayerEdit() {
   }, [player]);
 
   useEffect(() => {
-    if (playerTemp!== player) {
+    if (playerTemp !== player) {
       setIsUpdated(true);
     } else {
       setIsUpdated(false);
     }
   }, [playerTemp]);
 
+  const isOwner = user?.uid === player?.uid;
 
   /*const player = {
     id: "",
@@ -261,32 +262,53 @@ export default function PlayerEdit() {
           <PlayerCard
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={true}
+            isEditMode={isOwner}
           />
-          <Divider sx={{ my: 1 }} />
-          <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
+          {isOwner ? (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
+            </>
+          ) : null}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={1}>
-          <EditPlayerBasics player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerBasics
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerTraits player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerTraits
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerBonds player={playerTemp} setPlayer={setPlayerTemp} />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerBonds
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+          {isOwner ? (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
+            </>
+          ) : null}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={2}>
-          <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner}/>
           <Divider sx={{ my: 1 }} />
           <EditPlayerStats
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
+            isEditMode={isOwner}
           />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} />
+          <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={3}>
@@ -294,6 +316,7 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
+            isEditMode={isOwner}
           />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
@@ -302,7 +325,7 @@ export default function PlayerEdit() {
         <TabPanel value={6}>Equipment</TabPanel>
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
-      {isUpdated && (
+      {isUpdated && isOwner && (
         <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">

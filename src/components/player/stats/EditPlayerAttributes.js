@@ -22,7 +22,7 @@ import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import ExplainPlayerAttributes from "./ExplainPlayerAttributes";
 
-export default function EditPlayerAttributes({ player, setPlayer }) {
+export default function EditPlayerAttributes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -120,6 +120,7 @@ export default function EditPlayerAttributes({ player, setPlayer }) {
                       size="medium"
                       value={player.attributes[attribute.key]}
                       onChange={onChange(attribute.key)}
+                      disabled={!isEditMode}
                     />
                   </FormControl>
                 </Grid>

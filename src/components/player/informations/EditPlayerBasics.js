@@ -21,14 +21,14 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerBasics({ player, setPlayer }) {
+export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
-  const [imgUrlTemp, setImgUrlTemp] = React.useState("");
+  const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
 
   const onChange = (key) => {
     return (e) => {
@@ -75,6 +75,9 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               label={t("Name") + ":"}
               value={player.name}
               onChange={onChange("name")}
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             ></TextField>
           </FormControl>
         </Grid>
@@ -85,11 +88,18 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               label={t("Pronouns") + ":"}
               value={player.info.pronouns}
               onChange={onChangeInfo("pronouns")}
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             ></TextField>
           </FormControl>
         </Grid>
         <Grid item xs={4}>
-          <EditPlayerLevel player={player} setPlayer={setPlayer} />
+          <EditPlayerLevel
+            player={player}
+            setPlayer={setPlayer}
+            isEditMode={isEditMode}
+          />
         </Grid>
         <Grid item xs={12}>
           <FormControl variant="standard" fullWidth>
@@ -98,6 +108,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               label={t("Description") + ":"}
               value={player.info.description}
               onChange={onChangeInfo("description")}
+              readOnly={!isEditMode}
             />
           </FormControl>
         </Grid>
@@ -109,6 +120,9 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               value={player.info.fabulapoints}
               onChange={onChangeInfo("fabulapoints")}
               type="number"
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             ></TextField>
           </FormControl>
         </Grid>
@@ -120,6 +134,9 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               value={player.info.exp}
               onChange={onChangeInfo("exp")}
               type="number"
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             ></TextField>
           </FormControl>
         </Grid>
@@ -131,56 +148,61 @@ export default function EditPlayerBasics({ player, setPlayer }) {
               value={player.info.zenit}
               onChange={onChangeInfo("zenit")}
               type="number"
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             ></TextField>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={12}>
-          <FormControl variant="standard" fullWidth>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                id="imgurl"
-                label={t("Image URL") + ":"}
-                value={imgUrlTemp}
-                onChange={(e) => {
-                  setImgUrlTemp(e.target.value);
-                }}
-                fullWidth
-              ></TextField>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setPlayer((prevState) => {
-                    const newState = { ...prevState };
-                    newState.info.imgurl = imgUrlTemp;
-                    return newState;
-                  });
-                }}
-                sx={{ height: "56px" }}
-              >
-                {t("Update Image")}
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  setPlayer((prevState) => {
-                    const newState = { ...prevState };
-                    newState.info.imgurl = null;
-                    return newState;
-                  });
-                }}
-                sx={{ height: "56px" }}
-              >
-                {t("Remove Image")}
-              </Button>
-            </Stack>
-          </FormControl>
-        </Grid>
+        {isEditMode ? (
+          <Grid item xs={12} sm={12}>
+            <FormControl variant="standard" fullWidth>
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  id="imgurl"
+                  label={t("Image URL") + ":"}
+                  value={imgUrlTemp}
+                  onChange={(e) => {
+                    setImgUrlTemp(e.target.value);
+                  }}
+                  fullWidth
+                ></TextField>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setPlayer((prevState) => {
+                      const newState = { ...prevState };
+                      newState.info.imgurl = imgUrlTemp;
+                      return newState;
+                    });
+                  }}
+                  sx={{ height: "56px" }}
+                >
+                  {t("Update Image")}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setPlayer((prevState) => {
+                      const newState = { ...prevState };
+                      newState.info.imgurl = null;
+                      return newState;
+                    });
+                  }}
+                  sx={{ height: "56px" }}
+                >
+                  {t("Remove Image")}
+                </Button>
+              </Stack>
+            </FormControl>
+          </Grid>
+        ) : null}
       </Grid>
     </Paper>
   );
 }
 
-function EditPlayerLevel({ player, setPlayer }) {
+function EditPlayerLevel({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
 
   const onRaiseLevel = () => {
@@ -210,6 +232,7 @@ function EditPlayerLevel({ player, setPlayer }) {
               aria-label="decrease level"
               edge="start"
               onClick={onLowerLevel}
+              disabled={!isEditMode}
             >
               <Remove />
             </IconButton>
@@ -219,6 +242,7 @@ function EditPlayerLevel({ player, setPlayer }) {
               aria-label="increase level"
               edge="end"
               onClick={onRaiseLevel}
+              disabled={!isEditMode}
             >
               <Add />
             </IconButton>

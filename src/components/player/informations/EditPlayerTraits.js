@@ -17,7 +17,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerTraits({ player, setPlayer }) {
+export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -83,6 +83,9 @@ export default function EditPlayerTraits({ player, setPlayer }) {
               label={t("Identity") + ":"}
               value={player.info.identity}
               onChange={onChangeInfo("identity")}
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             />
           </FormControl>
         </Grid>
@@ -94,6 +97,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
             onChange={handleThemeChange}
             onInputChange={handleThemeInputChange}
             freeSolo
+            readOnly={!isEditMode} // Disable Autocomplete when not in edit mode
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -110,6 +114,9 @@ export default function EditPlayerTraits({ player, setPlayer }) {
               label={t("Origin") + ":"}
               value={player.info.origin}
               onChange={onChangeInfo("origin")}
+              InputProps={{
+                readOnly: !isEditMode,
+              }}
             />
           </FormControl>
         </Grid>

@@ -12,7 +12,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerStats({ player, setPlayer, updateMaxStats }) {
+export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -75,62 +75,64 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats }) {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <Grid container spacing={1} justifyContent="center">
-            <Grid item xs={12} sm="auto">
-              <ButtonGroup
-                variant="outlined"
-                size="small"
-                color={color}
-                sx={{ flexWrap: "wrap" }}
-              >
-                {negativeIncrements.map((val) => (
-                  <Button key={val} onClick={changeStat(stat, val)}>
-                    {val}
+        {isEditMode && (
+          <Grid item xs={12} sm={6}>
+            <Grid container spacing={1} justifyContent="center">
+              <Grid item xs={12} sm="auto">
+                <ButtonGroup
+                  variant="outlined"
+                  size="small"
+                  color={color}
+                  sx={{ flexWrap: "wrap" }}
+                >
+                  {negativeIncrements.map((val) => (
+                    <Button key={val} onClick={changeStat(stat, val)}>
+                      {val}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </Grid>
+              <Grid item xs={12} sm="auto">
+                <ButtonGroup
+                  variant="outlined"
+                  size="small"
+                  color={color}
+                  sx={{ flexWrap: "wrap" }}
+                >
+                  {positiveIncrements.map((val) => (
+                    <Button key={val} onClick={changeStat(stat, val)}>
+                      +{val}
+                    </Button>
+                  ))}
+                </ButtonGroup>
+              </Grid>
+              {stat === "hp" && (
+                <Grid item xs={12} sm="auto">
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={changeStat(
+                      "hp",
+                      Math.floor(player.stats.hp.max / 2) -
+                        player.stats.hp.current
+                    )}
+                  >
+                    {t("Half")}
                   </Button>
-                ))}
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={12} sm="auto">
-              <ButtonGroup
-                variant="outlined"
-                size="small"
-                color={color}
-                sx={{ flexWrap: "wrap" }}
-              >
-                {positiveIncrements.map((val) => (
-                  <Button key={val} onClick={changeStat(stat, val)}>
-                    +{val}
-                  </Button>
-                ))}
-              </ButtonGroup>
-            </Grid>
-            {stat === "hp" && (
+                </Grid>
+              )}
               <Grid item xs={12} sm="auto">
                 <Button
                   variant="contained"
-                  color="warning"
-                  onClick={changeStat(
-                    "hp",
-                    Math.floor(player.stats.hp.max / 2) -
-                      player.stats.hp.current
-                  )}
+                  color={color}
+                  onClick={changeStat(stat, player.stats[stat].max)}
                 >
-                  {t("Half")}
+                  {t("Full")}
                 </Button>
               </Grid>
-            )}
-            <Grid item xs={12} sm="auto">
-              <Button
-                variant="contained"
-                color={color}
-                onClick={changeStat(stat, player.stats[stat].max)}
-              >
-                {t("Full")}
-              </Button>
             </Grid>
           </Grid>
-        </Grid>
+        )}
         {stat === "hp" &&
           player.stats.hp.current <= Math.floor(player.stats.hp.max / 2) && (
             <Grid item xs={12}>

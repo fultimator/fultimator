@@ -22,7 +22,7 @@ import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
 import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
 
-export default function EditPlayerBonds({ player, setPlayer }) {
+export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -144,7 +144,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
           <CustomHeader
             type="top"
             headerText={t("Bonds")}
-            addItem={addNewBond}
+            addItem={isEditMode ? addNewBond : null}
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (
@@ -152,18 +152,21 @@ export default function EditPlayerBonds({ player, setPlayer }) {
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} md={4}>
                 <Box display="flex" alignItems="center">
-                  <IconButton
+                  {isEditMode ? <IconButton
                     aria-label="delete"
                     onClick={() => deleteBond(index)}
                     sx={{ ml: 1 }}
                   >
                     <RemoveCircleOutline />
-                  </IconButton>
+                  </IconButton> : null}
                   <TextField
                     fullWidth
                     label={t("Bond Name")}
                     value={bond.name}
                     onChange={handleBondNameChange(index)}
+                    InputProps={{
+                      readOnly: !isEditMode,
+                    }}
                   />
                 </Box>
               </Grid>
@@ -175,6 +178,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.admiration}
                           onChange={handleBondChange(index, "admiration")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Admiration")}
@@ -186,6 +190,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.loyality}
                           onChange={handleBondChange(index, "loyality")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Loyality")}
@@ -197,6 +202,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.affection}
                           onChange={handleBondChange(index, "affection")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Affection")}
@@ -208,6 +214,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.inferiority}
                           onChange={handleBondChange(index, "inferiority")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Inferiority")}
@@ -219,6 +226,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.mistrust}
                           onChange={handleBondChange(index, "mistrust")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Mistrust")}
@@ -230,6 +238,7 @@ export default function EditPlayerBonds({ player, setPlayer }) {
                         <Checkbox
                           checked={bond.hatred}
                           onChange={handleBondChange(index, "hatred")}
+                          disabled={!isEditMode}
                         />
                       }
                       label={t("Hatred")}

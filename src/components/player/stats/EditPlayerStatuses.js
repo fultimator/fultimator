@@ -14,7 +14,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerStatuses({ player, setPlayer }) {
+export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const { secondary } = theme.palette;
@@ -62,6 +62,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.slow}
                 onChange={() => handleStatusChange("slow")}
+                disabled={!isEditMode}
               />
             }
             label={t("Slow")}
@@ -73,6 +74,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.dazed}
                 onChange={() => handleStatusChange("dazed")}
+                disabled={!isEditMode}
               />
             }
             label={t("Dazed")}
@@ -85,6 +87,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.enraged}
                 onChange={() => handleStatusChange("enraged")}
+                disabled={!isEditMode}
               />
             }
             label={t("Enraged")}
@@ -96,6 +99,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.weak}
                 onChange={() => handleStatusChange("weak")}
+                disabled={!isEditMode}
               />
             }
             label={t("Weak")}
@@ -107,6 +111,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.shaken}
                 onChange={() => handleStatusChange("shaken")}
+                disabled={!isEditMode}
               />
             }
             label={t("Shaken")}
@@ -118,6 +123,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.poisoned}
                 onChange={() => handleStatusChange("poisoned")}
+                disabled={!isEditMode}
               />
             }
             label={t("Poisoned")}
@@ -129,6 +135,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.dexUp}
                 onChange={() => handleStatusChange("dexUp")}
+                disabled={!isEditMode}
               />
             }
             label={t("Dex Up")}
@@ -140,6 +147,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.insUp}
                 onChange={() => handleStatusChange("insUp")}
+                disabled={!isEditMode}
               />
             }
             label={t("Ins Up")}
@@ -151,6 +159,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.migUp}
                 onChange={() => handleStatusChange("migUp")}
+                disabled={!isEditMode}
               />
             }
             label={t("Mig Up")}
@@ -162,6 +171,7 @@ export default function EditPlayerStatuses({ player, setPlayer }) {
               <Checkbox
                 checked={player.statuses.wlpUp}
                 onChange={() => handleStatusChange("wlpUp")}
+                disabled={!isEditMode}
               />
             }
             label={t("Wlp Up")}
