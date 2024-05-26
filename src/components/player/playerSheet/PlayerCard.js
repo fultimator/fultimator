@@ -114,6 +114,55 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     </div>
   );
 
+  // Calculate DEF and MDEF
+  const currDef = currDex;
+  const currMDef = currInsight;
+
+  // Initialize INIT to 0
+  const currInit = 0;
+
+  // Function to render DEF, MDEF, and INIT as numbers
+  const renderAdditionalStats = () => (
+    <>
+      <Grid item xs={12} sm={4}>
+        <Typography
+          variant="body2"
+          style={{
+            fontFamily: "fantasy",
+            fontSize: "1rem",
+            marginBottom: "5px",
+          }}
+        >
+          DEF: {currDef}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={4}>
+        <Typography
+          variant="body2"
+          style={{
+            fontFamily: "fantasy",
+            fontSize: "1rem",
+            marginBottom: "5px",
+          }}
+        >
+          MDEF: {currMDef}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={4}>
+        <Typography
+          variant="body2"
+          style={{
+            fontFamily: "fantasy",
+            fontSize: "1rem",
+            marginBottom: "5px",
+          }}
+        >
+          INIT: {currInit}
+        </Typography>
+      </Grid>
+    </>
+  );
+
   const onStatusChange = (status) => (event) => {
     setPlayer((prevPlayer) => ({
       ...prevPlayer,
@@ -198,7 +247,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
               xs={1}
               sx={{
                 marginRight: 2,
-                marginTop: 0.4
+                marginTop: 0.4,
               }}
             >
               <Grid
@@ -263,7 +312,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
               xs={2}
               sx={{
                 marginRight: 1,
-                marginTop: 0.4
+                marginTop: 0.4,
               }}
             >
               <Grid
@@ -568,6 +617,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                   }
                 />
               </Grid>
+            </Grid>
+            <Grid container xs={12} sx={{ marginTop: 3, marginLeft: 1 }}>
+              {renderAdditionalStats()}
             </Grid>
           </Grid>
         </Grid>

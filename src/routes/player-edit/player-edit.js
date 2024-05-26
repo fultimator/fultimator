@@ -35,6 +35,7 @@ import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
 import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
+import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
@@ -322,7 +323,10 @@ export default function PlayerEdit() {
         </TabPanel>
         <TabPanel value={4}>Skills</TabPanel>
         <TabPanel value={5}>Spells</TabPanel>
-        <TabPanel value={6}>Equipment</TabPanel>
+        <TabPanel value={6}>
+          <EditPlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner}/>
+          <Box sx={{ height: "5vh" }} />
+        </TabPanel>
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && isOwner && (

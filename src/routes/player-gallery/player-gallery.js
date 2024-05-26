@@ -171,6 +171,7 @@ function Personal({ user }) {
         wlpUp: false,
       },
       classes: [],
+      equipment: [],
       notes: [],
     };
     const ref = collection(firestore, "player-personal");
