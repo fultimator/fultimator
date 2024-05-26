@@ -49,13 +49,17 @@ export default function EditPlayerTraits({ player, setPlayer }) {
     };
   };
 
-  const handleThemeInputChange = (event, newInputValue) => {
-    setInputTheme(newInputValue);
+  const handleThemeChange = (event, newValue) => {
+    setInputTheme(newValue);
     setPlayer((prevState) => {
       const newState = { ...prevState };
-      newState.info.theme = newInputValue;
+      newState.info.theme = newValue;
       return newState;
     });
+  };
+
+  const handleThemeInputChange = (event, newInputValue) => {
+    setInputTheme(newInputValue);
   };
 
   return (
@@ -76,7 +80,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="identity"
-              label={t("Identity:")}
+              label={t("Identity") + ":"}
               value={player.info.identity}
               onChange={onChangeInfo("identity")}
             />
@@ -87,13 +91,13 @@ export default function EditPlayerTraits({ player, setPlayer }) {
             id="theme-autocomplete"
             options={themes}
             value={inputTheme}
-            onChange={(event, newValue) => onChangeInfo("theme")(event, newValue)}
+            onChange={handleThemeChange}
             onInputChange={handleThemeInputChange}
             freeSolo
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={t("Theme:")}
+                label={t("Theme") + ":"}
                 fullWidth
               />
             )}
@@ -103,7 +107,7 @@ export default function EditPlayerTraits({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="origin"
-              label={t("Origin:")}
+              label={t("Origin") + ":"}
               value={player.info.origin}
               onChange={onChangeInfo("origin")}
             />

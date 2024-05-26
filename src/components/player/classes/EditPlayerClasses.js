@@ -32,7 +32,7 @@ export default function EditPlayerClasses({
 
     // Check if player has at least 2 classes
     if (!player.classes || player.classes.length < 2) {
-      newWarnings.push("Player must have at least 2 classes.");
+      newWarnings.push(t("Player must have at least 2 classes."));
     }
 
     // Check if class count exceeds 3 beyond the number of classes at level 10
@@ -41,7 +41,7 @@ export default function EditPlayerClasses({
       : 0;
     if (player.classes && player.classes.length - maxLevelClasses > 3) {
       newWarnings.push(
-        "The number of classes exceeds the limit beyond the number of classes at level 10."
+        t("The number of classes exceeds the limit beyond the number of classes at level 10.")
       );
     }
 
@@ -52,7 +52,7 @@ export default function EditPlayerClasses({
 
     // Check if sum of levels isn't equal to player level
     if (totalLevels !== player.lvl) {
-      newWarnings.push("Sum of class levels isn't equal to player level.");
+      newWarnings.push(t("Sum of class levels isn't equal to player level."));
     }
 
     setWarnings(newWarnings);
@@ -67,7 +67,7 @@ export default function EditPlayerClasses({
   
       if (classExists) {
         // Display an error message or handle the case where the class type already exists
-        console.error("This class type already exists for the player");
+        console.error(t("This class type already exists for the player"));
         return;
       }
   
@@ -159,7 +159,7 @@ export default function EditPlayerClasses({
                 },
                 []
               )}
-              getOptionLabel={(book) => book || ""}
+              getOptionLabel={(book) => t(book) || ""}
               value={selectedBook}
               onChange={(event, newValue) => setSelectedBook(newValue)}
               renderInput={(params) => (
@@ -176,15 +176,15 @@ export default function EditPlayerClasses({
             <Autocomplete
               id="class-select"
               options={filteredClasses}
-              getOptionLabel={(option) => option.name || ""}
+              getOptionLabel={(option) => t(option.name) || ""}
               value={selectedClass}
               onChange={(event, newValue) => setSelectedClass(newValue)}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   variant="outlined"
-                  label={t("Classes")}
-                  placeholder={t("Classes")}
+                  label={t("Class")}
+                  placeholder={t("Class")}
                 />
               )}
             />
@@ -201,7 +201,7 @@ export default function EditPlayerClasses({
         player.classes.map((cls, index) => (
           <React.Fragment key={index}>
             <PlayerClassCard
-              classItem={cls}
+              classItem={{ ...cls, name: t(cls.name) }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
             />

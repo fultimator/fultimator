@@ -35,19 +35,19 @@ export default function PlayerClassCard({
           <Grid item xs={12}>
             {classItem.benefits.hpplus !== 0 && (
               <Typography>
-                Permanently increase your maximum Hit Points by{" "}
+                {t("Permanently increase your maximum Hit Points by")}{" "}
                 {classItem.benefits.hpplus}.
               </Typography>
             )}
             {classItem.benefits.mpplus !== 0 && (
               <Typography>
-                Permanently increase your maximum Mind Points by{" "}
+                {t("Permanently increase your maximum Mind Points by")}{" "}
                 {classItem.benefits.mpplus}.
               </Typography>
             )}
             {classItem.benefits.ipplus !== 0 && (
               <Typography>
-                Permanently increase your maximum Inventory Points by{" "}
+                {t("Permanently increase your maximum Inventory Points by")}{" "}
                 {classItem.benefits.ipplus}.
               </Typography>
             )}
@@ -55,8 +55,7 @@ export default function PlayerClassCard({
               <>
                 {classItem.benefits.rituals.ritualism && (
                   <Typography>
-                    You may perform Rituals whose effects fall within the
-                    Ritualism discipline.
+                    {t("You may perform Rituals whose effects fall within the Ritualism discipline.")}
                   </Typography>
                 )}
               </>
@@ -65,22 +64,22 @@ export default function PlayerClassCard({
               <>
                 {classItem.benefits.martials.melee && (
                   <Typography>
-                    Gain the ability to equip martial melee weapons.
+                    {t("Gain the ability to equip martial melee weapons.")}
                   </Typography>
                 )}
                 {classItem.benefits.martials.ranged && (
                   <Typography>
-                    Gain the ability to equip martial ranged weapons.
+                    {t("Gain the ability to equip martial ranged weapons.")}
                   </Typography>
                 )}
                 {classItem.benefits.martials.shields && (
                   <Typography>
-                    Gain the ability to equip martial shields.
+                    {t("Gain the ability to equip martial shields.")}
                   </Typography>
                 )}
                 {classItem.benefits.martials.armor && (
                   <Typography>
-                    Gain the ability to equip martial armor.
+                    {t("Gain the ability to equip martial armor.")}
                   </Typography>
                 )}
               </>

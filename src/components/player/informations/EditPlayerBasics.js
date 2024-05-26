@@ -72,7 +72,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="name"
-              label={t("Name:")}
+              label={t("Name") + ":"}
               value={player.name}
               onChange={onChange("name")}
             ></TextField>
@@ -82,7 +82,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="pronouns"
-              label={t("Pronouns:")}
+              label={t("Pronouns") + ":"}
               value={player.info.pronouns}
               onChange={onChangeInfo("pronouns")}
             ></TextField>
@@ -95,7 +95,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <CustomTextarea
               id="description"
-              label={t("Description:")}
+              label={t("Description") + ":"}
               value={player.info.description}
               onChange={onChangeInfo("description")}
             />
@@ -105,7 +105,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="fabulapoints"
-              label={t("Fabula Points:")}
+              label={t("Fabula Points") + ":"}
               value={player.info.fabulapoints}
               onChange={onChangeInfo("fabulapoints")}
               type="number"
@@ -116,7 +116,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="exp"
-              label={t("Exp:")}
+              label={t("Exp") + ":"}
               value={player.info.exp}
               onChange={onChangeInfo("exp")}
               type="number"
@@ -127,7 +127,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
           <FormControl variant="standard" fullWidth>
             <TextField
               id="zenit"
-              label={t("Zenit:")}
+              label={t("Zenit") + ":"}
               value={player.info.zenit}
               onChange={onChangeInfo("zenit")}
               type="number"
@@ -139,9 +139,7 @@ export default function EditPlayerBasics({ player, setPlayer }) {
             <Stack direction="row" spacing={2}>
               <TextField
                 id="imgurl"
-                label={t(
-                  "Image URL (needs to end with .png, .jpg, .jpeg, etc...):"
-                )}
+                label={t("Image URL") + ":"}
                 value={imgUrlTemp}
                 onChange={(e) => {
                   setImgUrlTemp(e.target.value);
@@ -203,7 +201,7 @@ function EditPlayerLevel({ player, setPlayer }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         id="level"
-        label={t("Level:")}
+        label={t("Level") + ":"}
         value={player.lvl}
         InputProps={{
           readOnly: true,

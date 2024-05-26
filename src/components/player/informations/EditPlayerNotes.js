@@ -101,7 +101,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
             <Grid item xs={7}>
               <TextField
                 id="name"
-                label={t("Note Name:")}
+                label={t("Note Name") + ":"}
                 value={note.name}
                 onChange={handleNoteNameChange(index)}
               />
@@ -109,7 +109,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
             <Grid item xs={12} sm={12}>
               <CustomTextarea
                 id="description"
-                label={t("Description:")}
+                label={t("Description") + ":"}
                 value={note.description}
                 onChange={handleNoteDescriptionChange(index)}
               />
