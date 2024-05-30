@@ -10,6 +10,7 @@ interface CustomTextareaProps {
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onMouseOver?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
   onMouseOut?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
+  readOnly?: boolean; // Add readOnly to the props
 }
 
 const CustomTextarea: React.FC<CustomTextareaProps> = ({
@@ -21,6 +22,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onBlur,
   onMouseOver,
   onMouseOut,
+  readOnly = false, // Default value is false
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -92,6 +94,8 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     outline: 'none',
     resize: 'vertical',
     boxShadow: isFocused ? `0 0 0 2px ${primary}` : 'none',
+    backgroundColor: readOnly ? '#f5f5f5' : 'white', // Gray background if read-only
+    cursor: readOnly ? 'not-allowed' : 'text', // Not-allowed cursor if read-only
   };
 
   const labelStyle: React.CSSProperties = {
@@ -140,10 +144,10 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   return (
     <div style={{ position: 'relative', margin: '5px 0' }}>
       <div style={toolbarStyle}>
-        <Button onClick={() => handleFormat('bold')} style={buttonStyle}>
+        <Button onClick={() => handleFormat('bold')} style={buttonStyle} disabled={readOnly}>
           Bold
         </Button>
-        <Button onClick={() => handleFormat('italic')} style={buttonStyle}>
+        <Button onClick={() => handleFormat('italic')} style={buttonStyle} disabled={readOnly}>
           Italic
         </Button>
       </div>
@@ -156,6 +160,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
         onBlur={handleBlur}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
+        readOnly={readOnly} // Add readOnly here
         style={textareaStyle}
       />
       <label style={labelStyle}>{label}</label>
