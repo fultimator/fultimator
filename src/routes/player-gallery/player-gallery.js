@@ -51,6 +51,7 @@ import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
 import { useNavigate } from "react-router-dom";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
+import { testUsers, moderators } from "../../libs/userGroups";
 
 export default function PlayerGallery() {
   const { t } = useTranslate();
@@ -80,6 +81,9 @@ function Personal({ user }) {
   const theme = useTheme();
   const [name, setName] = useState("");
 
+  const canAccessTest =
+    testUsers.includes(user.uid) || moderators.includes(user.uid);
+
   const personalRef = collection(firestore, "player-personal");
   const personalQuery = query(personalRef, where("uid", "==", user.uid));
   const [personalList, loading, err] = useCollectionData(personalQuery, {
@@ -87,6 +91,14 @@ function Personal({ user }) {
   });
 
   const isMobile = window.innerWidth < 900;
+
+  if (!canAccessTest) {
+    return (
+      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+        {t("You are not authorized to access this page.")}
+      </Paper>
+    );
+  }
 
   if (err?.code === "resource-exhausted") {
     return (
@@ -213,6 +225,13 @@ function Personal({ user }) {
 
   return (
     <>
+      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+        <Typography sx={{ color: "error.main" }}>
+          {t(
+            "Player Creator is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Player created could be deleted at any time for testing purposes."
+          )}
+        </Typography>
+      </Paper>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
           <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">

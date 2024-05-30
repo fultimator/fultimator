@@ -618,7 +618,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
             </Grid>
-            <Grid container xs={12} sx={{ marginTop: 3, marginLeft: 1 }}>
+            <Grid container sx={{ marginTop: 3, marginLeft: 1 }}>
               {renderAdditionalStats()}
             </Grid>
           </Grid>

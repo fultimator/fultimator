@@ -39,6 +39,7 @@ import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEqu
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
+import { testUsers, moderators } from "../../libs/userGroups";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -52,6 +53,12 @@ export default function PlayerEdit() {
   const ref = doc(firestore, "player-personal", params.playerId); // Firestore document reference
 
   const [user] = useAuthState(auth); // Authentication state hook
+
+  let canAccessTest = false;
+
+  if (user && (testUsers.includes(user.uid) || moderators.includes(user.uid))) {
+    canAccessTest = true;
+  }
 
   const [player] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
 
@@ -206,6 +213,16 @@ export default function PlayerEdit() {
     return null;
   }
 
+  if (!canAccessTest) {
+    return (
+      <Layout>
+        <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+          {t("You are not authorized to access this page.")}
+        </Paper>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Tabs value={openTab} onChange={handleTabChange}>
@@ -300,7 +317,11 @@ export default function PlayerEdit() {
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={2}>
-          <EditPlayerAttributes player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner}/>
+          <EditPlayerAttributes
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStats
             player={playerTemp}
@@ -309,7 +330,11 @@ export default function PlayerEdit() {
             isEditMode={isOwner}
           />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerStatuses player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
+          <EditPlayerStatuses
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={3}>
@@ -324,7 +349,11 @@ export default function PlayerEdit() {
         <TabPanel value={4}>Skills</TabPanel>
         <TabPanel value={5}>Spells</TabPanel>
         <TabPanel value={6}>
-          <EditPlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner}/>
+          <EditPlayerEquipment
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
       </Tabs>

@@ -13,10 +13,22 @@ import React, { useState } from "react";
 
 import { useTranslate } from "../translation/translate";
 
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
+import { testUsers, moderators } from "../libs/userGroups";
+
 function Home() {
   const navigate = useNavigate();
   const [hover, setHover] = useState("");
   const { t } = useTranslate();
+  const [user, loading] = useAuthState(auth);
+
+  let canAccessTest = false;
+  if (user?.uid) {
+    canAccessTest =
+      testUsers.includes(user.uid) || moderators.includes(user.uid);
+  }
+
   return (
     <Layout>
       <div
@@ -28,26 +40,28 @@ function Home() {
           margin: "1em",
         }}
       >
-        <CardMedia
-          component="img"
-          image={player_designer}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform: hover === "player_designer" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("player_designer");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/player-gallery");
-          }}
-        />
+        {canAccessTest && (
+          <CardMedia
+            component="img"
+            image={player_designer}
+            alt=""
+            sx={{
+              objectFit: "contain",
+              width: 360,
+              cursor: "pointer",
+              transform: hover === "player_designer" ? " scale(1.1)" : "none",
+            }}
+            onMouseEnter={() => {
+              setHover("player_designer");
+            }}
+            onMouseLeave={() => {
+              setHover("");
+            }}
+            onClick={() => {
+              navigate("/player-gallery");
+            }}
+          />
+        )}
         <CardMedia
           component="img"
           image={adversary_designer}
