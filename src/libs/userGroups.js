@@ -1,6 +1,7 @@
 export const testUsers = 
 [
-    "gv5trf4iOGNDsn5Yuo7lWPamRQC2"
+    "gv5trf4iOGNDsn5Yuo7lWPamRQC2",
+    "tKuJ3RcAAYYavYF2nyBkjzZohA03"
 ];
 
 export const moderators =

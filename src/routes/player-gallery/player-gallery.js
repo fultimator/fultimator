@@ -31,6 +31,7 @@ import {
   Button,
   useTheme,
   Autocomplete,
+  InputAdornment
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -52,6 +53,7 @@ import { useTranslate } from "../../translation/translate";
 import { useNavigate } from "react-router-dom";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import { testUsers, moderators } from "../../libs/userGroups";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function PlayerGallery() {
   const { t } = useTranslate();
@@ -245,13 +247,20 @@ function Personal({ user }) {
             >
               <TextField
                 id="outlined-basic"
-                label={t("Player Name")}
+                label={t("Search by Player Name")}
                 variant="outlined"
                 size="small"
                 fullWidth
                 value={name}
                 onChange={(evt) => {
                   setName(evt.target.value);
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
                 }}
               />
             </Grid>
