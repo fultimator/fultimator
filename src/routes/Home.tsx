@@ -1,7 +1,12 @@
-import { CardMedia, Typography } from "@mui/material";
+import { CardMedia, Typography, Link, Box } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-
 import Layout from "../components/Layout";
+import React, { useState } from "react";
+import { useTranslate } from "../translation/translate";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
+import { testUsers, moderators } from "../libs/userGroups";
 
 import adversary_compedium from "./adversary_compedium.webp";
 import adversary_designer from "./adversary_designer.webp";
@@ -9,16 +14,12 @@ import combat_simulator from "./combat_simulator.webp";
 import player_designer from "./custom_class_no_title.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
-import React, { useState } from "react";
-
-import { useTranslate } from "../translation/translate";
-
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
-import { testUsers, moderators } from "../libs/userGroups";
 
 function Home() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
   const [hover, setHover] = useState("");
   const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
@@ -28,6 +29,40 @@ function Home() {
     canAccessTest =
       testUsers.includes(user.uid) || moderators.includes(user.uid);
   }
+
+  const mediaItems = [
+    {
+      image: player_designer,
+      link: "/player-gallery",
+      hoverKey: "player_designer",
+      canAccess: canAccessTest,
+    },
+    {
+      image: adversary_designer,
+      link: "/npc-gallery",
+      hoverKey: "adversary_designer",
+    },
+    {
+      image: adversary_compedium,
+      link: "/npc-compedium",
+      hoverKey: "adversary_compedium",
+    },
+    {
+      image: combat_simulator,
+      link: "/combat",
+      hoverKey: "combat_simulator",
+    },
+    {
+      image: items_rituals_projects,
+      link: "/generate",
+      hoverKey: "items_rituals_projects",
+    },
+    {
+      image: dice_roller,
+      link: "/roller",
+      hoverKey: "dice_roller",
+    },
+  ];
 
   return (
     <Layout>
@@ -40,146 +75,86 @@ function Home() {
           margin: "1em",
         }}
       >
-        {canAccessTest && (
-          <CardMedia
-            component="img"
-            image={player_designer}
-            alt=""
-            sx={{
-              objectFit: "contain",
-              width: 360,
-              cursor: "pointer",
-              transform: hover === "player_designer" ? " scale(1.1)" : "none",
-            }}
-            onMouseEnter={() => {
-              setHover("player_designer");
-            }}
-            onMouseLeave={() => {
-              setHover("");
-            }}
-            onClick={() => {
-              navigate("/player-gallery");
-            }}
-          />
+        {mediaItems.map(
+          (item, index) =>
+            (item.canAccess === undefined || item.canAccess) && (
+              <CardMedia
+                key={index}
+                component="img"
+                image={item.image}
+                alt=""
+                sx={{
+                  objectFit: "contain",
+                  width: 360,
+                  cursor: "pointer",
+                  transform: hover === item.hoverKey ? "scale(1.1)" : "none",
+                  transition: "transform 0.3s",
+                }}
+                onMouseEnter={() => {
+                  setHover(item.hoverKey);
+                }}
+                onMouseLeave={() => {
+                  setHover("");
+                }}
+                onClick={() => {
+                  navigate(item.link);
+                }}
+              />
+            )
         )}
-        <CardMedia
-          component="img"
-          image={adversary_designer}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform: hover === "adversary_designer" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("adversary_designer");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/npc-gallery");
-          }}
-        />
-
-        <CardMedia
-          component="img"
-          image={adversary_compedium}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform: hover === "adversary_compedium" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("adversary_compedium");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/npc-compedium");
-          }}
-        />
-
-        <CardMedia
-          component="img"
-          image={combat_simulator}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform: hover === "combat_simulator" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("combat_simulator");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/combat");
-          }}
-        />
-
-        <CardMedia
-          component="img"
-          image={items_rituals_projects}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform:
-              hover === "items_rituals_projects" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("items_rituals_projects");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/generate");
-          }}
-        />
-
-        <CardMedia
-          component="img"
-          image={dice_roller}
-          alt=""
-          sx={{
-            objectFit: "contain",
-            width: 360,
-            cursor: "pointer",
-            transform: hover === "dice_roller" ? " scale(1.1)" : "none",
-          }}
-          onMouseEnter={() => {
-            setHover("dice_roller");
-          }}
-          onMouseLeave={() => {
-            setHover("");
-          }}
-          onClick={() => {
-            navigate("/roller");
-          }}
-        />
       </div>
-      <Typography sx={{ p: 3, textAlign: "center" }}>
-        {t("If you have any feedback, give us your thoughts here")}{" "}
-        <a href=" https://forms.gle/3P7Bq1CtZrnFwQsm8">{t("Google Form.")}</a>{" "}
-        <br />
-        {t("The wonderful Fultimator Icons are made by Runty! Email:")}{" "}
-        <a href="mailto:contactrunty@iCloud.com">contactrunty@iCloud.com</a>
-        <br />
-        {t("Monster Icons are taken from:")}{" "}
-        <a href="http://www.akashics.moe/" target="_blank" rel="noreferrer">
-          http://www.akashics.moe/
-        </a>
-      </Typography>
+      <Box
+        sx={{
+          textAlign: "center",
+          mt: 5,
+        }}
+      >
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          <Link
+            href="https://discord.gg/9yYc6R93Cd"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#7289da", fontWeight: "bold" }}
+          >
+            {t("Dive into the Discord Hub!")}
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          {t("If you have any feedback, give us your thoughts here")}{" "}
+          <Link
+            href="https://forms.gle/3P7Bq1CtZrnFwQsm8"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            {t("Google Form.")}
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          {t("The wonderful Fultimator Icons are made by Runty! Email:")}{" "}
+          <Link
+            href="mailto:contactrunty@iCloud.com"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            contactrunty@iCloud.com
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          {t("Monster Icons are taken from:")}{" "}
+          <Link
+            href="http://www.akashics.moe/"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            akashics.moe
+          </Link>
+        </Typography>
+      </Box>
     </Layout>
   );
 }

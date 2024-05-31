@@ -2,7 +2,6 @@ import { Container } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "./appbar/AppBar";
-
 import { useThemeContext } from "../ThemeContext";
 
 type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
@@ -38,6 +37,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const fultimatorRoutes = ["/npc-gallery/:npcId"];
   const isNpcEdit = fultimatorRoutes.includes(location.pathname);
 
+  // Determine if the current path is the homepage
+  const isHomepage = location.pathname === "/";
+
   return (
     <>
       <AppBar
@@ -45,6 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         handleGoBack={handleGoBack}
         selectedTheme={selectedTheme}
         handleSelectTheme={handleSelectTheme}
+        showGoBackButton={!isHomepage} // Pass the prop to control the visibility of the "Go Back" button
       />
       <Container style={{ marginTop: "8em", alignItems: "center" }}>
         {children}

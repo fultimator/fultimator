@@ -23,6 +23,7 @@ interface AppBarProps {
   handleGoBack: () => void;
   selectedTheme: ThemeValue;
   handleSelectTheme: (theme: ThemeValue) => void;
+  showGoBackButton: boolean; // Add this prop to the interface
 }
 
 const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
@@ -42,6 +43,7 @@ const AppBar: React.FC<AppBarProps> = ({
   handleGoBack,
   selectedTheme,
   handleSelectTheme,
+  showGoBackButton, // Add this prop to the destructuring
 }) => {
   const viewportWidth = window.innerWidth;
   const isSmallViewport = viewportWidth <= 600;
@@ -60,7 +62,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 justifyContent: "flex-start",
               }}
             >
-              {!isNpcEdit && (
+              {showGoBackButton && ( // Use the showGoBackButton prop to conditionally render the button
                 <IconButton color="inherit" onClick={handleGoBack}>
                   <ArrowBack sx={{ width: "32px", height: "32px" }} />
                 </IconButton>
