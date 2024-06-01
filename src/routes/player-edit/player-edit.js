@@ -254,12 +254,9 @@ export default function PlayerEdit() {
                   <ListItemText primary={t("Classes")} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 4)}>
-                  <ListItemText primary={t("Skills")} />
-                </ListItem>
-                <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <ListItemText primary={t("Spells")} />
                 </ListItem>
-                <ListItem onClick={(e) => handleTabChange(e, 6)}>
+                <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <ListItemText primary={t("Equipment")} />
                 </ListItem>
               </List>
@@ -271,9 +268,8 @@ export default function PlayerEdit() {
             <Tab value={1}>{t("Informations")}</Tab>
             <Tab value={2}>{t("Stats")}</Tab>
             <Tab value={3}>{t("Classes")}</Tab>
-            <Tab value={4}>{t("Skills")}</Tab>
-            <Tab value={5}>{t("Spells")}</Tab>
-            <Tab value={6}>{t("Equipment")}</Tab>
+            <Tab value={4}>{t("Spells")}</Tab>
+            <Tab value={5}>{t("Equipment")}</Tab>
           </TabsList>
         )}
         <TabPanel value={0}>
@@ -346,9 +342,8 @@ export default function PlayerEdit() {
           />
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
-        <TabPanel value={4}>Skills</TabPanel>
-        <TabPanel value={5}>Spells</TabPanel>
-        <TabPanel value={6}>
+        <TabPanel value={4}>Spells</TabPanel>
+        <TabPanel value={5}>
           <EditPlayerEquipment
             player={playerTemp}
             setPlayer={setPlayerTemp}

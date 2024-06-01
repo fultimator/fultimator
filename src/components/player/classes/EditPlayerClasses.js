@@ -69,7 +69,6 @@ export default function EditPlayerClasses({
       );
 
       if (classExists) {
-        // Display an error message or handle the case where the class type already exists
         console.error(t("This class type already exists for the player"));
         return;
       }
@@ -118,6 +117,30 @@ export default function EditPlayerClasses({
     setPlayer(updatedPlayer);
     updateMaxStats();
   };
+
+  const handleAddSkill = (className, skillName, maxLevel, description) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map(cls => {
+        if (cls.name === className) {
+          return {
+            ...cls,
+            skills: [
+              ...cls.skills,
+              {
+                skillName: skillName,
+                currentLvl: 1,
+                maxLvl: maxLevel, // Ensure maxLevel is parsed as a number
+                description: description
+              }
+            ]
+          };
+        }
+        return cls;
+      })
+    };
+    setPlayer(updatedPlayer);
+};
 
   const { t } = useTranslate();
   const theme = useTheme();
@@ -211,6 +234,7 @@ export default function EditPlayerClasses({
               classItem={{ ...cls, name: t(cls.name) }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
+              onAddSkill={handleAddSkill} // Pass the handleAddSkill function to the PlayerClassCard component
               isEditMode={isEditMode}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
