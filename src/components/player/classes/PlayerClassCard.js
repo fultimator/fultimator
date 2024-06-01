@@ -12,32 +12,75 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderClasses from "../../common/CustomHeaderClasses";
 import CustomHeader from "../../common/CustomHeader";
 import CustomTextarea from "../../common/CustomTextarea";
+import CustomHeader2 from "../../common/CustomHeader2";
+import CustomHeader3 from "../../common/CustomHeader3";
 
 export default function PlayerClassCard({
   classItem,
   onRemove,
   onLevelChange,
   onAddSkill,
+  onEditSkill,
+  onDeleteSkill,
+  onIncreaseSkillLevel,
+  onDecreaseSkillLevel,
   isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
+
   const [openAddSkillModal, setOpenAddSkillModal] = useState(false);
+  const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
 
   const handleAddSkill = () => {
-    // Call the onAddSkill callback with the new skill details
-    onAddSkill(classItem.name, skillName, maxLevel, description);
+    if (editSkillIndex !== null) {
+      // Edit existing skill
+      onEditSkill(
+        classItem.name,
+        editSkillIndex,
+        skillName,
+        maxLevel,
+        description  // Pass the adjusted current level here
+      );
+    } else {
+      // Add new skill
+      onAddSkill(classItem.name, skillName, maxLevel, description);
+    }
     // Reset the state and close the modal
     setOpenAddSkillModal(false);
+    setSkillName("");
+    setMaxLevel(1);
+    setDescription("");
+    setEditSkillIndex(null);
+  };
+
+  const handleEditSkill = (index) => {
+    const skill = classItem.skills[index];
+    setSkillName(skill.skillName);
+    setMaxLevel(skill.maxLvl);
+    setDescription(skill.description);
+    setEditSkillIndex(index);
+    setOpenAddSkillModal(true);
+  };
+
+  const handleDeleteSkill = () => {
+    onDeleteSkill(editSkillIndex);
+    setOpenAddSkillModal(false);
+    setEditSkillIndex(null);
     setSkillName("");
     setMaxLevel(1);
     setDescription("");
@@ -65,105 +108,128 @@ export default function PlayerClassCard({
             isEditMode={isEditMode}
           />
         </Grid>
- {classItem.benefits && (
+        {classItem.benefits && (
           <>
             <Grid item xs={12}>
-              <Typography variant="h2" component="legend">
-                {t("Free Benefits")}
-              </Typography>
+              <CustomHeader2 headerText={t("Free Benefits")} />
             </Grid>
-            <Grid item xs={12}>
-              {classItem.benefits.hpplus !== 0 && (
-                <Typography>
-                  {t("Permanently increase your maximum Hit Points by")}{" "}
-                  {classItem.benefits.hpplus}.
-                </Typography>
-              )}
-              {classItem.benefits.mpplus !== 0 && (
-                <Typography>
-                  {t("Permanently increase your maximum Mind Points by")}{" "}
-                  {classItem.benefits.mpplus}.
-                </Typography>
-              )}
-              {classItem.benefits.ipplus !== 0 && (
-                <Typography>
-                  {t("Permanently increase your maximum Inventory Points by")}{" "}
-                  {classItem.benefits.ipplus}.
-                </Typography>
-              )}
-              {classItem.benefits.rituals && (
-                <>
-                  {classItem.benefits.rituals.ritualism && (
+            <Grid item xs={12} style={{ margin: "-20px 0 0 0" }}>
+              <ul>
+                {classItem.benefits.hpplus !== 0 && (
+                  <li>
+                    <Typography>
+                      {t("Permanently increase your maximum Hit Points by")}{" "}
+                      {classItem.benefits.hpplus}.
+                    </Typography>
+                  </li>
+                )}
+                {classItem.benefits.mpplus !== 0 && (
+                  <li>
+                    <Typography>
+                      {t("Permanently increase your maximum Mind Points by")}{" "}
+                      {classItem.benefits.mpplus}.
+                    </Typography>
+                  </li>
+                )}
+                {classItem.benefits.ipplus !== 0 && (
+                  <li>
                     <Typography>
                       {t(
-                        "You may perform Rituals whose effects fall within the Ritualism discipline."
-                      )}
+                        "Permanently increase your maximum Inventory Points by"
+                      )}{" "}
+                      {classItem.benefits.ipplus}.
                     </Typography>
-                  )}
-                </>
-              )}
-              {classItem.benefits.martials && (
-                <>
-                  {classItem.benefits.martials.melee && (
-                    <Typography>
-                      {t("Gain the ability to equip martial melee weapons.")}
-                    </Typography>
-                  )}
-                  {classItem.benefits.martials.ranged && (
-                    <Typography>
-                      {t("Gain the ability to equip martial ranged weapons.")}
-                    </Typography>
-                  )}
-                  {classItem.benefits.martials.shields && (
-                    <Typography>
-                      {t("Gain the ability to equip martial shields.")}
-                    </Typography>
-                  )}
-                  {classItem.benefits.martials.armor && (
-                    <Typography>
-                      {t("Gain the ability to equip martial armor.")}
-                    </Typography>
-                  )}
-                </>
-              )}
+                  </li>
+                )}
+                {classItem.benefits.rituals && (
+                  <>
+                    {classItem.benefits.rituals.ritualism && (
+                      <li>
+                        <Typography>
+                          {t(
+                            "You may perform Rituals whose effects fall within the Ritualism discipline."
+                          )}
+                        </Typography>
+                      </li>
+                    )}
+                  </>
+                )}
+                {classItem.benefits.martials && (
+                  <>
+                    {classItem.benefits.martials.melee && (
+                      <li>
+                        <Typography>
+                          {t(
+                            "Gain the ability to equip martial melee weapons."
+                          )}
+                        </Typography>
+                      </li>
+                    )}
+                    {classItem.benefits.martials.ranged && (
+                      <li>
+                        <Typography>
+                          {t(
+                            "Gain the ability to equip martial ranged weapons."
+                          )}
+                        </Typography>
+                      </li>
+                    )}
+                    {classItem.benefits.martials.shields && (
+                      <li>
+                        <Typography>
+                          {t("Gain the ability to equip martial shields.")}
+                        </Typography>
+                      </li>
+                    )}
+                    {classItem.benefits.martials.armor && (
+                      <li>
+                        <Typography>
+                          {t("Gain the ability to equip martial armor.")}
+                        </Typography>
+                      </li>
+                    )}
+                  </>
+                )}
+              </ul>
             </Grid>
             <Grid item xs={12}>
               <Divider />
             </Grid>
           </>
         )}
-        <Grid item xs={10}>
-          <Typography variant="h2" component="legend">
-            {t("Skills")}
-          </Typography>
+        <Grid item xs={12}>
+          <CustomHeader2
+            headerText={t("Skills")}
+            buttonText={t("Add Skill")}
+            onButtonClick={() => setOpenAddSkillModal(true)}
+          />
         </Grid>
-        <Grid item xs={2}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setOpenAddSkillModal(true)}
-          >
-            {t("Add Skill")}
-          </Button>
-        </Grid>
-                {classItem.skills && classItem.skills.map((skill, index) => (
-          <Grid item xs={12} key={index}>
-            <Typography variant="body1">
-              {t("Skill Name")}: {skill.skillName}
-            </Typography>
-            <Typography variant="body1">
-              {t("Max Level")}: {skill.maxLvl}
-            </Typography>
-            <Typography variant="body1">
-              {t("Description")}: {skill.description}
-            </Typography>
-          </Grid>
-        ))}
+        {classItem.skills &&
+          classItem.skills.map((skill, index) => (
+            <Grid item xs={12} key={index}>
+              <CustomHeader3
+                headerText={skill.skillName}
+                currentLvl={skill.currentLvl}
+                maxLvl={skill.maxLvl}
+                onIncrease={() => onIncreaseSkillLevel(index)}
+                onDecrease={() => onDecreaseSkillLevel(index)}
+                onEdit={() => handleEditSkill(index)} // Add this line
+              />
+              <Typography variant="body1">
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
+                  {skill.description}
+                </StyledMarkdown>
+              </Typography>
+            </Grid>
+          ))}
         {isEditMode ? (
           <Grid item xs={12}>
             <Button
               variant="contained"
-              color="secondary"
+              color="error"
               onClick={onRemove}
               sx={{ marginTop: "30px" }}
             >
@@ -176,7 +242,13 @@ export default function PlayerClassCard({
       {/* Add Skill Modal */}
       <Dialog
         open={openAddSkillModal}
-        onClose={() => setOpenAddSkillModal(false)}
+        onClose={() => {
+          setOpenAddSkillModal(false);
+          setSkillName("");
+          setMaxLevel(1);
+          setDescription("");
+          setEditSkillIndex(null);
+        }}
         PaperProps={{
           sx: {
             width: "80%", // Adjust width as needed
@@ -185,7 +257,7 @@ export default function PlayerClassCard({
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-          {t("Add Skill")}
+          {editSkillIndex !== null ? t("Edit Skill") : t("Add Skill")}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
@@ -221,12 +293,21 @@ export default function PlayerClassCard({
         </DialogContent>
 
         <DialogActions>
+          {editSkillIndex !== null && (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteSkill}
+            >
+              {t("Delete")}
+            </Button>
+          )}
           <Button
             variant="contained"
             color="secondary"
             onClick={handleAddSkill}
           >
-            {t("Add")}
+            {editSkillIndex !== null ? t("Save Changes") : t("Add")}
           </Button>
         </DialogActions>
       </Dialog>

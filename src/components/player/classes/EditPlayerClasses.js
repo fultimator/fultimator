@@ -142,6 +142,92 @@ export default function EditPlayerClasses({
     setPlayer(updatedPlayer);
 };
 
+const handleIncreaseSkillLevel = (classIndex, skillIndex) => {
+  const updatedPlayer = {
+    ...player,
+    classes: player.classes.map((cls, i) => {
+      if (i === classIndex) {
+        return {
+          ...cls,
+          skills: cls.skills.map((skill, j) => {
+            if (j === skillIndex && skill.currentLvl < skill.maxLvl) {
+              return { ...skill, currentLvl: skill.currentLvl + 1 };
+            }
+            return skill;
+          }),
+        };
+      }
+      return cls;
+    }),
+  };
+  setPlayer(updatedPlayer);
+  updateMaxStats();
+};
+
+
+const handleDecreaseSkillLevel = (classIndex, skillIndex) => {
+  const updatedPlayer = {
+    ...player,
+    classes: player.classes.map((cls, i) => {
+      if (i === classIndex) {
+        return {
+          ...cls,
+          skills: cls.skills.map((skill, j) => {
+            if (j === skillIndex && skill.currentLvl > 0) {
+              return { ...skill, currentLvl: skill.currentLvl - 1 };
+            }
+            return skill;
+          }),
+        };
+      }
+      return cls;
+    }),
+  };
+  setPlayer(updatedPlayer);
+  updateMaxStats();
+};
+
+const handleEditSkill = (className, skillIndex, skillName, maxLevel, description) => {
+  const updatedPlayer = {
+    ...player,
+    classes: player.classes.map(cls => {
+      if (cls.name === className) {
+        return {
+          ...cls,
+          skills: cls.skills.map((skill, index) => {
+            if (index === skillIndex) {
+              const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
+              const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
+              return { ...skill, skillName, maxLvl: newMaxLevel, currentLvl: newCurrentLevel, description };
+            }
+            return skill;
+          })
+        };
+      }
+      return cls;
+    })
+  };
+  setPlayer(updatedPlayer);
+  updateMaxStats();
+};
+
+const handleDeleteSkill = (classIndex, skillIndex) => {
+  const updatedPlayer = {
+    ...player,
+    classes: player.classes.map((cls, i) => {
+      if (i === classIndex) {
+        return {
+          ...cls,
+          skills: cls.skills.filter((_, index) => index !== skillIndex)
+        };
+      }
+      return cls;
+    })
+  };
+  setPlayer(updatedPlayer);
+  updateMaxStats();
+};
+
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -234,7 +320,11 @@ export default function EditPlayerClasses({
               classItem={{ ...cls, name: t(cls.name) }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
-              onAddSkill={handleAddSkill} // Pass the handleAddSkill function to the PlayerClassCard component
+              onAddSkill={handleAddSkill}
+              onEditSkill={handleEditSkill}
+              onDeleteSkill={(skillIndex) => handleDeleteSkill(index, skillIndex)}
+              onIncreaseSkillLevel={(skillIndex) => handleIncreaseSkillLevel(index, skillIndex)}
+              onDecreaseSkillLevel={(skillIndex) => handleDecreaseSkillLevel(index, skillIndex)}
               isEditMode={isEditMode}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
