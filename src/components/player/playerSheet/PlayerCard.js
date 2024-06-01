@@ -79,7 +79,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         variant="body2"
         style={{
           minWidth: 30,
-          fontFamily: "fantasy",
+          fontFamily: "'Antonio', fantasy, sans-serif",
           fontSize: "0.8rem",
           marginRight: 5,
           color: theme.palette.text.secondary,
@@ -105,7 +105,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         variant="body2"
         style={{
           minWidth: 40,
-          fontFamily: "fantasy",
+          fontFamily: "'Antonio', fantasy, sans-serif",
           fontSize: "0.8rem",
           marginLeft: 5,
           color: theme.palette.text.secondary,
@@ -128,36 +128,45 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         <Typography
           variant="body2"
           style={{
-            fontFamily: "fantasy",
             fontSize: "1rem",
             marginBottom: "5px",
           }}
         >
-          DEF: {currDef}
+          <span style={{ fontFamily: "fantasy" }}>DEF:</span>
+          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+            {" "}
+            {currDef}
+          </span>
         </Typography>
       </Grid>
       <Grid item xs={12} sm={4}>
         <Typography
           variant="body2"
           style={{
-            fontFamily: "fantasy",
             fontSize: "1rem",
             marginBottom: "5px",
           }}
         >
-          MDEF: {currMDef}
+          <span style={{ fontFamily: "fantasy" }}>MDEF:</span>
+          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+            {" "}
+            {currMDef}
+          </span>
         </Typography>
       </Grid>
       <Grid item xs={12} sm={4}>
         <Typography
           variant="body2"
           style={{
-            fontFamily: "fantasy",
             fontSize: "1rem",
             marginBottom: "5px",
           }}
         >
-          INIT: {currInit}
+          <span style={{ fontFamily: "fantasy" }}>INIT:</span>
+          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+            {" "}
+            {currInit}
+          </span>
         </Typography>
       </Grid>
     </>
@@ -201,7 +210,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           <Typography
             variant="h5"
             style={{
-              fontFamily: "fantasy",
+              fontFamily: "fantasy, 'Antonio', sans-serif",
               fontSize: "1.5rem",
               marginBottom: "10px",
               display: "flex",
@@ -212,7 +221,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             {player.info.pronouns && (
               <span
                 style={{
-                  fontFamily: "fantasy",
+                  fontFamily: "'Antonio', fantasy, sans-serif",
                   fontSize: "1rem",
                   color: theme.palette.text.disabled,
                   marginRight: "5px",
@@ -254,12 +263,15 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1,
+                  marginY: 1.2,
                 }}
               >
                 <Typography
                   variant="body2"
-                  style={{ fontFamily: "fantasy", fontSize: "1rem" }}
+                  style={{
+                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontSize: "1rem",
+                  }}
                 >
                   {t("DEX")}:{" "}
                 </Typography>
@@ -268,12 +280,15 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1,
+                  marginY: 1.2,
                 }}
               >
                 <Typography
                   variant="body2"
-                  style={{ fontFamily: "fantasy", fontSize: "1rem" }}
+                  style={{
+                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontSize: "1rem",
+                  }}
                 >
                   {t("INS")}:{" "}
                 </Typography>
@@ -282,12 +297,15 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1,
+                  marginY: 1.2,
                 }}
               >
                 <Typography
                   variant="body2"
-                  style={{ fontFamily: "fantasy", fontSize: "1rem" }}
+                  style={{
+                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontSize: "1rem",
+                  }}
                 >
                   {t("MIG")}:{" "}
                 </Typography>
@@ -296,12 +314,15 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1,
+                  marginY: 1.2,
                 }}
               >
                 <Typography
                   variant="body2"
-                  style={{ fontFamily: "fantasy", fontSize: "1rem" }}
+                  style={{
+                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontSize: "1rem",
+                  }}
                 >
                   {t("WLP")}:{" "}
                 </Typography>
@@ -326,7 +347,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                   component="span"
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy",
+                    fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: "1rem",
                     color: getAttributeColor(
                       player.attributes.dexterity,
@@ -348,7 +369,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                   component="span"
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy",
+                    fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: "1rem",
                     color: getAttributeColor(
                       player.attributes.insight,
@@ -370,7 +391,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                   component="span"
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy",
+                    fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: "1rem",
                     color: getAttributeColor(
                       player.attributes.might,
@@ -392,7 +413,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                   component="span"
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy",
+                    fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: "1rem",
                     color: getAttributeColor(
                       player.attributes.willpower,
@@ -434,7 +455,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
@@ -466,7 +487,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
@@ -498,7 +519,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
@@ -530,7 +551,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
@@ -573,7 +594,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
@@ -608,7 +629,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                     <Typography
                       variant="body2"
                       style={{
-                        fontFamily: "fantasy",
+                        fontFamily: "'Antonio', fantasy, sans-serif",
                         fontSize: "0.8rem",
                       }}
                     >
