@@ -132,7 +132,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "fantasy" }}>DEF:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>DEF:</span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currDef}
@@ -147,7 +147,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "fantasy" }}>MDEF:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>MDEF:</span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currMDef}
@@ -162,7 +162,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "fantasy" }}>INIT:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>INIT:</span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currInit}
@@ -210,7 +210,8 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           <Typography
             variant="h5"
             style={{
-              fontFamily: "fantasy, 'Antonio', sans-serif",
+              fontFamily: "'Antonio'",
+                    fontWeight: "bold",
               fontSize: "1.5rem",
               marginBottom: "10px",
               display: "flex",
@@ -221,7 +222,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             {player.info.pronouns && (
               <span
                 style={{
-                  fontFamily: "'Antonio', fantasy, sans-serif",
+                  fontFamily: "'Antonio'",
                   fontSize: "1rem",
                   color: theme.palette.text.disabled,
                   marginRight: "5px",
@@ -263,13 +264,14 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1.2,
+                  marginY: 1,
                 }}
               >
                 <Typography
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontFamily: "'Antonio'",
+                    fontWeight: "bold",
                     fontSize: "1rem",
                   }}
                 >
@@ -286,7 +288,8 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 <Typography
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontFamily: "'Antonio'",
+                    fontWeight: "bold",
                     fontSize: "1rem",
                   }}
                 >
@@ -303,7 +306,8 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 <Typography
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontFamily: "'Antonio'",
+                    fontWeight: "bold",
                     fontSize: "1rem",
                   }}
                 >
@@ -314,13 +318,14 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 item
                 xs={12}
                 sx={{
-                  marginY: 1.2,
+                  marginY: 1.3,
                 }}
               >
                 <Typography
                   variant="body2"
                   style={{
-                    fontFamily: "fantasy, 'Antonio', sans-serif",
+                    fontFamily: "'Antonio'",
+                    fontWeight: "bold",
                     fontSize: "1rem",
                   }}
                 >
@@ -639,7 +644,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
             </Grid>
-            <Grid container sx={{ marginTop: 3, marginLeft: 1 }}>
+            <Grid container sx={{ marginTop: 2, marginLeft: 1 }}>
               {renderAdditionalStats()}
             </Grid>
           </Grid>
