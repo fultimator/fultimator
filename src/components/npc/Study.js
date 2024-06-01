@@ -2,7 +2,9 @@ import React from "react";
 import { Grid, Typography } from "@mui/material";
 import { calcHP, calcMP, Rank, Stats, Attacks, Spells } from "./Pretty";
 import Diamond from "../Diamond";
+import { useTranslate } from "../../translation/translate";
 const Study = ({ npc, study }) => {
+  const { t } = useTranslate();
   return (
     <>
       {study >= 0 && (
@@ -43,7 +45,7 @@ const Study = ({ npc, study }) => {
               fontWeight="medium"
               sx={{ textTransform: "uppercase" }}
             >
-              Lvl {npc.lvl} <Rank npc={npc} /> <Diamond /> {npc.species}
+              {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
             </Typography>
           </Grid>
         </Grid>
@@ -60,7 +62,7 @@ const Study = ({ npc, study }) => {
             }}
           >
             <Typography>
-              <strong>Typical Traits: </strong>
+              <strong>{t("Typical Traits:")} </strong>
               {npc.traits}
             </Typography>
           </Grid>
@@ -77,6 +79,7 @@ const Study = ({ npc, study }) => {
 };
 
 function Love({ npc, study }) {
+  const { t } = useTranslate();
   return (
     <Typography
       component="div"
@@ -106,7 +109,7 @@ function Love({ npc, study }) {
           >
             <Grid container alignItems="stretch">
               <Grid item sx={{ px: 1.5, py: 0.4 }}>
-                HP
+                {t("HP")}
               </Grid>
               <Grid
                 item
@@ -121,7 +124,7 @@ function Love({ npc, study }) {
                 {Math.floor(calcHP(npc) / 2)}
               </Grid>
               <Grid item sx={{ px: 1.5, py: 0.4 }}>
-                MP
+                {t("MP")}
               </Grid>
               <Grid
                 item
