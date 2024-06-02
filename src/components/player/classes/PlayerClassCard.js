@@ -332,7 +332,7 @@ export default function PlayerClassCard({
           },
         }}
       >
-        <DialogTitle>{t("Edit Class Name")}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>{t("Edit Class Name")}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -438,7 +438,7 @@ export default function PlayerClassCard({
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-          {t("Edit Free Benefits")}
+          {t("Edit Benefits")}
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ marginTop: "10px" }}>
