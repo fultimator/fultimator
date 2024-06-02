@@ -23,6 +23,9 @@ import CustomHeader from "../../common/CustomHeader";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader2 from "../../common/CustomHeader2";
 import CustomHeader3 from "../../common/CustomHeader3";
+import AddSkillModal from "./AddSkillModal";
+import EditBenefitsModal from "./EditBenefitsModal";
+import EditClassNameModal from "./EditClassNameModal";
 
 export default function PlayerClassCard({
   classItem,
@@ -322,268 +325,42 @@ export default function PlayerClassCard({
         ) : null}
       </Grid>
       {/* Edit Class Name Modal */}
-      <Dialog
+      <EditClassNameModal
         open={openEditClassNameModal}
         onClose={handleCloseEditClassNameModal}
-        PaperProps={{
-          sx: {
-            width: "80%", // Adjust width as needed
-            maxWidth: "lg", // Adjust maximum width as needed
-          },
-        }}
-      >
-        <DialogTitle>{t("Edit Class Name")}</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label={t("Class Name")}
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            sx={{ marginTop: "10px" }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleSaveClassName}
-          >
-            {t("Save Changes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        className={className}
+        setClassName={setClassName} // Pass setClassName as a prop
+        onSaveClassName={handleSaveClassName}
+      />
       {/* Add Skill Modal */}
-      <Dialog
+      <AddSkillModal
         open={openAddSkillModal}
         onClose={() => {
           setOpenAddSkillModal(false);
-          setSkillName("");
-          setMaxLevel(1);
-          setDescription("");
-          setEditSkillIndex(null);
+          setSkillName(""); // Reset skillName state
+          setMaxLevel(1); // Reset maxLevel state
+          setDescription(""); // Reset description state
+          setEditSkillIndex(null); // Reset editSkillIndex state
         }}
-        PaperProps={{
-          sx: {
-            width: "80%", // Adjust width as needed
-            maxWidth: "lg", // Adjust maximum width as needed
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-          {editSkillIndex !== null ? t("Edit Skill") : t("Add Skill")}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ marginTop: "10px" }}>
-            <Grid item sm={10} xs={12}>
-              <TextField
-                label={t("Skill Name")}
-                fullWidth
-                value={skillName}
-                onChange={(e) => setSkillName(e.target.value)}
-              />
-            </Grid>
-            <Grid item sm={2} xs={12}>
-              <TextField
-                label={t("Max Level")}
-                type="number"
-                InputProps={{
-                  inputProps: { min: 1, max: 10 },
-                }}
-                fullWidth
-                value={maxLevel}
-                onChange={(e) => setMaxLevel(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <CustomTextarea
-                label={t("Description")}
-                fullWidth
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions>
-          {editSkillIndex !== null && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDeleteSkill}
-            >
-              {t("Delete")}
-            </Button>
-          )}
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleAddSkill}
-          >
-            {editSkillIndex !== null ? t("Save Changes") : t("Add")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onAddSkill={handleAddSkill} // Pass the function to add a new skill
+        onEditSkill={handleEditSkill} // Pass the function to edit an existing skill
+        skillName={skillName} // Pass the skillName state
+        maxLevel={maxLevel} // Pass the maxLevel state
+        description={description} // Pass the description state
+        editSkillIndex={editSkillIndex} // Pass the editSkillIndex state
+      />
       {/* Edit Free Benefits Modal */}
-      <Dialog
+      <EditBenefitsModal
         open={openEditBenefitsModal}
         onClose={() => {
           setOpenEditBenefitsModal(false);
         }}
-        PaperProps={{
-          sx: {
-            width: "80%", // Adjust width as needed
-            maxWidth: "lg", // Adjust maximum width as needed
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-          {t("Edit Free Benefits")}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ marginTop: "10px" }}>
-            <Grid item xs={4}>
-              <TextField
-                label={t("HP Modifier")}
-                type="number"
-                fullWidth
-                value={benefits.hpplus}
-                onChange={(e) =>
-                  handleBenefitChange("hpplus", parseInt(e.target.value))
-                }
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                label={t("MP Modifier")}
-                type="number"
-                fullWidth
-                value={benefits.mpplus}
-                onChange={(e) =>
-                  handleBenefitChange("mpplus", parseInt(e.target.value))
-                }
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                label={t("IP Modifier")}
-                type="number"
-                fullWidth
-                value={benefits.ipplus}
-                onChange={(e) =>
-                  handleBenefitChange("ipplus", parseInt(e.target.value))
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={benefits.rituals.ritualism}
-                      onChange={(e) =>
-                        handleRitualChange("ritualism", e.target.checked)
-                      }
-                    />
-                  }
-                  label={
-                    <Typography>
-                      {t(
-                        "You may perform Rituals whose effects fall within the Ritualism discipline."
-                      )}
-                    </Typography>
-                  }
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={benefits.martials.melee}
-                      onChange={(e) =>
-                        handleMartialChange("melee", e.target.checked)
-                      }
-                    />
-                  }
-                  label={
-                    <Typography>
-                      {t("Gain the ability to equip martial melee weapons.")}
-                    </Typography>
-                  }
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={benefits.martials.ranged}
-                      onChange={(e) =>
-                        handleMartialChange("ranged", e.target.checked)
-                      }
-                    />
-                  }
-                  label={
-                    <Typography>
-                      {t("Gain the ability to equip martial ranged weapons.")}
-                    </Typography>
-                  }
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={benefits.martials.shields}
-                      onChange={(e) =>
-                        handleMartialChange("shields", e.target.checked)
-                      }
-                    />
-                  }
-                  label={
-                    <Typography>
-                      {t("Gain the ability to equip martial shields.")}
-                    </Typography>
-                  }
-                />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={benefits.martials.armor}
-                      onChange={(e) =>
-                        handleMartialChange("armor", e.target.checked)
-                      }
-                    />
-                  }
-                  label={
-                    <Typography>
-                      {t("Gain the ability to equip martial armor.")}
-                    </Typography>
-                  }
-                />
-              </FormGroup>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleSaveBenefits}
-          >
-            {t("Save Changes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        benefits={benefits}
+        handleBenefitChange={handleBenefitChange} // Pass handleBenefitChange as a prop
+        handleRitualChange={handleRitualChange} // Pass handleRitualChange as a prop
+        handleMartialChange={handleMartialChange} // Pass handleMartialChange as a prop
+        onSaveBenefits={handleSaveBenefits}
+      />
     </Paper>
   );
 }
