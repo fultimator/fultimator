@@ -403,6 +403,31 @@ const classList = [
       spellClasses: ["arcanist-rework"],
     },
   },
+  {
+    name: "Blank Class",
+    book: "homebrew",
+    benefits: {
+      hpplus: 0,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+        arcanism: false,
+        chimerism: false,
+        elementalism: false,
+        entropism: false,
+        spiritism: false,
+      },
+      spellClasses: ["default"],
+    },
+  },
 ];
 
 

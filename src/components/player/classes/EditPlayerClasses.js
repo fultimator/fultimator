@@ -18,7 +18,7 @@ export default function EditPlayerClasses({
   player,
   setPlayer,
   updateMaxStats,
-  isEditMode
+  isEditMode,
 }) {
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
@@ -135,7 +135,7 @@ export default function EditPlayerClasses({
   const handleAddSkill = (className, skillName, maxLevel, description) => {
     const updatedPlayer = {
       ...player,
-      classes: player.classes.map(cls => {
+      classes: player.classes.map((cls) => {
         if (cls.name === className) {
           return {
             ...cls,
@@ -145,102 +145,113 @@ export default function EditPlayerClasses({
                 skillName: skillName,
                 currentLvl: 1,
                 maxLvl: maxLevel, // Ensure maxLevel is parsed as a number
-                description: description
-              }
-            ]
+                description: description,
+              },
+            ],
           };
         }
         return cls;
-      })
+      }),
     };
     setPlayer(updatedPlayer);
-};
-
-const handleIncreaseSkillLevel = (classIndex, skillIndex) => {
-  const updatedPlayer = {
-    ...player,
-    classes: player.classes.map((cls, i) => {
-      if (i === classIndex) {
-        return {
-          ...cls,
-          skills: cls.skills.map((skill, j) => {
-            if (j === skillIndex && skill.currentLvl < skill.maxLvl) {
-              return { ...skill, currentLvl: skill.currentLvl + 1 };
-            }
-            return skill;
-          }),
-        };
-      }
-      return cls;
-    }),
   };
-  setPlayer(updatedPlayer);
-  updateMaxStats();
-};
 
-
-const handleDecreaseSkillLevel = (classIndex, skillIndex) => {
-  const updatedPlayer = {
-    ...player,
-    classes: player.classes.map((cls, i) => {
-      if (i === classIndex) {
-        return {
-          ...cls,
-          skills: cls.skills.map((skill, j) => {
-            if (j === skillIndex && skill.currentLvl > 0) {
-              return { ...skill, currentLvl: skill.currentLvl - 1 };
-            }
-            return skill;
-          }),
-        };
-      }
-      return cls;
-    }),
+  const handleIncreaseSkillLevel = (classIndex, skillIndex) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === classIndex) {
+          return {
+            ...cls,
+            skills: cls.skills.map((skill, j) => {
+              if (j === skillIndex && skill.currentLvl < skill.maxLvl) {
+                return { ...skill, currentLvl: skill.currentLvl + 1 };
+              }
+              return skill;
+            }),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
   };
-  setPlayer(updatedPlayer);
-  updateMaxStats();
-};
 
-const handleEditSkill = (className, skillIndex, skillName, maxLevel, description) => {
-  const updatedPlayer = {
-    ...player,
-    classes: player.classes.map(cls => {
-      if (cls.name === className) {
-        return {
-          ...cls,
-          skills: cls.skills.map((skill, index) => {
-            if (index === skillIndex) {
-              const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
-              const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
-              return { ...skill, skillName, maxLvl: newMaxLevel, currentLvl: newCurrentLevel, description };
-            }
-            return skill;
-          })
-        };
-      }
-      return cls;
-    })
+  const handleDecreaseSkillLevel = (classIndex, skillIndex) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === classIndex) {
+          return {
+            ...cls,
+            skills: cls.skills.map((skill, j) => {
+              if (j === skillIndex && skill.currentLvl > 0) {
+                return { ...skill, currentLvl: skill.currentLvl - 1 };
+              }
+              return skill;
+            }),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
   };
-  setPlayer(updatedPlayer);
-  updateMaxStats();
-};
 
-const handleDeleteSkill = (classIndex, skillIndex) => {
-  const updatedPlayer = {
-    ...player,
-    classes: player.classes.map((cls, i) => {
-      if (i === classIndex) {
-        return {
-          ...cls,
-          skills: cls.skills.filter((_, index) => index !== skillIndex)
-        };
-      }
-      return cls;
-    })
+  const handleEditSkill = (
+    className,
+    skillIndex,
+    skillName,
+    maxLevel,
+    description
+  ) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls) => {
+        if (cls.name === className) {
+          return {
+            ...cls,
+            skills: cls.skills.map((skill, index) => {
+              if (index === skillIndex) {
+                const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
+                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
+                return {
+                  ...skill,
+                  skillName,
+                  maxLvl: newMaxLevel,
+                  currentLvl: newCurrentLevel,
+                  description,
+                };
+              }
+              return skill;
+            }),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
   };
-  setPlayer(updatedPlayer);
-  updateMaxStats();
-};
+
+  const handleDeleteSkill = (classIndex, skillIndex) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === classIndex) {
+          return {
+            ...cls,
+            skills: cls.skills.filter((_, index) => index !== skillIndex),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
+  };
 
   const { t } = useTranslate();
   const theme = useTheme();
@@ -278,15 +289,19 @@ const handleDeleteSkill = (classIndex, skillIndex) => {
               <Grid item xs={12} sm={5}>
                 <Autocomplete
                   id="book-select"
-                  options={Object.values(classList).reduce(
-                    (books, currentClass) => {
+                  options={Object.values(classList)
+                    .reduce((books, currentClass) => {
                       if (!books.includes(currentClass.book)) {
                         books.push(currentClass.book);
                       }
                       return books;
-                    },
-                    []
-                  )}
+                    }, [])
+                    .map((book) => ({
+                      original: book,
+                      translated: t(book) || "",
+                    }))
+                    .sort((a, b) => a.translated.localeCompare(b.translated))
+                    .map((book) => book.original)}
                   getOptionLabel={(book) => t(book) || ""}
                   value={selectedBook}
                   onChange={(event, newValue) => setSelectedBook(newValue)}
@@ -303,7 +318,13 @@ const handleDeleteSkill = (classIndex, skillIndex) => {
               <Grid item xs={12} sm={5}>
                 <Autocomplete
                   id="class-select"
-                  options={filteredClasses}
+                  options={filteredClasses
+                    .map((classOption) => ({
+                      original: classOption,
+                      translated: t(classOption.name) || "",
+                    }))
+                    .sort((a, b) => a.translated.localeCompare(b.translated))
+                    .map((classOption) => classOption.original)}
                   getOptionLabel={(option) => t(option.name) || ""}
                   value={selectedClass}
                   onChange={(event, newValue) => setSelectedClass(newValue)}
@@ -337,9 +358,15 @@ const handleDeleteSkill = (classIndex, skillIndex) => {
               onSaveBenefits={(benefits) => handleSaveBenefits(index, benefits)}
               onAddSkill={handleAddSkill}
               onEditSkill={handleEditSkill}
-              onDeleteSkill={(skillIndex) => handleDeleteSkill(index, skillIndex)}
-              onIncreaseSkillLevel={(skillIndex) => handleIncreaseSkillLevel(index, skillIndex)}
-              onDecreaseSkillLevel={(skillIndex) => handleDecreaseSkillLevel(index, skillIndex)}
+              onDeleteSkill={(skillIndex) =>
+                handleDeleteSkill(index, skillIndex)
+              }
+              onIncreaseSkillLevel={(skillIndex) =>
+                handleIncreaseSkillLevel(index, skillIndex)
+              }
+              onDecreaseSkillLevel={(skillIndex) =>
+                handleDecreaseSkillLevel(index, skillIndex)
+              }
               isEditMode={isEditMode}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}

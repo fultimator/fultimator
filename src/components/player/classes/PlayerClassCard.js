@@ -287,7 +287,14 @@ export default function PlayerClassCard({
             <Button
               variant="contained"
               color="error"
-              onClick={onRemove}
+              onClick={() => {
+                const confirmed = window.confirm(
+                  "Are you sure you want to remove the class?"
+                );
+                if (confirmed) {
+                  onRemove();
+                }
+              }}
               sx={{ marginTop: "30px" }}
             >
               {t("Remove Class")}
@@ -523,7 +530,7 @@ export default function PlayerClassCard({
             color="secondary"
             onClick={handleSaveBenefits}
           >
-            {t("Save")}
+            {t("Save Changes")}
           </Button>
         </DialogActions>
       </Dialog>
