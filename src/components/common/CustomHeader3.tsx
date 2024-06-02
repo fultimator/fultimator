@@ -12,7 +12,7 @@ const EmptyStarSVG = (
     height="24"
   >
     <path
-      fill="none"
+      fill="white"
       opacity=".96"
       stroke="#78a49a"
       strokeLinecap="round"

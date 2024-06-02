@@ -118,6 +118,20 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
+  const handleSaveBenefits = (index, benefits) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === index) {
+          return { ...cls, benefits };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
+  };
+
   const handleAddSkill = (className, skillName, maxLevel, description) => {
     const updatedPlayer = {
       ...player,
@@ -320,6 +334,7 @@ const handleDeleteSkill = (classIndex, skillIndex) => {
               classItem={{ ...cls, name: t(cls.name) }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
+              onSaveBenefits={(benefits) => handleSaveBenefits(index, benefits)}
               onAddSkill={handleAddSkill}
               onEditSkill={handleEditSkill}
               onDeleteSkill={(skillIndex) => handleDeleteSkill(index, skillIndex)}
