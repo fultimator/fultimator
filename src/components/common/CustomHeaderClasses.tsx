@@ -6,9 +6,11 @@ import IconButton from "@mui/material/IconButton";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import { useTheme } from "@mui/system";
 import { Grid, Tooltip, TextField } from "@mui/material";
+import { useTranslate } from "../../translation/translate";
+import { Edit } from "@mui/icons-material";
 
 interface CustomHeaderClassesProps {
-  addItem: () => void;
+  editClassName: () => void;
   headerText: string;
   type: "top" | "middle";
   rightHeaderText: string;
@@ -19,7 +21,7 @@ interface CustomHeaderClassesProps {
 }
 
 const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
-  addItem,
+  editClassName,
   headerText,
   type,
   rightHeaderText,
@@ -32,6 +34,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+  const { t } = useTranslate();
 
   return (
     <Grid item xs={12} sx={{ width: "100%", margin: "15px" }}>
@@ -52,12 +55,12 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           lineHeight: "normal", // Reset line height to normal
         }}
       >
-        <Tooltip title={"Add " + headerText}>
+        <Tooltip title={t("Edit Class Name")}>
           <IconButton
             sx={{ px: 1, "&:hover": { color: primary } }}
-            onClick={addItem}
+            onClick={editClassName}
           >
-            <HistoryEduIcon fontSize="large" />
+            <Edit fontSize="large" />
           </IconButton>
         </Tooltip>
         <div style={{ flex: 1, textAlign: "left", paddingBottom: 7 }}>

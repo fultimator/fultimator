@@ -103,6 +103,19 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
+  const editClassName = (index, newClassName) => { 
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === index) {
+          return { ...cls, name: newClassName };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+  };
+
   const handleLevelChange = (index, newLevel) => {
     const updatedPlayer = {
       ...player,
@@ -368,6 +381,7 @@ export default function EditPlayerClasses({
                 handleDecreaseSkillLevel(index, skillIndex)
               }
               isEditMode={isEditMode}
+              editClassName={(newClassName) => editClassName(index, newClassName)}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>

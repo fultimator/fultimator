@@ -35,6 +35,7 @@ export default function PlayerClassCard({
   onIncreaseSkillLevel,
   onDecreaseSkillLevel,
   isEditMode,
+  editClassName,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -46,10 +47,27 @@ export default function PlayerClassCard({
 
   const [openAddSkillModal, setOpenAddSkillModal] = useState(false);
   const [openEditBenefitsModal, setOpenEditBenefitsModal] = useState(false);
+  const [openEditClassNameModal, setOpenEditClassNameModal] = useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
+
+  const [className, setClassName] = useState(classItem.name);
+
+  const handleOpenEditClassNameModal = () => {
+    setOpenEditClassNameModal(true);
+    setClassName(classItem.name);
+  };
+
+  const handleCloseEditClassNameModal = () => {
+    setOpenEditClassNameModal(false);
+  };
+
+  const handleSaveClassName = () => {
+    editClassName(className);
+    setOpenEditClassNameModal(false);
+  };
 
   // Define state variables for the benefits modal
   const [benefits, setBenefits] = useState({
@@ -155,6 +173,7 @@ export default function PlayerClassCard({
             readOnlyNumber={10}
             onLevelChange={onLevelChange}
             isEditMode={isEditMode}
+            editClassName={() => handleOpenEditClassNameModal()}
           />
         </Grid>
         {classItem.benefits && (
@@ -289,7 +308,7 @@ export default function PlayerClassCard({
               color="error"
               onClick={() => {
                 const confirmed = window.confirm(
-                  "Are you sure you want to remove the class?"
+                  t("Are you sure you want to remove the class?")
                 );
                 if (confirmed) {
                   onRemove();
@@ -302,6 +321,37 @@ export default function PlayerClassCard({
           </Grid>
         ) : null}
       </Grid>
+      {/* Edit Class Name Modal */}
+      <Dialog
+        open={openEditClassNameModal}
+        onClose={handleCloseEditClassNameModal}
+        PaperProps={{
+          sx: {
+            width: "80%", // Adjust width as needed
+            maxWidth: "lg", // Adjust maximum width as needed
+          },
+        }}
+      >
+        <DialogTitle>{t("Edit Class Name")}</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label={t("Class Name")}
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+            sx={{ marginTop: "10px" }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleSaveClassName}
+          >
+            {t("Save Changes")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Add Skill Modal */}
       <Dialog
         open={openAddSkillModal}
