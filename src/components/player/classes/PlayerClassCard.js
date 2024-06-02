@@ -167,7 +167,7 @@ export default function PlayerClassCard({
         <Grid item xs={12}>
           <CustomHeaderClasses
             type="top"
-            headerText={classItem.name}
+            headerText={t(classItem.name)}
             rightHeaderText={t("Class Level")}
             editableNumber={classItem.lvl}
             readOnlyNumber={10}

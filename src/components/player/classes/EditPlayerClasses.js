@@ -148,7 +148,7 @@ export default function EditPlayerClasses({
   const handleAddSkill = (className, skillName, maxLevel, description) => {
     const updatedPlayer = {
       ...player,
-      classes: player.classes.map((cls) => {
+      classes: player.classes.map(cls => {
         if (cls.name === className) {
           return {
             ...cls,
@@ -365,7 +365,7 @@ export default function EditPlayerClasses({
         player.classes.map((cls, index) => (
           <React.Fragment key={index}>
             <PlayerClassCard
-              classItem={{ ...cls, name: t(cls.name) }}
+              classItem={{ ...cls, name: cls.name }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
               onSaveBenefits={(benefits) => handleSaveBenefits(index, benefits)}
