@@ -4,7 +4,8 @@ export const testUsers =
     "tKuJ3RcAAYYavYF2nyBkjzZohA03",
     "J0a1FbAxHhcWeW182OWQd1znU6m1",
     "ggm41SdXGYTs0pC38NAuxZDFZ6C3",
-    "68aH6PdfE9YMeQtur8UXMltu3Bg2"
+    "68aH6PdfE9YMeQtur8UXMltu3Bg2",
+    "8qZG7p3fpTcJrnIiAxlWn4UGDY03"
 ];
 
 export const moderators =
