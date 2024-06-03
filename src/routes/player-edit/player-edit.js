@@ -349,6 +349,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
+          <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={5}>
           <EditPlayerEquipment
