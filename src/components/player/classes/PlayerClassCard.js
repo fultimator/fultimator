@@ -24,6 +24,7 @@ import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader2 from "../../common/CustomHeader2";
 import CustomHeader3 from "../../common/CustomHeader3";
 import EditClassNameModal from "./EditClassNameModal";
+import AddSkillModal from "./AddSkillModal";
 
 export default function PlayerClassCard({
   classItem,
@@ -331,7 +332,26 @@ export default function PlayerClassCard({
         setClassName={setClassName}
       />
       {/* Add Skill Modal */}
-      <Dialog
+      <AddSkillModal
+        open={openAddSkillModal}
+        onClose={() => {
+          setOpenAddSkillModal(false);
+          setSkillName("");
+          setMaxLevel(1);
+          setDescription("");
+          setEditSkillIndex(null);
+        }}
+        editSkillIndex={editSkillIndex}
+        skillName={skillName}
+        setSkillName={setSkillName}
+        maxLevel={maxLevel}
+        setMaxLevel={setMaxLevel}
+        description={description}
+        setDescription={setDescription}
+        onAddSkill={handleAddSkill}
+        onDeleteSkill={handleDeleteSkill}
+      />
+      {/*<Dialog
         open={openAddSkillModal}
         onClose={() => {
           setOpenAddSkillModal(false);
@@ -401,7 +421,7 @@ export default function PlayerClassCard({
             {editSkillIndex !== null ? t("Save Changes") : t("Add")}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog>*/}
       {/* Edit Free Benefits Modal */}
       <Dialog
         open={openEditBenefitsModal}
