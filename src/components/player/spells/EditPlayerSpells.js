@@ -63,7 +63,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               borderColor: secondary,
             }}
           >
-            <Grid container spacing={2}>
+            <Grid container >
               <Grid item xs={12}>
                 <CustomHeader type="top" headerText={t("Spells")} />
               </Grid>
@@ -95,7 +95,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                         fullWidth
                       />
                     )}
-                    sx={{ marginLeft: "20px" }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={5}>
@@ -151,7 +150,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={2} sm={1}>
+              <Grid item xs={12} sm={1}>
                 <FormControl variant="standard" fullWidth>
                   <ToggleButtonGroup
                     size="large"

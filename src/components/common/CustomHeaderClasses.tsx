@@ -1,13 +1,12 @@
-// CustomHeaderClasses.tsx
 import React from "react";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
-import { useTheme } from "@mui/system";
+import { useMediaQuery } from "@mui/material";
 import { Grid, Tooltip, TextField } from "@mui/material";
-import { useTranslate } from "../../translation/translate";
 import { Edit } from "@mui/icons-material";
+import { useTranslate } from "../../translation/translate";
+import { useTheme } from "@mui/system";
 
 interface CustomHeaderClassesProps {
   editClassName: () => void;
@@ -31,6 +30,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   isEditMode,
 }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -48,11 +48,11 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           padding: "5px 10px",
           borderRadius: type === "top" ? "8px 8px 0 0" : 0,
           margin: type === "top" ? "-30px 0 0 -30px" : "0 0 0 -30px",
-          fontSize: "1.5em",
-          display: "flex", // Added to allow for flex layout
-          alignItems: "center", // Align items vertically
-          justifyContent: "space-between", // Align items to the start and end of the container
-          lineHeight: "normal", // Reset line height to normal
+          fontSize: isMobile ? "1em" : "1.5em",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          lineHeight: "normal",
         }}
       >
         <Tooltip title={t("Edit Class Name")}>
@@ -65,8 +65,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
         </Tooltip>
         <div style={{ flex: 1, textAlign: "left", paddingBottom: 7 }}>
           {headerText}
-        </div>{" "}
-        {/* Left-aligned */}
+        </div>
         <div
           style={{
             textAlign: "right",
@@ -88,14 +87,14 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
               },
             }}
             value={editableNumber}
-            onChange={(e) => onLevelChange(parseInt(e.target.value))} // Handle level change
+            onChange={(e) => onLevelChange(parseInt(e.target.value))}
             variant="outlined"
             size="small"
-            style={{
-              width: "60px",
+            sx={{
+              width: isMobile ? "40px" : "60px",
               textAlign: "center",
               marginRight: "4px",
-              fontFamily: "inherit", // Match font with the rest
+              fontFamily: "inherit",
             }}
           />
           {" / "}
@@ -103,18 +102,20 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             type="number"
             InputProps={{
               inputProps: { min: 1, max: 10, readOnly: true },
-              style: { fontFamily: "inherit", fontSize: "inherit" },
+              style: {
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                backgroundColor: "white",
+              },
             }}
             value={readOnlyNumber}
             variant="outlined"
             size="small"
-            disabled
-            style={{
-              width: "60px",
+            sx={{
+              width: isMobile ? "40px" : "60px",
               textAlign: "center",
-              backgroundColor: "white",
               border: "none",
-              fontFamily: "inherit", // Match font with the rest
+              fontFamily: "inherit",
             }}
           />
         </div>

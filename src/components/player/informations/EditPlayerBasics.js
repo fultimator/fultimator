@@ -15,11 +15,15 @@ import {
   useTheme,
   Paper,
   Button,
+  InputAdornment,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
+import { ReactComponent as ZenitIcon } from "../../zenit.svg";
+import { ReactComponent as ExpIcon } from "../../exp.svg";
+import {ReactComponent as FabulaIcon} from "../../fabula.svg";
 
 export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -94,7 +98,7 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
             ></TextField>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={4}>
           <EditPlayerLevel
             player={player}
             setPlayer={setPlayer}
@@ -122,6 +126,13 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <FabulaIcon style={{ width: "28px", height: "28px" }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             ></TextField>
           </FormControl>
@@ -136,6 +147,13 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <ExpIcon style={{ width: "28px", height: "28px" }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             ></TextField>
           </FormControl>
@@ -150,52 +168,61 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <ZenitIcon style={{ width: "28px", height: "28px" }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
-            ></TextField>
+            />
           </FormControl>
         </Grid>
         {isEditMode ? (
-          <Grid item xs={12} sm={12}>
-            <FormControl variant="standard" fullWidth>
-              <Stack direction="row" spacing={2}>
-                <TextField
-                  id="imgurl"
-                  label={t("Image URL") + ":"}
-                  value={imgUrlTemp}
-                  onChange={(e) => {
-                    setImgUrlTemp(e.target.value);
-                  }}
-                  fullWidth
-                ></TextField>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setPlayer((prevState) => {
-                      const newState = { ...prevState };
-                      newState.info.imgurl = imgUrlTemp;
-                      return newState;
-                    });
-                  }}
-                  sx={{ height: "56px" }}
-                >
-                  {t("Update Image")}
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setPlayer((prevState) => {
-                      const newState = { ...prevState };
-                      newState.info.imgurl = null;
-                      return newState;
-                    });
-                  }}
-                  sx={{ height: "56px" }}
-                >
-                  {t("Remove Image")}
-                </Button>
-              </Stack>
-            </FormControl>
-          </Grid>
+          <>
+            <Grid item xs={12} sm={8}>
+              <TextField
+                id="imgurl"
+                label={t("Image URL") + ":"}
+                value={imgUrlTemp}
+                onChange={(e) => {
+                  setImgUrlTemp(e.target.value);
+                }}
+                fullWidth
+              ></TextField>
+            </Grid>
+            <Grid item xs={6} sm={2}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setPlayer((prevState) => {
+                    const newState = { ...prevState };
+                    newState.info.imgurl = imgUrlTemp;
+                    return newState;
+                  });
+                }}
+                sx={{ height: "56px", width: "100%" }}
+              >
+                {t("Update Image")}
+              </Button>
+            </Grid>
+            <Grid item xs={6} sm={2}>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setPlayer((prevState) => {
+                    const newState = { ...prevState };
+                    newState.info.imgurl = null;
+                    return newState;
+                  });
+                }}
+                sx={{ height: "56px", width: "100%" }}
+              >
+                {t("Remove Image")}
+              </Button>
+            </Grid>
+          </>
         ) : null}
       </Grid>
     </Paper>
@@ -224,6 +251,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode }) {
       <TextField
         id="level"
         label={t("Level") + ":"}
+        sx={{ width: "100%" }}
         value={player.lvl}
         InputProps={{
           readOnly: true,

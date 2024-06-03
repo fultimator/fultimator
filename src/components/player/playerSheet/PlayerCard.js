@@ -193,7 +193,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2} alignItems="flex-start">
-        <Grid item xs={4}>
+        <Grid item xs={4} sm={4}>
           <img
             src={player.info.imgurl ? player.info.imgurl : avatar_image}
             alt={"Player Avatar"}
