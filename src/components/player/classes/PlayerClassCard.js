@@ -81,6 +81,7 @@ export default function PlayerClassCard({
       ritualism: classItem.benefits.rituals?.ritualism || false,
     },
     martials: classItem.benefits.martials || {},
+    custom: classItem.benefits.custom || [],
   });
 
   // Update the state when changes are made in the modal
@@ -111,9 +112,35 @@ export default function PlayerClassCard({
     }));
   };
 
+  const handleCustomBenefitChange = (index, value) => {
+    setBenefits((prevBenefits) => ({
+      ...prevBenefits,
+      custom: prevBenefits.custom.map((benefit, i) => {
+        if (i === index) {
+          return value;
+        }
+        return benefit;
+      }),
+    }));
+  };
+
   const handleSaveBenefits = () => {
     onSaveBenefits(benefits);
     setOpenEditBenefitsModal(false);
+  };
+
+  const handleAddCustomBenefit = () => {
+    setBenefits((prevBenefits) => ({
+      ...prevBenefits,
+      custom: [...prevBenefits.custom, [""]],
+    }));
+  };
+
+  const handleRemoveCustomBenefit = (index) => {
+    setBenefits((prevBenefits) => ({
+      ...prevBenefits,
+      custom: prevBenefits.custom.filter((_, i) => i !== index),
+    }));
   };
 
   const handleResetBenefits = () => {
@@ -125,6 +152,7 @@ export default function PlayerClassCard({
         ritualism: classItem.benefits.rituals?.ritualism || false,
       },
       martials: classItem.benefits.martials || {},
+      custom: classItem.benefits.custom || [],
     });
   };
 
@@ -136,7 +164,7 @@ export default function PlayerClassCard({
         editSkillIndex,
         skillName,
         maxLevel,
-        description // Pass the adjusted current level here
+        description
       );
     } else {
       // Add new skill
@@ -275,6 +303,12 @@ export default function PlayerClassCard({
                         </Typography>
                       </li>
                     )}
+                    {classItem.benefits.custom &&
+                      classItem.benefits.custom.map((custombenefit, index) => (
+                        <li key={index}>
+                          <Typography>{custombenefit}</Typography>
+                        </li>
+                      ))}
                   </>
                 )}
               </ul>
@@ -375,7 +409,10 @@ export default function PlayerClassCard({
         onBenefitChange={handleBenefitChange}
         onRitualChange={handleRitualChange}
         onMartialChange={handleMartialChange}
+        onCustomBenefitChange={handleCustomBenefitChange}
         onSaveBenefits={handleSaveBenefits}
+        onAddCustomBenefit={handleAddCustomBenefit}
+        onRemoveCustomBenefit={handleRemoveCustomBenefit}
         t={t}
       />
     </Paper>

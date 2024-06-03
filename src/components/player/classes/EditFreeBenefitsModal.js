@@ -1,5 +1,19 @@
 import React from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Checkbox, FormGroup, FormControlLabel, Grid, TextField, Button, Typography } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
 
 export default function EditFreeBenefitsModal({
   open,
@@ -8,7 +22,10 @@ export default function EditFreeBenefitsModal({
   onBenefitChange,
   onRitualChange,
   onMartialChange,
+  onCustomBenefitChange,
   onSaveBenefits,
+  onAddCustomBenefit,
+  onRemoveCustomBenefit,
   t,
 }) {
   return (
@@ -82,9 +99,7 @@ export default function EditFreeBenefitsModal({
                 control={
                   <Checkbox
                     checked={benefits.martials.melee}
-                    onChange={(e) =>
-                      onMartialChange("melee", e.target.checked)
-                    }
+                    onChange={(e) => onMartialChange("melee", e.target.checked)}
                   />
                 }
                 label={
@@ -139,9 +154,7 @@ export default function EditFreeBenefitsModal({
                 control={
                   <Checkbox
                     checked={benefits.martials.armor}
-                    onChange={(e) =>
-                      onMartialChange("armor", e.target.checked)
-                    }
+                    onChange={(e) => onMartialChange("armor", e.target.checked)}
                   />
                 }
                 label={
@@ -153,8 +166,45 @@ export default function EditFreeBenefitsModal({
             </FormGroup>
           </Grid>
         </Grid>
+        {benefits.custom.length > 0 && (
+          <>
+            <Grid
+              item
+              xs={12}
+              sx={{ marginTop: "20px", fontWeight: "bold", fontSize: "1.2rem" }}
+            >
+              {t("Custom Benefits")}
+            </Grid>
+            {benefits.custom.map((custombenefit, index) => (
+              <Grid container sx={{ marginTop: "10px" }} key={index}>
+                <Grid item xs={2} sm={1}>
+                  <IconButton onClick={() => onRemoveCustomBenefit(index)}>
+                    <Delete />
+                  </IconButton>
+                </Grid>
+                <Grid item xs={10} sx={11}>
+                  <TextField
+                    sx={{ width: "100%" }}
+                    label={t("Custom Benefit") + " " + (index + 1)}
+                    value={custombenefit}
+                    onChange={(e) =>
+                      onCustomBenefitChange(index, e.target.value)
+                    }
+                  />
+                </Grid>
+              </Grid>
+            ))}
+          </>
+        )}
       </DialogContent>
       <DialogActions>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onAddCustomBenefit}
+        >
+          {t("Add Custom Benefit")}
+        </Button>
         <Button variant="contained" color="secondary" onClick={onSaveBenefits}>
           {t("Save Changes")}
         </Button>
