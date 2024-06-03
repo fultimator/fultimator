@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Paper,
@@ -59,8 +59,29 @@ export default function PlayerClassCard({
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
+  const [warnings, setWarnings] = useState([]);
 
   const [className, setClassName] = useState(classItem.name);
+
+  useEffect(() => {
+    setWarnings([]);
+    checkWarnings();
+  }, [classItem]);
+
+  const checkWarnings = () => {
+    const warnings = [];
+
+    const sumOfSkillLevels = classItem.skills.reduce(
+      (acc, skill) => acc + skill.currentLvl,
+      0
+    );
+    if (sumOfSkillLevels !== classItem.lvl) {
+      warnings.push(
+        t("The sum of the skill levels is different from the class level")
+      );
+      setWarnings(warnings);
+    }
+  };
 
   const handleOpenEditClassNameModal = () => {
     setOpenEditClassNameModal(true);
@@ -243,6 +264,13 @@ export default function PlayerClassCard({
             editClassName={() => handleOpenEditClassNameModal()}
           />
         </Grid>
+        {warnings.map((warning, index) => (
+          <Grid item xs={12} key={index}>
+            <Typography color="error" variant="body1">
+              {warning}
+            </Typography>
+          </Grid>
+        ))}
         {classItem.benefits && (
           <>
             <Grid item xs={12}>
