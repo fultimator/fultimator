@@ -5,7 +5,7 @@ import {
   Grid,
   Typography,
   Button,
-  TextField,
+  Box,
   Divider,
   Dialog,
   DialogTitle,
@@ -26,6 +26,8 @@ import CustomHeader3 from "../../common/CustomHeader3";
 import EditClassNameModal from "./EditClassNameModal";
 import AddSkillModal from "./AddSkillModal";
 import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
+import EditSpellClassesModal from "./EditSpellClassesModal";
+import spellClasses from "../../../libs/spellClasses";
 
 export default function PlayerClassCard({
   classItem,
@@ -51,6 +53,8 @@ export default function PlayerClassCard({
   const [openAddSkillModal, setOpenAddSkillModal] = useState(false);
   const [openEditBenefitsModal, setOpenEditBenefitsModal] = useState(false);
   const [openEditClassNameModal, setOpenEditClassNameModal] = useState(false);
+  const [openEditSpellClassesModal, setOpenEditSpellClassesModal] =
+    useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
@@ -82,6 +86,7 @@ export default function PlayerClassCard({
     },
     martials: classItem.benefits.martials || {},
     custom: classItem.benefits.custom || [],
+    spellClasses: classItem.benefits.spellClasses || [],
   });
 
   // Update the state when changes are made in the modal
@@ -153,7 +158,26 @@ export default function PlayerClassCard({
       },
       martials: classItem.benefits.martials || {},
       custom: classItem.benefits.custom || [],
+      spellClasses: classItem.benefits.spellClasses || [],
     });
+  };
+
+  const handleSpellClassChange = (spellClassName, isSelected) => {
+    setBenefits((prevBenefits) => {
+      const updatedSpellClasses = isSelected
+        ? [...prevBenefits.spellClasses, spellClassName]
+        : prevBenefits.spellClasses.filter((name) => name !== spellClassName);
+
+      return {
+        ...prevBenefits,
+        spellClasses: updatedSpellClasses,
+      };
+    });
+  };
+
+  const handleSaveSpellClasses = () => {
+    onSaveBenefits(benefits);
+    setOpenEditSpellClassesModal(false);
   };
 
   const handleAddSkill = () => {
@@ -350,25 +374,39 @@ export default function PlayerClassCard({
               </Typography>
             </Grid>
           ))}
-        {isEditMode ? (
-          <Grid item xs={12}>
+        <Grid item xs={12}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
             <Button
               variant="contained"
-              color="error"
-              onClick={() => {
-                const confirmed = window.confirm(
-                  t("Are you sure you want to remove the class?")
-                );
-                if (confirmed) {
-                  onRemove();
-                }
-              }}
+              color="secondary"
               sx={{ marginTop: "30px" }}
+              onClick={() => setOpenEditSpellClassesModal(true)}
             >
-              {t("Remove Class")}
+              {t("Edit Class Spell Types")}
             </Button>
-          </Grid>
-        ) : null}
+            {isEditMode && (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => {
+                  const confirmed = window.confirm(
+                    t("Are you sure you want to remove the class?")
+                  );
+                  if (confirmed) {
+                    onRemove();
+                  }
+                }}
+                sx={{ marginTop: "30px" }}
+              >
+                {t("Remove Class")}
+              </Button>
+            )}
+          </Box>
+        </Grid>
       </Grid>
       {/* Edit Class Name Modal */}
       <EditClassNameModal
@@ -414,6 +452,17 @@ export default function PlayerClassCard({
         onAddCustomBenefit={handleAddCustomBenefit}
         onRemoveCustomBenefit={handleRemoveCustomBenefit}
         t={t}
+      />
+      {/* Edit Class Spell Types Modal */}
+      <EditSpellClassesModal
+        open={openEditSpellClassesModal}
+        onClose={() => {
+          setOpenEditSpellClassesModal(false);
+        }}
+        onSave={handleSaveSpellClasses}
+        onSpellClassChange={handleSpellClassChange}
+        spellClassesList={spellClasses}
+        selectedSpellClasses={benefits.spellClasses}
       />
     </Paper>
   );

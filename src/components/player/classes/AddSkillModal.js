@@ -6,7 +6,11 @@ import {
   DialogActions,
   Button,
   TextField,
-  Grid
+  Grid,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
@@ -69,6 +73,89 @@ export default function AddSkillModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </Grid>
+          <Grid item xs={12} sx={{marginTop: "20px"}}>
+            <Typography variant="h4">
+              {t("Skill Special Effects")}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      //checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL × 2】 Magic Check Bonus")}
+                />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL × 3】 maximum Hit Points")}
+                />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      //checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL × 3】 maximum Mind Points")}
+                />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      //checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL】 Defense Bonus")}
+                />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      //checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL】 Accuracy Check Bonus with ranged weapons")}
+                />
+            </FormGroup>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+              <FormGroup>
+                <FormControlLabel
+                control={
+                    <Checkbox
+                      //checked={true}
+                      color="primary"
+                    />
+                  }
+                  label={t("Plus【SL】 Accuracy Check Bonus with melee weapons")}
+                />
+            </FormGroup>
           </Grid>
         </Grid>
       </DialogContent>
