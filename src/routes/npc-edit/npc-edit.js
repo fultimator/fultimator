@@ -123,6 +123,15 @@ export default function NpcEdit() {
     };
   }, [handleCtrlS]);
 
+  useEffect(() => {
+    // Change page title with npc name
+    const originalTitle = document.title;
+    document.title = npc?.name;
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [npc?.name]);
+
   // Download image hook and reference
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
@@ -345,8 +354,8 @@ export default function NpcEdit() {
                     npcTemp.published
                       ? t("This NPC is part of the Adversary Compendium.")
                       : t(
-                          "Help the Adversary Compendium grow by publishing your finished work!"
-                        )
+                        "Help the Adversary Compendium grow by publishing your finished work!"
+                      )
                   }
                   fullWidth
                   value={npcTemp.createdBy}
