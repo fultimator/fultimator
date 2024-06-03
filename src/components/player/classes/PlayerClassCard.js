@@ -23,6 +23,7 @@ import CustomHeader from "../../common/CustomHeader";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader2 from "../../common/CustomHeader2";
 import CustomHeader3 from "../../common/CustomHeader3";
+import EditClassNameModal from "./EditClassNameModal";
 
 export default function PlayerClassCard({
   classItem,
@@ -322,36 +323,13 @@ export default function PlayerClassCard({
         ) : null}
       </Grid>
       {/* Edit Class Name Modal */}
-      <Dialog
+      <EditClassNameModal
         open={openEditClassNameModal}
         onClose={handleCloseEditClassNameModal}
-        PaperProps={{
-          sx: {
-            width: "80%", // Adjust width as needed
-            maxWidth: "lg", // Adjust maximum width as needed
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>{t("Edit Class Name")}</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label={t("Class Name")}
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            sx={{ marginTop: "10px" }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleSaveClassName}
-          >
-            {t("Save Changes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onSave={handleSaveClassName}
+        className={className}
+        setClassName={setClassName}
+      />
       {/* Add Skill Modal */}
       <Dialog
         open={openAddSkillModal}

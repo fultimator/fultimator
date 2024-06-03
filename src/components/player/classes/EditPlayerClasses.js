@@ -103,7 +103,7 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
-  const editClassName = (index, newClassName) => { 
+  const editClassName = (index, newClassName) => {
     const updatedPlayer = {
       ...player,
       classes: player.classes.map((cls, i) => {
@@ -148,7 +148,7 @@ export default function EditPlayerClasses({
   const handleAddSkill = (className, skillName, maxLevel, description) => {
     const updatedPlayer = {
       ...player,
-      classes: player.classes.map(cls => {
+      classes: player.classes.map((cls) => {
         if (cls.name === className) {
           return {
             ...cls,
@@ -299,7 +299,7 @@ export default function EditPlayerClasses({
                   </Typography>
                 </Grid>
               ))}
-              <Grid item xs={12} sm={5}>
+              <Grid item xs={12} sm={4}>
                 <Autocomplete
                   id="book-select"
                   options={Object.values(classList)
@@ -328,7 +328,7 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={5}>
+              <Grid item xs={12} sm={7}>
                 <Autocomplete
                   id="class-select"
                   options={filteredClasses
@@ -351,8 +351,12 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
-                <Button variant="contained" onClick={handleAddClass}>
+              <Grid item xs={12} sm={1}>
+                <Button
+                  variant="contained"
+                  onClick={handleAddClass}
+                  sx={{ width: "100%", height: "100%" }}
+                >
                   {t("Add")}
                 </Button>
               </Grid>
@@ -381,7 +385,9 @@ export default function EditPlayerClasses({
                 handleDecreaseSkillLevel(index, skillIndex)
               }
               isEditMode={isEditMode}
-              editClassName={(newClassName) => editClassName(index, newClassName)}
+              editClassName={(newClassName) =>
+                editClassName(index, newClassName)
+              }
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
