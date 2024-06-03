@@ -29,6 +29,13 @@ export default function AddSkillModal({
   onDeleteSkill,
 }) {
   const { t } = useTranslate();
+  
+  const handleMaxLevelChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (value >= 1 && value <= 10) {
+      setMaxLevel(value);
+    }
+  };
 
   return (
     <Dialog
@@ -63,7 +70,7 @@ export default function AddSkillModal({
               }}
               fullWidth
               value={maxLevel}
-              onChange={(e) => setMaxLevel(e.target.value)}
+              onChange={handleMaxLevelChange}
             />
           </Grid>
           <Grid item xs={12}>
