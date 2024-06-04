@@ -262,6 +262,7 @@ function Personal({ user }) {
                     </InputAdornment>
                   ),
                 }}
+                inputProps={{maxLength: 50}}
               />
             </Grid>
             <Grid

@@ -23,7 +23,7 @@ import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import { ReactComponent as ZenitIcon } from "../../zenit.svg";
 import { ReactComponent as ExpIcon } from "../../exp.svg";
-import {ReactComponent as FabulaIcon} from "../../fabula.svg";
+import { ReactComponent as FabulaIcon } from "../../fabula.svg";
 
 export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -33,6 +33,7 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
+  const [isImageTooLarge, setIsImageTooLarge] = React.useState(false);
 
   const onChange = (key) => {
     return (e) => {
@@ -45,13 +46,35 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
   };
 
   const onChangeInfo = (key) => {
-    return (e) => {
+    return (value) => {
       setPlayer((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.info[key] = e.target.value;
+        newState.info[key] = value;
         return newState;
       });
     };
+  };
+
+  const checkImageSize = async (imageUrl) => {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      const blob = await response.blob();
+      if (
+        blob.size >
+        5 * 1024 * 1024 // 5MB
+      ) {
+        setIsImageTooLarge(true);
+        return false;
+      } else {
+        setIsImageTooLarge(false);
+        return true;
+      }
+    } catch (error) {
+      console.error("Error checking image size:", error);
+    }
   };
 
   return (
@@ -82,7 +105,8 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               InputProps={{
                 readOnly: !isEditMode,
               }}
-            ></TextField>
+              inputProps={{ maxLength: 50 }} // Set the maximum length to 50 characters
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -91,11 +115,12 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               id="pronouns"
               label={t("Pronouns") + ":"}
               value={player.info.pronouns}
-              onChange={onChangeInfo("pronouns")}
+              onChange={(e) => onChangeInfo("pronouns")(e.target.value)}
               InputProps={{
                 readOnly: !isEditMode,
               }}
-            ></TextField>
+              inputProps={{ maxLength: 15 }}
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -111,8 +136,10 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               id="description"
               label={t("Description") + ":"}
               value={player.info.description}
-              onChange={onChangeInfo("description")}
+              onChange={(e) => onChangeInfo("description")(e.target.value)}
               readOnly={!isEditMode}
+              maxRows={10}
+              maxLength={5000}
             />
           </FormControl>
         </Grid>
@@ -121,8 +148,27 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
             <TextField
               id="fabulapoints"
               label={t("Fabula Points") + ":"}
-              value={player.info.fabulapoints}
-              onChange={onChangeInfo("fabulapoints")}
+              value={player.info.fabulapoints.toString()}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (
+                  value === "" ||
+                  (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
+                ) {
+                  onChangeInfo("fabulapoints")(
+                    value === "" ? 0 : parseInt(value, 10)
+                  );
+                }
+              }}
+              onBlur={(e) => {
+                let value = parseInt(e.target.value, 10);
+                if (isNaN(value) || value < 0) {
+                  value = 0;
+                } else if (value > 9999) {
+                  value = 9999;
+                }
+                onChangeInfo("fabulapoints")(value);
+              }}
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
@@ -134,7 +180,7 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
                   </InputAdornment>
                 ),
               }}
-            ></TextField>
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -142,8 +188,20 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
             <TextField
               id="exp"
               label={t("Exp") + ":"}
-              value={player.info.exp}
-              onChange={onChangeInfo("exp")}
+              value={player.info.exp.toString()}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)) {
+                  onChangeInfo("exp")(value === "" ? 0 : parseInt(value, 10));
+                }
+              }}
+              onBlur={(e) => {
+                let value = parseInt(e.target.value, 10);
+                if (isNaN(value) || value < 0) {
+                  value = 0;
+                }
+                onChangeInfo("exp")(value);
+              }}
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
@@ -155,7 +213,7 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
                   </InputAdornment>
                 ),
               }}
-            ></TextField>
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -163,8 +221,13 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
             <TextField
               id="zenit"
               label={t("Zenit") + ":"}
-              value={player.info.zenit}
-              onChange={onChangeInfo("zenit")}
+              value={player.info.zenit.toString()}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || (/^\d+$/.test(value) && +value >= 0 && +value <= 99999999)) {
+                  onChangeInfo("zenit")(value === "" ? 0 : parseInt(value, 10));
+                }
+              }}
               type="number"
               InputProps={{
                 readOnly: !isEditMode,
@@ -190,16 +253,26 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
                   setImgUrlTemp(e.target.value);
                 }}
                 fullWidth
-              ></TextField>
+                error={imgUrlTemp.length > 0 && isImageTooLarge}
+                helperText={
+                  isImageTooLarge ? "Image must be smaller than 5 MB" : null
+                }
+              />
             </Grid>
             <Grid item xs={6} sm={2}>
               <Button
                 variant="contained"
                 onClick={() => {
-                  setPlayer((prevState) => {
-                    const newState = { ...prevState };
-                    newState.info.imgurl = imgUrlTemp;
-                    return newState;
+                  checkImageSize(imgUrlTemp).then((result) => {
+                    if (result) {
+                      setPlayer((prevState) => {
+                        const newState = { ...prevState };
+                        newState.info.imgurl = imgUrlTemp;
+                        return newState;
+                      });
+                    } else {
+                      console.log("Image too large");
+                    }
                   });
                 }}
                 sx={{ height: "56px", width: "100%" }}
@@ -211,6 +284,8 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               <Button
                 variant="outlined"
                 onClick={() => {
+                  setImgUrlTemp("");
+                  setIsImageTooLarge(false);
                   setPlayer((prevState) => {
                     const newState = { ...prevState };
                     newState.info.imgurl = null;

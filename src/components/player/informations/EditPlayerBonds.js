@@ -167,6 +167,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                     InputProps={{
                       readOnly: !isEditMode,
                     }}
+                    inputProps={{ maxLength: 50 }}
                   />
                 </Box>
               </Grid>

@@ -45,6 +45,7 @@ export default function EditClassNameModal({
           value={className}
           onChange={(e) => setClassName(e.target.value)}
           sx={{ marginTop: "10px" }}
+          inputProps={{ maxLength: 50 }}
         />
       </DialogContent>
       <DialogActions>

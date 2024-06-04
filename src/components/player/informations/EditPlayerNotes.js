@@ -104,6 +104,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
                 label={t("Note Name") + ":"}
                 value={note.name}
                 onChange={handleNoteNameChange(index)}
+                inputProps={{ maxLength: 50 }}
               />
             </Grid>
             <Grid item xs={12} sm={12}>
@@ -112,6 +113,8 @@ export default function EditPlayerNotes({ player, setPlayer }) {
                 label={t("Description") + ":"}
                 value={note.description}
                 onChange={handleNoteDescriptionChange(index)}
+                maxLength={5000}
+                maxRows={10}
               />
             </Grid>
             {index !== player.notes.length - 1 && (

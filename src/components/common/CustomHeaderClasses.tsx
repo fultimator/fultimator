@@ -86,8 +86,26 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
                 backgroundColor: "white",
               },
             }}
-            value={editableNumber}
-            onChange={(e) => onLevelChange(parseInt(e.target.value))}
+            value={editableNumber.toString()} // Ensure the value is a string
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow empty input for user convenience
+              if (
+                value === "" ||
+                (/^\d+$/.test(value) && +value >= 1 && +value <= 10)
+              ) {
+                onLevelChange(value === "" ? 0 : parseInt(value, 10)); // Assuming 0 as the default value for empty input
+              }
+            }}
+            onBlur={(e) => {
+              let value = parseInt(e.target.value, 10);
+              if (isNaN(value) || value < 1) {
+                value = 1;
+              } else if (value > 10) {
+                value = 10;
+              }
+              onLevelChange(value);
+            }}
             variant="outlined"
             size="small"
             sx={{

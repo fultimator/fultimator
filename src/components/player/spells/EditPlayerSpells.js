@@ -63,7 +63,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               borderColor: secondary,
             }}
           >
-            <Grid container >
+            <Grid container>
               <Grid item xs={12}>
                 <CustomHeader type="top" headerText={t("Spells")} />
               </Grid>
@@ -148,6 +148,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   label={t("Spell Name")}
                   variant="outlined"
                   fullWidth
+                  inputProps={{ maxLength: 50 }}
                 />
               </Grid>
               <Grid item xs={12} sm={1}>
@@ -188,10 +189,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   label={t("Target Description")}
                   variant="outlined"
                   fullWidth
+                  inputProps={{ maxLength: 100 }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label={t("Duration")} variant="outlined" fullWidth />
+                <TextField
+                  label={t("Duration")}
+                  variant="outlined"
+                  fullWidth
+                  inputProps={{ maxLength: 100 }}
+                />
               </Grid>
               {isOffensiveSpell ? (
                 <>
@@ -241,16 +248,24 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   label={t("Arcana Name")}
                   variant="outlined"
                   fullWidth
+                  inputProps={{ maxLength: 50 }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField label={t("Domain")} variant="outlined" fullWidth />
+                <TextField
+                  label={t("Domain")}
+                  variant="outlined"
+                  fullWidth
+                  inputProps={{ maxLength: 50 }}
+                />
               </Grid>
               <Grid item xs={12} sm={12}>
                 <TextField
                   label={t("Description")}
                   variant="outlined"
                   fullWidth
+                  maxRows={10}
+                  maxLength={1000}
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
@@ -258,10 +273,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   label={t("Merge Name")}
                   variant="outlined"
                   fullWidth
+                  inputProps={{ maxLength: 50 }}
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
-                <CustomTextarea label={t("Merge Benefit")} fullWidth />
+                <CustomTextarea
+                  label={t("Merge Benefit")}
+                  fullWidth
+                  maxRows={10}
+                  maxLength={1000}
+                />
               </Grid>
               {isReworkArcanist && (
                 <>
@@ -270,10 +291,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       label={t("Pulse Name")}
                       variant="outlined"
                       fullWidth
+                      inputProps={{ maxLength: 50 }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={12}>
-                    <CustomTextarea label={t("Pulse Benefit")} fullWidth />
+                    <CustomTextarea
+                      label={t("Pulse Benefit")}
+                      fullWidth
+                      maxRows={10}
+                      maxLength={1000}
+                    />
                   </Grid>
                 </>
               )}
@@ -282,10 +309,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   label={t("Dismiss Name")}
                   variant="outlined"
                   fullWidth
+                  inputProps={{ maxLength: 50 }}
                 />
               </Grid>
               <Grid item xs={12} sm={12}>
-                <CustomTextarea label={t("Dismiss Benefit")} fullWidth />
+                <CustomTextarea
+                  label={t("Dismiss Benefit")}
+                  fullWidth
+                  maxRows={10}
+                  maxLength={1000}
+                />
               </Grid>
               <Grid item xs={12} sm={12}>
                 <Checkbox

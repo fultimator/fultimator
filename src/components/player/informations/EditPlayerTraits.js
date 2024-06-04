@@ -57,9 +57,14 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
       return newState;
     });
   };
-
+  
   const handleThemeInputChange = (event, newInputValue) => {
     setInputTheme(newInputValue);
+    setPlayer((prevState) => {
+      const newState = { ...prevState };
+      newState.info.theme = newInputValue;
+      return newState;
+    });
   };
 
   return (
@@ -86,6 +91,7 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
               InputProps={{
                 readOnly: !isEditMode,
               }}
+              inputProps={{ maxLength: 300 }}
             />
           </FormControl>
         </Grid>
@@ -103,6 +109,7 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                 {...params}
                 label={t("Theme") + ":"}
                 fullWidth
+                inputProps={{ ...params.inputProps, maxLength: 50 }}
               />
             )}
           />
@@ -117,6 +124,7 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
               InputProps={{
                 readOnly: !isEditMode,
               }}
+              inputProps={{ maxLength: 50 }}
             />
           </FormControl>
         </Grid>

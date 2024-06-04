@@ -190,6 +190,7 @@ export default function EditFreeBenefitsModal({
                     onChange={(e) =>
                       onCustomBenefitChange(index, e.target.value)
                     }
+                    inputProps={{ maxLength: 1000 }}
                   />
                 </Grid>
               </Grid>

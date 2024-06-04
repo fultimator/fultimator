@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextareaAutosize, useTheme, Button } from '@mui/material';
+import { max } from 'date-fns';
 
 interface CustomTextareaProps {
   label: string;
@@ -10,7 +11,9 @@ interface CustomTextareaProps {
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onMouseOver?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
   onMouseOut?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
-  readOnly?: boolean; // Add readOnly to the props
+  readOnly?: boolean;
+  maxRows?: number;
+  maxLength?: number;
 }
 
 const CustomTextarea: React.FC<CustomTextareaProps> = ({
@@ -22,7 +25,9 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onBlur,
   onMouseOver,
   onMouseOut,
-  readOnly = false, // Default value is false
+  readOnly = false, 
+  maxRows,
+  maxLength,
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -162,6 +167,8 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
         onMouseOut={handleMouseOut}
         readOnly={readOnly} // Add readOnly here
         style={textareaStyle}
+        maxRows={maxRows}
+        maxLength={maxLength}
       />
       <label style={labelStyle}>{label}</label>
       <div style={helperStyle}>
