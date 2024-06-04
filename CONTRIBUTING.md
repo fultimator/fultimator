@@ -39,7 +39,6 @@ Fultimator uses [React](https://react.dev/) for building dynamic user interfaces
 
 - **main:** The mainline branch intended for deployment to Firebase.
 - **dev:** The primary development branch for most features.
-- **mobile:** A development branch specifically for mobile-related features.
 
 When opening a pull request (PR), ensure it goes into the most relevant branch.
 
