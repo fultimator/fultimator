@@ -8,7 +8,8 @@ export const testUsers =
     "8qZG7p3fpTcJrnIiAxlWn4UGDY03",
     "xS120kBfEPfCvjsJlskzdUunnVi1",
     "AGTQJZq98feuyTKwjTeeA7luhlo1",
-    "F4imSnwKmMblDkt6Qcg4aRyEMd12"
+    "F4imSnwKmMblDkt6Qcg4aRyEMd12",
+    "zpWqAgN3mwdIDE2WZad7EwbaXoz2"
 ];
 
 export const moderators =
