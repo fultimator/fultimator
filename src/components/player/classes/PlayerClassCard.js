@@ -27,7 +27,9 @@ import EditClassNameModal from "./EditClassNameModal";
 import AddSkillModal from "./AddSkillModal";
 import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
+import EditHeroicSkillModal from "./EditHeroicSkillModal";
 import spellClasses from "../../../libs/spellClasses";
+import { set } from "date-fns";
 
 export default function PlayerClassCard({
   classItem,
@@ -41,6 +43,7 @@ export default function PlayerClassCard({
   onDecreaseSkillLevel,
   isEditMode,
   editClassName,
+  editHeroic,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -55,11 +58,18 @@ export default function PlayerClassCard({
   const [openEditClassNameModal, setOpenEditClassNameModal] = useState(false);
   const [openEditSpellClassesModal, setOpenEditSpellClassesModal] =
     useState(false);
+  const [openEditHeroicSkillModal, setOpenEditHeroicSkillModal] =
+    useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
   const [warnings, setWarnings] = useState([]);
+
+  const [heroic, setHeroic] = useState({
+    name: classItem.heroic ? classItem.heroic.name : "",
+    description: classItem.heroic ? classItem.heroic.description : "",
+  });
 
   const [className, setClassName] = useState(classItem.name);
 
@@ -241,6 +251,16 @@ export default function PlayerClassCard({
     setDescription("");
   };
 
+  const handleEditHeroicSkill = () => {
+    setOpenEditHeroicSkillModal(true);
+    setHeroic(heroic);
+  };
+
+  const handleSaveHeroicSkill = () => {
+    editHeroic(heroic);
+    setOpenEditHeroicSkillModal(false);
+  };
+
   return (
     <Paper
       elevation={3}
@@ -404,6 +424,41 @@ export default function PlayerClassCard({
               </Typography>
             </Grid>
           ))}
+        {classItem.lvl == 10 && (
+          <>
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomHeader2
+                headerText={t("Heroic Skill")}
+                //buttonText={t("Edit Benefits")}
+                //onButtonClick={() => setOpenEditBenefitsModal(true)}
+                isEditMode={false}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomHeader3
+                headerText={classItem.heroic.name}
+                currentLvl={0}
+                maxLvl={0}
+                onIncrease={() => {}}
+                onDecrease={() => {}}
+                onEdit={() => handleEditHeroicSkill()}
+                isEditMode={isEditMode}
+                isHeroicSkill={true}
+              />
+              <Typography variant="body1">
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                >
+                  {classItem.heroic.description}
+                </StyledMarkdown>
+              </Typography>
+            </Grid>
+          </>
+        )}
         {isEditMode && (
           <Grid item xs={12}>
             <Box
@@ -494,6 +549,14 @@ export default function PlayerClassCard({
         onSpellClassChange={handleSpellClassChange}
         spellClassesList={spellClasses}
         selectedSpellClasses={benefits.spellClasses}
+      />
+      {/* Edit Heroic Skill Modal */}
+      <EditHeroicSkillModal
+        open={openEditHeroicSkillModal}
+        onClose={() => setOpenEditHeroicSkillModal(false)}
+        onSave={handleSaveHeroicSkill}
+        heroic={heroic}
+        setHeroic={setHeroic}
       />
     </Paper>
   );

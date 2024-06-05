@@ -50,6 +50,7 @@ interface CustomHeader3Props {
   onDecrease: () => void;
   onEdit: () => void;
   isEditMode: boolean;
+  isHeroicSkill: boolean;
 }
 
 const CustomHeader3: React.FC<CustomHeader3Props> = ({
@@ -60,6 +61,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   onDecrease,
   onEdit,
   isEditMode,
+  isHeroicSkill,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
   const { t } = useTranslate();
@@ -116,7 +118,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
             )}
           </>
         )}
-        {isEditMode && (
+        {isEditMode && !isHeroicSkill && (
           <>
             <IconButton
               size="small"
@@ -132,6 +134,13 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
             >
               <Add style={{ color: "white" }} />
             </IconButton>
+            <IconButton size="small" onClick={onEdit}>
+              <Edit style={{ color: "white" }} />
+            </IconButton>
+          </>
+        )}
+        {isHeroicSkill && (
+          <>
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: "white" }} />
             </IconButton>

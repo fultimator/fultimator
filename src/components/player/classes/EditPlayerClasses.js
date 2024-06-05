@@ -83,7 +83,10 @@ export default function EditPlayerClasses({
         lvl: 1,
         benefits: selectedClass.benefits,
         skills: [],
-        heroic: null,
+        heroic: {
+          name: "",
+          description: "",
+        },
         spells: [],
       });
 
@@ -126,6 +129,13 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
+
+    if (newLevel == 10 && !updatedPlayer.classes[index].heroic) {
+      updatedPlayer.classes[index].heroic = {
+        name: "",
+        description: "",
+      };
+    }
 
     setPlayer(updatedPlayer);
     updateMaxStats();
@@ -266,6 +276,20 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
+  const editHeroic = (index, newHeroic) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === index) {
+          return { ...cls, heroic: newHeroic };
+        }
+        return cls;
+      }),
+    };
+
+    setPlayer(updatedPlayer);
+  };
+
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -404,6 +428,7 @@ export default function EditPlayerClasses({
               editClassName={(newClassName) =>
                 editClassName(index, newClassName)
               }
+              editHeroic={(heroic) => editHeroic(index, heroic)}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
