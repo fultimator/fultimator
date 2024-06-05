@@ -77,9 +77,8 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             {rightHeaderText}
           </div>
           <TextField
-            type="number"
             InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: !isEditMode },
+              inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
               style: {
                 fontFamily: "inherit",
                 fontSize: "inherit",
@@ -117,9 +116,8 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           />
           {" / "}
           <TextField
-            type="number"
             InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: true },
+              inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
               style: {
                 fontFamily: "inherit",
                 fontSize: "inherit",
