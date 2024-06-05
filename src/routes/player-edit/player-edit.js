@@ -37,6 +37,8 @@ import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
+import PlayerInfo from "../../components/player/playerSheet/PlayerInfo";
+import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
@@ -68,6 +70,7 @@ export default function PlayerEdit() {
   const [playerTemp, setPlayerTemp] = useState(player);
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [battleMode, setBattleMode] = useState(false);
 
   // Effect to update temporary Player state when Player data changes
   useEffect(() => {
@@ -279,11 +282,17 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          {isOwner ? (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
-            </>
+          <Divider sx={{ my: 1 }} />
+          <BattleModeToggle
+            battleMode={battleMode}
+            setBattleMode={setBattleMode}
+          />
+          <Divider sx={{ my: 1 }} />
+          {!battleMode && (
+            <PlayerInfo player={playerTemp} isEditMode={isOwner} />
+          )}
+          {isOwner && battleMode ? (
+            <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
           ) : null}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
