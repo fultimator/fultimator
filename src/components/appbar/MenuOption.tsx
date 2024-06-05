@@ -29,6 +29,7 @@ import { signInWithPopup } from "@firebase/auth";
 
 import ThemeSwitcher, { ThemeSwitcherProps } from "./ThemeSwitcher";
 import LanguageMenu from "./LanguageMenu";
+import HelpFeedbackDialog from "./HelpFeedbackDialog"; // Import the dialog component
 
 interface MenuOptionProps extends ThemeSwitcherProps {}
 
@@ -41,11 +42,22 @@ const MenuOption: React.FC<MenuOptionProps> = ({
   const [message, setMessage] = useState<string | null>(null);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
+  const [userEmail, setUserEmail] = useState("");
+  const [userUUID, setUserUUID] = useState("");
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuthenticated(!!user);
+      if (user) {
+        setIsAuthenticated(true);
+        setUserEmail(user.email || "");
+        setUserUUID(user.uid);
+      } else {
+        setIsAuthenticated(false);
+        setUserEmail("");
+        setUserUUID("");
+      }
     });
 
     return () => unsubscribe();
@@ -57,6 +69,15 @@ const MenuOption: React.FC<MenuOptionProps> = ({
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDialogOpen = () => {
+    setIsDialogOpen(true);
+    handleClose();
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
   };
 
   const handleSnackbarClose = () => {
@@ -143,18 +164,6 @@ const MenuOption: React.FC<MenuOptionProps> = ({
           horizontal: "right",
         }}
       >
-        {/* User Info */}
-        {/* {[
-          <MenuItem key="user-info">
-            <ListItemIcon>
-              <AccountCircle />
-            </ListItemIcon>
-            <ListItemText primary={t("Username")} />
-          </MenuItem>,
-          <Divider key="user-info-divider" />,
-        ]} */}
-
-        {/* Switch Account */}
         <MenuItem onClick={handleSwitchAccount}>
           <ListItemIcon>
             <SwitchAccount />
@@ -162,7 +171,6 @@ const MenuOption: React.FC<MenuOptionProps> = ({
           <ListItemText primary={t("Switch Account")} />
         </MenuItem>
 
-        {/* Sign Out/Sign In */}
         {isAuthenticated ? (
           <MenuItem onClick={handleSignOut}>
             <ListItemIcon>
@@ -180,24 +188,17 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         )}
         <Divider key="sign-in-out-divider" />
 
-        {/* ThemeSwitcher */}
-        {[
-          <ThemeSwitcher
-            key="theme-switcher"
-            selectedTheme={selectedTheme}
-            onSelectTheme={onSelectTheme}
-          />,
-          <Divider key="theme-switcher-divider" />,
-        ]}
+        <ThemeSwitcher
+          key="theme-switcher"
+          selectedTheme={selectedTheme}
+          onSelectTheme={onSelectTheme}
+        />
+        <Divider key="theme-switcher-divider" />
 
-        {/* LanguageMenu */}
-        {[
-          <LanguageMenu key="language-menu" />,
-          <Divider key="language-menu-divider" />,
-        ]}
+        <LanguageMenu key="language-menu" />
+        <Divider key="language-menu-divider" />
 
-        {/* Help & Feedback */}
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleDialogOpen}> {/* Open the dialog */}
           <ListItemIcon>
             <Help />
           </ListItemIcon>
@@ -212,6 +213,13 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         onClose={handleSnackbarClose}
         message={message}
       />
+
+      <HelpFeedbackDialog 
+        open={isDialogOpen} 
+        onClose={handleDialogClose} 
+        userEmail={userEmail}
+        userUUID={userUUID}
+      /> {/* Render the dialog */}
     </>
   );
 };
