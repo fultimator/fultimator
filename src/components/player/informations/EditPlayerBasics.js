@@ -288,7 +288,7 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
                   setIsImageTooLarge(false);
                   setPlayer((prevState) => {
                     const newState = { ...prevState };
-                    newState.info.imgurl = null;
+                    newState.info.imgurl = "";
                     return newState;
                   });
                 }}
