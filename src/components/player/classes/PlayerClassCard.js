@@ -397,6 +397,7 @@ export default function PlayerClassCard({
               headerText={t("Skills")}
               buttonText={t("Add Skill")}
               onButtonClick={() => setOpenAddSkillModal(true)}
+              isEditMode={isEditMode}
             />
           ) : (
             <CustomHeader2 headerText={t("Skills")} />
@@ -413,6 +414,7 @@ export default function PlayerClassCard({
                 onDecrease={() => onDecreaseSkillLevel(index)}
                 onEdit={() => handleEditSkill(index)}
                 isEditMode={isEditMode}
+                isHeroicSkill={false}
               />
               <Typography variant="body1">
                 <StyledMarkdown

@@ -32,7 +32,7 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({ headerText, buttonText, on
       <Typography variant="h2">
         {headerText}
       </Typography>
-      {isEditMode && buttonText && onButtonClick && (
+      {isEditMode && (buttonText && onButtonClick) && (
         <Button variant="outlined" onClick={onButtonClick} sx={{height: "30px"}}>
           {buttonText}
         </Button>
