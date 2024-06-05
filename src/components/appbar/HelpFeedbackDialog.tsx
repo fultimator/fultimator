@@ -37,7 +37,15 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   }, [cooldown]);
 
   const handleSubmit = async () => {
+    const webhookUrl = process.env.REACT_APP_DISCORD_FEEDBACK_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      console.error("Webhook URL is not defined");
+      return;
+    }
+
     setIsSubmitting(true);
+
     const payload = {
       content: null,
       embeds: [
@@ -56,16 +64,13 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     };
 
     try {
-      const response = await fetch(
-        "https://discord.com/api/webhooks/1247855019743510581/IPyL2AckePAQmMEvOWa60b8sCx5eraNUM6-ylQ4uFR7nT_LF6VENTVFlaJMi-1gI8kyO",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
