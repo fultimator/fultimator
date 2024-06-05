@@ -15,7 +15,7 @@ export default function EditHeroicSkillModal({
   onClose,
   onSave,
   heroic,
-  setHeroic,
+  setHeroic
 }) {
   const { t } = useTranslate();
 
@@ -45,6 +45,7 @@ export default function EditHeroicSkillModal({
           fullWidth
           margin="normal"
           sx={{ marginTop: "10px" }}
+          inputProps={{ maxLength: 50 }}
         />
         <CustomTextarea
           label={t("Description")}

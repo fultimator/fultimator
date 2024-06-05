@@ -139,7 +139,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
             </IconButton>
           </>
         )}
-        {isHeroicSkill && (
+        {isEditMode && isHeroicSkill && (
           <>
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: "white" }} />
