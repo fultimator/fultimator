@@ -31,7 +31,7 @@ import {
   Button,
   useTheme,
   Autocomplete,
-  InputAdornment
+  InputAdornment,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -82,6 +82,7 @@ function Personal({ user }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const [name, setName] = useState("");
+  const [open, setOpen] = useState(false);
 
   const canAccessTest =
     testUsers.includes(user.uid) || moderators.includes(user.uid);
@@ -225,6 +226,17 @@ function Personal({ user }) {
     };
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const sharePlayer = async (id) => {
+    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    const fullUrl = `${baseUrl}/player-gallery/${id}`;
+    await navigator.clipboard.writeText(fullUrl);
+    setOpen(true);
+  };
+
   return (
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
@@ -262,7 +274,7 @@ function Personal({ user }) {
                     </InputAdornment>
                   ),
                 }}
-                inputProps={{maxLength: 50}}
+                inputProps={{ maxLength: 50 }}
               />
             </Grid>
             <Grid
@@ -294,6 +306,7 @@ function Personal({ user }) {
             alignItems="center"
             justifyContent="center"
             key={index}
+            sx={{ marginBottom: "20px"}}
           >
             <PlayerCard
               player={player}
@@ -301,6 +314,7 @@ function Personal({ user }) {
               isEditMode={false}
               sx={{ marginBottom: 1 }}
             />
+            <div style={{ marginTop: "3px"}}>
             <Tooltip title={t("Copy")}>
               <IconButton onClick={copyPlayer(player)}>
                 <ContentCopy />
@@ -319,9 +333,22 @@ function Personal({ user }) {
                 <Delete />
               </IconButton>
             </Tooltip>
+            <Tooltip title={t("Share URL")}>
+              <IconButton onClick={() => sharePlayer(player.id)}>
+                <Share />
+              </IconButton>
+            </Tooltip>
+            </div>
           </Grid>
         ))}
       </Grid>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message={t("Copied to Clipboard!")}
+      />
     </>
   );
 }

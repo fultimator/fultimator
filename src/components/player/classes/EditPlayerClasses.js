@@ -278,7 +278,6 @@ export default function EditPlayerClasses({
     <>
       {isEditMode ? (
         <>
-          {" "}
           <Paper
             elevation={3}
             sx={{
@@ -365,6 +364,23 @@ export default function EditPlayerClasses({
           <Divider sx={{ my: 2 }} />{" "}
         </>
       ) : null}
+      {player.classes.length == 0 && (
+        <Paper
+          elevation={3}
+          sx={{
+            p: "15px",
+            borderRadius: "8px",
+            border: "2px solid",
+            borderColor: secondary,
+          }}
+        >
+          <Grid item sx={12}>
+            <Typography variant="h3" align="center">
+              {t("No classes added yet")}
+            </Typography>
+          </Grid>
+        </Paper>
+      )}
       {player.classes &&
         player.classes.map((cls, index) => (
           <React.Fragment key={index}>

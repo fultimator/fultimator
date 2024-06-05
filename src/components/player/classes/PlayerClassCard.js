@@ -278,6 +278,7 @@ export default function PlayerClassCard({
                 headerText={t("Free Benefits")}
                 buttonText={t("Edit Benefits")}
                 onButtonClick={() => setOpenEditBenefitsModal(true)}
+                isEditMode={isEditMode}
               />
             </Grid>
             <Grid item xs={12} style={{ margin: "-20px 0 0 0" }}>
@@ -390,7 +391,8 @@ export default function PlayerClassCard({
                 maxLvl={skill.maxLvl}
                 onIncrease={() => onIncreaseSkillLevel(index)}
                 onDecrease={() => onDecreaseSkillLevel(index)}
-                onEdit={() => handleEditSkill(index)} // Add this line
+                onEdit={() => handleEditSkill(index)}
+                isEditMode={isEditMode}
               />
               <Typography variant="body1">
                 <StyledMarkdown
@@ -402,21 +404,22 @@ export default function PlayerClassCard({
               </Typography>
             </Grid>
           ))}
-        <Grid item xs={12}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{ marginTop: "30px" }}
-              onClick={() => setOpenEditSpellClassesModal(true)}
+        {isEditMode && (
+          <Grid item xs={12}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
             >
-              {t("Edit Class Spell Types")}
-            </Button>
-            {isEditMode && (
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ marginTop: "30px" }}
+                onClick={() => setOpenEditSpellClassesModal(true)}
+              >
+                {t("Edit Class Spell Types")}
+              </Button>
+
               <Button
                 variant="contained"
                 color="error"
@@ -432,9 +435,9 @@ export default function PlayerClassCard({
               >
                 {t("Remove Class")}
               </Button>
-            )}
-          </Box>
-        </Grid>
+            </Box>
+          </Grid>
+        )}
       </Grid>
       {/* Edit Class Name Modal */}
       <EditClassNameModal

@@ -49,6 +49,7 @@ interface CustomHeader3Props {
   onIncrease: () => void;
   onDecrease: () => void;
   onEdit: () => void;
+  isEditMode: boolean;
 }
 
 const CustomHeader3: React.FC<CustomHeader3Props> = ({
@@ -58,6 +59,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   onIncrease,
   onDecrease,
   onEdit,
+  isEditMode,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
   const { t } = useTranslate();
@@ -98,7 +100,11 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
       </Typography>
       <div style={{ display: "flex", alignItems: "center" }}>
         {isMobileView ? (
-          <Typography variant="body1" color={"gold"} sx={{fontFamily: "Antonio",}}>{`${currentLvl}/${maxLvl}`}</Typography>
+          <Typography
+            variant="body1"
+            color={"gold"}
+            sx={{ fontFamily: "Antonio" }}
+          >{`${currentLvl}/${maxLvl}`}</Typography>
         ) : (
           <>
             {[...Array(Number(maxLvl))].map((_, index) =>
@@ -110,25 +116,27 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
             )}
           </>
         )}
-        <>
-          <IconButton
-            size="small"
-            onClick={onDecrease}
-            disabled={currentLvl <= 0}
-          >
-            <Remove style={{ color: "white" }} />
-          </IconButton>
-          <IconButton
-            size="small"
-            onClick={onIncrease}
-            disabled={currentLvl >= maxLvl}
-          >
-            <Add style={{ color: "white" }} />
-          </IconButton>
-          <IconButton size="small" onClick={onEdit}>
-            <Edit style={{ color: "white" }} />
-          </IconButton>
-        </>
+        {isEditMode && (
+          <>
+            <IconButton
+              size="small"
+              onClick={onDecrease}
+              disabled={currentLvl <= 0}
+            >
+              <Remove style={{ color: "white" }} />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={onIncrease}
+              disabled={currentLvl >= maxLvl}
+            >
+              <Add style={{ color: "white" }} />
+            </IconButton>
+            <IconButton size="small" onClick={onEdit}>
+              <Edit style={{ color: "white" }} />
+            </IconButton>
+          </>
+        )}
       </div>
     </div>
   );

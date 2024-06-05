@@ -55,15 +55,15 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           lineHeight: "normal",
         }}
       >
-        <Tooltip title={t("Edit Class Name")}>
+        {isEditMode && <Tooltip title={t("Edit Class Name")}>
           <IconButton
             sx={{ px: 1, "&:hover": { color: primary } }}
             onClick={editClassName}
           >
             <Edit fontSize="large" />
           </IconButton>
-        </Tooltip>
-        <div style={{ flex: 1, textAlign: "left", paddingBottom: 7 }}>
+        </Tooltip>}
+        <div style={{ flex: 1, textAlign: "left", paddingBottom: 7, paddingLeft: isEditMode ? 0 : 10 }}>
           {headerText}
         </div>
         <div
