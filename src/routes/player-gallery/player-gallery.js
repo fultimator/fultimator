@@ -73,7 +73,7 @@ function Personal({ user }) {
 
   const personalRef = collection(firestore, "player-personal");
   const personalQuery = query(personalRef, where("uid", "==", user.uid));
-  const [personalList, loading, err] = useCollectionData(personalQuery, {
+  const [personalList, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
 

@@ -38,6 +38,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
 
   useEffect(() => {
     updateMaxStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player]);
 
   const renderStatControls = (stat, label, color, increments) => {

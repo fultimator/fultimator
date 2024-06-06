@@ -1,5 +1,4 @@
 import { CardMedia, Typography, Link, Box } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
@@ -17,12 +16,9 @@ import items_rituals_projects from "./items_rituals_projects.webp";
 
 function Home() {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
   const [hover, setHover] = useState("");
   const { t } = useTranslate();
-  const [user, loading] = useAuthState(auth);
+  const [user] = useAuthState(auth);
 
   let canAccessTest = false;
   if (user?.uid) {

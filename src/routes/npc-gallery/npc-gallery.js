@@ -78,7 +78,7 @@ function Personal({ user }) {
   const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
   const [species, setSpecies] = useState("");
-  const [tagSearch, setTagSearch] = useState("");
+  const [tagSearch] = useState("");
   const [tagSort, setTagSort] = useState("");
   const [collapse, setCollapse] = useState(false);
 
@@ -214,6 +214,7 @@ function Personal({ user }) {
 
         return true;
       })
+      // eslint-disable-next-line array-callback-return
       .sort((item1, item2) => {
         // Sort based on selected sort and direction
         if (direction === "ascending") {

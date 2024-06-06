@@ -26,6 +26,7 @@ export default function EditPlayerClasses({
 
   useEffect(() => {
     checkWarnings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, player.classes, player.lvl]);
 
   const checkWarnings = () => {

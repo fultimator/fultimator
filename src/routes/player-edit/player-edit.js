@@ -64,7 +64,7 @@ export default function PlayerEdit() {
   const [player] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
-  const [showScrollTop, setShowScrollTop] = useState(true);
+  const [showScrollTop] = useState(true);
   const [playerTemp, setPlayerTemp] = useState(player);
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -81,6 +81,7 @@ export default function PlayerEdit() {
     } else {
       setIsUpdated(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerTemp]);
 
   const isOwner = user?.uid === player?.uid;

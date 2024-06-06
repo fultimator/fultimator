@@ -66,6 +66,7 @@ export default function PlayerClassCard({
   useEffect(() => {
     setWarnings([]);
     checkWarnings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classItem]);
 
   const checkWarnings = () => {
