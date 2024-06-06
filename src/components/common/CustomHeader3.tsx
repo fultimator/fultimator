@@ -101,7 +101,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         {headerText}
       </Typography>
       <div style={{ display: "flex", alignItems: "center" }}>
-        {isMobileView ? (
+        {isMobileView && !isHeroicSkill ? (
           <Typography
             variant="body1"
             color={"gold"}
