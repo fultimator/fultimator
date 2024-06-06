@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Paper,
   Grid,
-  TextField,
   Button,
   Divider,
   Typography,
   Box,
 } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import Weapons from "../../../routes/equip/weapons/Weapons";
@@ -18,7 +16,6 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Modal from "@mui/material/Modal";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
@@ -26,7 +23,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const style = {
     position: "absolute",

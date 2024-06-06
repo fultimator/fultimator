@@ -2,7 +2,6 @@ import { Link as RouterLink } from "react-router-dom";
 
 import {
   query,
-  orderBy,
   collection,
   where,
   doc,
@@ -10,7 +9,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-
+import React, {useState} from "react";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 
@@ -21,36 +20,23 @@ import {
   Typography,
   Grid,
   Snackbar,
-  CircularProgress,
   Paper,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
-  useTheme,
-  Autocomplete,
   InputAdornment,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
   ContentCopy,
   Delete,
   Share,
-  Download,
   Edit,
   HistoryEdu,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
-import { useEffect, useRef, useState } from "react";
-import useDownloadImage from "../../hooks/useDownloadImage";
-import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
-import { useNavigate } from "react-router-dom";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import { testUsers, moderators } from "../../libs/userGroups";
 import SearchIcon from "@mui/icons-material/Search";
@@ -78,9 +64,7 @@ export default function PlayerGallery() {
 }
 
 function Personal({ user }) {
-  const navigate = useNavigate();
   const { t } = useTranslate();
-  const theme = useTheme();
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
 
@@ -93,7 +77,7 @@ function Personal({ user }) {
     idField: "id",
   });
 
-  const isMobile = window.innerWidth < 900;
+
 
   if (!canAccessTest) {
     return (

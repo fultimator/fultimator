@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   Grid,
-  Stack,
   TextField,
   Typography,
   Paper,
@@ -15,9 +14,7 @@ import CustomHeader from "../../common/CustomHeader";
 export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {

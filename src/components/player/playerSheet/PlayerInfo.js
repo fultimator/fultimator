@@ -3,9 +3,6 @@ import {
   Paper,
   Grid,
   Typography,
-  LinearProgress,
-  FormControlLabel,
-  Checkbox,
   Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";

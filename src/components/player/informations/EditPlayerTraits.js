@@ -1,28 +1,20 @@
-import { Add, Remove } from "@mui/icons-material";
 import {
-  Card,
-  Divider,
   FormControl,
   Grid,
-  IconButton,
   TextField,
-  Typography,
   useTheme,
   Paper,
   Autocomplete,
 } from "@mui/material";
 import React, { useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 
 export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary ? theme.palette.ternary.main : "#000"; // Default to black if ternary is undefined
+
 
   const themes = [
     t("Ambition"),

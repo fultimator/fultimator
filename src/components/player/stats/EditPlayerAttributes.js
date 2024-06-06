@@ -1,33 +1,20 @@
 import React from "react";
-import { Add, Remove } from "@mui/icons-material";
 import {
-  Card,
-  Divider,
   FormControl,
   Grid,
-  IconButton,
   InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography,
   useTheme,
   Paper,
   Slider,
 } from "@mui/material";
-import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import ExplainPlayerAttributes from "./ExplainPlayerAttributes";
 
 export default function EditPlayerAttributes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const onChange = (key) => {
     return (e, value) => {

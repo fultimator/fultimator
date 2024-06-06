@@ -12,8 +12,6 @@ import ReactMarkdown from "react-markdown";
 export default function ExplainPlayerAttributes() {
     const { t } = useTranslate();
     const theme = useTheme();
-    const primary = theme.palette.primary.main;
-    const secondary = theme.palette.secondary.main;
     const ternary = theme.palette.ternary.main;
 
 return (

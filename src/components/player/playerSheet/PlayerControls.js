@@ -1,8 +1,6 @@
 import React from "react";
 import {
   Grid,
-  Stack,
-  TextField,
   Typography,
   Paper,
   Button,
@@ -10,14 +8,11 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import CustomHeader from "../../common/CustomHeader";
 
 export default function PlayerControls({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { TextareaAutosize, useTheme, Button } from '@mui/material';
-import { max } from 'date-fns';
 
 interface CustomTextareaProps {
   label: string;

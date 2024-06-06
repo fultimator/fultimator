@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Typography, IconButton } from "@mui/material";
 import { Add, Edit, Remove } from "@mui/icons-material";
-import { useTranslate } from "../../translation/translate";
 
 // Include your SVGs here as React components
 const EmptyStarSVG = (
@@ -64,7 +63,6 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   isHeroicSkill,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
-  const { t } = useTranslate();
 
   useEffect(() => {
     const handleResize = () => {

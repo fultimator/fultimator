@@ -1,15 +1,8 @@
 import {
-  Card,
   Divider,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
   TextField,
-  Typography,
   useTheme,
   Paper,
   Checkbox,
@@ -17,17 +10,13 @@ import {
   Box,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
-import DeleteIcon from "@mui/icons-material/Delete"; // Import DeleteIcon
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   /* Bond example:
         {

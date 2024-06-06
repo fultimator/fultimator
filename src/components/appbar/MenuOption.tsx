@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import {
   Menu as MenuIcon,
-  AccountCircle,
   Help,
   Logout,
   Login,

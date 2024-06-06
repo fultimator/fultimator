@@ -25,7 +25,7 @@ import {
   SpellIcon,
 } from "../icons";
 import { Martial } from "../icons";
-import { TypeAffinity, TypeName } from "../types";
+import { TypeAffinity } from "../types";
 import Study from "./Study";
 import EditableImage from "../EditableImage";
 import { ArrowDropDown } from "@mui/icons-material";

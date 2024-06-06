@@ -7,10 +7,6 @@ import {
   Button,
   TextField,
   Grid,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
-  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";

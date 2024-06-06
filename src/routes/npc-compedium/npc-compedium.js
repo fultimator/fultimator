@@ -8,7 +8,6 @@ import {
   addDoc,
   deleteDoc,
   startAfter,
-  setDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -95,9 +94,11 @@ function Personal({ user }) {
   const [language, setLanguage] = useState("en");
   const [levels, setLevels] = useState([5, 60]);
 
+  /*
   useEffect(() => {
     console.log("User ID: ", user.uid);
   }, []);
+  */
 
   const [searchParams, setSearchParams] = useState({
     type: "All",

@@ -130,7 +130,7 @@ export default function EditPlayerClasses({
       }),
     };
 
-    if (newLevel == 10 && !updatedPlayer.classes[index].heroic) {
+    if (newLevel === 10 && !updatedPlayer.classes[index].heroic) {
       updatedPlayer.classes[index].heroic = {
         name: "",
         description: "",
@@ -388,7 +388,7 @@ export default function EditPlayerClasses({
           <Divider sx={{ my: 2 }} />{" "}
         </>
       ) : null}
-      {player.classes.length == 0 && (
+      {player.classes.length === 0 && (
         <Paper
           elevation={3}
           sx={{

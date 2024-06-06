@@ -7,20 +7,11 @@ import {
   Button,
   Box,
   Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox,
-  FormGroup,
-  FormControlLabel,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderClasses from "../../common/CustomHeaderClasses";
-import CustomHeader from "../../common/CustomHeader";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader2 from "../../common/CustomHeader2";
 import CustomHeader3 from "../../common/CustomHeader3";
 import EditClassNameModal from "./EditClassNameModal";
@@ -29,7 +20,6 @@ import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
 import EditHeroicSkillModal from "./EditHeroicSkillModal";
 import spellClasses from "../../../libs/spellClasses";
-import { set } from "date-fns";
 
 export default function PlayerClassCard({
   classItem,
@@ -426,7 +416,7 @@ export default function PlayerClassCard({
               </Typography>
             </Grid>
           ))}
-        {classItem.lvl == 10 && (
+        {classItem.lvl === 10 && (
           <>
             <Grid item xs={12}>
               <Divider />

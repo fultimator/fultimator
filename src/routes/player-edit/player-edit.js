@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { firestore, auth } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
+import { doc, setDoc } from "@firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
   Paper,
   Button,
-  TextField,
   Drawer,
   List,
   ListItem,
@@ -47,7 +46,6 @@ import { testUsers, moderators } from "../../libs/userGroups";
 export default function PlayerEdit() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
   const isSmallScreen = useMediaQuery("(max-width: 899px)");

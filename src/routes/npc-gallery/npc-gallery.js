@@ -29,7 +29,6 @@ import {
   Select,
   MenuItem,
   Button,
-  useTheme,
   Autocomplete,
 } from "@mui/material";
 import Layout from "../../components/Layout";
@@ -74,10 +73,6 @@ export default function NpcGallery() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [sort, setSort] = useState("name");
