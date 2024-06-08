@@ -299,6 +299,7 @@ export default function PlayerEdit() {
           <EditPlayerBasics
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
           <Divider sx={{ my: 1 }} />

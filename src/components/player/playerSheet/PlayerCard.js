@@ -132,7 +132,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>DEF:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
+            DEF:
+          </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currDef}
@@ -147,7 +149,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>MDEF:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
+            MDEF:
+          </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currMDef}
@@ -162,7 +166,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             marginBottom: "5px",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>INIT:</span>
+          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
+            INIT:
+          </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
             {currInit}
@@ -211,28 +217,49 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             variant="h5"
             style={{
               fontFamily: "'Antonio'",
-                    fontWeight: "bold",
+              fontWeight: "bold",
               fontSize: "1.5rem",
               marginBottom: "10px",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
+              alignItems: "flex-start",
             }}
           >
-            <span style={{ marginRight: "5px" }}>{player.name}</span>
-            {player.info.pronouns && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
               <span
                 style={{
-                  fontFamily: "'Antonio'",
-                  fontSize: "1rem",
-                  color: theme.palette.text.disabled,
                   marginRight: "5px",
+                  wordWrap: "break-word",
+                  whiteSpace: "normal",
+                  maxWidth: "calc(100% - 130px)", // Adjust according to the layout
                 }}
               >
-                ({player.info.pronouns})
+                {player.name}
               </span>
-            )}
-            <span style={{ marginLeft: "auto" }}>LVL. {player.lvl}</span>
-          </Typography>
+              {player.info.pronouns && (
+                <span
+                  style={{
+                    fontFamily: "'Antonio'",
+                    fontSize: "1rem",
+                    color: theme.palette.text.disabled,
+                    marginRight: "5px",
+                    wordWrap: "break-word",
+                    whiteSpace: "normal",
+                    maxWidth: "calc(100% - 50px)", // Adjust according to the layout
+                  }}
+                >
+                  ({player.info.pronouns})
+                </span>
+              )}
+              <span style={{ marginLeft: "auto", whiteSpace: "nowrap" }}>LVL. {player.lvl}</span>
+            </div>
+          </Typography> 
           {renderStatBar(
             "HP",
             player.stats.hp.current,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   FormControl,
@@ -17,7 +17,12 @@ import { ReactComponent as ZenitIcon } from "../../zenit.svg";
 import { ReactComponent as ExpIcon } from "../../exp.svg";
 import { ReactComponent as FabulaIcon } from "../../fabula.svg";
 
-export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
+export default function EditPlayerBasics({
+  player,
+  setPlayer,
+  updateMaxStats,
+  isEditMode,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -66,6 +71,11 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
       console.error("Error checking image size:", error);
     }
   };
+
+  useEffect(() => {
+    updateMaxStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [player]);
 
   return (
     <Paper
@@ -181,7 +191,10 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               value={player.info.exp.toString()}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === "" || (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)) {
+                if (
+                  value === "" ||
+                  (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
+                ) {
                   onChangeInfo("exp")(value === "" ? 0 : parseInt(value, 10));
                 }
               }}
@@ -214,7 +227,10 @@ export default function EditPlayerBasics({ player, setPlayer, isEditMode }) {
               value={player.info.zenit.toString()}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value === "" || (/^\d+$/.test(value) && +value >= 0 && +value <= 99999999)) {
+                if (
+                  value === "" ||
+                  (/^\d+$/.test(value) && +value >= 0 && +value <= 99999999)
+                ) {
                   onChangeInfo("zenit")(value === "" ? 0 : parseInt(value, 10));
                 }
               }}
