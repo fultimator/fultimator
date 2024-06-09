@@ -12,7 +12,9 @@ import { useTranslate } from "../../../translation/translate";
 export default function PlayerControls({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {
@@ -108,13 +110,32 @@ export default function PlayerControls({ player, setPlayer }) {
     <Paper
       elevation={3}
       sx={{
-        p: "15px",
         borderRadius: "8px",
         border: "2px solid",
         borderColor: secondary,
+        display: "flex",
       }}
     >
-      <Grid container spacing={2}>
+            <Typography
+        variant="h1"
+        sx={{
+          writingMode: "vertical-lr",
+          textTransform: "uppercase",
+          marginLeft: "-1px",
+          marginRight: "10px",
+          marginTop:"-1px",
+          marginBottom: "-1px",
+          backgroundColor: primary, 
+          color: ternary,
+          borderRadius: "0 8px 8px 0",
+          transform: "rotate(180deg)",
+          fontSize: "2em"
+        }}
+        align="center"
+      >
+        {t("Controls")}
+      </Typography>
+      <Grid container spacing={2} sx={{ padding: "1em" }}>
         <Grid item xs={12}>
           {renderStatControls(
             "hp",

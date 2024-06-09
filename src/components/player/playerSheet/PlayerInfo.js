@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Paper,
-  Grid,
-  Typography,
-  Divider,
-} from "@mui/material";
+import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
@@ -12,25 +7,48 @@ import ReactMarkdown from "react-markdown";
 export default function PlayerInfo({ player, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
 
   return (
     <Paper
       elevation={3}
       sx={{
-        p: "15px",
+        
         borderRadius: "8px",
         border: "2px solid",
         borderColor: secondary,
+        display: "flex",
       }}
     >
-      <Grid container spacing={2}>
+      <Typography
+        variant="h1"
+        sx={{
+          writingMode: "vertical-lr",
+          textTransform: "uppercase",
+          marginLeft: "-1px",
+          marginRight: "10px",
+          marginTop:"-1px",
+          marginBottom: "-1px",
+          backgroundColor: primary, 
+          color: ternary,
+          borderRadius: "0 8px 8px 0",
+          transform: "rotate(180deg)",
+          fontSize: "2em"
+        }}
+        align="center"
+      >
+        {t("Traits")}
+      </Typography>
+
+      <Grid container spacing={2} sx={{ padding: "1em" }}>
         <Grid item xs={12} md={12}>
           <Typography variant="h4">
             <span
               style={{
                 fontWeight: "bolder",
-                fontSize: "1.4rem",
+                fontSize: "1.6em",
                 textTransform: "uppercase",
               }}
             >
@@ -38,7 +56,7 @@ export default function PlayerInfo({ player, isEditMode }) {
             </span>
             <span
               style={{
-                fontSize: "1.2rem",
+                fontSize: "1.4em",
                 textTransform: "uppercase",
               }}
             >
@@ -51,7 +69,7 @@ export default function PlayerInfo({ player, isEditMode }) {
             <span
               style={{
                 fontWeight: "bolder",
-                fontSize: "1.4rem",
+                fontSize: "1.6em",
                 textTransform: "uppercase",
               }}
             >
@@ -59,7 +77,7 @@ export default function PlayerInfo({ player, isEditMode }) {
             </span>
             <span
               style={{
-                fontSize: "1.2rem",
+                fontSize: "1.4em",
                 textTransform: "uppercase",
               }}
             >
@@ -72,7 +90,7 @@ export default function PlayerInfo({ player, isEditMode }) {
             <span
               style={{
                 fontWeight: "bolder",
-                fontSize: "1.4rem",
+                fontSize: "1.6em",
                 textTransform: "uppercase",
               }}
             >
@@ -80,7 +98,7 @@ export default function PlayerInfo({ player, isEditMode }) {
             </span>
             <span
               style={{
-                fontSize: "1.2rem",
+                fontSize: "1.4em",
                 textTransform: "uppercase",
               }}
             >
@@ -98,7 +116,7 @@ export default function PlayerInfo({ player, isEditMode }) {
                 <span
                   style={{
                     fontWeight: "bolder",
-                    fontSize: "1.4rem",
+                    fontSize: "1.6em",
                     textTransform: "uppercase",
                   }}
                 >
