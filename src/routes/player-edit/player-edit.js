@@ -43,6 +43,8 @@ import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
 import { testUsers, moderators } from "../../libs/userGroups";
+import { usePrompt } from "../../hooks/usePrompt";
+import deepEqual from "deep-equal";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -71,89 +73,47 @@ export default function PlayerEdit() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [battleMode, setBattleMode] = useState(false);
 
-  // Effect to update temporary Player state when Player data changes
+  // Effect to update temporary Player state and check for unsaved changes
   useEffect(() => {
-    setPlayerTemp(player);
+    if (player) {
+      // Perform a deep copy of the player object
+      const updatedPlayerTemp = JSON.parse(JSON.stringify(player));
+      setPlayerTemp(updatedPlayerTemp);
+      setIsUpdated(false);
+    }
   }, [player]);
+  
 
   useEffect(() => {
-    if (playerTemp !== player) {
+    if (!deepEqual(playerTemp, player)) {
       setIsUpdated(true);
     } else {
       setIsUpdated(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerTemp]);
+  }, [playerTemp, player]);
+  
+  // Warn user when leaving the page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isUpdated) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isUpdated]);
+
+  usePrompt(
+    "You have unsaved changes. Are you sure you want to leave?",
+    isUpdated
+  );
 
   const isOwner = user?.uid === player?.uid;
-
-  /*const player = {
-    id: "",
-    uid: "",
-    name: "",
-    lvl: 5,
-    info: {
-      pronouns: "",
-      identity: "",
-      theme: "",
-      origin: "",
-      bonds: [
-        {
-          name: "",
-          admiration: false,
-          loyalty: false,
-          affection: false,
-          inferiority: false,
-          mistrust: false,
-          hatred: false,
-        },
-      ],
-      description: "",
-      fabulapoints: 3,
-      exp: 0,
-      zenit: 0,
-      imgurl: "",
-    },
-    attributes: {
-      dexterity: 8,
-      insight: 8,
-      might: 8,
-      willpower: 8,
-    },
-    stats: {
-      hp: {
-        max: 45,
-        current: 45,
-      },
-      mp: {
-        max: 45,
-        current: 45,
-      },
-      ip: {
-        max: 6,
-        current: 6,
-      },
-    },
-    statuses: {
-      slow: false,
-      dazed: false,
-      enraged: false,
-      weak: false,
-      shaken: false,
-      poisoned: false,
-      dexUp: false,
-      insUp: false,
-      migUp: false,
-      wlpUp: false,
-    },
-    classes: [],
-    notes: [
-      {
-        name: "",
-        description: "",
-      },
-    ],
-  };*/
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -334,6 +294,7 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
+            updateMaxStats={updateMaxStats}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStats

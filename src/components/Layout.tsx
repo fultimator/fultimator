@@ -34,6 +34,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate(-1);
   };
 
+  const handleNavigation = () => {
+    // This function will be passed to the AppBar component
+    navigate(-1);
+  };
+
   const fultimatorRoutes = ["/npc-gallery/:npcId"];
   const isNpcEdit = fultimatorRoutes.includes(location.pathname);
 
@@ -48,6 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         selectedTheme={selectedTheme}
         handleSelectTheme={handleSelectTheme}
         showGoBackButton={!isHomepage} // Pass the prop to control the visibility of the "Go Back" button
+        handleNavigation={handleNavigation} // Pass the handleNavigation function to the AppBar component
       />
       <Container style={{ marginTop: "8em", alignItems: "center" }}>
         {children}

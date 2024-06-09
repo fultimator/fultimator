@@ -11,7 +11,12 @@ import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import ExplainPlayerAttributes from "./ExplainPlayerAttributes";
 
-export default function EditPlayerAttributes({ player, setPlayer, isEditMode }) {
+export default function EditPlayerAttributes({
+  player,
+  setPlayer,
+  isEditMode,
+  updateMaxStats,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -23,6 +28,7 @@ export default function EditPlayerAttributes({ player, setPlayer, isEditMode }) 
         newState.attributes[key] = value;
         return newState;
       });
+      updateMaxStats();
     };
   };
 

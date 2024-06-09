@@ -63,14 +63,15 @@ export default function EditPlayerNotes({ player, setPlayer }) {
             type="top"
             headerText={t("Notes")}
             addItem={() =>
-              setPlayer((prevState) => {
+              {
+                setPlayer((prevState) => {
                 const newState = { ...prevState };
                 newState.notes.push({
                   name: "",
                   description: "",
                 });
                 return newState;
-              })
+              })}
             }
           />
         </Grid>

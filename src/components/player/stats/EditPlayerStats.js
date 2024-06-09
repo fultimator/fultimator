@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Grid,
   TextField,
@@ -35,11 +35,6 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
     });
     updateMaxStats();
   };
-
-  useEffect(() => {
-    updateMaxStats();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player]);
 
   const renderStatControls = (stat, label, color, increments) => {
     const negativeIncrements = increments.filter((val) => val < 0);

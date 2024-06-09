@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {  useCallback } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   FormControl,
@@ -30,27 +30,24 @@ export default function EditPlayerBasics({
   const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
   const [isImageTooLarge, setIsImageTooLarge] = React.useState(false);
 
-  const onChange = (key) => {
-    return (e) => {
-      setPlayer((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState[key] = e.target.value;
-        return newState;
-      });
-    };
-  };
+  const onChange = useCallback((key) => (e) => {
+    setPlayer((prevState) => ({
+      ...prevState,
+      [key]: e.target.value,
+    }));
+  }, [setPlayer]);
 
-  const onChangeInfo = (key) => {
-    return (value) => {
-      setPlayer((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.info[key] = value;
-        return newState;
-      });
-    };
-  };
+  const onChangeInfo = useCallback((key) => (value) => {
+    setPlayer((prevState) => ({
+      ...prevState,
+      info: {
+        ...prevState.info,
+        [key]: value,
+      },
+    }));
+  }, [setPlayer]);
 
-  const checkImageSize = async (imageUrl) => {
+  const checkImageSize = useCallback(async (imageUrl) => {
     try {
       const response = await fetch(imageUrl);
       if (!response.ok) {
@@ -70,12 +67,7 @@ export default function EditPlayerBasics({
     } catch (error) {
       console.error("Error checking image size:", error);
     }
-  };
-
-  useEffect(() => {
-    updateMaxStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [player]);
+  }, []);
 
   return (
     <Paper
@@ -128,6 +120,7 @@ export default function EditPlayerBasics({
             player={player}
             setPlayer={setPlayer}
             isEditMode={isEditMode}
+            updateMaxStats={updateMaxStats}
           />
         </Grid>
         <Grid item xs={12}>
@@ -310,7 +303,7 @@ export default function EditPlayerBasics({
   );
 }
 
-function EditPlayerLevel({ player, setPlayer, isEditMode }) {
+function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
   const { t } = useTranslate();
 
   const onRaiseLevel = () => {
@@ -318,6 +311,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode }) {
       if (prevState.lvl >= 60) return prevState;
       return { ...prevState, lvl: prevState.lvl + 1 };
     });
+    updateMaxStats();
   };
 
   const onLowerLevel = () => {
@@ -325,6 +319,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode }) {
       if (prevState.lvl <= 5) return prevState;
       return { ...prevState, lvl: prevState.lvl - 1 };
     });
+    updateMaxStats();
   };
 
   return (
