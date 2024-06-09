@@ -115,11 +115,11 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   );
 
   // Calculate DEF and MDEF
-  const currDef = currDex;
-  const currMDef = currInsight;
+  const currDef = currDex + (player.modifiers?.def || 0);
+  const currMDef = currInsight + (player.modifiers?.mdef || 0);
 
   // Initialize INIT to 0
-  const currInit = 0;
+  const currInit = 0 + (player.modifiers?.init || 0);
 
   // Function to render DEF, MDEF, and INIT as numbers
   const renderAdditionalStats = () => (
@@ -133,7 +133,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            DEF:
+            {t("DEF") + ":"}
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
@@ -150,7 +150,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            MDEF:
+            {t("M.DEF") + ":"}
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
@@ -167,7 +167,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            INIT:
+            {t("INIT") + ":"}
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}

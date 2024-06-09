@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Paper,
-  Checkbox,
-  FormControlLabel,
-} from "@mui/material";
+import { Grid, Paper, Checkbox, FormControlLabel } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
@@ -12,7 +7,7 @@ import CustomHeader from "../../common/CustomHeader";
 export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const { secondary } = theme.palette;
+  const secondary = theme.palette.secondary.main;
 
   /* STATUS LIST
     Slow - Dexterity attribute is lowered by 2 points to maximum 6
@@ -41,7 +36,12 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   return (
     <Paper
       elevation={3}
-      sx={{ p: "15px", borderRadius: "8px", border: `2px solid ${secondary}` }}
+      sx={{
+        p: "15px",
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: secondary,
+      }}
     >
       <Grid item xs={12}>
         <CustomHeader

@@ -32,6 +32,7 @@ import EditPlayerBonds from "../../components/player/informations/EditPlayerBond
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
+import EditManualStats from "../../components/player/stats/EditManualStats";
 import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
@@ -81,7 +82,7 @@ export default function PlayerEdit() {
     } else {
       setIsUpdated(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerTemp]);
 
   const isOwner = user?.uid === player?.uid;
@@ -183,6 +184,12 @@ export default function PlayerEdit() {
             ipBonus += cls.benefits.ipplus || 0;
           }
         });
+
+        if (prevPlayer.modifiers) {
+          hpBonus += prevPlayer.modifiers.hp || 0;
+          mpBonus += prevPlayer.modifiers.mp || 0;
+          ipBonus += prevPlayer.modifiers.ip || 0;
+        }
 
         const maxHP = baseMaxHP + hpBonus;
         const maxMP = baseMaxMP + mpBonus;
@@ -339,6 +346,13 @@ export default function PlayerEdit() {
           <EditPlayerStatuses
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+          <Divider sx={{ my: 1 }} />
+          <EditManualStats
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
           <Box sx={{ height: "5vh" }} />
