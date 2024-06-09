@@ -1,13 +1,24 @@
 import React from "react";
-import { Typography, IconButton, Grid } from "@mui/material";
+import {
+  Typography,
+  IconButton,
+  Grid,
+  useTheme,
+  ThemeProvider,
+} from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "../../icons"; // Ensure this path is correct
 import attributes from "../../../libs/attributes";
 import { CloseBracket, OpenBracket } from "../../Bracket";
 import { useTranslate } from "../../../translation/translate";
 
-export default function SpellDefault({
+const StyledMarkdown = styled(ReactMarkdown)({
+  whiteSpace: "pre-line",
+});
+
+function ThemedSpellDefault({
   spellName,
   mp,
   maxTargets,
@@ -21,141 +32,73 @@ export default function SpellDefault({
   isEditMode,
 }) {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
+  const white = theme.palette.white.main;
 
   return (
     <>
+      {/* Row 2 */}
       <div
         style={{
-          backgroundColor: "#2B4A42",
-          fontFamily: "Antonio",
-          fontWeight: "normal",
-          fontSize: "1.1em",
+          background: `linear-gradient(to right, ${ternary}, ${white})`,
           padding: "3px 17px",
-          color: "white",
-          textAlign: "left",
-          marginBottom: "4px",
-          marginTop: "10px",
-          textTransform: "uppercase",
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
+          borderTop: `1px solid ${secondary}`,
+          borderBottom: `1px solid ${secondary}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
-            {spellName}
-          </Typography>
-          {isOffensive && <OffensiveSpellIcon />}
-        </div>
+        <Grid container style={{ flexGrow: 1 }}>
+          <Grid item xs flexGrow style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
+            <Typography fontWeight="bold" style={{ flexGrow: 1, marginRight: "5px" }}>
+              {spellName} {isOffensive && <OffensiveSpellIcon />}
+            </Typography>
+          </Grid>
+          <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Typography>{mp}</Typography>
+          </Grid>
+          <Grid item xs={4} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Typography>{targetDesc}</Typography>
+          </Grid>
+          <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Typography>{duration}</Typography>
+          </Grid>
+        </Grid>
         {isEditMode && (
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <Grid item xs style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "white" }} />
+              <Edit style={{ color: "black" }} />
             </IconButton>
-          </div>
+          </Grid>
         )}
       </div>
-      <Grid container>
-        <Grid item xs={2}>
-          <Typography
-            variant="body1"
-            style={{
-              marginLeft: "10px",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-          >
-            {t("MP x Target")}
-          </Typography>
-          <Typography
-            variant="body1"
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            {mp}
-          </Typography>
-        </Grid>
-        <Grid item xs={2}>
-          <Typography
-            variant="body1"
-            style={{
-              marginLeft: "10px",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-          >
-            {t("Max Targets")}
-          </Typography>
-          <Typography
-            variant="body1"
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            {maxTargets}
-          </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography
-            variant="body1"
-            style={{
-              marginLeft: "10px",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-          >
-            {t("Target Description")}
-          </Typography>
-          <Typography
-            variant="body1"
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            {targetDesc}
-          </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography
-            variant="body1"
-            style={{
-              marginLeft: "10px",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-          >
-            {t("Duration")}
-          </Typography>
-          <Typography
-            variant="body1"
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            {duration}
-          </Typography>
-        </Grid>
+
+      {/* Row 3 */}
+      <Grid
+        container
+        justifyContent="flex-start"
+        sx={{
+          background: "transparent",
+          padding: "3px 17px",
+          marginBottom: "1px",
+          borderBottom: `1px solid ${secondary}`,
+        }}
+      >
         <Grid item xs={12}>
-          <Typography
-            variant="body1"
-            style={{
-              marginLeft: "10px",
-              marginTop: "10px",
-              fontWeight: "bold",
-            }}
-          >
-            {t("Description")}
+          <Typography>
+            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+              {description}
+            </StyledMarkdown>
           </Typography>
-          <div
-            style={{
-              marginLeft: "10px",
-              marginRight: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <ReactMarkdown>{description}</ReactMarkdown>
-          </div>
         </Grid>
         {isOffensive && (
           <Grid item xs={12}>
             <Typography
               variant="body1"
               style={{
-                marginLeft: "10px",
-                marginTop: "5px",
+                marginTop: "1px",
                 fontWeight: "bold",
               }}
             >
@@ -172,5 +115,14 @@ export default function SpellDefault({
         )}
       </Grid>
     </>
+  );
+}
+
+export default function SpellDefault(props) {
+  const theme = useTheme();
+  return (
+    <ThemeProvider theme={theme}>
+      <ThemedSpellDefault {...props} />
+    </ThemeProvider>
   );
 }

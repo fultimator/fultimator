@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
+import { Paper, Grid, TextField, Button, Divider, Typography } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
@@ -11,7 +11,9 @@ import SpellDefaultModal from "./SpellDefaultModal";
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const white = theme.palette.white.main;
 
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSpell, setSelectedSpell] = useState(null);
@@ -36,7 +38,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const filteredSpells = selectedClass
     ? player.classes.find((cls) => cls.name === selectedClass)?.benefits
-        .spellClasses || []
+      .spellClasses || []
     : [];
 
   const addNewSpell = (spell) => {
@@ -150,10 +152,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     value={
                       selectedClass
                         ? t(
-                            player.classes.find(
-                              (cls) => cls.name === selectedClass
-                            )?.name
-                          )
+                          player.classes.find(
+                            (cls) => cls.name === selectedClass
+                          )?.name
+                        )
                         : null
                     }
                     onChange={handleClassChange}
@@ -227,6 +229,44 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   {cls.spells.some((spl) => spl.spellType === "default") && (
                     <CustomHeader2 headerText={t("Default Spells")} />
                   )}
+
+                  {/* Row 1 */}
+                  <div
+                    style={{
+                      backgroundColor: primary,
+                      fontFamily: "Antonio",
+                      fontWeight: "normal",
+                      fontSize: "1.1em",
+                      padding: "2px 17px",
+                      color: white,
+                      textTransform: "uppercase",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Grid container style={{ flexGrow: 1 }}>
+                      <Grid item xs flexGrow style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
+                        <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+                          {t("Spell")}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Typography variant="h3">{t("MP")}</Typography>
+                      </Grid>
+                      <Grid item xs={4} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Typography variant="h3">{t("Target")}</Typography>
+                      </Grid>
+                      <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Typography variant="h3">{t("Duration")}</Typography>
+                      </Grid>
+                    </Grid>
+                    {isEditMode && (
+                      <Grid item xs style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                        <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
+                      </Grid>
+                    )}
+                  </div>
+
                   {cls.spells.map((spell, index) => (
                     <SpellDefault
                       spellName={spell.name}
