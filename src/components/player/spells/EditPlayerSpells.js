@@ -1,35 +1,11 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Divider,
-  /* 
-  FormControl,
-  ToggleButtonGroup,
-  ToggleButton,
-  Select,
-  MenuItem,
-  Checkbox,
-  InputLabel,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Box,
-  */
-} from "@mui/material";
+import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-//import CustomTextarea from "../../common/CustomTextarea";
-//import { OffensiveSpellIcon } from "../../icons";
 import SpellDefault from "./SpellDefault";
 import CustomHeader2 from "../../common/CustomHeader2";
-//import { Delete } from "@mui/icons-material";
 import SpellDefaultModal from "./SpellDefaultModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
@@ -41,12 +17,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [selectedSpell, setSelectedSpell] = useState(null);
 
   const [openSpellDefaultModal, setOpenSpellDefaultModal] = useState(false);
-
-  //const [isOffensiveSpell, setIsOffensiveSpell] = useState(false);
-  //const [isReworkArcanist, setIsReworkArcanist] = useState(false);
-
-  //const [openAlchemyTargetModal, setOpenAlchemyTargetModal] = useState(false);
-  //const [openAlchemyEffectModal, setOpenAlchemyEffectModal] = useState(false);
+  const [spellBeingEdited, setSpellBeingEdited] = useState(null);
+  const [editingSpellClass, setEditingSpellClass] = useState(null);
+  const [editingSpellIndex, setEditingSpellIndex] = useState(null);
 
   const handleClassChange = (event, newValue) => {
     setSelectedClass(
@@ -85,8 +58,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   duration: "",
                   description: "",
                   isOffensive: false,
-                  attr1: "dex",
-                  attr2: "dex",
+                  attr1: "dexterity",
+                  attr2: "dexterity",
                 },
               ],
             };
@@ -102,9 +75,49 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedSpell(null);
   };
 
-  const handleEditDefaultSpell = (spell) => {
+  const handleEditDefaultSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
     setOpenSpellDefaultModal(true);
-    console.log("Edit default spell:", spell.name);
+  };
+
+  const handleSaveEditedSpell = (editedSpell) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === editingSpellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell) =>
+              spell.name === spellBeingEdited.name ? editedSpell : spell
+            ),
+          };
+        }
+        return cls;
+      }),
+    }));
+    setOpenSpellDefaultModal(false);
+    setSpellBeingEdited(null);
+    setEditingSpellClass(null);
+  };
+
+  const handleDeleteSpell = (spellIndex) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === editingSpellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.filter((_, index) => index !== spellIndex),
+          };
+        }
+        return cls;
+      }),
+    }));
+    setOpenSpellDefaultModal(false);
+    setSpellBeingEdited(null);
+    setEditingSpellClass(null);
   };
 
   return (
@@ -183,103 +196,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               </Grid>
             </Grid>
           </Paper>
-          {/*Sample Default Spell*/}
-          {/*}
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <CustomHeader type="top" headerText={t("CLASS NAME")} />
-              </Grid>
-              <Grid item xs={12} sm={7}>
-                <TextField
-                  label={t("Spell Name")}
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ maxLength: 50 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={1}>
-                <FormControl variant="standard" fullWidth>
-                  <ToggleButtonGroup
-                    size="large"
-                    value={isOffensiveSpell}
-                    exclusive
-                    onChange={(event, newValue) =>
-                      setIsOffensiveSpell(newValue)
-                    }
-                    aria-label="text alignment"
-                  >
-                    <ToggleButton value="offensive" aria-label="left aligned">
-                      <OffensiveSpellIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <TextField
-                  type="number"
-                  label={t("MP x Target")}
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <TextField
-                  type="number"
-                  label={t("Max Targets")}
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label={t("Target Description")}
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ maxLength: 100 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label={t("Duration")}
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ maxLength: 100 }}
-                />
-              </Grid>
-              {isOffensiveSpell ? (
-                <>
-                  <Grid item xs={12} sm={6}>
-                    <Select fullWidth defaultValue={"dexterity"}>
-                      <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-                      <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-                      <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-                      <MenuItem value={"will"}>{t("Wil")}</MenuItem>
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Select fullWidth defaultValue={"dexterity"}>
-                      <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-                      <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-                      <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-                      <MenuItem value={"will"}>{t("Wil")}</MenuItem>
-                    </Select>
-                  </Grid>
-                </>
-              ) : null}
-              <Grid item xs={12} sm={12}>
-                <CustomTextarea label={t("Description")} fullWidth />
-              </Grid>
-            </Grid>
-          </Paper>*/}
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
@@ -304,7 +220,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 <Grid item xs={12}>
                   <CustomHeader
                     type="top"
-                    headerText={t("Spells") + " - " + cls.name}
+                    headerText={t("Spells") + " - " + t(cls.name)}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -319,9 +235,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       targetDesc={spell.targetDesc}
                       duration={spell.duration}
                       description={spell.description}
-                      onEdit={() => handleEditDefaultSpell(spell, index)}
+                      onEdit={() => handleEditDefaultSpell(spell, cls.name, index)}
                       isEditMode={isEditMode}
-                      isOffensive={spell.isOffensiveSpell}
+                      isOffensive={spell.isOffensive}
                       attr1={spell.attr1}
                       attr2={spell.attr2}
                       key={index}
@@ -333,7 +249,18 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             <Divider sx={{ my: 2 }} />
           </React.Fragment>
         ))}
-        <SpellDefaultModal isEditMode={isEditMode} open={openSpellDefaultModal} onClose={() => setOpenSpellDefaultModal(false)}  />
+      <SpellDefaultModal
+        isEditMode={isEditMode}
+        open={openSpellDefaultModal}
+        onClose={() => {
+          setOpenSpellDefaultModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
     </>
   );
 }

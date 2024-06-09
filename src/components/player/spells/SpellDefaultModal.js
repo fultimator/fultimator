@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,11 +8,11 @@ import {
   Grid,
   TextField,
   FormControl,
-  ToggleButtonGroup,
   ToggleButton,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
+import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { OffensiveSpellIcon } from "../../icons";
@@ -21,10 +21,27 @@ export default function SpellDefaultModal({
   open,
   onClose,
   onSave,
-  spell
+  onDelete,
+  spell,
 }) {
   const { t } = useTranslate();
-  const [isOffensiveSpell, setIsOffensiveSpell] = React.useState(false);
+  const [editedSpell, setEditedSpell] = useState(spell || {});
+
+  useEffect(() => {
+    setEditedSpell(spell || {});
+  }, [spell]);
+
+  const handleChange = (field, value) => {
+    setEditedSpell((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    onSave(editedSpell);
+  };
+
+  const handleDelete = () => {
+    onDelete(spell.index);
+  };
 
   return (
     <Dialog
@@ -41,91 +58,162 @@ export default function SpellDefaultModal({
         {t("Edit Spell")}
       </DialogTitle>
       <DialogContent>
-      <Grid container spacing={2}>
-              <Grid item xs={12} sm={7}>
-                <TextField
-                  label={t("Spell Name")}
-                  variant="outlined"
+        <Grid container spacing={2} sx={{ marginTop: "10px" }}>
+          <Grid item xs={12} sm={7}>
+            <TextField
+              label={t("Spell Name")}
+              variant="outlined"
+              fullWidth
+              value={editedSpell.name || ""}
+              onChange={(e) => handleChange("name", e.target.value)}
+              inputProps={{ maxLength: 50 }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={1}>
+            <FormControl variant="standard" fullWidth style={{ height: '100%' }}>
+              <ToggleButton
+                value={editedSpell.isOffensive || false}
+                onChange={(e) =>
+                  handleChange("isOffensive", !editedSpell.isOffensive)
+                }
+                aria-label="offensive-toggle"
+                style={{ height: '100%' }}
+              >
+                <OffensiveSpellIcon />
+              </ToggleButton>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <TextField
+              type="number"
+              label={t("MP x Target")}
+              variant="outlined"
+              fullWidth
+              value={
+                editedSpell.mp === null || editedSpell.mp === undefined
+                  ? ""
+                  : editedSpell.mp.toString()
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (
+                  value === "" ||
+                  (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
+                ) {
+                  handleChange("mp", value === "" ? 0 : parseInt(value, 10));
+                }
+              }}
+              onBlur={(e) => {
+                let value = parseInt(e.target.value, 10);
+                if (isNaN(value) || value < 0) {
+                  value = 0;
+                } else if (value > 999) {
+                  value = 999;
+                }
+                handleChange("mp", value);
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <TextField
+              type="number"
+              label={t("Max Targets")}
+              variant="outlined"
+              fullWidth
+              value={
+                editedSpell.maxTargets === null ||
+                editedSpell.maxTargets === undefined
+                  ? ""
+                  : editedSpell.maxTargets.toString()
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (
+                  value === "" ||
+                  (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
+                ) {
+                  handleChange(
+                    "maxTargets",
+                    value === "" ? 0 : parseInt(value, 10)
+                  );
+                }
+              }}
+              onBlur={(e) => {
+                let value = parseInt(e.target.value, 10);
+                if (isNaN(value) || value < 0) {
+                  value = 0;
+                } else if (value > 999) {
+                  value = 999;
+                }
+                handleChange("maxTargets", value);
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label={t("Target Description")}
+              variant="outlined"
+              fullWidth
+              value={editedSpell.targetDesc || ""}
+              onChange={(e) => handleChange("targetDesc", e.target.value)}
+              inputProps={{ maxLength: 100 }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label={t("Duration")}
+              variant="outlined"
+              fullWidth
+              value={editedSpell.duration || ""}
+              onChange={(e) => handleChange("duration", e.target.value)}
+              inputProps={{ maxLength: 100 }}
+            />
+          </Grid>
+          {editedSpell.isOffensive ? (
+            <>
+              <Grid item xs={6} sm={6}>
+                <Select
                   fullWidth
-                  inputProps={{ maxLength: 50 }}
-                />
+                  value={editedSpell.attr1 || "dexterity"}
+                  onChange={(e) => handleChange("attr1", e.target.value)}
+                >
+                  <MenuItem value={"dexterity"}>{attributes["dexterity"].shortcaps}</MenuItem>
+                  <MenuItem value={"insight"}>{attributes["insight"].shortcaps}</MenuItem>
+                  <MenuItem value={"might"}>{attributes["might"].shortcaps}</MenuItem>
+                  <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
+                </Select>
               </Grid>
-              <Grid item xs={12} sm={1}>
-                <FormControl variant="standard" fullWidth>
-                  <ToggleButtonGroup
-                    size="large"
-                    value={isOffensiveSpell}
-                    exclusive
-                    onChange={(event, newValue) =>
-                      setIsOffensiveSpell(newValue)
-                    }
-                    aria-label="text alignment"
-                  >
-                    <ToggleButton value="offensive" aria-label="left aligned">
-                      <OffensiveSpellIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6} sm={2}>
-                <TextField
-                  type="number"
-                  label={t("MP x Target")}
-                  variant="outlined"
+              <Grid item xs={6} sm={6}>
+                <Select
                   fullWidth
-                />
+                  value={editedSpell.attr2 || "dexterity"}
+                  onChange={(e) => handleChange("attr2", e.target.value)}
+                >
+                  <MenuItem value={"dexterity"}>{attributes["dexterity"].shortcaps}</MenuItem>
+                  <MenuItem value={"insight"}>{attributes["insight"].shortcaps}</MenuItem>
+                  <MenuItem value={"might"}>{attributes["might"].shortcaps}</MenuItem>
+                  <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
+                </Select>
               </Grid>
-              <Grid item xs={6} sm={2}>
-                <TextField
-                  type="number"
-                  label={t("Max Targets")}
-                  variant="outlined"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label={t("Target Description")}
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ maxLength: 100 }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label={t("Duration")}
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ maxLength: 100 }}
-                />
-              </Grid>
-              {isOffensiveSpell ? (
-                <>
-                  <Grid item xs={12} sm={6}>
-                    <Select fullWidth defaultValue={"dexterity"}>
-                      <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-                      <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-                      <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-                      <MenuItem value={"will"}>{t("Wil")}</MenuItem>
-                    </Select>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Select fullWidth defaultValue={"dexterity"}>
-                      <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-                      <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-                      <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-                      <MenuItem value={"will"}>{t("Wil")}</MenuItem>
-                    </Select>
-                  </Grid>
-                </>
-              ) : null}
-              <Grid item xs={12} sm={12}>
-                <CustomTextarea label={t("Description")} fullWidth />
-              </Grid>
-            </Grid>
+            </>
+          ) : null}
+          <Grid item xs={12} sm={12}>
+            <CustomTextarea
+              label={t("Description")}
+              fullWidth
+              value={editedSpell.description || ""}
+              onChange={(e) => handleChange("description", e.target.value)}
+              maxRows={10}
+              maxLength={1500}
+            />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={onSave}>
+        <Button variant="contained" color="error" onClick={handleDelete}>
+          {t("Delete Spell")}
+        </Button>
+        <Button variant="contained" color="secondary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

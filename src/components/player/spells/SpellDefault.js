@@ -2,6 +2,10 @@ import React from "react";
 import { Typography, IconButton, Grid } from "@mui/material";
 import { Edit } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import { OffensiveSpellIcon } from "../../icons"; // Ensure this path is correct
+import attributes from "../../../libs/attributes";
+import { CloseBracket, OpenBracket } from "../../Bracket";
+import { useTranslate } from "../../../translation/translate";
 
 export default function SpellDefault({
   spellName,
@@ -16,6 +20,8 @@ export default function SpellDefault({
   attr2,
   isEditMode,
 }) {
+  const { t } = useTranslate();
+
   return (
     <>
       <div
@@ -35,18 +41,19 @@ export default function SpellDefault({
           justifyContent: "space-between",
         }}
       >
-        <Typography variant="h3" style={{ flexGrow: 1 }}>
-          {spellName}
-        </Typography>
         <div style={{ display: "flex", alignItems: "center" }}>
-          {isEditMode && (
-            <>
-              <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color: "white" }} />
-              </IconButton>
-            </>
-          )}
+          <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            {spellName}
+          </Typography>
+          {isOffensive && <OffensiveSpellIcon />}
         </div>
+        {isEditMode && (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <IconButton size="small" onClick={onEdit}>
+              <Edit style={{ color: "white" }} />
+            </IconButton>
+          </div>
+        )}
       </div>
       <Grid container>
         <Grid item xs={2}>
@@ -58,7 +65,7 @@ export default function SpellDefault({
               fontWeight: "bold",
             }}
           >
-            PM x Target
+            {t("MP x Target")}
           </Typography>
           <Typography
             variant="body1"
@@ -76,7 +83,7 @@ export default function SpellDefault({
               fontWeight: "bold",
             }}
           >
-            Max Targets
+            {t("Max Targets")}
           </Typography>
           <Typography
             variant="body1"
@@ -94,7 +101,7 @@ export default function SpellDefault({
               fontWeight: "bold",
             }}
           >
-            Target Description
+            {t("Target Description")}
           </Typography>
           <Typography
             variant="body1"
@@ -112,7 +119,7 @@ export default function SpellDefault({
               fontWeight: "bold",
             }}
           >
-            Duration
+            {t("Duration")}
           </Typography>
           <Typography
             variant="body1"
@@ -130,7 +137,7 @@ export default function SpellDefault({
               fontWeight: "bold",
             }}
           >
-            Description
+            {t("Description")}
           </Typography>
           <div
             style={{
@@ -142,6 +149,27 @@ export default function SpellDefault({
             <ReactMarkdown>{description}</ReactMarkdown>
           </div>
         </Grid>
+        {isOffensive && (
+          <Grid item xs={12}>
+            <Typography
+              variant="body1"
+              style={{
+                marginLeft: "10px",
+                marginTop: "5px",
+                fontWeight: "bold",
+              }}
+            >
+              {t("Magic Check") + ": "}
+              <strong>
+                <OpenBracket />
+                {t(attributes[attr1].shortcaps)}
+                {t(" + ")}
+                {t(attributes[attr2].shortcaps)}
+                <CloseBracket />
+              </strong>
+            </Typography>
+          </Grid>
+        )}
       </Grid>
     </>
   );
