@@ -45,7 +45,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           color: primary,
           background: `linear-gradient(to right, ${ternary}, transparent, ${ternary})`,
           textTransform: "uppercase",
-          padding: "0 5px",
+          padding: "5px 10px",
           borderRadius: type === "top" ? "8px 8px 0 0" : 0,
           margin: type === "top" ? "-30px 0 0 -30px" : "0 0 0 -30px",
           fontSize: isMobile ? "1em" : "1.5em",
@@ -53,6 +53,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           lineHeight: "normal",
+          textAlign: "center",
         }}
       >
         {isEditMode && <Tooltip title={t("Edit Class Name")}>

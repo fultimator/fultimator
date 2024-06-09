@@ -66,7 +66,7 @@ export default function PlayerClassCard({
   useEffect(() => {
     setWarnings([]);
     checkWarnings();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classItem]);
 
   const checkWarnings = () => {
@@ -286,7 +286,7 @@ export default function PlayerClassCard({
           <>
             <Grid item xs={12}>
               <CustomHeader2
-                headerText={t("Free Benefits")}
+                headerText={`${t(classItem.name)} ${t("Free Benefits")}`}
                 buttonText={t("Edit Benefits")}
                 onButtonClick={() => setOpenEditBenefitsModal(true)}
                 isEditMode={isEditMode}
@@ -407,7 +407,12 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
                 isHeroicSkill={false}
               />
-              <Typography variant="body1">
+              <Typography variant="body1"
+                justifyContent="flex-start"
+                sx={{
+                  background: "transparent",
+                  padding: "0 17px",
+                }}>
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
@@ -435,13 +440,18 @@ export default function PlayerClassCard({
                 headerText={classItem.heroic.name}
                 currentLvl={0}
                 maxLvl={0}
-                onIncrease={() => {}}
-                onDecrease={() => {}}
+                onIncrease={() => { }}
+                onDecrease={() => { }}
                 onEdit={() => handleEditHeroicSkill()}
                 isEditMode={isEditMode}
                 isHeroicSkill={true}
               />
-              <Typography variant="body1">
+              <Typography variant="body1"
+                justifyContent="flex-start"
+                sx={{
+                  background: "transparent",
+                  padding: "0 17px",
+                }}>
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
