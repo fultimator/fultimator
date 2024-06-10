@@ -11,11 +11,13 @@ import {
   ToggleButton,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { OffensiveSpellIcon } from "../../icons";
+import { Close } from "@mui/icons-material";
 
 export default function SpellDefaultModal({
   open,
@@ -57,8 +59,20 @@ export default function SpellDefaultModal({
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         {t("Edit Spell")}
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
       <DialogContent>
-        <Grid container spacing={2} sx={{ marginTop: "10px" }}>
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={7}>
             <TextField
               label={t("Spell Name")}
@@ -70,14 +84,21 @@ export default function SpellDefaultModal({
             />
           </Grid>
           <Grid item xs={12} sm={1}>
-            <FormControl variant="standard" fullWidth style={{ height: '100%' }}>
+            <FormControl
+              variant="standard"
+              fullWidth
+              style={{ height: "100%" }}
+            >
               <ToggleButton
-                value={editedSpell.isOffensive || false}
-                onChange={(e) =>
+                value={editedSpell.isOffensive}
+                selected={editedSpell.isOffensive}
+                onChange={() =>
                   handleChange("isOffensive", !editedSpell.isOffensive)
                 }
                 aria-label="offensive-toggle"
-                style={{ height: '100%' }}
+                style={{
+                  height: "100%",
+                }}
               >
                 <OffensiveSpellIcon />
               </ToggleButton>
@@ -177,10 +198,18 @@ export default function SpellDefaultModal({
                   value={editedSpell.attr1 || "dexterity"}
                   onChange={(e) => handleChange("attr1", e.target.value)}
                 >
-                  <MenuItem value={"dexterity"}>{attributes["dexterity"].shortcaps}</MenuItem>
-                  <MenuItem value={"insight"}>{attributes["insight"].shortcaps}</MenuItem>
-                  <MenuItem value={"might"}>{attributes["might"].shortcaps}</MenuItem>
-                  <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
+                  <MenuItem value={"dexterity"}>
+                    {attributes["dexterity"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"insight"}>
+                    {attributes["insight"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"might"}>
+                    {attributes["might"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"will"}>
+                    {attributes["will"].shortcaps}
+                  </MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={6} sm={6}>
@@ -189,10 +218,18 @@ export default function SpellDefaultModal({
                   value={editedSpell.attr2 || "dexterity"}
                   onChange={(e) => handleChange("attr2", e.target.value)}
                 >
-                  <MenuItem value={"dexterity"}>{attributes["dexterity"].shortcaps}</MenuItem>
-                  <MenuItem value={"insight"}>{attributes["insight"].shortcaps}</MenuItem>
-                  <MenuItem value={"might"}>{attributes["might"].shortcaps}</MenuItem>
-                  <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
+                  <MenuItem value={"dexterity"}>
+                    {attributes["dexterity"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"insight"}>
+                    {attributes["insight"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"might"}>
+                    {attributes["might"].shortcaps}
+                  </MenuItem>
+                  <MenuItem value={"will"}>
+                    {attributes["will"].shortcaps}
+                  </MenuItem>
                 </Select>
               </Grid>
             </>

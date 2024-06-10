@@ -8,8 +8,10 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  IconButton,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
+import { Close } from "@mui/icons-material";
 
 export default function EditSpellClassesModal({
   open,
@@ -35,6 +37,18 @@ export default function EditSpellClassesModal({
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         {t("Edit Class Spell Types")}
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
       <DialogContent>
         <FormGroup>
           {spellClassesList.map((spellClass, index) => (
@@ -43,7 +57,9 @@ export default function EditSpellClassesModal({
               control={
                 <Checkbox
                   checked={selectedSpellClasses.includes(spellClass)}
-                  onChange={(e) => onSpellClassChange(spellClass, e.target.checked)}
+                  onChange={(e) =>
+                    onSpellClassChange(spellClass, e.target.checked)
+                  }
                 />
               }
               label={t(spellClass)}

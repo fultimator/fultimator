@@ -82,7 +82,6 @@ export default function PlayerEdit() {
       setIsUpdated(false);
     }
   }, [player]);
-  
 
   useEffect(() => {
     if (!deepEqual(playerTemp, player)) {
@@ -91,7 +90,7 @@ export default function PlayerEdit() {
       setIsUpdated(false);
     }
   }, [playerTemp, player]);
-  
+
   // Warn user when leaving the page with unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -358,9 +357,15 @@ export default function PlayerEdit() {
                 }}
                 disabled={!isUpdated}
                 size="medium"
-                style={{ marginLeft: "5px" }}
+                style={{
+                  marginLeft: "5px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
-                <Save />
+                <Save style={{ fontSize: 20 }} />
+                <div style={{ fontSize: 10 }}>{t("Save")}</div>
               </Fab>
             </Tooltip>
           </Fade>

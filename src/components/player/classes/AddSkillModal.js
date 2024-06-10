@@ -7,9 +7,11 @@ import {
   Button,
   TextField,
   Grid,
+  IconButton,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
+import { Close } from "@mui/icons-material";
 
 export default function AddSkillModal({
   open,
@@ -40,8 +42,20 @@ export default function AddSkillModal({
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         {editSkillIndex !== null ? t("Edit Skill") : t("Add Skill")}
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
       <DialogContent>
-        <Grid container spacing={2} sx={{ marginTop: "10px" }}>
+        <Grid container spacing={2}>
           <Grid item sm={10} xs={12}>
             <TextField
               label={t("Skill Name")}

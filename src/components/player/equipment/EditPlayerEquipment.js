@@ -42,6 +42,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   return (
     <>
+    <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
       {isEditMode ? (
         <>
           {" "}

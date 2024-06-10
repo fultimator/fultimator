@@ -6,16 +6,18 @@ import {
   DialogActions,
   TextField,
   Button,
+  IconButton,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
+import { Close } from "@mui/icons-material";
 
 export default function EditHeroicSkillModal({
   open,
   onClose,
   onSave,
   heroic,
-  setHeroic
+  setHeroic,
 }) {
   const { t } = useTranslate();
 
@@ -37,6 +39,18 @@ export default function EditHeroicSkillModal({
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         {t("Edit Heroic Skill")}
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
       <DialogContent>
         <TextField
           label={t("Heroic Name")}
@@ -44,7 +58,6 @@ export default function EditHeroicSkillModal({
           onChange={(e) => setHeroic({ ...heroic, name: e.target.value })}
           fullWidth
           margin="normal"
-          sx={{ marginTop: "10px" }}
           inputProps={{ maxLength: 50 }}
         />
         <CustomTextarea
@@ -59,11 +72,7 @@ export default function EditHeroicSkillModal({
         />
       </DialogContent>
       <DialogActions>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleSave}
-        >
+        <Button variant="contained" color="secondary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

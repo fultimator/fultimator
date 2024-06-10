@@ -57,7 +57,7 @@ function ThemedSpellDefault({
             </Typography>
           </Grid>
           <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Typography>{mp}</Typography>
+            <Typography>{mp}{maxTargets !== 1 ? " x " + t("T") : ""}</Typography>
           </Grid>
           <Grid item xs={4} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Typography>{targetDesc}</Typography>

@@ -13,7 +13,7 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import { Delete, Close } from "@mui/icons-material";
 
 export default function EditFreeBenefitsModal({
   open,
@@ -37,8 +37,20 @@ export default function EditFreeBenefitsModal({
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         {t("Edit Benefits")}
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
       <DialogContent>
-        <Grid container spacing={2} sx={{ marginTop: "10px" }}>
+        <Grid container spacing={2}>
           <Grid item xs={4}>
             <TextField
               label={t("HP Modifier")}
