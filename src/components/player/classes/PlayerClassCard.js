@@ -472,7 +472,7 @@ export default function PlayerClassCard({
               <Button
                 variant="contained"
                 color="secondary"
-                sx={{ marginTop: "30px" }}
+                sx={{ marginTop: "30px", fontSize: "0.9em" }}
                 onClick={() => setOpenEditSpellClassesModal(true)}
               >
                 {t("Edit Class Spell Types")}
@@ -489,7 +489,7 @@ export default function PlayerClassCard({
                     onRemove();
                   }
                 }}
-                sx={{ marginTop: "30px" }}
+                sx={{ marginTop: "30px", fontSize: "0.9em" }}
               >
                 {t("Remove Class")}
               </Button>
