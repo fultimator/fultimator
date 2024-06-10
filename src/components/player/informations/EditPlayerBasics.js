@@ -308,7 +308,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
 
   const onRaiseLevel = () => {
     setPlayer((prevState) => {
-      if (prevState.lvl >= 60) return prevState;
+      if (prevState.lvl >= 50) return prevState;
       return { ...prevState, lvl: prevState.lvl + 1 };
     });
     updateMaxStats();

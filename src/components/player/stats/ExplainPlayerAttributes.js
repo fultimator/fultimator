@@ -31,9 +31,6 @@ return (
               <Typography>
                 <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
               </Typography>
-              <Typography>
-                <strong>{t("Super Specialized")}</strong>: d12, d8, d6, d6
-              </Typography>
               <Divider sx={{ my: 1 }} />
               <Typography variant="body2">
                 <ReactMarkdown
