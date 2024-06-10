@@ -130,7 +130,7 @@ export default function PlayerEdit() {
         const baseMaxHP =
           prevPlayer.lvl + (prevPlayer.attributes?.might || 0) * 5;
         const baseMaxMP =
-          prevPlayer.lvl + (prevPlayer.attributes?.insight || 0) * 5;
+          prevPlayer.lvl + (prevPlayer.attributes?.willpower || 0) * 5;
 
         let hpBonus = 0;
         let mpBonus = 0;
