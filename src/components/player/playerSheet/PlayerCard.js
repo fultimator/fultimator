@@ -1,20 +1,23 @@
 import React from "react";
 import {
-  Paper,
   Grid,
   Typography,
   LinearProgress,
   FormControlLabel,
   Checkbox,
+  Card,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
+import Diamond from "../../Diamond";
 
 export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
@@ -189,15 +192,59 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   };
 
   return (
-    <Paper
+    <Card
       elevation={3}
       sx={{
-        p: "15px",
         borderRadius: "8px",
         border: "2px solid",
         borderColor: secondary,
       }}
     >
+      <Grid container>
+        <Grid
+          item
+          xs
+          sx={{
+            background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%);`,
+            borderRight: "4px solid white",
+            px: 2,
+          }}
+        >
+          <Typography
+            color="#fff"
+            fontFamily="Antonio"
+            fontSize="1.5rem"
+            fontWeight="medium"
+            sx={{ textTransform: "uppercase" }}
+          >
+            {player.name}
+          </Typography>
+        </Grid>
+        <Grid
+          item
+          sx={{
+            px: 2,
+            py: 0.5,
+            borderLeft: `2px solid ${primary} `,
+            borderBottom: `2px solid ${primary} `,
+            borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
+          }}
+        >
+          <Typography
+            fontFamily="Antonio"
+            fontSize="1.25rem"
+            fontWeight="medium"
+            sx={{ textTransform: "uppercase" }}
+          >
+            {player.info.pronouns && (
+              <>
+                {player.info.pronouns} <Diamond color={primary} />{" "}
+              </>
+            )}
+            {t("Lvl")} {player.lvl}
+          </Typography>
+        </Grid>
+      </Grid>
       <Grid container spacing={2} alignItems="flex-start">
         <Grid item xs={4} sm={4}>
           <img
@@ -207,59 +254,10 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
               width: "100%",
               aspectRatio: "1",
               objectFit: "cover",
-              borderRadius: "8px",
-              border: `2px solid ${theme.palette.divider}`,
             }}
           />
         </Grid>
-        <Grid item xs={8}>
-          <Typography
-            variant="h5"
-            style={{
-              fontFamily: "'Antonio'",
-              fontWeight: "bold",
-              fontSize: "1.5rem",
-              marginBottom: "10px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <span
-                style={{
-                  marginRight: "5px",
-                  wordWrap: "break-word",
-                  whiteSpace: "normal",
-                  maxWidth: "calc(100% - 130px)", // Adjust according to the layout
-                }}
-              >
-                {player.name}
-              </span>
-              {player.info.pronouns && (
-                <span
-                  style={{
-                    fontFamily: "'Antonio'",
-                    fontSize: "1rem",
-                    color: theme.palette.text.disabled,
-                    marginRight: "5px",
-                    wordWrap: "break-word",
-                    whiteSpace: "normal",
-                    maxWidth: "calc(100% - 50px)", // Adjust according to the layout
-                  }}
-                >
-                  ({player.info.pronouns})
-                </span>
-              )}
-              <span style={{ marginLeft: "auto", whiteSpace: "nowrap" }}>LVL. {player.lvl}</span>
-            </div>
-          </Typography> 
+        <Grid item xs={8} sx={{ marginTop: "10px" }}>
           {renderStatBar(
             "HP",
             player.stats.hp.current,
@@ -677,6 +675,6 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
-    </Paper>
+    </Card>
   );
 }

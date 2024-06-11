@@ -13,9 +13,9 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import { ReactComponent as ZenitIcon } from "../../zenit.svg";
-import { ReactComponent as ExpIcon } from "../../exp.svg";
-import { ReactComponent as FabulaIcon } from "../../fabula.svg";
+import { ReactComponent as ZenitIcon } from "../../svgs/zenit.svg";
+import { ReactComponent as ExpIcon } from "../../svgs/exp.svg";
+import { ReactComponent as FabulaIcon } from "../../svgs/fabula.svg";
 import { Code } from "@mui/icons-material";
 
 export default function EditPlayerBasics({
