@@ -51,9 +51,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                             fontSize: '1.5em',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             minHeight: '56px'
                         }}
                     >
+                        <div style={{ marginLeft: '15px' }}>{headerText}</div>
                         {showIconButton ? (
                             disableIconButton ? (
                                 <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
@@ -70,7 +72,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         ) : (
                             <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
                         )}
-                        <div>{headerText}</div>
                     </Typography>
                     <Divider
                         orientation="horizontal"
@@ -108,9 +109,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                             fontSize: '1.5em',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                             minHeight: '56px'
                         }}
                     >
+                        <div style={{ marginLeft: '15px' }}>{headerText}</div>
                         {showIconButton ? (
                             disableIconButton ? (
                                 <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
@@ -127,7 +130,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         ) : (
                             <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
                         )}
-                        {headerText}
                     </Typography>
                     <Divider
                         orientation="horizontal"
