@@ -37,7 +37,8 @@ import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
-import PlayerInfo from "../../components/player/playerSheet/PlayerInfo";
+import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
+import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
@@ -254,7 +255,11 @@ export default function PlayerEdit() {
           />
           <Divider sx={{ my: 1 }} />
           {!battleMode && (
-            <PlayerInfo player={playerTemp} isEditMode={isOwner} />
+            <>
+              <PlayerTraits player={playerTemp} isEditMode={isOwner} />
+              <Divider sx={{ my: 1 }} />
+              <PlayerBonds player={playerTemp} isEditMode={isOwner} />
+            </>
           )}
           {isOwner && battleMode ? (
             <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />

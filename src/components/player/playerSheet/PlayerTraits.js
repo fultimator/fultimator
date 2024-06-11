@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 
-export default function PlayerInfo({ player, isEditMode }) {
+export default function PlayerTraits({ player, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;

@@ -9,7 +9,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 
@@ -77,8 +77,6 @@ function Personal({ user }) {
     idField: "id",
   });
 
-
-
   if (!canAccessTest) {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
@@ -120,17 +118,7 @@ function Personal({ user }) {
         identity: "",
         theme: "",
         origin: "",
-        bonds: [
-          {
-            name: "",
-            admiration: false,
-            loyalty: false,
-            affection: false,
-            inferiority: false,
-            mistrust: false,
-            hatred: false,
-          },
-        ],
+        bonds: [],
         description: "",
         fabulapoints: 3,
         exp: 0,
@@ -290,7 +278,7 @@ function Personal({ user }) {
             alignItems="center"
             justifyContent="center"
             key={index}
-            sx={{ marginBottom: "20px"}}
+            sx={{ marginBottom: "20px" }}
           >
             <PlayerCard
               player={player}
@@ -298,30 +286,30 @@ function Personal({ user }) {
               isEditMode={false}
               sx={{ marginBottom: 1 }}
             />
-            <div style={{ marginTop: "3px"}}>
-            <Tooltip title={t("Copy")}>
-              <IconButton onClick={copyPlayer(player)}>
-                <ContentCopy />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Edit")}>
-              <IconButton
-                component={RouterLink}
-                to={`/player-gallery/${player.id}`}
-              >
-                <Edit />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Delete")}>
-              <IconButton onClick={deletePlayer(player)}>
-                <Delete />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Share URL")}>
-              <IconButton onClick={() => sharePlayer(player.id)}>
-                <Share />
-              </IconButton>
-            </Tooltip>
+            <div style={{ marginTop: "3px" }}>
+              <Tooltip title={t("Copy")}>
+                <IconButton onClick={copyPlayer(player)}>
+                  <ContentCopy />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Edit")}>
+                <IconButton
+                  component={RouterLink}
+                  to={`/player-gallery/${player.id}`}
+                >
+                  <Edit />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Delete")}>
+                <IconButton onClick={deletePlayer(player)}>
+                  <Delete />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Share URL")}>
+                <IconButton onClick={() => sharePlayer(player.id)}>
+                  <Share />
+                </IconButton>
+              </Tooltip>
             </div>
           </Grid>
         ))}

@@ -33,6 +33,9 @@ const Fabula = createTheme({
     purple: {
       main: "#794a75",
     },
+    error: {
+      main: "#d1232a",
+    }
   } as ExtendedTheme['palette'],
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
