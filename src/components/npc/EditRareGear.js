@@ -9,6 +9,7 @@ import {
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditRareGear({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -46,7 +47,7 @@ export default function EditRareGear({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="middle"addItem={addRareGear} headerText={t("Rare Equipment")} />
+      <CustomHeader type="middle"addItem={addRareGear} headerText={t("Rare Equipment")} icon={Add} />
       {npc.raregear?.map((raregear, i) => {
         return (
           <Grid container key={i} spacing={1}>

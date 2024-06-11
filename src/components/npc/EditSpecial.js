@@ -10,6 +10,7 @@ import {
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -48,7 +49,7 @@ export default function EditSpecial({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type={isSmallScreen ? 'middle' : 'top'} addItem={addSpecial} headerText={t("Special Rules")} />
+      <CustomHeader type={isSmallScreen ? 'middle' : 'top'} addItem={addSpecial} headerText={t("Special Rules")} icon={Add} />
       {npc.special?.map((special, i) => {
         return (
           <Grid container key={i} spacing={1}>

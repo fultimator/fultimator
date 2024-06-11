@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, TextField, Button, Divider, Typography } from "@mui/material";
+import {
+  Paper,
+  Grid,
+  TextField,
+  Button,
+  Divider,
+  Typography,
+} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
@@ -38,7 +45,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const filteredSpells = selectedClass
     ? player.classes.find((cls) => cls.name === selectedClass)?.benefits
-      .spellClasses || []
+        .spellClasses || []
     : [];
 
   const addNewSpell = (spell) => {
@@ -137,7 +144,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
           >
             <Grid container>
               <Grid item xs={12}>
-                <CustomHeader type="top" headerText={t("Spells")} />
+                <CustomHeader
+                  type="top"
+                  headerText={t("Spells")}
+                  showIconButton={false}
+                />
               </Grid>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={5}>
@@ -152,10 +163,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     value={
                       selectedClass
                         ? t(
-                          player.classes.find(
-                            (cls) => cls.name === selectedClass
-                          )?.name
-                        )
+                            player.classes.find(
+                              (cls) => cls.name === selectedClass
+                            )?.name
+                          )
                         : null
                     }
                     onChange={handleClassChange}
@@ -223,6 +234,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   <CustomHeader
                     type="top"
                     headerText={t("Spells") + " - " + t(cls.name)}
+                    showIconButton={false}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -245,24 +257,69 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     }}
                   >
                     <Grid container style={{ flexGrow: 1 }}>
-                      <Grid item xs flexGrow style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
-                        <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+                      <Grid
+                        item
+                        xs
+                        flexGrow
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "left",
+                        }}
+                      >
+                        <Typography
+                          variant="h3"
+                          style={{ flexGrow: 1, marginRight: "5px" }}
+                        >
                           {t("Spell")}
                         </Typography>
                       </Grid>
-                      <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Grid
+                        item
+                        xs={2}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <Typography variant="h3">{t("MP")}</Typography>
                       </Grid>
-                      <Grid item xs={4} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Grid
+                        item
+                        xs={4}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <Typography variant="h3">{t("Target")}</Typography>
                       </Grid>
-                      <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Grid
+                        item
+                        xs={3}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <Typography variant="h3">{t("Duration")}</Typography>
                       </Grid>
                     </Grid>
                     {isEditMode && (
-                      <Grid item xs style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-                        <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
+                      <Grid
+                        item
+                        xs
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <div style={{ width: 40, height: 40 }} />{" "}
+                        {/* Retain space */}
                       </Grid>
                     )}
                   </div>
@@ -275,7 +332,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       targetDesc={spell.targetDesc}
                       duration={spell.duration}
                       description={spell.description}
-                      onEdit={() => handleEditDefaultSpell(spell, cls.name, index)}
+                      onEdit={() =>
+                        handleEditDefaultSpell(spell, cls.name, index)
+                      }
                       isEditMode={isEditMode}
                       isOffensive={spell.isOffensive}
                       attr1={spell.attr1}

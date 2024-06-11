@@ -9,6 +9,7 @@ import {
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -46,7 +47,7 @@ export default function EditNotes({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="middle" addItem={addNotes} headerText={t("Notes")} />
+      <CustomHeader type="middle" addItem={addNotes} headerText={t("Notes")} icon={Add} />
       {npc.notes?.map((notes, i) => {
         return (
           <Grid container key={i} spacing={1}>

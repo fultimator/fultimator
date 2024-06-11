@@ -20,6 +20,7 @@ import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -60,7 +61,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="middle" addItem={addAttack} headerText={t("Attacks with Weapons")} />
+      <CustomHeader type="middle" addItem={addAttack} headerText={t("Attacks with Weapons")} icon={Add} />
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>

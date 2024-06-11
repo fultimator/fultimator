@@ -157,7 +157,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
           <CustomHeader
             type="top"
             headerText={t("Statistics")}
-            addItem={() => console.log(player)}
+            showIconButton={false}
           />
         </Grid>
         <Grid item xs={12}>

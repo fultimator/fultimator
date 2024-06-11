@@ -12,6 +12,7 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
+import { Add } from "@mui/icons-material";
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -134,6 +135,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
             type="top"
             headerText={t("Bonds")}
             addItem={isEditMode ? addNewBond : null}
+            icon={Add}
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (

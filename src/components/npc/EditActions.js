@@ -9,6 +9,7 @@ import {
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditActions({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -46,7 +47,7 @@ export default function EditActions({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" addItem={addActions} headerText={t("Other Actions")} />
+      <CustomHeader type="top" addItem={addActions} headerText={t("Other Actions")} icon={Add} />
       {npc.actions?.map((actions, i) => {
         return (
           <Grid container key={i} spacing={1}>

@@ -11,6 +11,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
+import { Add } from "@mui/icons-material";
 
 export default function EditPlayerNotes({ player, setPlayer }) {
   const { t } = useTranslate();
@@ -73,6 +74,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
                 return newState;
               })}
             }
+            icon={Add}
           />
         </Grid>
         {player.notes.map((note, index) => (

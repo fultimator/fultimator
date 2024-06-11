@@ -15,6 +15,7 @@ import { OffensiveSpellIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -58,7 +59,7 @@ export default function EditSpells({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" addItem={addSpell} headerText={t("Spells")} />
+      <CustomHeader type="top" addItem={addSpell} headerText={t("Spells")} icon={Add} />
       {npc.spells?.map((spell, i) => {
         return (
           <Grid container key={i} spacing={1}>

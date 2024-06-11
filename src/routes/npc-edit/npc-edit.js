@@ -466,7 +466,7 @@ export default function NpcEdit() {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <CustomHeader type="top" headerText={t("Affinity")} />
+                <CustomHeader type="top" headerText={t("Affinity")} showIconButton={false} />
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
@@ -474,6 +474,7 @@ export default function NpcEdit() {
                 <CustomHeader
                   type={isSmallScreen ? "middle" : "top"}
                   headerText={t("Bonuses")}
+                  showIconButton={false}
                 />
                 <EditExtra npc={npcTemp} setNpc={updateNPC} />
               </Grid>

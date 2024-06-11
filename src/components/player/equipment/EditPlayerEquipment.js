@@ -1,13 +1,6 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  Button,
-  Divider,
-  Typography,
-  Box,
-} from "@mui/material";
+import { Paper, Grid, Button, Divider, Typography, Box } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import Weapons from "../../../routes/equip/weapons/Weapons";
@@ -42,7 +35,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   return (
     <>
-    <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
+      <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
       {isEditMode ? (
         <>
           {" "}
@@ -57,7 +50,11 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           >
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <CustomHeader type="top" headerText={t("Equipment")} />
+                <CustomHeader
+                  type="top"
+                  headerText={t("Equipment")}
+                  showIconButton={false}
+                />
               </Grid>
               <Grid container justifyContent="center" spacing={2}>
                 <Grid item xs={6} sm={3} container justifyContent="center">
@@ -110,9 +107,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             {t("Weapons")}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
-            {/* List all available Weapons */}
-        </AccordionDetails>
+        <AccordionDetails>{/* List all available Weapons */}</AccordionDetails>
       </Accordion>
       <Accordion
         elevation={3}
@@ -144,9 +139,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             {t("Armor")}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
-            {/* List all available Armor */}
-        </AccordionDetails>
+        <AccordionDetails>{/* List all available Armor */}</AccordionDetails>
       </Accordion>
       <Accordion
         elevation={3}
@@ -178,9 +171,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             {t("Shields")}
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
-            {/* List all available Shields */}
-        </AccordionDetails>
+        <AccordionDetails>{/* List all available Shields */}</AccordionDetails>
       </Accordion>
       <Accordion
         elevation={3}
@@ -213,7 +204,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-            {/* List all available Accessories */}
+          {/* List all available Accessories */}
         </AccordionDetails>
       </Accordion>
       <Modal

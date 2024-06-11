@@ -58,7 +58,7 @@ export default function EditManualStats({
           <CustomHeader
             type="top"
             headerText={t("Edit Stats Manually")}
-            addItem={() => console.log(player)}
+            showIconButton={false}
           />
         </Grid>
         <Grid item xs={4}>

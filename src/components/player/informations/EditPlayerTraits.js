@@ -71,7 +71,9 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <CustomHeader type="top" headerText={t("Traits")} />
+          <CustomHeader type="top" headerText={t("Traits")}
+            showIconButton={false}
+          />
         </Grid>
         <Grid item xs={12} sm={12}>
           <FormControl variant="standard" fullWidth>

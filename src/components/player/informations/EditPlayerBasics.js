@@ -16,6 +16,7 @@ import CustomHeader from "../../common/CustomHeader";
 import { ReactComponent as ZenitIcon } from "../../zenit.svg";
 import { ReactComponent as ExpIcon } from "../../exp.svg";
 import { ReactComponent as FabulaIcon } from "../../fabula.svg";
+import { Code } from "@mui/icons-material";
 
 export default function EditPlayerBasics({
   player,
@@ -85,6 +86,8 @@ export default function EditPlayerBasics({
             type="top"
             headerText={t("Basic Information")}
             addItem={() => console.log(player)}
+            icon ={ Code}
+            customTooltip="Console.log Player Object"
           />
         </Grid>
         <Grid item xs={12} sm={4}>

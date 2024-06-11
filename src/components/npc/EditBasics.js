@@ -73,7 +73,7 @@ export default function EditBasics({ npc, setNpc }) {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <CustomHeader type="top" headerText={t("Basic Information")} />
+        <CustomHeader type="top" headerText={t("Basic Information")} showIconButton={false} />
       </Grid>
       <Grid item xs={12} sm={4}>
         <FormControl variant="standard" fullWidth>

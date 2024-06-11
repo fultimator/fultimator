@@ -5,14 +5,27 @@ import IconButton from '@mui/material/IconButton';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import { useTheme } from '@mui/system';
 import { Grid, Tooltip } from "@mui/material";
+import { SvgIconComponent } from '@mui/icons-material';
 
 interface CustomHeaderProps {
     addItem: () => void;
     headerText: string;
     type: 'top' | 'middle';
+    icon?: SvgIconComponent; // Optional icon prop
+    showIconButton?: boolean; // Optional prop to control icon button visibility
+    disableIconButton?: boolean; // Optional prop to control icon button clickability
+    customTooltip?: string; // Optional prop to add custom tooltip
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }) => {
+const CustomHeader: React.FC<CustomHeaderProps> = ({
+    addItem,
+    headerText,
+    type,
+    icon: Icon = HistoryEduIcon,
+    showIconButton = true,
+    disableIconButton = false,
+    customTooltip = '',
+}) => {
     const theme = useTheme();
     const primary = theme.palette.primary.main;
     const secondary = theme.palette.secondary.main;
@@ -36,17 +49,28 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             borderRadius: '8px 8px 0 0',
                             margin: '-30px 0 0 -30px',
                             fontSize: '1.5em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            minHeight: '56px'
                         }}
                     >
-                        <Tooltip title={"Add " + headerText}>
-                            <IconButton
-                                sx={{ px: 1, '&:hover': { color: primary } }}
-                                onClick={addItem}
-                            >
-                                <HistoryEduIcon fontSize="large" />
-                            </IconButton>
-                        </Tooltip>
-                        {headerText}
+                        {showIconButton ? (
+                            disableIconButton ? (
+                                <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
+                            ) : (
+                                <Tooltip title={customTooltip || ("Add " + headerText)}>
+                                    <IconButton
+                                        sx={{ px: 1, '&:hover': { color: primary } }}
+                                        onClick={addItem}
+                                    >
+                                        <Icon fontSize="large" />
+                                    </IconButton>
+                                </Tooltip>
+                            )
+                        ) : (
+                            <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
+                        )}
+                        <div>{headerText}</div>
                     </Typography>
                     <Divider
                         orientation="horizontal"
@@ -82,16 +106,27 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ addItem, headerText, type }
                             borderRadius: 0,
                             margin: '0 0 0 -30px',
                             fontSize: '1.5em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            minHeight: '56px'
                         }}
                     >
-                        <Tooltip title={"Add " + headerText}>
-                            <IconButton
-                                sx={{ px: 1, '&:hover': { color: primary } }}
-                                onClick={addItem}
-                            >
-                                <HistoryEduIcon fontSize="large" />
-                            </IconButton>
-                        </Tooltip>
+                        {showIconButton ? (
+                            disableIconButton ? (
+                                <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
+                            ) : (
+                                <Tooltip title={"Add " + headerText}>
+                                    <IconButton
+                                        sx={{ px: 1, '&:hover': { color: primary } }}
+                                        onClick={addItem}
+                                    >
+                                        <Icon fontSize="large" />
+                                    </IconButton>
+                                </Tooltip>
+                            )
+                        ) : (
+                            <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
+                        )}
                         {headerText}
                     </Typography>
                     <Divider

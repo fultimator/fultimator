@@ -47,7 +47,7 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
         <CustomHeader
           type="top"
           headerText={t("Statuses")}
-          addItem={() => console.log(player)}
+          showIconButton={false}
         />
       </Grid>
       <Grid container spacing={2}>

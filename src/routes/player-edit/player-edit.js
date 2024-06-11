@@ -359,13 +359,9 @@ export default function PlayerEdit() {
                 size="medium"
                 style={{
                   marginLeft: "5px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
                 }}
               >
-                <Save style={{ fontSize: 20 }} />
-                <div style={{ fontSize: 10 }}>{t("Save")}</div>
+                <Save />
               </Fab>
             </Tooltip>
           </Fade>

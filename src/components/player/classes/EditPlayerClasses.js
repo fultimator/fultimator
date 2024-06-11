@@ -26,7 +26,7 @@ export default function EditPlayerClasses({
 
   useEffect(() => {
     checkWarnings();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, player.classes, player.lvl]);
 
   const checkWarnings = () => {
@@ -314,7 +314,11 @@ export default function EditPlayerClasses({
           >
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <CustomHeader type="top" headerText={t("Classes")} />
+                <CustomHeader
+                  type="top"
+                  headerText={t("Classes")}
+                  showIconButton={false}
+                />
               </Grid>
               {warnings.map((warning, index) => (
                 <Grid item xs={12} key={index}>

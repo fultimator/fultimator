@@ -20,6 +20,7 @@ import { DistanceIcon, MeleeIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
+import { Add } from "@mui/icons-material";
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -63,7 +64,7 @@ export default function EditAttacks({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" addItem={addAttack} headerText={t("Basic Attacks")} />
+      <CustomHeader type="top" addItem={addAttack} headerText={t("Basic Attacks")} icon={Add} />
       {npc.attacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>

@@ -80,7 +80,7 @@ export default function EditPlayerAttributes({
           <CustomHeader
             type="top"
             headerText={t("Attributes")}
-            addItem={() => console.log(player)}
+            showIconButton={false}
           />
         </Grid>
         {/* Attributes control */}
