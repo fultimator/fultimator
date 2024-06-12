@@ -181,7 +181,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 marginBottom: "-4px",
               }}
             >
-              DEF
+              {t("DEF")}
             </span>
             <span style={{ marginLeft: "-4px" }}>
               <DefIcon style={{ width: "24px", height: "24px" }} />
@@ -215,7 +215,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 marginBottom: "-4px",
               }}
             >
-              MDEF
+              {t("M.DEF")}
             </span>
             <span style={{ marginLeft: "-4px" }}>
               <MdefIcon style={{ width: "24px", height: "24px" }} />
@@ -249,7 +249,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 marginBottom: "-4px",
               }}
             >
-              INIT
+              {t("INIT")}
             </span>
             <span style={{ marginLeft: "-4px" }}>
               <InitIcon style={{ width: "24px", height: "24px" }} />
@@ -341,28 +341,28 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             }}
           />
           {renderStatBar(
-            "HP",
+            t("HP"),
             player.stats.hp.current,
             player.stats.hp.max,
             newShade(theme.palette.error.main, 80),
             theme.palette.error.main
           )}
           {renderStatBar(
-            "MP",
+            t("MP"),
             player.stats.mp.current,
             player.stats.mp.max,
             newShade(theme.palette.info.main, 80),
             theme.palette.info.main
           )}
           {renderStatBar(
-            "IP",
+            t("IP"),
             player.stats.ip.current,
             player.stats.ip.max,
             newShade(theme.palette.success.main, 80),
             theme.palette.success.main
           )}
         </Grid>
-        <Grid item xs={8} sx={{ marginTop: "10px" }}>
+        <Grid item xs={8} sx={{ marginTop: "5px", marginX:"-5px" }}>
           <Paper
             elevation={3}
             sx={{
@@ -370,7 +370,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
               border: "1px solid",
               borderColor: secondary,
               display: "flex",
-              marginRight: "15px",
+              marginRight: "5px",
               boxShadow: "none",
             }}
           >
@@ -433,7 +433,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {player.info.theme}
+                    {t(player.info.theme)}
                   </span>
                 </Typography>
               </Grid>
