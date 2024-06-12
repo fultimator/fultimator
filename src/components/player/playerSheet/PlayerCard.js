@@ -7,6 +7,7 @@ import {
   Checkbox,
   Card,
   Box,
+  Paper,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -23,6 +24,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+  const isMobile = window.innerWidth < 900;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
@@ -104,7 +106,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     ({ theme, color1, color2 }) => ({
       height: 15,
       borderRadius: 0,
-      backgroundColor: theme.palette.grey[800],
+      backgroundColor: theme.palette.grey[200],
       position: "relative",
       overflow: "hidden",
       "& .MuiLinearProgress-bar": {
@@ -164,15 +166,31 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             fontSize: "1.5rem",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            <DefIcon
-              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
-            />
-          </span>
-          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-            {" "}
-            {currDef}
-          </span>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                fontSize: "0.7rem",
+                marginBottom: "-4px",
+              }}
+            >
+              DEF
+            </span>
+            <span style={{ marginLeft: "-4px" }}>
+              <DefIcon style={{ width: "24px", height: "24px" }} />
+              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+                {" "}
+                {currDef}
+              </span>
+            </span>
+          </div>
         </Typography>
       </Grid>
       <Grid item xs={4} sm={4}>
@@ -182,15 +200,31 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             fontSize: "1.5rem",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            <MdefIcon
-              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
-            />
-          </span>
-          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-            {" "}
-            {currMDef}
-          </span>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                fontSize: "0.7rem",
+                marginBottom: "-4px",
+              }}
+            >
+              MDEF
+            </span>
+            <span style={{ marginLeft: "-4px" }}>
+              <MdefIcon style={{ width: "24px", height: "24px" }} />
+              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+                {" "}
+                {currMDef}
+              </span>
+            </span>
+          </div>
         </Typography>
       </Grid>
       <Grid item xs={4} sm={4}>
@@ -200,15 +234,31 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             fontSize: "1.5rem",
           }}
         >
-          <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            <InitIcon
-              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
-            />
-          </span>
-          <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-            {" "}
-            {currInit}
-          </span>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                fontSize: "0.7rem",
+                marginBottom: "-4px",
+              }}
+            >
+              INIT
+            </span>
+            <span style={{ marginLeft: "-4px" }}>
+              <InitIcon style={{ width: "24px", height: "24px" }} />
+              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+                {" "}
+                {currInit}
+              </span>
+            </span>
+          </div>
         </Typography>
       </Grid>
     </>
@@ -313,7 +363,104 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           )}
         </Grid>
         <Grid item xs={8} sx={{ marginTop: "10px" }}>
-          <Grid container spacing={1} style={{ marginTop: "10px" }}>
+          <Paper
+            elevation={3}
+            sx={{
+              borderRadius: "8px",
+              border: "1px solid",
+              borderColor: secondary,
+              display: "flex",
+              marginRight: "15px",
+              boxShadow: "none",
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                marginLeft: "-1px",
+                marginRight: "10px",
+                marginTop: "-1px",
+                marginBottom: "-1px",
+                backgroundColor: primary,
+                color: ternary,
+                borderRadius: "0 8px 8px 0",
+                transform: "rotate(180deg)",
+                fontSize: "1.2rem",
+              }}
+              align="center"
+            >
+              {t("Traits")}
+            </Typography>
+
+            <Grid container spacing={1} sx={{ padding: "0.3rem" }}>
+              <Grid item xs={12} md={12}>
+                <Typography variant="h4">
+                  <span
+                    style={{
+                      fontWeight: "bolder",
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {t("Identity") + ": "}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {player.info.identity}
+                  </span>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4">
+                  <span
+                    style={{
+                      fontWeight: "bolder",
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {t("Theme") + ": "}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {player.info.theme}
+                  </span>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4">
+                  <span
+                    style={{
+                      fontWeight: "bolder",
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {t("Origin") + ": "}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: isMobile ? "0.8rem" : "1rem",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {player.info.origin}
+                  </span>
+                </Typography>
+              </Grid>
+            </Grid>
+          </Paper>
+          <Grid container spacing={1}>
             <Grid
               item
               xs={1}
@@ -706,7 +853,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
             </Grid>
-            <Grid container sx={{ marginTop: 1, marginLeft: 1, marginBottom: 0 }}>
+            <Grid container sx={{ marginBottom: 0 }}>
               {renderAdditionalStats()}
             </Grid>
           </Grid>
