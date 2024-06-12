@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Typography,
 } from "@mui/material";
 
 interface HelpFeedbackDialogProps {
@@ -25,6 +26,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -40,11 +42,12 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     const webhookUrl = process.env.REACT_APP_DISCORD_FEEDBACK_WEBHOOK_URL;
 
     if (!webhookUrl) {
-      console.error("Webhook URL is not defined");
+      setErrorMessage("Webhook URL is not defined");
       return;
     }
 
     setIsSubmitting(true);
+    setErrorMessage("");
 
     const payload = {
       content: null,
@@ -77,21 +80,26 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       }
 
       console.log("Message sent successfully");
+      setCooldown(30);
+      onClose();
+      setDiscordAccount("");
+      setMessage("");
     } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
+      if (error instanceof Error) {
+        setErrorMessage("There was a problem with the fetch operation: " + error.message);
+      } else {
+        setErrorMessage("An unknown error occurred");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setCooldown(30);
-    onClose();
-    setDiscordAccount("");
-    setMessage("");
   };
 
   const handleClose = () => {
     onClose();
     setDiscordAccount("");
     setMessage("");
+    setErrorMessage("");
   };
 
   return (
@@ -123,6 +131,11 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
             maxLength: 5000,
           }}
         />
+        {errorMessage && (
+          <Typography color="error" variant="body2">
+            {errorMessage}
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
