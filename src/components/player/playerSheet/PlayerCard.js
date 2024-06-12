@@ -6,11 +6,16 @@ import {
   FormControlLabel,
   Checkbox,
   Card,
+  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
+import { styled } from "@mui/system";
+import { ReactComponent as DefIcon } from "../../svgs/def.svg";
+import { ReactComponent as MdefIcon } from "../../svgs/mdef.svg";
+import { ReactComponent as InitIcon } from "../../svgs/init.svg";
 
 export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -20,6 +25,25 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+  const newShade = (hexColor, magnitude) => {
+    hexColor = hexColor.replace(`#`, ``);
+    if (hexColor.length === 6) {
+      const decimalColor = parseInt(hexColor, 16);
+      let r = (decimalColor >> 16) + magnitude;
+      r > 255 && (r = 255);
+      r < 0 && (r = 0);
+      let g = (decimalColor & 0x0000ff) + magnitude;
+      g > 255 && (g = 255);
+      g < 0 && (g = 0);
+      let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
+      b > 255 && (b = 255);
+      b < 0 && (b = 0);
+      return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
+    } else {
+      return hexColor;
+    }
+  };
 
   const calculateAttribute = (
     base,
@@ -76,45 +100,51 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     return theme.palette.text.primary;
   };
 
-  const renderStatBar = (label, value, max, color) => (
-    <div style={{ display: "flex", alignItems: "center", marginBottom: 5 }}>
-      <Typography
-        variant="body2"
-        style={{
-          minWidth: 30,
-          fontFamily: "'Antonio', fantasy, sans-serif",
-          fontSize: "0.8rem",
-          marginRight: 5,
-          color: theme.palette.text.secondary,
-        }}
-      >
-        {label}
-      </Typography>
-      <div style={{ flexGrow: 1 }}>
-        <LinearProgress
+  const GradientLinearProgress = styled(LinearProgress)(
+    ({ theme, color1, color2 }) => ({
+      height: 15,
+      borderRadius: 0,
+      backgroundColor: theme.palette.grey[800],
+      position: "relative",
+      overflow: "hidden",
+      "& .MuiLinearProgress-bar": {
+        background: `linear-gradient(to right, ${color1}, ${color2})`,
+        borderRadius: 0,
+      },
+    })
+  );
+
+  const ProgressBarWithLabel = styled(Box)(({ theme }) => ({
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    color: theme.palette.text.secondary,
+    fontFamily: "'Antonio', fantasy, sans-serif",
+    fontSize: "0.7rem",
+    pointerEvents: "none",
+    whiteSpace: "nowrap",
+  }));
+
+  const renderStatBar = (label, value, max, color1, color2) => (
+    <Box sx={{ display: "flex", alignItems: "center", marginBottom: 0 }}>
+      <Box sx={{ flexGrow: 1, position: "relative" }}>
+        <GradientLinearProgress
           variant="determinate"
           value={(value / max) * 100}
+          color1={color1}
+          color2={color2}
           sx={{
-            height: 8,
-            borderRadius: 5,
-            backgroundColor: theme.palette.grey[800],
             "& .MuiLinearProgress-bar": {
-              backgroundColor: color,
+              transition: "width 1s ease-in-out",
             },
           }}
         />
-      </div>
-      <Typography
-        variant="body2"
-        style={{
-          minWidth: 40,
-          fontFamily: "'Antonio', fantasy, sans-serif",
-          fontSize: "0.8rem",
-          marginLeft: 5,
-          color: theme.palette.text.secondary,
-        }}
-      >{`${value}/${max}`}</Typography>
-    </div>
+        <ProgressBarWithLabel>
+          {label} {`${value}/${max}`}
+        </ProgressBarWithLabel>
+      </Box>
+    </Box>
   );
 
   // Calculate DEF and MDEF
@@ -127,16 +157,17 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   // Function to render DEF, MDEF, and INIT as numbers
   const renderAdditionalStats = () => (
     <>
-      <Grid item xs={12} sm={4}>
+      <Grid item xs={4} sm={4}>
         <Typography
           variant="body2"
           style={{
-            fontSize: "1rem",
-            marginBottom: "5px",
+            fontSize: "1.5rem",
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            {t("DEF") + ":"}
+            <DefIcon
+              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
+            />
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
@@ -144,16 +175,17 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           </span>
         </Typography>
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid item xs={4} sm={4}>
         <Typography
           variant="body2"
           style={{
-            fontSize: "1rem",
-            marginBottom: "5px",
+            fontSize: "1.5rem",
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            {t("M.DEF") + ":"}
+            <MdefIcon
+              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
+            />
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
@@ -161,16 +193,17 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
           </span>
         </Typography>
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid item xs={4} sm={4}>
         <Typography
           variant="body2"
           style={{
-            fontSize: "1rem",
-            marginBottom: "5px",
+            fontSize: "1.5rem",
           }}
         >
           <span style={{ fontFamily: "Antonio", fontWeight: "bold" }}>
-            {t("INIT") + ":"}
+            <InitIcon
+              style={{ width: "24px", height: "24px", marginLeft: "4px" }}
+            />
           </span>
           <span style={{ fontFamily: "'Antonio', sans-serif" }}>
             {" "}
@@ -254,28 +287,32 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
               width: "100%",
               aspectRatio: "1",
               objectFit: "cover",
+              marginBottom: "-6px",
             }}
           />
-        </Grid>
-        <Grid item xs={8} sx={{ marginTop: "10px" }}>
           {renderStatBar(
             "HP",
             player.stats.hp.current,
             player.stats.hp.max,
+            newShade(theme.palette.error.main, 80),
             theme.palette.error.main
           )}
           {renderStatBar(
             "MP",
             player.stats.mp.current,
             player.stats.mp.max,
+            newShade(theme.palette.info.main, 80),
             theme.palette.info.main
           )}
           {renderStatBar(
             "IP",
             player.stats.ip.current,
             player.stats.ip.max,
+            newShade(theme.palette.success.main, 80),
             theme.palette.success.main
           )}
+        </Grid>
+        <Grid item xs={8} sx={{ marginTop: "10px" }}>
           <Grid container spacing={1} style={{ marginTop: "10px" }}>
             <Grid
               item
@@ -669,7 +706,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
             </Grid>
-            <Grid container sx={{ marginTop: 2, marginLeft: 1 }}>
+            <Grid container sx={{ marginTop: 1, marginLeft: 1, marginBottom: 0 }}>
               {renderAdditionalStats()}
             </Grid>
           </Grid>
