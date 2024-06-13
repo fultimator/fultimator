@@ -274,7 +274,7 @@ export default function PlayerEdit() {
               <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} />
             </>
           )}
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={1}>
           <EditPlayerBasics
@@ -301,7 +301,7 @@ export default function PlayerEdit() {
               <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
             </>
           ) : null}
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={2}>
           <EditPlayerAttributes
@@ -330,7 +330,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={3}>
           <EditPlayerClasses
@@ -339,7 +339,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={4}>
           <EditPlayerSpells
@@ -347,7 +347,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={5}>
           <EditPlayerEquipment
@@ -355,7 +355,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "5vh" }} />
+          <Box sx={{ height: "10vh" }} />
         </TabPanel>
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}

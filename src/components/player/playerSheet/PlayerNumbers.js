@@ -59,7 +59,7 @@ export default function PlayerNumbers({ player, isEditMode }) {
               }}
             >
               <span>
-                {isMobile ? t("Exp") : t("Experience")}
+                {isMobile ? "Exp" : t("Exp")}
                 {":"}
               </span>
               <span style={{ marginLeft: "4px", fontSize: { xs: "1em", md: "1.4em" } }}>
