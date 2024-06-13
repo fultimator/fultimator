@@ -176,7 +176,7 @@ export default function PlayerWeaponModal({
       cost,
       damage,
       prec,
-      isEquipped,
+      isEquipped: (weapon?.hands || weapons[0].hands) !== hands || (weapon?.martial || false) !== martial ? false : isEquipped,
     };
     onAddWeapon(updatedWeapon);
   };

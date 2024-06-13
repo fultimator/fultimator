@@ -41,6 +41,7 @@ import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
+import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
@@ -267,6 +268,12 @@ export default function PlayerEdit() {
           {isOwner && battleMode ? (
             <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
           ) : null}
+          {battleMode && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} />
+            </>
+          )}
           <Box sx={{ height: "5vh" }} />
         </TabPanel>
         <TabPanel value={1}>

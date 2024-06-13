@@ -64,6 +64,15 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setOpenNewWeapon(false);
   };
 
+  const handleEquipWeapon = (weaponIndex) => {
+    // Toggle equipped weapon (weapon.isEquipped)
+    /* Note: there can be only one Two Handed Weapon or two One Handed weapons equipped at a time */
+    const updatedWeapons = (player.weapons || []).map((weapon, i) =>
+      i === weaponIndex ? { ...weapon, isEquipped: !weapon.isEquipped } : weapon
+    );
+    setPlayer({ ...player, weapons: updatedWeapons });
+  };
+
   return (
     <>
       <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
@@ -113,6 +122,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         weapons={player.weapons || []}
         onEditWeapon={handleEditWeapon}
         onDeleteWeapon={handleDeleteWeapon}
+        onEquipWeapon={handleEquipWeapon}
       />
 
       <Accordion
