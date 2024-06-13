@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -8,18 +8,10 @@ import {
   IconButton,
   Grid,
   Divider,
-  useTheme,
-  Card,
-  Stack,
-  Typography,
 } from "@mui/material";
-import { styled } from "@mui/system";
-import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
 import weapons from "../../../routes/equip/weapons/base";
 import qualities from "../../../routes/equip/weapons/qualities";
-import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
 import ChangeBase from "../../../routes/equip/weapons/ChangeBase";
 import ChangeMartial from "../../../routes/equip/common/ChangeMartial";
 import ChangeName from "../../../routes/equip/common/ChangeName";
@@ -30,31 +22,61 @@ import SelectQuality from "../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../routes/equip/common/ChangeQuality";
 import ChangeBonus from "../../../routes/equip/weapons/ChangeBonus";
 import ApplyRework from "../../../routes/equip/common/ApplyRework";
-import { Martial } from "../../icons";
-import { OpenBracket, CloseBracket } from "../../Bracket";
-import Diamond from "../../Diamond";
-//import PrettySingle from "../../../routes/equip/weapons/Pretty";
 import { Close } from "@mui/icons-material";
 
-export default function PlayerWeaponModal({ open, onClose }) {
-  const { t } = useTranslate();
-  const [base, setBase] = useState(weapons[0]);
-  const [name, setName] = useState(weapons[0].name);
-  const [type, setType] = useState(weapons[0].type);
-  const [hands, setHands] = useState(weapons[0].hands);
-  const [att1, setAtt1] = useState(weapons[0].att1);
-  const [att2, setAtt2] = useState(weapons[0].att2);
-  const [martial, setMartial] = useState(false);
-  const [damageBonus, setDamageBonus] = useState(false);
-  const [damageReworkBonus, setDamageReworkBonus] = useState(false);
-  const [precBonus, setPrecBonus] = useState(false);
-  const [rework, setRework] = useState(false);
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [totalBonus, setTotalBonus] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
+import PrettyWeapon from "./PrettyWeapon";
 
-  function calcCost() {
+export default function PlayerWeaponModal({
+  open,
+  onClose,
+  editWeaponIndex,
+  weapon,
+  setWeapon,
+  onAddWeapon,
+  onDeleteWeapon,
+}) {
+  const { t } = useTranslate();
+  const [base, setBase] = useState(weapon?.base || weapons[0]);
+  const [name, setName] = useState(weapon?.name || weapons[0].name);
+  const [type, setType] = useState(weapon?.type || weapons[0].type);
+  const [hands, setHands] = useState(weapon?.hands || weapons[0].hands);
+  const [att1, setAtt1] = useState(weapon?.att1 || weapons[0].att1);
+  const [att2, setAtt2] = useState(weapon?.att2 || weapons[0].att2);
+  const [martial, setMartial] = useState(weapon?.martial || false);
+  const [damageBonus, setDamageBonus] = useState(weapon?.damageBonus || false);
+  const [damageReworkBonus, setDamageReworkBonus] = useState(
+    weapon?.damageReworkBonus || false
+  );
+  const [precBonus, setPrecBonus] = useState(weapon?.precBonus || false);
+  const [rework, setRework] = useState(weapon?.rework || false);
+  const [quality, setQuality] = useState(weapon?.quality || "");
+  const [qualityCost, setQualityCost] = useState(weapon?.qualityCost || 0);
+  const [totalBonus, setTotalBonus] = useState(weapon?.totalBonus || 0);
+  const [selectedQuality, setSelectedQuality] = useState(
+    weapon?.selectedQuality || ""
+  );
+  const [isEquipped, setIsEquipped] = useState(weapon?.isEquipped || false);
+
+  useEffect(() => {
+    setBase(weapon?.base || weapons[0]);
+    setName(weapon?.name || weapons[0].name);
+    setType(weapon?.type || weapons[0].type);
+    setHands(weapon?.hands || weapons[0].hands);
+    setAtt1(weapon?.att1 || weapons[0].att1);
+    setAtt2(weapon?.att2 || weapons[0].att2);
+    setMartial(weapon?.martial || false);
+    setDamageBonus(weapon?.damageBonus || false);
+    setDamageReworkBonus(weapon?.damageReworkBonus || false);
+    setPrecBonus(weapon?.precBonus || false);
+    setRework(weapon?.rework || false);
+    setQuality(weapon?.quality || "");
+    setQualityCost(weapon?.qualityCost || 0);
+    setTotalBonus(weapon?.totalBonus || 0);
+    setSelectedQuality(weapon?.selectedQuality || "");
+    setIsEquipped(weapon?.isEquipped || false);
+  }, [weapon]);
+
+  const calcCost = () => {
     let cost = base.cost;
 
     // Changed type
@@ -74,10 +96,10 @@ export default function PlayerWeaponModal({ open, onClose }) {
       cost += 200;
     }
 
-    // Bonus prec
+    // Bonus precision
     if (!rework && base.prec !== 1 && precBonus) {
       cost += 100;
-      // Bonus prec (rework)
+      // Bonus precision (rework)
     } else if (rework && base.prec <= 1 && precBonus) {
       cost += 100;
     }
@@ -85,9 +107,9 @@ export default function PlayerWeaponModal({ open, onClose }) {
     // Quality
     cost += parseInt(qualityCost);
     return cost;
-  }
+  };
 
-  function calcDamage() {
+  const calcDamage = () => {
     let damage = base.damage;
 
     // Changed type
@@ -108,16 +130,16 @@ export default function PlayerWeaponModal({ open, onClose }) {
     }
 
     return damage;
-  }
+  };
 
-  function calcPrec() {
+  const calcPrec = () => {
     let prec = base.prec;
 
-    // Bonus prec
+    // Bonus precision
     if (!rework && prec !== 1 && precBonus) {
       prec = 1;
     }
-    // Bonus prec (rework)
+    // Bonus precision (rework)
     if (rework && prec === 1 && precBonus) {
       prec = 2;
     } else if (rework && prec === 0 && precBonus) {
@@ -125,7 +147,46 @@ export default function PlayerWeaponModal({ open, onClose }) {
     }
 
     return prec;
-  }
+  };
+
+  const handleSave = () => {
+    const cost = calcCost();
+    const damage = calcDamage();
+    const prec = calcPrec();
+
+    const updatedWeapon = {
+      base,
+      name,
+      category: base.category,
+      melee: base.melee,
+      ranged: base.ranged,
+      type,
+      hands,
+      att1,
+      att2,
+      martial,
+      damageBonus,
+      damageReworkBonus,
+      precBonus,
+      rework,
+      quality,
+      qualityCost,
+      totalBonus,
+      selectedQuality,
+      cost,
+      damage,
+      prec,
+      isEquipped,
+    };
+    onAddWeapon(updatedWeapon);
+  };
+
+  const handleDelete = () => {
+    if (editWeaponIndex !== null) {
+      onDeleteWeapon(editWeaponIndex);
+    }
+    onClose();
+  };
 
   const handleClearFields = () => {
     setBase(weapons[0]);
@@ -279,7 +340,7 @@ export default function PlayerWeaponModal({ open, onClose }) {
             <Grid container spacing={1} alignItems="center">
               <Grid item>
                 <Button variant="outlined" onClick={handleClearFields}>
-                  Clear All Fields
+                  {t("Clear All Fields")}
                 </Button>
               </Grid>
               {/* Rework */}
@@ -294,7 +355,7 @@ export default function PlayerWeaponModal({ open, onClose }) {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <PrettySingle
+          <PrettyWeapon
             weapon={{
               base: base,
               name: name,
@@ -320,179 +381,15 @@ export default function PlayerWeaponModal({ open, onClose }) {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary">
+        {editWeaponIndex !== null && (
+          <Button onClick={() => handleDelete(editWeaponIndex)} color="error">
+            {t("Delete")}
+          </Button>
+        )}
+        <Button onClick={handleSave} color="primary">
           {t("Save Changes")}
         </Button>
       </DialogActions>
     </Dialog>
-  );
-}
-
-function PrettySingle({ weapon, showActions }) {
-  const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
-
-  const ref = useRef();
-
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-  });
-
-  return (
-    <>
-      <Card>
-        <div
-          ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
-        >
-          <Stack>
-            <Grid
-              container
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{
-                p: 1,
-                background: `${primary}`,
-                color: "#ffffff",
-                "& .MuiTypography-root": {
-                  fontSize: { xs: "0.8rem", sm: "1.2rem" },
-                  textTransform: "uppercase",
-                },
-              }}
-            >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={3}>
-                <Typography variant="h4" textAlign="left">
-                  {t("Weapon")}
-                </Typography>
-              </Grid>
-              <Grid item xs={1}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Accuracy")}
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Damage")}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container>
-              <Grid container direction="column" item xs>
-                {/* First Row */}
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  item
-                  sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
-                    borderBottom: `1px solid ${secondary}`,
-                    padding: "5px",
-                    "& .MuiTypography-root": {
-                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                    },
-                  }}
-                >
-                  <Grid
-                    item
-                    xs={3}
-                    sx={{ display: "flex", alignItems: "center" }}
-                  >
-                    <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
-                      {weapon.name}
-                    </Typography>
-                    {weapon.martial && <Martial />}
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography fontWeight="bold" textAlign="center">
-                      <OpenBracket />
-                      {`${attributes[weapon.att1].shortcaps} + ${
-                        attributes[weapon.att2].shortcaps
-                      }`}
-                      <CloseBracket />
-                      {weapon.prec !== 0 ? `+${weapon.prec}` : ""}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={4}>
-                    <Typography fontWeight="bold" textAlign="center">
-                      <OpenBracket />
-                      {t("HR +")} {weapon.damage}
-                      <CloseBracket />
-                      {types[weapon.type].long}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {/* Second Row */}
-                <Grid
-                  container
-                  justifyContent="flex-end"
-                  sx={{
-                    background: "transparent",
-                    borderBottom: `1px solid ${secondary}`,
-                    padding: "5px",
-                    "& .MuiTypography-root": {
-                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                    },
-                  }}
-                >
-                  <Grid item xs={3}>
-                    <Typography fontWeight="bold">{weapon.category}</Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Diamond color={primary} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography textAlign="center">
-                      {weapon.hands === 1 && t("One-handed")}
-                      {weapon.hands === 2 && t("Two-handed")}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Diamond color="{primary}" />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography textAlign="center">
-                      {weapon.melee && t("Melee")}
-                      {weapon.ranged && t("Ranged")}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Typography
-              sx={{
-                background: "transparent",
-                borderBottom: `1px solid ${secondary}`,
-                px: 1,
-                py: 1,
-              }}
-            >
-              {!weapon.quality && t("No Qualities")}{" "}
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed={true}
-                sx={{ fontSize: { xs: "0.9rem", sm: "1.1rem"} }}
-              >
-                {weapon.quality}
-              </StyledMarkdown>
-            </Typography>
-          </Stack>
-        </div>
-      </Card>
-    </>
   );
 }

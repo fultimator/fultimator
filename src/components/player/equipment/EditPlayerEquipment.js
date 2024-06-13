@@ -1,24 +1,18 @@
+// EditPlayerEquipment.js
+
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  Button,
-  Divider,
-} from "@mui/material";
+import { Paper, Grid, Button, Divider } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-
 import PlayerWeapons from "./PlayerWeapons";
 import PlayerArmor from "./PlayerArmor";
 import PlayerShields from "./PlayerShields";
 import PlayerAccessories from "./PlayerAccessories";
-
 import PlayerWeaponModal from "./PlayerWeaponModal";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
@@ -27,14 +21,54 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
 
   const [openNewWeapon, setOpenNewWeapon] = React.useState(false);
-  const handleOpenNewWeapon = () => setOpenNewWeapon(true);
+  const [editWeaponIndex, setEditWeaponIndex] = React.useState(null);
+  const [weapon, setWeapon] = React.useState(null);
+
+  const handleOpenNewWeapon = () => {
+    setWeapon(null);
+    setEditWeaponIndex(null);
+    setOpenNewWeapon(true);
+  };
+
+  const handleCloseNewWeapon = () => {
+    setOpenNewWeapon(false);
+    setWeapon(null);
+    setEditWeaponIndex(null);
+  };
+
+  const handleAddWeapon = (newWeapon) => {
+    const updatedWeapons = [...(player.weapons || []), newWeapon];
+    setPlayer({ ...player, weapons: updatedWeapons });
+  };
+
+  const handleDeleteWeapon = (index) => {
+    const updatedWeapons = (player.weapons || []).filter((_, i) => i !== index);
+    setPlayer({ ...player, weapons: updatedWeapons });
+  };
+
+  const handleEditWeapon = (index) => {
+    setWeapon(player.weapons[index]);
+    setEditWeaponIndex(index);
+    setOpenNewWeapon(true);
+  };
+
+  const handleSaveWeapon = (updatedWeapon) => {
+    if (editWeaponIndex !== null) {
+      const updatedWeapons = (player.weapons || []).map((weapon, i) =>
+        i === editWeaponIndex ? updatedWeapon : weapon
+      );
+      setPlayer({ ...player, weapons: updatedWeapons });
+    } else {
+      handleAddWeapon(updatedWeapon);
+    }
+    setOpenNewWeapon(false);
+  };
 
   return (
     <>
       <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
       {isEditMode ? (
         <>
-          {" "}
           <Paper
             elevation={3}
             sx={{
@@ -70,28 +104,17 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
               </Grid>
             </Grid>
           </Paper>
-          <Divider sx={{ my: 2 }} />{" "}
+          <Divider sx={{ my: 2 }} />
         </>
       ) : null}
-      <Accordion
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          marginBottom: 3,
-        }}
-      >
-        <AccordionSummary
-          expandIcon={<ArrowDownwardIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-        >
-          <PlayerWeapons />
-        </AccordionSummary>
-        <AccordionDetails>{/* List all available Weapons */}</AccordionDetails>
-      </Accordion>
+
+      <PlayerWeapons
+        player={player}
+        weapons={player.weapons || []}
+        onEditWeapon={handleEditWeapon}
+        onDeleteWeapon={handleDeleteWeapon}
+      />
+
       <Accordion
         elevation={3}
         sx={{
@@ -153,7 +176,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       </Accordion>
       <PlayerWeaponModal
         open={openNewWeapon}
-        onClose={() => setOpenNewWeapon(false)}
+        onClose={handleCloseNewWeapon}
+        editWeaponIndex={editWeaponIndex}
+        weapon={weapon}
+        setWeapon={setWeapon}
+        onAddWeapon={handleSaveWeapon}
+        onDeleteWeapon={handleDeleteWeapon}
       />
     </>
   );

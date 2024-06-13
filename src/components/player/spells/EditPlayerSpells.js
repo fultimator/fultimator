@@ -91,21 +91,25 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenSpellDefaultModal(true);
   };
 
-  const handleSaveEditedSpell = (editedSpell) => {
+  const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls) => {
         if (cls.name === editingSpellClass) {
           return {
             ...cls,
-            spells: cls.spells.map((spell) =>
-              spell.name === spellBeingEdited.name ? editedSpell : spell
-            ),
+            spells: cls.spells.map((spell, index) => {
+              if (index === spellIndex) {
+                return editedSpell;
+              }
+              return spell;
+            }),
           };
         }
         return cls;
       }),
     }));
+
     setOpenSpellDefaultModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);

@@ -82,12 +82,12 @@ function ThemedSpellDefault({
         sx={{
           background: "transparent",
           padding: "3px 17px",
-          marginBottom: "1px",
+          marginBottom: "6px",
           borderBottom: `1px solid ${secondary}`,
         }}
       >
         <Grid item xs={12}>
-          <Typography>
+          <Typography sx={{minHeight: "30px"}}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {description}
             </StyledMarkdown>

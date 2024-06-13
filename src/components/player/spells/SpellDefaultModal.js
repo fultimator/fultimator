@@ -38,7 +38,7 @@ export default function SpellDefaultModal({
   };
 
   const handleSave = () => {
-    onSave(editedSpell);
+    onSave(spell.index, editedSpell);
   };
 
   const handleDelete = () => {
