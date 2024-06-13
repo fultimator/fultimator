@@ -156,6 +156,27 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   // Initialize INIT to 0
   const currInit = 0 + (player.modifiers?.init || 0);
 
+  let crisis = player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
+  const crisisText = crisis ? (
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="flex-end"
+      style={{
+        position: "absolute",
+        bottom: 0,
+        width: "100%",
+        background: "rgba(0, 0, 0, 0.6)",
+        color: "white", // Text color changed to white
+        padding: "6px",
+        fontFamily: "Antonio",
+        textShadow: "0 0 3px red", // Red shadow around the text
+      }}
+    >
+      !! {t("CRISIS")} !!
+    </Grid>
+  ) : null;
+
   // Function to render DEF, MDEF, and INIT as numbers
   const renderAdditionalStats = () => (
     <>
@@ -330,16 +351,19 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
       </Grid>
       <Grid container spacing={2} alignItems="flex-start">
         <Grid item xs={4} sm={4}>
-          <img
-            src={player.info.imgurl ? player.info.imgurl : avatar_image}
-            alt={"Player Avatar"}
-            style={{
-              width: "100%",
-              aspectRatio: "1",
-              objectFit: "cover",
-              marginBottom: "-6px",
-            }}
-          />
+          <div style={{ position: "relative" }}>
+            <img
+              src={player.info.imgurl ? player.info.imgurl : avatar_image}
+              alt="Player Avatar"
+              style={{
+                width: "100%",
+                aspectRatio: "1",
+                objectFit: "cover",
+                marginBottom: "-6px",
+              }}
+            />
+            {crisisText}
+          </div>
           {renderStatBar(
             t("HP"),
             player.stats.hp.current,
@@ -362,7 +386,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             theme.palette.success.main
           )}
         </Grid>
-        <Grid item xs={8} sx={{ marginTop: "5px", marginX:"-5px" }}>
+        <Grid item xs={8} sx={{ marginTop: "5px", marginX: "-5px" }}>
           <Paper
             elevation={3}
             sx={{
