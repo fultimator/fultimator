@@ -98,17 +98,17 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
               <Grid container justifyContent="center" spacing={2}>
                 <Grid item xs={6} sm={3} container justifyContent="center">
                   <Button variant="contained" onClick={handleOpenNewWeapon}>
-                    Add Weapon
+                    {t("Add Weapon")}
                   </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">Add Armor</Button>
+                  <Button variant="contained">{t("Add Armor")}</Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">Add Shield</Button>
+                  <Button variant="contained">{t("Add Shield")}</Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">Add Accessory</Button>
+                  <Button variant="contained">{t("Add Accessory")}</Button>
                 </Grid>
               </Grid>
             </Grid>
