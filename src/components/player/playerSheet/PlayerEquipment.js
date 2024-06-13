@@ -188,94 +188,98 @@ export default function PlayerEquipment({ player, setPlayer }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-        display: "flex",
-      }}
-    >
-      <Typography
-        variant="h1"
-        sx={{
-          writingMode: "vertical-lr",
-          textTransform: "uppercase",
-          marginLeft: "-1px",
-          marginRight: "10px",
-          marginTop: "-1px",
-          marginBottom: "-1px",
-          paddingY: "10px",
-          backgroundColor: primary,
-          color: ternary,
-          borderRadius: "0 8px 8px 0",
-          transform: "rotate(180deg)",
-          fontSize: "2em",
-        }}
-        align="center"
-      >
-        {t("Equipment")}
-      </Typography>
-      <Grid container spacing={2} sx={{ padding: "1em" }}>
-        <Grid item xs={12}>
-          <Typography variant="h2" sx={{ fontWeight: "bold" }}>
-            {t("Weapons")}
+    <>
+      {equippedWeapons.length > 0 && (
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: "8px",
+            border: "2px solid",
+            borderColor: secondary,
+            display: "flex",
+          }}
+        >
+          <Typography
+            variant="h1"
+            sx={{
+              writingMode: "vertical-lr",
+              textTransform: "uppercase",
+              marginLeft: "-1px",
+              marginRight: "10px",
+              marginTop: "-1px",
+              marginBottom: "-1px",
+              paddingY: "10px",
+              backgroundColor: primary,
+              color: ternary,
+              borderRadius: "0 8px 8px 0",
+              transform: "rotate(180deg)",
+              fontSize: "2em",
+            }}
+            align="center"
+          >
+            {t("Equipment")}
           </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          {equippedWeapons.map((weapon, index) => (
-            <React.Fragment key={index}>
-              <Grid container>
-                <Grid item xs={11}>
-                  <PrettyWeapon
-                    weapon={weapon}
-                    player={player}
-                    setPlayer={setPlayer}
-                  />
-                </Grid>
-                <Grid item xs={1}>
-                  <IconButton onClick={() => handleDiceRoll(weapon)}>
-                    <Casino />
-                  </IconButton>
-                </Grid>
+          <Grid container spacing={2} sx={{ padding: "1em" }}>
+            <Grid item xs={12}>
+              <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                {t("Weapons")}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              {equippedWeapons.map((weapon, index) => (
+                <React.Fragment key={index}>
+                  <Grid container>
+                    <Grid item xs={11}>
+                      <PrettyWeapon
+                        weapon={weapon}
+                        player={player}
+                        setPlayer={setPlayer}
+                      />
+                    </Grid>
+                    <Grid item xs={1}>
+                      <IconButton onClick={() => handleDiceRoll(weapon)}>
+                        <Casino />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                  <br />
+                </React.Fragment>
+              ))}
+            </Grid>
+            {(player.modifiers.meleePrec !== 0 ||
+              player.modifiers.rangedPrec !== 0) && (
+              <Grid item xs={12}>
+                <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                  {t("Modifiers")}
+                </Typography>
+                {player.modifiers.meleePrec !== 0 && (
+                  <Typography variant="h4">
+                    {t("Melee Precision Bonus")}: {player.modifiers.meleePrec}
+                  </Typography>
+                )}
+                {player.modifiers.rangedPrec !== 0 && (
+                  <Typography variant="h4">
+                    {t("Ranged Precision Bonus")}: {player.modifiers.rangedPrec}
+                  </Typography>
+                )}
               </Grid>
-              <br />
-            </React.Fragment>
-          ))}
-        </Grid>
-        {(player.modifiers.meleePrec !== 0 ||
-          player.modifiers.rangedPrec !== 0) && (
-          <Grid item xs={12}>
-            <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-              {t("Modifiers")}
-            </Typography>
-            {player.modifiers.meleePrec !== 0 && (
-              <Typography variant="h4">
-                {t("Melee Precision Bonus")}: {player.modifiers.meleePrec}
-              </Typography>
-            )}
-            {player.modifiers.rangedPrec !== 0 && (
-              <Typography variant="h4">
-                {t("Ranged Precision Bonus")}: {player.modifiers.rangedPrec}
-              </Typography>
             )}
           </Grid>
-        )}
-      </Grid>
-      <Snackbar
-        open={snackbarOpen}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%", fontSize: "1.2rem" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Paper>
+          <Snackbar
+            open={snackbarOpen}
+            onClose={handleSnackbarClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          >
+            <Alert
+              onClose={handleSnackbarClose}
+              severity={snackbarSeverity}
+              sx={{ width: "100%", fontSize: "1.2rem" }}
+            >
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+        </Paper>
+      )}
+    </>
   );
 }

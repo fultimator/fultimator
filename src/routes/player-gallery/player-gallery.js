@@ -160,6 +160,17 @@ function Personal({ user }) {
       classes: [],
       equipment: [],
       notes: [],
+      modifiers: {
+        hp: 0,
+        mp: 0,
+        ip: 0,
+        def: 0,
+        mdef: 0,
+        init: 0,
+        meleePrec: 0,
+        rangedPrec: 0,
+        magicPrec: 0,
+      },
     };
     const ref = collection(firestore, "player-personal");
 
