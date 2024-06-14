@@ -43,6 +43,7 @@ import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
+import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
@@ -275,6 +276,8 @@ export default function PlayerEdit() {
               <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} />
               <Divider sx={{ my: 1 }} />
               <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} />
+              <Divider sx={{ my: 1 }} />
+              <PlayerSkills player={playerTemp} setPlayer={setPlayerTemp} />
             </>
           )}
           <Box sx={{ height: "10vh" }} />
