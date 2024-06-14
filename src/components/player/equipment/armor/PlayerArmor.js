@@ -13,15 +13,15 @@ import {
   Checkbox,
 } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { useTranslate } from "../../../translation/translate";
-import PrettyWeapon from "./PrettyWeapon";
+import { useTranslate } from "../../../../translation/translate";
+import PrettyArmor from "./PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";
 
-export default function PlayerWeapons({
+export default function PlayerArmor({
   player,
-  weapons,
-  onEditWeapon,
-  onEquipWeapon,
+  armor,
+  onEditArmor,
+  onEquipArmor,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -30,84 +30,69 @@ export default function PlayerWeapons({
 
   const [expanded, setExpanded] = useState(false);
 
-  const checkIfEquippable = (weapon) => {
-    // if weapon is not martial then is always equippable
+  const checkIfEquippable = (armorItem) => {
+    // if armor is not martial then is always equippable
     // true = equippable, false = not equippable
 
     const { classes } = player;
 
-    // If the weapon is not martial, it is always equippable
-    if (!weapon.martial) {
+    // If the armor is not martial, it is always equippable
+    if (!armorItem.martial) {
       return true;
     }
 
-    // Iterate through each class to check if the weapon is equippable based on their benefits
+    // Iterate through each class to check if the armor is equippable based on their benefits
     for (const playerClass of classes) {
       const { benefits } = playerClass;
 
-      // Check if the class benefits allow equipping armor, shields, melee, or ranged weapons
+      // Check if the class benefits allow equipping martial armor
       if (benefits.martials) {
-        if (
-          (weapon.melee && benefits.martials.melee) ||
-          (weapon.ranged && benefits.martials.ranged)
-        ) {
-          // The weapon is equippable based on the current class
+        if (armorItem.martial && benefits.martials.armor) {
+          // The armor is equippable based on the current class
           return true;
         }
       }
     }
 
-    // The weapon is not equippable based on any of the player's classes
+    // The armor is not equippable based on any of the player's classes
     return false;
+  };
+
+  const countEquippedArmor = () => {
+    let count = 0;
+    armor.forEach((armor) => {
+      if (armor.isEquipped) {
+        count++;
+      }
+    });
+    return count;
+  };
+
+  const canEquipArmor = () => {
+    if (countEquippedArmor() === 0) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleEquipArmor = (index, checked) => {
+    const armorSelected = armor[index];
+    if (canEquipArmor(armorSelected) || !checked) {
+      const updatedArmor = { ...armor };
+      updatedArmor[index].isEquipped = checked;
+      onEquipArmor(updatedArmor);
+    }
   };
 
   useEffect(() => {
     // Open the Accordion when a new weapon is added
-    if (weapons.length > 0) {
+    if (armor.length > 0) {
       setExpanded(true);
     }
-  }, [weapons]);
+  }, [armor]);
 
   const handleAccordionChange = () => {
     setExpanded(!expanded);
-  };
-
-  const canEquipWeapon = (weapon) => {
-    const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
-
-    if (weapon.hands === 2) {
-      return oneHandedCount === 0 && twoHandedCount === 0;
-    } else if (weapon.hands === 1) {
-      return twoHandedCount === 0 && oneHandedCount < 2;
-    }
-
-    return false;
-  };
-
-  const countEquippedWeapons = () => {
-    let oneHandedCount = 0;
-    let twoHandedCount = 0;
-
-    weapons.forEach((weapon) => {
-      if (weapon.isEquipped) {
-        if (weapon.hands === 1) {
-          oneHandedCount++;
-        } else if (weapon.hands === 2) {
-          twoHandedCount++;
-        }
-      }
-    });
-
-    return { oneHandedCount, twoHandedCount };
-  };
-
-  const handleEquipWeapon = (index, checked) => {
-    const weapon = weapons[index];
-    if (canEquipWeapon(weapon) || !checked) {
-      const updatedWeapons = [...weapons];
-      updatedWeapons[index].isEquipped = checked;
-      onEquipWeapon(updatedWeapons);
-    }
   };
 
   return (
@@ -140,29 +125,29 @@ export default function PlayerWeapons({
             fontSize: "1.5em",
           }}
         >
-          {t("Weapons")}
+          {t("Armor")}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
-          {weapons.map((weapon, index) => (
+          {armor.map((armorItem, index) => (
             <React.Fragment key={index}>
               <Grid item container xs={12} alignItems="center">
                 {/* Updated grid item */}
                 <Grid item xs={1}>
-                  {checkIfEquippable(weapon) ? (
+                  {checkIfEquippable(armorItem) ? (
                     <FormGroup>
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={weapon.isEquipped}
+                            checked={armorItem.isEquipped}
                             onChange={(e) =>
-                              handleEquipWeapon(index, e.target.checked)
+                              handleEquipArmor(index, e.target.checked)
                             }
                           />
                         }
-                        label={<Typography align="center">{t("Equip Weapon")}</Typography>}
+                        label={<Typography align="center">{t("Equip Armor")}</Typography>}
                         labelPlacement="bottom"
                       />
                     </FormGroup>
@@ -175,7 +160,7 @@ export default function PlayerWeapons({
                   )}
                 </Grid>
                 <Grid item xs={10}>
-                  <PrettyWeapon weapon={weapon} />
+                  <PrettyArmor armor={armorItem} />
                 </Grid>
                 <Grid
                   item
@@ -186,12 +171,12 @@ export default function PlayerWeapons({
                 >
                   {/* Updated grid item */}
                   <Grid item xs={12}>
-                    <IconButton onClick={() => onEditWeapon(index)}>
+                    <IconButton onClick={() => onEditArmor(index)}>
                       <Edit />
                     </IconButton>
                   </Grid>
                   <Grid item xs={12}>
-                    {weapon.equipped && (
+                    {armorItem.equipped && (
                       <Typography
                         variant="h5"
                         sx={{ transform: "rotate(90deg)", marginRight: "20px" }}

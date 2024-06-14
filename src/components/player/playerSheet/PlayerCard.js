@@ -8,6 +8,7 @@ import {
   Card,
   Box,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -149,14 +150,29 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     </Box>
   );
 
+  /* player.armor.isEquipped (should be only one) */
+  const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
+
   // Calculate DEF and MDEF
-  const currDef = currDex + (player.modifiers?.def || 0);
-  const currMDef = currInsight + (player.modifiers?.mdef || 0);
+  const currDef =
+    (equippedArmor !== null
+      ? equippedArmor.martial
+        ? equippedArmor.def
+        : currDex + equippedArmor.def
+      : currDex) + (player.modifiers?.def || 0);
+  //currDex + (player.modifiers?.def || 0);
+  const currMDef =
+    (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
+    (player.modifiers?.mdef || 0);
+  //currInsight + (player.modifiers?.mdef || 0);
 
   // Initialize INIT to 0
-  const currInit = 0 + (player.modifiers?.init || 0);
+  const currInit =
+    (equippedArmor !== null ? equippedArmor.init : 0) +
+    (player.modifiers?.init || 0);
 
-  let crisis = player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
+  let crisis =
+    player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
   const crisisText = crisis ? (
     <Grid
       container
@@ -249,38 +265,41 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         </Typography>
       </Grid>
       <Grid item xs={4} sm={4}>
-        <Typography
-          variant="body2"
-          style={{
-            fontSize: "1.5rem",
-          }}
-        >
-          <div
+        <Tooltip title={isEditMode && (t("DEX") + " + " + t("INS"))} >
+          <Typography
+            variant="body2"
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              fontSize: "1.5rem",
             }}
           >
-            <span
+            <div
               style={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                marginBottom: "-4px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }}
             >
-              {t("INIT")}
-            </span>
-            <span style={{ marginLeft: "-4px" }}>
-              <InitIcon style={{ width: "24px", height: "24px" }} />
-              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-                {" "}
-                {currInit}
+              <span
+                style={{
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  fontSize: "0.7rem",
+                  marginBottom: "-4px",
+                }}
+              >
+                {t("INIT")}
               </span>
-            </span>
-          </div>
-        </Typography>
+              <span style={{ marginLeft: "-4px" }}>
+                <InitIcon style={{ width: "24px", height: "24px" }} />
+
+                <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+                  {" "}
+                  {currInit}
+                </span>
+              </span>
+            </div>
+          </Typography>
+        </Tooltip>
       </Grid>
     </>
   );

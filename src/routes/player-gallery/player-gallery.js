@@ -158,7 +158,8 @@ function Personal({ user }) {
         wlpUp: false,
       },
       classes: [],
-      equipment: [],
+      weapons: [],
+      armor: [],
       notes: [],
       modifiers: {
         hp: 0,
