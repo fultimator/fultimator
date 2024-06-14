@@ -39,7 +39,7 @@ export default function EditActions({ npc, setNpc }) {
     return () => {
       setNpc((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.actions.splice(i-1, 1);
+        newState.actions.splice(i, 1);
         return newState;
       });
     };
