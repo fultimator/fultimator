@@ -11,6 +11,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, Info } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import { OffensiveSpellIcon } from "../../icons";
 
 export default function PlayerSpells({ player, setPlayer }) {
   const { t } = useTranslate();
@@ -76,9 +77,17 @@ export default function PlayerSpells({ player, setPlayer }) {
           </Typography>
           <Grid container spacing={1} sx={{ padding: "1em" }}>
             {allSpells.map((spell, index) => (
-              <Grid item container xs={12} md={6} key={index}>
-                <Grid item xs={10}>
+              <Grid
+                item
+                container
+                xs={12}
+                md={6}
+                key={index}
+                sx={{ display: "flex", alignItems: "stretch" }}
+              >
+                <Grid item xs={10} sx={{ display: "flex" }}>
                   <Typography
+                    id="spell-left-name"
                     variant="h2"
                     sx={{
                       fontWeight: "bold",
@@ -88,19 +97,27 @@ export default function PlayerSpells({ player, setPlayer }) {
                       paddingLeft: "10px",
                       color: "#fff",
                       borderRadius: "8px 0 0 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
                     }}
                   >
-                    {spell.name}
+                    {spell.name}{spell.isOffensive && <OffensiveSpellIcon />}
                   </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
                   <div
+                    id="spell-right-controls"
                     style={{
                       padding: "10px",
                       backgroundColor: ternary,
                       borderRadius: "0 8px 8px 0",
                       marginRight: "15px",
+                      display: "flex",
+                      alignItems: "center",
+                      flexDirection: "row",
                     }}
+                    className="spell-right-controls"
                   >
                     <IconButton
                       sx={{ padding: "0px" }}
@@ -131,7 +148,7 @@ export default function PlayerSpells({ player, setPlayer }) {
             <Paper
               sx={{
                 position: "absolute",
-                width: 400,
+                width: { xs: "90%", md: 400},
                 bgcolor: "#fff",
                 border: "2px solid",
                 borderColor: secondary,
@@ -160,6 +177,17 @@ export default function PlayerSpells({ player, setPlayer }) {
           </Modal>
         </Paper>
       )}
+      <style jsx>{`
+        @media (max-width: 600px) {
+          .spell-right-controls {
+            flex-direction: column !important;
+          }
+          .spell-right-controls .MuiIconButton-root {
+            margin-left: 0 !important;
+            margin-top: 5px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

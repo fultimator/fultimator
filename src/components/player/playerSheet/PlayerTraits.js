@@ -81,7 +81,7 @@ export default function PlayerTraits({ player, isEditMode }) {
                 textTransform: "uppercase",
               }}
             >
-              {player.info.theme}
+              {t(player.info.theme)}
             </span>
           </Typography>
         </Grid>

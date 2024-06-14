@@ -4,8 +4,12 @@ import {
   Typography,
   Paper,
   IconButton,
-  Snackbar,
-  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -20,9 +24,10 @@ export default function PlayerEquipment({ player, setPlayer }) {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+  const [dialogMessage, setDialogMessage] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogSeverity, setDialogSeverity] = useState("info");
+  const [currentWeapon, setCurrentWeapon] = useState(null);
 
   const equippedWeapons = player.weapons
     ? player.weapons.filter((weapon) => weapon.isEquipped)
@@ -86,6 +91,8 @@ export default function PlayerEquipment({ player, setPlayer }) {
   };
 
   const handleDiceRoll = (weapon) => {
+    setCurrentWeapon(weapon);
+
     const att1 = weapon.att1;
     const att2 = weapon.att2;
     let att1Value = attributeMap[att1];
@@ -114,77 +121,107 @@ export default function PlayerEquipment({ player, setPlayer }) {
 
     const damageDealt = maxDie + damage;
 
-    const snackbarContent = (
+    const dialogContent = (
       <>
-        <Typography
-          component="span"
-          sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-        >
-          {t("Accuracy")}:
-        </Typography>
-        <Typography component="span">
-          {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
-            attributes[att2].shortcaps
-          }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${
-            weapon.melee
-              ? meleeModifier !== 0
-                ? "+" + meleeModifier
-                : rangedModifier
-              : rangedModifier !== 0
-              ? "+" + rangedModifier
-              : ""
-          } = `}
-        </Typography>
-
-        <Typography component="span" sx={{ fontWeight: "bold" }}>
-          {result}
-        </Typography>
-        <br />
-        <Typography
-          component="span"
-          sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-        >
-          {t("Damage")}:
-        </Typography>
-        <Typography component="span">{` ${maxDie} + ${damage} = `}</Typography>
-        <Typography component="span" sx={{ fontWeight: "bold" }}>
-          {damageDealt + " " + t(weapon.type)}
-        </Typography>
+        <Grid container spacing={2} sx={{ textAlign: "center" }}>
+          <Grid item container xs={6}>
+            <Grid item xs={12}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
+                {t("Accuracy")}
+              </Typography>
+              <Typography variant="h1" sx={{ textAlign: "center" }}>
+                {result}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item container xs={6}>
+            <Grid item xs={12}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
+                {t("Damage")}
+              </Typography>
+              <Typography variant="h1" sx={{ textAlign: "center" }}>
+                {damageDealt}
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
+                {t(weapon.type)}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sx={{ marginTop: "20px" }}>
+            <Typography component="span">
+              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
+                attributes[att2].shortcaps
+              }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${
+                weapon.melee
+                  ? meleeModifier !== 0
+                    ? "+" + meleeModifier
+                    : rangedModifier
+                  : rangedModifier !== 0
+                  ? "+" + rangedModifier
+                  : ""
+              }`}
+            </Typography>
+            <br />
+            <Typography
+              component="span"
+              sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+            >
+              {t("Damage")}:
+            </Typography>
+            <Typography component="span">{` ${maxDie} + ${damage}`}</Typography>
+          </Grid>
+        </Grid>
       </>
     );
 
     // Add critical success/failure visualization
     if (isCriticalFailure) {
-      setSnackbarSeverity("error");
-      setSnackbarMessage(
-        <Typography variant="body1">
-          Critical Failure!
-          <br />
-          {snackbarContent}
-        </Typography>
+      setDialogSeverity("error");
+      setDialogMessage(
+        <>
+          <Typography
+            variant="h1"
+            sx={{ textAlign: "center", marginBottom: "10px" }}
+          >
+            Critical Failure!
+            <br />
+          </Typography>
+          {dialogContent}
+        </>
       );
     } else if (isCriticalSuccess) {
-      setSnackbarSeverity("success");
-      setSnackbarMessage(
-        <Typography variant="body1">
-          Critical Success!
-          <br />
-          {snackbarContent}
-        </Typography>
+      setDialogSeverity("success");
+      setDialogMessage(
+        <>
+          <Typography
+            variant="h1"
+            sx={{ textAlign: "center", marginBottom: "10px" }}
+          >
+            Critical Success!
+            <br />
+          </Typography>
+          {dialogContent}
+        </>
       );
     } else {
-      setSnackbarSeverity("info");
-      setSnackbarMessage(snackbarContent);
+      setDialogSeverity("info");
+      setDialogMessage(dialogContent);
     }
 
-    setSnackbarOpen(true);
+    setDialogOpen(true);
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
+  const handleDialogClose = () => {
+    setDialogOpen(false);
   };
 
   return (
@@ -265,19 +302,45 @@ export default function PlayerEquipment({ player, setPlayer }) {
               </Grid>
             )}
           </Grid>
-          <Snackbar
-            open={snackbarOpen}
-            onClose={handleSnackbarClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          <Dialog
+            open={dialogOpen}
+            onClose={handleDialogClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
           >
-            <Alert
-              onClose={handleSnackbarClose}
-              severity={snackbarSeverity}
-              sx={{ width: "100%", fontSize: "1.2rem" }}
+            <DialogTitle
+              id="alert-dialog-title"
+              variant="h3"
+              sx={{
+                backgroundColor:
+                  dialogSeverity === "error"
+                    ? "#bb2124"
+                    : dialogSeverity === "success"
+                    ? "#22bb33"
+                    : "#aaaaaa",
+              }}
             >
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
+              Result
+            </DialogTitle>
+            <DialogContent sx={{ marginTop: "10px" }}>
+              <DialogContentText id="alert-dialog-description">
+                {dialogMessage}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDialogClose} color="primary">
+                Close
+              </Button>
+              <Button
+                onClick={() => handleDiceRoll(currentWeapon)}
+                color="primary"
+                autoFocus
+              >
+                Re-roll
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Paper>
       )}
     </>

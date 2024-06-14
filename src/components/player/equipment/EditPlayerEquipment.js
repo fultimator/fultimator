@@ -102,13 +102,34 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">{t("Add Armor")}</Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      alert("Armor not yet implemented");
+                    }}
+                  >
+                    {t("Add Armor")}
+                  </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">{t("Add Shield")}</Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      alert("Shields not yet implemented");
+                    }}
+                  >
+                    {t("Add Shield")}
+                  </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained">{t("Add Accessory")}</Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      alert("Accessories not yet implemented");
+                    }}
+                  >
+                    {t("Add Accessory")}
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>

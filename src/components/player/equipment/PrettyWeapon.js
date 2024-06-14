@@ -42,18 +42,18 @@ export default function PrettyWeapon({ weapon, showActions }) {
                 background: `${primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
-                  fontSize: { xs: "0.8rem", sm: "1.2rem" },
+                  fontSize: { xs: "0.6rem", sm: "1.2rem" },
                   textTransform: "uppercase",
                 },
               }}
             >
               <Grid item xs={1}></Grid>
-              <Grid item xs={3}>
+              <Grid item xs={2} md={3}>
                 <Typography variant="h4" textAlign="left">
                   {t("Weapon")}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid item xs={2} md={1}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
