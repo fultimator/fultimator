@@ -34,7 +34,7 @@ export default function EditPlayerClasses({
 
     // Check if player has at least 2 classes
     if (!player.classes || player.classes.length < 2) {
-      newWarnings.push(t("Character must have at least 2 classes."));
+      newWarnings.push("Character must have at least 2 classes.");
     }
 
     // Check if class count exceeds 3 beyond the number of classes at level 10
@@ -43,9 +43,7 @@ export default function EditPlayerClasses({
       : 0;
     if (player.classes && player.classes.length - maxLevelClasses > 3) {
       newWarnings.push(
-        t(
-          "The number of classes exceeds the limit beyond the number of classes at level 10."
-        )
+        "The number of classes exceeds the limit beyond the number of classes at level 10."
       );
     }
 
@@ -56,7 +54,7 @@ export default function EditPlayerClasses({
 
     // Check if sum of levels isn't equal to player level
     if (totalLevels !== player.lvl) {
-      newWarnings.push(t("Sum of class levels isn't equal to character level."));
+      newWarnings.push("Sum of class levels isn't equal to character level.");
     }
 
     setWarnings(newWarnings);
@@ -70,7 +68,7 @@ export default function EditPlayerClasses({
       );
 
       if (classExists) {
-        console.error(t("This class type already exists for the character"));
+        console.error("This class type already exists for the character");
         return;
       }
 
@@ -323,7 +321,7 @@ export default function EditPlayerClasses({
               {warnings.map((warning, index) => (
                 <Grid item xs={12} key={index}>
                   <Typography color="error" variant="body1">
-                    {warning}
+                    {t(warning)}
                   </Typography>
                 </Grid>
               ))}
