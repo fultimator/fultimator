@@ -171,7 +171,7 @@ export default function EditManualStats({
         </Grid>
         <Grid item xs={4}>
           <TextField
-            label={t("Melee Precision Modifier")}
+            label={t("Melee Accuracy Modifier")}
             type="number"
             fullWidth
             value={meleePrecModifier}
@@ -188,7 +188,7 @@ export default function EditManualStats({
         </Grid>
         <Grid item xs={4}>
           <TextField
-            label={t("Ranged Precision Modifier")}
+            label={t("Ranged Accuracy Modifier")}
             type="number"
             fullWidth
             value={rangedPrecModifier}

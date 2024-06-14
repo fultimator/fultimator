@@ -291,12 +291,12 @@ export default function PlayerEquipment({ player, setPlayer }) {
                 </Typography>
                 {player.modifiers.meleePrec !== 0 && (
                   <Typography variant="h4">
-                    {t("Melee Precision Bonus")}: {player.modifiers.meleePrec}
+                    {t("Melee Accuracy Bonus")}: {player.modifiers.meleePrec}
                   </Typography>
                 )}
                 {player.modifiers.rangedPrec !== 0 && (
                   <Typography variant="h4">
-                    {t("Ranged Precision Bonus")}: {player.modifiers.rangedPrec}
+                    {t("Ranged Accuracy Bonus")}: {player.modifiers.rangedPrec}
                   </Typography>
                 )}
               </Grid>
