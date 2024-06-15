@@ -9,19 +9,19 @@ import {
   Grid,
   Divider,
 } from "@mui/material";
-import { useTranslate } from "../../../translation/translate";
-import weapons from "../../../routes/equip/weapons/base";
-import qualities from "../../../routes/equip/weapons/qualities";
-import ChangeBase from "../../../routes/equip/weapons/ChangeBase";
-import ChangeMartial from "../../../routes/equip/common/ChangeMartial";
-import ChangeName from "../../../routes/equip/common/ChangeName";
-import ChangeType from "../../../routes/equip/weapons/ChangeType";
-import ChangeHands from "../../../routes/equip/weapons/ChangeHands";
-import ChangeAttr from "../../../routes/equip/weapons/ChangeAttr";
-import SelectQuality from "../../../routes/equip/weapons/SelectQuality";
-import ChangeQuality from "../../../routes/equip/common/ChangeQuality";
-import ChangeBonus from "../../../routes/equip/weapons/ChangeBonus";
-import ApplyRework from "../../../routes/equip/common/ApplyRework";
+import { useTranslate } from "../../../../translation/translate";
+import weapons from "../../../../routes/equip/weapons/base";
+import qualities from "../../../../routes/equip/weapons/qualities";
+import ChangeBase from "../../../../routes/equip/weapons/ChangeBase";
+import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
+import ChangeName from "../../../../routes/equip/common/ChangeName";
+import ChangeType from "../../../../routes/equip/weapons/ChangeType";
+import ChangeHands from "../../../../routes/equip/weapons/ChangeHands";
+import ChangeAttr from "../../../../routes/equip/weapons/ChangeAttr";
+import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
+import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
+import ChangeBonus from "../../../../routes/equip/weapons/ChangeBonus";
+import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import { Close } from "@mui/icons-material";
 
 import PrettyWeapon from "./PrettyWeapon";

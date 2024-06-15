@@ -2,14 +2,14 @@ import React, { useRef } from "react";
 import { Grid, useTheme, Card, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
-import { useTranslate } from "../../../translation/translate";
+import { useTranslate } from "../../../../translation/translate";
 
-import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
+import attributes from "../../../../libs/attributes";
+import types from "../../../../libs/types";
 
-import { Martial } from "../../icons";
-import { OpenBracket, CloseBracket } from "../../Bracket";
-import Diamond from "../../Diamond";
+import { Martial } from "../../../icons";
+import { OpenBracket, CloseBracket } from "../../../Bracket";
+import Diamond from "../../../Diamond";
 
 export default function PrettyWeapon({ weapon, showActions }) {
   const { t } = useTranslate();

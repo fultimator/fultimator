@@ -1,4 +1,4 @@
-import React, {  useCallback } from "react";
+import React, { useCallback } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   FormControl,
@@ -29,29 +29,39 @@ export default function EditPlayerBasics({
   const secondary = theme.palette.secondary.main;
 
   const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
-  const [isImageTooLarge, setIsImageTooLarge] = React.useState(false);
 
-  const onChange = useCallback((key) => (e) => {
-    setPlayer((prevState) => ({
-      ...prevState,
-      [key]: e.target.value,
-    }));
-  }, [setPlayer]);
+  const [isImageError, setIsImageError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
 
-  const onChangeInfo = useCallback((key) => (value) => {
-    setPlayer((prevState) => ({
-      ...prevState,
-      info: {
-        ...prevState.info,
-        [key]: value,
-      },
-    }));
-  }, [setPlayer]);
+  const onChange = useCallback(
+    (key) => (e) => {
+      setPlayer((prevState) => ({
+        ...prevState,
+        [key]: e.target.value,
+      }));
+    },
+    [setPlayer]
+  );
+
+  const onChangeInfo = useCallback(
+    (key) => (value) => {
+      setPlayer((prevState) => ({
+        ...prevState,
+        info: {
+          ...prevState.info,
+          [key]: value,
+        },
+      }));
+    },
+    [setPlayer]
+  );
 
   const checkImageSize = useCallback(async (imageUrl) => {
     try {
       const response = await fetch(imageUrl);
       if (!response.ok) {
+        setIsImageError(true);
+        setErrorMessage("Failed to fetch image");
         throw new Error("Failed to fetch image");
       }
       const blob = await response.blob();
@@ -59,14 +69,18 @@ export default function EditPlayerBasics({
         blob.size >
         5 * 1024 * 1024 // 5MB
       ) {
-        setIsImageTooLarge(true);
+        setIsImageError(true);
+        setErrorMessage("Image size is too large, max 5MB");
         return false;
       } else {
-        setIsImageTooLarge(false);
+        setIsImageError(false);
+        setErrorMessage("");
         return true;
       }
     } catch (error) {
       console.error("Error checking image size:", error);
+      setIsImageError(true);
+      setErrorMessage("Error checking image size: " + error.message);
     }
   }, []);
 
@@ -86,7 +100,7 @@ export default function EditPlayerBasics({
             type="top"
             headerText={t("Basic Information")}
             addItem={() => console.log(player)}
-            icon ={ Code}
+            icon={Code}
             customTooltip="Console.log Player Object"
           />
         </Grid>
@@ -253,12 +267,12 @@ export default function EditPlayerBasics({
                 value={imgUrlTemp}
                 onChange={(e) => {
                   setImgUrlTemp(e.target.value);
+                  setIsImageError(false);
+                  setErrorMessage("");
                 }}
                 fullWidth
-                error={imgUrlTemp.length > 0 && isImageTooLarge}
-                helperText={
-                  isImageTooLarge ? "Image must be smaller than 5 MB" : null
-                }
+                error={imgUrlTemp.length > 0 && isImageError}
+                helperText={isImageError && imgUrlTemp.length > 0 ? errorMessage : null}
               />
             </Grid>
             <Grid item xs={6} sm={2}>
@@ -273,7 +287,7 @@ export default function EditPlayerBasics({
                         return newState;
                       });
                     } else {
-                      console.log("Image too large");
+                      console.log("Error on uploading image");
                     }
                   });
                 }}
@@ -287,7 +301,8 @@ export default function EditPlayerBasics({
                 variant="outlined"
                 onClick={() => {
                   setImgUrlTemp("");
-                  setIsImageTooLarge(false);
+                  setIsImageError(false);
+                  setErrorMessage("");
                   setPlayer((prevState) => {
                     const newState = { ...prevState };
                     newState.info.imgurl = "";

@@ -13,7 +13,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import { useTranslate } from "../../../translation/translate";
+import { useTranslate } from "../../../../translation/translate";
 import PrettyWeapon from "./PrettyWeapon";
 import { Edit, Error } from "@mui/icons-material";
 

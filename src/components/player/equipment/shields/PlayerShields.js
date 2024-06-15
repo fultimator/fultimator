@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
 import { Typography } from "@mui/material";
-import { useTranslate } from "../../../translation/translate";
+import { useTranslate } from "../../../../translation/translate";
 
 export default function PlayerShields() {
   const { t } = useTranslate();

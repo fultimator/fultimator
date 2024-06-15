@@ -7,11 +7,11 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import PlayerWeapons from "./PlayerWeapons";
-import PlayerShields from "./PlayerShields";
-import PlayerAccessories from "./PlayerAccessories";
-import PlayerWeaponModal from "./PlayerWeaponModal";
-import PlayerArmorModal from "./PlayerArmorModal";
+import PlayerWeapons from "./weapons/PlayerWeapons";
+import PlayerShields from "./shields/PlayerShields";
+import PlayerAccessories from "./accessories/PlayerAccessories";
+import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
+import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerArmor from "./armor/PlayerArmor";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {

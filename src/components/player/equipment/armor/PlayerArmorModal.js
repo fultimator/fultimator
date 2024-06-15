@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTranslate } from "../../../translation/translate";
+import { useTranslate } from "../../../../translation/translate";
 import {
   Grid,
   Divider,
@@ -11,14 +11,14 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import armor from "../../../libs/armor";
-import qualities from "../../../routes/equip/ArmorShield/qualities";
-import ChangeBase from "./armor/ChangeBase";
-import SelectQuality from "../../../routes/equip/ArmorShield/SelectQuality";
-import ChangeName from "../../../routes/equip/common/ChangeName";
-import ChangeQuality from "../../../routes/equip/common/ChangeQuality";
-import ApplyRework from "../../../routes/equip/common/ApplyRework";
-import PrettyArmor from "./armor/PrettyArmor";
+import armor from "../../../../libs/armor";
+import qualities from "../../../../routes/equip/ArmorShield/qualities";
+import ChangeBase from "./ChangeBase";
+import SelectQuality from "../../../../routes/equip/ArmorShield/SelectQuality";
+import ChangeName from "../../../../routes/equip/common/ChangeName";
+import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
+import ApplyRework from "../../../../routes/equip/common/ApplyRework";
+import PrettyArmor from "./PrettyArmor";
 
 export default function PlayerArmorModal({
   open,

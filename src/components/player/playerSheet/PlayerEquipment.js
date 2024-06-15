@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import PrettyWeapon from "../equipment/PrettyWeapon";
+import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 
