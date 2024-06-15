@@ -11,15 +11,11 @@ import { useTranslate } from "../../../../translation/translate";
 function ChangeBase({ value, onChange }) {
   const { t } = useTranslate();
 
-  const options = [];
-
-  for (const armorItem of armor) {
-    options.push(
-      <MenuItem key={armorItem.name} value={armorItem.name}>
-        {armorItem.name} {armorItem.martial && <Martial />}
-      </MenuItem>
-    );
-  }
+  const options = armor.map((armorItem) => (
+    <MenuItem key={armorItem.name} value={armorItem.name}>
+      {t(armorItem.name)} {armorItem.martial && <Martial />}
+    </MenuItem>
+  ));
 
   return (
     <FormControl fullWidth>

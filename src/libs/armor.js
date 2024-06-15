@@ -1,9 +1,7 @@
-import { t } from "../translation/translate";
-
 const armor = [
   {
-    category: t("Armor", true),
-    name: t("Silk Shirt", true),
+    category: "Armor",
+    name: "Silk Shirt",
     cost: 100,
     def: 0,
     mdef: 2,
@@ -12,8 +10,8 @@ const armor = [
     init: -1
   },
   {
-    category: t("Armor", true),
-    name: t("Travel Garb", true),
+    category: "Armor",
+    name: "Travel Garb",
     cost: 100,
     def: 1,
     mdef: 1,
@@ -22,8 +20,8 @@ const armor = [
     init: -1
   },
   {
-    category: t("Armor", true),
-    name: t("Combat Tunic", true),
+    category: "Armor",
+    name: "Combat Tunic",
     cost: 150,
     def: 1,
     mdef: 1,
@@ -32,8 +30,8 @@ const armor = [
     init: 0
   },
   {
-    category: t("Armor", true),
-    name: t("Combat Tunic (Rework)", true),
+    category: "Armor",
+    name: "Combat Tunic (Rework)",
     cost: 150,
     def: 2,
     mdef: 0,
@@ -42,8 +40,8 @@ const armor = [
     init: 0
   },
   {
-    category: t("Armor", true),
-    name: t("Sage Robe", true),
+    category: "Armor",
+    name: "Sage Robe",
     cost: 200,
     def: 1,
     mdef: 2,
@@ -52,8 +50,8 @@ const armor = [
     init: -2
   },
   {
-    category: t("Armor", true),
-    name: t("Brigandine", true),
+    category: "Armor",
+    name: "Brigandine",
     cost: 150,
     def: 10,
     mdef: 0,
@@ -62,8 +60,8 @@ const armor = [
     init: -2
   },
   {
-    category: t("Armor", true),
-    name: t("Bronze Plate", true),
+    category: "Armor",
+    name: "Bronze Plate",
     cost: 200,
     def: 11,
     mdef: 0,
@@ -72,8 +70,8 @@ const armor = [
     init: -3
   },
   {
-    category: t("Armor", true),
-    name: t("Runic Plate", true),
+    category: "Armor",
+    name: "Runic Plate",
     cost: 250,
     def: 11,
     mdef: 1,
@@ -82,8 +80,8 @@ const armor = [
     init: -3
   },
   {
-    category: t("Armor", true),
-    name: t("Steel Plate", true),
+    category: "Armor",
+    name: "Steel Plate",
     cost: 300,
     def: 12,
     mdef: 0,

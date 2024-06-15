@@ -10,7 +10,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import weapons from "../../../../routes/equip/weapons/base";
+import weapons from "../../../../libs/weapons";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import ChangeBase from "../../../../routes/equip/weapons/ChangeBase";
 import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";

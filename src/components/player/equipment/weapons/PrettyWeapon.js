@@ -91,7 +91,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
-                      {weapon.name}
+                      {t(weapon.name)}
                     </Typography>
                     {weapon.martial && <Martial />}
                   </Grid>
@@ -133,7 +133,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
                   }}
                 >
                   <Grid item xs={3}>
-                    <Typography fontWeight="bold">{weapon.category}</Typography>
+                    <Typography fontWeight="bold">{t(weapon.category)}</Typography>
                   </Grid>
                   <Grid item xs={1}>
                     <Diamond color={primary} />

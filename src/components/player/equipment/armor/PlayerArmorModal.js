@@ -87,9 +87,9 @@ export default function PlayerArmorModal({
       selectedQuality,
       init,
       rework,
-      isEquipped: /* if martial has changed then false */ martial !== armorPlayer?.martial ? false : isEquipped,
+      isEquipped: martial !== armorPlayer?.martial ? false : isEquipped,
       cost,
-      category: t("Armor", true),
+      category: "Armor",
       def: base.def,
       mdef: base.mdef,
     };

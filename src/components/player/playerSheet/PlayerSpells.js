@@ -9,7 +9,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Select,
   MenuItem,
@@ -411,7 +410,7 @@ export default function PlayerSpells({ player, setPlayer }) {
               {t("Spell Rolls")}
             </DialogTitle>
             <DialogContent sx={{ marginTop: "10px" }}>
-              <DialogContentText id="alert-dialog-description">
+              <DialogContent id="alert-dialog-description">
                 {!isRolling ? (
                   <Grid container alignItems="center" spacing={1}>
                     <Grid item xs={12}>
@@ -469,7 +468,7 @@ export default function PlayerSpells({ player, setPlayer }) {
                 ) : (
                   <>{dialogMessage}</>
                 )}
-              </DialogContentText>
+              </DialogContent>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleDialogClose}>Cancel</Button>

@@ -38,7 +38,7 @@ function ChangeMartial({ martial, setMartial }) {
           }
           sx={{margin: 0}}
           title={t("Martial", true)}
-          labelPlacement="center"
+          //labelPlacement="center"
           
         />
         <label style={labelStyle}>{t("Martial", true)}</label>

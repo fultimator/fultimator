@@ -1,7 +1,7 @@
 import { Grid, Paper, Button, useTheme, Divider } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState, useRef, useEffect } from "react";
-import weapons from "./base";
+import weapons from "../../../libs/weapons";
 import ChangeBase from "./ChangeBase";
 import ChangeAttr from "./ChangeAttr";
 import ChangeMartial from "../common/ChangeMartial";

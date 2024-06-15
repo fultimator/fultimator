@@ -7,13 +7,13 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
+import PrettyArmor from "../equipment/armor/PrettyArmor";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 
@@ -31,6 +31,10 @@ export default function PlayerEquipment({ player, setPlayer }) {
 
   const equippedWeapons = player.weapons
     ? player.weapons.filter((weapon) => weapon.isEquipped)
+    : [];
+
+  const equippedArmor = player.armor
+    ? player.armor.filter((armor) => armor.isEquipped)
     : [];
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
@@ -226,7 +230,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
 
   return (
     <>
-      {equippedWeapons.length > 0 && (
+      {(equippedWeapons.length > 0 || equippedArmor.length > 0) && (
         <Paper
           elevation={3}
           sx={{
@@ -257,32 +261,58 @@ export default function PlayerEquipment({ player, setPlayer }) {
             {t("Equipment")}
           </Typography>
           <Grid container spacing={2} sx={{ padding: "1em" }}>
-            <Grid item xs={12}>
-              <Typography variant="h2" sx={{ fontWeight: "bold" }}>
-                {t("Weapons")}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              {equippedWeapons.map((weapon, index) => (
-                <React.Fragment key={index}>
-                  <Grid container>
-                    <Grid item xs={11}>
-                      <PrettyWeapon
-                        weapon={weapon}
-                        player={player}
-                        setPlayer={setPlayer}
-                      />
-                    </Grid>
-                    <Grid item xs={1}>
-                      <IconButton onClick={() => handleDiceRoll(weapon)}>
-                        <Casino />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                  <br />
-                </React.Fragment>
-              ))}
-            </Grid>
+            {equippedWeapons.length > 0 && (
+              <>
+                <Grid item xs={12}>
+                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                    {t("Weapons")}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  {equippedWeapons.map((weapon, index) => (
+                    <React.Fragment key={index}>
+                      <Grid container>
+                        <Grid item xs={11}>
+                          <PrettyWeapon
+                            weapon={weapon}
+                            player={player}
+                            setPlayer={setPlayer}
+                          />
+                        </Grid>
+                        <Grid item xs={1}>
+                          <IconButton onClick={() => handleDiceRoll(weapon)}>
+                            <Casino />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                      <br />
+                    </React.Fragment>
+                  ))}
+                </Grid>
+              </>
+            )}
+            {equippedArmor.length > 0 && (
+              <>
+                <Grid item xs={12}>
+                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                    {t("Armor")}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  {equippedArmor.map((armor, index) => (
+                    <React.Fragment key={index}>
+                      <Grid container>
+                        <Grid item xs={11}>
+                          <PrettyArmor armor={armor} />
+                        </Grid>
+                        <Grid item xs={1}></Grid>
+                      </Grid>
+                      <br />
+                    </React.Fragment>
+                  ))}
+                </Grid>
+              </>
+            )}
             {(player.modifiers.meleePrec !== 0 ||
               player.modifiers.rangedPrec !== 0) && (
               <Grid item xs={12}>
@@ -324,9 +354,9 @@ export default function PlayerEquipment({ player, setPlayer }) {
               Result
             </DialogTitle>
             <DialogContent sx={{ marginTop: "10px" }}>
-              <DialogContentText id="alert-dialog-description">
+              <DialogContent id="alert-dialog-description">
                 {dialogMessage}
-              </DialogContentText>
+              </DialogContent>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleDialogClose} color="primary">

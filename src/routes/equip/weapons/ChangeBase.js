@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { Martial } from "../../../components/icons";
 import groupBy from "../../../libs/groupby";
-import weapons from "./base";
+import weapons from "../../../libs/weapons";
 import { useTranslate } from "../../../translation/translate";
 
 function ChangeBase({ value, onChange }) {
@@ -17,12 +17,12 @@ function ChangeBase({ value, onChange }) {
   const options = [];
 
   for (const [category, weapons] of Object.entries(groupedWeapons)) {
-    options.push(<ListSubheader key={category}>{category}</ListSubheader>);
+    options.push(<ListSubheader key={category}>{t(category)}</ListSubheader>);
 
     for (const weapon of weapons) {
       options.push(
         <MenuItem key={weapon.name} value={weapon.name}>
-          {weapon.name} {" "}
+          {t(weapon.name)} {" "}
           {weapon.martial && <Martial />}{" "}
         </MenuItem>
       );
@@ -36,7 +36,7 @@ function ChangeBase({ value, onChange }) {
         labelId="type"
         id="select-type"
         value={value}
-        label="Basic Weapon"
+        label={t("Basic Weapon")}
         onChange={onChange}
       >
         {options}

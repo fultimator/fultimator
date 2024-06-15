@@ -44,7 +44,7 @@ export default function PrettyArmor({ armor, showActions }) {
               <Grid item xs={0} sm={1}></Grid>
               <Grid item xs={2}>
                 <Typography variant="h4" textAlign="left">
-                  {armor.category}
+                  {t(armor.category)}
                 </Typography>
               </Grid>
               <Grid item xs={1}>
@@ -89,7 +89,7 @@ export default function PrettyArmor({ armor, showActions }) {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
-                      {armor.name}
+                      {t(armor.name)}
                     </Typography>
                     {armor.martial && <Martial />}
                   </Grid>
@@ -98,33 +98,32 @@ export default function PrettyArmor({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === t("Shield") ? "+" + armor.def : ""}
-                      {armor.category === t("Armor") && armor.martial
+                      {armor.category === "Shield" ? "+" + armor.def : ""}
+                      {armor.category === "Armor" && armor.martial
                         ? armor.def
                         : ""}
-                      {armor.category === t("Armor") && !armor.martial
+                      {armor.category === "Armor" && !armor.martial
                         ? armor.def === 0
                           ? t("DEX die")
-                          : t("DEX die") + "+" + armor.def
+                          : `${t("DEX die")} + ${armor.def}`
                         : ""}
                     </Typography>
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === t("Shield") ? "+" + armor.mdef : ""}
-
-                      {armor.category === t("Armor")
+                      {armor.category === "Shield" ? "+" + armor.mdef : ""}
+                      {armor.category === "Armor"
                         ? armor.mdef === 0
                           ? t("INS die")
-                          : t("INS die") + "+" + armor.mdef
+                          : `${t("INS die")} + ${armor.mdef}`
                         : ""}
                     </Typography>
                   </Grid>
                   {!armor.rework && (
                     <Grid item xs={2}>
                       <Typography fontWeight="bold" textAlign="center">
-                        {armor.category === t("Armor") ||
-                        armor.category === t("Shield")
+                        {armor.category === "Armor" ||
+                        armor.category === "Shield"
                           ? armor.init === 0
                             ? "-"
                             : armor.init
