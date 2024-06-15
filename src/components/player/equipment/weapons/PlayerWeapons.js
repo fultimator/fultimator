@@ -74,11 +74,12 @@ export default function PlayerWeapons({
 
   const canEquipWeapon = (weapon) => {
     const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
+    const shieldsCount = countEquippedShields();
 
     if (weapon.hands === 2) {
-      return oneHandedCount === 0 && twoHandedCount === 0;
+      return oneHandedCount === 0 && twoHandedCount === 0 && shieldsCount === 0;
     } else if (weapon.hands === 1) {
-      return twoHandedCount === 0 && oneHandedCount < 2;
+      return twoHandedCount === 0 && oneHandedCount < 2 && shieldsCount < 2;
     }
 
     return false;
@@ -99,6 +100,18 @@ export default function PlayerWeapons({
     });
 
     return { oneHandedCount, twoHandedCount };
+  };
+
+  const countEquippedShields = () => {
+    let count = 0;
+    if (player.shields && player.shields.length > 0) {
+      player.shields.forEach((shield) => {
+        if (shield.isEquipped) {
+          count++;
+        }
+      });
+    }
+    return count;
   };
 
   const handleEquipWeapon = (index, checked) => {
@@ -162,7 +175,11 @@ export default function PlayerWeapons({
                             }
                           />
                         }
-                        label={<Typography align="center">{t("Equip Weapon")}</Typography>}
+                        label={
+                          <Typography align="center">
+                            {t("Equip Weapon")}
+                          </Typography>
+                        }
                         labelPlacement="bottom"
                       />
                     </FormGroup>

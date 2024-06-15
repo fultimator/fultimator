@@ -153,18 +153,24 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   /* player.armor.isEquipped (should be only one) */
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
 
+  /* player.shields.isEquipped (should be only one) */
+  const equippedShield =
+    player.shields?.find((shield) => shield.isEquipped) || null;
+
   // Calculate DEF and MDEF
   const currDef =
     (equippedArmor !== null
       ? equippedArmor.martial
         ? equippedArmor.def
         : currDex + equippedArmor.def
-      : currDex) + (player.modifiers?.def || 0);
-  //currDex + (player.modifiers?.def || 0);
+      : currDex) +
+    (equippedShield !== null ? equippedShield.def : 0) +
+    (player.modifiers?.def || 0);
+
   const currMDef =
     (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
+    (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0);
-  //currInsight + (player.modifiers?.mdef || 0);
 
   // Initialize INIT to 0
   const currInit =
@@ -265,7 +271,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         </Typography>
       </Grid>
       <Grid item xs={4} sm={4}>
-        <Tooltip title={isEditMode && (t("DEX") + " + " + t("INS"))} >
+        <Tooltip title={isEditMode && t("DEX") + " + " + t("INS")}>
           <Typography
             variant="body2"
             style={{

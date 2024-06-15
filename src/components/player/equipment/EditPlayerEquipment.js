@@ -12,6 +12,7 @@ import PlayerShields from "./shields/PlayerShields";
 import PlayerAccessories from "./accessories/PlayerAccessories";
 import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
+import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerArmor from "./armor/PlayerArmor";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
@@ -27,34 +28,100 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [editArmorIndex, setEditArmorIndex] = React.useState(null);
   const [armor, setArmor] = React.useState(null);
 
+  const [openNewShields, setOpenNewShields] = React.useState(false);
+  const [editShieldIndex, setEditShieldIndex] = React.useState(null);
+  const [shields, setShields] = React.useState(null);
+
+  // OPEN MODALS
   const handleOpenNewWeapon = () => {
     setWeapon(null);
     setEditWeaponIndex(null);
     setOpenNewWeapon(true);
   };
 
+  const handleOpenNewArmor = () => {
+    setArmor(null);
+    setEditArmorIndex(null);
+    setOpenNewArmor(true);
+  };
+
+  const handleOpenNewShield = () => {
+    setShields(null);
+    setEditShieldIndex(null);
+    setOpenNewShields(true);
+  };
+
+  // CLOSE MODALS
   const handleCloseNewWeapon = () => {
     setOpenNewWeapon(false);
     setWeapon(null);
     setEditWeaponIndex(null);
   };
 
+  const handleCloseNewArmor = () => {
+    setOpenNewArmor(false);
+    setArmor(null);
+    setEditArmorIndex(null);
+  };
+
+  const handleCloseNewShield = () => {
+    setOpenNewShields(false);
+    setShields(null);
+    setEditShieldIndex(null);
+  };
+
+  // ADD NEW
   const handleAddWeapon = (newWeapon) => {
     const updatedWeapons = [...(player.weapons || []), newWeapon];
     setPlayer({ ...player, weapons: updatedWeapons });
   };
 
+  const handleAddArmor = (newArmor) => {
+    const updatedArmors = [...(player.armor || []), newArmor];
+    setPlayer({ ...player, armor: updatedArmors });
+  };
+
+  const handleAddShield = (newShields) => {
+    const updatedShields = [...(player.shields || []), newShields];
+    setPlayer({ ...player, shields: updatedShields });
+  };
+
+  // DELETE
   const handleDeleteWeapon = (index) => {
     const updatedWeapons = (player.weapons || []).filter((_, i) => i !== index);
     setPlayer({ ...player, weapons: updatedWeapons });
   };
 
+  const handleDeleteArmor = (index) => {
+    const updatedArmors = (player.armor || []).filter((_, i) => i !== index);
+    setPlayer({ ...player, armor: updatedArmors });
+  };
+
+  const handleDeleteShield = (index) => {
+    const updatedShields = (player.shields || []).filter((_, i) => i !== index);
+    setPlayer({ ...player, shields: updatedShields });
+  };
+
+  // EDIT
   const handleEditWeapon = (index) => {
     setWeapon(player.weapons[index]);
     setEditWeaponIndex(index);
     setOpenNewWeapon(true);
   };
 
+  const handleEditArmor = (index) => {
+    setArmor(player.armor[index]);
+    setEditArmorIndex(index);
+    setOpenNewArmor(true);
+  };
+
+  const handleEditShield = (index) => {
+    setShields(player.shields[index]);
+    setEditShieldIndex(index);
+    setOpenNewShields(true);
+  };
+
+  // SAVE
   const handleSaveWeapon = (updatedWeapon) => {
     if (editWeaponIndex !== null) {
       const updatedWeapons = (player.weapons || []).map((weapon, i) =>
@@ -65,35 +132,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       handleAddWeapon(updatedWeapon);
     }
     setOpenNewWeapon(false);
-  };
-
-  const handleEquipWeapon = (weaponIndex) => {
-    // Toggle equipped weapon (weapon.isEquipped)
-    /* Note: there can be only one Two Handed Weapon or two One Handed weapons equipped at a time */
-    const updatedWeapons = (player.weapons || []).map((weapon, i) =>
-      i === weaponIndex ? { ...weapon, isEquipped: !weapon.isEquipped } : weapon
-    );
-    setPlayer({ ...player, weapons: updatedWeapons });
-  };
-
-  const handleOpenNewArmor = () => {
-    setArmor(null);
-    setEditArmorIndex(null);
-    setOpenNewArmor(true);
-  };
-
-  const handleCloseNewArmor = () => {
-    setOpenNewArmor(false);
-    setArmor(null);
-    setEditArmorIndex(null);
-  };
-
-  const handleEquipArmor = (armorIndex) => {
-    // Toggle equipped armor (armor.isEquipped)
-    const updatedArmors = (player.armor || []).map((armor, i) =>
-      i === armorIndex ? { ...armor, isEquipped: !armor.isEquipped } : armor
-    );
-    setPlayer({ ...player, armor: updatedArmors });
   };
 
   const handleSaveArmor = (updatedArmor) => {
@@ -108,20 +146,44 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setOpenNewArmor(false);
   };
 
-  const handleAddArmor = (newArmor) => {
-    const updatedArmors = [...(player.armor || []), newArmor];
+  const handleSaveShield = (updatedShield) => {
+    if (editShieldIndex !== null) {
+      const updatedShields = (player.shields || []).map((shield, i) =>
+        i === editShieldIndex ? updatedShield : shield
+      );
+      setPlayer({ ...player, shields: updatedShields });
+    } else {
+      handleAddShield(updatedShield);
+    }
+    setOpenNewShields(false);
+  };
+
+  // TOGGLE EQUIPPED
+  const handleEquipWeapon = (weaponIndex) => {
+    // Toggle equipped weapon (weapon.isEquipped)
+    /* Note: there can be only one Two Handed Weapon or two One Handed weapons equipped at a time */
+    const updatedWeapons = (player.weapons || []).map((weapon, i) =>
+      i === weaponIndex ? { ...weapon, isEquipped: !weapon.isEquipped } : weapon
+    );
+    setPlayer({ ...player, weapons: updatedWeapons });
+  };
+
+  const handleEquipArmor = (armorIndex) => {
+    // Toggle equipped armor (armor.isEquipped)
+    const updatedArmors = (player.armor || []).map((armor, i) =>
+      i === armorIndex ? { ...armor, isEquipped: !armor.isEquipped } : armor
+    );
     setPlayer({ ...player, armor: updatedArmors });
   };
 
-  const handleDeleteArmor = (index) => {
-    const updatedArmors = (player.armor || []).filter((_, i) => i !== index);
-    setPlayer({ ...player, armor: updatedArmors });
-  };
-
-  const handleEditArmor = (index) => {
-    setArmor(player.armor[index]);
-    setEditArmorIndex(index);
-    setOpenNewArmor(true);
+  const handleEquipShield = (shieldsIndex) => {
+    // Toggle equipped shields (shields.isEquipped)
+    const updatedShields = (player.shields || []).map((shields, i) =>
+      i === shieldsIndex
+        ? { ...shields, isEquipped: !shields.isEquipped }
+        : shields
+    );
+    setPlayer({ ...player, shields: updatedShields });
   };
 
   return (
@@ -158,12 +220,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      alert("Shields not yet implemented");
-                    }}
-                  >
+                  <Button variant="contained" onClick={handleOpenNewShield}>
                     {t("Add Shield")}
                   </Button>
                 </Grid>
@@ -200,25 +257,14 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEquipArmor={handleEquipArmor}
       />
 
-      <Accordion
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          marginBottom: 3,
-        }}
-      >
-        <AccordionSummary
-          expandIcon={<ArrowDownwardIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-        >
-          <PlayerShields />
-        </AccordionSummary>
-        <AccordionDetails>{/* List all available Shields */}</AccordionDetails>
-      </Accordion>
+      <PlayerShields
+        player={player}
+        shields={player.shields || []}
+        onEditShield={handleEditShield}
+        onDeleteShield={handleDeleteShield}
+        onEquipShield={handleEquipShield}
+      />
+
       <Accordion
         elevation={3}
         sx={{
@@ -257,6 +303,15 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         setArmorPlayer={setArmor}
         onAddArmor={handleSaveArmor}
         onDeleteArmor={handleDeleteArmor}
+      />
+      <PlayerShieldModal
+        open={openNewShields}
+        onClose={handleCloseNewShield}
+        editShieldIndex={editShieldIndex}
+        shield={shields}
+        setShield={setShields}
+        onAddShield={handleSaveShield}
+        onDeleteShield={handleDeleteShield}
       />
     </>
   );

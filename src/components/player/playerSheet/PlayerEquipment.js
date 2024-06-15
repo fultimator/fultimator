@@ -37,6 +37,10 @@ export default function PlayerEquipment({ player, setPlayer }) {
     ? player.armor.filter((armor) => armor.isEquipped)
     : [];
 
+  const equippedShields = player.shields
+    ? player.shields.filter((shield) => shield.isEquipped)
+    : [];
+
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
   const calculateAttribute = (
     base,
@@ -312,6 +316,29 @@ export default function PlayerEquipment({ player, setPlayer }) {
                   ))}
                 </Grid>
               </>
+            )}
+            {equippedShields.length > 0 && (
+              <>
+                <Grid item xs={12}>
+                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                    {t("Shields")}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  {equippedShields.map((shield, index) => (
+                    <React.Fragment key={index}>
+                      <Grid container>
+                        <Grid item xs={11}>
+                          <PrettyArmor armor={shield} />
+                        </Grid>
+                        <Grid item xs={1}></Grid>
+                      </Grid>
+                      <br />
+                    </React.Fragment>
+                  ))}
+                </Grid>
+              </>
+
             )}
             {(player.modifiers.meleePrec !== 0 ||
               player.modifiers.rangedPrec !== 0) && (

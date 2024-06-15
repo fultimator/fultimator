@@ -1,9 +1,7 @@
-import { t } from "../translation/translate";
-
 const shields = [
   {
-    category: t("Shield", true),
-    name: t("Bronze Shield", true),
+    category: "Shield",
+    name: "Bronze Shield",
     cost: 100,
     def: 2,
     mdef: 0,
@@ -11,8 +9,8 @@ const shields = [
     init: 0
   },
   {
-    category: t("Shield", true),
-    name: t("Runic Shield", true),
+    category: "Shield",
+    name: "Runic Shield",
     cost: 150,
     def: 2,
     mdef: 2,
