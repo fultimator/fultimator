@@ -98,24 +98,28 @@ export default function PrettyArmor({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + armor.def : ""}
+                      {armor.category === "Shield" ? "+" + parseInt(armor.def + (armor.defModifier || 0)) : ""}
                       {armor.category === "Armor" && armor.martial
-                        ? armor.def
+                        ? armor.def + (armor.defModifier || 0)
                         : ""}
                       {armor.category === "Armor" && !armor.martial
-                        ? armor.def === 0
+                        ? (armor.def + (armor.defModifier || 0)) === 0
                           ? t("DEX die")
-                          : `${t("DEX die")} + ${armor.def}`
+                          : `${t("DEX die")} + ${
+                              armor.def + (armor.defModifier || 0)
+                            }`
                         : ""}
                     </Typography>
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + armor.mdef : ""}
+                      {armor.category === "Shield" ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0)) : ""}
                       {armor.category === "Armor"
-                        ? armor.mdef === 0
+                        ? (armor.mdef + (armor.mDefModifier || 0)) === 0
                           ? t("INS die")
-                          : `${t("INS die")} + ${armor.mdef}`
+                          : `${t("INS die")} + ${
+                              armor.mdef + (armor.mDefModifier || 0)
+                            }`
                         : ""}
                     </Typography>
                   </Grid>
@@ -124,9 +128,12 @@ export default function PrettyArmor({ armor, showActions }) {
                       <Typography fontWeight="bold" textAlign="center">
                         {armor.category === "Armor" ||
                         armor.category === "Shield"
-                          ? armor.init === 0
+                          ? (armor.init + (armor.initModifier || 0)) === 0
                             ? "-"
-                            : armor.init
+                            : (armor.init + (armor.initModifier || 0) > 0
+                                ? "+"
+                                : "") +
+                              parseInt(armor.init + (armor.initModifier || 0))
                           : ""}
                       </Typography>
                     </Grid>

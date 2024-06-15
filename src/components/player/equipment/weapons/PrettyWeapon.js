@@ -105,14 +105,14 @@ export default function PrettyWeapon({ weapon, showActions }) {
                         attributes[weapon.att2].shortcaps
                       }`}
                       <CloseBracket />
-                      {weapon.prec !== 0 ? `+${weapon.prec}` : ""}
+                      {weapon.prec > 0 ? `+${weapon.prec}` : weapon.prec < 0 ? `${weapon.prec}` : ""}
                     </Typography>
                   </Grid>
 
                   <Grid item xs={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
-                      {t("HR +")} {weapon.damage}
+                      {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
                       <CloseBracket />
                       {types[weapon.type].long}
                     </Typography>

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useTranslate } from "../../../../translation/translate";
 import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Grid,
+  Typography,
   Divider,
   Button,
   Dialog,
@@ -18,7 +22,9 @@ import SelectQuality from "../../../../routes/equip/ArmorShield/SelectQuality";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
+import ChangeModifiers from "../ChangeModifiers";
 import PrettyArmor from "./PrettyArmor";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function PlayerArmorModal({
   open,
@@ -41,6 +47,13 @@ export default function PlayerArmorModal({
   );
   const [init, setInit] = useState(armorPlayer?.init || 0);
   const [rework, setRework] = useState(armorPlayer?.rework || false);
+  const [defModifier, setDefModifier] = useState(armorPlayer?.defModifier || 0);
+  const [mDefModifier, setMDefModifier] = useState(
+    armorPlayer?.mDefModifier || 0
+  );
+  const [initModifier, setInitModifier] = useState(
+    armorPlayer?.initModifier || 0
+  );
   const [isEquipped, setIsEquipped] = useState(
     armorPlayer?.isEquipped || false
   );
@@ -55,6 +68,9 @@ export default function PlayerArmorModal({
     setInit(armorPlayer?.init || 0);
     setRework(armorPlayer?.rework || false);
     setIsEquipped(armorPlayer?.isEquipped || false);
+    setDefModifier(armorPlayer?.defModifier || 0);
+    setMDefModifier(armorPlayer?.mDefModifier || 0);
+    setInitModifier(armorPlayer?.initModifier || 0);
   }, [armorPlayer]);
 
   function calcCost() {
@@ -75,6 +91,9 @@ export default function PlayerArmorModal({
     setSelectedQuality("");
     setInit(armor[0].init);
     setRework(false);
+    setDefModifier(0);
+    setMDefModifier(0);
+    setInitModifier(0);
   };
 
   const handleSave = () => {
@@ -92,6 +111,9 @@ export default function PlayerArmorModal({
       category: "Armor",
       def: base.def,
       mdef: base.mdef,
+      defModifier: parseInt(defModifier),
+      mDefModifier: parseInt(mDefModifier),
+      initModifier: parseInt(initModifier),
     };
 
     onAddArmor(updatedArmor);
@@ -178,6 +200,42 @@ export default function PlayerArmorModal({
               qualityCost={qualityCost}
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
+          </Grid>
+          <Accordion sx={{ width: "100%", marginLeft: "10px" }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Modifiers</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"DEF Modifier"}
+                    value={defModifier}
+                    onChange={(e) => setDefModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"MDEF Modifier"}
+                    value={mDefModifier}
+                    onChange={(e) => setMDefModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"INIT Modifier"}
+                    value={initModifier}
+                    onChange={(e) => setInitModifier(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+          <Grid item xs={12}>
             <Divider />
           </Grid>
           <Grid item xs={12} sx={{ py: 0 }}>
@@ -209,6 +267,9 @@ export default function PlayerArmorModal({
               quality: quality,
               init: init,
               rework: rework,
+              defModifier: parseInt(defModifier),
+              mDefModifier: parseInt(mDefModifier),
+              initModifier: parseInt(initModifier),
             }}
           />
         </Grid>

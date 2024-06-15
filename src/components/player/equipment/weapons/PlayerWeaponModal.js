@@ -6,7 +6,11 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Grid,
+  Typography,
   Divider,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
@@ -22,7 +26,9 @@ import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ChangeBonus from "../../../../routes/equip/weapons/ChangeBonus";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
+import ChangeModifiers from "../ChangeModifiers";
 import { Close } from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import PrettyWeapon from "./PrettyWeapon";
 
@@ -55,6 +61,12 @@ export default function PlayerWeaponModal({
   const [selectedQuality, setSelectedQuality] = useState(
     weapon?.selectedQuality || ""
   );
+  const [precModifier, setPrecModifier] = useState(weapon?.precModifier || 0);
+  const [damageModifier, setDamageModifier] = useState(
+    weapon?.damageModifier || 0
+  );
+  const [defModifier, setDefModifier] = useState(weapon?.defModifier || 0);
+  const [mDefModifier, setMDefModifier] = useState(weapon?.mDefModifier || 0);
   const [isEquipped, setIsEquipped] = useState(weapon?.isEquipped || false);
 
   useEffect(() => {
@@ -73,6 +85,10 @@ export default function PlayerWeaponModal({
     setQualityCost(weapon?.qualityCost || 0);
     setTotalBonus(weapon?.totalBonus || 0);
     setSelectedQuality(weapon?.selectedQuality || "");
+    setPrecModifier(weapon?.precModifier || 0);
+    setDamageModifier(weapon?.damageModifier || 0);
+    setDefModifier(weapon?.defModifier || 0);
+    setMDefModifier(weapon?.mDefModifier || 0);
     setIsEquipped(weapon?.isEquipped || false);
   }, [weapon]);
 
@@ -129,6 +145,9 @@ export default function PlayerWeaponModal({
       damage += bonus;
     }
 
+    // Damage modifier
+    damage += parseInt(damageModifier);
+
     return damage;
   };
 
@@ -145,6 +164,9 @@ export default function PlayerWeaponModal({
     } else if (rework && prec === 0 && precBonus) {
       prec = 1;
     }
+
+    // Precision modifier
+    prec += parseInt(precModifier);
 
     return prec;
   };
@@ -176,7 +198,15 @@ export default function PlayerWeaponModal({
       cost,
       damage,
       prec,
-      isEquipped: (weapon?.hands || weapons[0].hands) !== hands || (weapon?.martial || false) !== martial ? false : isEquipped,
+      damageModifier: parseInt(damageModifier),
+      precModifier: parseInt(precModifier),
+      defModifier: parseInt(defModifier),
+      mDefModifier: parseInt(mDefModifier),
+      isEquipped:
+        (weapon?.hands || weapons[0].hands) !== hands ||
+        (weapon?.martial || false) !== martial
+          ? false
+          : isEquipped,
     };
     onAddWeapon(updatedWeapon);
   };
@@ -203,6 +233,11 @@ export default function PlayerWeaponModal({
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
+    setDamageModifier(0);
+    setPrecModifier(0);
+    setDefModifier(0);
+    setMDefModifier(0);
+    setIsEquipped(false);
   };
 
   const cost = calcCost();
@@ -334,6 +369,49 @@ export default function PlayerWeaponModal({
               qualityCost={qualityCost}
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
+          </Grid>
+          <Accordion sx={{ width: "100%", marginLeft: "10px" }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Modifiers</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"Damage Modifier"}
+                    value={damageModifier}
+                    onChange={(e) => setDamageModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"Precision Modifier"}
+                    value={precModifier}
+                    onChange={(e) => setPrecModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"DEF Modifier"}
+                    value={defModifier}
+                    onChange={(e) => setDefModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <ChangeModifiers
+                    label={"MDEF Modifier"}
+                    value={mDefModifier}
+                    onChange={(e) => setMDefModifier(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+          <Grid item xs={12}>
             <Divider />
           </Grid>
           <Grid item xs={12}>
