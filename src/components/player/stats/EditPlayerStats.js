@@ -134,7 +134,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
                 color="error"
                 sx={{ textAlign: { xs: "center", sm: "left" } }}
               >
-                CRISIS
+                {t("CRISIS")}
               </Typography>
             </Grid>
           )}

@@ -237,7 +237,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
             variant="h1"
             sx={{ textAlign: "center", marginBottom: "10px" }}
           >
-            Critical Failure!
+            {t("Critical Failure")}!
             <br />
           </Typography>
           {dialogContent}
@@ -251,7 +251,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
             variant="h1"
             sx={{ textAlign: "center", marginBottom: "10px" }}
           >
-            Critical Success!
+            {t("Critical Success")}!
             <br />
           </Typography>
           {dialogContent}
@@ -426,7 +426,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
                     : "#aaaaaa",
               }}
             >
-              Result
+              {t("Result")}
             </DialogTitle>
             <DialogContent sx={{ marginTop: "10px" }}>
               <DialogContent id="alert-dialog-description">
@@ -435,14 +435,14 @@ export default function PlayerEquipment({ player, setPlayer }) {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleDialogClose} color="primary">
-                Close
+                {t("Close")}
               </Button>
               <Button
                 onClick={() => handleDiceRoll(currentWeapon)}
                 color="primary"
                 autoFocus
               >
-                Re-roll
+                {t("Re-roll")}
               </Button>
             </DialogActions>
           </Dialog>

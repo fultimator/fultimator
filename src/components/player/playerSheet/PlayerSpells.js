@@ -182,7 +182,7 @@ export default function PlayerSpells({ player, setPlayer }) {
                 variant="h1"
                 sx={{ textAlign: "center", marginBottom: "10px" }}
               >
-                Critical Success!
+                {t("Critical Success")}!
                 <br />
               </Typography>
             )}
@@ -191,7 +191,7 @@ export default function PlayerSpells({ player, setPlayer }) {
                 variant="h1"
                 sx={{ textAlign: "center", marginBottom: "10px" }}
               >
-                Critical Failure!
+                {t("Critical Failure")}!
                 <br />
               </Typography>
             )}
@@ -498,7 +498,7 @@ export default function PlayerSpells({ player, setPlayer }) {
               </DialogContent>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleDialogClose}>Cancel</Button>
+              <Button onClick={handleDialogClose}>{t("Close")}</Button>
               <Button onClick={handleRoll}>
                 {isRolling ? t("Re-Roll") : t("Roll")}
               </Button>
