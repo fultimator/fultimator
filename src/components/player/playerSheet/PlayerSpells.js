@@ -40,6 +40,19 @@ export default function PlayerSpells({ player, setPlayer }) {
 
   const [dialogSeverity, setDialogSeverity] = useState("");
 
+  const equippedArmor = player.armor
+    ? player.armor.filter((armor) => armor.isEquipped)
+    : [];
+
+  const equippedShields = player.shields
+    ? player.shields.filter((shield) => shield.isEquipped)
+    : [];
+
+  const magicModifier =
+    (player.modifiers.magicPrec || 0) +
+    (equippedArmor.length > 0 ? equippedArmor[0].magicModifier || 0 : 0) +
+    (equippedShields.length > 0 ? equippedShields[0].magicModifier || 0 : 0);
+
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
   const calculateAttribute = (
     base,
@@ -140,12 +153,14 @@ export default function PlayerSpells({ player, setPlayer }) {
         const die1 = Math.floor(Math.random() * att1Value) + 1;
         const die2 = Math.floor(Math.random() * att2Value) + 1;
 
+        const precBonus = magicModifier;
+
         // Check for critical failure
         const isCriticalFailure = die1 === 1 && die2 === 1;
         // Check for critical success
         const isCriticalSuccess = die1 >= 6 && die2 >= 6 && die1 === die2;
 
-        const result = die1 + die2;
+        const result = die1 + die2 + precBonus;
 
         const maxDie = Math.max(die1, die2);
 
@@ -209,7 +224,7 @@ export default function PlayerSpells({ player, setPlayer }) {
               </Grid>
               <Grid item xs={12} sx={{ marginTop: "20px" }}>
                 <Typography component="span">
-                  {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`}
+                  {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`} {precBonus !== 0 ? " + " + precBonus : ""}
                 </Typography>
               </Grid>
             </Grid>
@@ -351,6 +366,18 @@ export default function PlayerSpells({ player, setPlayer }) {
                 </Grid>
               </Grid>
             ))}
+            {magicModifier !== 0 && (
+              <Grid item xs={12} sx={{ marginTop: "20px" }}>
+                <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                  {t("Modifiers")}
+                </Typography>
+                {magicModifier !== 0 && (
+                  <Typography variant="h4">
+                    {t("Magic Precision Bonus")}: {magicModifier}
+                  </Typography>
+                )}
+              </Grid>
+            )}
           </Grid>
           <Modal
             open={openModal}
