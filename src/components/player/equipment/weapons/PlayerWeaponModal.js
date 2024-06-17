@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
   Dialog,
@@ -76,6 +76,7 @@ export default function PlayerWeaponModal({
       ? true
       : false
   );
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
@@ -107,6 +108,69 @@ export default function PlayerWeaponModal({
         : false
     );
   }, [weapon]);
+
+  const handleFileUpload = (data) => {
+    if (data) {
+      const {
+        base,
+        name,
+        att1,
+        att2,
+        martial,
+        type,
+        hand,
+        quality,
+        qualityCost,
+        damageBonus,
+        damageReworkBonus,
+        precBonus,
+        rework,
+      } = data;
+
+      handleClearFields();
+
+      if (base) {
+        setBase(base);
+      }
+      if (name) {
+        setName(name);
+      }
+      if (att1) {
+        setAtt1(att1);
+      }
+      if (att2) {
+        setAtt2(att2);
+      }
+      if (martial) {
+        setMartial(martial);
+      }
+      if (type) {
+        setType(type);
+      }
+      if (hand) {
+        setHands(hand);
+      }
+      if (quality) {
+        setSelectedQuality("");
+        setQuality(quality);
+      }
+      if (qualityCost) {
+        setQualityCost(qualityCost);
+      }
+      if (damageBonus) {
+        setDamageBonus(damageBonus);
+      }
+      if (damageReworkBonus) {
+        setDamageReworkBonus(damageReworkBonus);
+      }
+      if (precBonus) {
+        setPrecBonus(precBonus);
+      }
+      if (rework) {
+        setRework(rework);
+      }
+    }
+  };
 
   const calcCost = () => {
     let cost = base.cost;
@@ -386,7 +450,11 @@ export default function PlayerWeaponModal({
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion sx={{ width: "100%", marginLeft: "10px" }} expanded={modifiersExpanded} onChange={() => setModifiersExpanded(!modifiersExpanded)}>
+          <Accordion
+            sx={{ width: "100%", marginLeft: "10px" }}
+            expanded={modifiersExpanded}
+            onChange={() => setModifiersExpanded(!modifiersExpanded)}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -433,6 +501,14 @@ export default function PlayerWeaponModal({
           <Grid item xs={12}>
             <Grid container spacing={1} alignItems="center">
               <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
+              </Grid>
+              <Grid item>
                 <Button variant="outlined" onClick={handleClearFields}>
                   {t("Clear All Fields")}
                 </Button>
@@ -441,6 +517,23 @@ export default function PlayerWeaponModal({
               <Grid item xs>
                 <ApplyRework rework={rework} setRework={setRework} />
               </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const result = JSON.parse(reader.result);
+                      handleFileUpload(result);
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                style={{ display: "none" }}
+              />
             </Grid>
           </Grid>
           <Grid item xs={12}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslate } from "../../../../translation/translate";
 import {
   Accordion,
@@ -25,6 +25,7 @@ import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import ChangeModifiers from "../ChangeModifiers";
 import PrettyArmor from "./PrettyArmor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import useUploadJSON from "../../../../hooks/useUploadJSON";
 
 export default function PlayerArmorModal({
   open,
@@ -84,6 +85,8 @@ export default function PlayerArmorModal({
       : false
   );
 
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     setBase(armorPlayer?.base || armor[0]);
     setName(armorPlayer?.name || armor[0].name);
@@ -114,6 +117,38 @@ export default function PlayerArmorModal({
         : false
     );
   }, [armorPlayer]);
+
+  const { handleFileUpload } = useUploadJSON((data) => {
+    if (data) {
+      const { base, name, quality, martial, cost, init, rework } = data;
+
+      if (base.category === "Armor") {
+        handleClearFields();
+
+        if (base) {
+          setBase(base);
+        }
+        if (name) {
+          setName(name);
+        }
+        if (quality) {
+          setQuality(quality);
+        }
+        if (martial) {
+          setMartial(martial);
+        }
+        if (cost) {
+          setQualityCost(cost);
+        }
+        if (init) {
+          setInit(init);
+        }
+        if (rework) {
+          setRework(rework);
+        }
+      }
+    }
+  });
 
   function calcCost() {
     let cost = base.cost;
@@ -323,6 +358,14 @@ export default function PlayerArmorModal({
           <Grid item xs={12} sx={{ py: 0 }}>
             <Grid container spacing={2} alignItems="center">
               <Grid item>
+                <Button
+                  variant="outlined"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
+              </Grid>
+              <Grid item>
                 <Button variant="outlined" onClick={handleClearFields}>
                   {t("Clear All Fields")}
                 </Button>
@@ -331,6 +374,13 @@ export default function PlayerArmorModal({
               <Grid item xs>
                 <ApplyRework rework={rework} setRework={setRework} />
               </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
             </Grid>
           </Grid>
           <Grid item xs={12}>
