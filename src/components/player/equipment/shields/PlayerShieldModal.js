@@ -50,7 +50,28 @@ export default function PlayerShieldModal({
   const [defModifier, setDefModifier] = useState(shield?.defModifier || 0);
   const [mDefModifier, setMDefModifier] = useState(shield?.mDefModifier || 0);
   const [initModifier, setInitModifier] = useState(shield?.initModifier || 0);
+  const [magicModifier, setMagicModifier] = useState(
+    shield?.magicModifier || 0
+  );
+  const [precModifier, setPrecModifier] = useState(shield?.precModifier || 0);
+  const [damageMeleeModifier, setDamageMeleeModifier] = useState(
+    shield?.damageMeleeModifier || 0
+  );
+  const [damageRangedModifier, setDamageRangedModifier] = useState(
+    shield?.damageRangedModifier || 0
+  );
   const [isEquipped, setIsEquipped] = useState(shield?.isEquipped || false);
+  const [modifiersExpanded, setModifiersExpanded] = useState(
+    (shield?.defModifier && shield?.defModifier !== 0) ||
+      (shield?.mDefModifier && shield?.mDefModifier !== 0) ||
+      (shield?.initModifier && shield?.initModifier !== 0) ||
+      (shield?.magicModifier && shield?.magicModifier !== 0) ||
+      (shield?.precModifier && shield?.precModifier !== 0) ||
+      (shield?.damageMeleeModifier && shield?.damageMeleeModifier !== 0) ||
+      (shield?.damageRangedModifier && shield?.damageRangedModifier !== 0)
+      ? true
+      : false
+  );
 
   useEffect(() => {
     setBase(shield?.base || shields[0]);
@@ -65,6 +86,17 @@ export default function PlayerShieldModal({
     setDefModifier(shield?.defModifier || 0);
     setMDefModifier(shield?.mDefModifier || 0);
     setInitModifier(shield?.initModifier || 0);
+    setModifiersExpanded(
+      (shield?.defModifier && shield?.defModifier !== 0) ||
+        (shield?.mDefModifier && shield?.mDefModifier !== 0) ||
+        (shield?.initModifier && shield?.initModifier !== 0) ||
+        (shield?.magicModifier && shield?.magicModifier !== 0) ||
+        (shield?.precModifier && shield?.precModifier !== 0) ||
+        (shield?.damageMeleeModifier && shield?.damageMeleeModifier !== 0) ||
+        (shield?.damageRangedModifier && shield?.damageRangedModifier !== 0)
+        ? true
+        : false
+    );
   }, [shield]);
 
   function calcCost() {
@@ -108,6 +140,10 @@ export default function PlayerShieldModal({
       defModifier: parseInt(defModifier),
       mDefModifier: parseInt(mDefModifier),
       initModifier: parseInt(initModifier),
+      magicModifier: parseInt(magicModifier),
+      precModifier: parseInt(precModifier),
+      damageMeleeModifier: parseInt(damageMeleeModifier),
+      damageRangedModifier: parseInt(damageRangedModifier),
     };
 
     onAddShield(updatedShield);
@@ -195,35 +231,67 @@ export default function PlayerShieldModal({
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion sx={{ width: "100%", marginLeft: "10px" }}>
+          <Accordion
+            sx={{ width: "100%", marginLeft: "10px" }}
+            expanded={modifiersExpanded}
+            onChange={() => setModifiersExpanded(!modifiersExpanded)}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Modifiers</Typography>
+              <Typography>{t("Modifiers")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"DEF Modifier"}
                     value={defModifier}
                     onChange={(e) => setDefModifier(e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"MDEF Modifier"}
                     value={mDefModifier}
                     onChange={(e) => setMDefModifier(e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"INIT Modifier"}
                     value={initModifier}
                     onChange={(e) => setInitModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Magic Modifier"}
+                    value={magicModifier}
+                    onChange={(e) => setMagicModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Precision Modifier"}
+                    value={precModifier}
+                    onChange={(e) => setPrecModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Damage (Melee) Modifier"}
+                    value={damageMeleeModifier}
+                    onChange={(e) => setDamageMeleeModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Damage (Ranged) Modifier"}
+                    value={damageRangedModifier}
+                    onChange={(e) => setDamageRangedModifier(e.target.value)}
                   />
                 </Grid>
               </Grid>

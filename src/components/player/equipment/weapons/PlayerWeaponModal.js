@@ -68,6 +68,14 @@ export default function PlayerWeaponModal({
   const [defModifier, setDefModifier] = useState(weapon?.defModifier || 0);
   const [mDefModifier, setMDefModifier] = useState(weapon?.mDefModifier || 0);
   const [isEquipped, setIsEquipped] = useState(weapon?.isEquipped || false);
+  const [modifiersExpanded, setModifiersExpanded] = useState(
+    (weapon?.precModifier && weapon?.precModifier !== 0) ||
+      (weapon?.damageModifier && weapon?.damageModifier !== 0) ||
+      (weapon?.defModifier && weapon?.defModifier !== 0) ||
+      (weapon?.mDefModifier && weapon?.mDefModifier !== 0)
+      ? true
+      : false
+  );
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
@@ -90,6 +98,14 @@ export default function PlayerWeaponModal({
     setDefModifier(weapon?.defModifier || 0);
     setMDefModifier(weapon?.mDefModifier || 0);
     setIsEquipped(weapon?.isEquipped || false);
+    setModifiersExpanded(
+      (weapon?.precModifier && weapon?.precModifier !== 0) ||
+        (weapon?.damageModifier && weapon?.damageModifier !== 0) ||
+        (weapon?.defModifier && weapon?.defModifier !== 0) ||
+        (weapon?.mDefModifier && weapon?.mDefModifier !== 0)
+        ? true
+        : false
+    );
   }, [weapon]);
 
   const calcCost = () => {
@@ -370,13 +386,13 @@ export default function PlayerWeaponModal({
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion sx={{ width: "100%", marginLeft: "10px" }}>
+          <Accordion sx={{ width: "100%", marginLeft: "10px" }} expanded={modifiersExpanded} onChange={() => setModifiersExpanded(!modifiersExpanded)}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Modifiers</Typography>
+              <Typography>{t("Modifiers")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>

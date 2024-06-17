@@ -54,8 +54,34 @@ export default function PlayerArmorModal({
   const [initModifier, setInitModifier] = useState(
     armorPlayer?.initModifier || 0
   );
+  const [magicModifier, setMagicModifier] = useState(
+    armorPlayer?.magicModifier || 0
+  );
+  const [precModifier, setPrecModifier] = useState(
+    armorPlayer?.precModifier || 0
+  );
+  const [damageMeleeModifier, setDamageMeleeModifier] = useState(
+    armorPlayer?.damageMeleeModifier || 0
+  );
+  const [damageRangedModifier, setDamageRangedModifier] = useState(
+    armorPlayer?.damageRangedModifier || 0
+  );
   const [isEquipped, setIsEquipped] = useState(
     armorPlayer?.isEquipped || false
+  );
+
+  const [modifiersExpanded, setModifiersExpanded] = useState(
+    /* if any of the modifiers is not 0 else false */
+    (armorPlayer?.defModifier && armorPlayer?.mDefModifier !== 0) ||
+      (armorPlayer?.initModifier && armorPlayer?.initModifier !== 0) ||
+      (armorPlayer?.magicModifier && armorPlayer?.magicModifier !== 0) ||
+      (armorPlayer?.precModifier && armorPlayer?.precModifier !== 0) ||
+      (armorPlayer?.damageMeleeModifier &&
+        armorPlayer?.damageMeleeModifier !== 0) ||
+      (armorPlayer?.damageRangedModifier &&
+        armorPlayer?.damageRangedModifier !== 0)
+      ? true
+      : false
   );
 
   useEffect(() => {
@@ -71,6 +97,22 @@ export default function PlayerArmorModal({
     setDefModifier(armorPlayer?.defModifier || 0);
     setMDefModifier(armorPlayer?.mDefModifier || 0);
     setInitModifier(armorPlayer?.initModifier || 0);
+    setMagicModifier(armorPlayer?.magicModifier || 0);
+    setPrecModifier(armorPlayer?.precModifier || 0);
+    setDamageMeleeModifier(armorPlayer?.damageMeleeModifier || 0);
+    setDamageRangedModifier(armorPlayer?.damageRangedModifier || 0);
+    setModifiersExpanded(
+      (armorPlayer?.defModifier && armorPlayer?.mDefModifier !== 0) ||
+        (armorPlayer?.initModifier && armorPlayer?.initModifier !== 0) ||
+        (armorPlayer?.magicModifier && armorPlayer?.magicModifier !== 0) ||
+        (armorPlayer?.precModifier && armorPlayer?.precModifier !== 0) ||
+        (armorPlayer?.damageMeleeModifier &&
+          armorPlayer?.damageMeleeModifier !== 0) ||
+        (armorPlayer?.damageRangedModifier &&
+          armorPlayer?.damageRangedModifier !== 0)
+        ? true
+        : false
+    );
   }, [armorPlayer]);
 
   function calcCost() {
@@ -94,6 +136,10 @@ export default function PlayerArmorModal({
     setDefModifier(0);
     setMDefModifier(0);
     setInitModifier(0);
+    setMagicModifier(0);
+    setPrecModifier(0);
+    setDamageMeleeModifier(0);
+    setDamageRangedModifier(0);
   };
 
   const handleSave = () => {
@@ -114,6 +160,10 @@ export default function PlayerArmorModal({
       defModifier: parseInt(defModifier),
       mDefModifier: parseInt(mDefModifier),
       initModifier: parseInt(initModifier),
+      magicModifier: parseInt(magicModifier),
+      precModifier: parseInt(precModifier),
+      damageMeleeModifier: parseInt(damageMeleeModifier),
+      damageRangedModifier: parseInt(damageRangedModifier),
     };
 
     onAddArmor(updatedArmor);
@@ -201,35 +251,67 @@ export default function PlayerArmorModal({
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion sx={{ width: "100%", marginLeft: "10px" }}>
+          <Accordion
+            sx={{ width: "100%", marginLeft: "10px" }}
+            expanded={modifiersExpanded}
+            onChange={() => setModifiersExpanded(!modifiersExpanded)}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography>Modifiers</Typography>
+              <Typography>{t("Modifiers")}</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"DEF Modifier"}
                     value={defModifier}
                     onChange={(e) => setDefModifier(e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"MDEF Modifier"}
                     value={mDefModifier}
                     onChange={(e) => setMDefModifier(e.target.value)}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} md={4}>
                   <ChangeModifiers
                     label={"INIT Modifier"}
                     value={initModifier}
                     onChange={(e) => setInitModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Magic Modifier"}
+                    value={magicModifier}
+                    onChange={(e) => setMagicModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Precision Modifier"}
+                    value={precModifier}
+                    onChange={(e) => setPrecModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Damage (Melee) Modifier"}
+                    value={damageMeleeModifier}
+                    onChange={(e) => setDamageMeleeModifier(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={6} md={4}>
+                  <ChangeModifiers
+                    label={"Damage (Ranged) Modifier"}
+                    value={damageRangedModifier}
+                    onChange={(e) => setDamageRangedModifier(e.target.value)}
                   />
                 </Grid>
               </Grid>

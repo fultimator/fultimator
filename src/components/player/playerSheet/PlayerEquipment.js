@@ -41,6 +41,30 @@ export default function PlayerEquipment({ player, setPlayer }) {
     ? player.shields.filter((shield) => shield.isEquipped)
     : [];
 
+  const precMeleeModifier =
+    (player.modifiers.meleePrec || 0) +
+    (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
+    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0);
+
+  const precRangedModifier =
+    (player.modifiers.rangedPrec || 0) +
+    (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
+    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0);
+
+  const damageMeleeModifier =
+    (equippedArmor.length > 0 ? equippedArmor[0].damageMeleeModifier || 0 : 0) +
+    (equippedShields.length > 0
+      ? equippedShields[0].damageMeleeModifier || 0
+      : 0);
+
+  const damageRangedModifier =
+    (equippedArmor.length > 0
+      ? equippedArmor[0].damageRangedModifier || 0
+      : 0) +
+    (equippedShields.length > 0
+      ? equippedShields[0].damageRangedModifier || 0
+      : 0);
+
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
   const calculateAttribute = (
     base,
@@ -107,8 +131,11 @@ export default function PlayerEquipment({ player, setPlayer }) {
     let att2Value = attributeMap[att2];
 
     const weaponPrec = weapon.prec;
-    const meleeModifier = player.modifiers.meleePrec;
-    const rangedModifier = player.modifiers.rangedPrec;
+    const meleeModifier = precMeleeModifier;
+    const rangedModifier = precRangedModifier;
+
+    const meleeDmgModifier = damageMeleeModifier;
+    const rangedDmgModifier = damageRangedModifier;
 
     const die1 = Math.floor(Math.random() * att1Value) + 1;
     const die2 = Math.floor(Math.random() * att2Value) + 1;
@@ -127,7 +154,8 @@ export default function PlayerEquipment({ player, setPlayer }) {
     const maxDie = Math.max(die1, die2);
     const damage = weapon.damage;
 
-    const damageDealt = maxDie + damage;
+    const damageDealt =
+      maxDie + damage + (weapon.melee ? meleeDmgModifier : rangedDmgModifier);
 
     const dialogContent = (
       <>
@@ -185,7 +213,16 @@ export default function PlayerEquipment({ player, setPlayer }) {
             >
               {t("Damage")}:
             </Typography>
-            <Typography component="span">{` ${maxDie} + ${damage}`}</Typography>
+            <Typography component="span">
+              {` ${maxDie} + ${damage}`}
+              {weapon.melee
+                ? meleeDmgModifier !== 0
+                  ? " + " + meleeDmgModifier
+                  : ""
+                : rangedDmgModifier !== 0
+                ? " + " + rangedDmgModifier
+                : ""}
+            </Typography>
           </Grid>
         </Grid>
       </>
@@ -338,22 +375,33 @@ export default function PlayerEquipment({ player, setPlayer }) {
                   ))}
                 </Grid>
               </>
-
             )}
-            {(player.modifiers.meleePrec !== 0 ||
-              player.modifiers.rangedPrec !== 0) && (
+            {(precMeleeModifier !== 0 ||
+              precRangedModifier !== 0 ||
+              damageMeleeModifier !== 0 ||
+              damageRangedModifier !== 0) && (
               <Grid item xs={12}>
                 <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                   {t("Modifiers")}
                 </Typography>
-                {player.modifiers.meleePrec !== 0 && (
+                {precMeleeModifier !== 0 && (
                   <Typography variant="h4">
-                    {t("Melee Accuracy Bonus")}: {player.modifiers.meleePrec}
+                    {t("Melee Accuracy Bonus")}: {precMeleeModifier}
                   </Typography>
                 )}
-                {player.modifiers.rangedPrec !== 0 && (
+                {precRangedModifier !== 0 && (
                   <Typography variant="h4">
-                    {t("Ranged Accuracy Bonus")}: {player.modifiers.rangedPrec}
+                    {t("Ranged Accuracy Bonus")}: {precRangedModifier}
+                  </Typography>
+                )}
+                {damageMeleeModifier !== 0 && (
+                  <Typography variant="h4">
+                    {t("Melee Damage Bonus")}: {damageMeleeModifier}
+                  </Typography>
+                )}
+                {damageRangedModifier !== 0 && (
+                  <Typography variant="h4">
+                    {t("Ranged Damage Bonus")}: {damageRangedModifier}
                   </Typography>
                 )}
               </Grid>

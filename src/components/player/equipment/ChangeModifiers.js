@@ -14,6 +14,10 @@ import {
         value={value}
         onChange={onChange}
         type="number"
+        color={
+          value > 0 ? "success" : value < 0 ? "error" : "primary"
+        }
+        focused={value > 0 || value < 0}
       />
     </FormControl>
   );
