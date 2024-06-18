@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Paper,
@@ -7,13 +7,14 @@ import {
   Button,
   Divider,
   Typography,
-  Alert
+  Alert,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
 import PlayerClassCard from "./PlayerClassCard";
+import useUploadJSON from "../../../hooks/useUploadJSON";
 
 export default function EditPlayerClasses({
   player,
@@ -24,6 +25,8 @@ export default function EditPlayerClasses({
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [warnings, setWarnings] = useState([]);
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     checkWarnings();
@@ -61,15 +64,52 @@ export default function EditPlayerClasses({
     setWarnings(newWarnings);
   };
 
+  const { handleFileUpload } = useUploadJSON((data) => {
+    if (data) {
+      const { name, lvl, benefits, skills, heroic, spells } = data;
+
+      /* Add class from data */
+      const classExists = player.classes.some(
+        (cls) => cls.name.toLowerCase() === name.toLowerCase()
+      );
+
+      if (classExists) {
+        alert("This class type already exists for the character");
+        fileInputRef.current.value = null;
+        return;
+      }
+
+      const updatedPlayer = {
+        ...player,
+        classes: Array.isArray(player.classes) ? player.classes : [],
+      };
+
+      updatedPlayer.classes.push({
+        name: name,
+        lvl: lvl,
+        benefits: benefits,
+        skills: skills,
+        heroic: heroic,
+        spells: spells,
+      });
+
+      setPlayer(updatedPlayer);
+      updateMaxStats();
+      setSelectedClass(null);
+    }
+
+    fileInputRef.current.value = null;
+  });
+
   const handleAddClass = () => {
     if (selectedClass) {
       // Check if the selected class type already exists in player's classes
       const classExists = player.classes.some(
-        (cls) => cls.name === selectedClass.name
+        (cls) => cls.name.toLowerCase() === selectedClass.name.toLowerCase()
       );
 
       if (classExists) {
-        console.error("This class type already exists for the character");
+        alert("This class type already exists for the character");
         return;
       }
 
@@ -321,7 +361,9 @@ export default function EditPlayerClasses({
               </Grid>
               {warnings.map((warning, index) => (
                 <Grid item xs={12} key={index}>
-                  <Alert variant="filled" severity="warning">{t(warning)}</Alert>
+                  <Alert variant="filled" severity="warning">
+                    {t(warning)}
+                  </Alert>
                 </Grid>
               ))}
               <Grid item xs={12} sm={4}>
@@ -353,7 +395,7 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={7}>
+              <Grid item xs={12} sm={5}>
                 <Autocomplete
                   id="class-select"
                   options={filteredClasses
@@ -376,7 +418,7 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={1}>
+              <Grid item xs={10} sm={2}>
                 <Button
                   variant="contained"
                   onClick={handleAddClass}
@@ -385,7 +427,22 @@ export default function EditPlayerClasses({
                   {t("Add")}
                 </Button>
               </Grid>
+              <Grid item xs={2} sm={1}>
+                <Button
+                  variant="outlined"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
+              </Grid>
             </Grid>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileUpload}
+              style={{ display: "none" }}
+            />
           </Paper>
           <Divider sx={{ my: 2 }} />{" "}
         </>

@@ -132,6 +132,7 @@ export default function PlayerShieldModal({
         }
       }
     }
+    fileInputRef.current.value = null;
   });
 
   function calcCost() {

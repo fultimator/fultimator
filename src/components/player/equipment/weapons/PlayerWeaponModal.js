@@ -170,6 +170,7 @@ export default function PlayerWeaponModal({
         setRework(rework);
       }
     }
+    fileInputRef.current.value = null;
   };
 
   const calcCost = () => {

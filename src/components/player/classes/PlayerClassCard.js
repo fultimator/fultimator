@@ -7,7 +7,7 @@ import {
   Button,
   Box,
   Divider,
-  Alert
+  Alert,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
@@ -21,6 +21,7 @@ import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
 import EditHeroicSkillModal from "./EditHeroicSkillModal";
 import spellClasses from "../../../libs/spellClasses";
+import Export from "../../Export";
 
 export default function PlayerClassCard({
   classItem,
@@ -278,7 +279,9 @@ export default function PlayerClassCard({
         </Grid>
         {warnings.map((warning, index) => (
           <Grid item xs={12} key={index}>
-             <Alert variant="filled" severity="warning">{warning}</Alert>
+            <Alert variant="filled" severity="warning">
+              {warning}
+            </Alert>
           </Grid>
         ))}
         {classItem.benefits && (
@@ -406,12 +409,14 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
                 isHeroicSkill={false}
               />
-              <Typography variant="body1"
+              <Typography
+                variant="body1"
                 justifyContent="flex-start"
                 sx={{
                   background: "transparent",
                   padding: "0 17px",
-                }}>
+                }}
+              >
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
@@ -439,18 +444,20 @@ export default function PlayerClassCard({
                 headerText={classItem.heroic.name}
                 currentLvl={0}
                 maxLvl={0}
-                onIncrease={() => { }}
-                onDecrease={() => { }}
+                onIncrease={() => {}}
+                onDecrease={() => {}}
                 onEdit={() => handleEditHeroicSkill()}
                 isEditMode={isEditMode}
                 isHeroicSkill={true}
               />
-              <Typography variant="body1"
+              <Typography
+                variant="body1"
                 justifyContent="flex-start"
                 sx={{
                   background: "transparent",
                   padding: "0 17px",
-                }}>
+                }}
+              >
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
@@ -495,6 +502,9 @@ export default function PlayerClassCard({
             </Box>
           </Grid>
         )}
+        <Grid item xs={12}>
+          <Export name={classItem.name} data={classItem} />
+        </Grid>
       </Grid>
       {/* Edit Class Name Modal */}
       <EditClassNameModal

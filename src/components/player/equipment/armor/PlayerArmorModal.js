@@ -148,6 +148,7 @@ export default function PlayerArmorModal({
         }
       }
     }
+    fileInputRef.current.value = null;
   });
 
   function calcCost() {
