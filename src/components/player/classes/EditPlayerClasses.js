@@ -7,6 +7,7 @@ import {
   Button,
   Divider,
   Typography,
+  Alert
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
@@ -320,9 +321,7 @@ export default function EditPlayerClasses({
               </Grid>
               {warnings.map((warning, index) => (
                 <Grid item xs={12} key={index}>
-                  <Typography color="error" variant="body1">
-                    {t(warning)}
-                  </Typography>
+                  <Alert variant="filled" severity="warning">{t(warning)}</Alert>
                 </Grid>
               ))}
               <Grid item xs={12} sm={4}>

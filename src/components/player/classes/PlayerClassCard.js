@@ -7,6 +7,7 @@ import {
   Button,
   Box,
   Divider,
+  Alert
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
@@ -277,9 +278,7 @@ export default function PlayerClassCard({
         </Grid>
         {warnings.map((warning, index) => (
           <Grid item xs={12} key={index}>
-            <Typography color="error" variant="body1">
-              {warning}
-            </Typography>
+             <Alert variant="filled" severity="warning">{warning}</Alert>
           </Grid>
         ))}
         {classItem.benefits && (
