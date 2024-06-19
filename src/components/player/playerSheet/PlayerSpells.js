@@ -14,6 +14,7 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -224,7 +225,8 @@ export default function PlayerSpells({ player, setPlayer }) {
               </Grid>
               <Grid item xs={12} sx={{ marginTop: "20px" }}>
                 <Typography component="span">
-                  {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`} {precBonus !== 0 ? " + " + precBonus : ""}
+                  {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`}{" "}
+                  {precBonus !== 0 ? " + " + precBonus : ""}
                 </Typography>
               </Grid>
             </Grid>
@@ -347,20 +349,24 @@ export default function PlayerSpells({ player, setPlayer }) {
                     }}
                     className="spell-right-controls"
                   >
-                    <IconButton
-                      sx={{ padding: "0px" }}
-                      onClick={() => handleOpenModal(spell)}
-                    >
-                      <Info />
-                    </IconButton>
-                    {spell.isOffensive && (
-                      <IconButton sx={{ padding: "0px", marginLeft: "5px" }}>
-                        <Casino
-                          onClick={() => {
-                            handleRollSetup(spell);
-                          }}
-                        />
+                    <Tooltip title={t("Info")}>
+                      <IconButton
+                        sx={{ padding: "0px" }}
+                        onClick={() => handleOpenModal(spell)}
+                      >
+                        <Info />
                       </IconButton>
+                    </Tooltip>
+                    {spell.isOffensive && (
+                      <Tooltip title={t("Roll")}>
+                        <IconButton sx={{ padding: "0px", marginLeft: "5px" }}>
+                          <Casino
+                            onClick={() => {
+                              handleRollSetup(spell);
+                            }}
+                          />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </div>
                 </Grid>
@@ -406,6 +412,22 @@ export default function PlayerSpells({ player, setPlayer }) {
               <ReactMarkdown>
                 {selectedSpell && selectedSpell.description}
               </ReactMarkdown>
+              <Typography variant="h5">
+                {t("MP Cost")}: {selectedSpell && selectedSpell.mp}{" "}
+                {selectedSpell && selectedSpell.maxTargets !== 1
+                  ? "x " + t("Target")
+                  : ""}
+              </Typography>
+              <Typography variant="h5">
+                {t("Max Targets")}: {selectedSpell && selectedSpell.maxTargets}
+              </Typography>
+              <Typography variant="h5">
+                {t("Target Description")}:{" "}
+                {selectedSpell && selectedSpell.targetDesc}
+              </Typography>
+              <Typography variant="h5">
+                {t("Duration")}: {selectedSpell && selectedSpell.duration}
+              </Typography>
               <Button
                 variant="contained"
                 onClick={handleOK}

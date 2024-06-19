@@ -6,6 +6,7 @@ import {
   IconButton,
   Modal,
   Button,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -28,7 +29,6 @@ export default function PlayerSkills({ player, setPlayer }) {
     .flat()
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
-  
 
   const handleOpenModal = (skill) => {
     setSelectedSkill(skill);
@@ -105,7 +105,11 @@ export default function PlayerSkills({ player, setPlayer }) {
                     {skill.skillName}
                   </Typography>
                 </Grid>
-                <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                <Grid
+                  item
+                  xs={2}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
                   <div
                     id="skill-right-controls"
                     style={{
@@ -119,12 +123,14 @@ export default function PlayerSkills({ player, setPlayer }) {
                     }}
                     className="skill-right-controls"
                   >
-                    <IconButton
-                      sx={{ padding: "0px" }}
-                      onClick={() => handleOpenModal(skill)}
-                    >
-                      <Info />
-                    </IconButton>
+                    <Tooltip title={t("Info")}>
+                      <IconButton
+                        sx={{ padding: "0px" }}
+                        onClick={() => handleOpenModal(skill)}
+                      >
+                        <Info />
+                      </IconButton>
+                    </Tooltip>
                   </div>
                 </Grid>
               </Grid>
@@ -139,7 +145,7 @@ export default function PlayerSkills({ player, setPlayer }) {
             <Paper
               sx={{
                 position: "absolute",
-                width: { xs: "90%", md: 400},
+                width: { xs: "90%", md: 400 },
                 bgcolor: "#fff",
                 border: "2px solid",
                 borderColor: secondary,
@@ -152,7 +158,7 @@ export default function PlayerSkills({ player, setPlayer }) {
               }}
             >
               <Typography variant="h4">
-                {selectedSkill && selectedSkill.name}
+                {selectedSkill && selectedSkill.skillName}
               </Typography>
               <ReactMarkdown>
                 {selectedSkill && selectedSkill.description}

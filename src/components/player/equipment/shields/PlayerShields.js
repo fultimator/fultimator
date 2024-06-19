@@ -107,6 +107,8 @@ export default function PlayerShields({
       const updatedShield = { ...shields };
       updatedShield[index].isEquipped = checked;
       onEquipShield(updatedShield);
+    } else {
+      alert(t('You cannot equip this shield as no hands are free.'));
     }
   };
 

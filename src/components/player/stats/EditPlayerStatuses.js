@@ -1,27 +1,14 @@
 import React from "react";
-import { Grid, Paper, Checkbox, FormControlLabel } from "@mui/material";
+import { Grid, Paper, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
+import ReactMarkdown from "react-markdown";
 
 export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
-
-  /* STATUS LIST
-    Slow - Dexterity attribute is lowered by 2 points to maximum 6
-    Dazed - Insight attribute is lowered by 2 points to maximum 6
-    Enraged - Both Dexterity and Insight attributes are lowered by 2 points to maximum 6
-    Weak - Might attribute is lowered by 2 points to maximum 6
-    Shaken - Willpower attribute is lowered by 2 points to maximum 6
-    Poisoned - Both Might and Willpower attributes are lowered by 2 points to maximum 6
-    
-    Dex Up - Dexterity attribute is increased by 2 points to maximum 12
-    Ins Up - Insight attribute is increased by 2 points to maximum 12
-    Mig Up - Might attribute is increased by 2 points to maximum 12
-    Wlp Up - Willpower attribute is increased by 2 points to maximum 12
-  */
 
   const handleStatusChange = (status) => {
     setPlayer((prevPlayer) => ({
@@ -33,11 +20,24 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
     }));
   };
 
+  const statusDescriptions = {
+    slow: "Dexterity is lowered by 2",
+    dazed: "Insight is lowered by 2",
+    enraged: "Both Dexterity and Insight are lowered by 2",
+    weak: "Might is lowered by 2",
+    shaken: "Willpower is lowered by 2",
+    poisoned: "Both Might and Willpower are lowered by 2",
+    dexUp: "Dexterity is increased by 2",
+    insUp: "Insight is increased by 2",
+    migUp: "Might is increased by 2",
+    wlpUp: "Willpower is increased by 2",
+  };
+
   return (
     <Paper
       elevation={3}
       sx={{
-        p: "15px",
+        p: 2,
         borderRadius: "8px",
         border: "2px solid",
         borderColor: secondary,
@@ -50,128 +50,30 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
           showIconButton={false}
         />
       </Grid>
-      <Grid container spacing={2}>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.slow}
-                onChange={() => handleStatusChange("slow")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Slow")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.dazed}
-                onChange={() => handleStatusChange("dazed")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Dazed")}
-          />
-        </Grid>
-        {/* Add more checkboxes for other statuses */}
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.enraged}
-                onChange={() => handleStatusChange("enraged")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Enraged")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.weak}
-                onChange={() => handleStatusChange("weak")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Weak")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.shaken}
-                onChange={() => handleStatusChange("shaken")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Shaken")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.poisoned}
-                onChange={() => handleStatusChange("poisoned")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Poisoned")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.dexUp}
-                onChange={() => handleStatusChange("dexUp")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Dex Up")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.insUp}
-                onChange={() => handleStatusChange("insUp")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Ins Up")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.migUp}
-                onChange={() => handleStatusChange("migUp")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Mig Up")}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={player.statuses.wlpUp}
-                onChange={() => handleStatusChange("wlpUp")}
-                disabled={!isEditMode}
-              />
-            }
-            label={t("Wlp Up")}
-          />
-        </Grid>
+      <Grid container spacing={1}>
+        {Object.keys(statusDescriptions).map((status) => (
+          <Grid item xs={12} md={6} key={status}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={player.statuses[status]}
+                  onChange={() => handleStatusChange(status)}
+                  disabled={!isEditMode}
+                />
+              }
+              label={t(status.charAt(0).toUpperCase() + status.slice(1))}
+              sx={{ marginRight: 2 }}
+            />
+            <Typography variant="body2" component="span" sx={{fontSize: "0.8em"}}>
+              <ReactMarkdown
+                allowedElements={["strong"]}
+                unwrapDisallowed={true}
+              >
+                {t(statusDescriptions[status])}
+              </ReactMarkdown>
+            </Typography>
+          </Grid>
+        ))}
       </Grid>
     </Paper>
   );

@@ -81,6 +81,8 @@ export default function PlayerArmor({
       const updatedArmor = { ...armor };
       updatedArmor[index].isEquipped = checked;
       onEquipArmor(updatedArmor);
+    } else {
+      alert(t('You cannot equip this armor as you have already equipped one.'));
     }
   };
 

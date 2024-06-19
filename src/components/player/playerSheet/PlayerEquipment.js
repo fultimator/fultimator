@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -321,9 +322,11 @@ export default function PlayerEquipment({ player, setPlayer }) {
                           />
                         </Grid>
                         <Grid item xs={1}>
-                          <IconButton onClick={() => handleDiceRoll(weapon)}>
-                            <Casino />
-                          </IconButton>
+                          <Tooltip title={t("Roll")}>
+                            <IconButton onClick={() => handleDiceRoll(weapon)}>
+                              <Casino />
+                            </IconButton>
+                          </Tooltip>
                         </Grid>
                       </Grid>
                       <br />

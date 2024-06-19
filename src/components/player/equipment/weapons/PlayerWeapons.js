@@ -77,9 +77,19 @@ export default function PlayerWeapons({
     const shieldsCount = countEquippedShields();
 
     if (weapon.hands === 2) {
+      // Two-handed weapon can be equipped only if both hands are free
       return oneHandedCount === 0 && twoHandedCount === 0 && shieldsCount === 0;
     } else if (weapon.hands === 1) {
-      return twoHandedCount === 0 && oneHandedCount < 2 && shieldsCount < 2;
+      // One-handed weapon can be equipped if there is at least one hand free
+      // Player can't equip 2 one-handed weapons and a shield
+      if (twoHandedCount > 0) {
+        return false;
+      }
+      return (
+        oneHandedCount < 2 &&
+        shieldsCount < 2 &&
+        !(oneHandedCount === 1 && shieldsCount === 1)
+      );
     }
 
     return false;
@@ -120,8 +130,11 @@ export default function PlayerWeapons({
       const updatedWeapons = [...weapons];
       updatedWeapons[index].isEquipped = checked;
       onEquipWeapon(updatedWeapons);
+    } else {
+      alert(t('You cannot equip this weapon as no hands are free.'));
     }
   };
+  
 
   return (
     <Accordion
