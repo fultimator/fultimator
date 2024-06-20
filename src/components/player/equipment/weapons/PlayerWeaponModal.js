@@ -68,14 +68,7 @@ export default function PlayerWeaponModal({
   const [defModifier, setDefModifier] = useState(weapon?.defModifier || 0);
   const [mDefModifier, setMDefModifier] = useState(weapon?.mDefModifier || 0);
   const [isEquipped, setIsEquipped] = useState(weapon?.isEquipped || false);
-  const [modifiersExpanded, setModifiersExpanded] = useState(
-    (weapon?.precModifier && weapon?.precModifier !== 0) ||
-      (weapon?.damageModifier && weapon?.damageModifier !== 0) ||
-      (weapon?.defModifier && weapon?.defModifier !== 0) ||
-      (weapon?.mDefModifier && weapon?.mDefModifier !== 0)
-      ? true
-      : false
-  );
+  const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -293,10 +286,15 @@ export default function PlayerWeaponModal({
   };
 
   const handleDelete = () => {
-    if (editWeaponIndex !== null) {
-      onDeleteWeapon(editWeaponIndex);
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this weapon?"
+    );
+    if (confirmDelete) {
+      if (editWeaponIndex !== null) {
+        onDeleteWeapon(editWeaponIndex);
+      }
+      onClose();
     }
-    onClose();
   };
 
   const handleClearFields = () => {

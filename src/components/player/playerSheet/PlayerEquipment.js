@@ -16,6 +16,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
 import PrettyArmor from "../equipment/armor/PrettyArmor";
+import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 
@@ -43,20 +44,33 @@ export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
     ? player.shields.filter((shield) => shield.isEquipped)
     : [];
 
+  const equippedAccessories = player.accessories
+    ? player.accessories.filter((accessory) => accessory.isEquipped)
+    : [];
+
   const precMeleeModifier =
     (player.modifiers.meleePrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
-    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0);
+    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
+    (equippedAccessories.length > 0
+      ? equippedAccessories[0].precModifier || 0
+      : 0);
 
   const precRangedModifier =
     (player.modifiers.rangedPrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
-    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0);
+    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
+    (equippedAccessories.length > 0
+      ? equippedAccessories[0].precModifier || 0
+      : 0);
 
   const damageMeleeModifier =
     (equippedArmor.length > 0 ? equippedArmor[0].damageMeleeModifier || 0 : 0) +
     (equippedShields.length > 0
       ? equippedShields[0].damageMeleeModifier || 0
+      : 0) +
+    (equippedAccessories.length > 0
+      ? equippedAccessories[0].damageMeleeModifier || 0
       : 0);
 
   const damageRangedModifier =
@@ -65,6 +79,9 @@ export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
       : 0) +
     (equippedShields.length > 0
       ? equippedShields[0].damageRangedModifier || 0
+      : 0) +
+    (equippedAccessories.length > 0
+      ? equippedAccessories[0].damageRangedModifier || 0
       : 0);
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
@@ -377,6 +394,28 @@ export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
                         <Grid container>
                           <Grid item xs={isEditMode ? 11 : 12}>
                             <PrettyArmor armor={shield} />
+                          </Grid>
+                          <Grid item xs={1}></Grid>
+                        </Grid>
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </>
+              )}
+              {equippedAccessories.length > 0 && (
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                      {t("Accessory")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {equippedAccessories.map((accessory, index) => (
+                      <React.Fragment key={index}>
+                        <Grid container>
+                          <Grid item xs={isEditMode ? 11 : 12}>
+                            <PrettyAccessory accessory={accessory} />
                           </Grid>
                           <Grid item xs={1}></Grid>
                         </Grid>

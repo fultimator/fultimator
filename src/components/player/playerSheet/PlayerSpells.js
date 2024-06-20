@@ -50,10 +50,17 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     ? player.shields.filter((shield) => shield.isEquipped)
     : [];
 
+  const equippedAccessories = player.accessories
+    ? player.accessories.filter((accessory) => accessory.isEquipped)
+    : [];
+
   const magicModifier =
     (player.modifiers.magicPrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].magicModifier || 0 : 0) +
-    (equippedShields.length > 0 ? equippedShields[0].magicModifier || 0 : 0);
+    (equippedShields.length > 0 ? equippedShields[0].magicModifier || 0 : 0) +
+    (equippedAccessories.length > 0
+      ? equippedAccessories[0].magicModifier || 0
+      : 0);
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
   const calculateAttribute = (

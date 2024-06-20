@@ -161,6 +161,10 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const equippedWeapons =
     player.weapons?.filter((weapon) => weapon.isEquipped) || [];
 
+  /* player.accessories.isEquipped (should be only one) */
+  const equippedAccessory =
+    player.accessories?.find((accessory) => accessory.isEquipped) || null;
+
   // Calculate DEF and MDEF
   const currDef =
     (equippedArmor !== null
@@ -172,6 +176,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     (player.modifiers?.def || 0) +
     (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
     (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
+    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.defModifier || 0),
       0
@@ -183,6 +188,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     (player.modifiers?.mdef || 0) +
     (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
     (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
+    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
       0
@@ -193,7 +199,8 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
     (equippedArmor !== null ? equippedArmor.init : 0) +
     (player.modifiers?.init || 0) +
     (equippedArmor !== null ? equippedArmor.initModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.initModifier || 0 : 0);
+    (equippedShield !== null ? equippedShield.initModifier || 0 : 0) +
+    (equippedAccessory !== null ? equippedAccessory.initModifier || 0 : 0);
 
   let crisis =
     player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;

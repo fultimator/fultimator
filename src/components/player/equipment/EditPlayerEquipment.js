@@ -3,17 +3,15 @@ import { useTheme } from "@mui/material/styles";
 import { Paper, Grid, Button, Divider } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import PlayerWeapons from "./weapons/PlayerWeapons";
+import PlayerArmor from "./armor/PlayerArmor";
 import PlayerShields from "./shields/PlayerShields";
 import PlayerAccessories from "./accessories/PlayerAccessories";
 import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
-import PlayerArmor from "./armor/PlayerArmor";
+import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
+
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
@@ -33,6 +31,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [editShieldIndex, setEditShieldIndex] = React.useState(null);
   const [shields, setShields] = React.useState(null);
 
+  const [openNewAccessory, setOpenNewAccessory] = React.useState(false);
+  const [editAccessoryIndex, setEditAccessoryIndex] = React.useState(null);
+  const [accessory, setAccessory] = React.useState(null);
+
   // OPEN MODALS
   const handleOpenNewWeapon = () => {
     setWeapon(null);
@@ -50,6 +52,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setShields(null);
     setEditShieldIndex(null);
     setOpenNewShields(true);
+  };
+
+  const handleOpenNewAccessory = () => {
+    setAccessory(null);
+    setEditAccessoryIndex(null);
+    setOpenNewAccessory(true);
   };
 
   // CLOSE MODALS
@@ -71,6 +79,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setEditShieldIndex(null);
   };
 
+  const handleCloseNewAccessory = () => {
+    setOpenNewAccessory(false);
+    setAccessory(null);
+    setEditAccessoryIndex(null);
+  };
+
   // ADD NEW
   const handleAddWeapon = (newWeapon) => {
     const updatedWeapons = [...(player.weapons || []), newWeapon];
@@ -87,6 +101,11 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setPlayer({ ...player, shields: updatedShields });
   };
 
+  const handleAddAccessory = (newAccessory) => {
+    const updatedAccessories = [...(player.accessories || []), newAccessory];
+    setPlayer({ ...player, accessories: updatedAccessories });
+  };
+
   // DELETE
   const handleDeleteWeapon = (index) => {
     const updatedWeapons = (player.weapons || []).filter((_, i) => i !== index);
@@ -101,6 +120,13 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const handleDeleteShield = (index) => {
     const updatedShields = (player.shields || []).filter((_, i) => i !== index);
     setPlayer({ ...player, shields: updatedShields });
+  };
+
+  const handleDeleteAccessory = (index) => {
+    const updatedAccessories = (player.accessories || []).filter(
+      (_, i) => i !== index
+    );
+    setPlayer({ ...player, accessories: updatedAccessories });
   };
 
   // EDIT
@@ -120,6 +146,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setShields(player.shields[index]);
     setEditShieldIndex(index);
     setOpenNewShields(true);
+  };
+
+  const handleEditAccessory = (index) => {
+    setAccessory(player.accessories[index]);
+    setEditAccessoryIndex(index);
+    setOpenNewAccessory(true);
   };
 
   // SAVE
@@ -159,6 +191,19 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setOpenNewShields(false);
   };
 
+  const handleSaveAccessory = (updatedAccessory) => {
+    if (editAccessoryIndex !== null) {
+      const updatedAccessories = (player.accessories || []).map(
+        (accessory, i) =>
+          i === editAccessoryIndex ? updatedAccessory : accessory
+      );
+      setPlayer({ ...player, accessories: updatedAccessories });
+    } else {
+      handleAddAccessory(updatedAccessory);
+    }
+    setOpenNewAccessory(false);
+  };
+
   // TOGGLE EQUIPPED
   const handleEquipWeapon = (weaponIndex) => {
     // Toggle equipped weapon (weapon.isEquipped)
@@ -185,6 +230,16 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         : shields
     );
     setPlayer({ ...player, shields: updatedShields });
+  };
+
+  const handleEquipAccessory = (accessoryIndex) => {
+    // Toggle equipped accessory (accessory.isEquipped)
+    const updatedAccessories = (player.accessories || []).map((accessory, i) =>
+      i === accessoryIndex
+        ? { ...accessory, isEquipped: !accessory.isEquipped }
+        : accessory
+    );
+    setPlayer({ ...player, accessories: updatedAccessories });
   };
 
   return (
@@ -239,9 +294,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                 <Grid item xs={6} sm={3} container justifyContent="center">
                   <Button
                     variant="contained"
-                    onClick={() => {
-                      alert("Accessories not yet implemented");
-                    }}
+                    onClick={handleOpenNewAccessory}
                     startIcon={<AccessoryIcon />}
                   >
                     {t("Add Accessory")}
@@ -281,27 +334,16 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
       />
 
-      <Accordion
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          marginBottom: 3,
-        }}
-      >
-        <AccordionSummary
-          expandIcon={<ArrowDownwardIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-        >
-          <PlayerAccessories />
-        </AccordionSummary>
-        <AccordionDetails>
-          {/* List all available Accessories */}
-        </AccordionDetails>
-      </Accordion>
+      <PlayerAccessories
+        player={player}
+        accessories={player.accessories || []}
+        onEditAccessory={handleEditAccessory}
+        onDeleteAccessory={handleDeleteAccessory}
+        onEquipAccessory={handleEquipAccessory}
+        isEditMode={isEditMode}
+      />
+
+      {/* Modals */}
       <PlayerWeaponModal
         open={openNewWeapon}
         onClose={handleCloseNewWeapon}
@@ -328,6 +370,15 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         setShield={setShields}
         onAddShield={handleSaveShield}
         onDeleteShield={handleDeleteShield}
+      />
+
+      <PlayerAccessoryModal
+        open={openNewAccessory}
+        onClose={handleCloseNewAccessory}
+        editAccIndex={editAccessoryIndex}
+        accessory={accessory}
+        onAddAccessory={handleSaveAccessory}
+        onDeleteAccessory={handleDeleteAccessory}
       />
     </>
   );

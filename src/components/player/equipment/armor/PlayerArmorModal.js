@@ -71,19 +71,7 @@ export default function PlayerArmorModal({
     armorPlayer?.isEquipped || false
   );
 
-  const [modifiersExpanded, setModifiersExpanded] = useState(
-    /* if any of the modifiers is not 0 else false */
-    (armorPlayer?.defModifier && armorPlayer?.mDefModifier !== 0) ||
-      (armorPlayer?.initModifier && armorPlayer?.initModifier !== 0) ||
-      (armorPlayer?.magicModifier && armorPlayer?.magicModifier !== 0) ||
-      (armorPlayer?.precModifier && armorPlayer?.precModifier !== 0) ||
-      (armorPlayer?.damageMeleeModifier &&
-        armorPlayer?.damageMeleeModifier !== 0) ||
-      (armorPlayer?.damageRangedModifier &&
-        armorPlayer?.damageRangedModifier !== 0)
-      ? true
-      : false
-  );
+  const [modifiersExpanded, setModifiersExpanded] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -105,14 +93,13 @@ export default function PlayerArmorModal({
     setDamageMeleeModifier(armorPlayer?.damageMeleeModifier || 0);
     setDamageRangedModifier(armorPlayer?.damageRangedModifier || 0);
     setModifiersExpanded(
-      (armorPlayer?.defModifier && armorPlayer?.mDefModifier !== 0) ||
+      (armorPlayer?.defModifier && armorPlayer?.defModifier !== 0) ||
+        (armorPlayer?.mDefModifier && armorPlayer?.mDefModifier !== 0) ||
         (armorPlayer?.initModifier && armorPlayer?.initModifier !== 0) ||
         (armorPlayer?.magicModifier && armorPlayer?.magicModifier !== 0) ||
         (armorPlayer?.precModifier && armorPlayer?.precModifier !== 0) ||
-        (armorPlayer?.damageMeleeModifier &&
-          armorPlayer?.damageMeleeModifier !== 0) ||
-        (armorPlayer?.damageRangedModifier &&
-          armorPlayer?.damageRangedModifier !== 0)
+        (armorPlayer?.damageMeleeModifier && armorPlayer?.damageMeleeModifier !== 0) ||
+        (armorPlayer?.damageRangedModifier && armorPlayer?.damageRangedModifier !== 0)
         ? true
         : false
     );
@@ -206,11 +193,15 @@ export default function PlayerArmorModal({
   };
 
   const handleDelete = (armorIndex) => {
-    if (armorIndex !== null) {
-      onDeleteArmor(armorIndex);
+    const confirmDelete = window.confirm("Are you sure you want to delete this armor?");
+    if (confirmDelete) {
+      if (armorIndex !== null) {
+        onDeleteArmor(armorIndex);
+      }
+      onClose();
     }
-    onClose();
   };
+  
 
   return (
     <Dialog
