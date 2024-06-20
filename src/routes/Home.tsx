@@ -3,35 +3,23 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
 import { useTranslate } from "../translation/translate";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
-import { testUsers, moderators } from "../libs/userGroups";
-
 import adversary_compedium from "./adversary_compedium.webp";
 import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
-import character_designer from "./character_designer_alpha_1_0.webp";
+import character_designer from "./character_designer_alpha_2_00.webp";
 
 function Home() {
   const navigate = useNavigate();
   const [hover, setHover] = useState("");
   const { t } = useTranslate();
-  const [user] = useAuthState(auth);
-
-  let canAccessTest = false;
-  if (user?.uid) {
-    canAccessTest =
-      testUsers.includes(user.uid) || moderators.includes(user.uid);
-  }
 
   const mediaItems = [
     {
       image: character_designer,
       link: "/pc-gallery",
       hoverKey: "character_designer",
-      canAccess: canAccessTest,
     },
     {
       image: adversary_designer,
@@ -71,33 +59,30 @@ function Home() {
           margin: "1em",
         }}
       >
-        {mediaItems.map(
-          (item, index) =>
-            (item.canAccess === undefined || item.canAccess) && (
-              <CardMedia
-                key={index}
-                component="img"
-                image={item.image}
-                alt=""
-                sx={{
-                  objectFit: "contain",
-                  width: 360,
-                  cursor: "pointer",
-                  transform: hover === item.hoverKey ? "scale(1.1)" : "none",
-                  transition: "transform 0.3s",
-                }}
-                onMouseEnter={() => {
-                  setHover(item.hoverKey);
-                }}
-                onMouseLeave={() => {
-                  setHover("");
-                }}
-                onClick={() => {
-                  navigate(item.link);
-                }}
-              />
-            )
-        )}
+        {mediaItems.map((item, index) => (
+          <CardMedia
+            key={index}
+            component="img"
+            image={item.image}
+            alt=""
+            sx={{
+              objectFit: "contain",
+              width: 360,
+              cursor: "pointer",
+              transform: hover === item.hoverKey ? "scale(1.1)" : "none",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={() => {
+              setHover(item.hoverKey);
+            }}
+            onMouseLeave={() => {
+              setHover("");
+            }}
+            onClick={() => {
+              navigate(item.link);
+            }}
+          />
+        ))}
       </div>
       <Box
         sx={{
