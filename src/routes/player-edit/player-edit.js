@@ -41,6 +41,7 @@ import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
+import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
 import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
@@ -255,10 +256,17 @@ export default function PlayerEdit() {
           <Divider sx={{ my: 1 }} />
           <PlayerNumbers player={playerTemp} isEditMode={isOwner} />
           <Divider sx={{ my: 1 }} />
-          <BattleModeToggle
-            battleMode={battleMode}
-            setBattleMode={setBattleMode}
-          />
+          <Grid container spacing={1} sx={{ py: 1 }}>
+            <Grid item xs={9} sm={10} md={11}>
+              <BattleModeToggle
+                battleMode={battleMode}
+                setBattleMode={setBattleMode}
+              />
+            </Grid>
+            <Grid item xs={3} sm={2} md={1}>
+              <GenericRolls player={playerTemp} isEditMode={isOwner} />
+            </Grid>
+          </Grid>
           <Divider sx={{ my: 1 }} />
           {!battleMode && (
             <>
@@ -275,9 +283,9 @@ export default function PlayerEdit() {
               <Divider sx={{ my: 1 }} />
               <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} />
               <Divider sx={{ my: 1 }} />
-              <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} />
+              <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
               <Divider sx={{ my: 1 }} />
-              <PlayerSkills player={playerTemp} setPlayer={setPlayerTemp} />
+              <PlayerSkills player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
             </>
           )}
           <Box sx={{ height: "10vh" }} />

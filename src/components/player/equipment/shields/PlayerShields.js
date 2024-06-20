@@ -20,6 +20,7 @@ export default function PlayerShields({
   shields,
   onEditShield,
   onEquipShield,
+  isEditMode
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -173,11 +174,11 @@ export default function PlayerShields({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  <Grid item xs={12}>
+                  {isEditMode && <Grid item xs={12}>
                     <IconButton onClick={() => onEditShield(index)}>
                       <Edit />
                     </IconButton>
-                  </Grid>
+                  </Grid>}
                   <Grid item xs={12}>
                     {checkIfEquippable(shield) ? (
                       <Tooltip
@@ -191,6 +192,7 @@ export default function PlayerShields({
                           onClick={() =>
                             handleEquipShields(index, !shield.isEquipped)
                           }
+                          disabled={!isEditMode}
                           sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
                         >
                           <Equip

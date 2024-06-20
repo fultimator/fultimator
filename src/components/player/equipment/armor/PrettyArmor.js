@@ -163,7 +163,7 @@ export default function PrettyArmor({ armor, showActions }) {
                     <StyledMarkdown
                       allowedElements={["strong", "em"]}
                       unwrapDisallowed={true}
-                      sx={{ fontSize: { xs: "0.9rem", sm: "1.1rem" } }}
+                      sx={{ fontSize: { xs: "0.9rem", sm: "1.0rem" } }}
                     >
                       {armor.quality}
                     </StyledMarkdown>

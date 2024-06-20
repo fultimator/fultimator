@@ -73,6 +73,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else {
+            alert(spell.toUpperCase() + " spell not implemented yet");
             return cls;
           }
         }

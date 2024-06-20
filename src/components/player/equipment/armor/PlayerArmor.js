@@ -20,6 +20,7 @@ export default function PlayerArmor({
   armor,
   onEditArmor,
   onEquipArmor,
+  isEditMode
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -147,11 +148,11 @@ export default function PlayerArmor({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  <Grid item xs={12}>
+                  {isEditMode && <Grid item xs={12}>
                     <IconButton onClick={() => onEditArmor(index)}>
                       <Edit />
                     </IconButton>
-                  </Grid>
+                  </Grid>}
                   <Grid item xs={12}>
                     {checkIfEquippable(armorItem) ? (
                       <Tooltip
@@ -165,6 +166,7 @@ export default function PlayerArmor({
                           onClick={() =>
                             handleEquipArmor(index, !armorItem.isEquipped)
                           }
+                          disabled={!isEditMode}
                           sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
                         >
                           <Equip

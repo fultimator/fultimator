@@ -18,7 +18,7 @@ import PrettyArmor from "../equipment/armor/PrettyArmor";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 
-export default function PlayerEquipment({ player, setPlayer }) {
+export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -314,20 +314,24 @@ export default function PlayerEquipment({ player, setPlayer }) {
                   {equippedWeapons.map((weapon, index) => (
                     <React.Fragment key={index}>
                       <Grid container>
-                        <Grid item xs={11}>
+                        <Grid item xs={isEditMode ? 11 : 12}>
                           <PrettyWeapon
                             weapon={weapon}
                             player={player}
                             setPlayer={setPlayer}
                           />
                         </Grid>
-                        <Grid item xs={1}>
-                          <Tooltip title={t("Roll")}>
-                            <IconButton onClick={() => handleDiceRoll(weapon)}>
-                              <Casino />
-                            </IconButton>
-                          </Tooltip>
-                        </Grid>
+                        {isEditMode && (
+                          <Grid item xs={1}>
+                            <Tooltip title={t("Roll")}>
+                              <IconButton
+                                onClick={() => handleDiceRoll(weapon)}
+                              >
+                                <Casino />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        )}
                       </Grid>
                       <br />
                     </React.Fragment>
@@ -346,7 +350,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
                   {equippedArmor.map((armor, index) => (
                     <React.Fragment key={index}>
                       <Grid container>
-                        <Grid item xs={11}>
+                        <Grid item xs={isEditMode ? 11 : 12}>
                           <PrettyArmor armor={armor} />
                         </Grid>
                         <Grid item xs={1}></Grid>
@@ -368,7 +372,7 @@ export default function PlayerEquipment({ player, setPlayer }) {
                   {equippedShields.map((shield, index) => (
                     <React.Fragment key={index}>
                       <Grid container>
-                        <Grid item xs={11}>
+                        <Grid item xs={isEditMode ? 11 : 12}>
                           <PrettyArmor armor={shield} />
                         </Grid>
                         <Grid item xs={1}></Grid>

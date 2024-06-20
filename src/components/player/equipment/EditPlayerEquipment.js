@@ -189,7 +189,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   return (
     <>
-      <div>EQUIPMENT IS PLACEHOLDER, AND NEEDS TO BE IMPLEMENTED</div>
       {isEditMode ? (
         <>
           <Paper
@@ -261,6 +260,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditWeapon={handleEditWeapon}
         onDeleteWeapon={handleDeleteWeapon}
         onEquipWeapon={handleEquipWeapon}
+        isEditMode={isEditMode}
       />
 
       <PlayerArmor
@@ -269,6 +269,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditArmor={handleEditArmor}
         onDeleteArmor={handleDeleteArmor}
         onEquipArmor={handleEquipArmor}
+        isEditMode={isEditMode}
       />
 
       <PlayerShields
@@ -277,6 +278,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditShield={handleEditShield}
         onDeleteShield={handleDeleteShield}
         onEquipShield={handleEquipShield}
+        isEditMode={isEditMode}
       />
 
       <Accordion

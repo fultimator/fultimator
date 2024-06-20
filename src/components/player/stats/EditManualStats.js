@@ -90,6 +90,9 @@ export default function EditManualStats({
               hpModifier > 0 ? "success" : hpModifier < 0 ? "error" : "primary"
             }
             focused={hpModifier > 0 || hpModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -103,6 +106,9 @@ export default function EditManualStats({
               mpModifier > 0 ? "success" : mpModifier < 0 ? "error" : "primary"
             }
             focused={mpModifier > 0 || mpModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -116,6 +122,9 @@ export default function EditManualStats({
               ipModifier > 0 ? "success" : ipModifier < 0 ? "error" : "primary"
             }
             focused={ipModifier > 0 || ipModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -133,6 +142,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={defModifier > 0 || defModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -150,6 +162,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={mdefModifier > 0 || mdefModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -167,6 +182,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={initModifier > 0 || initModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -184,6 +202,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={meleePrecModifier > 0 || meleePrecModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -201,6 +222,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={rangedPrecModifier > 0 || rangedPrecModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
         <Grid item xs={4}>
@@ -218,6 +242,9 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={magicPrecModifier > 0 || magicPrecModifier < 0}
+            InputProps={{
+              readOnly: !isEditMode,
+            }}
           />
         </Grid>
       </Grid>

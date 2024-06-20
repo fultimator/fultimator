@@ -44,8 +44,6 @@ export default function PlayerSkills({ player, setPlayer }) {
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
 
-  console.log(allSkills);
-
   const handleOpenModal = (skill) => {
     setSelectedSkill(skill);
     setOpenModal(true);

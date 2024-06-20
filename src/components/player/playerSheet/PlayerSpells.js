@@ -23,7 +23,7 @@ import ReactMarkdown from "react-markdown";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
 
-export default function PlayerSpells({ player, setPlayer }) {
+export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -356,7 +356,7 @@ export default function PlayerSpells({ player, setPlayer }) {
                         <Info />
                       </IconButton>
                     </Tooltip>
-                    {spell.isOffensive && (
+                    {(spell.isOffensive && isEditMode) && (
                       <Tooltip title={t("Roll")}>
                         <IconButton sx={{ padding: "0px", marginLeft: "5px" }}>
                           <Casino

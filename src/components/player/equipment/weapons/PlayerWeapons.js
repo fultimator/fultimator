@@ -20,6 +20,7 @@ export default function PlayerWeapons({
   weapons,
   onEditWeapon,
   onEquipWeapon,
+  isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -185,23 +186,28 @@ export default function PlayerWeapons({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  <Grid item xs={12}>
-                    <IconButton onClick={() => onEditWeapon(index)}>
-                      <Edit />
-                    </IconButton>
-                  </Grid>
+                  {isEditMode && (
+                    <Grid item xs={12}>
+                      <IconButton onClick={() => onEditWeapon(index)}>
+                        <Edit />
+                      </IconButton>
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
                     {checkIfEquippable(weapon) ? (
                       <Tooltip
-                        title={weapon.isEquipped ? t("Unequip Weapon") : t("Equip Weapon")}
+                        title={
+                          weapon.isEquipped
+                            ? t("Unequip Weapon")
+                            : t("Equip Weapon")
+                        }
                       >
                         <IconButton
                           onClick={() =>
                             handleEquipWeapon(index, !weapon.isEquipped)
                           }
-                          sx={{ mt: 1,
-                            boxShadow: "1px 1px 5px",
-                          }}
+                          disabled={!isEditMode}
+                          sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
                         >
                           <Equip
                             color={weapon.isEquipped ? "green" : ternary}
