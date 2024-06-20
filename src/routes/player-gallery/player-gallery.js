@@ -118,6 +118,24 @@ function Personal({ user }) {
                 </Button>
               </Box>
             </Grid>
+            <Grid item>
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    backgroundColor: "#7289da",
+                    color: "#fff",
+                    ":hover": { backgroundColor: "#7289da" },
+                  }}
+                  href="https://discord.gg/9yYc6R93Cd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Join our Discord
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
         </Paper>
         <HelpFeedbackDialog
