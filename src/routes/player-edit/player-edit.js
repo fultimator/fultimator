@@ -44,13 +44,14 @@ import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
 import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
+import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
 import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -191,10 +192,9 @@ export default function PlayerEdit() {
   }
 
   if (!canAccessTest) {
-    navigate('/pc-gallery');
+    navigate("/pc-gallery");
     return null;
   }
-
 
   return (
     <Layout>
@@ -269,6 +269,7 @@ export default function PlayerEdit() {
             <>
               <PlayerTraits player={playerTemp} isEditMode={isOwner} />
               <PlayerBonds player={playerTemp} isEditMode={isOwner} />
+              <PlayerNotes player={playerTemp} isEditMode={isOwner} />
             </>
           )}
           {isOwner && battleMode ? (
@@ -276,9 +277,21 @@ export default function PlayerEdit() {
           ) : null}
           {battleMode && (
             <>
-              <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
-              <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
-              <PlayerSkills player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
+              <PlayerEquipment
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
+              <PlayerSpells
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
+              <PlayerSkills
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
             </>
           )}
           <Box sx={{ height: "10vh" }} />
