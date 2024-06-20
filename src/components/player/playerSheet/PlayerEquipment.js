@@ -10,6 +10,7 @@ import {
   DialogActions,
   Button,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -273,187 +274,190 @@ export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
   return (
     <>
       {(equippedWeapons.length > 0 || equippedArmor.length > 0) && (
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-            display: "flex",
-          }}
-        >
-          <Typography
-            variant="h1"
+        <>
+          <Divider sx={{ my: 1 }} />
+          <Paper
+            elevation={3}
             sx={{
-              writingMode: "vertical-lr",
-              textTransform: "uppercase",
-              marginLeft: "-1px",
-              marginRight: "10px",
-              marginTop: "-1px",
-              marginBottom: "-1px",
-              paddingY: "10px",
-              backgroundColor: primary,
-              color: ternary,
-              borderRadius: "0 8px 8px 0",
-              transform: "rotate(180deg)",
-              fontSize: "2em",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              display: "flex",
             }}
-            align="center"
           >
-            {t("Equipment")}
-          </Typography>
-          <Grid container spacing={2} sx={{ padding: "1em" }}>
-            {equippedWeapons.length > 0 && (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
-                    {t("Weapons")}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  {equippedWeapons.map((weapon, index) => (
-                    <React.Fragment key={index}>
-                      <Grid container>
-                        <Grid item xs={isEditMode ? 11 : 12}>
-                          <PrettyWeapon
-                            weapon={weapon}
-                            player={player}
-                            setPlayer={setPlayer}
-                          />
-                        </Grid>
-                        {isEditMode && (
-                          <Grid item xs={1}>
-                            <Tooltip title={t("Roll")}>
-                              <IconButton
-                                onClick={() => handleDiceRoll(weapon)}
-                              >
-                                <Casino />
-                              </IconButton>
-                            </Tooltip>
-                          </Grid>
-                        )}
-                      </Grid>
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              </>
-            )}
-            {equippedArmor.length > 0 && (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
-                    {t("Armor")}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  {equippedArmor.map((armor, index) => (
-                    <React.Fragment key={index}>
-                      <Grid container>
-                        <Grid item xs={isEditMode ? 11 : 12}>
-                          <PrettyArmor armor={armor} />
-                        </Grid>
-                        <Grid item xs={1}></Grid>
-                      </Grid>
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              </>
-            )}
-            {equippedShields.length > 0 && (
-              <>
-                <Grid item xs={12}>
-                  <Typography variant="h2" sx={{ fontWeight: "bold" }}>
-                    {t("Shields")}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  {equippedShields.map((shield, index) => (
-                    <React.Fragment key={index}>
-                      <Grid container>
-                        <Grid item xs={isEditMode ? 11 : 12}>
-                          <PrettyArmor armor={shield} />
-                        </Grid>
-                        <Grid item xs={1}></Grid>
-                      </Grid>
-                      <br />
-                    </React.Fragment>
-                  ))}
-                </Grid>
-              </>
-            )}
-            {(precMeleeModifier !== 0 ||
-              precRangedModifier !== 0 ||
-              damageMeleeModifier !== 0 ||
-              damageRangedModifier !== 0) && (
-              <Grid item xs={12}>
-                <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                  {t("Modifiers")}
-                </Typography>
-                {precMeleeModifier !== 0 && (
-                  <Typography variant="h4">
-                    {t("Melee Accuracy Bonus")}: {precMeleeModifier}
-                  </Typography>
-                )}
-                {precRangedModifier !== 0 && (
-                  <Typography variant="h4">
-                    {t("Ranged Accuracy Bonus")}: {precRangedModifier}
-                  </Typography>
-                )}
-                {damageMeleeModifier !== 0 && (
-                  <Typography variant="h4">
-                    {t("Melee Damage Bonus")}: {damageMeleeModifier}
-                  </Typography>
-                )}
-                {damageRangedModifier !== 0 && (
-                  <Typography variant="h4">
-                    {t("Ranged Damage Bonus")}: {damageRangedModifier}
-                  </Typography>
-                )}
-              </Grid>
-            )}
-          </Grid>
-          <Dialog
-            open={dialogOpen}
-            onClose={handleDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              variant="h3"
+            <Typography
+              variant="h1"
               sx={{
-                backgroundColor:
-                  dialogSeverity === "error"
-                    ? "#bb2124"
-                    : dialogSeverity === "success"
-                    ? "#22bb33"
-                    : "#aaaaaa",
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                marginLeft: "-1px",
+                marginRight: "10px",
+                marginTop: "-1px",
+                marginBottom: "-1px",
+                paddingY: "10px",
+                backgroundColor: primary,
+                color: ternary,
+                borderRadius: "0 8px 8px 0",
+                transform: "rotate(180deg)",
+                fontSize: "2em",
               }}
+              align="center"
             >
-              {t("Result")}
-            </DialogTitle>
-            <DialogContent sx={{ marginTop: "10px" }}>
-              <DialogContent id="alert-dialog-description">
-                {dialogMessage}
-              </DialogContent>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose} color="primary">
-                {t("Close")}
-              </Button>
-              <Button
-                onClick={() => handleDiceRoll(currentWeapon)}
-                color="primary"
-                autoFocus
+              {t("Equipment")}
+            </Typography>
+            <Grid container spacing={2} sx={{ padding: "1em" }}>
+              {equippedWeapons.length > 0 && (
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                      {t("Weapons")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {equippedWeapons.map((weapon, index) => (
+                      <React.Fragment key={index}>
+                        <Grid container>
+                          <Grid item xs={isEditMode ? 11 : 12}>
+                            <PrettyWeapon
+                              weapon={weapon}
+                              player={player}
+                              setPlayer={setPlayer}
+                            />
+                          </Grid>
+                          {isEditMode && (
+                            <Grid item xs={1}>
+                              <Tooltip title={t("Roll")}>
+                                <IconButton
+                                  onClick={() => handleDiceRoll(weapon)}
+                                >
+                                  <Casino />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          )}
+                        </Grid>
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </>
+              )}
+              {equippedArmor.length > 0 && (
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                      {t("Armor")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {equippedArmor.map((armor, index) => (
+                      <React.Fragment key={index}>
+                        <Grid container>
+                          <Grid item xs={isEditMode ? 11 : 12}>
+                            <PrettyArmor armor={armor} />
+                          </Grid>
+                          <Grid item xs={1}></Grid>
+                        </Grid>
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </>
+              )}
+              {equippedShields.length > 0 && (
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h2" sx={{ fontWeight: "bold" }}>
+                      {t("Shields")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    {equippedShields.map((shield, index) => (
+                      <React.Fragment key={index}>
+                        <Grid container>
+                          <Grid item xs={isEditMode ? 11 : 12}>
+                            <PrettyArmor armor={shield} />
+                          </Grid>
+                          <Grid item xs={1}></Grid>
+                        </Grid>
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                </>
+              )}
+              {(precMeleeModifier !== 0 ||
+                precRangedModifier !== 0 ||
+                damageMeleeModifier !== 0 ||
+                damageRangedModifier !== 0) && (
+                <Grid item xs={12}>
+                  <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                    {t("Modifiers")}
+                  </Typography>
+                  {precMeleeModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Melee Accuracy Bonus")}: {precMeleeModifier}
+                    </Typography>
+                  )}
+                  {precRangedModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Ranged Accuracy Bonus")}: {precRangedModifier}
+                    </Typography>
+                  )}
+                  {damageMeleeModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Melee Damage Bonus")}: {damageMeleeModifier}
+                    </Typography>
+                  )}
+                  {damageRangedModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Ranged Damage Bonus")}: {damageRangedModifier}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
+            </Grid>
+            <Dialog
+              open={dialogOpen}
+              onClose={handleDialogClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+            >
+              <DialogTitle
+                id="alert-dialog-title"
+                variant="h3"
+                sx={{
+                  backgroundColor:
+                    dialogSeverity === "error"
+                      ? "#bb2124"
+                      : dialogSeverity === "success"
+                      ? "#22bb33"
+                      : "#aaaaaa",
+                }}
               >
-                {t("Re-roll")}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Paper>
+                {t("Result")}
+              </DialogTitle>
+              <DialogContent sx={{ marginTop: "10px" }}>
+                <DialogContent id="alert-dialog-description">
+                  {dialogMessage}
+                </DialogContent>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleDialogClose} color="primary">
+                  {t("Close")}
+                </Button>
+                <Button
+                  onClick={() => handleDiceRoll(currentWeapon)}
+                  color="primary"
+                  autoFocus
+                >
+                  {t("Re-roll")}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Paper>
+        </>
       )}
     </>
   );

@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   Checkbox,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -270,262 +271,274 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   return (
     <>
       {allSpells.length > 0 && (
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-            display: "flex",
-          }}
-        >
-          <Typography
-            variant="h1"
+        <>
+          <Divider sx={{ my: 1 }} />
+          <Paper
+            elevation={3}
             sx={{
-              writingMode: "vertical-lr",
-              textTransform: "uppercase",
-              marginLeft: "-1px",
-              marginRight: "10px",
-              marginTop: "-1px",
-              marginBottom: "-1px",
-              paddingY: "10px",
-              backgroundColor: primary,
-              color: ternary,
-              borderRadius: "0 8px 8px 0",
-              transform: "rotate(180deg)",
-              fontSize: "2em",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              display: "flex",
             }}
-            align="center"
           >
-            {t("Spells")}
-          </Typography>
-          <Grid container spacing={1} sx={{ padding: "1em" }}>
-            {allSpells.map((spell, index) => (
-              <Grid
-                item
-                container
-                xs={12}
-                md={6}
-                key={index}
-                sx={{ display: "flex", alignItems: "stretch" }}
-              >
-                <Grid item xs={10} sx={{ display: "flex" }}>
-                  <Typography
-                    id="spell-left-name"
-                    variant="h2"
-                    sx={{
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                      backgroundColor: primary,
-                      padding: "5px",
-                      paddingLeft: "10px",
-                      color: "#fff",
-                      borderRadius: "8px 0 0 8px",
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    {spell.name}
-                    {spell.isOffensive && <OffensiveSpellIcon />}
-                  </Typography>
-                </Grid>
+            <Typography
+              variant="h1"
+              sx={{
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                marginLeft: "-1px",
+                marginRight: "10px",
+                marginTop: "-1px",
+                marginBottom: "-1px",
+                paddingY: "10px",
+                backgroundColor: primary,
+                color: ternary,
+                borderRadius: "0 8px 8px 0",
+                transform: "rotate(180deg)",
+                fontSize: "2em",
+              }}
+              align="center"
+            >
+              {t("Spells")}
+            </Typography>
+            <Grid container spacing={1} sx={{ padding: "1em" }}>
+              {allSpells.map((spell, index) => (
                 <Grid
                   item
-                  xs={2}
+                  container
+                  xs={12}
+                  md={6}
+                  key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
                 >
-                  <div
-                    id="spell-right-controls"
-                    style={{
-                      padding: "10px",
-                      backgroundColor: ternary,
-                      borderRadius: "0 8px 8px 0",
-                      marginRight: "15px",
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "row",
-                    }}
-                    className="spell-right-controls"
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      id="spell-left-name"
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {spell.name}
+                      {spell.isOffensive && <OffensiveSpellIcon />}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    sx={{ display: "flex", alignItems: "stretch" }}
                   >
-                    <Tooltip title={t("Info")}>
-                      <IconButton
-                        sx={{ padding: "0px" }}
-                        onClick={() => handleOpenModal(spell)}
-                      >
-                        <Info />
-                      </IconButton>
-                    </Tooltip>
-                    {(spell.isOffensive && isEditMode) && (
-                      <Tooltip title={t("Roll")}>
-                        <IconButton sx={{ padding: "0px", marginLeft: "5px" }}>
-                          <Casino
-                            onClick={() => {
-                              handleRollSetup(spell);
-                            }}
-                          />
+                    <div
+                      id="spell-right-controls"
+                      style={{
+                        padding: "10px",
+                        backgroundColor: ternary,
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                      className="spell-right-controls"
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton
+                          sx={{ padding: "0px" }}
+                          onClick={() => handleOpenModal(spell)}
+                        >
+                          <Info />
                         </IconButton>
                       </Tooltip>
-                    )}
-                  </div>
-                </Grid>
-              </Grid>
-            ))}
-            {magicModifier !== 0 && (
-              <Grid item xs={12} sx={{ marginTop: "20px" }}>
-                <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                  {t("Modifiers")}
-                </Typography>
-                {magicModifier !== 0 && (
-                  <Typography variant="h4">
-                    {t("Magic Precision Bonus")}: {magicModifier}
-                  </Typography>
-                )}
-              </Grid>
-            )}
-          </Grid>
-          <Modal
-            open={openModal}
-            onClose={handleCloseModal}
-            aria-labelledby="spell-description"
-            aria-describedby="spell-description"
-          >
-            <Paper
-              sx={{
-                position: "absolute",
-                width: { xs: "90%", md: 400 },
-                bgcolor: "#fff",
-                border: "2px solid",
-                borderColor: secondary,
-                borderRadius: "8px",
-                boxShadow: 24,
-                padding: 2,
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            >
-              <Typography variant="h4" sx={{ textTransform: "uppercase" }} fontWeight={"bold"}>
-                {selectedSpell && selectedSpell.name}{" - "}{selectedSpell && selectedSpell.className}
-              </Typography>
-              <ReactMarkdown>
-                {selectedSpell && selectedSpell.description}
-              </ReactMarkdown>
-              <Typography variant="h5">
-                {t("MP Cost")}: {selectedSpell && selectedSpell.mp}{" "}
-                {selectedSpell && selectedSpell.maxTargets !== 1
-                  ? "x " + t("Target")
-                  : ""}
-              </Typography>
-              <Typography variant="h5">
-                {t("Max Targets")}: {selectedSpell && selectedSpell.maxTargets}
-              </Typography>
-              <Typography variant="h5">
-                {t("Target Description")}:{" "}
-                {selectedSpell && selectedSpell.targetDesc}
-              </Typography>
-              <Typography variant="h5">
-                {t("Duration")}: {selectedSpell && selectedSpell.duration}
-              </Typography>
-              <Button
-                variant="contained"
-                onClick={handleOK}
-                sx={{ marginTop: 2, width: "100%" }}
-              >
-                OK
-              </Button>
-            </Paper>
-          </Modal>
-          <Dialog
-            open={dialogOpen}
-            onClose={handleDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
-          >
-            <DialogTitle
-              variant="h3"
-              sx={{
-                backgroundColor:
-                  dialogSeverity === "error"
-                    ? "#bb2124"
-                    : dialogSeverity === "success"
-                    ? "#22bb33"
-                    : "#aaaaaa",
-              }}
-              id="alert-dialog-title"
-            >
-              {t("Spell Rolls")}
-            </DialogTitle>
-            <DialogContent sx={{ marginTop: "10px" }}>
-              <DialogContent id="alert-dialog-description">
-                {!isRolling ? (
-                  <Grid container alignItems="center" spacing={1}>
-                    <Grid item xs={12}>
-                      <Typography variant="body1">
-                        {t("Select number of targets from 1 to")}{" "}
-                        {selectedSpell?.maxTargets || 1}:
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Select
-                        value={targets}
-                        onChange={(e) =>
-                          setTargets(parseInt(e.target.value, 10))
-                        }
-                        size="small"
-                        sx={{ width: "100px" }}
-                      >
-                        {Array.from(
-                          { length: selectedSpell?.maxTargets || 1 },
-                          (_, i) => (
-                            <MenuItem key={i} value={i + 1}>
-                              {i + 1}
-                            </MenuItem>
-                          )
-                        )}
-                      </Select>
-                      {useMp && (
-                        <>
-                          <Typography variant="body1">
-                            {t("MP Cost")}
-                            {": "}
-                            {selectedSpell?.mp * targets}
-                          </Typography>
-                          {selectedSpell?.mp * targets >
-                            player.stats.mp.current && (
-                            <Typography variant="body1" color="error">
-                              {t("Not enough MP")}
-                            </Typography>
-                          )}
-                        </>
+                      {spell.isOffensive && isEditMode && (
+                        <Tooltip title={t("Roll")}>
+                          <IconButton
+                            sx={{ padding: "0px", marginLeft: "5px" }}
+                          >
+                            <Casino
+                              onClick={() => {
+                                handleRollSetup(spell);
+                              }}
+                            />
+                          </IconButton>
+                        </Tooltip>
                       )}
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={useMp}
-                            onChange={(e) => setUseMp(e.target.checked)}
-                          />
-                        }
-                        label={t("Use MP")}
-                      />
-                    </Grid>
+                    </div>
                   </Grid>
-                ) : (
-                  <>{dialogMessage}</>
-                )}
+                </Grid>
+              ))}
+              {magicModifier !== 0 && (
+                <Grid item xs={12} sx={{ marginTop: "20px" }}>
+                  <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                    {t("Modifiers")}
+                  </Typography>
+                  {magicModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Magic Precision Bonus")}: {magicModifier}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
+            </Grid>
+            <Modal
+              open={openModal}
+              onClose={handleCloseModal}
+              aria-labelledby="spell-description"
+              aria-describedby="spell-description"
+            >
+              <Paper
+                sx={{
+                  position: "absolute",
+                  width: { xs: "90%", md: 400 },
+                  bgcolor: "#fff",
+                  border: "2px solid",
+                  borderColor: secondary,
+                  borderRadius: "8px",
+                  boxShadow: 24,
+                  padding: 2,
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <Typography
+                  variant="h4"
+                  sx={{ textTransform: "uppercase" }}
+                  fontWeight={"bold"}
+                >
+                  {selectedSpell && selectedSpell.name}
+                  {" - "}
+                  {selectedSpell && selectedSpell.className}
+                </Typography>
+                <ReactMarkdown>
+                  {selectedSpell && selectedSpell.description}
+                </ReactMarkdown>
+                <Typography variant="h5">
+                  {t("MP Cost")}: {selectedSpell && selectedSpell.mp}{" "}
+                  {selectedSpell && selectedSpell.maxTargets !== 1
+                    ? "x " + t("Target")
+                    : ""}
+                </Typography>
+                <Typography variant="h5">
+                  {t("Max Targets")}:{" "}
+                  {selectedSpell && selectedSpell.maxTargets}
+                </Typography>
+                <Typography variant="h5">
+                  {t("Target Description")}:{" "}
+                  {selectedSpell && selectedSpell.targetDesc}
+                </Typography>
+                <Typography variant="h5">
+                  {t("Duration")}: {selectedSpell && selectedSpell.duration}
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={handleOK}
+                  sx={{ marginTop: 2, width: "100%" }}
+                >
+                  OK
+                </Button>
+              </Paper>
+            </Modal>
+            <Dialog
+              open={dialogOpen}
+              onClose={handleDialogClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+              PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+            >
+              <DialogTitle
+                variant="h3"
+                sx={{
+                  backgroundColor:
+                    dialogSeverity === "error"
+                      ? "#bb2124"
+                      : dialogSeverity === "success"
+                      ? "#22bb33"
+                      : "#aaaaaa",
+                }}
+                id="alert-dialog-title"
+              >
+                {t("Spell Rolls")}
+              </DialogTitle>
+              <DialogContent sx={{ marginTop: "10px" }}>
+                <DialogContent id="alert-dialog-description">
+                  {!isRolling ? (
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item xs={12}>
+                        <Typography variant="body1">
+                          {t("Select number of targets from 1 to")}{" "}
+                          {selectedSpell?.maxTargets || 1}:
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Select
+                          value={targets}
+                          onChange={(e) =>
+                            setTargets(parseInt(e.target.value, 10))
+                          }
+                          size="small"
+                          sx={{ width: "100px" }}
+                        >
+                          {Array.from(
+                            { length: selectedSpell?.maxTargets || 1 },
+                            (_, i) => (
+                              <MenuItem key={i} value={i + 1}>
+                                {i + 1}
+                              </MenuItem>
+                            )
+                          )}
+                        </Select>
+                        {useMp && (
+                          <>
+                            <Typography variant="body1">
+                              {t("MP Cost")}
+                              {": "}
+                              {selectedSpell?.mp * targets}
+                            </Typography>
+                            {selectedSpell?.mp * targets >
+                              player.stats.mp.current && (
+                              <Typography variant="body1" color="error">
+                                {t("Not enough MP")}
+                              </Typography>
+                            )}
+                          </>
+                        )}
+                      </Grid>
+                      <Grid item xs={12}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={useMp}
+                              onChange={(e) => setUseMp(e.target.checked)}
+                            />
+                          }
+                          label={t("Use MP")}
+                        />
+                      </Grid>
+                    </Grid>
+                  ) : (
+                    <>{dialogMessage}</>
+                  )}
+                </DialogContent>
               </DialogContent>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose}>{t("Close")}</Button>
-              <Button onClick={handleRoll}>
-                {isRolling ? t("Re-Roll") : t("Roll")}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Paper>
+              <DialogActions>
+                <Button onClick={handleDialogClose}>{t("Close")}</Button>
+                <Button onClick={handleRoll}>
+                  {isRolling ? t("Re-Roll") : t("Roll")}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Paper>
+        </>
       )}
       <style jsx>{`
         @media (max-width: 600px) {

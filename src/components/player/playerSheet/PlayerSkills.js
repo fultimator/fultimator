@@ -7,6 +7,7 @@ import {
   Modal,
   Button,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -60,152 +61,155 @@ export default function PlayerSkills({ player, setPlayer }) {
   return (
     <>
       {allSkills.length > 0 && (
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-            display: "flex",
-          }}
-        >
-          <Typography
-            variant="h1"
+        <>
+          <Divider sx={{ my: 1 }} />
+          <Paper
+            elevation={3}
             sx={{
-              writingMode: "vertical-lr",
-              textTransform: "uppercase",
-              marginLeft: "-1px",
-              marginRight: "10px",
-              marginTop: "-1px",
-              marginBottom: "-1px",
-              paddingY: "10px",
-              backgroundColor: primary,
-              color: ternary,
-              borderRadius: "0 8px 8px 0",
-              transform: "rotate(180deg)",
-              fontSize: "2em",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              display: "flex",
             }}
-            align="center"
           >
-            {t("Skills")}
-          </Typography>
-          <Grid container spacing={1} sx={{ padding: "1em" }}>
-            {allSkills.map((skill, index) => (
-              <Grid
-                item
-                container
-                xs={12}
-                md={6}
-                key={index}
-                sx={{ display: "flex", alignItems: "stretch" }}
-              >
-                <Grid item xs={10} sx={{ display: "flex" }}>
-                  <Typography
-                    id="skill-left-name"
-                    variant="h2"
-                    sx={{
-                      fontWeight: "bold",
-                      textTransform: "uppercase",
-                      backgroundColor: primary,
-                      padding: "5px",
-                      paddingLeft: "10px",
-                      color: "#fff",
-                      borderRadius: "8px 0 0 8px",
-                      display: "flex",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    {skill.skillName}
-                  </Typography>
-                </Grid>
+            <Typography
+              variant="h1"
+              sx={{
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                marginLeft: "-1px",
+                marginRight: "10px",
+                marginTop: "-1px",
+                marginBottom: "-1px",
+                paddingY: "10px",
+                backgroundColor: primary,
+                color: ternary,
+                borderRadius: "0 8px 8px 0",
+                transform: "rotate(180deg)",
+                fontSize: "2em",
+              }}
+              align="center"
+            >
+              {t("Skills")}
+            </Typography>
+            <Grid container spacing={1} sx={{ padding: "1em" }}>
+              {allSkills.map((skill, index) => (
                 <Grid
                   item
-                  xs={2}
+                  container
+                  xs={12}
+                  md={6}
+                  key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
                 >
-                  <div
-                    id="skill-right-controls"
-                    style={{
-                      padding: "10px",
-                      backgroundColor: ternary,
-                      borderRadius: "0 8px 8px 0",
-                      marginRight: "15px",
-                      display: "flex",
-                      alignItems: "center",
-                      flexDirection: "row",
-                    }}
-                    className="skill-right-controls"
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      id="skill-left-name"
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {skill.skillName}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    sx={{ display: "flex", alignItems: "stretch" }}
                   >
-                    <Tooltip title={t("Info")}>
-                      <IconButton
-                        sx={{ padding: "0px" }}
-                        onClick={() => handleOpenModal(skill)}
-                      >
-                        <Info />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
+                    <div
+                      id="skill-right-controls"
+                      style={{
+                        padding: "10px",
+                        backgroundColor: ternary,
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                      className="skill-right-controls"
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton
+                          sx={{ padding: "0px" }}
+                          onClick={() => handleOpenModal(skill)}
+                        >
+                          <Info />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </Grid>
                 </Grid>
-              </Grid>
-            ))}
-          </Grid>
-          <Modal
-            open={openModal}
-            onClose={handleCloseModal}
-            aria-labelledby="skill-description"
-            aria-describedby="skill-description"
-          >
-            <Paper
-              sx={{
-                position: "absolute",
-                width: { xs: "90%", md: 400 },
-                bgcolor: "#fff",
-                border: "2px solid",
-                borderColor: secondary,
-                borderRadius: "8px",
-                boxShadow: 24,
-                padding: 2,
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
+              ))}
+            </Grid>
+            <Modal
+              open={openModal}
+              onClose={handleCloseModal}
+              aria-labelledby="skill-description"
+              aria-describedby="skill-description"
             >
-              <Typography
-                variant="h4"
-                sx={{ textTransform: "uppercase" }}
-                fontWeight={"bold"}
+              <Paper
+                sx={{
+                  position: "absolute",
+                  width: { xs: "90%", md: 400 },
+                  bgcolor: "#fff",
+                  border: "2px solid",
+                  borderColor: secondary,
+                  borderRadius: "8px",
+                  boxShadow: 24,
+                  padding: 2,
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
               >
-                {selectedSkill && selectedSkill.skillName}
-                {" - "}
-                {selectedSkill && selectedSkill.className} {" -  "}{" "}
                 <Typography
-                  component="span"
-                  sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
+                  variant="h4"
+                  sx={{ textTransform: "uppercase" }}
+                  fontWeight={"bold"}
                 >
-                  【
+                  {selectedSkill && selectedSkill.skillName}
+                  {" - "}
+                  {selectedSkill && selectedSkill.className} {" -  "}{" "}
+                  <Typography
+                    component="span"
+                    sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
+                  >
+                    【
+                  </Typography>
+                  {selectedSkill && t("SL") + " " + selectedSkill.currentLvl}
+                  <Typography
+                    component="span"
+                    sx={{ mr: -0.7, fontSize: "1.2em" }}
+                  >
+                    】
+                  </Typography>
                 </Typography>
-                {selectedSkill && t("SL") + " " + selectedSkill.currentLvl}
-                <Typography
-                  component="span"
-                  sx={{ mr: -0.7, fontSize: "1.2em" }}
+                <ReactMarkdown>
+                  {selectedSkill && selectedSkill.description}
+                </ReactMarkdown>
+                <Button
+                  variant="contained"
+                  onClick={handleOK}
+                  sx={{ marginTop: 2, width: "100%" }}
                 >
-                  】
-                </Typography>
-              </Typography>
-              <ReactMarkdown>
-                {selectedSkill && selectedSkill.description}
-              </ReactMarkdown>
-              <Button
-                variant="contained"
-                onClick={handleOK}
-                sx={{ marginTop: 2, width: "100%" }}
-              >
-                OK
-              </Button>
-            </Paper>
-          </Modal>
-        </Paper>
+                  OK
+                </Button>
+              </Paper>
+            </Modal>
+          </Paper>
+        </>
       )}
       <style jsx>{`
         @media (max-width: 600px) {

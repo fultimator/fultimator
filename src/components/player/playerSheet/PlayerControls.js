@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Paper,
-  Button,
-  ButtonGroup,
-} from "@mui/material";
+import { Grid, Typography, Paper, Button, ButtonGroup, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 
@@ -70,16 +64,9 @@ export default function PlayerControls({ player, setPlayer }) {
           </Grid>
         )}
         <Grid item xs={12} sm={6}>
-          <Grid
-            container
-            spacing={1}
-          >
+          <Grid container spacing={1}>
             <Grid item xs={12} sm="auto">
-              <ButtonGroup
-                variant="outlined"
-                size="small"
-                color={color}
-              >
+              <ButtonGroup variant="outlined" size="small" color={color}>
                 {negativeIncrements.map((val) => (
                   <Button key={val} onClick={changeStat(stat, val)}>
                     {val}
@@ -88,11 +75,7 @@ export default function PlayerControls({ player, setPlayer }) {
               </ButtonGroup>
             </Grid>
             <Grid item xs={12} sm="auto">
-              <ButtonGroup
-                variant="outlined"
-                size="small"
-                color={color}
-              >
+              <ButtonGroup variant="outlined" size="small" color={color}>
                 {positiveIncrements.map((val) => (
                   <Button key={val} onClick={changeStat(stat, val)}>
                     +{val}
@@ -107,55 +90,58 @@ export default function PlayerControls({ player, setPlayer }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-        display: "flex",
-      }}
-    >
-            <Typography
-        variant="h1"
+    <>
+      <Divider sx={{ my: 1 }} />
+      <Paper
+        elevation={3}
         sx={{
-          writingMode: "vertical-lr",
-          textTransform: "uppercase",
-          marginLeft: "-1px",
-          marginRight: "10px",
-          marginTop:"-1px",
-          marginBottom: "-1px",
-          backgroundColor: primary, 
-          color: ternary,
-          borderRadius: "0 8px 8px 0",
-          transform: "rotate(180deg)",
-          fontSize: "2em"
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          display: "flex",
         }}
-        align="center"
       >
-        {t("Controls")}
-      </Typography>
-      <Grid container spacing={2} sx={{ padding: "1em" }}>
-        <Grid item xs={12}>
-          {renderStatControls(
-            "hp",
-            "HP",
-            "error",
-            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
-          )}
+        <Typography
+          variant="h1"
+          sx={{
+            writingMode: "vertical-lr",
+            textTransform: "uppercase",
+            marginLeft: "-1px",
+            marginRight: "10px",
+            marginTop: "-1px",
+            marginBottom: "-1px",
+            backgroundColor: primary,
+            color: ternary,
+            borderRadius: "0 8px 8px 0",
+            transform: "rotate(180deg)",
+            fontSize: "2em",
+          }}
+          align="center"
+        >
+          {t("Controls")}
+        </Typography>
+        <Grid container spacing={2} sx={{ padding: "1em" }}>
+          <Grid item xs={12}>
+            {renderStatControls(
+              "hp",
+              "HP",
+              "error",
+              [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
+            )}
+          </Grid>
+          <Grid item xs={12}>
+            {renderStatControls(
+              "mp",
+              "MP",
+              "info",
+              [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
+            )}
+          </Grid>
+          <Grid item xs={12}>
+            {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          {renderStatControls(
-            "mp",
-            "MP",
-            "info",
-            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
-          )}
-        </Grid>
-        <Grid item xs={12}>
-          {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
-        </Grid>
-      </Grid>
-    </Paper>
+      </Paper>
+    </>
   );
 }

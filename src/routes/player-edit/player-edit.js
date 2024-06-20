@@ -265,11 +265,9 @@ export default function PlayerEdit() {
               <GenericRolls player={playerTemp} isEditMode={isOwner} />
             </Grid>
           </Grid>
-          <Divider sx={{ my: 1 }} />
           {!battleMode && (
             <>
               <PlayerTraits player={playerTemp} isEditMode={isOwner} />
-              <Divider sx={{ my: 1 }} />
               <PlayerBonds player={playerTemp} isEditMode={isOwner} />
             </>
           )}
@@ -278,11 +276,8 @@ export default function PlayerEdit() {
           ) : null}
           {battleMode && (
             <>
-              <Divider sx={{ my: 1 }} />
               <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
-              <Divider sx={{ my: 1 }} />
               <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
-              <Divider sx={{ my: 1 }} />
               <PlayerSkills player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
             </>
           )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Grid, Typography } from "@mui/material";
+import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 
@@ -45,147 +45,153 @@ export default function PlayerBonds({ player, isEditMode }) {
   return (
     <>
       {player.info.bonds.length > 0 && (
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-            display: "flex",
-          }}
-        >
-          <Typography
-            variant="h1"
+        <>
+          <Divider sx={{ my: 1 }} />
+          <Paper
+            elevation={3}
             sx={{
-              writingMode: "vertical-lr",
-              textTransform: "uppercase",
-              marginLeft: "-1px",
-              marginRight: "10px",
-              marginTop: "-1px",
-              marginBottom: "-1px",
-              backgroundColor: primary,
-              color: ternary,
-              borderRadius: "0 8px 8px 0",
-              transform: "rotate(180deg)",
-              fontSize: "2em",
-              minHeight: "100px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              display: "flex",
             }}
-            align="center"
           >
-            {t("Bonds")}
-          </Typography>
+            <Typography
+              variant="h1"
+              sx={{
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                marginLeft: "-1px",
+                marginRight: "10px",
+                marginTop: "-1px",
+                marginBottom: "-1px",
+                backgroundColor: primary,
+                color: ternary,
+                borderRadius: "0 8px 8px 0",
+                transform: "rotate(180deg)",
+                fontSize: "2em",
+                minHeight: "100px",
+              }}
+              align="center"
+            >
+              {t("Bonds")}
+            </Typography>
 
-          <Grid container spacing={2} sx={{ padding: "1em" }}>
-            {player.info.bonds && player.info.bonds.length > 0
-              ? player.info.bonds.map((bond, index) => (
-                  <Grid item xs={12} md={6} key={index}>
-                    <Typography variant="h4">
-                      <span
-                        style={{
-                          fontWeight: "bolder",
-                          fontSize: "1.6em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        <span style={{ wordWrap: "break-word" }}>
-                          {bond.name + ": "}
+            <Grid container spacing={2} sx={{ padding: "1em" }}>
+              {player.info.bonds && player.info.bonds.length > 0
+                ? player.info.bonds.map((bond, index) => (
+                    <Grid item xs={12} md={6} key={index}>
+                      <Typography variant="h4">
+                        <span
+                          style={{
+                            fontWeight: "bolder",
+                            fontSize: "1.6em",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          <span style={{ wordWrap: "break-word" }}>
+                            {bond.name + ": "}
+                          </span>
                         </span>
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "1.4em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {/* BOND TYPES
+                        <span
+                          style={{
+                            fontSize: "1.4em",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          {/* BOND TYPES
                     Admiration
                     Loyality
                     Affection
                     Inferiority
                     Mistrust
                     Hatred*/}
-                        {[
-                          bond.admiration && (
-                            <span
-                              key="admiration"
-                              style={{ color: positiveColor }}
-                            >
-                              {t("Admiration")}
+                          {[
+                            bond.admiration && (
+                              <span
+                                key="admiration"
+                                style={{ color: positiveColor }}
+                              >
+                                {t("Admiration")}
+                              </span>
+                            ),
+                            bond.loyality && (
+                              <span
+                                key="loyality"
+                                style={{ color: positiveColor }}
+                              >
+                                {t("Loyality")}
+                              </span>
+                            ),
+                            bond.affection && (
+                              <span
+                                key="affection"
+                                style={{ color: positiveColor }}
+                              >
+                                {t("Affection")}
+                              </span>
+                            ),
+                            bond.inferiority && (
+                              <span
+                                key="inferiority"
+                                style={{ color: negativeColor }}
+                              >
+                                {t("Inferiority")}
+                              </span>
+                            ),
+                            bond.mistrust && (
+                              <span
+                                key="mistrust"
+                                style={{ color: negativeColor }}
+                              >
+                                {t("Mistrust")}
+                              </span>
+                            ),
+                            bond.hatred && (
+                              <span
+                                key="hatred"
+                                style={{ color: negativeColor }}
+                              >
+                                {t("Hatred")}
+                              </span>
+                            ),
+                          ]
+                            .filter(Boolean)
+                            .reduce(
+                              (acc, curr, i, arr) => [
+                                ...acc,
+                                curr,
+                                i < arr.length - 1 ? ", " : "",
+                              ],
+                              []
+                            )}
+                          {calculateBondStrength(bond) > 0 && (
+                            <span>
+                              {" "}
+                              <Typography
+                                component="span"
+                                sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
+                              >
+                                【
+                              </Typography>
+                              {FilledStarSVG}
+                              {calculateBondStrength(bond)}
+                              <Typography
+                                component="span"
+                                sx={{ mr: -0.7, fontSize: "1.2em" }}
+                              >
+                                】
+                              </Typography>
                             </span>
-                          ),
-                          bond.loyality && (
-                            <span
-                              key="loyality"
-                              style={{ color: positiveColor }}
-                            >
-                              {t("Loyality")}
-                            </span>
-                          ),
-                          bond.affection && (
-                            <span
-                              key="affection"
-                              style={{ color: positiveColor }}
-                            >
-                              {t("Affection")}
-                            </span>
-                          ),
-                          bond.inferiority && (
-                            <span
-                              key="inferiority"
-                              style={{ color: negativeColor }}
-                            >
-                              {t("Inferiority")}
-                            </span>
-                          ),
-                          bond.mistrust && (
-                            <span
-                              key="mistrust"
-                              style={{ color: negativeColor }}
-                            >
-                              {t("Mistrust")}
-                            </span>
-                          ),
-                          bond.hatred && (
-                            <span key="hatred" style={{ color: negativeColor }}>
-                              {t("Hatred")}
-                            </span>
-                          ),
-                        ]
-                          .filter(Boolean)
-                          .reduce(
-                            (acc, curr, i, arr) => [
-                              ...acc,
-                              curr,
-                              i < arr.length - 1 ? ", " : "",
-                            ],
-                            []
                           )}
-                        {calculateBondStrength(bond) > 0 && (
-                          <span>
-                            {" "}
-                            <Typography
-                              component="span"
-                              sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
-                            >
-                              【
-                            </Typography>
-                            {FilledStarSVG}
-                            {calculateBondStrength(bond)}
-                            <Typography
-                              component="span"
-                              sx={{ mr: -0.7, fontSize: "1.2em" }}
-                            >
-                              】
-                            </Typography>
-                          </span>
-                        )}
-                      </span>
-                    </Typography>
-                  </Grid>
-                ))
-              : null}
-          </Grid>
-        </Paper>
+                        </span>
+                      </Typography>
+                    </Grid>
+                  ))
+                : null}
+            </Grid>
+          </Paper>
+        </>
       )}
     </>
   );

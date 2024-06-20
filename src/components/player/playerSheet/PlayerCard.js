@@ -154,11 +154,13 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
 
   /* player.shields.isEquipped (should be only one) */
-  const equippedShield = player.shields?.find((shield) => shield.isEquipped) || null;
-  
+  const equippedShield =
+    player.shields?.find((shield) => shield.isEquipped) || null;
+
   /* player.weapons.isEquipped (can be more than one) */
-  const equippedWeapons = player.weapons?.filter((weapon) => weapon.isEquipped) || [];
-  
+  const equippedWeapons =
+    player.weapons?.filter((weapon) => weapon.isEquipped) || [];
+
   // Calculate DEF and MDEF
   const currDef =
     (equippedArmor !== null
@@ -168,30 +170,30 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
       : currDex) +
     (equippedShield !== null ? equippedShield.def : 0) +
     (player.modifiers?.def || 0) +
-    (equippedArmor !== null ? (equippedArmor.defModifier || 0) : 0) +
-    (equippedShield !== null ? (equippedShield.defModifier || 0) : 0) +
+    (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
+    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.defModifier || 0),
       0
     );
-  
+
   const currMDef =
     (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
     (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0) +
-    (equippedArmor !== null ? (equippedArmor.mDefModifier || 0) : 0) +
-    (equippedShield !== null ? (equippedShield.mDefModifier || 0) : 0) +
+    (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
+    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
       0
     );
-  
+
   // Initialize INIT to 0
   const currInit =
     (equippedArmor !== null ? equippedArmor.init : 0) +
-    (player.modifiers?.init || 0)+
-    (equippedArmor !== null ? (equippedArmor.initModifier || 0) : 0) +
-    (equippedShield !== null ? (equippedShield.initModifier || 0) : 0);
+    (player.modifiers?.init || 0) +
+    (equippedArmor !== null ? equippedArmor.initModifier || 0 : 0) +
+    (equippedShield !== null ? equippedShield.initModifier || 0 : 0);
 
   let crisis =
     player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
@@ -316,7 +318,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
 
                 <span style={{ fontFamily: "'Antonio', sans-serif" }}>
                   {" "}
-                  {( currInit > 0 ? "+" : "" ) + currInit}
+                  {(currInit > 0 ? "+" : "") + currInit}
                 </span>
               </span>
             </div>
@@ -477,7 +479,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {player.info.identity}
+                    {player.info.identity.length > 40
+                      ? player.info.identity.slice(0, 40) + "..."
+                      : player.info.identity}
                   </span>
                 </Typography>
               </Grid>
@@ -498,7 +502,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {t(player.info.theme)}
+                    {t(player.info.theme).length > 20
+                      ? t(player.info.theme).slice(0, 20) + "..."
+                      : t(player.info.theme)}
                   </span>
                 </Typography>
               </Grid>
@@ -519,7 +525,9 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
                       textTransform: "uppercase",
                     }}
                   >
-                    {player.info.origin}
+                    {player.info.origin.length > 20
+                      ? player.info.origin.slice(0, 20) + "..."
+                      : player.info.origin}
                   </span>
                 </Typography>
               </Grid>
