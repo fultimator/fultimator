@@ -16,7 +16,19 @@ export const testUsers =
     "JhUKkYOAJfVmrCBb93tRgPgW1J62",
     "rw1nK9uXvoMTEVDpcLJYiV7QSL53",
     "nHsW3KRgdEOGvihDLD7I4unsgnZ2",
-    "yfm0s6xHpKb5ks5dvO7Wh7tWd8V2"
+    "yfm0s6xHpKb5ks5dvO7Wh7tWd8V2",
+    "eGaKufBWmPSXm4pHmJ4QxC2CuWu2",
+    "q7S9gRBwiDXDx3P8kt43KE36dob2",
+    "UWKwBzi6ZLP25abCsHemGSShgtC3",
+    "wH8RlIWRxPWkWSRdGIx8qfPlnW92",
+    "JvCiXKDRthhCwvAxAE6kuXhrGx12",
+    "Osh2uJcn0MXAWOMype3ULZUcBZg2",
+    "wKMpkuZfrMMDiYgav43eQlwnq1a2",
+    "otsAN8fTrYZFVRo1cv78sqNzWpH3",
+    "wkZuwC5xtwhBqZIJAyvVH0SUHTS2",
+    "gpUdRLMYPaUuGGjCzeURbxinmOq2",
+    "rBERgI7u5jM0L4BCxctLswjqL6b2",
+    "tSvQKuGu1Oa86Oc4bZKKkfVhEK63"
 ];
 
 export const moderators =
