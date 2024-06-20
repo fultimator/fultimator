@@ -25,10 +25,26 @@ export default function PlayerSkills({ player, setPlayer }) {
 
   /* All skills with currentLvl > 0 from all classes */
   const allSkills = player.classes
-    .map((c) => c.skills)
-    .flat()
+    .flatMap((c) =>
+      c.skills
+        .concat(
+          c.heroic && c.heroic.name !== ""
+            ? [
+                {
+                  skillName: c.heroic.name,
+                  description: c.heroic.description,
+                  currentLvl: 1,
+                  className: c.name,
+                },
+              ]
+            : []
+        )
+        .map((skill) => ({ ...skill, className: c.name }))
+    )
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
+
+  console.log(allSkills);
 
   const handleOpenModal = (skill) => {
     setSelectedSkill(skill);
@@ -157,8 +173,27 @@ export default function PlayerSkills({ player, setPlayer }) {
                 transform: "translate(-50%, -50%)",
               }}
             >
-              <Typography variant="h4">
+              <Typography
+                variant="h4"
+                sx={{ textTransform: "uppercase" }}
+                fontWeight={"bold"}
+              >
                 {selectedSkill && selectedSkill.skillName}
+                {" - "}
+                {selectedSkill && selectedSkill.className} {" -  "}{" "}
+                <Typography
+                  component="span"
+                  sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
+                >
+                  【
+                </Typography>
+                {selectedSkill && t("SL") + " " + selectedSkill.currentLvl}
+                <Typography
+                  component="span"
+                  sx={{ mr: -0.7, fontSize: "1.2em" }}
+                >
+                  】
+                </Typography>
               </Typography>
               <ReactMarkdown>
                 {selectedSkill && selectedSkill.description}

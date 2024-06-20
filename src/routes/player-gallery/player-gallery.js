@@ -24,6 +24,7 @@ import {
   TextField,
   Button,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -223,13 +224,15 @@ function Personal({ user }) {
 
   return (
     <>
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        <Typography sx={{ color: "error.main" }}>
-          {t(
-            "Player Creator is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Player created could be deleted at any time for testing purposes."
-          )}
-        </Typography>
-      </Paper>
+      <Alert
+        variant="filled"
+        severity="warning"
+        sx={{ marginBottom: 3 }}
+      >
+        {t(
+          "Character Creator is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
+        )}
+      </Alert>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
           <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">

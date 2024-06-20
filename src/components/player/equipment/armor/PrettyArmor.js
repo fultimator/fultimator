@@ -81,6 +81,9 @@ export default function PrettyArmor({ armor, showActions }) {
                     background: `linear-gradient(to right, ${ternary}, ${white})`,
                     borderBottom: `1px solid ${secondary}`,
                     padding: "5px",
+                    "& .MuiTypography-root": {
+                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
+                    },
                   }}
                 >
                   <Grid
@@ -98,12 +101,14 @@ export default function PrettyArmor({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + parseInt(armor.def + (armor.defModifier || 0)) : ""}
+                      {armor.category === "Shield"
+                        ? "+" + parseInt(armor.def + (armor.defModifier || 0))
+                        : ""}
                       {armor.category === "Armor" && armor.martial
                         ? armor.def + (armor.defModifier || 0)
                         : ""}
                       {armor.category === "Armor" && !armor.martial
-                        ? (armor.def + (armor.defModifier || 0)) === 0
+                        ? armor.def + (armor.defModifier || 0) === 0
                           ? t("DEX die")
                           : `${t("DEX die")} + ${
                               armor.def + (armor.defModifier || 0)
@@ -113,9 +118,11 @@ export default function PrettyArmor({ armor, showActions }) {
                   </Grid>
                   <Grid item xs={2}>
                     <Typography fontWeight="bold" textAlign="center">
-                      {armor.category === "Shield" ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0)) : ""}
+                      {armor.category === "Shield"
+                        ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0))
+                        : ""}
                       {armor.category === "Armor"
-                        ? (armor.mdef + (armor.mDefModifier || 0)) === 0
+                        ? armor.mdef + (armor.mDefModifier || 0) === 0
                           ? t("INS die")
                           : `${t("INS die")} + ${
                               armor.mdef + (armor.mDefModifier || 0)
@@ -128,7 +135,7 @@ export default function PrettyArmor({ armor, showActions }) {
                       <Typography fontWeight="bold" textAlign="center">
                         {armor.category === "Armor" ||
                         armor.category === "Shield"
-                          ? (armor.init + (armor.initModifier || 0)) === 0
+                          ? armor.init + (armor.initModifier || 0) === 0
                             ? "-"
                             : (armor.init + (armor.initModifier || 0) > 0
                                 ? "+"
@@ -147,13 +154,16 @@ export default function PrettyArmor({ armor, showActions }) {
                   sx={{
                     background: "transparent",
                     padding: "5px",
+                    px: 1,
+                    py: 1,
                   }}
                 >
-                  <Typography>
+                  <Typography fontSize={{ xs: "0.7rem", sm: "1.0rem" }}>
                     {!armor.quality && t("No Qualities")}{" "}
                     <StyledMarkdown
                       allowedElements={["strong", "em"]}
                       unwrapDisallowed={true}
+                      sx={{ fontSize: { xs: "0.9rem", sm: "1.1rem" } }}
                     >
                       {armor.quality}
                     </StyledMarkdown>

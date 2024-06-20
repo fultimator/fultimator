@@ -113,8 +113,7 @@ export default function PlayerSpells({ player, setPlayer }) {
 
   /* All spells from all classes */
   const allSpells = player.classes
-    .map((c) => c.spells)
-    .flat()
+    .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
     .filter((spell) => spell !== undefined)
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -406,8 +405,8 @@ export default function PlayerSpells({ player, setPlayer }) {
                 transform: "translate(-50%, -50%)",
               }}
             >
-              <Typography variant="h4">
-                {selectedSpell && selectedSpell.name}
+              <Typography variant="h4" sx={{ textTransform: "uppercase" }} fontWeight={"bold"}>
+                {selectedSpell && selectedSpell.name}{" - "}{selectedSpell && selectedSpell.className}
               </Typography>
               <ReactMarkdown>
                 {selectedSpell && selectedSpell.description}

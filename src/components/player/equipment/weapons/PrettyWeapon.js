@@ -105,7 +105,11 @@ export default function PrettyWeapon({ weapon, showActions }) {
                         attributes[weapon.att2].shortcaps
                       }`}
                       <CloseBracket />
-                      {weapon.prec > 0 ? `+${weapon.prec}` : weapon.prec < 0 ? `${weapon.prec}` : ""}
+                      {weapon.prec > 0
+                        ? `+${weapon.prec}`
+                        : weapon.prec < 0
+                        ? `${weapon.prec}`
+                        : ""}
                     </Typography>
                   </Grid>
 
@@ -133,7 +137,9 @@ export default function PrettyWeapon({ weapon, showActions }) {
                   }}
                 >
                   <Grid item xs={3}>
-                    <Typography fontWeight="bold">{t(weapon.category)}</Typography>
+                    <Typography fontWeight="bold">
+                      {t(weapon.category)}
+                    </Typography>
                   </Grid>
                   <Grid item xs={1}>
                     <Diamond color={primary} />
@@ -157,6 +163,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
               </Grid>
             </Grid>
             <Typography
+              fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
               sx={{
                 background: "transparent",
                 borderBottom: `1px solid ${secondary}`,

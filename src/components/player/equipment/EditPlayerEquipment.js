@@ -14,6 +14,7 @@ import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerArmor from "./armor/PlayerArmor";
+import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -210,17 +211,29 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
               </Grid>
               <Grid container justifyContent="center" spacing={2}>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained" onClick={handleOpenNewWeapon}>
+                  <Button
+                    variant="contained"
+                    onClick={handleOpenNewWeapon}
+                    startIcon={<MeleeIcon />}
+                  >
                     {t("Add Weapon")}
                   </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained" onClick={handleOpenNewArmor}>
+                  <Button
+                    variant="contained"
+                    onClick={handleOpenNewArmor}
+                    startIcon={<ArmorIcon />}
+                  >
                     {t("Add Armor")}
                   </Button>
                 </Grid>
                 <Grid item xs={6} sm={3} container justifyContent="center">
-                  <Button variant="contained" onClick={handleOpenNewShield}>
+                  <Button
+                    variant="contained"
+                    onClick={handleOpenNewShield}
+                    startIcon={<ShieldIcon />}
+                  >
                     {t("Add Shield")}
                   </Button>
                 </Grid>
@@ -230,6 +243,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     onClick={() => {
                       alert("Accessories not yet implemented");
                     }}
+                    startIcon={<AccessoryIcon />}
                   >
                     {t("Add Accessory")}
                   </Button>

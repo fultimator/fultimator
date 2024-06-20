@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Typography, IconButton } from "@mui/material";
+import { Typography, IconButton, Tooltip } from "@mui/material";
 import { Add, Edit, Remove } from "@mui/icons-material";
+import { useTranslate } from "../../translation/translate";
 
 // Include your SVGs here as React components
 const EmptyStarSVG = (
@@ -64,6 +65,8 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
+  const { t } = useTranslate();
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768); // Adjust the threshold as per your design
@@ -118,30 +121,38 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         )}
         {isEditMode && !isHeroicSkill && (
           <>
+            <Tooltip title={t("Decrease Level")}>
             <IconButton
               size="small"
               onClick={onDecrease}
               disabled={currentLvl <= 0}
             >
-              <Remove style={{ color: "white" }} />
+              <Remove style={{ color: currentLvl <= 0 ? "gray" : "white" }} />
             </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Increase Level")}>
             <IconButton
               size="small"
               onClick={onIncrease}
               disabled={currentLvl >= maxLvl}
             >
-              <Add style={{ color: "white" }} />
+              <Add style={{ color: currentLvl >= maxLvl ? "gray" : "white" }} />
             </IconButton>
-            <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "white" }} />
-            </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Edit Skill")}>
+              <IconButton size="small" onClick={onEdit}>
+                <Edit style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
           </>
         )}
         {isEditMode && isHeroicSkill && (
           <>
-            <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "white" }} />
-            </IconButton>
+            <Tooltip title={t("Edit Heroic Skill")}>
+              <IconButton size="small" onClick={onEdit}>
+                <Edit style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
           </>
         )}
       </div>

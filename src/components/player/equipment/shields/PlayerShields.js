@@ -8,14 +8,12 @@ import {
   AccordionDetails,
   IconButton,
   Tooltip,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
 } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyArmor from "../armor/PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";
+import { Equip } from "../../../icons";
 
 export default function PlayerShields({
   player,
@@ -27,6 +25,7 @@ export default function PlayerShields({
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const ternary = theme.palette.ternary.main;
 
   const [expanded, setExpanded] = useState(false);
 
@@ -108,7 +107,7 @@ export default function PlayerShields({
       updatedShield[index].isEquipped = checked;
       onEquipShield(updatedShield);
     } else {
-      alert(t('You cannot equip this shield as no hands are free.'));
+      alert(t("You cannot equip this shield as no hands are free."));
     }
   };
 
@@ -161,37 +160,9 @@ export default function PlayerShields({
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {shields.map((shield, index) => (
             <React.Fragment key={index}>
-              <Grid item container xs={12} alignItems="center">
+              <Grid item container xs={12} alignItems="center" spacing={1}>
                 {/* Updated grid item */}
-                <Grid item xs={1}>
-                  {checkIfEquippable(shield) ? (
-                    <FormGroup>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={shield.isEquipped}
-                            onChange={(e) =>
-                              handleEquipShields(index, e.target.checked)
-                            }
-                          />
-                        }
-                        label={
-                          <Typography align="center">
-                            {t("Equip Shield")}
-                          </Typography>
-                        }
-                        labelPlacement="bottom"
-                      />
-                    </FormGroup>
-                  ) : (
-                    <Tooltip title={t("Not Equippable")}>
-                      <IconButton>
-                        <Error color="error" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={11}>
                   <PrettyArmor armor={shield} />
                 </Grid>
                 <Grid
@@ -208,13 +179,32 @@ export default function PlayerShields({
                     </IconButton>
                   </Grid>
                   <Grid item xs={12}>
-                    {shield.equipped && (
-                      <Typography
-                        variant="h5"
-                        sx={{ transform: "rotate(90deg)", marginRight: "20px" }}
+                    {checkIfEquippable(shield) ? (
+                      <Tooltip
+                        title={
+                          shield.isEquipped
+                            ? t("Unequip Shield")
+                            : t("Equip Shield")
+                        }
                       >
-                        {t("Equipped")}
-                      </Typography>
+                        <IconButton
+                          onClick={() =>
+                            handleEquipShields(index, !shield.isEquipped)
+                          }
+                          sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
+                        >
+                          <Equip
+                            color={shield.isEquipped ? "green" : ternary}
+                            strokeColor={"#000"}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title={t("Not Equippable")}>
+                        <IconButton>
+                          <Error color="error" />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </Grid>
                 </Grid>
