@@ -8,6 +8,7 @@ import {
   Checkbox,
   FormControlLabel,
   Box,
+  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
@@ -18,26 +19,6 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
-
-  /* Bond example:
-        {
-            name: "",
-            admiration: false,
-            loyality: false,
-            affection: false,
-            inferiority: false,
-            mistrust: false,
-            hatred: false,
-        }
-
-        if admiration, then not inferiority and vice versa
-        if loyality, then not mistrust and vice versa
-        if affection, then not hatred and vice versa
-
-        Display the name of the bond and add 6 checkboxes to add the 6 types of bonds.
-
-        There can be a maximum of 6 bonds for a player.
-    */
 
   const handleBondChange = (index, key) => (event) => {
     const updatedBonds = player.info.bonds.map((bond, i) => {
@@ -173,7 +154,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Admiration")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Admiration")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -185,7 +170,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Loyality")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Loyality")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -197,7 +186,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Affection")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Affection")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -209,7 +202,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Inferiority")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Inferiority")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -221,7 +218,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Mistrust")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Mistrust")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                   <Grid item xs={4}>
@@ -233,7 +234,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                           disabled={!isEditMode}
                         />
                       }
-                      label={t("Hatred")}
+                      label={
+                        <Typography sx={{ fontSize: '14px' }}>
+                          {t("Hatred")}
+                        </Typography>
+                      }
                     />
                   </Grid>
                 </Grid>

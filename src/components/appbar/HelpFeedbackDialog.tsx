@@ -48,6 +48,11 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       return;
     }
 
+    if (!message.trim()) {
+      setErrorMessage("Message is required");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage("");
 

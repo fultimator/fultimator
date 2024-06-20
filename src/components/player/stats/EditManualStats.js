@@ -79,7 +79,7 @@ export default function EditManualStats({
             showIconButton={false}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max HP Modifier")}
             type="number"
@@ -95,7 +95,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max MP Modifier")}
             type="number"
@@ -111,7 +111,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max IP Modifier")}
             type="number"
@@ -127,7 +127,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max DEF Modifier")}
             type="number"
@@ -147,7 +147,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max MDEF Modifier")}
             type="number"
@@ -167,7 +167,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Max INIT Modifier")}
             type="number"
@@ -187,7 +187,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Melee Accuracy Modifier")}
             type="number"
@@ -207,7 +207,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Ranged Accuracy Modifier")}
             type="number"
@@ -227,7 +227,7 @@ export default function EditManualStats({
             }}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label={t("Magic Precision Modifier")}
             type="number"

@@ -124,7 +124,7 @@ function Personal({ user }) {
           open={isDialogOpen}
           onClose={handleDialogClose}
           userEmail={user.email}
-          userUUID={user.uuid}
+          userUUID={user.uid}
           title={t("Apply for Test")}
         />
       </>
