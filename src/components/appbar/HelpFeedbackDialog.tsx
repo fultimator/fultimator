@@ -14,6 +14,7 @@ interface HelpFeedbackDialogProps {
   onClose: () => void;
   userEmail: string;
   userUUID: string;
+  title: string;
 }
 
 const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
@@ -21,6 +22,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   onClose,
   userEmail,
   userUUID,
+  title,
 }) => {
   const [discordAccount, setDiscordAccount] = useState("");
   const [message, setMessage] = useState("");
@@ -104,7 +106,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle sx={{ fontSize: "1.4rem" }}>Help & Feedback</DialogTitle>
+      <DialogTitle sx={{ fontSize: "1.4rem" }}>{title}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus

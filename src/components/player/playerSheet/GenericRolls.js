@@ -32,13 +32,6 @@ export default function GenericRolls({ player, isEditMode }) {
 
   const handleClose = () => {
     setOpen(false);
-    setAttribute1("");
-    setAttribute2("");
-    setResult1(null);
-    setResult2(null);
-    setSumResult(null);
-    setIsCritFailure(false);
-    setIsCritSuccess(false);
   };
 
   const handleRollDice = () => {

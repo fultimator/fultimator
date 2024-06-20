@@ -12,6 +12,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import React, { useState } from "react";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
+import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 
 import {
   IconButton,
@@ -25,6 +26,7 @@ import {
   Button,
   InputAdornment,
   Alert,
+  Box,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -68,6 +70,7 @@ function Personal({ user }) {
   const { t } = useTranslate();
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
 
   const canAccessTest =
     testUsers.includes(user.uid) || moderators.includes(user.uid);
@@ -78,11 +81,53 @@ function Personal({ user }) {
     idField: "id",
   });
 
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+
   if (!canAccessTest) {
     return (
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        {t("You are not authorized to access this page.")}
-      </Paper>
+      <>
+        <Paper
+          elevation={3}
+          sx={{ marginBottom: 5, padding: 4, textAlign: "center" }}
+        >
+          <Grid container direction="column" alignItems="center" spacing={3}>
+            <Grid item>
+              <Typography variant="h2" gutterBottom>
+                Join the Alpha Test!
+              </Typography>
+              <Typography variant="body1">
+                Be among the first to experience our Character Designer.
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant="body2" color="textSecondary">
+                Sign up now for exclusive early access.
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={() => setIsDialogOpen(true)}
+                >
+                  Apply for Test
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
+        <HelpFeedbackDialog
+          open={isDialogOpen}
+          onClose={handleDialogClose}
+          userEmail={user.email}
+          userUUID={user.uuid}
+          title={t("Apply for Test")}
+        />
+      </>
     );
   }
 
@@ -195,7 +240,7 @@ function Personal({ user }) {
 
       addDoc(ref, data)
         .then(function (docRef) {
-          window.location.href = `/player-gallery/${docRef.id}`;
+          window.location.href = `/pc-gallery/${docRef.id}`;
         })
         .catch(function (error) {
           console.error("Error adding document: ", error);
@@ -217,18 +262,14 @@ function Personal({ user }) {
 
   const sharePlayer = async (id) => {
     const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
-    const fullUrl = `${baseUrl}/player-gallery/${id}`;
+    const fullUrl = `${baseUrl}/pc-gallery/${id}`;
     await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
 
   return (
     <>
-      <Alert
-        variant="filled"
-        severity="warning"
-        sx={{ marginBottom: 3 }}
-      >
+      <Alert variant="filled" severity="warning" sx={{ marginBottom: 3 }}>
         {t(
           "Character Designer is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
         )}
@@ -310,7 +351,7 @@ function Personal({ user }) {
               <Tooltip title={t("Edit")}>
                 <IconButton
                   component={RouterLink}
-                  to={`/player-gallery/${player.id}`}
+                  to={`/pc-gallery/${player.id}`}
                 >
                   <Edit />
                 </IconButton>

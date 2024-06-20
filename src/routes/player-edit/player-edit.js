@@ -7,7 +7,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
-  Paper,
   Button,
   Drawer,
   List,
@@ -51,6 +50,7 @@ import { Save } from "@mui/icons-material";
 import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
+import { useNavigate } from 'react-router-dom';
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -78,6 +78,8 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [battleMode, setBattleMode] = useState(false);
+
+  const navigate = useNavigate();
 
   // Effect to update temporary Player state and check for unsaved changes
   useEffect(() => {
@@ -189,14 +191,10 @@ export default function PlayerEdit() {
   }
 
   if (!canAccessTest) {
-    return (
-      <Layout>
-        <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-          {t("You are not authorized to access this page.")}
-        </Paper>
-      </Layout>
-    );
+    navigate('/pc-gallery');
+    return null;
   }
+
 
   return (
     <Layout>
@@ -281,7 +279,7 @@ export default function PlayerEdit() {
           {battleMode && (
             <>
               <Divider sx={{ my: 1 }} />
-              <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} />
+              <PlayerEquipment player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
               <Divider sx={{ my: 1 }} />
               <PlayerSpells player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
               <Divider sx={{ my: 1 }} />

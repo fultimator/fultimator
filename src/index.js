@@ -46,8 +46,8 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/player-gallery/:playerId" element={<PlayerEdit />} />
-            <Route path="/player-gallery" element={<PlayerGallery />} />
+            <Route path="/pc-gallery/:playerId" element={<PlayerEdit />} />
+            <Route path="/pc-gallery" element={<PlayerGallery />} />
             <Route path="/npc-gallery/:npcId" element={<NpcEdit />} />
             <Route path="/npc-gallery" element={<NpcGallery />} />
             <Route path="/npc-compedium" element={<NpcCompedium />} />

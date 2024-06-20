@@ -29,7 +29,7 @@ function Home() {
   const mediaItems = [
     {
       image: character_designer,
-      link: "/player-gallery",
+      link: "/pc-gallery",
       hoverKey: "character_designer",
       canAccess: canAccessTest,
     },
