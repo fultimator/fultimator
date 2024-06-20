@@ -230,7 +230,7 @@ function Personal({ user }) {
         sx={{ marginBottom: 3 }}
       >
         {t(
-          "Character Creator is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
+          "Character Designer is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
         )}
       </Alert>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>

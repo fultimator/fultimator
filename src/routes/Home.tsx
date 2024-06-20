@@ -10,9 +10,9 @@ import { testUsers, moderators } from "../libs/userGroups";
 import adversary_compedium from "./adversary_compedium.webp";
 import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
-import player_designer from "./custom_class_no_title.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
+import character_designer from "./character_designer_alpha_1_0.webp";
 
 function Home() {
   const navigate = useNavigate();
@@ -28,9 +28,9 @@ function Home() {
 
   const mediaItems = [
     {
-      image: player_designer,
+      image: character_designer,
       link: "/player-gallery",
-      hoverKey: "player_designer",
+      hoverKey: "character_designer",
       canAccess: canAccessTest,
     },
     {
