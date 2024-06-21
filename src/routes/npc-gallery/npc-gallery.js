@@ -144,14 +144,15 @@ function Personal({ user }) {
       data.published = false;
 
       const ref = collection(firestore, "npc-personal");
-
-      addDoc(ref, data)
-        .then(function (docRef) {
-          window.location.href = `/npc-gallery/${docRef.id}`;
-        })
-        .catch(function (error) {
-          console.error("Error adding document: ", error);
-        });
+      if (window.confirm("Are you sure you want to copy?")) {
+        addDoc(ref, data)
+          .then(function (docRef) {
+            window.location.href = `/npc-gallery/${docRef.id}`;
+          })
+          .catch(function (error) {
+            console.error("Error adding document: ", error);
+          });
+      }
     };
   };
 

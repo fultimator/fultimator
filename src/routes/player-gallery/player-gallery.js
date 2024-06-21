@@ -161,15 +161,15 @@ function Personal({ user }) {
 
   const filteredList = personalList
     ? personalList.filter((item) => {
-        // Filter based on name
-        if (
-          name !== "" &&
-          !item.name.toLowerCase().includes(name.toLowerCase())
-        )
-          return false;
+      // Filter based on name
+      if (
+        name !== "" &&
+        !item.name.toLowerCase().includes(name.toLowerCase())
+      )
+        return false;
 
-        return true;
-      })
+      return true;
+    })
     : [];
 
   const addPlayer = async function () {
@@ -255,14 +255,15 @@ function Personal({ user }) {
       data.published = false;
 
       const ref = collection(firestore, "player-personal");
-
-      addDoc(ref, data)
-        .then(function (docRef) {
-          window.location.href = `/pc-gallery/${docRef.id}`;
-        })
-        .catch(function (error) {
-          console.error("Error adding document: ", error);
-        });
+      if (window.confirm("Are you sure you want to copy?")) {
+        addDoc(ref, data)
+          .then(function (docRef) {
+            window.location.href = `/pc-gallery/${docRef.id}`;
+          })
+          .catch(function (error) {
+            console.error("Error adding document: ", error);
+          });
+      }
     };
   };
 
