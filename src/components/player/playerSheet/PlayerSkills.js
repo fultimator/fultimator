@@ -181,7 +181,7 @@ export default function PlayerSkills({ player, setPlayer }) {
                 >
                   {selectedSkill && selectedSkill.skillName}
                   {" - "}
-                  {selectedSkill && selectedSkill.className} {" -  "}{" "}
+                  {selectedSkill && t(selectedSkill.className)} {" -  "}{" "}
                   <Typography
                     component="span"
                     sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}

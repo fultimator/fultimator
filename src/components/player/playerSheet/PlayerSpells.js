@@ -424,7 +424,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 >
                   {selectedSpell && selectedSpell.name}
                   {" - "}
-                  {selectedSpell && selectedSpell.className}
+                  {selectedSpell && t(selectedSpell.className)}
                 </Typography>
                 <ReactMarkdown>
                   {selectedSpell && selectedSpell.description}
