@@ -49,7 +49,6 @@ export const testUsers =
     "jX7t9oBeEvU1Onkt9hKfQS35xh23",
     "EZcuP28qRuZJpiov7y5O3iQRB2t1",
     "fgqQzG8z8gcq2zO5hyPIxarW5PY2",
-    "fgqQzG8z8gcq2zO5hyPIxarW5PY2",
     "pzTdyP61EPbPQJ5AadnbO6rqkKq1",
     "9qD5uHmHV2bOPu6XCgWQwXd2faB2",
     "GZJam8xIgzVPbFvtbJuzXgX2amE2",
