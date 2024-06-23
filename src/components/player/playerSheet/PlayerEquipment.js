@@ -308,6 +308,7 @@ export default function PlayerEquipment({
                     borderColor: secondary,
                     display: "flex",
                     flexDirection: "column",
+                    boxShadow: "none",
                   }
                 : {
                     borderRadius: "8px",

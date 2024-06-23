@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 
-export default function PlayerNotes({ player, isEditMode }) {
+export default function PlayerNotes({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -18,13 +18,24 @@ export default function PlayerNotes({ player, isEditMode }) {
           <Divider sx={{ my: 1 }} />
           <Paper
             elevation={3}
-            sx={{
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              display: "flex",
-              flexDirection: "column", // Ensure the children are in column layout
-            }}
+            sx={
+              isCharacterSheet
+                ? {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column", // Ensure the children are in column layout
+                    boxShadow: "none",
+                  }
+                : {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column", // Ensure the children are in column layout
+                  }
+            }
           >
             <Typography
               variant="h1"

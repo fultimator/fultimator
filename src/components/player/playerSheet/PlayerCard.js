@@ -354,11 +354,20 @@ export default function PlayerCard({
   return (
     <Card
       elevation={3}
-      sx={{
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
+      sx={
+        isCharacterSheet
+          ? {
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              boxShadow: "none",
+            }
+          : {
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }
+      }
     >
       <Grid container>
         <Grid

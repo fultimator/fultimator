@@ -24,6 +24,7 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
                 borderColor: secondary,
                 display: "flex",
                 flexDirection: "column",
+                boxShadow: "none",
               }
             : {
                 borderRadius: "8px",

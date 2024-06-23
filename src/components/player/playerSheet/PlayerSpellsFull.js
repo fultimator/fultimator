@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import SpellDefault from "../spells/SpellDefault";
 
-export default function PlayerSpellsFull({ player, isEditMode }) {
+export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -22,14 +22,26 @@ export default function PlayerSpellsFull({ player, isEditMode }) {
                 <Grid item xs={12} md={6} key={index}>
                   <Paper
                     elevation={3}
-                    sx={{
-                      borderRadius: "8px",
-                      border: "2px solid",
-                      borderColor: secondary,
-                      display: "flex",
-                      flexDirection: "column",
-                      marginBottom: "1em",
-                    }}
+                    sx={
+                      isCharacterSheet
+                        ? {
+                            borderRadius: "8px",
+                            border: "2px solid",
+                            borderColor: secondary,
+                            display: "flex",
+                            flexDirection: "column",
+                            marginBottom: "1em",
+                            boxShadow: "none",
+                          }
+                        : {
+                            borderRadius: "8px",
+                            border: "2px solid",
+                            borderColor: secondary,
+                            display: "flex",
+                            flexDirection: "column",
+                            marginBottom: "1em",
+                          }
+                    }
                   >
                     <Typography
                       variant="h1"

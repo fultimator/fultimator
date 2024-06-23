@@ -110,7 +110,7 @@ export default function CharacterSheet() {
             <PlayerCard player={player} isCharacterSheet={true} characterImage={player.info.imgurl} />
           </Grid>
           <Grid item xs={12}>
-            <PlayerNumbers player={player} />
+            <PlayerNumbers player={player} isCharacterSheet={true} />
           </Grid>
           <Grid item xs={12}>
             <PlayerTraits player={player} isCharacterSheet={true} />
@@ -122,16 +122,16 @@ export default function CharacterSheet() {
             <PlayerEquipment player={player} isCharacterSheet={true} />
           </Grid>
           <Grid item xs={12}>
-            <PlayerNotes player={player} />
+            <PlayerNotes player={player}  isCharacterSheet={true} />
           </Grid>
         </Grid>
         <Grid container item xs={12} md={6} spacing={2}>
           <Grid item xs={12}>
-            <PlayerClasses player={player} />
+            <PlayerClasses player={player}  isCharacterSheet={true} />
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <PlayerSpellsFull player={player} />
+          <PlayerSpellsFull player={player}  isCharacterSheet={true} />
         </Grid>
         <Grid container item xs={12}>
           <Grid item xs={4}>

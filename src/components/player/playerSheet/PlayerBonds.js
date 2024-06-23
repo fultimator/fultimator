@@ -57,6 +57,7 @@ export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
                     borderColor: secondary,
                     display: "flex",
                     flexDirection: "column",
+                    boxShadow: "none"
                   }
                 : {
                     borderRadius: "8px",

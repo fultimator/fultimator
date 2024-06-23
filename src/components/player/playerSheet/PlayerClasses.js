@@ -7,7 +7,7 @@ import CustomHeader3 from "../../common/CustomHeader3";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 
-export default function PlayerClasses({ player, isEditMode }) {
+export default function PlayerClasses({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -26,15 +26,28 @@ export default function PlayerClasses({ player, isEditMode }) {
             <Paper
               key={index}
               elevation={3}
-              sx={{
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-                display: "flex",
-                flexDirection: "column",
-                marginBottom: "1em",
-                paddingBottom: "1em",
-              }}
+              sx={
+                isCharacterSheet
+                  ? {
+                      borderRadius: "8px",
+                      border: "2px solid",
+                      borderColor: secondary,
+                      display: "flex",
+                      flexDirection: "column",
+                      marginBottom: "1em",
+                      paddingBottom: "1em",
+                      boxShadow: "none",
+                    }
+                  : {
+                      borderRadius: "8px",
+                      border: "2px solid",
+                      borderColor: secondary,
+                      display: "flex",
+                      flexDirection: "column",
+                      marginBottom: "1em",
+                      paddingBottom: "1em",
+                    }
+              }
             >
               <Typography
                 variant="h1"
@@ -181,7 +194,7 @@ export default function PlayerClasses({ player, isEditMode }) {
                 ))}
               {c.lvl === 10 && (
                 <>
-                  <Grid item xs={12} sx={{marginTop: "1em"}}>
+                  <Grid item xs={12} sx={{ marginTop: "1em" }}>
                     <CustomHeader2
                       headerText={t("Heroic Skill")}
                       //buttonText={t("Edit Benefits")}
