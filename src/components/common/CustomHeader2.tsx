@@ -1,6 +1,5 @@
 import React from "react";
 import { Typography, Button } from "@mui/material";
-import customHeader2gb from "../customHeader2bg.png";
 import { useTheme } from '@mui/system';
 
 interface CustomHeaderProps {
