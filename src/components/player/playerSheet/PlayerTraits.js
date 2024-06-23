@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 
-export default function PlayerTraits({ player, isEditMode }) {
+export default function PlayerTraits({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -16,32 +16,59 @@ export default function PlayerTraits({ player, isEditMode }) {
       <Divider sx={{ my: 1 }} />
       <Paper
         elevation={3}
-        sx={{
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          display: "flex",
-        }}
+        sx={
+          isCharacterSheet
+            ? {
+                borderRadius: "8px",
+                border: "2px solid",
+                borderColor: secondary,
+                display: "flex",
+                flexDirection: "column",
+              }
+            : {
+                borderRadius: "8px",
+                border: "2px solid",
+                borderColor: secondary,
+                display: "flex",
+              }
+        }
       >
-        <Typography
-          variant="h1"
-          sx={{
-            writingMode: "vertical-lr",
-            textTransform: "uppercase",
-            marginLeft: "-1px",
-            marginRight: "10px",
-            marginTop: "-1px",
-            marginBottom: "-1px",
-            backgroundColor: primary,
-            color: ternary,
-            borderRadius: "0 8px 8px 0",
-            transform: "rotate(180deg)",
-            fontSize: "2em",
-          }}
-          align="center"
-        >
-          {t("Traits")}
-        </Typography>
+        {isCharacterSheet ? (
+          <Typography
+            variant="h1"
+            sx={{
+              textTransform: "uppercase",
+              padding: "5px", // Adjust padding instead of margins
+              backgroundColor: primary,
+              color: ternary,
+              borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+              fontSize: "1.5em",
+            }}
+            align="center"
+          >
+            {t("Traits")}
+          </Typography>
+        ) : (
+          <Typography
+            variant="h1"
+            sx={{
+              writingMode: "vertical-lr",
+              textTransform: "uppercase",
+              marginLeft: "-1px",
+              marginRight: "10px",
+              marginTop: "-1px",
+              marginBottom: "-1px",
+              backgroundColor: primary,
+              color: ternary,
+              borderRadius: "0 8px 8px 0",
+              transform: "rotate(180deg)",
+              fontSize: "2em",
+            }}
+            align="center"
+          >
+            {t("Traits")}
+          </Typography>
+        )}
 
         <Grid container spacing={2} sx={{ padding: "1em" }}>
           <Grid item xs={12} md={12}>

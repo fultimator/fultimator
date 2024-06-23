@@ -250,6 +250,7 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
+            isCharacterSheet={false}
           />
           <Divider sx={{ my: 1 }} />
           <PlayerNumbers player={playerTemp} isEditMode={isOwner} />

@@ -8,9 +8,10 @@ type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 
 interface LayoutProps {
   children: React.ReactNode;
+  fullWidth?: boolean; // New prop for controlling Container width
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
   const { setTheme } = useThemeContext();
 
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
@@ -55,9 +56,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         showGoBackButton={!isHomepage} // Pass the prop to control the visibility of the "Go Back" button
         handleNavigation={handleNavigation} // Pass the handleNavigation function to the AppBar component
       />
-      <Container style={{ marginTop: "8em", alignItems: "center" }}>
-        {children}
-      </Container>
+      {fullWidth ? (
+        <div style={{ marginTop: "8em" }}>{children} </div>
+      ) : (
+        <Container style={{ marginTop: "8em", alignItems: "center" }}>
+          {children}
+        </Container>
+      )}
     </>
   );
 };

@@ -15,6 +15,7 @@ import NpcEdit from "./routes/npc-edit/npc-edit";
 import Roller from "./routes/roller/roller";
 import RollerScoped from "./routes/roller/roller-scoped";
 import Combat from "./routes/combat/combat";
+import CharacterSheet from "./routes/character-sheet/character-sheet";
 import Fabula from "./themes/Fabula";
 import High from "./themes/High";
 import Techno from "./themes/Techno";
@@ -55,6 +56,7 @@ const App = () => {
             <Route path="/roller" element={<Roller />} />
             <Route path="/roller/:scope" element={<RollerScoped />} />
             <Route path="/combat" element={<Combat />} />
+            <Route path="/character-sheet/:playerId" element={<CharacterSheet />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

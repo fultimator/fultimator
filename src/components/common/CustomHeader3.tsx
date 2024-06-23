@@ -2,45 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Typography, IconButton, Tooltip } from "@mui/material";
 import { Add, Edit, Remove } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
-
-// Include your SVGs here as React components
-const EmptyStarSVG = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 95.74 95.98"
-    width="24"
-    height="24"
-  >
-    <path
-      fill="white"
-      opacity=".96"
-      stroke="#78a49a"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="6px"
-      d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
-    />
-  </svg>
-);
-
-const FilledStarSVG = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 95.74 95.98"
-    width="24"
-    height="24"
-  >
-    <path
-      fill="gold" // Adjust the fill color to match the gold star
-      opacity=".96"
-      stroke="#78a49a"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="6px"
-      d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
-    />
-  </svg>
-);
+import { useTheme } from "@mui/system";
 
 interface CustomHeader3Props {
   headerText: string;
@@ -66,6 +28,47 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
   const { t } = useTranslate();
+  const theme = useTheme();
+  const primary = theme.palette.primary.main;
+
+  // Include your SVGs here as React components
+  const EmptyStarSVG = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 95.74 95.98"
+      width="24"
+      height="24"
+    >
+      <path
+        fill="white"
+        opacity=".96"
+        stroke={theme.palette.secondary.main} // Use primary color from theme
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="6px"
+        d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
+      />
+    </svg>
+  );
+
+  const FilledStarSVG = (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 95.74 95.98"
+      width="24"
+      height="24"
+    >
+      <path
+        fill="gold" // Adjust the fill color to match the gold star
+        opacity=".96"
+        stroke={theme.palette.secondary.main} // Use primary color from theme
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="6px"
+        d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
+      />
+    </svg>
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,7 +86,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   return (
     <div
       style={{
-        backgroundColor: "#2B4A42",
+        backgroundColor: primary,
         fontFamily: "Antonio",
         fontWeight: "normal",
         fontSize: "1.1em",
@@ -122,22 +125,24 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         {isEditMode && !isHeroicSkill && (
           <>
             <Tooltip title={t("Decrease Level")}>
-            <IconButton
-              size="small"
-              onClick={onDecrease}
-              disabled={currentLvl <= 0}
-            >
-              <Remove style={{ color: currentLvl <= 0 ? "gray" : "white" }} />
-            </IconButton>
+              <IconButton
+                size="small"
+                onClick={onDecrease}
+                disabled={currentLvl <= 0}
+              >
+                <Remove style={{ color: currentLvl <= 0 ? "gray" : "white" }} />
+              </IconButton>
             </Tooltip>
             <Tooltip title={t("Increase Level")}>
-            <IconButton
-              size="small"
-              onClick={onIncrease}
-              disabled={currentLvl >= maxLvl}
-            >
-              <Add style={{ color: currentLvl >= maxLvl ? "gray" : "white" }} />
-            </IconButton>
+              <IconButton
+                size="small"
+                onClick={onIncrease}
+                disabled={currentLvl >= maxLvl}
+              >
+                <Add
+                  style={{ color: currentLvl >= maxLvl ? "gray" : "white" }}
+                />
+              </IconButton>
             </Tooltip>
             <Tooltip title={t("Edit Skill")}>
               <IconButton size="small" onClick={onEdit}>

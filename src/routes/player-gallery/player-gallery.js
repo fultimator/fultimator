@@ -37,6 +37,7 @@ import {
   Share,
   Edit,
   HistoryEdu,
+  Badge,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
@@ -360,6 +361,7 @@ function Personal({ user }) {
               setPlayer={null}
               isEditMode={false}
               sx={{ marginBottom: 1 }}
+              isCharacterSheet={false}
             />
             <div style={{ marginTop: "3px" }}>
               <Tooltip title={t("Copy")}>
@@ -383,6 +385,14 @@ function Personal({ user }) {
               <Tooltip title={t("Share URL")}>
                 <IconButton onClick={() => sharePlayer(player.id)}>
                   <Share />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Character Sheet")}>
+                <IconButton
+                  component={RouterLink}
+                  to={`/character-sheet/${player.id}`}
+                >
+                  <Badge />
                 </IconButton>
               </Tooltip>
             </div>

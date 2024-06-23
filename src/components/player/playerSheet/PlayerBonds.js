@@ -3,7 +3,7 @@ import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 
-export default function PlayerBonds({ player, isEditMode }) {
+export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -49,33 +49,60 @@ export default function PlayerBonds({ player, isEditMode }) {
           <Divider sx={{ my: 1 }} />
           <Paper
             elevation={3}
-            sx={{
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              display: "flex",
-            }}
+            sx={
+              isCharacterSheet
+                ? {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column",
+                  }
+                : {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                  }
+            }
           >
-            <Typography
-              variant="h1"
-              sx={{
-                writingMode: "vertical-lr",
-                textTransform: "uppercase",
-                marginLeft: "-1px",
-                marginRight: "10px",
-                marginTop: "-1px",
-                marginBottom: "-1px",
-                backgroundColor: primary,
-                color: ternary,
-                borderRadius: "0 8px 8px 0",
-                transform: "rotate(180deg)",
-                fontSize: "2em",
-                minHeight: "100px",
-              }}
-              align="center"
-            >
-              {t("Bonds")}
-            </Typography>
+            {isCharacterSheet ? (
+              <Typography
+                variant="h1"
+                sx={{
+                  textTransform: "uppercase",
+                  padding: "5px", // Adjust padding instead of margins
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+                  fontSize: "1.5em",
+                }}
+                align="center"
+              >
+                {t("Bonds")}
+              </Typography>
+            ) : (
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                  minHeight: "100px",
+                }}
+                align="center"
+              >
+                {t("Bonds")}
+              </Typography>
+            )}
 
             <Grid container spacing={2} sx={{ padding: "1em" }}>
               {player.info.bonds && player.info.bonds.length > 0

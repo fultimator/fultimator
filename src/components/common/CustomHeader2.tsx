@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography, Button } from "@mui/material";
 import customHeader2gb from "../customHeader2bg.png";
+import { useTheme } from '@mui/system';
 
 interface CustomHeaderProps {
   headerText: string;
@@ -10,6 +11,9 @@ interface CustomHeaderProps {
 }
 
 const CustomHeader2: React.FC<CustomHeaderProps> = ({ headerText, buttonText, onButtonClick, isEditMode }) => {
+  const theme = useTheme();
+  const ternary = theme.palette.ternary.main;
+
   return (
     <div style={{
       display: 'flex',
@@ -25,7 +29,7 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({ headerText, buttonText, on
       textAlign: 'left',
       marginBottom: '10px',
       textTransform: 'uppercase',
-      backgroundImage: `url(${customHeader2gb})`,
+      backgroundColor: ternary,
       backgroundSize: '100% 100%',
       backgroundRepeat: 'no-repeat',
     }}>

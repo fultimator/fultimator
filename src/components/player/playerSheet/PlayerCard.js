@@ -19,7 +19,13 @@ import { ReactComponent as DefIcon } from "../../svgs/def.svg";
 import { ReactComponent as MdefIcon } from "../../svgs/mdef.svg";
 import { ReactComponent as InitIcon } from "../../svgs/init.svg";
 
-export default function PlayerCard({ player, setPlayer, isEditMode }) {
+export default function PlayerCard({
+  player,
+  setPlayer,
+  isEditMode,
+  isCharacterSheet,
+  characterImage,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -143,7 +149,7 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
             },
           }}
         />
-        <ProgressBarWithLabel>
+        <ProgressBarWithLabel sx={{ fontWeight: "bold" }}>
           {label} {`${value}/${max}`}
         </ProgressBarWithLabel>
       </Box>
@@ -403,7 +409,15 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         <Grid item xs={4} sm={4}>
           <div style={{ position: "relative" }}>
             <img
-              src={player.info.imgurl ? player.info.imgurl : avatar_image}
+              src={
+                isCharacterSheet
+                  ? characterImage
+                    ? characterImage
+                    : avatar_image
+                  : player.info.imgurl
+                  ? player.info.imgurl
+                  : avatar_image
+              }
               alt="Player Avatar"
               style={{
                 width: "100%",
@@ -439,34 +453,63 @@ export default function PlayerCard({ player, setPlayer, isEditMode }) {
         <Grid item xs={8} sx={{ marginTop: "5px", marginX: "-5px" }}>
           <Paper
             elevation={3}
-            sx={{
-              borderRadius: "8px",
-              border: "1px solid",
-              borderColor: secondary,
-              display: "flex",
-              marginRight: "5px",
-              boxShadow: "none",
-            }}
+            sx={
+              isCharacterSheet
+                ? {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    marginRight: "0px",
+                    boxShadow: "none",
+                    flexDirection: "column",
+                  }
+                : {
+                    borderRadius: "8px",
+                    border: "1px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    marginRight: "5px",
+                    boxShadow: "none",
+                  }
+            }
           >
-            <Typography
-              variant="h4"
-              sx={{
-                writingMode: "vertical-lr",
-                textTransform: "uppercase",
-                marginLeft: "-1px",
-                marginRight: "10px",
-                marginTop: "-1px",
-                marginBottom: "-1px",
-                backgroundColor: primary,
-                color: ternary,
-                borderRadius: "0 8px 8px 0",
-                transform: "rotate(180deg)",
-                fontSize: "1.2rem",
-              }}
-              align="center"
-            >
-              {t("Traits")}
-            </Typography>
+            {isCharacterSheet ? (
+              <Typography
+                variant="h1"
+                sx={{
+                  textTransform: "uppercase",
+                  padding: "5px", // Adjust padding instead of margins
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+                  fontSize: "1em",
+                }}
+                align="center"
+              >
+                {t("Traits")}
+              </Typography>
+            ) : (
+              <Typography
+                variant="h4"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "1.2rem",
+                }}
+                align="center"
+              >
+                {t("Traits")}
+              </Typography>
+            )}
 
             <Grid container spacing={1} sx={{ padding: "0.3rem" }}>
               <Grid item xs={12} md={12}>

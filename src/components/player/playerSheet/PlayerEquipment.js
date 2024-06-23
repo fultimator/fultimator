@@ -20,7 +20,12 @@ import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 
-export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
+export default function PlayerEquipment({
+  player,
+  setPlayer,
+  isEditMode,
+  isCharacterSheet,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -295,33 +300,60 @@ export default function PlayerEquipment({ player, setPlayer, isEditMode }) {
           <Divider sx={{ my: 1 }} />
           <Paper
             elevation={3}
-            sx={{
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              display: "flex",
-            }}
+            sx={
+              isCharacterSheet
+                ? {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column",
+                  }
+                : {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                  }
+            }
           >
-            <Typography
-              variant="h1"
-              sx={{
-                writingMode: "vertical-lr",
-                textTransform: "uppercase",
-                marginLeft: "-1px",
-                marginRight: "10px",
-                marginTop: "-1px",
-                marginBottom: "-1px",
-                paddingY: "10px",
-                backgroundColor: primary,
-                color: ternary,
-                borderRadius: "0 8px 8px 0",
-                transform: "rotate(180deg)",
-                fontSize: "2em",
-              }}
-              align="center"
-            >
-              {t("Equipment")}
-            </Typography>
+            {isCharacterSheet ? (
+              <Typography
+                variant="h1"
+                sx={{
+                  textTransform: "uppercase",
+                  padding: "5px", // Adjust padding instead of margins
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+                  fontSize: "1.5em",
+                }}
+                align="center"
+              >
+                {t("Equipment")}
+              </Typography>
+            ) : (
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  paddingY: "10px",
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                }}
+                align="center"
+              >
+                {t("Equipment")}
+              </Typography>
+            )}
             <Grid container spacing={2} sx={{ padding: "1em" }}>
               {equippedWeapons.length > 0 && (
                 <>
