@@ -61,16 +61,13 @@ export default function EditPlayerBasics({
       const response = await fetch(imageUrl);
       if (!response.ok) {
         setIsImageError(true);
-        setErrorMessage("Failed to fetch image");
-        throw new Error("Failed to fetch image");
+        setErrorMessage(`Failed to fetch image: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
       }
       const blob = await response.blob();
-      if (
-        blob.size >
-        5 * 1024 * 1024 // 5MB
-      ) {
+      if (blob.size > 5 * 1024 * 1024) { // 5MB
         setIsImageError(true);
-        setErrorMessage("Image size is too large, max 5MB");
+        setErrorMessage("Error: Image size is too large, max 5MB");
         return false;
       } else {
         setIsImageError(false);
@@ -78,9 +75,9 @@ export default function EditPlayerBasics({
         return true;
       }
     } catch (error) {
-      console.error("Error checking image size:", error);
+      console.error("Error: ", error);
       setIsImageError(true);
-      setErrorMessage("Error checking image size: " + error.message);
+      setErrorMessage(`Error: ${error.message}`);
     }
   }, []);
 
