@@ -228,6 +228,7 @@ function Rank({ npc }) {
       {npc.rank === "champion4" && t("Champion (4)")}
       {npc.rank === "champion5" && t("Champion (5)")}
       {npc.rank === "champion6" && t("Champion (6)")}
+      {npc.rank === "companion" && t("Companion")}
     </>
   );
 }
