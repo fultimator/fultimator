@@ -19,7 +19,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             {Object.entries(attributes).map((key, i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
-                  {key[1].short}
+                  {key[1].shortcaps}
                 </MenuItem>
               );
             })}
@@ -39,7 +39,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             {Object.entries(attributes).map((key, i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
-                  {key[1].short}
+                  {key[1].shortcaps}
                 </MenuItem>
               );
             })}

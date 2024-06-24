@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import weapons from "../../../../libs/weapons";
+import weaponCategories from "../../../../libs/weaponCategories";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import ChangeBase from "../../../../routes/equip/weapons/ChangeBase";
 import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
@@ -27,6 +28,7 @@ import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ChangeBonus from "../../../../routes/equip/weapons/ChangeBonus";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import ChangeModifiers from "../ChangeModifiers";
+import ChangeCategory from "./ChangeCategory";
 import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -44,6 +46,7 @@ export default function PlayerWeaponModal({
   const { t } = useTranslate();
   const [base, setBase] = useState(weapon?.base || weapons[0]);
   const [name, setName] = useState(weapon?.name || weapons[0].name);
+  const [category, setCategory] = useState(weapon?.category || "");
   const [type, setType] = useState(weapon?.type || weapons[0].type);
   const [hands, setHands] = useState(weapon?.hands || weapons[0].hands);
   const [att1, setAtt1] = useState(weapon?.att1 || weapons[0].att1);
@@ -74,6 +77,7 @@ export default function PlayerWeaponModal({
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
     setName(weapon?.name || weapons[0].name);
+    setCategory(weapon?.category || weapons[0].category);
     setType(weapon?.type || weapons[0].type);
     setHands(weapon?.hands || weapons[0].hands);
     setAtt1(weapon?.att1 || weapons[0].att1);
@@ -110,6 +114,7 @@ export default function PlayerWeaponModal({
         att1,
         att2,
         martial,
+        category,
         type,
         hand,
         quality,
@@ -140,6 +145,9 @@ export default function PlayerWeaponModal({
       }
       if (martial) {
         setMartial(martial);
+      }
+      if (category) {
+        setCategory(category);
       }
       if (type) {
         setType(type);
@@ -273,7 +281,7 @@ export default function PlayerWeaponModal({
     const updatedWeapon = {
       base,
       name,
-      category: base.category,
+      category: category,
       melee: base.melee || false,
       ranged: base.ranged || false,
       type,
@@ -320,6 +328,7 @@ export default function PlayerWeaponModal({
   const handleClearFields = () => {
     setBase(weapons[0]);
     setName(weapons[0].name);
+    setCategory(weapons[0].category);
     setType(weapons[0].type);
     setHands(weapons[0].hands);
     setAtt1(weapons[0].att1);
@@ -389,6 +398,7 @@ export default function PlayerWeaponModal({
 
                 setBase(base);
                 setName(base.name);
+                setCategory(base.category);
                 setType(base.type);
                 setHands(base.hands);
                 setDamageBonus(false);
@@ -411,22 +421,34 @@ export default function PlayerWeaponModal({
               onChange={(e) => setName(e.target.value)}
             />
           </Grid>
+          {/* Change Category */}
+          <Grid item xs={12} md={4}>
+            <ChangeCategory
+              value={category}
+              onChange={(e) => {
+                const category = weaponCategories.find(
+                  (el) => el === e.target.value
+                );
+                setCategory(category);
+              }}
+            />
+          </Grid>
           {/* Change Type */}
-          <Grid item xs={6} md={3}>
+          <Grid item xs={6} md={4}>
             <ChangeType
               value={type}
               onChange={(e) => setType(e.target.value)}
             />
           </Grid>
           {/* Change Hands */}
-          <Grid item xs={6} md={3}>
+          <Grid item xs={6} md={4}>
             <ChangeHands
               value={hands}
               onChange={(e) => setHands(e.target.value)}
             />
           </Grid>
           {/* Change Attributes */}
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={12}>
             <ChangeAttr
               att1={att1}
               att2={att2}
@@ -571,7 +593,7 @@ export default function PlayerWeaponModal({
               martial: martial,
               type: type,
               hands: hands,
-              category: base.category,
+              category: category,
               melee: base.melee,
               ranged: base.ranged,
               cost: cost,
