@@ -143,7 +143,7 @@ export default function PlayerEquipment({
     dexterity: currDex,
     insight: currInsight,
     might: currMight,
-    willpower: currWillpower,
+    will: currWillpower,
   };
 
   const handleDiceRoll = (weapon) => {
