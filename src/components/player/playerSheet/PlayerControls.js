@@ -1,5 +1,15 @@
-import React from "react";
-import { Grid, Typography, Paper, Button, ButtonGroup, Divider } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Grid,
+  Typography,
+  Paper,
+  Button,
+  ButtonGroup,
+  Divider,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 
@@ -9,6 +19,9 @@ export default function PlayerControls({ player, setPlayer }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+
+  const [zenitChange, setZenitChange] = useState(0);
+  const [changeType, setChangeType] = useState("+");
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {
@@ -28,6 +41,34 @@ export default function PlayerControls({ player, setPlayer }) {
       };
     });
   };
+
+  const changeFabulaPoints = (value) => () => {
+    setPlayer((prevPlayer) => ({
+      ...prevPlayer,
+      info: {
+        ...prevPlayer.info,
+        fabulapoints: Math.max(
+          0,
+          Math.min(9999, prevPlayer.info.fabulapoints + value)
+        ),
+      },
+    }));
+  };
+
+  const changeZenit = () => {
+    const changeValue = changeType === "+" ? zenitChange : -zenitChange;
+    setPlayer((prevPlayer) => {
+      const newZenit = Math.max(0, Math.min(99999999, prevPlayer.info.zenit + changeValue));
+      return {
+        ...prevPlayer,
+        info: {
+          ...prevPlayer.info,
+          zenit: newZenit,
+        },
+      };
+    });
+    setZenitChange(0); // Reset the input field after applying the change
+  };  
 
   const renderStatControls = (stat, label, color, increments) => {
     const negativeIncrements = increments.filter((val) => val < 0);
@@ -139,6 +180,65 @@ export default function PlayerControls({ player, setPlayer }) {
           </Grid>
           <Grid item xs={12}>
             {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
+          </Grid>
+          {/* Fabula Points Section */}
+          <Grid item xs={12}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={5} sm={3}>
+                <Typography variant="h2" sx={{ minWidth: "100px" }}>
+                  {t("Fabula Points")}
+                </Typography>
+              </Grid>
+              <Grid item xs={7} sm={9} sx={{ textAlign: "left" }}>
+                <ButtonGroup variant="outlined" size="small" color="primary">
+                  <Button onClick={changeFabulaPoints(-1)}>-1</Button>
+                  <Button onClick={changeFabulaPoints(1)}>+1</Button>
+                </ButtonGroup>
+              </Grid>
+            </Grid>
+          </Grid>
+          {/* Zenit Section */}
+          <Grid item xs={12}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={5} sm={3}>
+                <Typography variant="h2" sx={{ minWidth: "100px" }}>
+                  {t("Zenit")}
+                </Typography>
+              </Grid>
+              <Grid item xs={7} sm={9} sx={{ textAlign: "left" }}>
+                <ToggleButtonGroup
+                  value={changeType}
+                  exclusive
+                  onChange={(event, newChangeType) =>
+                    newChangeType !== null && setChangeType(newChangeType)
+                  }
+                  aria-label="zenit-change-type"
+                >
+                  <ToggleButton value="+" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
+                    {t("+")}
+                  </ToggleButton>
+                  <ToggleButton value="-" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
+                    {t("-")}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <TextField
+                  type="number"
+                  size="small"
+                  value={zenitChange}
+                  onChange={(e) => setZenitChange(parseInt(e.target.value))}
+                  inputProps={{ min: 0 }}
+                  style={{ width: 80, margin: "0 8px",}}
+                />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={changeZenit}
+                  sx={{ height: 40, marginTop: "-6px" }}
+                >
+                  {t("Apply")}
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Paper>
