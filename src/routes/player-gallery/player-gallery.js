@@ -71,7 +71,8 @@ function Personal({ user }) {
   const { t } = useTranslate();
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
 
   const canAccessTest =
     testUsers.includes(user.uid) || moderators.includes(user.uid);
@@ -84,6 +85,10 @@ function Personal({ user }) {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+  };
+
+  const handleApplicationSuccess = () => {
+    setHasApplied(true);
   };
 
   if (!canAccessTest) {
@@ -107,18 +112,30 @@ function Personal({ user }) {
                 Sign up now for exclusive early access.
               </Typography>
             </Grid>
-            <Grid item>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={() => setIsDialogOpen(true)}
-                >
-                  Apply for Test
-                </Button>
-              </Box>
-            </Grid>
+            {!hasApplied && (
+              <Grid item>
+                <Box mt={2}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={() => setIsDialogOpen(true)}
+                  >
+                    Apply for Test
+                  </Button>
+                </Box>
+              </Grid>
+            )}
+            {hasApplied && (
+              <Grid item>
+                <Box mt={2}>
+                  <Typography variant="h2">
+                    Thank you for applying. Please check out our Discord Server for
+                    news and updates.
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
             <Grid item>
               <Box mt={2}>
                 <Button
@@ -145,6 +162,8 @@ function Personal({ user }) {
           userEmail={user.email}
           userUUID={user.uid}
           title={t("Apply for Test")}
+          placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message!"
+          onSuccess={handleApplicationSuccess}
         />
       </>
     );
@@ -162,15 +181,15 @@ function Personal({ user }) {
 
   const filteredList = personalList
     ? personalList.filter((item) => {
-      // Filter based on name
-      if (
-        name !== "" &&
-        !item.name.toLowerCase().includes(name.toLowerCase())
-      )
-        return false;
+        // Filter based on name
+        if (
+          name !== "" &&
+          !item.name.toLowerCase().includes(name.toLowerCase())
+        )
+          return false;
 
-      return true;
-    })
+        return true;
+      })
     : [];
 
   const addPlayer = async function () {

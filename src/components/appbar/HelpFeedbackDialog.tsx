@@ -15,6 +15,8 @@ interface HelpFeedbackDialogProps {
   userEmail: string;
   userUUID: string;
   title: string;
+  placeholder: string;
+  onSuccess: () => void; // New prop for success callback
 }
 
 const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
@@ -23,6 +25,8 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   userEmail,
   userUUID,
   title,
+  placeholder,
+  onSuccess,
 }) => {
   const [discordAccount, setDiscordAccount] = useState("");
   const [message, setMessage] = useState("");
@@ -60,7 +64,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       content: null,
       embeds: [
         {
-          title: "New Support Request!",
+          title: `New Support Request! (${title})`,
           description: `Discord: ${discordAccount}\nEmail: ${
             userEmail ? userEmail : "User Not Logged-In"
           }\nUUID: ${
@@ -91,9 +95,12 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       onClose();
       setDiscordAccount("");
       setMessage("");
+      onSuccess(); // Call the success callback
     } catch (error) {
       if (error instanceof Error) {
-        setErrorMessage("There was a problem with the fetch operation: " + error.message);
+        setErrorMessage(
+          "There was a problem with the fetch operation: " + error.message
+        );
       } else {
         setErrorMessage("An unknown error occurred");
       }
@@ -110,7 +117,16 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          width: "100%",
+          maxWidth: "sm",
+        },
+      }}
+    >
       <DialogTitle sx={{ fontSize: "1.4rem" }}>{title}</DialogTitle>
       <DialogContent>
         <TextField
@@ -125,6 +141,9 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
             maxLength: 100,
           }}
         />
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          {placeholder}
+        </Typography>
         <TextField
           margin="dense"
           label="Message"
