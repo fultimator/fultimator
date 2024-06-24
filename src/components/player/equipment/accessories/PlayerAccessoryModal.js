@@ -96,7 +96,18 @@ export default function PlayerAccessoryModal({
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
-      const { name, quality, cost } = data;
+      const {
+        name,
+        quality,
+        cost,
+        defModifier,
+        mDefModifier,
+        initModifier,
+        magicModifier,
+        precModifier,
+        damageMeleeModifier,
+        damageRangedModifier,
+      } = data;
 
       if (name) {
         setName(name);
@@ -107,6 +118,34 @@ export default function PlayerAccessoryModal({
       }
       if (cost) {
         setQualityCost(cost);
+      }
+      if (defModifier) {
+        setDefModifier(defModifier);
+        setModifiersExpanded(true);
+      }
+      if (mDefModifier) {
+        setMDefModifier(mDefModifier);
+        setModifiersExpanded(true);
+      }
+      if (initModifier) {
+        setInitModifier(initModifier);
+        setModifiersExpanded(true);
+      }
+      if (magicModifier) {
+        setMagicModifier(magicModifier);
+        setModifiersExpanded(true);
+      }
+      if (precModifier) {
+        setPrecModifier(precModifier);
+        setModifiersExpanded(true);
+      }
+      if (damageMeleeModifier) {
+        setDamageMeleeModifier(damageMeleeModifier);
+        setModifiersExpanded(true);
+      }
+      if (damageRangedModifier) {
+        setDamageRangedModifier(damageRangedModifier);
+        setModifiersExpanded(true);
       }
     }
     fileInputRef.current.value = null;
@@ -130,6 +169,7 @@ export default function PlayerAccessoryModal({
     setPrecModifier(0);
     setDamageMeleeModifier(0);
     setDamageRangedModifier(0);
+    setModifiersExpanded(false);
   };
 
   const handleSave = () => {

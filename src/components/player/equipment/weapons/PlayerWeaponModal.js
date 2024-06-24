@@ -118,6 +118,10 @@ export default function PlayerWeaponModal({
         damageReworkBonus,
         precBonus,
         rework,
+        defModifier,
+        mDefModifier,
+        precModifier,
+        damageModifier,
       } = data;
 
       handleClearFields();
@@ -161,6 +165,22 @@ export default function PlayerWeaponModal({
       }
       if (rework) {
         setRework(rework);
+      }
+      if (defModifier) {
+        setDefModifier(defModifier);
+        setModifiersExpanded(true);
+      }
+      if (mDefModifier) {
+        setMDefModifier(mDefModifier);
+        setModifiersExpanded(true);
+      }
+      if (precModifier) {
+        setPrecModifier(precModifier);
+        setModifiersExpanded(true);
+      }
+      if (damageModifier) {
+        setDamageModifier(damageModifier);
+        setModifiersExpanded(true);
       }
     }
     fileInputRef.current.value = null;
@@ -317,6 +337,7 @@ export default function PlayerWeaponModal({
     setDefModifier(0);
     setMDefModifier(0);
     setIsEquipped(false);
+    setModifiersExpanded(false);
   };
 
   const cost = calcCost();

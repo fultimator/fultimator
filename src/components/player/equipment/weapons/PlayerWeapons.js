@@ -14,6 +14,7 @@ import { useTranslate } from "../../../../translation/translate";
 import PrettyWeapon from "./PrettyWeapon";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
+import Export from "../../../Export";
 
 export default function PlayerWeapons({
   player,
@@ -222,6 +223,9 @@ export default function PlayerWeapons({
                         </IconButton>
                       </Tooltip>
                     )}
+                  </Grid>
+                  <Grid item xs={12} sx={{ mt: 1 }}>
+                    <Export name={weapon.name} data={weapon} />
                   </Grid>
                 </Grid>
               </Grid>

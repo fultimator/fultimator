@@ -14,13 +14,14 @@ import { useTranslate } from "../../../../translation/translate";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import PrettyAccessory from "./PrettyAccessory";
+import Export from "../../../Export";
 
 export default function PlayerAccessories({
   player,
   accessories,
   onEditAccessory,
   onEquipAccessory,
-  isEditMode
+  isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -82,7 +83,9 @@ export default function PlayerAccessories({
       updatedAcc[index].isEquipped = checked;
       onEquipAccessory(updatedAcc);
     } else {
-      alert(t("You cannot equip this accessory as you have already equipped one."));
+      alert(
+        t("You cannot equip this accessory as you have already equipped one.")
+      );
     }
   };
 
@@ -148,11 +151,13 @@ export default function PlayerAccessories({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  {isEditMode && <Grid item xs={12}>
-                    <IconButton onClick={() => onEditAccessory(index)}>
-                      <Edit />
-                    </IconButton>
-                  </Grid>}
+                  {isEditMode && (
+                    <Grid item xs={12}>
+                      <IconButton onClick={() => onEditAccessory(index)}>
+                        <Edit />
+                      </IconButton>
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
                     {checkIfEquippable(accessory) ? (
                       <Tooltip
@@ -182,6 +187,9 @@ export default function PlayerAccessories({
                         </IconButton>
                       </Tooltip>
                     )}
+                  </Grid>
+                  <Grid item xs={12} sx={{ mt: 1 }}>
+                    <Export name={accessory.name} data={accessory} />
                   </Grid>
                 </Grid>
               </Grid>

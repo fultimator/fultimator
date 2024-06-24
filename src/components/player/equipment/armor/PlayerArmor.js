@@ -14,13 +14,14 @@ import { useTranslate } from "../../../../translation/translate";
 import PrettyArmor from "./PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
+import Export from "../../../Export";
 
 export default function PlayerArmor({
   player,
   armor,
   onEditArmor,
   onEquipArmor,
-  isEditMode
+  isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -148,11 +149,13 @@ export default function PlayerArmor({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  {isEditMode && <Grid item xs={12}>
-                    <IconButton onClick={() => onEditArmor(index)}>
-                      <Edit />
-                    </IconButton>
-                  </Grid>}
+                  {isEditMode && (
+                    <Grid item xs={12}>
+                      <IconButton onClick={() => onEditArmor(index)}>
+                        <Edit />
+                      </IconButton>
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
                     {checkIfEquippable(armorItem) ? (
                       <Tooltip
@@ -182,6 +185,9 @@ export default function PlayerArmor({
                         </IconButton>
                       </Tooltip>
                     )}
+                  </Grid>
+                  <Grid item xs={12} sx={{ mt: 1 }}>
+                    <Export name={armorItem.name} data={armorItem} />
                   </Grid>
                 </Grid>
               </Grid>

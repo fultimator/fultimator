@@ -94,7 +94,22 @@ export default function PlayerShieldModal({
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
-      const { base, name, quality, martial, cost, init, rework } = data;
+      const {
+        base,
+        name,
+        quality,
+        martial,
+        cost,
+        init,
+        rework,
+        defModifier,
+        mDefModifier,
+        initModifier,
+        magicModifier,
+        precModifier,
+        damageMeleeModifier,
+        damageRangedModifier,
+      } = data;
 
       if (base.category === "Shield") {
         handleClearFields();
@@ -119,6 +134,34 @@ export default function PlayerShieldModal({
         }
         if (rework) {
           setRework(rework);
+        }
+        if (defModifier) {
+          setDefModifier(defModifier);
+          setModifiersExpanded(true);
+        }
+        if (mDefModifier) {
+          setMDefModifier(mDefModifier);
+          setModifiersExpanded(true);
+        }
+        if (initModifier) {
+          setInitModifier(initModifier);
+          setModifiersExpanded(true);
+        }
+        if (magicModifier) {
+          setMagicModifier(magicModifier);
+          setModifiersExpanded(true);
+        }
+        if (precModifier) {
+          setPrecModifier(precModifier);
+          setModifiersExpanded(true);
+        }
+        if (damageMeleeModifier) {
+          setDamageMeleeModifier(damageMeleeModifier);
+          setModifiersExpanded(true);
+        }
+        if (damageRangedModifier) {
+          setDamageRangedModifier(damageRangedModifier);
+          setModifiersExpanded(true);
         }
       }
     }
@@ -146,6 +189,7 @@ export default function PlayerShieldModal({
     setDefModifier(0);
     setMDefModifier(0);
     setInitModifier(0);
+    setModifiersExpanded(false);
   };
 
   const handleSave = () => {
@@ -176,7 +220,9 @@ export default function PlayerShieldModal({
   };
 
   const handleDelete = (shieldIndex) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this shield?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this shield?"
+    );
     if (confirmDelete) {
       if (shieldIndex !== null) {
         onDeleteShield(shieldIndex);
@@ -184,7 +230,6 @@ export default function PlayerShieldModal({
       onClose();
     }
   };
-  
 
   return (
     <Dialog

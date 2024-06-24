@@ -14,13 +14,14 @@ import { useTranslate } from "../../../../translation/translate";
 import PrettyArmor from "../armor/PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
+import Export from "../../../Export";
 
 export default function PlayerShields({
   player,
   shields,
   onEditShield,
   onEquipShield,
-  isEditMode
+  isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -174,11 +175,13 @@ export default function PlayerShields({
                   justifyContent="center"
                 >
                   {/* Updated grid item */}
-                  {isEditMode && <Grid item xs={12}>
-                    <IconButton onClick={() => onEditShield(index)}>
-                      <Edit />
-                    </IconButton>
-                  </Grid>}
+                  {isEditMode && (
+                    <Grid item xs={12}>
+                      <IconButton onClick={() => onEditShield(index)}>
+                        <Edit />
+                      </IconButton>
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
                     {checkIfEquippable(shield) ? (
                       <Tooltip
@@ -208,6 +211,9 @@ export default function PlayerShields({
                         </IconButton>
                       </Tooltip>
                     )}
+                  </Grid>
+                  <Grid item xs={12} sx={{ mt: 1 }}>
+                    <Export name={shield.name} data={shield} />
                   </Grid>
                 </Grid>
               </Grid>
