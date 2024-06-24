@@ -8,6 +8,11 @@ import {
   Divider,
   Typography,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
@@ -25,6 +30,8 @@ export default function EditPlayerClasses({
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [warnings, setWarnings] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newClassName, setNewClassName] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -103,37 +110,48 @@ export default function EditPlayerClasses({
 
   const handleAddClass = () => {
     if (selectedClass) {
-      // Check if the selected class type already exists in player's classes
-      const classExists = player.classes.some(
-        (cls) => cls.name.toLowerCase() === selectedClass.name.toLowerCase()
-      );
-
-      if (classExists) {
-        alert("This class type already exists for the character");
-        return;
+      if (selectedClass.name === "Blank Class") {
+        setDialogOpen(true);
+      } else {
+        addClassToPlayer(selectedClass.name);
       }
-
-      const updatedPlayer = {
-        ...player,
-        classes: Array.isArray(player.classes) ? player.classes : [],
-      };
-
-      updatedPlayer.classes.push({
-        name: selectedClass.name,
-        lvl: 1,
-        benefits: selectedClass.benefits,
-        skills: [],
-        heroic: {
-          name: "",
-          description: "",
-        },
-        spells: [],
-      });
-
-      setPlayer(updatedPlayer);
-      updateMaxStats();
-      setSelectedClass(null);
     }
+  };
+
+  const addClassToPlayer = (name) => {
+    // Check if the selected class type already exists in player's classes
+    const classExists = player.classes.some(
+      (cls) => cls.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (classExists) {
+      alert(t("This class type already exists for the character"));
+      return;
+    }
+
+    const updatedPlayer = {
+      ...player,
+      classes: Array.isArray(player.classes) ? player.classes : [],
+    };
+
+    updatedPlayer.classes.push({
+      name: name,
+      lvl: 1,
+      benefits: selectedClass.benefits,
+      skills: [],
+      heroic: {
+        name: "",
+        description: "",
+      },
+      spells: [],
+    });
+
+    setPlayer(updatedPlayer);
+    updateMaxStats();
+    setSelectedBook(null);
+    setSelectedClass(null);
+    setDialogOpen(false);
+    setNewClassName("");
   };
 
   const handleRemoveClass = (index) => {
@@ -380,11 +398,13 @@ export default function EditPlayerClasses({
                       original: book,
                       translated: t(book) || "",
                     }))
-                    .sort((a, b) => a.translated.localeCompare(b.translated))
                     .map((book) => book.original)}
                   getOptionLabel={(book) => t(book) || ""}
                   value={selectedBook}
-                  onChange={(event, newValue) => setSelectedBook(newValue)}
+                  onChange={(event, newValue) => {
+                    setSelectedBook(newValue);
+                    setSelectedClass(null); // Reset selected class when a new book is selected
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -398,15 +418,25 @@ export default function EditPlayerClasses({
               <Grid item xs={12} sm={5}>
                 <Autocomplete
                   id="class-select"
-                  options={filteredClasses
-                    .map((classOption) => ({
-                      original: classOption,
-                      translated: t(classOption.name) || "",
-                    }))
-                    .sort((a, b) => a.translated.localeCompare(b.translated))
-                    .map((classOption) => classOption.original)}
+                  options={
+                    selectedBook
+                      ? filteredClasses
+                          .filter(
+                            (classOption) => classOption.book === selectedBook
+                          ) // Filter classes based on selected book
+                          .map((classOption) => ({
+                            original: classOption,
+                            translated: t(classOption.name) || "",
+                          }))
+                          .sort((a, b) =>
+                            a.translated.localeCompare(b.translated)
+                          )
+                          .map((classOption) => classOption.original)
+                      : []
+                  } // Disable options if no book is selected
                   getOptionLabel={(option) => t(option.name) || ""}
                   value={selectedClass}
+                  disabled={!selectedBook}
                   onChange={(event, newValue) => setSelectedClass(newValue)}
                   renderInput={(params) => (
                     <TextField
@@ -414,6 +444,7 @@ export default function EditPlayerClasses({
                       variant="outlined"
                       label={t("Class")}
                       placeholder={t("Class")}
+                      disabled={!selectedBook} // Disable the input if no book is selected
                     />
                   )}
                 />
@@ -423,6 +454,7 @@ export default function EditPlayerClasses({
                   variant="contained"
                   onClick={handleAddClass}
                   sx={{ width: "100%", height: "100%" }}
+                  disabled={!selectedBook || !selectedClass} // Disable button if no book or class is selected
                 >
                   {t("Add")}
                 </Button>
@@ -492,6 +524,35 @@ export default function EditPlayerClasses({
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
         ))}
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>{t("Enter Class Name")}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t("Please enter the name for the new class")}.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label={t("Class Name")}
+            fullWidth
+            value={newClassName}
+            onChange={(e) => setNewClassName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            {t("Cancel")}
+          </Button>
+          <Button
+            onClick={() => addClassToPlayer(newClassName)}
+            color="primary"
+            disabled={!newClassName}
+          >
+            {t("Add")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
