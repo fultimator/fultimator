@@ -53,6 +53,7 @@ import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import { useNavigate } from "react-router-dom";
+import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -80,6 +81,11 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [battleMode, setBattleMode] = useState(false);
+
+  const [ritualClockSections, setRitualClockSections] = useState(4);
+  const [ritualClockState, setRitualClockState] = useState(
+    new Array(4).fill(false)
+  );
 
   const navigate = useNavigate();
 
@@ -271,6 +277,14 @@ export default function PlayerEdit() {
             <>
               <PlayerTraits player={playerTemp} isEditMode={isOwner} />
               <PlayerBonds player={playerTemp} isEditMode={isOwner} />
+              <PlayerRituals
+                player={playerTemp}
+                isEditMode={isOwner}
+                clockSections={ritualClockSections}
+                setClockSections={setRitualClockSections}
+                clockState={ritualClockState}
+                setClockState={setRitualClockState}
+              />
               <PlayerNotes player={playerTemp} isEditMode={isOwner} />
             </>
           )}
