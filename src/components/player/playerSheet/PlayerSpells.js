@@ -119,10 +119,15 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     will: currWillpower,
   };
 
-  /* All spells from all classes */
-  const allSpells = player.classes
+  /* All default spells from all classes */
+  const defaultSpells = player.classes
     .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
-    .filter((spell) => spell !== undefined)
+    .filter(
+      (spell) =>
+        spell !== undefined &&
+        spell.spellType === "default" &&
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+    )
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const handleOpenModal = (spell) => {
@@ -277,7 +282,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
   return (
     <>
-      {allSpells.length > 0 && (
+      {defaultSpells.length > 0 && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -310,7 +315,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               {t("Spells")}
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
-              {allSpells.map((spell, index) => (
+              {defaultSpells.map((spell, index) => (
                 <Grid
                   item
                   container

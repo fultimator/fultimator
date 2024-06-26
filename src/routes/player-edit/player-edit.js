@@ -43,6 +43,7 @@ import BattleModeToggle from "../../components/player/playerSheet/BattleModeTogg
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
+import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
 import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import { useTranslate } from "../../translation/translate";
@@ -283,12 +284,17 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}
               />
+              <PlayerSkills
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
               <PlayerSpells
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}
               />
-              <PlayerSkills
+              <PlayerArcana
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}

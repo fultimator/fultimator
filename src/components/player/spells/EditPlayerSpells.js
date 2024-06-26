@@ -1,31 +1,25 @@
 import React, { useState } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Divider,
-  Typography,
-} from "@mui/material";
+import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import SpellDefault from "./SpellDefault";
+import SpellArcanistModal from "./SpellArcanistModal";
+import SpellArcanist from "./SpellArcanist";
 import CustomHeader2 from "../../common/CustomHeader2";
 import SpellDefaultModal from "./SpellDefaultModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const white = theme.palette.white.main;
 
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSpell, setSelectedSpell] = useState(null);
 
   const [openSpellDefaultModal, setOpenSpellDefaultModal] = useState(false);
+  const [openSpellArcanistModal, setOpenSpellArcanistModal] = useState(false);
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
@@ -69,6 +63,47 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   isOffensive: false,
                   attr1: "dexterity",
                   attr2: "dexterity",
+                  showInPlayerSheet: true,
+                },
+              ],
+            };
+          } else if (spell === "arcanist") {
+            return {
+              ...cls,
+              spells: [
+                ...cls.spells,
+                {
+                  spellType: spell,
+                  name: "New Arcana",
+                  domain: "",
+                  description: "",
+                  domainDesc: "",
+                  merge: "",
+                  mergeDesc: "",
+                  dismiss: "",
+                  dismissDesc: "",
+                  showInPlayerSheet: true,
+                },
+              ],
+            };
+          } else if (spell === "arcanist-rework") {
+            return {
+              ...cls,
+              spells: [
+                ...cls.spells,
+                {
+                  spellType: spell,
+                  name: "New Arcana",
+                  domain: "",
+                  description: "",
+                  domainDesc: "",
+                  merge: "",
+                  mergeDesc: "",
+                  pulse: "",
+                  pulseDesc: "",
+                  dismiss: "",
+                  dismissDesc: "",
+                  showInPlayerSheet: true,
                 },
               ],
             };
@@ -92,6 +127,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenSpellDefaultModal(true);
   };
 
+  const handleEditArcanistSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenSpellArcanistModal(true);
+  };
+
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
@@ -112,6 +154,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }));
 
     setOpenSpellDefaultModal(false);
+    setOpenSpellArcanistModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);
   };
@@ -130,6 +173,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       }),
     }));
     setOpenSpellDefaultModal(false);
+    setOpenSpellArcanistModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);
   };
@@ -223,136 +267,112 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
           (cls) =>
             cls.benefits.spellClasses && cls.benefits.spellClasses.length > 0
         )
-        .map((cls) => (
-          <React.Fragment key={cls.name}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <Grid container>
-                <Grid item xs={12}>
-                  <CustomHeader
-                    type="top"
-                    headerText={t("Spells") + " - " + t(cls.name)}
-                    showIconButton={false}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  {cls.spells.some((spl) => spl.spellType === "default") && (
-                    <CustomHeader2 headerText={t("Default Spells")} />
-                  )}
+        .map((cls) => {
+          const spellTypeHeaders = {
+            default: false,
+            arcanist: false,
+            arcanistRework: false,
+          };
 
-                  {/* Row 1 */}
-                  <div
-                    style={{
-                      backgroundColor: primary,
-                      fontFamily: "Antonio",
-                      fontWeight: "normal",
-                      fontSize: "1.1em",
-                      padding: "2px 17px",
-                      color: white,
-                      textTransform: "uppercase",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Grid container style={{ flexGrow: 1 }}>
-                      <Grid
-                        item
-                        xs
-                        flexGrow
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "left",
-                        }}
-                      >
-                        <Typography
-                          variant="h3"
-                          style={{ flexGrow: 1, marginRight: "5px" }}
-                        >
-                          {t("Spell")}
-                        </Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography variant="h3">{t("MP")}</Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography variant="h3">{t("Target")}</Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={3}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Typography variant="h3">{t("Duration")}</Typography>
-                      </Grid>
-                    </Grid>
-                    {isEditMode && (
-                      <Grid
-                        item
-                        xs
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <div style={{ width: 40, height: 40 }} />{" "}
-                        {/* Retain space */}
-                      </Grid>
-                    )}
-                  </div>
-
-                  {cls.spells.map((spell, index) => (
-                    <SpellDefault
-                      spellName={spell.name}
-                      mp={spell.mp}
-                      maxTargets={spell.maxTargets}
-                      targetDesc={spell.targetDesc}
-                      duration={spell.duration}
-                      description={spell.description}
-                      onEdit={() =>
-                        handleEditDefaultSpell(spell, cls.name, index)
-                      }
-                      isEditMode={isEditMode}
-                      isOffensive={spell.isOffensive}
-                      attr1={spell.attr1}
-                      attr2={spell.attr2}
-                      key={index}
+          return (
+            <React.Fragment key={cls.name}>
+              <Paper
+                elevation={3}
+                sx={{
+                  p: "15px",
+                  borderRadius: "8px",
+                  border: "2px solid",
+                  borderColor: secondary,
+                }}
+              >
+                <Grid container>
+                  <Grid item xs={12}>
+                    <CustomHeader
+                      type="top"
+                      headerText={t("Spells") + " - " + t(cls.name)}
+                      showIconButton={false}
                     />
-                  ))}
+                  </Grid>
+                  <Grid item xs={12}>
+                    {cls.spells
+                      .sort((a, b) => a.spellType.localeCompare(b.spellType))
+                      .map((spell, index) => (
+                        <React.Fragment key={index}>
+                          {spell.spellType === "default" &&
+                            !spellTypeHeaders.default && (
+                              <>
+                                <CustomHeader2
+                                  headerText={t("Default Spells")}
+                                />
+                                {(spellTypeHeaders.default = true)}
+                              </>
+                            )}
+                          {spell.spellType === "arcanist" &&
+                            !spellTypeHeaders.arcanist && (
+                              <>
+                                <CustomHeader2 headerText={t("Arcana")} />
+                                {(spellTypeHeaders.arcanist = true)}
+                              </>
+                            )}
+                          {spell.spellType === "arcanist-rework" &&
+                            !spellTypeHeaders.arcanistRework && (
+                              <>
+                                <CustomHeader2
+                                  headerText={t("Arcana - Rework")}
+                                />
+                                {(spellTypeHeaders.arcanistRework = true)}
+                              </>
+                            )}
+                          {spell.spellType === "default" && (
+                            <SpellDefault
+                              spellName={spell.name}
+                              mp={spell.mp}
+                              maxTargets={spell.maxTargets}
+                              targetDesc={spell.targetDesc}
+                              duration={spell.duration}
+                              description={spell.description}
+                              onEdit={() =>
+                                handleEditDefaultSpell(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                              isOffensive={spell.isOffensive}
+                              attr1={spell.attr1}
+                              attr2={spell.attr2}
+                              index={index}
+                              key={index}
+                            />
+                          )}
+                          {spell.spellType === "arcanist" && (
+                            <SpellArcanist
+                              arcana={spell}
+                              rework={false}
+                              key={index}
+                              onEdit={() =>
+                                handleEditArcanistSpell(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "arcanist-rework" && (
+                            <SpellArcanist
+                              arcana={spell}
+                              rework={true}
+                              key={index}
+                              onEdit={() =>
+                                handleEditArcanistSpell(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                        </React.Fragment>
+                      ))}
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Paper>
-            <Divider sx={{ my: 2 }} />
-          </React.Fragment>
-        ))}
+              </Paper>
+              <Divider sx={{ my: 2 }} />
+            </React.Fragment>
+          );
+        })}
       <SpellDefaultModal
         isEditMode={isEditMode}
         open={openSpellDefaultModal}
@@ -364,6 +384,18 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellArcanistModal
+        open={openSpellArcanistModal}
+        onClose={() => {
+          setOpenSpellArcanistModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        isRework={spellBeingEdited?.spellType === "arcanist-rework"}
       />
     </>
   );

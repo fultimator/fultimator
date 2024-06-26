@@ -30,15 +30,99 @@ function ThemedSpellDefault({
   attr1,
   attr2,
   isEditMode,
+  index,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
   const white = theme.palette.white.main;
 
   return (
     <>
+      {/* Row 1 */}
+      {index === 0 && (
+        <div
+          style={{
+            backgroundColor: primary,
+            fontFamily: "Antonio",
+            fontWeight: "normal",
+            fontSize: "1.1em",
+            padding: "2px 17px",
+            color: white,
+            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Grid container style={{ flexGrow: 1 }}>
+            <Grid
+              item
+              xs
+              flexGrow
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "left",
+              }}
+            >
+              <Typography
+                variant="h3"
+                style={{ flexGrow: 1, marginRight: "5px" }}
+              >
+                {t("Spell")}
+              </Typography>
+            </Grid>
+            <Grid
+              item
+              xs={2}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="h3">{t("MP")}</Typography>
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="h3">{t("Target")}</Typography>
+            </Grid>
+            <Grid
+              item
+              xs={3}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="h3">{t("Duration")}</Typography>
+            </Grid>
+          </Grid>
+          {isEditMode && (
+            <Grid
+              item
+              xs
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flexShrink: 0,
+              }}
+            >
+              <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
+            </Grid>
+          )}
+        </div>
+      )}
       {/* Row 2 */}
       <div
         style={{
@@ -51,23 +135,66 @@ function ThemedSpellDefault({
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
-          <Grid item xs flexGrow style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
-            <Typography fontWeight="bold" style={{ flexGrow: 1, marginRight: "5px" }}>
+          <Grid
+            item
+            xs
+            flexGrow
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
+          >
+            <Typography
+              fontWeight="bold"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+            >
               {spellName} {isOffensive && <OffensiveSpellIcon />}
             </Typography>
           </Grid>
-          <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Typography>{mp}{maxTargets !== 1 ? " x " + t("T") : ""}</Typography>
+          <Grid
+            item
+            xs={2}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography>
+              {mp}
+              {maxTargets !== 1 ? " x " + t("T") : ""}
+            </Typography>
           </Grid>
-          <Grid item xs={4} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Grid
+            item
+            xs={4}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Typography>{targetDesc}</Typography>
           </Grid>
-          <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Grid
+            item
+            xs={3}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Typography>{duration}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
-          <Grid item xs style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+          <Grid
+            item
+            xs
+            style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
+          >
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: "black" }} />
             </IconButton>
@@ -87,7 +214,7 @@ function ThemedSpellDefault({
         }}
       >
         <Grid item xs={12}>
-          <Typography sx={{minHeight: "30px"}}>
+          <Typography sx={{ minHeight: "30px" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {description}
             </StyledMarkdown>

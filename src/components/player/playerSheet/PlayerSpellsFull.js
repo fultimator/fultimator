@@ -3,6 +3,7 @@ import { Paper, Typography, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import SpellDefault from "../spells/SpellDefault";
+import SpellArcanist from "../spells/SpellArcanist";
 
 export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   const { t } = useTranslate();
@@ -14,10 +15,23 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   return (
     <>
       {player.classes.length > 0 &&
-        player.classes.some((c) => c.spells.length > 0) && (
+        player.classes.some((c) =>
+          c.spells.some(
+            (spell) =>
+              spell.spellType === "default" &&
+              (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+          )
+        ) && (
           <Grid container spacing={2}>
             {player.classes
-              .filter((c) => c.spells.length > 0)
+              .filter((c) =>
+                c.spells.some(
+                  (spell) =>
+                    spell.spellType === "default" &&
+                    (spell.showInPlayerSheet ||
+                      spell.showInPlayerSheet === undefined)
+                )
+              )
               .map((c, index) => (
                 <Grid item xs={12} md={6} key={index}>
                   <Paper
@@ -123,21 +137,101 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                         </Grid>
                       </Grid>
                     </div>
-                    {c.spells.map((spell, spellIndex) => (
-                      <SpellDefault
-                        key={spellIndex}
-                        spellName={spell.name}
-                        mp={spell.mp}
-                        maxTargets={spell.maxTargets}
-                        targetDesc={spell.targetDesc}
-                        duration={spell.duration}
-                        description={spell.description}
-                        isEditMode={false}
-                        isOffensive={spell.isOffensive}
-                        attr1={spell.attr1}
-                        attr2={spell.attr2}
-                      />
-                    ))}
+                    {c.spells
+                      .filter(
+                        (spell) =>
+                          spell.spellType === "default" &&
+                          (spell.showInPlayerSheet ||
+                            spell.showInPlayerSheet === undefined)
+                      )
+                      .map((spell, spellIndex) => (
+                        <SpellDefault
+                          key={spellIndex}
+                          spellName={spell.name}
+                          mp={spell.mp}
+                          maxTargets={spell.maxTargets}
+                          targetDesc={spell.targetDesc}
+                          duration={spell.duration}
+                          description={spell.description}
+                          isEditMode={false}
+                          isOffensive={spell.isOffensive}
+                          attr1={spell.attr1}
+                          attr2={spell.attr2}
+                        />
+                      ))}
+                  </Paper>
+                </Grid>
+              ))}
+            {player.classes
+              .filter((c) =>
+                c.spells.some(
+                  (spell) =>
+                    (spell.spellType === "arcanist" ||
+                      spell.spellType === "arcanist-rework") &&
+                    (spell.showInPlayerSheet ||
+                      spell.showInPlayerSheet === undefined)
+                )
+              )
+              .map((c, index) => (
+                <Grid item xs={12} md={6} key={index}>
+                  <Paper
+                    elevation={3}
+                    sx={
+                      isCharacterSheet
+                        ? {
+                            borderRadius: "8px",
+                            border: "2px solid",
+                            borderColor: secondary,
+                            display: "flex",
+                            flexDirection: "column",
+                            marginBottom: "1em",
+                            boxShadow: "none",
+                          }
+                        : {
+                            borderRadius: "8px",
+                            border: "2px solid",
+                            borderColor: secondary,
+                            display: "flex",
+                            flexDirection: "column",
+                            marginBottom: "1em",
+                          }
+                    }
+                  >
+                    <Typography
+                      variant="h1"
+                      sx={{
+                        textTransform: "uppercase",
+                        padding: "5px", // Adjust padding instead of margins
+                        backgroundColor: primary,
+                        color: ternary,
+                        borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+                        fontSize: "1.5em",
+                      }}
+                      align="center"
+                    >
+                      {t("Arcana") + " - " + t(c.name)}
+                    </Typography>
+
+                    {c.spells
+                      .filter(
+                        (spell) =>
+                          (spell.spellType === "arcanist" ||
+                            spell.spellType === "arcanist-rework") &&
+                          (spell.showInPlayerSheet ||
+                            spell.showInPlayerSheet === undefined)
+                      )
+                      .map((spell, spellIndex) => (
+                        <div
+                          key={spellIndex}
+                          style={{ marginTop: "0.5em", padding: "0.5em" }}
+                        >
+                          <SpellArcanist
+                            arcana={spell}
+                            isEditMode={false}
+                            rework={spell.spellType === "arcanist-rework"}
+                          />
+                        </div>
+                      ))}
                   </Paper>
                 </Grid>
               ))}

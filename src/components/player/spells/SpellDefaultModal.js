@@ -12,6 +12,8 @@ import {
   Select,
   MenuItem,
   IconButton,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
@@ -242,6 +244,23 @@ export default function SpellDefaultModal({
               onChange={(e) => handleChange("description", e.target.value)}
               maxRows={10}
               maxLength={1500}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={
+                    editedSpell.showInPlayerSheet === undefined ||
+                    editedSpell.showInPlayerSheet ||
+                    false
+                  }
+                  onChange={(e) =>
+                    handleChange("showInPlayerSheet", e.target.checked)
+                  }
+                />
+              }
+              label={t("Show in Character Sheet")}
             />
           </Grid>
         </Grid>
