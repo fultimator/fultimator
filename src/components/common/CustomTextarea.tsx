@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TextareaAutosize, useTheme, Button } from '@mui/material';
+import React, { useState } from "react";
+import { TextareaAutosize, useTheme, Button } from "@mui/material";
 
 interface CustomTextareaProps {
   label: string;
@@ -24,7 +24,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onBlur,
   onMouseOver,
   onMouseOut,
-  readOnly = false, 
+  readOnly = false,
   maxRows,
   maxLength,
 }) => {
@@ -43,15 +43,15 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   };
 
   const handleMouseOver = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!e.currentTarget.matches(':focus')) {
-      e.currentTarget.style.outlineColor = 'black';
+    if (!e.currentTarget.matches(":focus")) {
+      e.currentTarget.style.outlineColor = "black";
     }
     if (onMouseOver) onMouseOver(e);
   };
 
   const handleMouseOut = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!e.currentTarget.matches(':focus')) {
-      e.currentTarget.style.outlineColor = isFocused ? primary : '#c4c4c4';
+    if (!e.currentTarget.matches(":focus")) {
+      e.currentTarget.style.outlineColor = isFocused ? primary : "#c4c4c4";
     }
     if (onMouseOut) onMouseOut(e);
   };
@@ -66,21 +66,29 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = value.substring(start, end);
-    let formattedText = '';
+    let formattedText = "";
 
     switch (format) {
-      case 'bold':
+      case "bold":
         formattedText = `**${selectedText}**`;
         break;
-      case 'italic':
+      case "italic":
         formattedText = `*${selectedText}*`;
+        break;
+      case "brackets":
+        formattedText = `【${selectedText}】`;
         break;
       default:
         break;
     }
 
-    const newText = `${value.substring(0, start)}${formattedText}${value.substring(end)}`;
-    onChange({ target: { value: newText } } as React.ChangeEvent<HTMLTextAreaElement>);
+    const newText = `${value.substring(
+      0,
+      start
+    )}${formattedText}${value.substring(end)}`;
+    onChange({
+      target: { value: newText },
+    } as React.ChangeEvent<HTMLTextAreaElement>);
 
     textarea.setSelectionRange(start + 2, start + 2 + selectedText.length);
     textarea.focus();
@@ -89,70 +97,85 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const textareaStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '14px',
-    fontSize: '1rem',
-    fontFamily: 'inherit',
-    borderRadius: '4px',
-    border: isFocused ? 'none' : '1px solid #c4c4c4',
-    outline: 'none',
-    resize: 'vertical',
-    boxShadow: isFocused ? `0 0 0 2px ${primary}` : 'none',
-    backgroundColor: readOnly ? '#f5f5f5' : 'white', // Gray background if read-only
-    cursor: readOnly ? 'not-allowed' : 'text', // Not-allowed cursor if read-only
+    width: "100%",
+    padding: "14px",
+    fontSize: "1rem",
+    fontFamily: "inherit",
+    borderRadius: "4px",
+    border: isFocused ? "none" : "1px solid #c4c4c4",
+    outline: "none",
+    resize: "vertical",
+    boxShadow: isFocused ? `0 0 0 2px ${primary}` : "none",
+    backgroundColor: readOnly ? "#f5f5f5" : "white", // Gray background if read-only
+    cursor: readOnly ? "not-allowed" : "text", // Not-allowed cursor if read-only
   };
 
   const labelStyle: React.CSSProperties = {
-    position: 'absolute',
-    padding: '0 2px',
-    top: isFocused || value ? '-8px' : '12px',
-    background: 'white',
-    left: '14px',
-    transition: 'top 0.2s ease, font-size 0.2s ease',
-    fontSize: isFocused || value ? '0.8rem' : '1rem',
-    color: isFocused ? primary : '#757575',
-    pointerEvents: 'none',
+    position: "absolute",
+    padding: "0 2px",
+    top: isFocused || value ? "-8px" : "12px",
+    background: "white",
+    left: "14px",
+    transition: "top 0.2s ease, font-size 0.2s ease",
+    fontSize: isFocused || value ? "0.8rem" : "1rem",
+    color: isFocused ? primary : "#757575",
+    pointerEvents: "none",
   };
 
   const helperStyle: React.CSSProperties = {
-    fontSize: '0.8rem',
-    color: '#757575',
-    marginTop: '4px',
-    marginRight: '14px',
-    marginBottom: '0',
-    marginLeft: '14px',
+    fontSize: "0.8rem",
+    color: "#757575",
+    marginTop: "4px",
+    marginRight: "14px",
+    marginBottom: "0",
+    marginLeft: "14px",
   };
 
   const toolbarStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: '-10px',
-    right: '10px',
-    display: 'flex',
+    position: "absolute",
+    top: "-10px",
+    right: "10px",
+    display: "flex",
     border: `1px solid ${primary}`,
-    borderRadius: '50px',
-    overflow: 'hidden',
-    backgroundColor: 'white',
+    borderRadius: "50px",
+    overflow: "hidden",
+    backgroundColor: "white",
   };
 
   const buttonStyle = {
-    fontSize: '12px',
-    padding: '0',
-    marginRight: '8px',
-    transition: 'font-weight 0.3s ease',
-    fontWeight: 'normal',
-    '&:hover': {
-      fontWeight: 'bold',
+    fontSize: "12px",
+    padding: "0",
+    marginRight: "8px",
+    transition: "font-weight 0.3s ease",
+    fontWeight: "normal",
+    "&:hover": {
+      fontWeight: "bold",
     },
-  } as React.CSSProperties;  
+  } as React.CSSProperties;
 
   return (
-    <div style={{ position: 'relative', margin: '5px 0' }}>
+    <div style={{ position: "relative", margin: "5px 0" }}>
       <div style={toolbarStyle}>
-        <Button onClick={() => handleFormat('bold')} style={buttonStyle} disabled={readOnly}>
+        <Button
+          onClick={() => handleFormat("bold")}
+          style={buttonStyle}
+          disabled={readOnly}
+        >
           Bold
         </Button>
-        <Button onClick={() => handleFormat('italic')} style={buttonStyle} disabled={readOnly}>
+        <Button
+          onClick={() => handleFormat("italic")}
+          style={buttonStyle}
+          disabled={readOnly}
+        >
           Italic
+        </Button>
+        <Button
+          onClick={() => handleFormat("brackets")}
+          style={buttonStyle}
+          disabled={readOnly}
+        >
+          【】
         </Button>
       </div>
       <TextareaAutosize
@@ -170,9 +193,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
         maxLength={maxLength}
       />
       <label style={labelStyle}>{label}</label>
-      <div style={helperStyle}>
-        {helperText}
-      </div>
+      <div style={helperStyle}>{helperText}</div>
     </div>
   );
 };
