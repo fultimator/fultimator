@@ -106,11 +106,15 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
     t("Special"),
   ];
 
+  // const handleChange = (field, value) => {
+  //   setSpell((prevSpell) => ({
+  //     ...prevSpell,
+  //     [field]: value,
+  //   }));
+  // };
+
   const handleChange = (field, value) => {
-    setSpell((prevSpell) => ({
-      ...prevSpell,
-      [field]: value,
-    }));
+    setSpell(field, value);
   };
 
   const handleDurationChange = (event, newValue) => {
@@ -118,17 +122,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
     handleChange("duration", newValue);
   };
 
-  const handleDurationInputChange = (event, newValue) => {
-    setInputDuration(newValue);
-    handleChange("duration", newValue);
-  };
-
   const handleTargetChange = (event, newValue) => {
-    setInputTarget(newValue);
-    handleChange("target", newValue);
-  };
-
-  const handleTargetInputChange = (event, newValue) => {
     setInputTarget(newValue);
     handleChange("target", newValue);
   };
@@ -247,7 +241,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             options={target}
             value={inputTarget}
             onChange={handleTargetChange}
-            onInputChange={handleTargetInputChange}
+            onInputChange={handleTargetChange}
             size="small"
             freeSolo
             renderInput={(params) => (
@@ -277,7 +271,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             options={duration}
             value={inputDuration}
             onChange={handleDurationChange}
-            onInputChange={handleDurationInputChange}
+            onInputChange={handleDurationChange}
             size="small"
             freeSolo
             renderInput={(params) => (
