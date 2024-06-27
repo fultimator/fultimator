@@ -14,6 +14,7 @@ import {
   IconButton,
   FormControlLabel,
   Switch,
+  Autocomplete
 } from "@mui/material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
@@ -30,9 +31,36 @@ export default function SpellDefaultModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
+  const [inputDuration, setInputDuration] = useState(editedSpell.duration || "");
+  const [inputTarget, setInputTarget] = useState(editedSpell.targetDesc || "");
+
+  const duration = [
+    t("Scene"),
+    t("Instantaneous"),
+    t("Special"),
+  ];
+
+  const target = [
+    t("Self"),
+    t("One creature"),
+    t("Up to two creatures"),
+    t("Up to three creatures"),
+    t("Up to four creatures"),
+    t("Up to five creatures"),
+    t("One equipped weapon"),
+    t("Special"),
+  ];
+
+  // useEffect(() => {
+  //   setEditedSpell(spell || {});
+  // }, [spell]);
 
   useEffect(() => {
-    setEditedSpell(spell || {});
+    if (spell) {
+      setEditedSpell(spell || {});
+      setInputDuration(spell.duration || "");
+      setInputTarget(spell.targetDesc || "");
+    }
   }, [spell]);
 
   const handleChange = (field, value) => {
@@ -45,6 +73,26 @@ export default function SpellDefaultModal({
 
   const handleDelete = () => {
     onDelete(spell.index);
+  };
+
+  const handleDurationChange = (event, newValue) => {
+    setInputDuration(newValue);
+    handleChange("duration", newValue);
+  };
+
+  const handleDurationInputChange = (event, newValue) => {
+    setInputDuration(newValue);
+    handleChange("duration", newValue);
+  };
+
+  const handleTargetChange = (event, newValue) => {
+    setInputTarget(newValue);
+    handleChange("targetDesc", newValue);
+  };
+
+  const handleTargetInputChange = (event, newValue) => {
+    setInputTarget(newValue);
+    handleChange("targetDesc", newValue);
   };
 
   return (
@@ -145,7 +193,7 @@ export default function SpellDefaultModal({
               fullWidth
               value={
                 editedSpell.maxTargets === null ||
-                editedSpell.maxTargets === undefined
+                  editedSpell.maxTargets === undefined
                   ? ""
                   : editedSpell.maxTargets.toString()
               }
@@ -173,23 +221,55 @@ export default function SpellDefaultModal({
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            {/* <TextField
               label={t("Target Description")}
               variant="outlined"
               fullWidth
               value={editedSpell.targetDesc || ""}
               onChange={(e) => handleChange("targetDesc", e.target.value)}
               inputProps={{ maxLength: 100 }}
+            /> */}
+            <Autocomplete
+              id="target-autocomplete"
+              options={target}
+              value={inputTarget}
+              onChange={handleTargetChange}
+              onInputChange={handleTargetInputChange}
+              freeSolo
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("Target Description")}
+                  fullWidth
+                  inputProps={{ ...params.inputProps, maxLength: 100 }}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
+            {/* <TextField
               label={t("Duration")}
               variant="outlined"
               fullWidth
               value={editedSpell.duration || ""}
               onChange={(e) => handleChange("duration", e.target.value)}
               inputProps={{ maxLength: 100 }}
+            /> */}
+            <Autocomplete
+              id="duration-autocomplete"
+              options={duration}
+              value={inputDuration}
+              onChange={handleDurationChange}
+              onInputChange={handleDurationInputChange}
+              freeSolo
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("Duration")}
+                  fullWidth
+                  inputProps={{ ...params.inputProps, maxLength: 50 }}
+                />
+              )}
             />
           </Grid>
           {editedSpell.isOffensive ? (

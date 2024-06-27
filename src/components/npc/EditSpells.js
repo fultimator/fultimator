@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import {
   Grid,
@@ -10,6 +11,7 @@ import {
   Divider,
   ToggleButtonGroup,
   ToggleButton,
+  Autocomplete
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
@@ -71,7 +73,7 @@ export default function EditSpells({ npc, setNpc }) {
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1}}>
+              <Grid item xs={12} sx={{ py: 1 }}>
                 <Divider />
               </Grid>
             )}
@@ -84,6 +86,53 @@ export default function EditSpells({ npc, setNpc }) {
 
 function EditSpell({ spell, setSpell, removeSpell, i }) {
   const { t } = useTranslate();
+  const [inputDuration, setInputDuration] = useState(spell.duration || "");
+  const [inputTarget, setInputTarget] = useState(spell.target || "");
+
+  const duration = [
+    t("Scene"),
+    t("Instantaneous"),
+    t("Special"),
+  ];
+
+  const target = [
+    t("Self"),
+    t("One creature"),
+    t("Up to two creatures"),
+    t("Up to three creatures"),
+    t("Up to four creatures"),
+    t("Up to five creatures"),
+    t("One equipped weapon"),
+    t("Special"),
+  ];
+
+  const handleChange = (field, value) => {
+    setSpell((prevSpell) => ({
+      ...prevSpell,
+      [field]: value,
+    }));
+  };
+
+  const handleDurationChange = (event, newValue) => {
+    setInputDuration(newValue);
+    handleChange("duration", newValue);
+  };
+
+  const handleDurationInputChange = (event, newValue) => {
+    setInputDuration(newValue);
+    handleChange("duration", newValue);
+  };
+
+  const handleTargetChange = (event, newValue) => {
+    setInputTarget(newValue);
+    handleChange("target", newValue);
+  };
+
+  const handleTargetInputChange = (event, newValue) => {
+    setInputTarget(newValue);
+    handleChange("target", newValue);
+  };
+
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
       <Grid item sx={{ p: 0, m: 0 }}>
@@ -184,7 +233,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       </Grid>
       <Grid item xs={5} md={3} lg={2}>
         <FormControl variant="outlined" fullWidth>
-          <TextField
+          {/* <TextField
             id="target"
             label={t("Target:")}
             value={spell.target}
@@ -192,12 +241,29 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               return setSpell("target", e.target.value);
             }}
             size="small"
-          ></TextField>
+          ></TextField> */}
+          <Autocomplete
+            id="target-autocomplete"
+            options={target}
+            value={inputTarget}
+            onChange={handleTargetChange}
+            onInputChange={handleTargetInputChange}
+            size="small"
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("Target:")}
+                fullWidth
+                inputProps={{ ...params.inputProps, maxLength: 100 }}
+              />
+            )}
+          />
         </FormControl>
       </Grid>
       <Grid item xs={4} md>
         <FormControl variant="outlined" fullWidth>
-          <TextField
+          {/* <TextField
             id="duration"
             label={t("Duration:")}
             value={spell.duration}
@@ -205,7 +271,24 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               return setSpell("duration", e.target.value);
             }}
             size="small"
-          ></TextField>
+          ></TextField> */}
+          <Autocomplete
+            id="duration-autocomplete"
+            options={duration}
+            value={inputDuration}
+            onChange={handleDurationChange}
+            onInputChange={handleDurationInputChange}
+            size="small"
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("Duration")}
+                fullWidth
+                inputProps={{ ...params.inputProps, maxLength: 50 }}
+              />
+            )}
+          />
         </FormControl>
       </Grid>
       <Grid item xs={12}>
@@ -216,7 +299,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             }}
             size="small"
           ></TextField> */}
-          
+
           <CustomTextarea
             id="special"
             label={t("Special:")}
