@@ -8,10 +8,17 @@ import {
   TextField,
   Grid,
   IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  ListSubheader,
+  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close } from "@mui/icons-material";
+import skills from "../../../libs/skills";
 
 export default function AddSkillModal({
   open,
@@ -23,10 +30,22 @@ export default function AddSkillModal({
   setMaxLevel,
   description,
   setDescription,
+  specialSkill,
+  setSpecialSkill,
   onAddSkill,
   onDeleteSkill,
 }) {
   const { t } = useTranslate();
+
+  // Group skills by class
+  const groupedSkills = skills.reduce((acc, skill) => {
+    const { class: skillClass, name } = skill;
+    if (!acc[skillClass]) {
+      acc[skillClass] = [];
+    }
+    acc[skillClass].push(name);
+    return acc;
+  }, {});
 
   return (
     <Dialog
@@ -105,83 +124,29 @@ export default function AddSkillModal({
               maxRows={10}
             />
           </Grid>
-          {/* SPECIAL SKILLS FUTURE IMPLEMENTATION
-          <Grid item xs={12} sx={{ marginTop: "20px" }}>
-            <Typography variant="h4">{t("Skill Special Effects")}</Typography>
+          <Grid item xs={12}>
+            <Typography>{t("Special Skill Effect")}</Typography>
+            <FormControl fullWidth>
+              <InputLabel>{t("Select Skill")}</InputLabel>
+              <Select
+                value={specialSkill}
+                onChange={(e) => setSpecialSkill(e.target.value)}
+                label={t("Select Skill")}
+              >
+                <MenuItem value="">
+                  <em>{t("None")}</em>
+                </MenuItem>
+                {Object.keys(groupedSkills).map((skillClass) => [
+                  <ListSubheader key={skillClass}>{skillClass}</ListSubheader>,
+                  groupedSkills[skillClass].map((skill) => (
+                    <MenuItem key={skill} value={skill}>
+                      {skill}
+                    </MenuItem>
+                  )),
+                ])}
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    //checked={true}
-                    color="primary"
-                  />
-                }
-                label={t("Plus【SL × 2】 Magic Check Bonus")}
-              />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={<Checkbox checked={true} color="primary" />}
-                label={t("Plus【SL × 3】 maximum Hit Points")}
-              />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    //checked={true}
-                    color="primary"
-                  />
-                }
-                label={t("Plus【SL × 3】 maximum Mind Points")}
-              />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    //checked={true}
-                    color="primary"
-                  />
-                }
-                label={t("Plus【SL】 Defense Bonus")}
-              />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    //checked={true}
-                    color="primary"
-                  />
-                }
-                label={t("Plus【SL】 Accuracy Check Bonus with ranged weapons")}
-              />
-            </FormGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    //checked={true}
-                    color="primary"
-                  />
-                }
-                label={t("Plus【SL】 Accuracy Check Bonus with melee weapons")}
-              />
-            </FormGroup>
-          </Grid>*/}
         </Grid>
       </DialogContent>
 

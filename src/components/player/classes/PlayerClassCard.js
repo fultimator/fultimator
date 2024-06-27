@@ -56,6 +56,7 @@ export default function PlayerClassCard({
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
+  const [specialSkill, setSpecialSkill] = React.useState(null);
   const [warnings, setWarnings] = useState([]);
 
   const [heroic, setHeroic] = useState({
@@ -242,6 +243,7 @@ export default function PlayerClassCard({
     setSkillName("");
     setMaxLevel(1);
     setDescription("");
+    setSpecialSkill(null);
   };
 
   const handleEditHeroicSkill = () => {
@@ -523,6 +525,7 @@ export default function PlayerClassCard({
           setMaxLevel(1);
           setDescription("");
           setEditSkillIndex(null);
+          setSpecialSkill(null);
         }}
         editSkillIndex={editSkillIndex}
         skillName={skillName}
@@ -531,6 +534,8 @@ export default function PlayerClassCard({
         setMaxLevel={setMaxLevel}
         description={description}
         setDescription={setDescription}
+        specialSkill={specialSkill}
+        setSpecialSkill={setSpecialSkill}
         onAddSkill={handleAddSkill}
         onDeleteSkill={handleDeleteSkill}
       />
