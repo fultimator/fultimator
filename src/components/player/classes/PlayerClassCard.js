@@ -56,6 +56,7 @@ export default function PlayerClassCard({
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
+  const [specialSkill, setSpecialSkill] = useState("");
   const [warnings, setWarnings] = useState([]);
 
   const [heroic, setHeroic] = useState({
@@ -107,6 +108,8 @@ export default function PlayerClassCard({
     ipplus: classItem.benefits.ipplus || 0,
     rituals: {
       ritualism: classItem.benefits.rituals?.ritualism || false,
+      arcanism: classItem.benefits.rituals?.arcanism || false,
+      elementalism: classItem.benefits.rituals?.elementalism || false,
     },
     martials: classItem.benefits.martials || {},
     custom: classItem.benefits.custom || [],
@@ -179,6 +182,8 @@ export default function PlayerClassCard({
       ipplus: classItem.benefits.ipplus || 0,
       rituals: {
         ritualism: classItem.benefits.rituals?.ritualism || false,
+        arcanism: classItem.benefits.rituals?.arcanism || false,
+        elementalism: classItem.benefits.rituals?.elementalism || false,
       },
       martials: classItem.benefits.martials || {},
       custom: classItem.benefits.custom || [],
@@ -212,18 +217,27 @@ export default function PlayerClassCard({
         editSkillIndex,
         skillName,
         maxLevel,
-        description
+        description,
+        specialSkill
       );
     } else {
       // Add new skill
-      onAddSkill(classItem.name, skillName, maxLevel, description);
+      onAddSkill(
+        classItem.name,
+        skillName,
+        maxLevel,
+        description,
+        specialSkill
+      );
     }
+
     // Reset the state and close the modal
     setOpenAddSkillModal(false);
     setSkillName("");
     setMaxLevel(1);
     setDescription("");
     setEditSkillIndex(null);
+    setSpecialSkill("");
   };
 
   const handleEditSkill = (index) => {
@@ -232,6 +246,7 @@ export default function PlayerClassCard({
     setMaxLevel(skill.maxLvl);
     setDescription(skill.description);
     setEditSkillIndex(index);
+    setSpecialSkill(skill.specialSkill);
     setOpenAddSkillModal(true);
   };
 
@@ -242,6 +257,7 @@ export default function PlayerClassCard({
     setSkillName("");
     setMaxLevel(1);
     setDescription("");
+    setSpecialSkill("");
   };
 
   const handleEditHeroicSkill = () => {
@@ -523,7 +539,9 @@ export default function PlayerClassCard({
           setMaxLevel(1);
           setDescription("");
           setEditSkillIndex(null);
+          setSpecialSkill("");
         }}
+        className={className}
         editSkillIndex={editSkillIndex}
         skillName={skillName}
         setSkillName={setSkillName}
@@ -531,6 +549,8 @@ export default function PlayerClassCard({
         setMaxLevel={setMaxLevel}
         description={description}
         setDescription={setDescription}
+        specialSkill={specialSkill}
+        setSpecialSkill={setSpecialSkill}
         onAddSkill={handleAddSkill}
         onDeleteSkill={handleDeleteSkill}
       />

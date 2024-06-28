@@ -213,7 +213,13 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
-  const handleAddSkill = (className, skillName, maxLevel, description) => {
+  const handleAddSkill = (
+    className,
+    skillName,
+    maxLevel,
+    description,
+    specialSkill
+  ) => {
     const updatedPlayer = {
       ...player,
       classes: player.classes.map((cls) => {
@@ -227,6 +233,7 @@ export default function EditPlayerClasses({
                 currentLvl: 1,
                 maxLvl: maxLevel, // Ensure maxLevel is parsed as a number
                 description: description,
+                specialSkill: specialSkill,
               },
             ],
           };
@@ -235,6 +242,61 @@ export default function EditPlayerClasses({
       }),
     };
     setPlayer(updatedPlayer);
+  };
+
+  const handleEditSkill = (
+    className,
+    skillIndex,
+    skillName,
+    maxLevel,
+    description,
+    specialSkill
+  ) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls) => {
+        if (cls.name === className) {
+          return {
+            ...cls,
+            skills: cls.skills.map((skill, index) => {
+              if (index === skillIndex) {
+                const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
+                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
+                return {
+                  ...skill,
+                  skillName,
+                  maxLvl: newMaxLevel,
+                  currentLvl: newCurrentLevel,
+                  description,
+                  specialSkill,
+                };
+              }
+              return skill;
+            }),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
+  };
+
+  const handleDeleteSkill = (classIndex, skillIndex) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === classIndex) {
+          return {
+            ...cls,
+            skills: cls.skills.filter((_, index) => index !== skillIndex),
+          };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+    updateMaxStats();
   };
 
   const handleIncreaseSkillLevel = (classIndex, skillIndex) => {
@@ -272,59 +334,6 @@ export default function EditPlayerClasses({
               }
               return skill;
             }),
-          };
-        }
-        return cls;
-      }),
-    };
-    setPlayer(updatedPlayer);
-    updateMaxStats();
-  };
-
-  const handleEditSkill = (
-    className,
-    skillIndex,
-    skillName,
-    maxLevel,
-    description
-  ) => {
-    const updatedPlayer = {
-      ...player,
-      classes: player.classes.map((cls) => {
-        if (cls.name === className) {
-          return {
-            ...cls,
-            skills: cls.skills.map((skill, index) => {
-              if (index === skillIndex) {
-                const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
-                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
-                return {
-                  ...skill,
-                  skillName,
-                  maxLvl: newMaxLevel,
-                  currentLvl: newCurrentLevel,
-                  description,
-                };
-              }
-              return skill;
-            }),
-          };
-        }
-        return cls;
-      }),
-    };
-    setPlayer(updatedPlayer);
-    updateMaxStats();
-  };
-
-  const handleDeleteSkill = (classIndex, skillIndex) => {
-    const updatedPlayer = {
-      ...player,
-      classes: player.classes.map((cls, i) => {
-        if (i === classIndex) {
-          return {
-            ...cls,
-            skills: cls.skills.filter((_, index) => index !== skillIndex),
           };
         }
         return cls;
