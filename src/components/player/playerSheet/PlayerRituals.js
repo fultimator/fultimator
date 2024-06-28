@@ -62,24 +62,39 @@ export default function PlayerRituals({
     (playerClass) => playerClass.benefits.rituals.ritualism
   );
 
-  const hasSpiritism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.spiritism
+  const hasSpiritism = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Spiritism"
+    )
   );
 
-  const hasArcanism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.arcanism
+  const hasArcanism = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Arcanism"
+    )
   );
 
-  const hasElementalism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.elementalism
+  const hasElementalism = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Elementalism"
+    )
   );
 
-  const hasEntropism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.entropism
+  const hasEntropism = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Entropism"
+    )
   );
 
-  const hasChimerism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.chimerism
+  const hasChimerism = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Chimerism"
+    )
   );
 
   const resetClock = () => {

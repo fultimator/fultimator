@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
-import { Close } from "@mui/icons-material";
+import { Close, Info } from "@mui/icons-material";
 import skills from "../../../libs/skills";
 
 export default function AddSkillModal({
@@ -125,7 +125,20 @@ export default function AddSkillModal({
             />
           </Grid>
           <Grid item xs={12}>
-            <Typography>{t("Special Skill Effect")}</Typography>
+            <Typography>
+              {t("Special Skill Effect")}
+              <IconButton
+                onClick={() =>
+                  alert(
+                    t(
+                      "Skills from this list will automatically update the Character with the selected effect. Please select one if needed."
+                    )
+                  )
+                }
+              >
+                <Info />
+              </IconButton>
+            </Typography>
             <FormControl fullWidth>
               <InputLabel>{t("Select Skill")}</InputLabel>
               <Select
@@ -136,14 +149,18 @@ export default function AddSkillModal({
                 <MenuItem value="">
                   <em>{t("None")}</em>
                 </MenuItem>
-                {Object.keys(groupedSkills).map((skillClass) => [
-                  <ListSubheader key={skillClass}>{skillClass}</ListSubheader>,
-                  groupedSkills[skillClass].map((skill) => (
-                    <MenuItem key={skill} value={skill}>
-                      {skill}
-                    </MenuItem>
-                  )),
-                ])}
+                {Object.keys(groupedSkills)
+                  .sort((a, b) => t(a).localeCompare(t(b)))
+                  .map((skillClass) => [
+                    <ListSubheader key={skillClass}>
+                      {t(skillClass)}
+                    </ListSubheader>,
+                    groupedSkills[skillClass].map((skill) => (
+                      <MenuItem key={skill} value={skill}>
+                        {skill}
+                      </MenuItem>
+                    )),
+                  ])}
               </Select>
             </FormControl>
           </Grid>
