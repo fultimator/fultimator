@@ -204,7 +204,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   }}
                 >
                   <Typography>
-                    {!arcana.mergeBenefit ? (
+                    {!arcana.mergeDesc ? (
                       t("No Merge Benefit")
                     ) : (
                       <div style={{ display: "inline" }}>
