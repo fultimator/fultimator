@@ -166,6 +166,24 @@ export default function PlayerEdit() {
           ipBonus += prevPlayer.modifiers.ip || 0;
         }
 
+        // Guardian - Fortress Skill Bonus
+        const fortressBonus = prevPlayer.classes
+          .map((cls) => cls.skills)
+          .flat()
+          .filter((skill) => skill.specialSkill === "Fortress")
+          .map((skill) => skill.currentLvl * 3)
+          .reduce((a, b) => a + b, 0);
+        hpBonus += fortressBonus;
+
+        // Loremaster - Focused Skill Bonus
+        const focusedBonus = prevPlayer.classes
+          .map((cls) => cls.skills)
+          .flat()
+          .filter((skill) => skill.specialSkill === "Focused")
+          .map((skill) => skill.currentLvl * 3)
+          .reduce((a, b) => a + b, 0);
+        mpBonus += focusedBonus;
+
         const maxHP = baseMaxHP + hpBonus;
         const maxMP = baseMaxMP + mpBonus;
         const maxIP = 6 + ipBonus;

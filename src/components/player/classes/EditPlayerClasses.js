@@ -242,6 +242,7 @@ export default function EditPlayerClasses({
       }),
     };
     setPlayer(updatedPlayer);
+    updateMaxStats();
   };
 
   const handleEditSkill = (
@@ -279,6 +280,7 @@ export default function EditPlayerClasses({
       }),
     };
     setPlayer(updatedPlayer);
+    updateMaxStats();
     updateMaxStats();
   };
 

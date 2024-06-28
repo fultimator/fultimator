@@ -53,13 +53,30 @@ export default function PlayerEquipment({
     ? player.accessories.filter((accessory) => accessory.isEquipped)
     : [];
 
+  // Weaponmaster - Melee Weapon Mastery Skill Bonus
+  const meleeMasteryModifier = player.classes
+    .map((cls) => cls.skills)
+    .flat()
+    .filter((skill) => skill.specialSkill === "Melee Weapon Mastery")
+    .map((skill) => skill.currentLvl)
+    .reduce((a, b) => a + b, 0);
+
+  // Sharpshooter - Ranged Weapon Mastery Skill Bonus
+  const rangedMasteryModifier = player.classes
+    .map((cls) => cls.skills)
+    .flat()
+    .filter((skill) => skill.specialSkill === "Ranged Weapon Mastery")
+    .map((skill) => skill.currentLvl)
+    .reduce((a, b) => a + b, 0);
+
   const precMeleeModifier =
     (player.modifiers.meleePrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
     (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
     (equippedAccessories.length > 0
       ? equippedAccessories[0].precModifier || 0
-      : 0);
+      : 0) +
+    meleeMasteryModifier;
 
   const precRangedModifier =
     (player.modifiers.rangedPrec || 0) +
@@ -67,7 +84,8 @@ export default function PlayerEquipment({
     (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
     (equippedAccessories.length > 0
       ? equippedAccessories[0].precModifier || 0
-      : 0);
+      : 0) +
+    rangedMasteryModifier;
 
   const damageMeleeModifier =
     (equippedArmor.length > 0 ? equippedArmor[0].damageMeleeModifier || 0 : 0) +

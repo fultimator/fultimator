@@ -171,6 +171,17 @@ export default function PlayerCard({
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
+  // Rogue - Dodge Skill Bonus
+  const dodgeBonus =
+    equippedShield === null && (equippedArmor === null || equippedArmor.martial === false)
+      ? player.classes
+          .map((cls) => cls.skills)
+          .flat()
+          .filter((skill) => skill.specialSkill === "Dodge")
+          .map((skill) => skill.currentLvl)
+          .reduce((a, b) => a + b, 0)
+      : 0;
+
   // Calculate DEF and MDEF
   const currDef =
     (equippedArmor !== null
@@ -186,7 +197,8 @@ export default function PlayerCard({
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.defModifier || 0),
       0
-    );
+    ) +
+    dodgeBonus;
 
   const currMDef =
     (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
