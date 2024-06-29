@@ -14,6 +14,7 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
+import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
 import { Download } from "@mui/icons-material";
@@ -117,6 +118,9 @@ export default function CharacterSheet() {
           </Grid>
           <Grid item xs={12}>
             <PlayerBonds player={player} isCharacterSheet={true} />
+          </Grid>
+          <Grid item xs={12}>
+            <PlayerRituals player={player} isCharacterSheet={true}/>
           </Grid>
           <Grid item xs={12}>
             <PlayerEquipment player={player} isCharacterSheet={true} />

@@ -25,6 +25,7 @@ export default function PlayerRituals({
   clockState,
   setClockState,
   isEditMode,
+  isCharacterSheet,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -118,33 +119,61 @@ export default function PlayerRituals({
           <Divider sx={{ my: 1 }} />
           <Paper
             elevation={3}
-            sx={{
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              display: "flex",
-            }}
+            sx={
+              isCharacterSheet
+                ? {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column",
+                    boxShadow: "none",
+                  }
+                : {
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                  }
+            }
           >
-            <Typography
-              variant="h1"
-              sx={{
-                writingMode: "vertical-lr",
-                textTransform: "uppercase",
-                marginLeft: "-1px",
-                marginRight: "10px",
-                marginTop: "-1px",
-                marginBottom: "-1px",
-                backgroundColor: primary,
-                color: ternary,
-                borderRadius: "0 8px 8px 0",
-                transform: "rotate(180deg)",
-                fontSize: "2em",
-                minHeight: "3.5em",
-              }}
-              align="center"
-            >
-              {t("Rituals")}
-            </Typography>
+            {isCharacterSheet ? (
+              <Typography
+                variant="h1"
+                sx={{
+                  textTransform: "uppercase",
+                  padding: "5px", // Adjust padding instead of margins
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
+                  fontSize: "1.5em",
+                }}
+                align="center"
+              >
+                {t("Rituals")}
+              </Typography>
+            ) : (
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  backgroundColor: primary,
+                  color: ternary,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                  minHeight: "100px",
+                }}
+                align="center"
+              >
+                {t("Rituals")}
+              </Typography>
+            )}
             <Grid container spacing={2} sx={{ padding: "0.7em" }}>
               <Grid item xs={4} md={2}>
                 <FormControlLabel

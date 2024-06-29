@@ -28,6 +28,7 @@ import EditPlayerBasics from "../../components/player/informations/EditPlayerBas
 import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
 import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
+import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
@@ -374,6 +375,12 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
+            isEditMode={isOwner}
+          />
+          <Divider sx={{ my: 1 }} />
+          <EditPlayerAffinities
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
           <Divider sx={{ my: 1 }} />

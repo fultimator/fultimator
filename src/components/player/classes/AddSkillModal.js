@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -39,13 +39,22 @@ export default function AddSkillModal({
 
   // Group skills by class
   const groupedSkills = skills.reduce((acc, skill) => {
-    const { class: skillClass, name } = skill;
+    const { class: skillClass, name, maxLvl } = skill; // Include maxLvl
     if (!acc[skillClass]) {
       acc[skillClass] = [];
     }
-    acc[skillClass].push(name);
+    acc[skillClass].push({ name, maxLvl }); // Store name and maxLvl
     return acc;
   }, {});
+
+  useEffect(() => {
+    if (specialSkill) {
+      const skill = skills.find((s) => s.name === specialSkill);
+      if (skill) {
+        setMaxLevel(skill.maxLvl);
+      }
+    }
+  }, [specialSkill, setMaxLevel]);
 
   return (
     <Dialog
@@ -90,6 +99,7 @@ export default function AddSkillModal({
               type="number"
               InputProps={{
                 inputProps: { min: 1, max: 10 },
+                readOnly: !!specialSkill,
               }}
               fullWidth
               value={maxLevel.toString()} // Ensure the value is a string
@@ -112,6 +122,7 @@ export default function AddSkillModal({
                 }
                 setMaxLevel(value);
               }}
+              disabled={!!specialSkill} // Disable if a specialSkill is selected
             />
           </Grid>
           <Grid item xs={12}>
@@ -156,8 +167,8 @@ export default function AddSkillModal({
                       {t(skillClass)}
                     </ListSubheader>,
                     groupedSkills[skillClass].map((skill) => (
-                      <MenuItem key={skill} value={skill}>
-                        {t(skill)}
+                      <MenuItem key={skill.name} value={skill.name}>
+                        {t(skill.name)}
                       </MenuItem>
                     )),
                   ])}
