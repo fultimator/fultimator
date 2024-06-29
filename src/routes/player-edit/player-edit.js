@@ -47,6 +47,7 @@ import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
 import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
 import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
+import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { Save } from "@mui/icons-material";
@@ -303,6 +304,10 @@ export default function PlayerEdit() {
                 setClockSections={setRitualClockSections}
                 clockState={ritualClockState}
                 setClockState={setRitualClockState}
+              />
+              <PlayerCompanion
+                player={playerTemp}
+                isEditMode={isOwner}
               />
               <PlayerNotes player={playerTemp} isEditMode={isOwner} />
             </>

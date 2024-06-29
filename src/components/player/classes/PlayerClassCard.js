@@ -20,10 +20,14 @@ import AddSkillModal from "./AddSkillModal";
 import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
 import EditHeroicSkillModal from "./EditHeroicSkillModal";
+import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
+import { firestore } from "../../../firebase";
+import { query, orderBy, collection, where, getDocs } from "firebase/firestore";
 
 export default function PlayerClassCard({
+  allClasses,
   classItem,
   onRemove,
   onLevelChange,
@@ -33,9 +37,11 @@ export default function PlayerClassCard({
   onDeleteSkill,
   onIncreaseSkillLevel,
   onDecreaseSkillLevel,
+  editCompanion,
   isEditMode,
   editClassName,
   editHeroic,
+  userId,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -52,6 +58,8 @@ export default function PlayerClassCard({
     useState(false);
   const [openEditHeroicSkillModal, setOpenEditHeroicSkillModal] =
     useState(false);
+  const [openSelectCompanionModal, setOpenSelectCompanionModal] =
+    useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
   const [maxLevel, setMaxLevel] = useState(1);
@@ -65,6 +73,14 @@ export default function PlayerClassCard({
   });
 
   const [className, setClassName] = useState(classItem.name);
+
+  const [selectedCompanion, setSelectedCompanion] = useState(
+    classItem.companion ? classItem.companion : null
+  );
+
+  const [companionList, setCompanionList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
 
   useEffect(() => {
     setWarnings([]);
@@ -269,6 +285,65 @@ export default function PlayerClassCard({
     editHeroic(heroic);
     setOpenEditHeroicSkillModal(false);
   };
+
+  const handleSaveCompanion = () => {
+    editCompanion(selectedCompanion);
+    setOpenSelectCompanionModal(false);
+  };
+
+  // Filter out all "Faithful Companion" skills across all classes
+  const faithfulCompanionSkills = allClasses
+    .flatMap((cls) => cls.skills)
+    .filter((skill) => skill.specialSkill === "Faithful Companion");
+
+  // Determine if there are multiple "Faithful Companion" skills
+  const hasMultipleFaithfulCompanionSkills = faithfulCompanionSkills.length > 1;
+
+  // Determine if there is exactly one "Faithful Companion" skill with currentLvl > 0 in classItem
+  const faithfulCompanionSkillsInClassItem = classItem.skills.filter(
+    (skill) =>
+      skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0
+  );
+
+  const hasSingleFaithfulCompanionSkill =
+    faithfulCompanionSkillsInClassItem.length === 1;
+
+  // Only query Firestore when the necessary conditions are met
+  useEffect(() => {
+    if (
+      !hasMultipleFaithfulCompanionSkills &&
+      hasSingleFaithfulCompanionSkill
+    ) {
+      console.log("Fetching companions...");
+      setLoading(true);
+      setErr(null);
+      const companionsQuery = query(
+        collection(firestore, `npc-personal`),
+        where("uid", "==", userId),
+        where("rank", "==", "companion"),
+        orderBy("lvl", "asc"),
+        orderBy("name", "asc")
+      );
+
+      const fetchCompanions = async () => {
+        try {
+          const querySnapshot = await getDocs(companionsQuery);
+          const companions = querySnapshot.docs.map((doc) => doc.data());
+          setCompanionList(companions);
+        } catch (error) {
+          setErr(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchCompanions();
+    }
+  }, [
+    hasMultipleFaithfulCompanionSkills,
+    hasSingleFaithfulCompanionSkill,
+    userId,
+  ]);
 
   return (
     <Paper
@@ -484,6 +559,48 @@ export default function PlayerClassCard({
             </Grid>
           </>
         )}
+        {faithfulCompanionSkills.length ===
+        0 ? null : hasMultipleFaithfulCompanionSkills &&
+          faithfulCompanionSkillsInClassItem.length > 0 ? (
+          <Grid item xs={12}>
+            <Typography>
+              {t("Error: There are too many Faithful Companion skills")}
+            </Typography>
+          </Grid>
+        ) : (
+          hasSingleFaithfulCompanionSkill && (
+            <>
+              <Grid item xs={12}>
+                <Divider />
+              </Grid>
+              <Grid item xs={12}>
+                <CustomHeader2
+                  headerText={t("Faithful Companion")}
+                  isEditMode={isEditMode}
+                  buttonText={t("Select")}
+                  onButtonClick={() => setOpenSelectCompanionModal(true)}
+                />
+                {classItem.companion ? (
+                  <CustomHeader3
+                    headerText={
+                      classItem.companion.name + " - " + t("Lvl") + " " + classItem.companion.lvl
+                    }
+                    currentLvl={0}
+                    maxLvl={0}
+                    onIncrease={() => {}}
+                    onDecrease={() => {}}
+                    isEditMode={false}
+                    isHeroicSkill={true}
+                  />
+                ) : (
+                  <Typography>{t("No Companion Selected")}</Typography>
+                )}
+                {loading && <Typography>{t("Loading...")}</Typography>}
+                {err && <Typography>{t("Error Loading Companion List") + ": " + err}</Typography>}
+              </Grid>
+            </>
+          )
+        )}
         {isEditMode && (
           <Grid item xs={12}>
             <Box
@@ -589,6 +706,14 @@ export default function PlayerClassCard({
         onSave={handleSaveHeroicSkill}
         heroic={heroic}
         setHeroic={setHeroic}
+      />
+      {/* Select Companion Modal */}
+      <SelectCompanionModal
+        open={openSelectCompanionModal}
+        onClose={() => setOpenSelectCompanionModal(false)}
+        onSave={handleSaveCompanion}
+        companionList={companionList}
+        setSelectedCompanion={setSelectedCompanion}
       />
     </Paper>
   );

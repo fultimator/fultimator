@@ -345,6 +345,19 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
+  const editCompanion = (index, newCompanion) => {
+    const updatedPlayer = {
+      ...player,
+      classes: player.classes.map((cls, i) => {
+        if (i === index) {
+          return { ...cls, companion: newCompanion };
+        }
+        return cls;
+      }),
+    };
+    setPlayer(updatedPlayer);
+  };
+
   const editHeroic = (index, newHeroic) => {
     const updatedPlayer = {
       ...player,
@@ -511,6 +524,7 @@ export default function EditPlayerClasses({
         player.classes.map((cls, index) => (
           <React.Fragment key={index}>
             <PlayerClassCard
+              allClasses={player.classes}
               classItem={{ ...cls, name: cls.name }}
               onRemove={() => handleRemoveClass(index)}
               onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
@@ -527,10 +541,12 @@ export default function EditPlayerClasses({
                 handleDecreaseSkillLevel(index, skillIndex)
               }
               isEditMode={isEditMode}
+              editCompanion={(companion) => editCompanion(index, companion)}
               editClassName={(newClassName) =>
                 editClassName(index, newClassName)
               }
               editHeroic={(heroic) => editHeroic(index, heroic)}
+              userId={player.uid}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>

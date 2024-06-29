@@ -64,6 +64,12 @@ const skills = [
     description: "You gain a bonus equal to **【SL】** to all Accuracy Checks with **melee** weapons.",
     class: "Weaponmaster",
     maxLvl: 4,
+  },
+  {
+    name: "Faithful Companion",
+    description: "Faithful Companion description",
+    class: "Wayfarer",
+    maxLvl: 5,
   }
 ];
 
