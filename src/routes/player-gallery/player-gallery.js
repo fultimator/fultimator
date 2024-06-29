@@ -27,6 +27,10 @@ import {
   InputAdornment,
   Alert,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -70,6 +74,7 @@ export default function PlayerGallery() {
 function Personal({ user }) {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
@@ -82,6 +87,7 @@ function Personal({ user }) {
   const [personalList, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
+  
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
@@ -189,6 +195,13 @@ function Personal({ user }) {
           return false;
 
         return true;
+      }).sort( (item1, item2) => {
+        // Sort based on selected sort and direction
+        if (direction === "ascending") {
+          return item1.name.localeCompare(item2.name);
+        } else {
+          return item2.name.localeCompare(item1.name);
+        }
       })
     : [];
 
@@ -343,6 +356,30 @@ function Personal({ user }) {
                 }}
                 inputProps={{ maxLength: 50 }}
               />
+            </Grid>
+            <Grid
+              item
+              xs={4}
+              md={1.5}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: "flex" }}
+            >
+              <FormControl fullWidth size="small">
+                <InputLabel id="direction">Direction:</InputLabel>
+                <Select
+                  labelId="direction"
+                  id="select-direction"
+                  value={direction}
+                  label="direction:"
+                  onChange={(evt, val2) => {
+                    setDirection(evt.target.value);
+                  }}
+                >
+                  <MenuItem value={"ascending"}>Ascending</MenuItem>
+                  <MenuItem value={"descending"}>Descending</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid
               item

@@ -14,6 +14,7 @@ const Clock = ({ numSections, size, state, setState }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const hoveredActiveColor = theme.palette.info.main; // Define a new color in the theme
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -47,8 +48,16 @@ const Clock = ({ numSections, size, state, setState }) => {
     `;
 
     const isHovered = hoveredIndex === i;
-    const sectionColor = state[i] ? primary : "transparent";
-    const fill = isHovered ? secondary : sectionColor;
+    const isActive = state[i];
+    let fill = "transparent";
+
+    if (isHovered && isActive) {
+      fill = hoveredActiveColor;
+    } else if (isHovered) {
+      fill = secondary;
+    } else if (isActive) {
+      fill = primary;
+    }
 
     sections.push(
       <path
