@@ -162,7 +162,7 @@ function Personal({ user }) {
           userEmail={user.email}
           userUUID={user.uid}
           title={t("Apply for Test")}
-          placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message!"
+          placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message in english!"
           onSuccess={handleApplicationSuccess}
         />
       </>
