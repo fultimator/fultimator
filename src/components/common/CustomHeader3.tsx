@@ -124,41 +124,57 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         )}
         {isEditMode && !isHeroicSkill && (
           <>
-            <Tooltip title={t("Decrease Level")}>
-              <IconButton
-                size="small"
-                onClick={onDecrease}
-                disabled={currentLvl <= 0}
-              >
-                <Remove style={{ color: currentLvl <= 0 ? "gray" : "white" }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Increase Level")}>
-              <IconButton
-                size="small"
-                onClick={onIncrease}
-                disabled={currentLvl >= maxLvl}
-              >
-                <Add
-                  style={{ color: currentLvl >= maxLvl ? "gray" : "white" }}
-                />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Edit Skill")}>
-              <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color: "white" }} />
-              </IconButton>
-            </Tooltip>
+            <span>
+              <Tooltip title={currentLvl <= 0 ? "" : t("Decrease Level")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onDecrease}
+                    disabled={currentLvl <= 0}
+                  >
+                    <Remove
+                      style={{ color: currentLvl <= 0 ? "gray" : "white" }}
+                    />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </span>
+            <span>
+              <Tooltip title={currentLvl >= maxLvl ? "" : t("Increase Level")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onIncrease}
+                    disabled={currentLvl >= maxLvl}
+                  >
+                    <Add
+                      style={{ color: currentLvl >= maxLvl ? "gray" : "white" }}
+                    />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </span>
+            <span>
+              <Tooltip title={t("Edit Skill")}>
+                <span>
+                  <IconButton size="small" onClick={onEdit}>
+                    <Edit style={{ color: "white" }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </span>
           </>
         )}
         {isEditMode && isHeroicSkill && (
-          <>
+          <span>
             <Tooltip title={t("Edit Heroic Skill")}>
-              <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color: "white" }} />
-              </IconButton>
+              <span>
+                <IconButton size="small" onClick={onEdit}>
+                  <Edit style={{ color: "white" }} />
+                </IconButton>
+              </span>
             </Tooltip>
-          </>
+          </span>
         )}
       </div>
     </div>

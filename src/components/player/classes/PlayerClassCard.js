@@ -500,21 +500,17 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
                 isHeroicSkill={false}
               />
-              <Typography
-                variant="body1"
-                justifyContent="flex-start"
+              <StyledMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed={true}
                 sx={{
-                  background: "transparent",
+                  fontFamily: "PT Sans Narrow",
                   padding: "0 17px",
+                  fontSize: "1rem",
                 }}
               >
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
-                >
-                  {skill.description}
-                </StyledMarkdown>
-              </Typography>
+                {skill.description}
+              </StyledMarkdown>
             </Grid>
           ))}
         {classItem.lvl === 10 && (
@@ -541,21 +537,17 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
                 isHeroicSkill={true}
               />
-              <Typography
-                variant="body1"
-                justifyContent="flex-start"
+              <StyledMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed={true}
                 sx={{
-                  background: "transparent",
+                  fontFamily: "PT Sans Narrow",
                   padding: "0 17px",
+                  fontSize: "1rem",
                 }}
               >
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
-                >
-                  {classItem.heroic.description}
-                </StyledMarkdown>
-              </Typography>
+                {classItem.heroic.description}
+              </StyledMarkdown>
             </Grid>
           </>
         )}
@@ -583,7 +575,11 @@ export default function PlayerClassCard({
                 {classItem.companion ? (
                   <CustomHeader3
                     headerText={
-                      classItem.companion.name + " - " + t("Lvl") + " " + classItem.companion.lvl
+                      classItem.companion.name +
+                      " - " +
+                      t("Lvl") +
+                      " " +
+                      classItem.companion.lvl
                     }
                     currentLvl={0}
                     maxLvl={0}
@@ -596,7 +592,11 @@ export default function PlayerClassCard({
                   <Typography>{t("No Companion Selected")}</Typography>
                 )}
                 {loading && <Typography>{t("Loading...")}</Typography>}
-                {err && <Typography>{t("Error Loading Companion List") + ": " + err}</Typography>}
+                {err && (
+                  <Typography>
+                    {t("Error Loading Companion List") + ": " + err}
+                  </Typography>
+                )}
               </Grid>
             </>
           )

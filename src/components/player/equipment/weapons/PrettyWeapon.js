@@ -162,16 +162,22 @@ export default function PrettyWeapon({ weapon, showActions }) {
                 </Grid>
               </Grid>
             </Grid>
-            <Typography
-              fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
-              sx={{
+            <div
+              style={{
+                fontSize: "0.7rem",
                 background: "transparent",
-                borderBottom: `1px solid ${secondary}`,
-                px: 1,
-                py: 1,
               }}
             >
-              {!weapon.quality && t("No Qualities")}{" "}
+              <Typography
+                fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
+                sx={{
+                  background: "transparent",
+                  px: 1,
+                  py: 1,
+                }}
+              >
+                {!weapon.quality && t("No Qualities")}
+              </Typography>
               <StyledMarkdown
                 allowedElements={["strong", "em"]}
                 unwrapDisallowed={true}
@@ -179,7 +185,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
               >
                 {weapon.quality}
               </StyledMarkdown>
-            </Typography>
+            </div>
           </Stack>
         </div>
       </Card>

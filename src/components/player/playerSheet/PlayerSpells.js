@@ -446,10 +446,10 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 </Typography>
                 <Typography variant="h5">
                   {t("Target Description")}:{" "}
-                  {selectedSpell && selectedSpell.targetDesc}
+                  {selectedSpell && t(selectedSpell.targetDesc)}
                 </Typography>
                 <Typography variant="h5">
-                  {t("Duration")}: {selectedSpell && selectedSpell.duration}
+                  {t("Duration")}: {selectedSpell && t(selectedSpell.duration)}
                 </Typography>
                 <Button
                   variant="contained"
@@ -552,17 +552,6 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
           </Paper>
         </>
       )}
-      <style jsx>{`
-        @media (max-width: 600px) {
-          .spell-right-controls {
-            flex-direction: column !important;
-          }
-          .spell-right-controls .MuiIconButton-root {
-            margin-left: 0 !important;
-            margin-top: 5px !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

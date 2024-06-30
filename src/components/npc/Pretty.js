@@ -190,14 +190,16 @@ function Header({ npc, includeImage }) {
               flexGrow: 1,
             }}
           >
-            <Typography>
               <StyledMarkdown
                 allowedElements={["strong", "em"]}
                 unwrapDisallowed={true}
+                sx={{
+                  fontFamily: "PT Sans Narrow",
+                  fontSize: "1rem",
+                }}
               >
                 {npc.description}
               </StyledMarkdown>
-            </Typography>
           </Box>
           {/* Row 3 */}
           <Box

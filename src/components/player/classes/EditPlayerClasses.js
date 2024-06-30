@@ -513,7 +513,7 @@ export default function EditPlayerClasses({
             borderColor: secondary,
           }}
         >
-          <Grid item sx={12}>
+          <Grid item xs={12}>
             <Typography variant="h3" align="center">
               {t("No classes added yet")}
             </Typography>

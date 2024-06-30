@@ -3,6 +3,7 @@ import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
+import { styled } from "@mui/system";
 
 export default function PlayerNotes({ player, isCharacterSheet }) {
   const { t } = useTranslate();
@@ -10,6 +11,10 @@ export default function PlayerNotes({ player, isCharacterSheet }) {
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
+
+  const StyledMarkdown = styled(ReactMarkdown)({
+    whiteSpace: "pre-line",
+  });
 
   return (
     <>
@@ -63,7 +68,14 @@ export default function PlayerNotes({ player, isCharacterSheet }) {
                   >
                     {note.name + ": "}
                   </Typography>
-                  <ReactMarkdown>{note.description}</ReactMarkdown>
+                  <StyledMarkdown
+                    sx={{
+                      fontFamily: "PT Sans Narrow",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {note.description}
+                  </StyledMarkdown>
                 </Grid>
               ))}
             </Grid>

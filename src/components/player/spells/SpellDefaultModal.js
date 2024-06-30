@@ -14,7 +14,7 @@ import {
   IconButton,
   FormControlLabel,
   Switch,
-  Autocomplete
+  Autocomplete,
 } from "@mui/material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
@@ -31,14 +31,12 @@ export default function SpellDefaultModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
-  const [inputDuration, setInputDuration] = useState(editedSpell.duration || "");
+  const [inputDuration, setInputDuration] = useState(
+    editedSpell.duration || ""
+  );
   const [inputTarget, setInputTarget] = useState(editedSpell.targetDesc || "");
 
-  const duration = [
-    t("Scene"),
-    t("Instantaneous"),
-    t("Special"),
-  ];
+  const duration = [t("Scene"), t("Instantaneous"), t("Special")];
 
   const target = [
     t("Self"),
@@ -140,7 +138,7 @@ export default function SpellDefaultModal({
               style={{ height: "100%" }}
             >
               <ToggleButton
-                value={editedSpell.isOffensive}
+                value={editedSpell.isOffensive || false}
                 selected={editedSpell.isOffensive}
                 onChange={() =>
                   handleChange("isOffensive", !editedSpell.isOffensive)
@@ -193,7 +191,7 @@ export default function SpellDefaultModal({
               fullWidth
               value={
                 editedSpell.maxTargets === null ||
-                  editedSpell.maxTargets === undefined
+                editedSpell.maxTargets === undefined
                   ? ""
                   : editedSpell.maxTargets.toString()
               }

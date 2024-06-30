@@ -158,8 +158,15 @@ export default function PrettyArmor({ armor, showActions }) {
                     py: 1,
                   }}
                 >
-                  <Typography fontSize={{ xs: "0.7rem", sm: "1.0rem" }}>
-                    {!armor.quality && t("No Qualities")}{" "}
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      background: "transparent",
+                    }}
+                  >
+                    <Typography fontSize={{ xs: "0.7rem", sm: "1.0rem" }}>
+                      {!armor.quality && t("No Qualities")}
+                    </Typography>
                     <StyledMarkdown
                       allowedElements={["strong", "em"]}
                       unwrapDisallowed={true}
@@ -167,7 +174,7 @@ export default function PrettyArmor({ armor, showActions }) {
                     >
                       {armor.quality}
                     </StyledMarkdown>
-                  </Typography>
+                  </div>
                 </Grid>
               </Grid>
             </Grid>

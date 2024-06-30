@@ -211,17 +211,6 @@ export default function PlayerSkills({ player, setPlayer }) {
           </Paper>
         </>
       )}
-      <style jsx>{`
-        @media (max-width: 600px) {
-          .skill-right-controls {
-            flex-direction: column !important;
-          }
-          .skill-right-controls .MuiIconButton-root {
-            margin-left: 0 !important;
-            margin-top: 5px !important;
-          }
-        }
-      `}</style>
     </>
   );
 }

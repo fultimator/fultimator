@@ -248,108 +248,92 @@ export default function PlayerCard({
   const renderAdditionalStats = () => (
     <>
       <Grid item xs={4} sm={4}>
-        <Typography
-          variant="body2"
+        <div
           style={{
-            fontSize: "1.5rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontSize: "1.5rem", // Move this style to the parent div
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                marginBottom: "-4px",
-              }}
-            >
-              {t("DEF")}
-            </span>
-            <span style={{ marginLeft: "-4px" }}>
-              <DefIcon style={{ width: "24px", height: "24px" }} />
-              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-                {" "}
-                {currDef}
-              </span>
-            </span>
-          </div>
-        </Typography>
-      </Grid>
-      <Grid item xs={4} sm={4}>
-        <Typography
-          variant="body2"
-          style={{
-            fontSize: "1.5rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                marginBottom: "-4px",
-              }}
-            >
-              {t("M.DEF")}
-            </span>
-            <span style={{ marginLeft: "-4px" }}>
-              <MdefIcon style={{ width: "24px", height: "24px" }} />
-              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-                {" "}
-                {currMDef}
-              </span>
-            </span>
-          </div>
-        </Typography>
-      </Grid>
-      <Grid item xs={4} sm={4}>
-        <Tooltip title={isEditMode && t("DEX") + " + " + t("INS")}>
           <Typography
             variant="body2"
             style={{
-              fontSize: "1.5rem",
+              fontFamily: "Antonio",
+              fontWeight: "bold",
+              fontSize: "0.7rem",
+              marginBottom: "-4px",
             }}
           >
-            <div
+            {t("DEF")}
+          </Typography>
+          <span style={{ marginLeft: "-4px" }}>
+            <DefIcon style={{ width: "24px", height: "24px" }} />
+            <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+              {" "}
+              {currDef}
+            </span>
+          </span>
+        </div>
+      </Grid>
+      <Grid item xs={4} sm={4}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontSize: "1.5rem", // Move this style to the parent div
+          }}
+        >
+          <Typography
+            variant="body2"
+            style={{
+              fontFamily: "Antonio",
+              fontWeight: "bold",
+              fontSize: "0.7rem",
+              marginBottom: "-4px",
+            }}
+          >
+            {t("M.DEF")}
+          </Typography>
+          <span style={{ marginLeft: "-4px" }}>
+            <MdefIcon style={{ width: "24px", height: "24px" }} />
+            <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+              {" "}
+              {currMDef}
+            </span>
+          </span>
+        </div>
+      </Grid>
+      <Grid item xs={4} sm={4}>
+        <Tooltip title={isEditMode && t("DEX") + " + " + t("INS")}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              fontSize: "1.5rem", // Move this style to the parent div
+            }}
+          >
+            <Typography
+              variant="body2"
               style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                fontSize: "0.7rem",
+                marginBottom: "-4px",
               }}
             >
-              <span
-                style={{
-                  fontFamily: "Antonio",
-                  fontWeight: "bold",
-                  fontSize: "0.7rem",
-                  marginBottom: "-4px",
-                }}
-              >
-                {t("INIT")}
+              {t("INIT")}
+            </Typography>
+            <span style={{ marginLeft: "-4px" }}>
+              <InitIcon style={{ width: "24px", height: "24px" }} />
+              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
+                {" "}
+                {(currInit > 0 ? "+" : "") + currInit}
               </span>
-              <span style={{ marginLeft: "-4px" }}>
-                <InitIcon style={{ width: "24px", height: "24px" }} />
-
-                <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-                  {" "}
-                  {(currInit > 0 ? "+" : "") + currInit}
-                </span>
-              </span>
-            </div>
-          </Typography>
+            </span>
+          </div>
         </Tooltip>
       </Grid>
     </>
