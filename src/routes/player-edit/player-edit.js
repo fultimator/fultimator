@@ -28,6 +28,7 @@ import EditPlayerBasics from "../../components/player/informations/EditPlayerBas
 import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
 import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
+import EditPlayerQuirk from "../../components/player/informations/EditPlayerQuirk";
 import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
@@ -56,6 +57,7 @@ import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import { useNavigate } from "react-router-dom";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
+import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -260,6 +262,9 @@ export default function PlayerEdit() {
                 <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <ListItemText primary={t("Equipment")} />
                 </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 6)}>
+                  <ListItemText primary={t("Notes")} />
+                </ListItem>
               </List>
             </Drawer>
           </>
@@ -272,6 +277,7 @@ export default function PlayerEdit() {
             <Tab value={3}>{t("Classes")}</Tab>
             <Tab value={4}>{t("Spells")}</Tab>
             <Tab value={5}>{t("Equipment")}</Tab>
+            <Tab value={6}>{t("Notes")}</Tab>
           </TabsList>
         )}
         <TabPanel value={0}>
@@ -299,6 +305,7 @@ export default function PlayerEdit() {
             <>
               <PlayerTraits player={playerTemp} isEditMode={isOwner} />
               <PlayerBonds player={playerTemp} isEditMode={isOwner} />
+              <PlayerQuirk player={playerTemp} isEditMode={isOwner} />
               <PlayerRituals
                 player={playerTemp}
                 isEditMode={isOwner}
@@ -359,12 +366,12 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          {isOwner ? (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <EditPlayerNotes player={playerTemp} setPlayer={setPlayerTemp} />
-            </>
-          ) : null}
+          <Divider sx={{ my: 1 }} />
+          <EditPlayerQuirk
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
           <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={2}>
@@ -421,6 +428,14 @@ export default function PlayerEdit() {
         </TabPanel>
         <TabPanel value={5}>
           <EditPlayerEquipment
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+          <Box sx={{ height: "10vh" }} />
+        </TabPanel>
+        <TabPanel value={6}>
+          <EditPlayerNotes
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}

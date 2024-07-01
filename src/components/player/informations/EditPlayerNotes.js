@@ -13,7 +13,7 @@ import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
 import { Add } from "@mui/icons-material";
 
-export default function EditPlayerNotes({ player, setPlayer }) {
+export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -63,17 +63,21 @@ export default function EditPlayerNotes({ player, setPlayer }) {
           <CustomHeader
             type="top"
             headerText={t("Notes")}
-            addItem={() =>
-              {
-                setPlayer((prevState) => {
-                const newState = { ...prevState };
-                newState.notes.push({
-                  name: "",
-                  description: "",
-                });
-                return newState;
-              })}
+            addItem={
+              isEditMode
+                ? () => {
+                    setPlayer((prevState) => {
+                      const newState = { ...prevState };
+                      newState.notes.push({
+                        name: "",
+                        description: "",
+                      });
+                      return newState;
+                    });
+                  }
+                : null
             }
+            showIconButton={isEditMode}
             icon={Add}
           />
         </Grid>
@@ -85,11 +89,13 @@ export default function EditPlayerNotes({ player, setPlayer }) {
             alignItems="center"
             key={index}
           >
-            <Grid item sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={removeItem(index)}>
-                <RemoveCircleOutline />
-              </IconButton>
-            </Grid>
+            {isEditMode && (
+              <Grid item sx={{ p: 0, m: 0 }}>
+                <IconButton onClick={removeItem(index)}>
+                  <RemoveCircleOutline />
+                </IconButton>
+              </Grid>
+            )}
             <Grid item xs={7}>
               <TextField
                 id="name"
@@ -97,6 +103,9 @@ export default function EditPlayerNotes({ player, setPlayer }) {
                 value={note.name}
                 onChange={handleNoteNameChange(index)}
                 inputProps={{ maxLength: 50 }}
+                InputProps={{
+                  readOnly: !isEditMode,
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={12}>
@@ -107,6 +116,7 @@ export default function EditPlayerNotes({ player, setPlayer }) {
                 onChange={handleNoteDescriptionChange(index)}
                 maxLength={5000}
                 maxRows={10}
+                readOnly={!isEditMode}
               />
             </Grid>
             {index !== player.notes.length - 1 && (

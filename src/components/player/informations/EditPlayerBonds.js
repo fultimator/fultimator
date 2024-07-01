@@ -117,6 +117,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
             headerText={t("Bonds")}
             addItem={isEditMode ? addNewBond : null}
             icon={Add}
+            showIconButton={isEditMode}
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (

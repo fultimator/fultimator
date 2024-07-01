@@ -4,13 +4,14 @@ import { useTranslate } from "../../translation/translate";
 import { firestore } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc } from "@firebase/firestore";
-import { Grid, Button, Typography } from "@mui/material";
+import { Grid, Button, Typography, Stack } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
+import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
@@ -102,7 +103,7 @@ export default function CharacterSheet() {
   return (
     <Layout fullWidth={true}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
-        <Grid item xs={10} >
+        <Grid item xs={10}>
           <Button
             variant="contained"
             color="primary"
@@ -130,34 +131,27 @@ export default function CharacterSheet() {
         <Grid container spacing={2} sx={{ padding: 1 }} id="character-sheet">
           <Grid container item xs={12} md={6} spacing={2}>
             <Grid item xs={12}>
-              <PlayerCard
-                player={player}
-                isCharacterSheet={true}
-                characterImage={player.info.imgurl}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerNumbers player={player} isCharacterSheet={true} />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerTraits player={player} isCharacterSheet={true} />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerBonds player={player} isCharacterSheet={true} />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerRituals player={player} isCharacterSheet={true} />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerEquipment player={player} isCharacterSheet={true} />
-            </Grid>
-            <Grid item xs={12}>
-              <PlayerNotes player={player} isCharacterSheet={true} />
+              <Stack direction="column" spacing={2}>
+                <PlayerCard
+                  player={player}
+                  isCharacterSheet={true}
+                  characterImage={player.info.imgurl}
+                />
+                <PlayerNumbers player={player} isCharacterSheet={true} />
+                <PlayerTraits player={player} isCharacterSheet={true} />
+                <PlayerBonds player={player} isCharacterSheet={true} />
+                <PlayerRituals player={player} isCharacterSheet={true} />
+                <PlayerEquipment player={player} isCharacterSheet={true} />
+                <PlayerNotes player={player} isCharacterSheet={true} />
+              </Stack>
             </Grid>
           </Grid>
           <Grid container item xs={12} md={6} spacing={2}>
             <Grid item xs={12}>
-              <PlayerClasses player={player} isCharacterSheet={true} />
+              <Stack direction="column" spacing={2}>
+                <PlayerClasses player={player} isCharacterSheet={true} />
+                <PlayerQuirk player={player} isCharacterSheet={true} />
+              </Stack>
             </Grid>
           </Grid>
           <Grid item xs={12}>
