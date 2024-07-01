@@ -72,7 +72,7 @@ export default function CharacterSheet() {
     const originalStyle = {
       width: element.style.width,
     };
-    element.style.width = fullCharacterSheet ? "2000px" : "1700px"; // Example: Set to a fixed width
+    element.style.width = fullCharacterSheet ? "2000px" : "1000px"; // Example: Set to a fixed width
 
     try {
       const canvas = await html2canvas(element, {
@@ -186,15 +186,13 @@ export default function CharacterSheet() {
           </Grid>
         </Grid>
       ) : (
-        <Grid container sx={{ padding: 1 }} id="character-sheet-short">
-          <Grid container item xs={12} md={12}>
-            <Grid item xs={12}>
+        <Grid container sx={{ padding: 1 }} justifyContent={"center"} id="character-sheet-short" >
+          <Grid container item xs={12} >
               <PlayerCardShort
                 player={player}
                 isCharacterSheet={true}
                 characterImage={player.info.imgurl}
               />
-            </Grid>
           </Grid>
         </Grid>
       )}

@@ -182,6 +182,26 @@ export default function PlayerCardShort({
                 }}
               />
             </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <img
+                src={powered_by_fu}
+                alt="Powered by Fu"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight: "9rem",
+                  maxWidth: "9rem",
+                  marginTop:"5px"
+                }}
+              />
+            </div>
           </Grid>
           <Grid
             container
@@ -189,7 +209,7 @@ export default function PlayerCardShort({
             xs={9}
             sx={{ marginTop: "5px", marginX: "-5px" }}
           >
-            <Grid item xs={11}>
+            <Grid item xs={12}>
               <Paper
                 elevation={3}
                 sx={{
@@ -288,27 +308,6 @@ export default function PlayerCardShort({
                   </Grid>
                 </Grid>
               </Paper>
-            </Grid>
-            <Grid
-              container
-              item
-              xs={1}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src={powered_by_fu}
-                alt="Powered by Fu"
-                style={{
-                  maxHeight: "6.5rem",
-                  maxWidth: "6.5rem",
-                  padding: 2,
-                  marginLeft: 10,
-                }}
-              />
             </Grid>
             <Grid
               container
