@@ -244,6 +244,7 @@ export default function PlayerEdit() {
                 <ListItem onClick={(e) => handleTabChange(e, 0)}>
                   <ListItemText primary={t("Player Sheet")} />
                 </ListItem>
+                <Divider />
                 <ListItem onClick={(e) => handleTabChange(e, 1)}>
                   <ListItemText primary={t("Informations")} />
                 </ListItem>
@@ -265,6 +266,7 @@ export default function PlayerEdit() {
         ) : (
           <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
             <Tab value={0}>{t("Player Sheet")}</Tab>
+            <Divider orientation="vertical" flexItem />
             <Tab value={1}>{t("Informations")}</Tab>
             <Tab value={2}>{t("Stats")}</Tab>
             <Tab value={3}>{t("Classes")}</Tab>
@@ -305,10 +307,7 @@ export default function PlayerEdit() {
                 clockState={ritualClockState}
                 setClockState={setRitualClockState}
               />
-              <PlayerCompanion
-                player={playerTemp}
-                isEditMode={isOwner}
-              />
+              <PlayerCompanion player={playerTemp} isEditMode={isOwner} />
               <PlayerNotes player={playerTemp} isEditMode={isOwner} />
             </>
           )}

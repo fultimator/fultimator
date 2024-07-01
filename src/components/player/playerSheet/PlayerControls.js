@@ -198,48 +198,55 @@ export default function PlayerControls({ player, setPlayer }) {
             </Grid>
           </Grid>
           {/* Zenit Section */}
-          <Grid item xs={12}>
-            <Grid container spacing={1} alignItems="center">
-              <Grid item xs={5} sm={3}>
-                <Typography variant="h2" sx={{ minWidth: "100px" }}>
-                  {t("Zenit")}
-                </Typography>
-              </Grid>
-              <Grid item xs={7} sm={9} sx={{ textAlign: "left" }}>
-                <ToggleButtonGroup
-                  value={changeType}
-                  exclusive
-                  onChange={(event, newChangeType) =>
-                    newChangeType !== null && setChangeType(newChangeType)
-                  }
-                  aria-label="zenit-change-type"
-                >
-                  <ToggleButton value="+" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
-                    {t("+")}
-                  </ToggleButton>
-                  <ToggleButton value="-" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
-                    {t("-")}
-                  </ToggleButton>
-                </ToggleButtonGroup>
-                <TextField
-                  type="number"
-                  size="small"
-                  value={zenitChange}
-                  onChange={(e) => setZenitChange(parseInt(e.target.value))}
-                  inputProps={{ min: 0 }}
-                  style={{ width: 80, margin: "0 8px",}}
-                />
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={changeZenit}
-                  sx={{ height: 40, marginTop: "-6px" }}
-                >
-                  {t("Apply")}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
+<Grid item xs={12}>
+  <Grid container spacing={2} alignItems="center">
+    <Grid item xs={12} sm={3}>
+      <Typography variant="h2" sx={{ minWidth: "100px" }}>
+        {t("Zenit")}
+      </Typography>
+    </Grid>
+    <Grid item xs={12} sm={9} container spacing={2} alignItems="center">
+      <Grid item>
+        <ToggleButtonGroup
+          value={changeType}
+          exclusive
+          onChange={(event, newChangeType) =>
+            newChangeType !== null && setChangeType(newChangeType)
+          }
+          aria-label="zenit-change-type"
+        >
+          <ToggleButton value="+" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
+            {t("+")}
+          </ToggleButton>
+          <ToggleButton value="-" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
+            {t("-")}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Grid>
+      <Grid item>
+        <TextField
+          type="number"
+          size="small"
+          value={zenitChange}
+          onChange={(e) => setZenitChange(parseInt(e.target.value))}
+          inputProps={{ min: 0 }}
+          sx={{ width: 80 }}
+        />
+      </Grid>
+      <Grid item>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={changeZenit}
+          sx={{ height: 40 }}
+        >
+          {t("Apply")}
+        </Button>
+      </Grid>
+    </Grid>
+  </Grid>
+</Grid>
+
         </Grid>
       </Paper>
     </>

@@ -20,6 +20,15 @@ import { ReactComponent as MdefIcon } from "../../svgs/mdef.svg";
 import { ReactComponent as InitIcon } from "../../svgs/init.svg";
 import { TypeAffinity } from "../stats/types";
 
+const AffinityGrid = styled(Grid)(({ theme }) => ({
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  borderTop: `1px solid ${theme.palette.divider}`,
+  borderLeft: `1px solid ${theme.palette.divider}`,
+  borderImage: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.background.paper}) 1`,
+  marginLeft: theme.spacing(0.25),
+  marginTop: theme.spacing(1),
+}));
+
 export default function PlayerCard({
   player,
   setPlayer,
@@ -987,75 +996,34 @@ export default function PlayerCard({
               {renderAdditionalStats()}
             </Grid>
           </Grid>
-          <Grid
-            item
-            xs
-            sx={{
-              borderBottom: "1px solid #281127",
-              borderTop: "1px solid #281127",
-              borderLeft: "1px solid #281127",
-              borderImage: "linear-gradient(90deg, #432846, #ffffff) 1;",
-              ml: isMobile ? "1px" : "2px",
-              mt: 0,
-            }}
-          >
-            <Grid container>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #513455" }}>
+          <AffinityGrid container>
+            {[
+              "physical",
+              "wind",
+              "bolt",
+              "dark",
+              "earth",
+              "fire",
+              "ice",
+              "light",
+              "poison",
+            ].map((type) => (
+              <Grid
+                item
+                xs
+                key={type}
+                sx={{
+                  py: 0.4,
+                  borderRight: `1px solid ${theme.palette.divider}`,
+                }}
+              >
                 <TypeAffinity
-                  type="physical"
-                  affinity={player.affinities?.physical || ""}
+                  type={type}
+                  affinity={player.affinities?.[type] || ""}
                 />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #604365" }}>
-                <TypeAffinity
-                  type="wind"
-                  affinity={player.affinities?.wind || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}>
-                <TypeAffinity
-                  type="bolt"
-                  affinity={player.affinities?.bolt || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #816687" }}>
-                <TypeAffinity
-                  type="dark"
-                  affinity={player.affinities?.dark || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}>
-                <TypeAffinity
-                  type="earth"
-                  affinity={player.affinities?.earth || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}>
-                <TypeAffinity
-                  type="fire"
-                  affinity={player.affinities?.fire || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}>
-                <TypeAffinity
-                  type="ice"
-                  affinity={player.affinities?.ice || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}>
-                <TypeAffinity
-                  type="light"
-                  affinity={player.affinities?.light || ""}
-                />
-              </Grid>
-              <Grid item xs sx={{ py: 0.4 }}>
-                <TypeAffinity
-                  type="poison"
-                  affinity={player.affinities?.poison || ""}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
+            ))}
+          </AffinityGrid>
         </Grid>
       </Grid>
     </Card>
