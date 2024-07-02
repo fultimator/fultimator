@@ -26,11 +26,13 @@ import {
   Button,
   InputAdornment,
   Alert,
+  AlertTitle,
   Box,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Link,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -42,6 +44,7 @@ import {
   Edit,
   HistoryEdu,
   Badge,
+  Star,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
@@ -87,7 +90,6 @@ function Personal({ user }) {
   const [personalList, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
-  
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
@@ -136,8 +138,8 @@ function Personal({ user }) {
               <Grid item>
                 <Box mt={2}>
                   <Typography variant="h2">
-                    Thank you for applying. Please check out our Discord Server for
-                    news and updates.
+                    Thank you for applying. Please check out our Discord Server
+                    for news and updates.
                   </Typography>
                 </Box>
               </Grid>
@@ -186,23 +188,25 @@ function Personal({ user }) {
   }
 
   const filteredList = personalList
-    ? personalList.filter((item) => {
-        // Filter based on name
-        if (
-          name !== "" &&
-          !item.name.toLowerCase().includes(name.toLowerCase())
-        )
-          return false;
+    ? personalList
+        .filter((item) => {
+          // Filter based on name
+          if (
+            name !== "" &&
+            !item.name.toLowerCase().includes(name.toLowerCase())
+          )
+            return false;
 
-        return true;
-      }).sort( (item1, item2) => {
-        // Sort based on selected sort and direction
-        if (direction === "ascending") {
-          return item1.name.localeCompare(item2.name);
-        } else {
-          return item2.name.localeCompare(item1.name);
-        }
-      })
+          return true;
+        })
+        .sort((item1, item2) => {
+          // Sort based on selected sort and direction
+          if (direction === "ascending") {
+            return item1.name.localeCompare(item2.name);
+          } else {
+            return item2.name.localeCompare(item1.name);
+          }
+        })
     : [];
 
   const addPlayer = async function () {
@@ -321,6 +325,45 @@ function Personal({ user }) {
 
   return (
     <>
+      <Alert
+        icon={<Star />}
+        severity="success"
+        variant="filled"
+        sx={{
+          mb: 3,
+          backgroundColor: "rgb(22, 163, 74)", // emerald-600 equivalent
+          "& .MuiAlert-icon": {
+            color: "inherit",
+          },
+        }}
+      >
+        <Box>
+          <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1 }}>
+            Help us improve the Character Designer!
+          </AlertTitle>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            We value your input on this new feature. Please take a moment to
+            complete our quick survey and share your thoughts. Your feedback
+            will directly influence future updates and enhancements.
+          </Typography>
+          <Button
+            href="https://forms.gle/4kfWcrZYRcoAErew5"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="contained"
+            sx={{
+              backgroundColor: "rgb(220, 252, 231)",
+              color: "rgb(22, 163, 74)",
+              fontWeight: "bold",
+              "&:hover": {
+                backgroundColor: "white",
+              },
+            }}
+          >
+            TAKE QUICK SURVEY
+          </Button>
+        </Box>
+      </Alert>
       <Alert variant="filled" severity="warning" sx={{ marginBottom: 3 }}>
         {t(
           "Character Designer is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
