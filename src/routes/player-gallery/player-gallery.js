@@ -31,7 +31,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -44,6 +44,7 @@ import {
   HistoryEdu,
   Badge,
   Star,
+  BugReport,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
@@ -79,6 +80,7 @@ function Personal({ user }) {
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
 
   const canAccessTest =
@@ -315,12 +317,18 @@ function Personal({ user }) {
     setOpen(false);
   };
 
+  
+  const handleBugDialogClose = () => {
+    setIsBugDialogOpen(false)
+  };
+
   const sharePlayer = async (id) => {
     const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
     const fullUrl = `${baseUrl}/pc-gallery/${id}`;
     await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
+
 
   return (
     <>
@@ -496,7 +504,27 @@ function Personal({ user }) {
             </div>
           </Grid>
         ))}
+        <Grid item xs={12}>
+          <Button
+            variant="outlined"
+            startIcon={<BugReport />}
+            sx={{ marginTop: "5rem"}}
+            onClick={( ) => setIsBugDialogOpen(true)}
+          >
+            {t("Report a Bug")}
+          </Button>
+        </Grid>
       </Grid>
+      <Box sx={{ height: "10vh" }} />
+      <HelpFeedbackDialog
+          open={isBugDialogOpen}
+          onClose={handleBugDialogClose}
+          userEmail={user.email}
+          userUUID={user.uid}
+          title={t("Report a Bug")}
+          placeholder="Please describe the bug. Please leave a message in english!"
+          onSuccess={null}
+        />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}

@@ -51,13 +51,14 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { Save } from "@mui/icons-material";
+import { BugReport, Save } from "@mui/icons-material";
 import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import { useNavigate } from "react-router-dom";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
+import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -90,6 +91,8 @@ export default function PlayerEdit() {
   const [ritualClockState, setRitualClockState] = useState(
     new Array(4).fill(false)
   );
+
+  const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -214,6 +217,10 @@ export default function PlayerEdit() {
         };
       });
     }
+  };
+
+  const handleBugDialogClose = () => {
+    setIsBugDialogOpen(false);
   };
 
   if (!playerTemp) {
@@ -345,7 +352,6 @@ export default function PlayerEdit() {
               />
             </>
           )}
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={1}>
           <EditPlayerBasics
@@ -372,7 +378,6 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={2}>
           <EditPlayerAttributes
@@ -407,7 +412,6 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={3}>
           <EditPlayerClasses
@@ -416,7 +420,6 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={4}>
           <EditPlayerSpells
@@ -424,7 +427,6 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={5}>
           <EditPlayerEquipment
@@ -432,7 +434,6 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
         <TabPanel value={6}>
           <EditPlayerNotes
@@ -440,8 +441,16 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
           />
-          <Box sx={{ height: "10vh" }} />
         </TabPanel>
+        <Button
+          variant="outlined"
+          startIcon={<BugReport />}
+          sx={{ marginTop: "5rem" }}
+          onClick={() => setIsBugDialogOpen(true)}
+        >
+          {t("Report a Bug")}
+        </Button>
+        <Box sx={{ height: "10vh" }} />
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && isOwner && (
@@ -467,6 +476,15 @@ export default function PlayerEdit() {
           </Fade>
         </Grid>
       )}
+      <HelpFeedbackDialog
+        open={isBugDialogOpen}
+        onClose={handleBugDialogClose}
+        userEmail={user.email}
+        userUUID={user.uid}
+        title={t("Report a Bug")}
+        placeholder="Please describe the bug. Please leave a message in english!"
+        onSuccess={null}
+      />
     </Layout>
   );
 }
