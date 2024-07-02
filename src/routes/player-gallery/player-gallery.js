@@ -170,7 +170,7 @@ function Personal({ user }) {
           onClose={handleDialogClose}
           userEmail={user.email}
           userUUID={user.uid}
-          title={t("Apply for Test")}
+          title={"Apply for Test"}
           placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message in english!"
           onSuccess={handleApplicationSuccess}
         />
@@ -521,7 +521,7 @@ function Personal({ user }) {
           onClose={handleBugDialogClose}
           userEmail={user.email}
           userUUID={user.uid}
-          title={t("Report a Bug")}
+          title={"Report a Bug"}
           placeholder="Please describe the bug. Please leave a message in english!"
           onSuccess={null}
         />

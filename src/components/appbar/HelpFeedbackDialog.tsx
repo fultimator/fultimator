@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useTranslate } from "../../translation/translate";
 
 interface HelpFeedbackDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   placeholder,
   onSuccess,
 }) => {
+  const { t } = useTranslate();
   const [discordAccount, setDiscordAccount] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,7 +129,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ fontSize: "1.4rem" }}>{title}</DialogTitle>
+      <DialogTitle sx={{ fontSize: "1.4rem" }}>{t(title)}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus

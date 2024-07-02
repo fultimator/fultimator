@@ -324,6 +324,195 @@ const classList = [
     },
   },
   {
+    name: "Ace of Cards",
+    book: "bonus",
+    benefits: {
+      hpplus: 0,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: true,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      custom: [
+        "You may choose to permanently increase your maximum Hit Points or Mind Points by 5 (your choice).",
+      ],
+      spellClasses: [],
+    },
+  },
+  {
+    name: "Necromancer",
+    book: "bonus",
+    benefits: {
+      hpplus: 0,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: true,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      custom: [
+        "You may choose to permanently increase your maximum Hit Points or Mind Points by 5 (your choice).",
+      ],
+      spellClasses: [],
+    },
+  },
+  {
+    name: "Chanter",
+    book: "high",
+    benefits: {
+      hpplus: 0,
+      mpplus: 5,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: ["default"],
+    },
+  },
+  {
+    name: "Commander",
+    book: "high",
+    benefits: {
+      hpplus: 5,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: true,
+        ranged: true,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: [],
+    },
+  },
+  {
+    name: "Dancer",
+    book: "high",
+    benefits: {
+      hpplus: 0,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: true,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      custom: [
+        "You may choose to permanently increase your maximum Hit Points or Mind Points by 5 (your choice).",
+      ],
+      spellClasses: ["default"],
+    },
+  },
+  {
+    name: "Symbolist",
+    book: "high",
+    benefits: {
+      hpplus: 0,
+      mpplus: 0,
+      ipplus: 2,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: ["default"],
+    },
+  },
+  {
+    name: "Esper",
+    book: "techno",
+    benefits: {
+      hpplus: 0,
+      mpplus: 5,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: [],
+    },
+  },
+  {
+    name: "Mutant",
+    book: "techno",
+    benefits: {
+      hpplus: 5,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: [],
+    },
+  },
+  {
+    name: "Pilot",
+    book: "techno",
+    benefits: {
+      hpplus: 5,
+      mpplus: 0,
+      ipplus: 0,
+      isCustomBenefit: false,
+      martials: {
+        armor: false,
+        shields: false,
+        melee: true,
+        ranged: true,
+      },
+      rituals: {
+        ritualism: false,
+      },
+      spellClasses: [],
+    },
+  },
+  {
     name: "Blank Class",
     book: "homebrew",
     benefits: {
@@ -344,6 +533,5 @@ const classList = [
     },
   },
 ];
-
 
 export default classList;

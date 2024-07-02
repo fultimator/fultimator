@@ -481,7 +481,7 @@ export default function PlayerEdit() {
         onClose={handleBugDialogClose}
         userEmail={user.email}
         userUUID={user.uid}
-        title={t("Report a Bug")}
+        title={"Report a Bug"}
         placeholder="Please describe the bug. Please leave a message in english!"
         onSuccess={null}
       />

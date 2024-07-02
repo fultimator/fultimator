@@ -218,7 +218,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         onClose={handleDialogClose} 
         userEmail={userEmail}
         userUUID={userUUID}
-        title={t("Help & Feedback")}
+        title={"Help & Feedback"}
         placeholder={t("How can we help you today? Please leave a message in english!")}
         onSuccess={() => console.log("Successfully submitted feedback")}
       /> {/* Render the dialog */}
