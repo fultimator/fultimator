@@ -88,6 +88,7 @@ function Home() {
         sx={{
           textAlign: "center",
           mt: 5,
+          mb: 5,
         }}
       >
         <Typography variant="body1" sx={{ mt: 2 }}>
@@ -133,6 +134,21 @@ function Home() {
             sx={{ color: "#47645b", fontWeight: "bold" }}
           >
             akashics.moe
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1.5 }}>
+          <strong>{t("Join the Fultimator Developer Team!")}</strong>{" "}
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 0 }}>
+          {t("We would love to have you on board!")}{" "}
+          <Link
+            href="https://discord.gg/9yYc6R93Cd"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#7289da", fontWeight: "bold" }}
+          >
+            {t("Simply reach out to us on Discord!")}
           </Link>
         </Typography>
       </Box>
