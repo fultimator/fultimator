@@ -173,6 +173,7 @@ function Personal({ user }) {
           title={"Apply for Test"}
           placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message in english!"
           onSuccess={handleApplicationSuccess}
+          webhookUrl={process.env.REACT_APP_DISCORD_APPLICATIONS_WEBHOOK_URL}
         />
       </>
     );
@@ -524,6 +525,7 @@ function Personal({ user }) {
           title={"Report a Bug"}
           placeholder="Please describe the bug. Please leave a message in english!"
           onSuccess={null}
+          webhookUrl={process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL}
         />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}

@@ -43,6 +43,7 @@ import {
   ContentCopy,
   Share,
   Download,
+  Report,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -59,6 +60,8 @@ import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
+
+import ReportContentDialog from "../../components/appbar/ReportContentDialog";
 
 export default function NpcCompedium() {
   const { t } = useTranslate();
@@ -84,6 +87,13 @@ export default function NpcCompedium() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
+
+  const [openReportDialog, setOpenReportDialog] = useState(false);
+  const [selectedReportNpc, setSelectedReportNpc] = useState({
+    id: "",
+    name: "",
+    author: "",
+  });
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
@@ -239,16 +249,16 @@ function Personal({ user }) {
                   ? 80
                   : 130
                 : isMobile
-                  ? 60
-                  : 100,
+                ? 60
+                : 100,
             height:
               selectedType === name
                 ? isMobile
                   ? 80
                   : 130
                 : isMobile
-                  ? 60
-                  : 100,
+                ? 60
+                : 100,
             border: selectedType === name ? "6px solid purple" : "none",
             cursor: "pointer",
           }}
@@ -296,6 +306,11 @@ function Personal({ user }) {
   ];
 
   const isMobile = window.innerWidth < 900;
+
+  const handleCloseReportDialog = () => {
+    setOpenReportDialog(false);
+    setSelectedReportNpc({ id: "", name: "", author: "" });
+  };
 
   if (err?.code === "resource-exhausted") {
     return (
@@ -474,6 +489,10 @@ function Personal({ user }) {
                 copyNpc={copyNpc}
                 deleteNpc={deleteNpc}
                 shareNpc={shareNpc}
+                reportNpc={() => {
+                  setSelectedReportNpc(npc);
+                  setOpenReportDialog(true);
+                }}
                 collapseGet={collapse}
               />
             );
@@ -493,6 +512,10 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  reportNpc={() => {
+                    setSelectedReportNpc(npc);
+                    setOpenReportDialog(true);
+                  }}
                   collapseGet={collapse}
                 />
               );
@@ -508,6 +531,10 @@ function Personal({ user }) {
                   copyNpc={copyNpc}
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
+                  reportNpc={() => {
+                    setSelectedReportNpc(npc);
+                    setOpenReportDialog(true);
+                  }}
                   collapseGet={collapse}
                 />
               );
@@ -570,6 +597,16 @@ function Personal({ user }) {
                 )}
               </div>
             )}
+            <ReportContentDialog
+              open={openReportDialog}
+              onClose={handleCloseReportDialog}
+              userUUID={user.uid}
+              contentId={selectedReportNpc.id}
+              contentName={selectedReportNpc.name}
+              contentAuthor={selectedReportNpc.uid}
+              contentType="NPC"
+              onSuccess={() => console.log("success")}
+            />
           </>
         ) : (
           <CircularProgress />
@@ -587,7 +624,7 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, shareNpc, collapseGet }) {
+function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
@@ -622,6 +659,11 @@ function Npc({ npc, copyNpc, shareNpc, collapseGet }) {
       <Tooltip title={t("Download as Image")}>
         <IconButton onClick={downloadImage}>
           <Download />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title={t("Report NPC")}>
+        <IconButton onClick={() => reportNpc(npc)}>
+          <Report />
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} data={npc} />

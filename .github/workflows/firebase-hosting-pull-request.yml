@@ -12,6 +12,9 @@ jobs:
       - run: npm ci && npm run build
         env:
           REACT_APP_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          REACT_APP_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

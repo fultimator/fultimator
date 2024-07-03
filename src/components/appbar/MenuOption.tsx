@@ -221,6 +221,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         title={"Help & Feedback"}
         placeholder={t("How can we help you today? Please leave a message in english!")}
         onSuccess={() => console.log("Successfully submitted feedback")}
+        webhookUrl={process.env.REACT_APP_DISCORD_FEEDBACK_WEBHOOK_URL || ""}
       /> {/* Render the dialog */}
     </>
   );

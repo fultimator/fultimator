@@ -7,36 +7,44 @@ import {
   Button,
   TextField,
   Typography,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  FormGroup,
 } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
 
-interface HelpFeedbackDialogProps {
+interface ReportContentDialogProps {
   open: boolean;
   onClose: () => void;
-  userEmail: string;
-  userUUID: string;
-  title: string;
-  placeholder: string;
-  webhookUrl: string;
-  onSuccess: () => void; // New prop for success callback
+  contentAuthor: string;
+  contentId: string;
+  contentName: string;
+  contentType: string;
+  onSuccess: () => void;
 }
 
-const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
+const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
   open,
   onClose,
-  userEmail,
-  userUUID,
-  title,
-  placeholder,
-  webhookUrl,
+  contentAuthor,
+  contentId,
+  contentName,
+  contentType,
   onSuccess,
 }) => {
   const { t } = useTranslate();
-  const [discordAccount, setDiscordAccount] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+
+  const reportReasons = [
+    "The content violates copyright as it's not original content",
+    "Offensive content",
+    "Content language unsupported",
+  ];
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -48,16 +56,24 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     return () => clearInterval(timer);
   }, [cooldown]);
 
+  const handleReasonChange = (reason: string) => {
+    setSelectedReasons((prevReasons) =>
+      prevReasons.includes(reason)
+        ? prevReasons.filter((r) => r !== reason)
+        : [...prevReasons, reason]
+    );
+  };
+
   const handleSubmit = async () => {
-    //const webhookUrl = process.env.REACT_APP_DISCORD_FEEDBACK_WEBHOOK_URL;
+    const webhookUrl = process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
 
     if (!webhookUrl) {
       setErrorMessage("Webhook URL is not defined");
       return;
     }
 
-    if (!message.trim()) {
-      setErrorMessage("Message is required");
+    if (selectedReasons.length === 0 && message.trim() === "") {
+      setErrorMessage("At least one reason must be selected");
       return;
     }
 
@@ -68,12 +84,11 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       content: null,
       embeds: [
         {
-          title: `New Support Request! (${title})`,
-          description: `Discord: ${discordAccount}\nEmail: ${
-            userEmail ? userEmail : "User Not Logged-In"
-          }\nUUID: ${
-            userUUID ? userUUID : "User Not Logged-In"
-          }\n\nMessage: ${message}`,
+          title: `New Report! (${contentType})`,
+          description: `Author UUID: ${contentAuthor}
+          \n Reported Content: ${contentName} - ${contentId} (${contentType})
+          \n\nReasons:\n${selectedReasons.join("\n")}
+          ${message ? `\n\nMessage: ${message}` : ""}`,
           color: 16248815,
         },
       ],
@@ -97,8 +112,8 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
       console.log("Message sent successfully");
       setCooldown(30);
       onClose();
-      setDiscordAccount("");
       setMessage("");
+      setSelectedReasons([]);
       onSuccess(); // Call the success callback
     } catch (error) {
       if (error instanceof Error) {
@@ -115,9 +130,9 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
 
   const handleClose = () => {
     onClose();
-    setDiscordAccount("");
     setMessage("");
     setErrorMessage("");
+    setSelectedReasons([]);
   };
 
   return (
@@ -131,22 +146,31 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ fontSize: "1.4rem" }}>{t(title)}</DialogTitle>
+      <DialogTitle sx={{ fontSize: "1.4rem" }}>
+        {t("Report Content")}
+      </DialogTitle>
       <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Discord Account"
-          type="text"
-          fullWidth
-          value={discordAccount}
-          onChange={(e) => setDiscordAccount(e.target.value)}
-          inputProps={{
-            maxLength: 100,
-          }}
-        />
+        <FormControl component="fieldset" sx={{ mt: 2 }}>
+          <Typography variant="body2">
+            {t("Select the reasons for reporting:")}
+          </Typography>
+          <FormGroup>
+            {reportReasons.map((reason) => (
+              <FormControlLabel
+                key={reason}
+                control={
+                  <Checkbox
+                    checked={selectedReasons.includes(reason)}
+                    onChange={() => handleReasonChange(reason)}
+                  />
+                }
+                label={reason}
+              />
+            ))}
+          </FormGroup>
+        </FormControl>
         <Typography variant="body2" sx={{ mt: 1 }}>
-          {placeholder}
+          {t("Add a message if other reasons.")}
         </Typography>
         <TextField
           margin="dense"
@@ -161,6 +185,9 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
             maxLength: 5000,
           }}
         />
+        <Typography variant="body2" sx={{ mt: 1 }}>
+          {t("Report is anonymous.")}
+        </Typography>
         {errorMessage && (
           <Typography color="error" variant="body2">
             {errorMessage}
@@ -183,4 +210,4 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
   );
 };
 
-export default HelpFeedbackDialog;
+export default ReportContentDialog;
