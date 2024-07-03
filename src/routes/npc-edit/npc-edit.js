@@ -20,6 +20,16 @@ import {
   useTheme,
   useMediaQuery,
   Alert,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  Box,
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import {
   Download,
@@ -53,6 +63,7 @@ import { useTranslate, languageOptions } from "../../translation/translate";
 import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
+import emaExample from "./emaExample.png";
 
 export default function NpcEdit() {
   const { t } = useTranslate(); // Translation hook
@@ -66,6 +77,22 @@ export default function NpcEdit() {
 
   const [user] = useAuthState(auth); // Authentication state hook
   const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+
+  const [checkedRules, setCheckedRules] = useState(false);
+  const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
+
+  const handleCheckboxChange = (event) => {
+    setCheckedRules(event.target.checked);
+  };
+
+  const handleDialogOpen = (event) => {
+    event.preventDefault();
+    setRulesDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setRulesDialogOpen(false);
+  };
 
   let isModerator = false;
 
@@ -450,18 +477,148 @@ export default function NpcEdit() {
 
                 {/* Publish/Unpublish Buttons */}
                 {!npcTemp.published && (
-                  <Button
-                    variant="contained"
-                    sx={{ marginTop: 1 }}
-                    startIcon={<Publish />}
-                    disabled={
-                      canPublish().disabled ||
-                      (user && isModerator && user.uid !== npc.uid)
-                    }
-                    onClick={publish}
-                  >
-                    {t("Publish to Adversary Compendium")}
-                  </Button>
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        marginTop: 1,
+                      }}
+                    >
+                      <Typography variant="body2">
+                        Ensure that your submission follows the
+                      </Typography>
+                      <Link href="#" onClick={handleDialogOpen}>
+                        Submission Guidelines for Adversary Compendium
+                      </Link>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: 1,
+                      }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={checkedRules}
+                            onChange={handleCheckboxChange}
+                          />
+                        }
+                        label="I Agree"
+                      />
+                    </Box>
+                    <Button
+                      variant="contained"
+                      sx={{ marginTop: 1 }}
+                      startIcon={<Publish />}
+                      disabled={
+                        !checkedRules ||
+                        canPublish().disabled ||
+                        (user && isModerator && user.uid !== npc.uid)
+                      }
+                      onClick={publish}
+                    >
+                      {t("Publish to Adversary Compendium")}
+                    </Button>
+                    <Dialog
+                      open={rulesDialogOpen}
+                      onClose={handleDialogClose}
+                      PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
+                    >
+                      <DialogTitle variant="h3">
+                        Submission Guidelines for Adversary Compendium
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText>
+                          <ol>
+                            <li>
+                              <strong>Original Content Only:</strong> Avoid
+                              using NPC data from official publications or
+                              translations, and refrain from copyrighted
+                              material.
+                            </li>
+                            <ul>
+                              <li>
+                                <strong>Deviations from Official Work:</strong>{" "}
+                                When creating NPCs inspired by official sources
+                                (e.g., an ice drake inspired by the core
+                                rulebook bestiary drake), ensure changes go
+                                beyond the <strong>"bare minimum"</strong>.
+                              </li>
+                            </ul>
+                            <li>
+                              <strong>Respectful Submissions:</strong> Tag
+                              sexually explicit content appropriately and
+                              provide warnings where necessary.
+                            </li>
+                            <li>
+                              <strong>Supported Languages Only:</strong> Entries
+                              must be in supported languages (English, Italian,
+                              Spanish, German, Polish, French, Brazilian
+                              Portuguese). Entries in unsupported languages will
+                              be flagged.
+                            </li>
+                          </ol>
+                          <p>
+                            <strong>Note:</strong> Content violating these
+                            guidelines may be unpublished. Each submission
+                            includes a report button. While I'm hesitant to ban
+                            accounts, repeated disregard for guidelines may lead
+                            to account termination.
+                          </p>
+                          <p>
+                            <strong>
+                              Deviation from Official Work Guidelines:
+                            </strong>
+                          </p>
+                          <ul>
+                            <li>
+                              <strong>Bare Minimum Modifications:</strong>
+                              <ul>
+                                <li>
+                                  Alter NPC names, descriptions, skill names,
+                                  etc.
+                                </li>
+                                <li>
+                                  Avoid using copyrighted names, terms, or
+                                  mechanics directly from official sources
+                                  (e.g., "Bite" or "Dragonbreath"). Instead, use
+                                  unique variations like "Vicious Bite" or
+                                  "Frost Breath" for compliance and originality.
+                                </li>
+                              </ul>
+                            </li>
+                          </ul>
+                          <p>
+                            Example provided by RoosterEma on what could
+                            constitute "bare minimum":
+                          </p>
+                          <img
+                            src={emaExample}
+                            alt="emaExample"
+                            style={{ maxWidth: "40rem" }}
+                          />
+                          <p>
+                            <a
+                              href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Fabula Ultima Third Party Tabletop License 1.0
+                            </a>
+                          </p>
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleDialogClose} color="primary">
+                          Close
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
                 )}
                 {npcTemp.published && (
                   <Button
@@ -469,7 +626,9 @@ export default function NpcEdit() {
                     sx={{ marginTop: 1 }}
                     onClick={unPublish}
                   >
-                    {user && isModerator && user.uid !== npc.uid ? t("Unpublish as Moderator") : t("Unpublish")}
+                    {user && isModerator && user.uid !== npc.uid
+                      ? t("Unpublish as Moderator")
+                      : t("Unpublish")}
                   </Button>
                 )}
 
