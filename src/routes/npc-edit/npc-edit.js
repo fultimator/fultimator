@@ -234,12 +234,55 @@ export default function NpcEdit() {
   };
 
   // Function to unpublish NPC
-  const unPublish = () => {
+  const unPublish = async () => {
     setIsUpdated(false);
     setDoc(ref, {
       ...npcTemp,
       published: false,
     });
+
+    // Send message to webhook when unpublishing as moderator
+    if (user && isModerator && user.uid !== npc.uid) {
+      const webhookUrl =
+        process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
+      const payload = {
+        content: null,
+        embeds: [
+          {
+            title: `UNPUBLISHED BY MODERATOR! (NPC)`,
+            description: `Moderator: ${user.uid}
+          \nAuthor UUID: ${npc.uid}
+          \n Reported Content: ${npc.name} - ${npc.id} (NPC)
+          \n https://fabula-ultima-helper.web.app/npc-gallery/${npc.id}`,
+            color: 16248815,
+          },
+        ],
+        username: "Fultimator-Support",
+        attachments: [],
+      };
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log(
+            "There was a problem with the fetch operation: " + error.message
+          );
+        } else {
+          console.log("An unknown error occurred");
+        }
+      }
+    }
   };
 
   // Function to copy NPC
@@ -274,7 +317,11 @@ export default function NpcEdit() {
     <Layout>
       {/* Main Grid Container */}
       {user && isModerator && user.uid !== npc.uid && (
-        <Alert severity="warning" variant="filled" sx={{marginBottom: "10px"}}>
+        <Alert
+          severity="warning"
+          variant="filled"
+          sx={{ marginBottom: "10px" }}
+        >
           Moderator view
         </Alert>
       )}
@@ -407,7 +454,10 @@ export default function NpcEdit() {
                     variant="contained"
                     sx={{ marginTop: 1 }}
                     startIcon={<Publish />}
-                    disabled={canPublish().disabled || (user && isModerator && user.uid !== npc.uid)}
+                    disabled={
+                      canPublish().disabled ||
+                      (user && isModerator && user.uid !== npc.uid)
+                    }
                     onClick={publish}
                   >
                     {t("Publish to Adversary Compendium")}
@@ -419,7 +469,7 @@ export default function NpcEdit() {
                     sx={{ marginTop: 1 }}
                     onClick={unPublish}
                   >
-                    {t("Unpublish")}
+                    {user && isModerator && user.uid !== npc.uid ? t("Unpublish as Moderator") : t("Unpublish")}
                   </Button>
                 )}
 
