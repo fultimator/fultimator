@@ -147,10 +147,10 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               return setAttack("attr1", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-            <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-            <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-            <MenuItem value={"will"}>{t("Wil")}</MenuItem>
+            <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+            <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+            <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+            <MenuItem value={"will"}>{t("WLP")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
@@ -169,10 +169,10 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               return setAttack("attr2", e.target.value);
             }}
           >
-            <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-            <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-            <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-            <MenuItem value={"will"}>{t("Wil")}</MenuItem>
+            <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+            <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+            <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+            <MenuItem value={"will"}>{t("WLP")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>

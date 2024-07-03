@@ -180,10 +180,10 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 return setSpell("attr1", e.target.value);
               }}
             >
-              <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-              <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-              <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-              <MenuItem value={"will"}>{t("Wil")}</MenuItem>
+              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -204,10 +204,10 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 return setSpell("attr2", e.target.value);
               }}
             >
-              <MenuItem value={"dexterity"}>{t("Dex")}</MenuItem>
-              <MenuItem value={"insight"}>{t("Ins")}</MenuItem>
-              <MenuItem value={"might"}>{t("Mig")}</MenuItem>
-              <MenuItem value={"will"}>{t("Wil")}</MenuItem>
+              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
