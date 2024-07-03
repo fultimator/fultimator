@@ -87,6 +87,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
           title: `New Report! (${contentType})`,
           description: `Author UUID: ${contentAuthor}
           \n Reported Content: ${contentName} - ${contentId} (${contentType})
+          \n https://fabula-ultima-helper.web.app/npc-gallery/${contentId}
           \n\nReasons:\n${selectedReasons.join("\n")}
           ${message ? `\n\nMessage: ${message}` : ""}`,
           color: 16248815,
