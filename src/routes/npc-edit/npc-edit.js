@@ -19,6 +19,7 @@ import {
   FormHelperText,
   useTheme,
   useMediaQuery,
+  Alert,
 } from "@mui/material";
 import {
   Download,
@@ -51,6 +52,7 @@ import Export from "../../components/Export";
 import { useTranslate, languageOptions } from "../../translation/translate";
 import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
+import { moderators } from "../../libs/userGroups";
 
 export default function NpcEdit() {
   const { t } = useTranslate(); // Translation hook
@@ -64,6 +66,12 @@ export default function NpcEdit() {
 
   const [user] = useAuthState(auth); // Authentication state hook
   const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+
+  let isModerator = false;
+
+  if (user && moderators.includes(user.uid)) {
+    isModerator = true;
+  }
 
   // Scroll-to-top handler
   const handleMoveToTop = () => {
@@ -265,6 +273,11 @@ export default function NpcEdit() {
   return (
     <Layout>
       {/* Main Grid Container */}
+      {user && isModerator && user.uid !== npc.uid && (
+        <Alert severity="warning" variant="filled" sx={{marginBottom: "10px"}}>
+          Moderator view
+        </Alert>
+      )}
       <Grid container spacing={2}>
         {/* NPC Pretty Display (Left-side Grid Item) */}
         <Grid item xs={12} md={8}>
@@ -336,7 +349,7 @@ export default function NpcEdit() {
             }}
           >
             {/* Show editing options only if user is the creator */}
-            {user && user.uid === npc.uid && (
+            {((user && user.uid === npc.uid) || isModerator) && (
               <div
                 style={{
                   display: "flex",
@@ -354,14 +367,15 @@ export default function NpcEdit() {
                     npcTemp.published
                       ? t("This NPC is part of the Adversary Compendium.")
                       : t(
-                        "Help the Adversary Compendium grow by publishing your finished work!"
-                      )
+                          "Help the Adversary Compendium grow by publishing your finished work!"
+                        )
                   }
                   fullWidth
                   value={npcTemp.createdBy}
                   onChange={(evt) =>
                     updateNPC({ ...npcTemp, createdBy: evt.target.value })
                   }
+                  disabled={user && isModerator && user.uid !== npc.uid}
                 />
 
                 {/* Language Selection */}
@@ -374,6 +388,7 @@ export default function NpcEdit() {
                     updateNPC({ ...npcTemp, language: evt.target.value })
                   }
                   fullWidth
+                  disabled={user && isModerator && user.uid !== npc.uid}
                 >
                   {languageOptions.map((option) => (
                     <MenuItem key={option.code} value={option.code}>
@@ -392,7 +407,7 @@ export default function NpcEdit() {
                     variant="contained"
                     sx={{ marginTop: 1 }}
                     startIcon={<Publish />}
-                    disabled={canPublish().disabled}
+                    disabled={canPublish().disabled || (user && isModerator && user.uid !== npc.uid)}
                     onClick={publish}
                   >
                     {t("Publish to Adversary Compendium")}
@@ -466,7 +481,11 @@ export default function NpcEdit() {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                <CustomHeader type="top" headerText={t("Affinity")} showIconButton={false} />
+                <CustomHeader
+                  type="top"
+                  headerText={t("Affinity")}
+                  showIconButton={false}
+                />
                 <ExplainAffinities npc={npcTemp} />
                 <EditAffinities npc={npcTemp} setNpc={updateNPC} />
               </Grid>
