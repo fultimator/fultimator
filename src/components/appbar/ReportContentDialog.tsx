@@ -111,7 +111,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
       }
 
       console.log("Message sent successfully");
-      setCooldown(30);
+      setCooldown(5);
       onClose();
       setMessage("");
       setSelectedReasons([]);
