@@ -17,17 +17,17 @@ export function EditAttributes({ npc, setNpc }) {
   const attributeList = [
     {
       key: "dexterity",
-      label: t("Dex"),
+      label: t("DEX"),
       min: 6,
       max: 12,
       step: 2,
       marks: true,
     },
-    { key: "insight", label: t("Ins"), min: 6, max: 12, step: 2, marks: true },
-    { key: "might", label: t("Mig"), min: 6, max: 12, step: 2, marks: true },
+    { key: "insight", label: t("INS"), min: 6, max: 12, step: 2, marks: true },
+    { key: "might", label: t("MIG"), min: 6, max: 12, step: 2, marks: true },
     {
       key: "will",
-      label: t("Wil"),
+      label: t("WLP"),
       min: 6,
       max: 12,
       step: 2,

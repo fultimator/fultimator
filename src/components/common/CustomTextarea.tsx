@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { TextareaAutosize, useTheme, Button } from "@mui/material";
 
 interface CustomTextareaProps {
@@ -32,31 +32,33 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const primary = theme.palette.primary.main;
   const [isFocused, setIsFocused] = useState(false);
 
-  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(true);
     if (onFocus) onFocus(e);
-  };
+  }, [onFocus]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(false);
     if (onBlur) onBlur(e);
-  };
+  }, [onBlur]);
 
-  const handleMouseOver = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+  const handleMouseOver = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
     if (!isFocused) {
       e.currentTarget.style.outlineColor = "black";
     }
     if (onMouseOver) onMouseOver(e);
-  };
+  }, [isFocused, onMouseOver]);
 
-  const handleMouseOut = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+  const handleMouseOut = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
     if (!isFocused) {
       e.currentTarget.style.outlineColor = primary;
     }
     if (onMouseOut) onMouseOut(e);
-  };
+  }, [isFocused, onMouseOut, primary]);
 
-  const handleFormat = (format: string) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleFormat = useCallback((format: string) => {
     const textarea = textareaRef.current;
 
     if (!textarea) return;
@@ -80,10 +82,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
         break;
     }
 
-    const newText = `${value.substring(
-      0,
-      start
-    )}${formattedText}${value.substring(end)}`;
+    const newText = `${value.substring(0, start)}${formattedText}${value.substring(end)}`;
 
     onChange({
       target: { value: newText },
@@ -91,9 +90,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 
     textarea.setSelectionRange(start + 2, start + 2 + selectedText.length);
     textarea.focus();
-  };
-
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  }, [value, onChange]);
 
   const textareaStyle: React.CSSProperties = {
     width: "100%",
@@ -140,15 +137,14 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     overflow: "hidden",
     backgroundColor: "white",
   };
-  
-  const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } =
-    {
-      fontSize: "12px",
-      padding: "0",
-      marginRight: "8px",
-      transition: "font-weight 0.3s ease",
-      fontWeight: "normal",
-    };
+
+  const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } = {
+    fontSize: "12px",
+    padding: "0",
+    marginRight: "8px",
+    transition: "font-weight 0.3s ease",
+    fontWeight: "normal",
+  };
 
   buttonStyle["&:hover"] = {
     fontWeight: "bold",

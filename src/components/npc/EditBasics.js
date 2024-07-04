@@ -202,7 +202,7 @@ export default function EditBasics({ npc, setNpc }) {
 
       {npc.rank === "companion" && (
         <Grid item xs={4}>
-          <FormControl fullWidth>
+          <FormControl variant="standard" fullWidth>
             <TextField
               labelid="companionpclvl"
               id="textfield-companionpclvl"
