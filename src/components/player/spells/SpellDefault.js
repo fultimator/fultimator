@@ -214,7 +214,7 @@ function ThemedSpellDefault({
         }}
       >
         <Grid item xs={12}>
-          <Typography sx={{ minHeight: "30px" }}>
+          <Typography component={"div"} sx={{ minHeight: "30px" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {description}
             </StyledMarkdown>

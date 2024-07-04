@@ -30,7 +30,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(true);
@@ -43,15 +43,15 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   };
 
   const handleMouseOver = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!e.currentTarget.matches(":focus")) {
+    if (!isFocused) {
       e.currentTarget.style.outlineColor = "black";
     }
     if (onMouseOver) onMouseOver(e);
   };
 
   const handleMouseOut = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!e.currentTarget.matches(":focus")) {
-      e.currentTarget.style.outlineColor = isFocused ? primary : "#c4c4c4";
+    if (!isFocused) {
+      e.currentTarget.style.outlineColor = primary;
     }
     if (onMouseOut) onMouseOut(e);
   };
@@ -59,9 +59,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const handleFormat = (format: string) => {
     const textarea = textareaRef.current;
 
-    if (!textarea) {
-      return;
-    }
+    if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -86,6 +84,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
       0,
       start
     )}${formattedText}${value.substring(end)}`;
+
     onChange({
       target: { value: newText },
     } as React.ChangeEvent<HTMLTextAreaElement>);
@@ -106,8 +105,8 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     outline: "none",
     resize: "vertical",
     boxShadow: isFocused ? `0 0 0 2px ${primary}` : "none",
-    backgroundColor: readOnly ? "#f5f5f5" : "white", // Gray background if read-only
-    cursor: readOnly ? "not-allowed" : "text", // Not-allowed cursor if read-only
+    backgroundColor: readOnly ? "#f5f5f5" : "white",
+    cursor: readOnly ? "not-allowed" : "text",
   };
 
   const labelStyle: React.CSSProperties = {
@@ -141,17 +140,19 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     overflow: "hidden",
     backgroundColor: "white",
   };
+  
+  const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } =
+    {
+      fontSize: "12px",
+      padding: "0",
+      marginRight: "8px",
+      transition: "font-weight 0.3s ease",
+      fontWeight: "normal",
+    };
 
-  const buttonStyle = {
-    fontSize: "12px",
-    padding: "0",
-    marginRight: "8px",
-    transition: "font-weight 0.3s ease",
-    fontWeight: "normal",
-    "&:hover": {
-      fontWeight: "bold",
-    },
-  } as React.CSSProperties;
+  buttonStyle["&:hover"] = {
+    fontWeight: "bold",
+  };
 
   return (
     <div style={{ position: "relative", margin: "5px 0" }}>
@@ -187,7 +188,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
         onBlur={handleBlur}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
-        readOnly={readOnly} // Add readOnly here
+        readOnly={readOnly}
         style={textareaStyle}
         maxRows={maxRows}
         maxLength={maxLength}

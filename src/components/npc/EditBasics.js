@@ -16,64 +16,64 @@ import {
 import { EditAttributes } from "./EditAttributes";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
+import { useCallback } from "react";
 
 export default function EditBasics({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const ternary = theme.palette.ternary.main;
-  const onChange = (key) => {
-    return (e) => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState[key] = e.target.value;
-        return newState;
+
+  const onChange = useCallback(
+    (key, value) => {
+      setNpc((prevNpc) => ({
+        ...prevNpc,
+        [key]: value,
+      }));
+    },
+    [setNpc]
+  );
+
+  const onChangeSpecies = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setNpc((prevNpc) => {
+        let affinities = {};
+
+        if (value === "Construct") {
+          affinities = { poison: "im", earth: "rs" };
+        } else if (value === "Elemental") {
+          affinities = { poison: "im" };
+        } else if (value === "Undead") {
+          affinities = { dark: "im", poison: "im", light: "vu" };
+        }
+
+        return {
+          ...prevNpc,
+          species: value,
+          affinities: affinities,
+        };
       });
-    };
-  };
+    },
+    [setNpc]
+  );
 
-  const onChangeSpecies = function (e) {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.species = e.target.value;
-
-      if (
-        e.target.value === "Beast" ||
-        e.target.value === "Demon" ||
-        e.target.value === "Monster" ||
-        e.target.value === "Plant" ||
-        e.target.value === "Humanoid"
-      ) {
-        newState.affinities = {};
-      }
-      if (e.target.value === "Construct") {
-        newState.affinities = {
-          poison: "im",
-          earth: "rs",
-        };
-      }
-      if (e.target.value === "Elemental") {
-        newState.affinities = {
-          poison: "im",
-        };
-      }
-      if (e.target.value === "Undead") {
-        newState.affinities = {
-          dark: "im",
-          poison: "im",
-          light: "vu",
-        };
-      }
-
-      return newState;
-    });
-  };
+  const handleDescriptionChange = useCallback(
+    (e) => {
+      onChange("description", e.target.value);
+    },
+    [onChange]
+  );
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <CustomHeader type="top" headerText={t("Basic Information")} showIconButton={false} />
+        <CustomHeader
+          type="top"
+          headerText={t("Basic Information")}
+          showIconButton={false}
+        />
       </Grid>
       <Grid item xs={12} sm={4}>
         <FormControl variant="standard" fullWidth>
@@ -81,7 +81,7 @@ export default function EditBasics({ npc, setNpc }) {
             id="name"
             label={t("Name:")}
             value={npc.name}
-            onChange={onChange("name")}
+            onChange={(e) => onChange("name", e.target.value)}
           ></TextField>
         </FormControl>
       </Grid>
@@ -91,7 +91,7 @@ export default function EditBasics({ npc, setNpc }) {
             id="traits"
             label={t("Traits:")}
             value={npc.traits}
-            onChange={onChange("traits")}
+            onChange={(e) => onChange("traits", e.target.value)}
           ></TextField>
         </FormControl>
       </Grid>
@@ -102,9 +102,9 @@ export default function EditBasics({ npc, setNpc }) {
         <FormControl fullWidth>
           <InputLabel id="species">{t("Species:")}</InputLabel>
           <Select
-            labelId="species"
+            labelid="species"
             id="select-species"
-            value={npc.species}
+            value={npc.species || "beast"}
             label={t("Species:")}
             onChange={onChangeSpecies}
           >
@@ -124,11 +124,11 @@ export default function EditBasics({ npc, setNpc }) {
           <FormControl fullWidth>
             <InputLabel id="rank">{t("Rank:")}</InputLabel>
             <Select
-              labelId="rank"
+              labelid="rank"
               id="select-rank"
-              value={npc.rank}
+              value={npc.rank || "soldier"}
               label={t("Rank:")}
-              onChange={onChange("rank")}
+              onChange={(e) => onChange("rank", e.target.value)}
             >
               <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
               <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
@@ -149,11 +149,11 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid item xs={4}>
         <FormControl fullWidth>
           <TextField
-            labelId="phases"
+            labelid="phases"
             id="textfield-phases"
             value={npc.phases || 0}
             label={t("Phases:")}
-            onChange={onChange("phases")}
+            onChange={(e) => onChange("phases", e.target.value)}
             type="number"
           ></TextField>
         </FormControl>
@@ -164,11 +164,11 @@ export default function EditBasics({ npc, setNpc }) {
           <FormControl fullWidth>
             <InputLabel id="villain">{t("Villain:")}</InputLabel>
             <Select
-              labelId="villain"
+              labelid="villain"
               id="select-villain"
-              value={npc.villain}
+              value={npc.villain || ""}
               label={t("Villain:")}
-              onChange={onChange("villain")}
+              onChange={(e) => onChange("villain", e.target.value)}
             >
               <MenuItem value={""}>{t("None")}</MenuItem>
               <MenuItem value={"minor"}>{t("minor_villain")}</MenuItem>
@@ -184,11 +184,11 @@ export default function EditBasics({ npc, setNpc }) {
           <FormControl fullWidth>
             <InputLabel id="companionlvl">SL</InputLabel>
             <Select
-              labelId="companionlvl"
+              labelid="companionlvl"
               id="select-companionlvl"
               value={npc.companionlvl || 1}
               label={t("Skill Level:")}
-              onChange={onChange("companionlvl")}
+              onChange={(e) => onChange("companionlvl", e.target.value)}
             >
               <MenuItem value={1}>1</MenuItem>
               <MenuItem value={2}>2</MenuItem>
@@ -204,11 +204,11 @@ export default function EditBasics({ npc, setNpc }) {
         <Grid item xs={4}>
           <FormControl fullWidth>
             <TextField
-              labelId="companionpclvl"
+              labelid="companionpclvl"
               id="textfield-companionpclvl"
               value={npc.companionpclvl || 5}
               label={t("PC Level:")}
-              onChange={onChange("companionpclvl")}
+              onChange={(e) => onChange("companionpclvl", e.target.value)}
               type="number"
             ></TextField>
           </FormControl>
@@ -221,12 +221,12 @@ export default function EditBasics({ npc, setNpc }) {
             id="multipart"
             label={t("Multi-Part:")}
             value={npc.multipart}
-            onChange={onChange("multipart")}
+            onChange={(e) => onChange("multipart", e.target.value)}
             helperText={
               npc.multipart
                 ? t(
-                  "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
-                )
+                    "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                  )
                 : ""
             }
           ></TextField>
@@ -246,7 +246,9 @@ export default function EditBasics({ npc, setNpc }) {
             id="Description"
             label={t("Description:")}
             value={npc.description}
-            onChange={onChange("description")}
+            onChange={handleDescriptionChange}
+            maxRows={10}
+            maxLength={5000}
           />
         </FormControl>
       </Grid>

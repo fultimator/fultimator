@@ -12,18 +12,19 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import {  Martial } from "../icons";
+import { Martial } from "../icons";
 import { useState } from "react";
 import attributes from "../../libs/attributes";
 import { baseWeapons } from "../../libs/equip";
 import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
+
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -61,7 +62,12 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="middle" addItem={addAttack} headerText={t("Attacks with Weapons")} icon={Add} />
+      <CustomHeader
+        type="middle"
+        addItem={addAttack}
+        headerText={t("Attacks with Weapons")}
+        icon={Add}
+      />
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -200,14 +206,14 @@ function EditAttackSpecial({ attack, setAttack }) {
   const [specials, setSpecials] = useState(attack.special[0]);
 
   const onChange = (e) => {
-    setSpecials(e.target.value);
+    const value = e.target.value;
+    setSpecials(value);
 
-    if (e.target.value === "") {
+    if (value === "") {
       setAttack("special", []);
-      return;
+    } else {
+      setAttack("special", [value]);
     }
-
-    setAttack("special", [e.target.value]);
   };
 
   return (
@@ -227,7 +233,7 @@ function EditAttackSpecial({ attack, setAttack }) {
             id="special"
             label={t("Special:")}
             value={specials}
-            onChange={onChange}
+            onChange={(e) => onChange(e)}
             helperText={t("Adding a special effect cost 1 skill point")}
           />
         </FormControl>
@@ -249,9 +255,7 @@ function SelectWeapon({ weapon, setWeapon }) {
   for (const weapon of baseWeapons) {
     options.push(
       <MenuItem key={weapon.name} value={weapon.name}>
-        {weapon.name} {" "}
-        {weapon.martial && <Martial />}{" "}
-        <OpenBracket />
+        {weapon.name} {weapon.martial && <Martial />} <OpenBracket />
         {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
         {weapon.prec > 0 && `+${weapon.prec}`}
         <CloseBracket /> <OpenBracket />

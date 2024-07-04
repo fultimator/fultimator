@@ -190,16 +190,16 @@ function Header({ npc, includeImage }) {
               flexGrow: 1,
             }}
           >
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed={true}
-                sx={{
-                  fontFamily: "PT Sans Narrow",
-                  fontSize: "1rem",
-                }}
-              >
-                {npc.description}
-              </StyledMarkdown>
+            <StyledMarkdown
+              allowedElements={["strong", "em"]}
+              unwrapDisallowed={true}
+              sx={{
+                fontFamily: "PT Sans Narrow",
+                fontSize: "1rem",
+              }}
+            >
+              {npc.description}
+            </StyledMarkdown>
           </Box>
           {/* Row 3 */}
           <Box
@@ -486,13 +486,13 @@ function Attacks({ npc }) {
         return (
           <Fragment key={i}>
             <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
-              <Typography textAlign="center">
+              <Typography component="div" textAlign="center">
                 {attack.range === "melee" && <MeleeIcon />}
                 {attack.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
                   <OpenBracket />
@@ -544,17 +544,17 @@ function Attacks({ npc }) {
                     </Typography>
                   );
                 })}
-                {typeof myVar === "string" ||
-                  (attack.special instanceof String && (
-                    <Typography component="span" key={i}>
-                      <StyledMarkdown
-                        allowedElements={["strong", "em"]}
-                        unwrapDisallowed={true}
-                      >
-                        {attack.special}
-                      </StyledMarkdown>
-                    </Typography>
-                  ))}
+                {(typeof myVar === "string" ||
+                  attack.special instanceof String) && (
+                  <Typography component="span" key={i}>
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed={true}
+                    >
+                      {attack.special}
+                    </StyledMarkdown>
+                  </Typography>
+                )}
               </Typography>
             </Grid>
           </Fragment>
@@ -565,13 +565,13 @@ function Attacks({ npc }) {
         return (
           <Fragment key={i}>
             <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
-              <Typography textAlign="center">
+              <Typography component="div" textAlign="center">
                 {attack.weapon.range === "melee" && <MeleeIcon />}
                 {attack.weapon.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>
                   {attack.name} ({attack.weapon.name}){" "}
                   {/* {attack.martial && <Martial />}{" "} */}
@@ -581,7 +581,8 @@ function Attacks({ npc }) {
                 <Diamond />{" "}
                 <strong>
                   <OpenBracket />
-                  {attributes[attack.weapon.att1].shortcaps}{" + "}
+                  {attributes[attack.weapon.att1].shortcaps}
+                  {" + "}
                   {attributes[attack.weapon.att2].shortcaps}
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
@@ -669,12 +670,12 @@ function Spells({ npc }) {
         return (
           <Fragment key={i}>
             <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
-              <Typography textAlign="center">
+              <Typography component="div" textAlign="center">
                 <SpellIcon />
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>{spell.name}</strong>{" "}
                 {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
                 <Diamond />{" "}
@@ -682,11 +683,11 @@ function Spells({ npc }) {
                   {spell.type === "offensive" && (
                     <>
                       <OpenBracket />
-                      {attributes[spell.attr1].shortcaps}{" + "}
+                      {attributes[spell.attr1].shortcaps}
+                      {" + "}
                       {attributes[spell.attr2].shortcaps}
                       <CloseBracket />
-                      {calcMagic(npc) > 0 && `+${calcMagic(npc)}`}{" "}
-                      <Diamond />
+                      {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
                     </>
                   )}{" "}
                   {spell.mp} MP <Diamond /> {spell.target} <Diamond />{" "}
@@ -781,7 +782,7 @@ function Special({ npc }) {
         return (
           <Fragment key={i}>
             <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <span style={{ display: "inline" }}>
                   <strong>{special.name}</strong> <Diamond />{" "}
                 </span>
@@ -851,7 +852,7 @@ function Actions({ npc }) {
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>{actions.name}</strong> <Diamond />{" "}
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
@@ -919,7 +920,7 @@ function Notes({ npc }) {
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>{notes.name}</strong> <Diamond />{" "}
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
@@ -987,7 +988,7 @@ function RareGear({ npc }) {
               </Typography>
             </Grid>
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
-              <Typography>
+              <Typography component="div">
                 <strong>{raregear.name}</strong> <Diamond />{" "}
                 <StyledMarkdown
                   allowedElements={["strong", "em"]}
@@ -1062,19 +1063,16 @@ function Equip({ npc }) {
         <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
           <Typography>
             <strong>{t("Weapon:")}</strong> {weapon.name}{" "}
-            {weapon.martial && <Martial />}{" "}
-            <Diamond /> {weapon.hands === 1
-              ? t("1 handed")
-              : t("2 handed")}{" "}
-            <Diamond />{" "}
+            {weapon.martial && <Martial />} <Diamond />{" "}
+            {weapon.hands === 1 ? t("1 handed") : t("2 handed")} <Diamond />{" "}
             <strong>
               {" "}
               <OpenBracket />
-              {attributes[weapon.att1].shortcaps}{" + "}
+              {attributes[weapon.att1].shortcaps}
+              {" + "}
               {attributes[weapon.att2].shortcaps}
               <CloseBracket />
-              {weapon.prec > 0 && `+${weapon.prec}`}{" "}
-              <Diamond /> <OpenBracket />
+              {weapon.prec > 0 && `+${weapon.prec}`} <Diamond /> <OpenBracket />
               {t("HR")} + {weapon.damage}
               <CloseBracket />
             </strong>{" "}
@@ -1182,7 +1180,7 @@ function RenderVillainPhase({ villain, phases, multipart }) {
     <>
       {combinedString && (
         <>
-          {combinedString} {Diamond}
+          {combinedString}
         </>
       )}
     </>

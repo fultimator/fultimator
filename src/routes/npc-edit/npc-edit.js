@@ -64,6 +64,7 @@ import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
 import emaExample from "./emaExample.png";
+import deepEqual from "deep-equal";
 
 export default function NpcEdit() {
   const { t } = useTranslate(); // Translation hook
@@ -110,16 +111,23 @@ export default function NpcEdit() {
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
 
-  // Update NPC handler
-  const updateNPC = (data) => {
-    setIsUpdated(true);
-    setNpcTemp(data);
-  };
-
-  // Effect to update temporary NPC state when NPC data changes
+   // Effect to update temporary NPC state when NPC data changes
   useEffect(() => {
-    setNpcTemp(npc);
+    if (npc) {
+      // Perform a deep copy of the npc object
+      const updatedPlayerTemp = JSON.parse(JSON.stringify(npc));
+      setNpcTemp(updatedPlayerTemp);
+      setIsUpdated(false);
+    }
   }, [npc]);
+
+  useEffect(() => {
+    if (!deepEqual(npcTemp, npc)) {
+      setIsUpdated(true);
+    } else {
+      setIsUpdated(false);
+    }
+  }, [npcTemp, npc]);
 
   // Handler for Ctrl+S to save NPC
   const handleCtrlS = useCallback(
@@ -161,7 +169,7 @@ export default function NpcEdit() {
   useEffect(() => {
     // Change page title with npc name
     const originalTitle = document.title;
-    document.title = npc?.name;
+    document.title = npc?.name ? `${npc.name} | Fultimator` : "Fultimator";
     return () => {
       document.title = originalTitle;
     };
@@ -447,7 +455,7 @@ export default function NpcEdit() {
                   fullWidth
                   value={npcTemp.createdBy}
                   onChange={(evt) =>
-                    updateNPC({ ...npcTemp, createdBy: evt.target.value })
+                    setNpcTemp({ ...npcTemp, createdBy: evt.target.value })
                   }
                   disabled={user && isModerator && user.uid !== npc.uid}
                 />
@@ -457,9 +465,9 @@ export default function NpcEdit() {
                   labelId="study"
                   id="study"
                   size="small"
-                  value={npcTemp.language}
+                  value={npcTemp.language || ""}
                   onChange={(evt) =>
-                    updateNPC({ ...npcTemp, language: evt.target.value })
+                    setNpcTemp({ ...npcTemp, language: evt.target.value })
                   }
                   fullWidth
                   disabled={user && isModerator && user.uid !== npc.uid}
@@ -652,7 +660,7 @@ export default function NpcEdit() {
           {user && user.uid === npc.uid && (
             <>
               <Divider sx={{ my: 1 }} />
-              <TagList npc={npcTemp} setNpc={updateNPC} />
+              <TagList npc={npcTemp} setNpc={setNpcTemp} />
               {/*TEST BUTTON <Button onClick={() => console.log(npcTemp)} variant="contained">Log Temp NPC Object</Button>*/}
             </>
           )}
@@ -674,7 +682,7 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <EditBasics npc={npcTemp} setNpc={updateNPC} />
+            <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
           </Paper>
           <Divider sx={{ my: 1 }} />
 
@@ -696,7 +704,7 @@ export default function NpcEdit() {
                   showIconButton={false}
                 />
                 <ExplainAffinities npc={npcTemp} />
-                <EditAffinities npc={npcTemp} setNpc={updateNPC} />
+                <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
               <Grid item xs={12} md={6}>
                 <CustomHeader
@@ -704,7 +712,7 @@ export default function NpcEdit() {
                   headerText={t("Bonuses")}
                   showIconButton={false}
                 />
-                <EditExtra npc={npcTemp} setNpc={updateNPC} />
+                <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
             </Grid>
           </Paper>
@@ -722,10 +730,10 @@ export default function NpcEdit() {
           >
             <Grid container>
               <Grid item xs={12}>
-                <EditAttacks npc={npcTemp} setNpc={updateNPC} />
+                <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
               <Grid item xs={12}>
-                <EditWeaponAttacks npc={npcTemp} setNpc={updateNPC} />
+                <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
             </Grid>
           </Paper>
@@ -741,7 +749,7 @@ export default function NpcEdit() {
               borderColor: secondary,
             }}
           >
-            <EditSpells npc={npcTemp} setNpc={updateNPC} />
+            <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
           </Paper>
           <Divider sx={{ my: 1 }} />
 
@@ -775,19 +783,19 @@ export default function NpcEdit() {
             <Grid container spacing={2}>
               {/* Edit Other Actions */}
               <Grid item xs={12} md={6}>
-                <EditActions npc={npcTemp} setNpc={updateNPC} />
+                <EditActions npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
               {/* Edit Special Rules */}
               <Grid item xs={12} md={6}>
-                <EditSpecial npc={npcTemp} setNpc={updateNPC} />
+                <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
               {/* Edit Rare Gear */}
               <Grid item xs={12} md={6}>
-                <EditRareGear npc={npcTemp} setNpc={updateNPC} />
+                <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
               {/* Edit Notes */}
               <Grid item xs={12} md={6}>
-                <EditNotes npc={npcTemp} setNpc={updateNPC} />
+                <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
               </Grid>
             </Grid>
           </Paper>
