@@ -59,6 +59,7 @@ import { useNavigate } from "react-router-dom";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
+import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -346,6 +347,11 @@ export default function PlayerEdit() {
                 isEditMode={isOwner}
               />
               <PlayerArcana
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
+              <PlayerGadgets
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}

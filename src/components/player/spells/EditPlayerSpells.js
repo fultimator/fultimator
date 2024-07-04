@@ -9,6 +9,11 @@ import SpellArcanistModal from "./SpellArcanistModal";
 import SpellArcanist from "./SpellArcanist";
 import CustomHeader2 from "../../common/CustomHeader2";
 import SpellDefaultModal from "./SpellDefaultModal";
+import SpellTinkererAlchemy from "./SpellTinkererAlchemy";
+import SpellTinkererAlchemyRankModal from "./SpellTinkererAlchemyRankModal";
+import SpellTinkererAlchemyTargetModal from "./SpellTinkererAlchemyTargetModal";
+import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal";
+import { tinkererAlchemy } from "../../../libs/classes";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -20,6 +25,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const [openSpellDefaultModal, setOpenSpellDefaultModal] = useState(false);
   const [openSpellArcanistModal, setOpenSpellArcanistModal] = useState(false);
+  const [openAlchemyRankModal, setOpenAlchemyRankModal] = useState(false);
+  const [openAlchemyTargetModal, setOpenAlchemyTargetModal] = useState(false);
+  const [openAlchemyEffectsModal, setOpenAlchemyEffectsModal] = useState(false);
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
@@ -107,6 +115,30 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 },
               ],
             };
+          } else if (spell === "tinkerer-alchemy") {
+            // Check if there's already a tinkerer-alchemy spell
+            const hasTinkererAlchemy = cls.spells.some(
+              (sp) => sp.spellType === "tinkerer-alchemy"
+            );
+
+            if (hasTinkererAlchemy) {
+              alert("You already have a tinkerer-alchemy spell");
+              return cls;
+            } else {
+              // Add a new tinkerer-alchemy spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    // add from tinkererAlchemy const
+                    ...tinkererAlchemy,
+                  },
+                ],
+              };
+            }
           } else {
             alert(spell.toUpperCase() + " spell not implemented yet");
             return cls;
@@ -134,6 +166,27 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenSpellArcanistModal(true);
   };
 
+  const handleEditAlchemyRank = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenAlchemyRankModal(true);
+  };
+
+  const handleEditAlchemyTarget = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenAlchemyTargetModal(true);
+  };
+
+  const handleEditAlchemyEffects = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenAlchemyEffectsModal(true);
+  };
+
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
@@ -155,11 +208,20 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
     setOpenSpellDefaultModal(false);
     setOpenSpellArcanistModal(false);
+    setOpenAlchemyRankModal(false);
+    setOpenAlchemyTargetModal(false);
+    setOpenAlchemyEffectsModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);
   };
 
   const handleDeleteSpell = (spellIndex) => {
+    console.log(
+      "spellIndex",
+      spellIndex,
+      "editingSpellClass",
+      editingSpellClass
+    );
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls) => {
@@ -174,6 +236,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }));
     setOpenSpellDefaultModal(false);
     setOpenSpellArcanistModal(false);
+    setOpenAlchemyRankModal(false);
+    setOpenAlchemyTargetModal(false);
+    setOpenAlchemyEffectsModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);
   };
@@ -272,6 +337,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             default: false,
             arcanist: false,
             arcanistRework: false,
+            tinkererAlchemy: false,
           };
 
           return (
@@ -323,6 +389,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 {(spellTypeHeaders.arcanistRework = true)}
                               </>
                             )}
+                          {spell.spellType === "tinkerer-alchemy" &&
+                            !spellTypeHeaders.tinkererAlchemy && (
+                              <>
+                                <CustomHeader2 headerText={t("Alchemy")} />
+                                {(spellTypeHeaders.tinkererAlchemy = true)}
+                              </>
+                            )}
                           {spell.spellType === "default" && (
                             <SpellDefault
                               spellName={spell.name}
@@ -364,6 +437,26 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               isEditMode={isEditMode}
                             />
                           )}
+                          {spell.spellType === "tinkerer-alchemy" && (
+                            <SpellTinkererAlchemy
+                              alchemy={spell}
+                              key={index}
+                              onEditRank={() => {
+                                handleEditAlchemyRank(spell, cls.name, index);
+                              }}
+                              onEditTargets={() => {
+                                handleEditAlchemyTarget(spell, cls.name, index);
+                              }}
+                              onEditEffects={() => {
+                                handleEditAlchemyEffects(
+                                  spell,
+                                  cls.name,
+                                  index
+                                );
+                              }}
+                              isEditMode={isEditMode}
+                            />
+                          )}
                         </React.Fragment>
                       ))}
                   </Grid>
@@ -396,6 +489,37 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onDelete={handleDeleteSpell}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
         isRework={spellBeingEdited?.spellType === "arcanist-rework"}
+      />
+      <SpellTinkererAlchemyRankModal
+        open={openAlchemyRankModal}
+        onClose={() => {
+          setOpenAlchemyRankModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellTinkererAlchemyTargetModal
+        open={openAlchemyTargetModal}
+        onClose={() => {
+          setOpenAlchemyTargetModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellTinkererAlchemyEffectsModal
+        open={openAlchemyEffectsModal}
+        onClose={() => {
+          setOpenAlchemyEffectsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
     </>
   );
