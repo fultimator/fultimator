@@ -1,3 +1,5 @@
+import { t } from "../translation/translate";
+
 const classList = [
   {
     name: "Arcanist",
@@ -533,5 +535,144 @@ const classList = [
     },
   },
 ];
+
+export const tinkererAlchemy = {
+  spellType: "tinkerer-alchemy",
+  rank: 1,
+  targets: [
+    {
+      rangeFrom: 1,
+      rangeTo: 6,
+      effect: t("You or one ally you can see that is present on the scene"),
+    },
+    {
+      rangeFrom: 7,
+      rangeTo: 11,
+      effect: t("One enemy you can see that is present on the scene"),
+    },
+    {
+      rangeFrom: 12,
+      rangeTo: 16,
+      effect: t("You and every ally present on the scene"),
+    },
+    {
+      rangeFrom: 17,
+      rangeTo: 20,
+      effect: t("Every enemy present on the scene"),
+    },
+  ],
+  effects: [
+    {
+      dieValue: 0,
+      effect: t("suffers 20 poison damage"),
+    },
+    {
+      dieValue: 0,
+      effect: t("recovers 30 Hit Points"),
+    },
+    {
+      dieValue: 1,
+      effect: t(
+        "treats their Dexterity and Might dice as if they were one size higher (up to a maximum of d12) until the end of your next turn"
+      ),
+    },
+    {
+      dieValue: 2,
+      effect: t(
+        "treats their Insight and Willpower dice as if they were one size higher (up to a maximum of d12) until the end of your next turn"
+      ),
+    },
+    {
+      dieValue: 3,
+      effect: t(
+        "suffers 20 air damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 4,
+      effect: t(
+        "suffers 20 bolt damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 5,
+      effect: t(
+        "suffers 20 dark damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 6,
+      effect: t(
+        "suffers 20 earth damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 7,
+      effect: t(
+        "suffers 20 fire damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 8,
+      effect: t(
+        "suffers 20 ice damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+      ),
+    },
+    {
+      dieValue: 9,
+      effect: t(
+        "gains Resistance to air and fire damage until the end of the scene"
+      ),
+    },
+    {
+      dieValue: 10,
+      effect: t(
+        "gains Resistance to bolt and ice damage until the end of the scene"
+      ),
+    },
+    {
+      dieValue: 11,
+      effect: t(
+        "gains Resistance to dark and earth damage until the end of the scene"
+      ),
+    },
+    {
+      dieValue: 12,
+      effect: t("suffers enraged"),
+    },
+    {
+      dieValue: 13,
+      effect: t("suffers poisoned"),
+    },
+    {
+      dieValue: 14,
+      effect: t("suffers dazed, shaken, slow and weak"),
+    },
+    {
+      dieValue: 15,
+      effect: t("recovers from all status effects"),
+    },
+    {
+      dieValue: 16,
+      effect: t("recovers 50 Hit Points and 50 Mind Points"),
+    },
+    {
+      dieValue: 17,
+      effect: t("recovers 50 Hit Points and 50 Mind Points"),
+    },
+    {
+      dieValue: 18,
+      effect: t("recovers 100 Hit Points"),
+    },
+    {
+      dieValue: 19,
+      effect: t("recovers 100 Mind Points"),
+    },
+    {
+      dieValue: 20,
+      effect: t("recovers 100 Hit Points and 100 Mind Points"),
+    },
+  ],
+};
 
 export default classList;
