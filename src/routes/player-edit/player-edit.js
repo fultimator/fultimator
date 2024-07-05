@@ -144,6 +144,7 @@ export default function PlayerEdit() {
 
   const handleTabChange = (event, newTab) => {
     setOpenTab(newTab);
+    updateMaxStats();
     setDrawerOpen(false);
   };
 
