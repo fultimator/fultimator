@@ -14,6 +14,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -36,6 +38,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const [selectedRank, setSelectedRank] = useState("Basic");
   const [rolledDice, setRolledDice] = useState([0, 0, 0, 0]); // Array to hold rolled dice values
   const [rolledResult, setRolledResult] = useState({ combinations: [] });
+  const [useIP, setUseIP] = useState(true);
   // Variable to hold the result of the rolled dice
 
   const handleOpenModal = (alchemy) => {
@@ -65,18 +68,30 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
 
   const handleRoll = () => {
     let numDice = 0;
-    //let ipCost = 0;
+    let ipCost = 0;
 
     // Determine number of dice and IP cost based on selected rank
     if (selectedRank === "Basic") {
       numDice = 2;
-      //ipCost = 3;
+      ipCost = 3;
     } else if (selectedRank === "Advanced") {
       numDice = 3;
-      //ipCost = 4;
+      ipCost = 4;
     } else if (selectedRank === "Superior") {
       numDice = 4;
-      //ipCost = 5;
+      ipCost = 5;
+    }
+
+    // Check if player has enough IP
+    if (player.stats.ip.current < ipCost && useIP) {
+      alert(t("You don't have enough IP to roll this alchemy!"));
+      return;
+    }
+
+    // Update player's IP
+    if (useIP) {
+      player.stats.ip.current -= ipCost;
+      setPlayer({ ...player });
     }
 
     // Simulate rolling the dice
@@ -229,10 +244,10 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     >
                       {t("Alchemy") +
                         " (" +
-                        (alchemy.rank ? ranks[alchemy.rank - 1] : "") +
+                        (alchemy.rank ? t(ranks[alchemy.rank - 1]) : "") +
                         ") " +
                         " - " +
-                        alchemy.className}
+                        t(alchemy.className)}
                     </Typography>
                   </Grid>
                   <Grid
@@ -309,44 +324,124 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               }}
             >
               <DialogContent>
-                <Typography variant="h2">{t("Select Alchemy Rank")}</Typography>
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel id="rank-select-label">
-                    {t("Select Rank")}
-                  </InputLabel>
+                <Typography variant="h2">{t("Alchemy Roll")}</Typography>
 
-                  <Select
-                    labelId="rank-select-label"
-                    id="rank-select"
-                    value={selectedRank}
-                    label={t("Select Rank")}
-                    onChange={handleRankChange}
-                  >
-                    {selectedAlchemy &&
-                      selectedAlchemy.rank &&
-                      ranks
-                        .filter((rank, index) => index < selectedAlchemy.rank) // Filter ranks based on selectedAlchemy.rank
-                        .map((rank, index) => (
-                          <MenuItem key={index} value={rank}>
-                            {rank}
-                          </MenuItem>
-                        ))}
-                  </Select>
-                </FormControl>
-                {/* Display possible combinations based on selectedRank */}
-                <Typography variant="h3">
-                  Rolled Dice: {rolledDice.join(", ")}
+                <Typography variant="h3" sx={{ mt: 2 }}>
+                  {t("Character LVL") + ": " + player.lvl} {" / "}
+                  {t("Current IP") + ": " + player.stats.ip.current}
                 </Typography>
-                <Typography variant="h3">Combinations:</Typography>
-                <ol>
-                  {rolledResult &&
-                    rolledResult.combinations &&
-                    rolledResult.combinations.map((combination, index) => (
-                      <li key={index}>
-                        {combination.target + " " + combination.effect}
-                      </li>
-                    ))}
-                </ol>
+                <Grid container spacing={2}>
+                  <Grid item xs={8}>
+                    <FormControl fullWidth sx={{ mt: 3 }}>
+                      <InputLabel id="rank-select-label">
+                        {t("Select Rank")}
+                      </InputLabel>
+                      <Select
+                        labelId="rank-select-label"
+                        id="rank-select"
+                        value={selectedRank}
+                        label={t("Select Rank")}
+                        onChange={handleRankChange}
+                      >
+                        {selectedAlchemy &&
+                          selectedAlchemy.rank &&
+                          ranks
+                            .filter(
+                              (rank, index) => index < selectedAlchemy.rank
+                            ) // Filter ranks based on selectedAlchemy.rank
+                            .map((rank, index) => (
+                              <MenuItem key={index} value={rank}>
+                                {t(rank) + " (" + t("IP Cost") + ": " + (index + 3) + ")"}
+                              </MenuItem>
+                            ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <FormControl fullWidth sx={{ mt: 3 }}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={useIP}
+                            onChange={(e) => setUseIP(e.target.checked)}
+                          />
+                        }
+                        label={t("Use IP")}
+                      />
+                    </FormControl>
+                  </Grid>
+                </Grid>
+                {/* Display possible combinations based on selectedRank */}
+                {rolledResult && rolledResult.combinations.length > 0 && (
+                  <Typography variant="h3" sx={{ mt: 2 }}>
+                    {t("Rolled Dice")}: {rolledDice.join(", ")}
+                  </Typography>
+                )}
+                {rolledResult && rolledResult.combinations.length > 0 && (
+                  <>
+                    <Typography variant="h3" sx={{ mt: 2 }}>
+                      {t("Combinations")}:
+                    </Typography>
+                    <ol>
+                      {rolledResult &&
+                        rolledResult.combinations &&
+                        (() => {
+                          const allCombinations = rolledResult.combinations.map(
+                            (combination) => ({
+                              target: combination.target,
+                              effect: combination.effect,
+                              combined:
+                                combination.target + " " + combination.effect,
+                            })
+                          );
+
+                          const uniqueCombinations = Array.from(
+                            new Set(
+                              allCombinations.map((item) => item.combined)
+                            )
+                          ).map((combined) =>
+                            allCombinations.find(
+                              (item) => item.combined === combined
+                            )
+                          );
+
+                          uniqueCombinations.sort((a, b) => {
+                            if (a.target < b.target) return -1;
+                            if (a.target > b.target) return 1;
+                            if (a.effect < b.effect) return -1;
+                            if (a.effect > b.effect) return 1;
+                            return 0;
+                          });
+
+                          return (
+                            <>
+                              {uniqueCombinations.map(
+                                (uniqueCombination, index) => (
+                                  <li key={index}>
+                                    <strong>{uniqueCombination.target}</strong>{" "}
+                                    <em>{uniqueCombination.effect}</em>
+                                  </li>
+                                )
+                              )}
+                              {uniqueCombinations.length <
+                                allCombinations.length && (
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    mt: 3,
+                                    fontStyle: "italic",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {t("Only unique combinations are shown")}.
+                                </Typography>
+                              )}
+                            </>
+                          );
+                        })()}
+                    </ol>
+                  </>
+                )}
               </DialogContent>
               <DialogActions>
                 <Button

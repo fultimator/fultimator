@@ -121,13 +121,13 @@ export default function SpellTinkererAlchemyEffectsModal({
               <Grid item xs={3}>
                 <FormControl fullWidth>
                   <InputLabel id={`die-value-label-${index}`}>
-                    {t("Die Value")}
+                    {t("Die")}
                   </InputLabel>
                   <Select
                     labelId={`die-value-label-${index}`}
                     id={`die-value-select-${index}`}
                     value={effect.dieValue}
-                    label={t("Die Value")}
+                    label={t("Die")}
                     onChange={(e) =>
                       handleEffectChange(index, "dieValue", e.target.value)
                     }
