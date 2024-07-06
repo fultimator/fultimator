@@ -247,7 +247,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={t("Target:")}
+                label={t("Target Description")}
                 fullWidth
                 inputProps={{ ...params.inputProps, maxLength: 100 }}
               />

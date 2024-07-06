@@ -139,7 +139,8 @@ export default function EditBasics({ npc, setNpc }) {
               <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
               <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
               <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
-            </Select>
+              <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
+              </Select>
           </FormControl>
         </Stack>
       </Grid>
@@ -232,6 +233,26 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
+
+      {npc.rank === "groupvehicle" && (
+        <Grid item xs={4}>
+          <FormControl fullWidth>
+            <InputLabel id="sizes">{t("Vehicle Size:")}</InputLabel>
+            <Select
+              labelid="sizes"
+              id="select-sizes"
+              value={npc.sizes || ""}
+              label={t("Vehicle Size:")}
+              onChange={(e) => onChange("sizes", e.target.value)}
+            >
+              <MenuItem value={""}>{t("None")}</MenuItem>
+              <MenuItem value={"small"}>Small</MenuItem>
+              <MenuItem value={"medium"}>Medium</MenuItem>
+              <MenuItem value={"large"}>Large</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
 
       <Grid item xs={12}>
         <FormControl variant="standard" fullWidth>

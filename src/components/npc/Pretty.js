@@ -231,6 +231,15 @@ function Rank({ npc }) {
       {npc.rank === "champion5" && t("Champion (5)")}
       {npc.rank === "champion6" && t("Champion (6)")}
       {npc.rank === "companion" && t("Companion")}
+      {npc.rank === "groupvehicle" && (
+        <>
+          {npc.sizes === "small" && t("Small")}
+          {npc.sizes === "medium" && t("Medium")}
+          {npc.sizes === "large" && t("Large")}
+          {npc.sizes && ' '}
+          {t("Group Vehicle")}
+        </>
+      )}
     </>
   );
 }

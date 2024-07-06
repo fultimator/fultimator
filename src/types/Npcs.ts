@@ -102,6 +102,7 @@ export interface TypeNpc {
     affinities: NpcAffinities,
     attributes: NpcAttributes,
     species: string,
+    sizes?: string,
     traits?: string,
     actions?: NpcAction[],
     extra?: NpcExtra,

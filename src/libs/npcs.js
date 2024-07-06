@@ -38,6 +38,10 @@ export function calcHP(npc) {
     hp = sl * npc.attributes.might + Math.floor(lvl / 2) + extraHP;
   }
 
+  if (npc.rank === "groupvehicle") {
+    hp = hp * 1;
+  }
+
   return hp;
 }
 
@@ -94,6 +98,10 @@ export function calcInit(npc) {
   if (npc.rank === "champion6") {
     init = init + 6;
   }
+  if (npc.rank === "groupvehicle") {
+    init = 0;
+  }
+
 
   // Armor
   if (npc.armor?.init) {
@@ -169,10 +177,16 @@ export function calcDamage(attack, npc) {
     number = number - 5 + attack.weapon.damage;
   }
 
-  //Flat Damage Input
+  // Flat Damage Input
   if (attack.flatdmg) {
     number += Number(attack.flatdmg);
   }
+
+  // Group Vehicle Rules
+  if (npc.rank === "groupvehicle") {
+    number = number + 5;
+  }
+
   return number;
 }
 
@@ -322,6 +336,10 @@ export function calcAvailableSkillsFromRank(npc) {
 
   if (npc.rank === "champion6") {
     return 6;
+  }
+
+  if (npc.rank === "groupvehicle") {
+    return 3;
   }
 
   return 0;

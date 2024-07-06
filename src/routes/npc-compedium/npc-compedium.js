@@ -414,6 +414,7 @@ function Personal({ user }) {
                 <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
                 <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
                 <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
+                <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
