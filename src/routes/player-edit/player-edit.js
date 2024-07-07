@@ -246,7 +246,7 @@ export default function PlayerEdit() {
               sx={{
                 position: "fixed",
                 bottom: 16,
-                left: 16,
+                left: 14,
                 zIndex: 1200,
                 textAlign: "center"
               }}
@@ -479,7 +479,7 @@ export default function PlayerEdit() {
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && isOwner && (
-        <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
+        <Grid style={{ position: "fixed", bottom: 20, right: 10, zIndex: 100 }}>
           <Fade in={showScrollTop} timeout={300}>
             <Tooltip title="Save" placement="bottom">
               <Fab
