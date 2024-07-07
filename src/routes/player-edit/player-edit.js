@@ -16,7 +16,9 @@ import {
   Grid,
   Fade,
   Tooltip,
+  Typography,
   Fab,
+  Stack
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -60,6 +62,7 @@ import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -239,17 +242,32 @@ export default function PlayerEdit() {
       <Tabs value={openTab} onChange={handleTabChange}>
         {isSmallScreen ? (
           <>
-            <Button
-              variant="contained"
-              onClick={toggleDrawer(true)}
-              sx={{ width: "100%", marginBottom: 1 }}
+             <Box
+              sx={{
+                position: "fixed",
+                bottom: 16,
+                left: 16,
+                zIndex: 1200,
+                textAlign: "center"
+              }}
             >
-              {t("Menu")}
-            </Button>
+              <Fab
+                onClick={toggleDrawer(true)}
+                color="primary"
+              >
+                <Stack direction="column" alignItems="center" spacing={0.5}>
+                  <MenuBookIcon />
+                  <Typography variant="caption" sx={{ fontSize: '10px' }}>
+                    {t("Menu")}
+                  </Typography>
+                </Stack>
+              </Fab>
+            </Box>
             <Drawer
               anchor="left"
               open={drawerOpen}
               onClose={toggleDrawer(false)}
+              sx={{ zIndex: 1300 }}
             >
               <List>
                 <ListItem onClick={(e) => handleTabChange(e, 0)}>
@@ -457,7 +475,7 @@ export default function PlayerEdit() {
         >
           {t("Report a Bug")}
         </Button>
-        <Box sx={{ height: "10vh" }} />
+        <Box sx={{ height: "15vh" }} />
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && isOwner && (

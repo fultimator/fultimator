@@ -23,6 +23,7 @@ import { Casino, Info } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
+import { OpenBracket, CloseBracket } from "../../Bracket";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -451,6 +452,18 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 <Typography variant="h5">
                   {t("Duration")}: {selectedSpell && t(selectedSpell.duration)}
                 </Typography>
+                {selectedSpell && selectedSpell.isOffensive && (
+                  <Typography variant="h5">
+                    {t("Magic Check") + ": "}
+                    <strong>
+                      <OpenBracket />
+                      {t(attributes[selectedSpell.attr1].shortcaps)}
+                      {t(" + ")}
+                      {t(attributes[selectedSpell.attr2].shortcaps)}
+                      <CloseBracket />
+                    </strong>
+                  </Typography>
+                )}
                 <Button
                   variant="contained"
                   onClick={handleOK}

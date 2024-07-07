@@ -76,9 +76,9 @@ export default function PlayerControls({ player, setPlayer }) {
 
     return (
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={4} sm={1}>
+        <Grid item xs={4} sm={2}>
           <Typography variant="h2" sx={{ minWidth: "50px" }}>
-            {t(label)}
+            {t(label) + "【" + player.stats[stat].current + "/" + player.stats[stat].max + "】"}
           </Typography>
         </Grid>
         <Grid item xs={4} sm={stat === "hp" ? 1 : 2}>
@@ -184,12 +184,12 @@ export default function PlayerControls({ player, setPlayer }) {
           {/* Fabula Points Section */}
           <Grid item xs={12}>
             <Grid container spacing={1} alignItems="center">
-              <Grid item xs={5} sm={3}>
+              <Grid item xs={5} sm={4}>
                 <Typography variant="h2" sx={{ minWidth: "100px" }}>
-                  {t("Fabula Points")}
+                  {t("Fabula Points") + "【" + player.info.fabulapoints + "】"}
                 </Typography>
               </Grid>
-              <Grid item xs={7} sm={9} sx={{ textAlign: "left" }}>
+              <Grid item xs={7} sm={8} sx={{ textAlign: "left" }}>
                 <ButtonGroup variant="outlined" size="small" color="primary">
                   <Button onClick={changeFabulaPoints(-1)}>-1</Button>
                   <Button onClick={changeFabulaPoints(1)}>+1</Button>
@@ -200,12 +200,12 @@ export default function PlayerControls({ player, setPlayer }) {
           {/* Zenit Section */}
 <Grid item xs={12}>
   <Grid container spacing={2} alignItems="center">
-    <Grid item xs={12} sm={3}>
+    <Grid item xs={12} sm={4}>
       <Typography variant="h2" sx={{ minWidth: "100px" }}>
-        {t("Zenit")}
+        {t("Zenit") + "【" + player.info.zenit + "】"}
       </Typography>
     </Grid>
-    <Grid item xs={12} sm={9} container spacing={2} alignItems="center">
+    <Grid item xs={12} sm={8} container spacing={2} alignItems="center">
       <Grid item>
         <ToggleButtonGroup
           value={changeType}

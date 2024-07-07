@@ -168,23 +168,32 @@ export default function PrettyWeapon({ weapon, showActions }) {
                 background: "transparent",
               }}
             >
-              <Typography
-                fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
-                sx={{
-                  background: "transparent",
-                  px: 1,
-                  py: 1,
-                }}
-              >
-                {!weapon.quality && t("No Qualities")}
-              </Typography>
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed={true}
-                sx={{ fontSize: { xs: "0.9rem", sm: "1.0rem" } }}
-              >
-                {weapon.quality}
-              </StyledMarkdown>
+              {!weapon.quality && (
+                <Typography
+                  fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
+                  sx={{
+                    background: "transparent",
+                    px: 1,
+                    py: 1,
+                  }}
+                >
+                  {!weapon.quality && t("No Qualities")}
+                </Typography>
+              )}
+              {weapon.quality && (
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed={true}
+                  sx={{
+                    fontSize: { xs: "0.9rem", sm: "1.0rem" },
+                    fontFamily: "PT Sans Narrow",
+                    px: 1,
+                    py: 1,
+                  }}
+                >
+                  {weapon.quality}
+                </StyledMarkdown>
+              )}
             </div>
           </Stack>
         </div>

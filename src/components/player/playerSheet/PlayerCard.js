@@ -157,9 +157,10 @@ export default function PlayerCard({
             "& .MuiLinearProgress-bar": {
               transition: "width 1s ease-in-out",
             },
+            padding: "0.6rem"
           }}
         />
-        <ProgressBarWithLabel sx={{ fontWeight: "bold" }}>
+        <ProgressBarWithLabel sx={{ fontWeight: "bold", fontSize: "0.8rem" }}>
           {label} {`${value}/${max}`}
         </ProgressBarWithLabel>
       </Box>
