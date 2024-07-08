@@ -10,7 +10,9 @@ An unofficial Fabula Ultima Tool
 
 It contains multiple tools to manage a game of Fabula Ultima.
 
-> Fultimator is not affiliated with Need Games, it's a product of the work of fans of the game. 
+Fultimator is an independent production by the [Fultimator Dev Team](https://github.com/fultimator) and is not affiliated with Need Games or Rooster Games. Supplied game rules in the system compendium adhere to and are published under the [Fabula Ultima Third Party Tabletop License 1.0](https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf). We adhere to RoosterEma's guidelines, ensuring that the core book and its supplements remain integral to your experience. To fully utilize this system, you will need the [Fabula Ultima Core Rulebook](https://www.needgames.it/fabula-ultima-en/).
+
+This repository's source code is subject to the terms of the [MIT License](https://github.com/fultimator/fultimator/blob/main/LICENSE.md). For further details, please refer to the [LICENSE](https://github.com/fultimator/fultimator/blob/main/LICENSE.md) file included in this repository.
 
 Welcome to the contribution guidelines for Fultimator! We appreciate your interest in improving our web app. Please follow the guidelines below for code and content contributions.
 
@@ -95,3 +97,14 @@ $ npm run deploy
 ```
 
 This command will build a production version of the app, and upload it to firebase.
+
+## Project Contributors
+
+Major thanks to the following contributors:
+
+- Triex ([matteosuppo](https://github.com/matteosuppo))/ - The original creator of the fultimator webapp. The repository can be found here: [Fultimator](https://github.com/codeclysm/fultimator)
+- [Alyx](https://github.com/greg-argulla) - For prolonging the project, providing useful features such as localization, adversary compendium and improving overall functionality of the webapp. 
+- [spyrella](https://github.com/spyrella) - For ongoing updates to the system and maintainence of the project.
+- [acinoroc](https://github.com/acinoroc) - Another active maintainer, lead developer of the Character Designer.
+
+- Special thanks to the following contributors found here: [Contributors Link](https://github.com/fultimator/fultimator/graphs/contributors)
