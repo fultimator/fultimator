@@ -43,6 +43,7 @@ export interface NpcSpell {
     name: string,
     range: string,
     type: string | null,
+    damagetype: string,
     attr1: string,
     attr2: string,
     mp?: string,

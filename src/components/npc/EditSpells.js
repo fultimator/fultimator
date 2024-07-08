@@ -42,7 +42,8 @@ export default function EditSpells({ npc, setNpc }) {
         range: "melee",
         attr1: "dexterity",
         attr2: "dexterity",
-        type: "physical",
+        type: "",
+        damagetype: "physical",
         special: [],
       });
       return newState;

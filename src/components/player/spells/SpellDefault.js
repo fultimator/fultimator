@@ -163,7 +163,7 @@ function ThemedSpellDefault({
           >
             <Typography>
               {mp}
-              {maxTargets !== 1 ? " x " + t("T") : ""}
+              {maxTargets !== 1 ? " × " + t("T") : ""}
             </Typography>
           </Grid>
           <Grid
