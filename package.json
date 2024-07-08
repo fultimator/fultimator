@@ -43,7 +43,8 @@
     "build": "react-scripts build",
     "deploy": "node DownloadTranslations.js && react-scripts build && firebase deploy",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "translate": "node DownloadTranslations.js"
   },
   "eslintConfig": {
     "extends": [

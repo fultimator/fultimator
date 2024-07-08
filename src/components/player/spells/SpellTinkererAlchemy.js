@@ -149,11 +149,15 @@ function ThemedSpellTinkererAlchemy({
           >
             <Typography>
               {alchemy.rank === 1
-                ? "Roll two d20s and assign one to target and one to effect."
+                ? t("Roll two d20s and assign one to target and one to effect.")
                 : alchemy.rank === 2
-                ? "Roll three d20s and assign one to target and one to effect."
+                ? t(
+                    "Roll three d20s and assign one to target and one to effect."
+                  )
                 : alchemy.rank === 3
-                ? "Roll four d20s and assign one to target and one to effect."
+                ? t(
+                    "Roll four d20s and assign one to target and one to effect."
+                  )
                 : null}
             </Typography>
           </Grid>
@@ -259,7 +263,7 @@ function ThemedSpellTinkererAlchemy({
               justifyContent: "center",
             }}
           >
-            <Typography>{t("The potion affects") + "..."}</Typography>
+            <Typography>{t("The potions affects...")}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
@@ -409,7 +413,7 @@ function ThemedSpellTinkererAlchemy({
             }}
           >
             <Typography>
-              {t("Each creature affected by the potion") + "..."}
+              {t("Each creature affected by the potion...")}
             </Typography>
           </Grid>
         </Grid>
