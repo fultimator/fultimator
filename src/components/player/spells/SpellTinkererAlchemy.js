@@ -5,8 +5,10 @@ import {
   Grid,
   useTheme,
   ThemeProvider,
+  Tooltip,
+  Icon,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { Edit, VisibilityOff } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 
 function ThemedSpellTinkererAlchemy({
@@ -24,6 +26,9 @@ function ThemedSpellTinkererAlchemy({
   const white = theme.palette.white.main;
 
   const ranks = [t("Basic"), t("Advanced"), t("Superior")];
+
+  const showInPlayerSheet =
+    alchemy.showInPlayerSheet || alchemy.showInPlayerSheet === undefined;
 
   return (
     <>
@@ -168,6 +173,13 @@ function ThemedSpellTinkererAlchemy({
             xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
           >
+            {!showInPlayerSheet && (
+              <Tooltip title={t("Arcana not shown in player sheet")}>
+                <Icon>
+                  <VisibilityOff style={{ color: "black" }} />
+                </Icon>
+              </Tooltip>
+            )}
             <IconButton size="small" onClick={onEditRank}>
               <Edit style={{ color: "black" }} />
             </IconButton>

@@ -411,6 +411,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               isOffensive={spell.isOffensive}
                               attr1={spell.attr1}
                               attr2={spell.attr2}
+                              showInPlayerSheet={spell.showInPlayerSheet || spell.showInPlayerSheet === undefined}
                               index={index}
                               key={index}
                             />

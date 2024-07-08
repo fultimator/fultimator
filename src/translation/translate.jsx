@@ -68,12 +68,20 @@ const replaceKey = (key, noSpan, language) => {
   }
 };
 
-export const useTranslate = () => {
+export const useTranslate = (allowedLanguages) => {
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
     setLanguage(localStorage.getItem("selectedLanguage") || "en");
   }, []);
+
+  if (
+    allowedLanguages &&
+    allowedLanguages.length > 0 &&
+    !allowedLanguages.includes(language)
+  ) {
+    setLanguage("en");
+  }
   const t = (key, noSpan) => {
     return replaceKey(key, noSpan, language);
   };
@@ -81,7 +89,14 @@ export const useTranslate = () => {
   return { t };
 };
 
-export const t = (key, noSpan) => {
-  const language = localStorage.getItem("selectedLanguage") || "en";
+export const t = (key, noSpan, allowedLanguages) => {
+  let language = localStorage.getItem("selectedLanguage") || "en";
+  if (
+    allowedLanguages &&
+    allowedLanguages.length > 0 &&
+    !allowedLanguages.includes(language)
+  ) {
+    language = "en";
+  }
   return replaceKey(key, noSpan, language);
 };

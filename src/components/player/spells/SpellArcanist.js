@@ -6,11 +6,14 @@ import {
   useTheme,
   darken,
   IconButton,
+  Tooltip,
+  Icon,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Edit from "@mui/icons-material/Edit";
+import { VisibilityOff } from "@mui/icons-material";
 
 export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
   const { t } = useTranslate();
@@ -24,9 +27,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
     whiteSpace: "pre-line",
   });
 
+  const showInPlayerSheet =
+    arcana.showInPlayerSheet || arcana.showInPlayerSheet === undefined;
+
   return (
     <>
-      <Card sx={{marginBottom: 2}}>
+      <Card sx={{ marginBottom: 2 }}>
         <div style={{ backgroundColor: "white", background: "white" }}>
           <Stack>
             <Grid container>
@@ -94,6 +100,13 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                         flexShrink: 0,
                       }}
                     >
+                      {!showInPlayerSheet && (
+                        <Tooltip title={t("Arcana not shown in player sheet")}>
+                          <Icon>
+                            <VisibilityOff style={{ color: "black" }} />
+                          </Icon>
+                        </Tooltip>
+                      )}
                       <IconButton size="small" onClick={onEdit}>
                         <Edit style={{ color: "black" }} />
                       </IconButton>

@@ -5,8 +5,10 @@ import {
   Grid,
   useTheme,
   ThemeProvider,
+  Icon,
+  Tooltip,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { Edit, VisibilityOff } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "../../icons"; // Ensure this path is correct
@@ -29,6 +31,7 @@ function ThemedSpellDefault({
   isOffensive,
   attr1,
   attr2,
+  showInPlayerSheet,
   isEditMode,
   index,
 }) {
@@ -87,7 +90,8 @@ function ThemedSpellDefault({
             </Grid>
             <Grid
               item
-              xs={4}
+              xs={3}
+              sm={4}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -98,7 +102,8 @@ function ThemedSpellDefault({
             </Grid>
             <Grid
               item
-              xs={3}
+              xs={4}
+              sm={3}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -148,6 +153,7 @@ function ThemedSpellDefault({
             <Typography
               fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              fontSize={{ xs: "0.8rem", sm: "1rem" }}
             >
               {spellName} {isOffensive && <OffensiveSpellIcon />}
             </Typography>
@@ -161,32 +167,38 @@ function ThemedSpellDefault({
               justifyContent: "center",
             }}
           >
-            <Typography>
+            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
               {mp}
               {maxTargets !== 1 ? " x " + t("T") : ""}
             </Typography>
           </Grid>
           <Grid
             item
-            xs={4}
+            xs={3}
+            sm={4}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Typography>{targetDesc}</Typography>
+            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+              {targetDesc}
+            </Typography>
           </Grid>
           <Grid
             item
-            xs={3}
+            xs={4}
+            sm={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Typography>{duration}</Typography>
+            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+              {duration}
+            </Typography>
           </Grid>
         </Grid>
         {isEditMode && (
@@ -195,6 +207,13 @@ function ThemedSpellDefault({
             xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
           >
+            {!showInPlayerSheet && (
+              <Tooltip title={t("Spell not shown in player sheet")}>
+                <Icon>
+                  <VisibilityOff style={{ color: "black" }} />
+                </Icon>
+              </Tooltip>
+            )}
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: "black" }} />
             </IconButton>

@@ -138,7 +138,7 @@ export default function EditPlayerClasses({
       name: name,
       lvl: 1,
       benefits: selectedClass.benefits,
-      skills: [],
+      skills: selectedClass.skills,
       heroic: {
         name: "",
         description: "",
