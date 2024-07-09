@@ -94,6 +94,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               onChange={handleTypeChange}
               fullWidth
               displayEmpty
+              disabled
               inputProps={{ 'aria-label': 'Select type' }}
             >
               <MenuItem value="spells">{t("Spells")}</MenuItem>

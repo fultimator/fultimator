@@ -320,7 +320,8 @@ function EditLevel({ npc, setnpc }) {
       }
 
       const newState = Object.assign({}, prevState);
-      newState.lvl = prevState.lvl + 5;
+      const incrementValue = prevState.rank === "groupvehicle" ? 1 : 5;
+      newState.lvl = prevState.lvl + incrementValue;
       return newState;
     });
   };
@@ -331,7 +332,8 @@ function EditLevel({ npc, setnpc }) {
       }
 
       const newState = Object.assign({}, prevState);
-      newState.lvl = prevState.lvl - 5;
+      const decrementValue = prevState.rank === "groupvehicle" ? 1 : 5;
+      newState.lvl = prevState.lvl - decrementValue;
       return newState;
     });
   };
