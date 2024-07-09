@@ -54,6 +54,19 @@ export const npcSpells = [
         special: []
     },
     {
+        name: t("Cursed Breath", true),
+        attr1: "insight",
+        attr2: "will",
+        type: "offensive",
+        damagetype: "physical",
+        mp: "10",
+        maxTargets: 1,
+        target: t("One creature"),
+        duration: t("Instantaneous"),
+        effect: t("CursedBreath_desc", true),
+        special: []
+    },    
+    {
         name: t("Devastation", true),
         attr1: "insight",
         attr2: "will",
