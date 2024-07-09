@@ -9,6 +9,7 @@ import {
   Paper,
   Button,
   InputAdornment,
+  Snackbar,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
@@ -32,6 +33,10 @@ export default function EditPlayerBasics({
 
   const [isImageError, setIsImageError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onChange = useCallback(
     (key) => (e) => {
@@ -61,11 +66,16 @@ export default function EditPlayerBasics({
       const response = await fetch(imageUrl);
       if (!response.ok) {
         setIsImageError(true);
-        setErrorMessage(`Failed to fetch image: ${response.status} ${response.statusText}`);
-        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+        setErrorMessage(
+          `Failed to fetch image: ${response.status} ${response.statusText}`
+        );
+        throw new Error(
+          `Failed to fetch image: ${response.status} ${response.statusText}`
+        );
       }
       const blob = await response.blob();
-      if (blob.size > 5 * 1024 * 1024) { // 5MB
+      if (blob.size > 5 * 1024 * 1024) {
+        // 5MB
         setIsImageError(true);
         setErrorMessage("Error: Image size is too large, max 5MB");
         return false;
@@ -269,7 +279,9 @@ export default function EditPlayerBasics({
                 }}
                 fullWidth
                 error={imgUrlTemp.length > 0 && isImageError}
-                helperText={isImageError && imgUrlTemp.length > 0 ? errorMessage : null}
+                helperText={
+                  isImageError && imgUrlTemp.length > 0 ? errorMessage : null
+                }
               />
             </Grid>
             <Grid item xs={6} sm={2}>
@@ -283,6 +295,7 @@ export default function EditPlayerBasics({
                         newState.info.imgurl = imgUrlTemp;
                         return newState;
                       });
+                      setOpen(true);
                     } else {
                       console.log("Error on uploading image");
                     }
@@ -292,6 +305,12 @@ export default function EditPlayerBasics({
               >
                 {t("Update Image")}
               </Button>
+              <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                message="Image Saved"
+              />
             </Grid>
             <Grid item xs={6} sm={2}>
               <Button
