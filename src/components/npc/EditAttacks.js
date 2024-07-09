@@ -143,7 +143,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={7}>
+      <Grid item xs={10}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -155,23 +155,6 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             size="small"
           ></TextField>
         </FormControl>
-      </Grid>
-      <Grid item xs>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="medium"
-                checked={attack.extraDamage}
-                value={attack.extraDamage}
-                onChange={(e, value) => {
-                  return setAttack("extraDamage", e.target.checked);
-                }}
-              />
-            }
-            label={t("Extra Damage")}
-          />
-        </FormGroup>
       </Grid>
       <Grid item xs={6} md={4} lg={3}>
         <FormControl variant="outlined" fullWidth>
@@ -292,6 +275,23 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             size="small"
           ></TextField>
         </FormControl>
+      </Grid>
+      <Grid item xs>
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="medium"
+                checked={attack.extraDamage}
+                value={attack.extraDamage}
+                onChange={(e, value) => {
+                  return setAttack("extraDamage", e.target.checked);
+                }}
+              />
+            }
+            label={t("Extra Damage")}
+          />
+        </FormGroup>
       </Grid>
     </Grid>
   );
