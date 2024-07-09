@@ -69,11 +69,7 @@ export default function EditBasics({ npc, setNpc }) {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <CustomHeader
-          type="top"
-          headerText={t("Basic Information")}
-          showIconButton={false}
-        />
+        <CustomHeader type="top" headerText={t("Basic Information")} showIconButton={false} />
       </Grid>
       <Grid item xs={12} sm={4}>
         <FormControl variant="standard" fullWidth>
@@ -140,13 +136,12 @@ export default function EditBasics({ npc, setNpc }) {
               <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
               <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
               <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
-              </Select>
+            </Select>
           </FormControl>
         </Stack>
       </Grid>
 
       {/* Villain & Phase Section*/}
-
       <Grid item xs={4}>
         <FormControl fullWidth>
           <TextField
@@ -226,8 +221,8 @@ export default function EditBasics({ npc, setNpc }) {
             helperText={
               npc.multipart
                 ? t(
-                    "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
-                  )
+                  "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
+                )
                 : ""
             }
           ></TextField>

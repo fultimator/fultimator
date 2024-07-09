@@ -102,9 +102,9 @@ This command will build a production version of the app, and upload it to fireba
 
 Major thanks to the following contributors:
 
-- Triex ([matteosuppo](https://github.com/matteosuppo))/ - The original creator of the fultimator webapp. The repository can be found here: [Fultimator](https://github.com/codeclysm/fultimator)
+- Triex ([matteosuppo](https://github.com/matteosuppo)) - The original creator of the fultimator webapp. The repository can be found here: [Fultimator](https://github.com/codeclysm/fultimator)
 - [Alyx](https://github.com/greg-argulla) - For prolonging the project, providing useful features such as localization, adversary compendium and improving overall functionality of the webapp. 
 - [spyrella](https://github.com/spyrella) - For ongoing updates to the system and maintainence of the project.
 - [acinoroc](https://github.com/acinoroc) - Another active maintainer, lead developer of the Character Designer.
 
-- Special thanks to the following contributors found here: [Contributors Link](https://github.com/fultimator/fultimator/graphs/contributors)
+Special thanks to the following contributors found here: [Contributors Link](https://github.com/fultimator/fultimator/graphs/contributors)

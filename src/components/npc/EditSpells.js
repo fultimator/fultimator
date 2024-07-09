@@ -1,4 +1,5 @@
 import { useState } from "react";
+import types from "../../libs/types";
 import { RemoveCircleOutline } from "@mui/icons-material";
 import {
   Grid,
@@ -9,7 +10,6 @@ import {
   Select,
   TextField,
   Divider,
-  ToggleButtonGroup,
   ToggleButton,
   Autocomplete
 } from "@mui/material";
@@ -18,9 +18,21 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import EditCompendiumModal from '../npc/EditCompendiumModal';
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openCompendiumModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeCompendiumModal = () => {
+    setModalOpen(false);
+  };
+
   const onChangeSpells = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -60,9 +72,33 @@ export default function EditSpells({ npc, setNpc }) {
     };
   };
 
+  const addCompendiumSpell = (selectedItem) => {
+    setNpc((prevState) => {
+      const newState = { ...prevState };
+      if (!newState.spells) {
+        newState.spells = [];
+      }
+      newState.spells.push({
+        name: selectedItem.name,
+        attr1: selectedItem.attr1 || "dexterity",
+        attr2: selectedItem.attr2 || "dexterity",
+        type: selectedItem.type || "",
+        damagetype: selectedItem.damagetype || "physical",
+        mp: selectedItem.mp,
+        maxTargets: selectedItem.maxTargets || 0,
+        target: selectedItem.target,
+        duration: selectedItem.duration,
+        effect: selectedItem.effect,
+        special: selectedItem.special || [],
+      });
+      return newState;
+    });
+    closeCompendiumModal();
+  };
+
   return (
     <>
-      <CustomHeader type="top" addItem={addSpell} headerText={t("Spells")} icon={Add} />
+      <CustomHeader type="top" openCompendium={openCompendiumModal} addItem={addSpell} headerText={t("Spells")} icon={Add} />
       {npc.spells?.map((spell, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -81,6 +117,7 @@ export default function EditSpells({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <EditCompendiumModal typeName="spells" open={modalOpen} onClose={closeCompendiumModal} onSave={addCompendiumSpell} />
     </>
   );
 }
@@ -135,98 +172,95 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={8} sm={9} md={10}>
-        <FormControl variant="standard" fullWidth>
-          <TextField
-            id="name"
-            label={t("Name:")}
-            value={spell.name}
-            onChange={(e) => {
-              return setSpell("name", e.target.value);
-            }}
-            size="small"
-          ></TextField>
-        </FormControl>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          label={t("Spell Name:")}
+          variant="outlined"
+          fullWidth
+          value={spell.name}
+          onChange={(e) => setSpell("name", e.target.value)}
+          inputProps={{ maxLength: 50 }}
+          size="small"
+        />
       </Grid>
-      <Grid item xs={2} md={1}>
-        <FormControl variant="standard" fullWidth>
-          <ToggleButtonGroup
-            size="medium"
-            value={spell.type}
-            exclusive
-            onChange={(e, value) => {
-              return setSpell("type", value);
+      <Grid item xs={12} sm={1}>
+        <FormControl
+          variant="standard"
+          fullWidth
+          style={{ height: "100%" }}
+        >
+          <ToggleButton
+            selected={spell.type === "offensive"}
+            onChange={(e) => {
+              const newValue = spell.type === "offensive" ? "" : "offensive";
+              setSpell("type", newValue);
             }}
-            aria-label="text alignment"
+            aria-label="offensive-toggle"
+            style={{
+              height: "100%",
+            }}
           >
-            <ToggleButton value="offensive" aria-label="left aligned">
-              <OffensiveSpellIcon />
-            </ToggleButton>
-          </ToggleButtonGroup>
+            <OffensiveSpellIcon />
+          </ToggleButton>
         </FormControl>
       </Grid>
-      {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4} md={2}>
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"spell-" + i + "-attr1label"}>
-              {t("Attr 1:")}
-            </InputLabel>
-            <Select
-              value={spell.attr1}
-              labelId={"spell-" + i + "-attr1label"}
-              id={"spell-" + i + "-attr1"}
-              label={t("Attr 1")}
-              size="small"
-              onChange={(e) => {
-                return setSpell("attr1", e.target.value);
-              }}
-            >
-              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
-              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
-              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
-              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      )}
-      {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4} md={2}>
-          <FormControl variant="outlined" fullWidth>
-            <InputLabel id={"spell-" + i + "-attr2label"}>
-              {t("Attr 2:")}
-            </InputLabel>
-            <Select
-              value={spell.attr2}
-              labelId={"spell-" + i + "-attr2label"}
-              id={"spell-" + i + "-attr2"}
-              label={t("Attr 2:")}
-              size="small"
-              onChange={(e, value) => {
-                return setSpell("attr2", e.target.value);
-              }}
-            >
-              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
-              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
-              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
-              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      )}
-      <Grid item xs={3} md={2}>
-        <FormControl variant="outlined" fullWidth>
-          <TextField
-            id="mp"
-            label={t("MP:")}
-            value={spell.mp}
-            onChange={(e) => {
-              return setSpell("mp", e.target.value);
-            }}
-            size="small"
-          ></TextField>
-        </FormControl>
+      <Grid item xs={6} sm={3} md={2}>
+        <TextField
+          id="mp"
+          label={t("MP x Target")}
+          variant="outlined"
+          fullWidth
+          placeholder="10"
+          value={
+            spell.mp === null ||
+              spell.mp === undefined
+              ? ""
+              : spell.mp.toString()
+          }
+          onChange={(e) => {
+            return setSpell("mp", e.target.value);
+          }}
+          size="small"
+        />
       </Grid>
-      <Grid item xs={5} md={3} lg={2}>
+      <Grid item xs={6} sm={4} md={2}>
+        <TextField
+          type="number"
+          label={t("Max Targets")}
+          variant="outlined"
+          fullWidth
+          size="small"
+          placeholder="1"
+          value={
+            spell.maxTargets === null ||
+              spell.maxTargets === undefined
+              ? "0"
+              : spell.maxTargets.toString()
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (
+              value === "" ||
+              (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
+            ) {
+              handleChange(
+                "maxTargets",
+                value === "" ? 0 : parseInt(value, 10)
+              );
+            }
+          }}
+          onBlur={(e) => {
+            let value = parseInt(e.target.value, 10);
+            if (isNaN(value) || value < 0) {
+              value = 0;
+            } else if (value > 999) {
+              value = 999;
+            }
+            handleChange("maxTargets", value);
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="target"
@@ -256,7 +290,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           />
         </FormControl>
       </Grid>
-      <Grid item xs={4} md>
+      <Grid item xs={12} sm={6}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="duration"
@@ -286,6 +320,82 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           />
         </FormControl>
       </Grid>
+      {spell.type === "offensive" && (
+        <Grid item xs={6} sm={4}>
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id={"spell-" + i + "-attr1label"}>
+              {t("Attr 1:")}
+            </InputLabel>
+            <Select
+              value={spell.attr1}
+              labelId={"spell-" + i + "-attr1label"}
+              id={"spell-" + i + "-attr1"}
+              label={t("Attr 1")}
+              size="small"
+              onChange={(e) => {
+                return setSpell("attr1", e.target.value);
+              }}
+            >
+              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
+      {spell.type === "offensive" && (
+        <Grid item xs={6} sm={4}>
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id={"spell-" + i + "-attr2label"}>
+              {t("Attr 2:")}
+            </InputLabel>
+            <Select
+              value={spell.attr2}
+              labelId={"spell-" + i + "-attr2label"}
+              id={"spell-" + i + "-attr2"}
+              label={t("Attr 2:")}
+              size="small"
+              onChange={(e, value) => {
+                return setSpell("attr2", e.target.value);
+              }}
+            >
+              <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
+              <MenuItem value={"insight"}>{t("INS")}</MenuItem>
+              <MenuItem value={"might"}>{t("MIG")}</MenuItem>
+              <MenuItem value={"will"}>{t("WLP")}</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
+      {spell.type === "offensive" && (
+        <Grid item xs={12} sm={4}>
+          <FormControl variant="outlined" fullWidth>
+            <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
+            <Select
+              value={spell.damagetype}
+              labelId={"attack-" + i + "-type"}
+              id={"attack-" + i + "-type"}
+              label={t("Type:")}
+              size="small"
+              onChange={(e, value) => {
+                return setSpell("damagetype", e.target.value);
+              }}
+            >
+              {Object.keys(types).map((damagetype) => {
+                return (
+                  <MenuItem key={damagetype} value={damagetype}>
+                    {types[damagetype].long}
+                  </MenuItem>
+                );
+              })}
+              <MenuItem value={"nodmg"}>
+                {t("no damage")}
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
       <Grid item xs={12}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField id="effect" label={t("Effect:")} value={spell.effect}

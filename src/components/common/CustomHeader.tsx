@@ -2,13 +2,15 @@ import React from 'react';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import { useTheme } from '@mui/system';
-import { Grid, Tooltip } from "@mui/material";
+import { Grid, Tooltip, Box } from "@mui/material";
 import { SvgIconComponent } from '@mui/icons-material';
 
 interface CustomHeaderProps {
     addItem: () => void;
+    openCompendium: () => void;
     headerText: string;
     type: 'top' | 'middle';
     icon?: SvgIconComponent; // Optional icon prop
@@ -19,6 +21,7 @@ interface CustomHeaderProps {
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
     addItem,
+    openCompendium,
     headerText,
     type,
     icon: Icon = HistoryEduIcon,
@@ -56,22 +59,34 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         }}
                     >
                         <div style={{ marginLeft: '15px' }}>{headerText}</div>
-                        {showIconButton ? (
-                            disableIconButton ? (
-                                <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
-                            ) : (
-                                <Tooltip title={customTooltip || ("Add " + headerText)}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {openCompendium && (
+                                <Tooltip title={"Open Compendium"}>
                                     <IconButton
                                         sx={{ px: 1, '&:hover': { color: primary } }}
-                                        onClick={addItem}
+                                        onClick={openCompendium}
                                     >
-                                        <Icon fontSize="large" />
+                                        <SearchIcon fontSize="large" />
                                     </IconButton>
                                 </Tooltip>
-                            )
-                        ) : (
-                            <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
-                        )}
+                            )}
+                            {showIconButton ? (
+                                disableIconButton ? (
+                                    <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
+                                ) : (
+                                    <Tooltip title={"Add " + headerText}>
+                                        <IconButton
+                                            sx={{ px: 1, '&:hover': { color: primary } }}
+                                            onClick={addItem}
+                                        >
+                                            <Icon fontSize="large" />
+                                        </IconButton>
+                                    </Tooltip>
+                                )
+                            ) : (
+                                <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
+                            )}
+                        </Box>
                     </Typography>
                     <Divider
                         orientation="horizontal"
@@ -114,22 +129,34 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         }}
                     >
                         <div style={{ marginLeft: '15px' }}>{headerText}</div>
-                        {showIconButton ? (
-                            disableIconButton ? (
-                                <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
-                            ) : (
-                                <Tooltip title={"Add " + headerText}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {openCompendium && (
+                                <Tooltip title={"Open Compendium"}>
                                     <IconButton
                                         sx={{ px: 1, '&:hover': { color: primary } }}
-                                        onClick={addItem}
+                                        onClick={openCompendium}
                                     >
-                                        <Icon fontSize="large" />
+                                        <SearchIcon fontSize="large" />
                                     </IconButton>
                                 </Tooltip>
-                            )
-                        ) : (
-                            <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
-                        )}
+                            )}
+                            {showIconButton ? (
+                                disableIconButton ? (
+                                    <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
+                                ) : (
+                                    <Tooltip title={"Add " + headerText}>
+                                        <IconButton
+                                            sx={{ px: 1, '&:hover': { color: primary } }}
+                                            onClick={addItem}
+                                        >
+                                            <Icon fontSize="large" />
+                                        </IconButton>
+                                    </Tooltip>
+                                )
+                            ) : (
+                                <span style={{ minWidth: '15px', display: 'inline-block' }}></span>
+                            )}
+                        </Box>
                     </Typography>
                     <Divider
                         orientation="horizontal"

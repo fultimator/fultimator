@@ -21,9 +21,21 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import EditCompendiumModal from '../npc/EditCompendiumModal';
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openCompendiumModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeCompendiumModal = () => {
+    setModalOpen(false);
+  };
+
   const onChangeAttacks = (i) => {
     return (key, value) => {
       setNpc((prevState) => {
@@ -62,9 +74,37 @@ export default function EditAttacks({ npc, setNpc }) {
     };
   };
 
+  const addCompendiumAttack = (selectedItem) => {
+    setNpc((prevState) => {
+      const newState = { ...prevState };
+      if (!newState.handleSaveAttack) {
+        newState.handleSaveAttack = [];
+      }
+      let range = "melee";
+      if (selectedItem.ranged === true) {
+        range = "distance";
+      } else if (selectedItem.melee === true) {
+        range = "melee";
+      }
+
+      newState.attacks.push({
+        name: selectedItem.name,
+        range: range,
+        attr1: selectedItem.attr1 || "dexterity",
+        attr2: selectedItem.attr2 || "dexterity",
+        type: selectedItem.type,
+        flathit: selectedItem.flathit,
+        flatdmg: selectedItem.flatdmg,
+        special: [],
+      });
+      return newState;
+    });
+    closeCompendiumModal();
+  };
+
   return (
     <>
-      <CustomHeader type="top" addItem={addAttack} headerText={t("Basic Attacks")} icon={Add} />
+      <CustomHeader type="top" openCompendium={openCompendiumModal} addItem={addAttack} headerText={t("Basic Attacks")} icon={Add} />
       {npc.attacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -89,6 +129,7 @@ export default function EditAttacks({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <EditCompendiumModal typeName="attacks" open={modalOpen} onClose={closeCompendiumModal} onSave={addCompendiumAttack} />
     </>
   );
 }
@@ -220,6 +261,36 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
               <DistanceIcon />
             </ToggleButton>
           </ToggleButtonGroup>
+        </FormControl>
+      </Grid>
+      <Grid item xs={3}>
+        <FormControl variant="standard">
+          <TextField
+            id="flathit"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label={t("Acc.")}
+            value={attack.flathit || 0}
+            onChange={(e) => {
+              return setAttack("flathit", e.target.value);
+            }}
+            size="small"
+          ></TextField>
+        </FormControl>
+      </Grid>
+      <Grid item xs={3}>
+        <FormControl variant="standard">
+          <TextField
+            id="flatdmg"
+            type="number"
+            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            label={t("Dmg.")}
+            value={attack.flatdmg || 0}
+            onChange={(e) => {
+              return setAttack("flatdmg", e.target.value);
+            }}
+            size="small"
+          ></TextField>
         </FormControl>
       </Grid>
     </Grid>
