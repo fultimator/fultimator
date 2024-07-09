@@ -134,11 +134,21 @@ export default function EditPlayerClasses({
       classes: Array.isArray(player.classes) ? player.classes : [],
     };
 
+    const sortedSkills = selectedClass.skills.sort((a, b) => {
+      if (a.skillName < b.skillName) {
+        return -1;
+      }
+      if (a.skillName > b.skillName) {
+        return 1;
+      }
+      return 0;
+    });
+
     updatedPlayer.classes.push({
       name: name,
       lvl: 1,
       benefits: selectedClass.benefits,
-      skills: selectedClass.skills,
+      skills: sortedSkills,
       heroic: {
         name: "",
         description: "",
