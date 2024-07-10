@@ -91,29 +91,6 @@ function Home() {
           mb: 5,
         }}
       >
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          <Link
-            href="https://discord.gg/9yYc6R93Cd"
-            target="_blank"
-            rel="noreferrer"
-            underline="hover"
-            sx={{ color: "#7289da", fontWeight: "bold" }}
-          >
-            {t("Dive into the Discord Hub!")}
-          </Link>
-        </Typography>
-        <Typography variant="body1" sx={{ mt: 1 }}>
-          {t("If you have any feedback, give us your thoughts here")}{" "}
-          <Link
-            href="https://forms.gle/3P7Bq1CtZrnFwQsm8"
-            target="_blank"
-            rel="noreferrer"
-            underline="hover"
-            sx={{ color: "#47645b", fontWeight: "bold" }}
-          >
-            {t("Google Form.")}
-          </Link>
-        </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
           {t("The wonderful Fultimator Icons are made by Runty! Email:")}{" "}
           <Link
@@ -137,7 +114,7 @@ function Home() {
           </Link>
         </Typography>
         <Typography variant="body1" sx={{ mt: 1.5 }}>
-          <strong>{t("Join the Fultimator Developer Team!")}</strong>{" "}
+          <strong>{t("Join the Fultimator Community!")}</strong>{" "}
         </Typography>
         <Typography variant="body1" sx={{ mt: 0 }}>
           {t("We would love to have you on board!")}{" "}
@@ -148,9 +125,51 @@ function Home() {
             underline="hover"
             sx={{ color: "#7289da", fontWeight: "bold" }}
           >
-            {t("Simply reach out to us on Discord!")}
+            {t("Dive into the Discord Hub!")}
           </Link>
         </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          {t("If you have any feedback, give us your thoughts here")}{" "}
+          <Link
+            href="https://forms.gle/3P7Bq1CtZrnFwQsm8"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            {t("Google Form.")}
+          </Link>
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1.5 }}>
+          <strong>{t("Copyright Notice")}</strong>{" "}
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 0 }}>
+          Fultimator is an independent production by
+
+          <Link
+            href="https://github.com/fultimator"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            {" Fultimator Dev Team "}
+          </Link>
+          and is not affiliated with Need Games or Rooster Games.<br />
+          It is published under the
+          <Link
+            href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
+            target="_blank"
+            rel="noreferrer"
+            underline="hover"
+            sx={{ color: "#47645b", fontWeight: "bold" }}
+          >
+            {" Fabula Ultima Third Party Tabletop License 1.0"}
+          </Link>
+          <br />
+          Fabula Ultima is a roleplaying game created by Emanuele Galletto and published by Need Games.<br />
+          Fabula Ultima is © Need Games and Rooster Games.
+        </Typography>;
       </Box>
     </Layout>
   );
