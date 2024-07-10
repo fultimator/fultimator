@@ -20,7 +20,6 @@ type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
 
 interface AppBarProps {
   isNpcEdit: boolean;
-  handleGoBack: () => void;
   selectedTheme: ThemeValue;
   handleSelectTheme: (theme: ThemeValue) => void;
   showGoBackButton: boolean;
@@ -31,7 +30,6 @@ const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
   children,
 }) => {
   const trigger = useScrollTrigger();
-
   return (
     <Slide appear={false} direction="down" in={!trigger}>
       {children}
@@ -41,7 +39,6 @@ const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
 
 const AppBar: React.FC<AppBarProps> = ({
   isNpcEdit,
-  handleGoBack,
   selectedTheme,
   handleSelectTheme,
   showGoBackButton,
@@ -50,87 +47,89 @@ const AppBar: React.FC<AppBarProps> = ({
   const viewportWidth = window.innerWidth;
   const isSmallViewport = viewportWidth <= 600;
   return (
-    <HideOnScroll>
-      <MuiAppBar position="fixed">
-        <Container>
-          <Grid container alignItems="center" justifyContent="space-between">
-            <Grid
-              item
-              xs={2}
-              textAlign="left"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              {showGoBackButton && (
-                <IconButton
-                  color="inherit"
-                  onClick={handleNavigation} // Use handleNavigation instead of handleGoBack
-                >
-                  <ArrowBack sx={{ width: "32px", height: "32px" }} />
-                </IconButton>
-              )}
-            </Grid>
-
-            {!isNpcEdit && (
+    <>
+      <HideOnScroll>
+        <MuiAppBar position="fixed">
+          <Container>
+            <Grid container alignItems="center" justifyContent="space-between">
               <Grid
                 item
-                xs={8}
-                textAlign="center"
+                xs={2}
+                textAlign="left"
                 sx={{
-                  height: "100px",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  margin: "2px 0",
+                  justifyContent: "flex-start",
                 }}
               >
-                <RouterLink
-                  to="/"
-                  style={{
-                    color: "inherit",
-                    textDecoration: "none",
-                    textAlign: "center",
+                {showGoBackButton && (
+                  <IconButton
+                    color="inherit"
+                    onClick={handleNavigation}
+                  >
+                    <ArrowBack sx={{ width: "32px", height: "32px" }} />
+                  </IconButton>
+                )}
+              </Grid>
+
+              {!isNpcEdit && (
+                <Grid
+                  item
+                  xs={8}
+                  textAlign="center"
+                  sx={{
+                    height: "85px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "2px 0",
                   }}
                 >
-                  <Typography variant="h1" textAlign="center">
-                    <img
-                      style={{ height: "100%", maxHeight: "90px" }}
-                      src={isSmallViewport ? logo : undefined}
-                      srcSet={
-                        isSmallViewport
-                          ? undefined
-                          : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`
-                      }
-                      sizes={isSmallViewport ? undefined : "100vw"}
-                      alt="Fultimator"
-                    />
-                  </Typography>
-                </RouterLink>
-              </Grid>
-            )}
+                  <RouterLink
+                    to="/"
+                    style={{
+                      color: "inherit",
+                      textDecoration: "none",
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography variant="h1" textAlign="center">
+                      <img
+                        style={{ height: "100%", maxHeight: "90px" }}
+                        src={isSmallViewport ? logo : undefined}
+                        srcSet={
+                          isSmallViewport
+                            ? undefined
+                            : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`
+                        }
+                        sizes={isSmallViewport ? undefined : "100vw"}
+                        alt="Fultimator"
+                      />
+                    </Typography>
+                  </RouterLink>
+                </Grid>
+              )}
 
-            <Grid item xs={2} sx={{ textAlign: "right" }}>
-              <Grid
-                container
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <MenuOption
-                  selectedTheme={selectedTheme}
-                  onSelectTheme={handleSelectTheme}
-                />
+              <Grid item xs={2} sx={{ textAlign: "right" }}>
+                <Grid
+                  container
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <MenuOption
+                    selectedTheme={selectedTheme}
+                    onSelectTheme={handleSelectTheme}
+                  />
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        </Container>
-      </MuiAppBar>
-    </HideOnScroll>
+          </Container>
+        </MuiAppBar>
+      </HideOnScroll>
+    </>
   );
 };
 

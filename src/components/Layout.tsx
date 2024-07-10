@@ -2,6 +2,7 @@ import { Container } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "./appbar/AppBar";
+import CompactAppBar from "./appbar/CompactAppBar";
 import { useThemeContext } from "../ThemeContext";
 
 type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
@@ -13,7 +14,6 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
   const { setTheme } = useThemeContext();
-
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
     return (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula";
   });
@@ -31,35 +31,41 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   const handleNavigation = () => {
-    // This function will be passed to the AppBar component
     navigate(-1);
   };
 
   const fultimatorRoutes = ["/npc-gallery/:npcId"];
-  const isNpcEdit = fultimatorRoutes.includes(location.pathname);
+  const isNpcEdit = fultimatorRoutes.some(route =>
+    new RegExp(route.replace(/:\w+/, "\\w+")).test(location.pathname)
+  );  
 
   // Determine if the current path is the homepage
   const isHomepage = location.pathname === "/";
 
   return (
     <>
-      <AppBar
-        isNpcEdit={isNpcEdit}
-        handleGoBack={handleGoBack}
-        selectedTheme={selectedTheme}
-        handleSelectTheme={handleSelectTheme}
-        showGoBackButton={!isHomepage} // Pass the prop to control the visibility of the "Go Back" button
-        handleNavigation={handleNavigation} // Pass the handleNavigation function to the AppBar component
-      />
-      {fullWidth ? (
-        <div style={{ marginTop: "8em" }}>{children} </div>
+      {isNpcEdit ? (
+        <CompactAppBar
+          isNpcEdit={isNpcEdit}
+          selectedTheme={selectedTheme}
+          handleSelectTheme={handleSelectTheme}
+          showGoBackButton={!isHomepage}
+          handleNavigation={handleNavigation}
+        />
       ) : (
-        <Container style={{ marginTop: "8em", alignItems: "center" }}>
+        <AppBar
+          isNpcEdit={isNpcEdit}
+          selectedTheme={selectedTheme}
+          handleSelectTheme={handleSelectTheme}
+          showGoBackButton={!isHomepage}
+          handleNavigation={handleNavigation}
+        />
+      )}
+      {fullWidth ? (
+        <div style={{ marginTop: "4em" }}>{children}</div>
+      ) : (
+        <Container style={{ marginTop: "6em", alignItems: "center" }}>
           {children}
         </Container>
       )}

@@ -1,8 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Popover,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +10,8 @@ import {
   Divider,
   useTheme,
   ThemeProvider,
+  Button,
+  Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -37,6 +37,7 @@ import {
   calcUsedSkillsFromEquip,
 } from "../../libs/npcs";
 import { useTranslate } from "../../translation/translate";
+import { darken } from "@mui/material/styles";
 
 const SkillTableRow = ({ label, value, isHeader }) => (
   <TableRow>
@@ -53,140 +54,136 @@ export default function ExplainSkillsSimplified({ npc }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+  const darkerPrimary = darken(primary, 0.2);
+  const hoverPrimary = darken(primary, 0.1);
   const totalAvailableSkills = calcAvailableSkills(npc);
   const totalUsedSkills = calcUsedSkills(npc);
-  const [isExpanded, setExpanded] = useState(false);
-  const accordionRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleToggleAccordion = () => {
-    setExpanded((prevExpanded) => !prevExpanded);
+  const handleClick = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
   };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "skills-popover" : undefined;
 
   return (
     <ThemeProvider theme={theme}>
-      <Accordion
-        ref={accordionRef}
-        expanded={isExpanded}
-        onChange={handleToggleAccordion}
-        sx={{
-          borderRadius: "16px",
-          boxShadow: "none",
-          backgroundColor: "transparent",
-          zIndex: 10,
-        }}
-      >
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ color: "#ffffff" }} />}
+      <Box sx={{ width: "300px" }}>
+        <Button
+          aria-describedby={id}
+          onClick={handleClick}
           sx={{
-            backgroundColor: `${primary}`,
+            backgroundColor: darkerPrimary,
             color: "#ffffff",
             borderRadius: "16px",
-            margin: "0",
-            "&.Mui-expanded": {
-              borderRadius: "16px 16px 0 0",
-            },
+            padding: "6px",
+            textTransform: "none",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            zIndex: theme.zIndex.appBar + 1,
+            width: "100%",
+            borderBottomLeftRadius: open ? 0 : "16px",
+            borderBottomRightRadius: open ? 0 : "16px",
+            borderBottom: open ? `1px solid ${primary}` : "none",
+            "&:hover": {
+              backgroundColor: hoverPrimary,
+            }
           }}
         >
-          <span>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              {t("Available:")} {totalAvailableSkills}
-            </Typography>
-          </span>
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{ mx: 1, height: 24, background: "white" }}
-          />
-          <span>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: "bold", display: "flex", alignItems: "center" }}
-            >
-              {t("Used:")} {totalUsedSkills}
-            </Typography>
-          </span>
-        </AccordionSummary>
-        <AccordionDetails
-          sx={{
-            borderRadius: "0 0 16px 16px",
-            boxShadow: "none",
-            backgroundColor: "#ffffff",
-            border: "1px solid black",
-            p: 0,
-            overflow: "auto",
-            maxHeight: "300px",
-            zIndex: 10,
-          }}
-        >
-          <Table size="small">
-            <TableHead>
-              <SkillTableRow
-                label={t("Total SP Available")}
-                value={totalAvailableSkills}
-                isHeader={true}
-              />
-            </TableHead>
-            <TableBody>
-              {[
-                [t("Species"), calcAvailableSkillsFromSpecies],
-                [t("Levels"), calcAvailableSkillsFromLevel],
-                [t("Vulnerabilities"), calcAvailableSkillsFromVulnerabilities],
-                [t("Rank"), calcAvailableSkillsFromRank],
-              ].map(
-                ([innerLabel, calculator]) =>
-                  calculator(npc) > 0 && (
-                    <SkillTableRow
-                      key={innerLabel}
-                      label={innerLabel}
-                      value={calculator(npc)}
-                    />
-                  )
-              )}
-            </TableBody>
-            <TableHead>
-              <SkillTableRow
-                label={t("Total SP Used")}
-                value={totalUsedSkills}
-                isHeader={true}
-              />
-            </TableHead>
-            <TableBody>
-              {[
-                [t("Special Attacks"), calcUsedSkillsFromSpecialAttacks],
-                [t("Spells"), calcUsedSkillsFromSpells],
-                [t("Extra Defense"), calcUsedSkillsFromExtraDefs],
-                [t("Extra HP"), calcUsedSkillsFromExtraHP],
-                [t("Extra MP"), calcUsedSkillsFromExtraMP],
-                [t("Extra Initiative"), calcUsedSkillsFromExtraInit],
-                [t("Extra Accuracy"), calcUsedSkillsFromExtraPrecision],
-                [t("Extra Magic"), calcUsedSkillsFromExtraMagic],
-                [t("Resistances"), calcUsedSkillsFromResistances],
-                [t("Immunities"), calcUsedSkillsFromImmunities],
-                [t("Absorption"), calcUsedSkillsFromAbsorbs],
-                [t("Special Rules"), calcUsedSkillsFromSpecial],
-                [t("Other Actions"), calcUsedSkillsFromOtherActions],
-                [t("Equipment"), calcUsedSkillsFromEquip],
-              ].map(
-                ([innerLabel, calculator]) =>
-                  calculator(npc) > 0 && (
-                    <SkillTableRow
-                      key={innerLabel}
-                      label={innerLabel}
-                      value={calculator(npc)}
-                    />
-                  )
-              )}
-            </TableBody>
-          </Table>
-        </AccordionDetails>
-      </Accordion>
+          <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
+            {t("Available:")} {totalAvailableSkills}
+          </Typography>
+          <Divider orientation="vertical" flexItem sx={{ mx: 2, background: "white" }} />
+          <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
+            {t("Used:")} {totalUsedSkills}
+          </Typography>
+          <ExpandMoreIcon sx={{ color: "white", marginLeft: 1 }} />
+        </Button>
+      </Box>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+        sx={{
+          zIndex: theme.zIndex.appBar + 2,
+        }}
+      >
+        <Table size="small" sx={{ minWidth: "300px" }}>
+          <TableHead>
+            <SkillTableRow
+              label={t("Total SP Available")}
+              value={totalAvailableSkills}
+              isHeader={true}
+            />
+          </TableHead>
+          <TableBody>
+            {[
+              [t("Species"), calcAvailableSkillsFromSpecies],
+              [t("Levels"), calcAvailableSkillsFromLevel],
+              [t("Vulnerabilities"), calcAvailableSkillsFromVulnerabilities],
+              [t("Rank"), calcAvailableSkillsFromRank],
+            ].map(
+              ([innerLabel, calculator]) =>
+                calculator(npc) > 0 && (
+                  <SkillTableRow
+                    key={innerLabel}
+                    label={innerLabel}
+                    value={calculator(npc)}
+                  />
+                )
+            )}
+          </TableBody>
+          <TableHead>
+            <SkillTableRow
+              label={t("Total SP Used")}
+              value={totalUsedSkills}
+              isHeader={true}
+            />
+          </TableHead>
+          <TableBody>
+            {[
+              [t("Special Attacks"), calcUsedSkillsFromSpecialAttacks],
+              [t("Spells"), calcUsedSkillsFromSpells],
+              [t("Extra Defense"), calcUsedSkillsFromExtraDefs],
+              [t("Extra HP"), calcUsedSkillsFromExtraHP],
+              [t("Extra MP"), calcUsedSkillsFromExtraMP],
+              [t("Extra Initiative"), calcUsedSkillsFromExtraInit],
+              [t("Extra Accuracy"), calcUsedSkillsFromExtraPrecision],
+              [t("Extra Magic"), calcUsedSkillsFromExtraMagic],
+              [t("Resistances"), calcUsedSkillsFromResistances],
+              [t("Immunities"), calcUsedSkillsFromImmunities],
+              [t("Absorption"), calcUsedSkillsFromAbsorbs],
+              [t("Special Rules"), calcUsedSkillsFromSpecial],
+              [t("Other Actions"), calcUsedSkillsFromOtherActions],
+              [t("Equipment"), calcUsedSkillsFromEquip],
+            ].map(
+              ([innerLabel, calculator]) =>
+                calculator(npc) > 0 && (
+                  <SkillTableRow
+                    key={innerLabel}
+                    label={innerLabel}
+                    value={calculator(npc)}
+                  />
+                )
+            )}
+          </TableBody>
+        </Table>
+      </Popover>
     </ThemeProvider>
   );
 }
