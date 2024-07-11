@@ -233,7 +233,6 @@ export const testUsers =
     "WE0UhQPMpWeDNlUPakQiGDg9Lsv2",
     "PPjRD2Rfp8ZQuWdl9TaIQY7uAUI2",
     "1M2U7bTGqRMqUmV4I0WEhxvHFRJ2",
-    "ha4EUGW1f9f7OnLFukVBfoiSm5Y2",
     "wGAoyYfVSCP7AeqMwP21MJxA6NI3",
     "4rRbq36Ty6gX42UYTjvROu3A40e2",
     "mRbqxYoiKJP3jBJGZRd936ioQwb2",
@@ -288,7 +287,21 @@ export const testUsers =
     "6bOpR2LoraMkhllvY2tfZz08oIF3",
     "rdCmvzsotecgC5YYKL0lH0AyfUr2",
     "87CaBHB1jKbSBqPpQuR16gsGV0k2",
-    "2wb3oPbzafVfpTXi786Rsd6qAkZ2"
+    "2wb3oPbzafVfpTXi786Rsd6qAkZ2",
+    "WEy1FjV1xth01VeHKpLRS9x2ngJ3",
+    "lNcW4Uuog6ZHd5Ia6jIeiLZpxks2",
+    "izQQgyYphhg7P2C0cOtsJjKkx1b2",
+    "7dfGfrOJ0tWdfaJ3evorfBHCN0g1",
+    "G0mpXIGW4BhDteLgT7qvMO085UB2",
+    "dnaJoIJcm2QXjkfJraqbqUxTNLD2",
+    "vkm6dVszkzgj04jHkijqkohpdm03",
+    "NdOa00PT0gRDs5nUxJG4CnWQlg82",
+    "ZU6cpRf7ySVPrpEoqUcJPaZBjeO2",
+    "kt9OOFeXE2YoGsqIPCWCiFAmKZr1",
+    "ERrL7UeHjmefEhdEsyKYSzqdg9E3",
+    "lX5NXWgovcQxbewzHOrPYknw3zk2",
+    "9xzIaEHis6R8xqIAW6WKPJvnrNn1",
+    "Iyja9YE7NnM3XPNwKS7Ck9o2lAw2",
 ];
 
 export const moderators =
