@@ -38,7 +38,7 @@ return (
                   unwrapDisallowed={true}
                 >
                   {t(
-                    "Upon reaching levels **20**, **40**, and **60**, the Character chooses one of its Attributes and increases it by one die size (to a maximum of d12).",
+                    "Upon reaching levels **20** and **40**, the Character chooses one of its Attributes and increases it by one die size (to a maximum of d12).",
                     true
                   )}
                 </ReactMarkdown>
