@@ -13,7 +13,9 @@ import SpellTinkererAlchemy from "./SpellTinkererAlchemy";
 import SpellTinkererAlchemyRankModal from "./SpellTinkererAlchemyRankModal";
 import SpellTinkererAlchemyTargetModal from "./SpellTinkererAlchemyTargetModal";
 import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal";
-import { tinkererAlchemy } from "../../../libs/classes";
+import { tinkererAlchemy, tinkererInfusion } from "../../../libs/classes";
+import SpellTinkererInfusion from "./SpellTinkererInfusion";
+import SpellTinkererInfusionModal from "./SpellTinkererInfusionModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -28,6 +30,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [openAlchemyRankModal, setOpenAlchemyRankModal] = useState(false);
   const [openAlchemyTargetModal, setOpenAlchemyTargetModal] = useState(false);
   const [openAlchemyEffectsModal, setOpenAlchemyEffectsModal] = useState(false);
+  const [openInfusionModal, setOpenInfusionModal] = useState(false);
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
@@ -139,6 +142,30 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 ],
               };
             }
+          } else if (spell === "tinkerer-infusion") {
+            // Check if there's already a tinkerer-infusion spell
+            const hasTinkererInfusion = cls.spells.some(
+              (sp) => sp.spellType === "tinkerer-infusion"
+            );
+
+            if (hasTinkererInfusion) {
+              alert("You already have a tinkerer-infusion spell");
+              return cls;
+            } else {
+              // Add a new tinkerer-infusion spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    // add from tinkererAlchemy const
+                    ...tinkererInfusion,
+                  },
+                ],
+              };
+            }
           } else {
             alert(spell.toUpperCase() + " spell not implemented yet");
             return cls;
@@ -187,6 +214,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenAlchemyEffectsModal(true);
   };
 
+  const handleEditInfusionSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenInfusionModal(true);
+  };
+
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
@@ -206,13 +240,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       }),
     }));
 
-    setOpenSpellDefaultModal(false);
-    setOpenSpellArcanistModal(false);
-    setOpenAlchemyRankModal(false);
-    setOpenAlchemyTargetModal(false);
-    setOpenAlchemyEffectsModal(false);
-    setSpellBeingEdited(null);
-    setEditingSpellClass(null);
+    closeModals();
   };
 
   const handleDeleteSpell = (spellIndex) => {
@@ -234,11 +262,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         return cls;
       }),
     }));
+    closeModals();
+  };
+
+  const closeModals = () => {
     setOpenSpellDefaultModal(false);
     setOpenSpellArcanistModal(false);
     setOpenAlchemyRankModal(false);
     setOpenAlchemyTargetModal(false);
     setOpenAlchemyEffectsModal(false);
+    setOpenInfusionModal(false);
     setSpellBeingEdited(null);
     setEditingSpellClass(null);
   };
@@ -338,6 +371,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             arcanist: false,
             arcanistRework: false,
             tinkererAlchemy: false,
+            tinkererInfusion: false,
           };
 
           return (
@@ -364,38 +398,47 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       .sort((a, b) => a.spellType.localeCompare(b.spellType))
                       .map((spell, index) => (
                         <React.Fragment key={index}>
-                          {spell.spellType === "default" &&
-                            !spellTypeHeaders.default && (
-                              <>
-                                <CustomHeader2
-                                  headerText={t("Default Spells")}
-                                />
-                                {(spellTypeHeaders.default = true)}
-                              </>
-                            )}
-                          {spell.spellType === "arcanist" &&
-                            !spellTypeHeaders.arcanist && (
-                              <>
-                                <CustomHeader2 headerText={t("Arcana")} />
-                                {(spellTypeHeaders.arcanist = true)}
-                              </>
-                            )}
-                          {spell.spellType === "arcanist-rework" &&
-                            !spellTypeHeaders.arcanistRework && (
-                              <>
-                                <CustomHeader2
-                                  headerText={t("Arcana - Rework")}
-                                />
-                                {(spellTypeHeaders.arcanistRework = true)}
-                              </>
-                            )}
-                          {spell.spellType === "tinkerer-alchemy" &&
-                            !spellTypeHeaders.tinkererAlchemy && (
-                              <>
-                                <CustomHeader2 headerText={t("Alchemy")} />
-                                {(spellTypeHeaders.tinkererAlchemy = true)}
-                              </>
-                            )}
+                          <div style={{ marginTop: index === 0 ? 0 : 50 }}>
+                            {spell.spellType === "default" &&
+                              !spellTypeHeaders.default && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("Default Spells")}
+                                  />
+                                  {(spellTypeHeaders.default = true)}
+                                </>
+                              )}
+                            {spell.spellType === "arcanist" &&
+                              !spellTypeHeaders.arcanist && (
+                                <>
+                                  <CustomHeader2 headerText={t("Arcana")} />
+                                  {(spellTypeHeaders.arcanist = true)}
+                                </>
+                              )}
+                            {spell.spellType === "arcanist-rework" &&
+                              !spellTypeHeaders.arcanistRework && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("Arcana - Rework")}
+                                  />
+                                  {(spellTypeHeaders.arcanistRework = true)}
+                                </>
+                              )}
+                            {spell.spellType === "tinkerer-alchemy" &&
+                              !spellTypeHeaders.tinkererAlchemy && (
+                                <>
+                                  <CustomHeader2 headerText={t("Alchemy")} />
+                                  {(spellTypeHeaders.tinkererAlchemy = true)}
+                                </>
+                              )}
+                            {spell.spellType === "tinkerer-infusion" &&
+                              !spellTypeHeaders.tinkererInfusion && (
+                                <>
+                                  <CustomHeader2 headerText={t("Infusions")} />
+                                  {(spellTypeHeaders.tinkererInfusion = true)}
+                                </>
+                              )}
+                          </div>
                           {spell.spellType === "default" && (
                             <SpellDefault
                               spellName={spell.name}
@@ -411,7 +454,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               isOffensive={spell.isOffensive}
                               attr1={spell.attr1}
                               attr2={spell.attr2}
-                              showInPlayerSheet={spell.showInPlayerSheet || spell.showInPlayerSheet === undefined}
+                              showInPlayerSheet={
+                                spell.showInPlayerSheet ||
+                                spell.showInPlayerSheet === undefined
+                              }
                               index={index}
                               key={index}
                             />
@@ -455,6 +501,16 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   index
                                 );
                               }}
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "tinkerer-infusion" && (
+                            <SpellTinkererInfusion
+                              infusion={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditInfusionSpell(spell, cls.name, index)
+                              }
                               isEditMode={isEditMode}
                             />
                           )}
@@ -521,6 +577,17 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         }}
         onSave={handleSaveEditedSpell}
         alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellTinkererInfusionModal
+        open={openInfusionModal}
+        onClose={() => {
+          setOpenInfusionModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        infusion={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
     </>
   );

@@ -21,6 +21,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info, Casino } from "@mui/icons-material";
 import SpellTinkererAlchemy from "../spells/SpellTinkererAlchemy";
+import SpellTinkererInfusion from "../spells/SpellTinkererInfusion";
 
 const ranks = ["Basic", "Advanced", "Superior"]; // Define ranks
 
@@ -32,6 +33,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedAlchemy, setSelectedAlchemy] = useState(null);
+  const [selectedInfusion, setSelectedInfusion] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const [openRollAlchemyModal, setOpenRollAlchemyModal] = useState(false);
@@ -41,17 +43,25 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const [useIP, setUseIP] = useState(true);
   // Variable to hold the result of the rolled dice
 
-  const handleOpenModal = (alchemy) => {
-    setSelectedAlchemy(alchemy);
+  const handleOpenModal = (gadget) => {
+    if (gadget.spellType === "tinkerer-alchemy") {
+      setSelectedAlchemy(gadget);
+    } else if (gadget.spellType === "tinkerer-infusion") {
+      setSelectedInfusion(gadget);
+    }
+
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setSelectedAlchemy(null);
+    setSelectedInfusion(null);
   };
 
   const handleCloseRollAlchemyModal = () => {
     setOpenRollAlchemyModal(false);
+    setSelectedAlchemy(null);
   };
 
   const handleRollSetup = (alchemy) => {
@@ -181,9 +191,19 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
+  const infusionSpells = player.classes
+    .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
+    .filter(
+      (spell) =>
+        spell !== undefined &&
+        spell.spellType === "tinkerer-infusion" &&
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+    )
+    .sort((a, b) => a.className.localeCompare(b.className));
+
   return (
     <>
-      {alchemySpells.length > 0 && (
+      {(alchemySpells.length > 0 || infusionSpells.length > 0) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -290,6 +310,70 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   </Grid>
                 </Grid>
               ))}
+              {infusionSpells.map((infusion, index) => (
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  md={6}
+                  key={index}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      id="spell-left-name"
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {t("Infusion") +
+                        " (" +
+                        (infusion.rank ? t(ranks[infusion.rank - 1]) : "") +
+                        ") " +
+                        " - " +
+                        t(infusion.className)}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                  >
+                    <div
+                      id="spell-right-controls"
+                      style={{
+                        padding: "10px",
+                        backgroundColor: ternary,
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                      className="spell-right-controls"
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton
+                          sx={{ padding: "0px" }}
+                          onClick={() => handleOpenModal(infusion)}
+                        >
+                          <Info />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </Grid>
+                </Grid>
+              ))}
             </Grid>
             <Dialog
               open={openModal}
@@ -302,10 +386,18 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               }}
             >
               <DialogContent>
-                <SpellTinkererAlchemy
-                  alchemy={selectedAlchemy}
-                  isEditMode={false}
-                />
+                {selectedAlchemy !== null && (
+                  <SpellTinkererAlchemy
+                    alchemy={selectedAlchemy}
+                    isEditMode={false}
+                  />
+                )}
+                {selectedInfusion !== null && (
+                  <SpellTinkererInfusion
+                    infusion={selectedInfusion}
+                    isEditMode={false}
+                  />
+                )}
               </DialogContent>
               <DialogActions>
                 <Button variant="contained" onClick={handleCloseModal}>
@@ -351,7 +443,12 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                             ) // Filter ranks based on selectedAlchemy.rank
                             .map((rank, index) => (
                               <MenuItem key={index} value={rank}>
-                                {t(rank) + " (" + t("IP Cost") + ": " + (index + 3) + ")"}
+                                {t(rank) +
+                                  " (" +
+                                  t("IP Cost") +
+                                  ": " +
+                                  (index + 3) +
+                                  ")"}
                               </MenuItem>
                             ))}
                       </Select>

@@ -1567,4 +1567,74 @@ export const tinkererAlchemy = {
   ],
 };
 
+export const tinkererInfusion = {
+  spellType: "tinkerer-infusion",
+  rank: 1,
+  effects: [
+    {
+      infusionRank: 1,
+      name: t("Cryo"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **ice**."
+      ),
+    },
+    {
+      infusionRank: 1,
+      name: t("Pyro"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **fire**."
+      ),
+    },
+    {
+      infusionRank: 1,
+      name: t("Volt"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **bolt**."
+      ),
+    },
+    {
+      infusionRank: 2,
+      name: t("Cyclone"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **air**."
+      ),
+    },
+    {
+      infusionRank: 2,
+      name: t("Exorcism"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **light**."
+      ),
+    },
+    {
+      infusionRank: 2,
+      name: t("Seismic"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **earth**."
+      ),
+    },
+    {
+      infusionRank: 2,
+      name: t("Shadow"),
+      effect: t(
+        "The attack deals 5 extra damage, and its damage becomes **dark**."
+      ),
+    },
+    {
+      infusionRank: 3,
+      name: t("Vampire"),
+      effect: t(
+        "Choose one option: you recover an amount of HP equal to half the HP loss suffered by the target of the attack; **or** you recover an amount of MP equal to half the HP loss suffered by the target of the attack. This infusion can only be used if the attack targeted **a single** creature."
+      ),
+    },
+    {
+      infusionRank: 3,
+      name: t("Venom"),
+      effect: t(
+        "The attack deals 5 extra damage, its damage becomes **poison**, and each creature hit by the attack suffers **poisoned**."
+      ),
+    },
+  ],
+};
+
 export default classList;

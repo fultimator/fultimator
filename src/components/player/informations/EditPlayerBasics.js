@@ -246,13 +246,13 @@ export default function EditPlayerBasics({
                 readOnly: !isEditMode,
                 endAdornment: (
                   <ExpAdornment
-                  exp={player.info.exp}
-                  isEditMode={isEditMode}
-                  player={player}
-                  setPlayer={setPlayer}
-                  onLevelUp={handleLevelUp} 
-                  onCloseLevelUp={handleCloseLevelUp}
-                />
+                    exp={player.info.exp}
+                    isEditMode={isEditMode}
+                    player={player}
+                    setPlayer={setPlayer}
+                    onLevelUp={handleLevelUp}
+                    onCloseLevelUp={handleCloseLevelUp}
+                  />
                 ),
               }}
             />
@@ -355,7 +355,7 @@ export default function EditPlayerBasics({
           </>
         ) : null}
       </Grid>
-      {showConfetti && <Confetti />} 
+      {showConfetti && <Confetti />}
     </Paper>
   );
 }
@@ -413,7 +413,15 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
     </FormControl>
   );
 }
-function ExpAdornment({ exp, isEditMode, player, setPlayer, onLevelUp, onCloseLevelUp }) {
+
+function ExpAdornment({
+  exp,
+  isEditMode,
+  player,
+  setPlayer,
+  onLevelUp,
+  onCloseLevelUp,
+}) {
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
   const { t } = useTranslate();
@@ -574,6 +582,15 @@ function ExpAdornment({ exp, isEditMode, player, setPlayer, onLevelUp, onCloseLe
           <Button onClick={handleClose}>{t("OK")}</Button>
         </DialogActions>
       </Dialog>
+      <style>
+        {`
+          @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </>
   );
 }

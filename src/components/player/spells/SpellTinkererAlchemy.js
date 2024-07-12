@@ -7,9 +7,13 @@ import {
   ThemeProvider,
   Tooltip,
   Icon,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
-import { Edit, VisibilityOff } from "@mui/icons-material";
+import { Edit, VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import ReactMarkdown from "react-markdown";
 
 function ThemedSpellTinkererAlchemy({
   alchemy,
@@ -32,6 +36,31 @@ function ThemedSpellTinkererAlchemy({
 
   return (
     <>
+      <Accordion sx={{ marginY: 1 }}>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Icon sx={{ color: primary, marginRight: 1 }}>
+            <Info />
+          </Icon>
+          <Typography variant="h4">{t("Alchemy Details")}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ReactMarkdown>
+            {t(
+              "You may perform the **Inventory** action to rapidly craft a **potion** with powerful but somewhat unpredictable effects. When you do so, choose one type of **mix** among those you have unlocked (**basic**, **advanced** or **superior**) and spend the appropriate amount of Inventory Points."
+            )}
+          </ReactMarkdown>
+          <ReactMarkdown>
+            {t(
+              "When you create a mix, roll the amount of twenty-sided dice indicated by that mix, then assign one of those rolls to the **target** table and one to the **effect** table . Discard all remaining dice, then describe the effects of the mix!"
+            )}
+          </ReactMarkdown>
+          <ReactMarkdown>
+            {t(
+              'Effects marked with "**Any**" on the **effect** table are always available and can be chosen if none of the available effects appeal to you.'
+            )}
+          </ReactMarkdown>
+        </AccordionDetails>
+      </Accordion>
       {/* MIX Row 1 */}
 
       <div
@@ -174,7 +203,7 @@ function ThemedSpellTinkererAlchemy({
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
           >
             {!showInPlayerSheet && (
-              <Tooltip title={t("Arcana not shown in player sheet")}>
+              <Tooltip title={t("Alchemy not shown in player sheet")}>
                 <Icon>
                   <VisibilityOff style={{ color: "black" }} />
                 </Icon>
