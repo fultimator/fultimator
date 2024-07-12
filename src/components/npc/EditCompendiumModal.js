@@ -16,7 +16,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   const { t } = useTranslate();
   const [selectedItem, setSelectedItem] = useState(null);
   const [type, setType] = useState([]);
-  const [selectedType, setSelectedType] = useState(typeName || 'spells');
+  const [selectedType, setSelectedType] = useState(typeName || 'spell');
 
   const damageTypeLabels = {
     physical: "physical_damage",
@@ -34,10 +34,10 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   useEffect(() => {
     let newType = [];
     switch (selectedType) {
-      case 'spells':
+      case 'spell':
         newType = npcSpells;
         break;
-      case 'attacks':
+      case 'basic':
         newType = npcAttacks;
         break;
       default:
@@ -51,7 +51,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   // Effect to set the default selectedType when dialog opens
   useEffect(() => {
     if (open) {
-      setSelectedType(typeName || 'spells');
+      setSelectedType(typeName || 'spell');
     }
   }, [open, typeName]);
 
@@ -94,11 +94,10 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               onChange={handleTypeChange}
               fullWidth
               displayEmpty
-              disabled
               inputProps={{ 'aria-label': 'Select type' }}
             >
-              <MenuItem value="spells">{t("Spells")}</MenuItem>
-              <MenuItem value="attacks">{t("Basic Attacks")}</MenuItem>
+              <MenuItem value="spell">{t("Spells")}</MenuItem>
+              <MenuItem value="basic">{t("Basic Attacks")}</MenuItem>
             </Select>
           </Grid>
           <Grid item>
@@ -144,7 +143,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                 <Typography variant="h3">
                   {selectedItem.name} {selectedItem.type === "offensive" && <OffensiveSpellIcon />}
                 </Typography>
-                {(selectedType === 'attacks') && (
+                {(selectedType === 'basic') && (
                   <>
                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                       {t(selectedItem.category)}
@@ -179,7 +178,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                     <Typography variant="body2">{selectedItem.specials}</Typography>
                   </>
                 )}
-                {(selectedType === 'spells') && (
+                {(selectedType === 'spell') && (
                   <>
                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                       {selectedItem.mp} {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""} {t("MP")}

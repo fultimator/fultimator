@@ -35,19 +35,25 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
     navigate(-1);
   };
 
-  const fultimatorRoutes = ["/npc-gallery/:npcId"];
-  const isNpcEdit = fultimatorRoutes.some(route =>
+  const npcRoutes = ["/npc-gallery/:npcId"];
+  const isNpcEdit = npcRoutes.some(route =>
     new RegExp(route.replace(/:\w+/, "\\w+")).test(location.pathname)
-  );  
+  );
+
+  const pcRoutes = ["/pc-gallery/:playerId", "/character-sheet/:playerId"];
+  const isPcEdit = pcRoutes.some(route =>
+    new RegExp(route.replace(/:\w+/, "\\w+")).test(location.pathname)
+  );
 
   // Determine if the current path is the homepage
   const isHomepage = location.pathname === "/";
 
   return (
     <>
-      {isNpcEdit ? (
+      {isNpcEdit || isPcEdit ? (
         <CompactAppBar
           isNpcEdit={isNpcEdit}
+          isPcEdit={isPcEdit}
           selectedTheme={selectedTheme}
           handleSelectTheme={handleSelectTheme}
           showGoBackButton={!isHomepage}
@@ -63,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
         />
       )}
       {fullWidth ? (
-        <div style={{ marginTop: "4em" }}>{children}</div>
+        <div style={{ marginTop: "5em" }}>{children}</div>
       ) : (
         <Container style={{ marginTop: "6em", alignItems: "center" }}>
           {children}

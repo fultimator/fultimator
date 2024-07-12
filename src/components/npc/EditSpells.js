@@ -18,7 +18,7 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
-import EditCompendiumModal from '../npc/EditCompendiumModal';
+import CompendiumHandler from './CompendiumHandler';
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -50,6 +50,7 @@ export default function EditSpells({ npc, setNpc }) {
         newState.spells = [];
       }
       newState.spells.push({
+        itemType: "spell",
         name: "",
         range: "melee",
         attr1: "dexterity",
@@ -70,30 +71,6 @@ export default function EditSpells({ npc, setNpc }) {
         return newState;
       });
     };
-  };
-
-  const addCompendiumSpell = (selectedItem) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState };
-      if (!newState.spells) {
-        newState.spells = [];
-      }
-      newState.spells.push({
-        name: selectedItem.name,
-        attr1: selectedItem.attr1 || "dexterity",
-        attr2: selectedItem.attr2 || "dexterity",
-        type: selectedItem.type || "",
-        damagetype: selectedItem.damagetype || "physical",
-        mp: selectedItem.mp,
-        maxTargets: selectedItem.maxTargets || 0,
-        target: selectedItem.target,
-        duration: selectedItem.duration,
-        effect: selectedItem.effect,
-        special: selectedItem.special || [],
-      });
-      return newState;
-    });
-    closeCompendiumModal();
   };
 
   return (
@@ -117,7 +94,7 @@ export default function EditSpells({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <EditCompendiumModal typeName="spells" open={modalOpen} onClose={closeCompendiumModal} onSave={addCompendiumSpell} />
+      <CompendiumHandler npc={npc} setNpc={setNpc} typeName="spell" open={modalOpen} onClose={closeCompendiumModal} />
     </>
   );
 }

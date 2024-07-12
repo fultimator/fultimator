@@ -21,7 +21,7 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
-import EditCompendiumModal from '../npc/EditCompendiumModal';
+import CompendiumHandler from './CompendiumHandler';
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -53,6 +53,7 @@ export default function EditAttacks({ npc, setNpc }) {
         newState.attacks = [];
       }
       newState.attacks.push({
+        itemType: "basic",
         name: "",
         range: "melee",
         attr1: "dexterity",
@@ -72,34 +73,6 @@ export default function EditAttacks({ npc, setNpc }) {
         return newState;
       });
     };
-  };
-
-  const addCompendiumAttack = (selectedItem) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState };
-      if (!newState.handleSaveAttack) {
-        newState.handleSaveAttack = [];
-      }
-      let range = "melee";
-      if (selectedItem.ranged === true) {
-        range = "distance";
-      } else if (selectedItem.melee === true) {
-        range = "melee";
-      }
-
-      newState.attacks.push({
-        name: selectedItem.name,
-        range: range,
-        attr1: selectedItem.attr1 || "dexterity",
-        attr2: selectedItem.attr2 || "dexterity",
-        type: selectedItem.type,
-        flathit: selectedItem.flathit,
-        flatdmg: selectedItem.flatdmg,
-        special: [],
-      });
-      return newState;
-    });
-    closeCompendiumModal();
   };
 
   return (
@@ -129,7 +102,7 @@ export default function EditAttacks({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <EditCompendiumModal typeName="attacks" open={modalOpen} onClose={closeCompendiumModal} onSave={addCompendiumAttack} />
+      <CompendiumHandler npc={npc} setNpc={setNpc} typeName="basic" open={modalOpen} onClose={closeCompendiumModal} />
     </>
   );
 }

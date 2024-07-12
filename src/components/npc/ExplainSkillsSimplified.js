@@ -73,7 +73,7 @@ export default function ExplainSkillsSimplified({ npc }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "300px" }}>
+      <Box sx={{ width: "200px" }}>
         <Button
           aria-describedby={id}
           onClick={handleClick}
@@ -99,11 +99,11 @@ export default function ExplainSkillsSimplified({ npc }) {
           <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
             {t("Available:")} {totalAvailableSkills}
           </Typography>
-          <Divider orientation="vertical" flexItem sx={{ mx: 2, background: "white" }} />
+          <Divider orientation="vertical" flexItem sx={{ mx: 1, background: "white" }} />
           <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
             {t("Used:")} {totalUsedSkills}
           </Typography>
-          <ExpandMoreIcon sx={{ color: "white", marginLeft: 1 }} />
+          <ExpandMoreIcon sx={{ color: "white" }} />
         </Button>
       </Box>
       <Popover
@@ -123,7 +123,7 @@ export default function ExplainSkillsSimplified({ npc }) {
           zIndex: theme.zIndex.appBar + 2,
         }}
       >
-        <Table size="small" sx={{ minWidth: "300px" }}>
+        <Table size="small" sx={{ minWidth: "200px" }}>
           <TableHead>
             <SkillTableRow
               label={t("Total SP Available")}

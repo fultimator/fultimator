@@ -148,7 +148,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
   return (
     <>
       <IconButton size="medium" color="inherit" onClick={handleClick}>
-        <MenuIcon sx={{ width: "32px", height: "32px" }} />
+        <MenuIcon />
       </IconButton>
       <Menu
         anchorEl={anchorEl}

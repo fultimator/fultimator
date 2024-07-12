@@ -67,7 +67,7 @@ const AppBar: React.FC<AppBarProps> = ({
                     color="inherit"
                     onClick={handleNavigation}
                   >
-                    <ArrowBack sx={{ width: "32px", height: "32px" }} />
+                    <ArrowBack />
                   </IconButton>
                 )}
               </Grid>
