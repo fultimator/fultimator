@@ -82,7 +82,7 @@ export default function PlayerEquipment({
     precBonus: false,
     rework: false,
     quality:
-      "Deals extra damage equal to your【 **SL**】in **defensive mastery**.",
+      t("Deals extra damage equal to your【 **SL**】in **defensive mastery**."),
     qualityCost: "0",
     totalBonus: 0,
     selectedQuality: "",
