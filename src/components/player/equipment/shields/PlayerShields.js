@@ -31,6 +31,13 @@ export default function PlayerShields({
 
   const [expanded, setExpanded] = useState(false);
 
+  // Check if the player has a "Dual Shieldbearer" Skill in player.classes[].skills[].specialSkill
+  const hasDualShieldBearer = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) => skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
+    )
+  );
+
   const checkIfEquippable = (shield) => {
     // if shield is not martial then is always equippable
     // true = equippable, false = not equippable
@@ -92,6 +99,13 @@ export default function PlayerShields({
     const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
     if (twoHandedCount === 1) {
       return false;
+    } else if (
+      hasDualShieldBearer &&
+      oneHandedCount === 0 &&
+      twoHandedCount === 0 &&
+      countEquippedShields() <= 1
+    ) {
+      return true;
     } else if (
       oneHandedCount <= 1 &&
       twoHandedCount === 0 &&

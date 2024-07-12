@@ -36,6 +36,18 @@ const skills = [
     maxLvl: 1,
   },
   {
+    name: "Defensive Mastery",
+    description: "",
+    class: "Guardian",
+    maxLvl: 5,
+  },
+  {
+    name: "Dual Shieldbearer",
+    description: "",
+    class: "Guardian",
+    maxLvl: 1,
+  },
+  {
     name: "Fortress",
     description: "Permanently increase your maximum Hit Points by **【 SL × 3】**.",
     class: "Guardian",

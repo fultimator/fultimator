@@ -37,6 +37,66 @@ export default function PlayerEquipment({
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
 
+  // Guardian - Dual Shieldbearer
+  const hasDualShieldBearer = player.classes.some((playerClass) =>
+    playerClass.skills.some(
+      (skill) =>
+        skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
+    )
+  );
+
+  // Guardian - Defensive Mastery
+  const defensiveMasteryBonus = player.classes
+  .map((cls) => cls.skills)
+  .flat()
+  .filter((skill) => skill.specialSkill === "Defensive Mastery")
+  .map((skill) => skill.currentLvl)
+  .reduce((a, b) => a + b, 0);
+
+  // Twin Shields object as described in the comments
+  const twinShields = {
+    base: {
+      category: "Brawling",
+      name: "Twin Shields",
+      cost: 0,
+      att1: "might",
+      att2: "might",
+      prec: 0,
+      damage: 5,
+      type: "physical",
+      hands: 2,
+      melee: true,
+      martial: false,
+    },
+    name: "Twin Shields",
+    category: "Brawling",
+    melee: true,
+    ranged: false,
+    type: "physical",
+    hands: 2,
+    att1: "might",
+    att2: "might",
+    martial: false,
+    damageBonus: false,
+    damageReworkBonus: false,
+    precBonus: false,
+    rework: false,
+    quality:
+      "Deals extra damage equal to your【 **SL**】in **defensive mastery**.",
+    qualityCost: "0",
+    totalBonus: 0,
+    selectedQuality: "",
+    cost: 0,
+    damage: 5 + defensiveMasteryBonus,
+    prec: 0,
+    damageModifier: 0,
+    precModifier: 0,
+    defModifier: 0,
+    mDefModifier: 0,
+    isEquipped: true,
+  };
+
+  // Retrieve equipped weapons, armor, shields, and accessories
   const equippedWeapons = player.weapons
     ? player.weapons.filter((weapon) => weapon.isEquipped)
     : [];
@@ -52,6 +112,11 @@ export default function PlayerEquipment({
   const equippedAccessories = player.accessories
     ? player.accessories.filter((accessory) => accessory.isEquipped)
     : [];
+
+  // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
+  if (hasDualShieldBearer && equippedShields.length >= 2) {
+    equippedWeapons.push(twinShields);
+  }
 
   // Weaponmaster - Melee Weapon Mastery Skill Bonus
   const meleeMasteryModifier = player.classes
@@ -72,40 +137,52 @@ export default function PlayerEquipment({
   const precMeleeModifier =
     (player.modifiers.meleePrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
-    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
-    (equippedAccessories.length > 0
-      ? equippedAccessories[0].precModifier || 0
-      : 0) +
+    equippedShields.reduce(
+      (total, shield) => total + (shield.precModifier || 0),
+      0
+    ) +
+    equippedAccessories.reduce(
+      (total, accessory) => total + (accessory.precModifier || 0),
+      0
+    ) +
     meleeMasteryModifier;
 
   const precRangedModifier =
     (player.modifiers.rangedPrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
-    (equippedShields.length > 0 ? equippedShields[0].precModifier || 0 : 0) +
-    (equippedAccessories.length > 0
-      ? equippedAccessories[0].precModifier || 0
-      : 0) +
+    equippedShields.reduce(
+      (total, shield) => total + (shield.precModifier || 0),
+      0
+    ) +
+    equippedAccessories.reduce(
+      (total, accessory) => total + (accessory.precModifier || 0),
+      0
+    ) +
     rangedMasteryModifier;
 
   const damageMeleeModifier =
     (equippedArmor.length > 0 ? equippedArmor[0].damageMeleeModifier || 0 : 0) +
-    (equippedShields.length > 0
-      ? equippedShields[0].damageMeleeModifier || 0
-      : 0) +
-    (equippedAccessories.length > 0
-      ? equippedAccessories[0].damageMeleeModifier || 0
-      : 0);
+    equippedShields.reduce(
+      (total, shield) => total + (shield.damageMeleeModifier || 0),
+      0
+    ) +
+    equippedAccessories.reduce(
+      (total, accessory) => total + (accessory.damageMeleeModifier || 0),
+      0
+    );
 
   const damageRangedModifier =
     (equippedArmor.length > 0
       ? equippedArmor[0].damageRangedModifier || 0
       : 0) +
-    (equippedShields.length > 0
-      ? equippedShields[0].damageRangedModifier || 0
-      : 0) +
-    (equippedAccessories.length > 0
-      ? equippedAccessories[0].damageRangedModifier || 0
-      : 0);
+    equippedShields.reduce(
+      (total, shield) => total + (shield.damageRangedModifier || 0),
+      0
+    ) +
+    equippedAccessories.reduce(
+      (total, accessory) => total + (accessory.damageRangedModifier || 0),
+      0
+    );
 
   const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
   const calculateAttribute = (

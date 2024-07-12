@@ -157,7 +157,7 @@ export default function PlayerCard({
             "& .MuiLinearProgress-bar": {
               transition: "width 1s ease-in-out",
             },
-            padding: "0.6rem"
+            padding: "0.6rem",
           }}
         />
         <ProgressBarWithLabel sx={{ fontWeight: "bold", fontSize: "0.8rem" }}>
@@ -167,24 +167,20 @@ export default function PlayerCard({
     </Box>
   );
 
-  /* player.armor.isEquipped (should be only one) */
+  // Retrieve equipped armor, shields, weapons, and accessories
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
-
-  /* player.shields.isEquipped (should be only one) */
-  const equippedShield =
-    player.shields?.find((shield) => shield.isEquipped) || null;
-
-  /* player.weapons.isEquipped (can be more than one) */
+  const equippedShields =
+    player.shields?.filter((shield) => shield.isEquipped) || [];
   const equippedWeapons =
     player.weapons?.filter((weapon) => weapon.isEquipped) || [];
-
-  /* player.accessories.isEquipped (should be only one) */
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
+
+
   // Rogue - Dodge Skill Bonus
   const dodgeBonus =
-    equippedShield === null &&
+    equippedShields.length === 0 &&
     (equippedArmor === null || equippedArmor.martial === false)
       ? player.classes
           .map((cls) => cls.skills)
@@ -201,10 +197,13 @@ export default function PlayerCard({
         ? equippedArmor.def
         : currDex + equippedArmor.def
       : currDex) +
-    (equippedShield !== null ? equippedShield.def : 0) +
+    equippedShields.reduce((total, shield) => total + (shield.def || 0), 0) +
     (player.modifiers?.def || 0) +
     (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
+    equippedShields.reduce(
+      (total, shield) => total + (shield.defModifier || 0),
+      0
+    ) +
     (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.defModifier || 0),
@@ -214,10 +213,13 @@ export default function PlayerCard({
 
   const currMDef =
     (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
-    (equippedShield !== null ? equippedShield.mdef : 0) +
+    equippedShields.reduce((total, shield) => total + (shield.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
     (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
+    equippedShields.reduce(
+      (total, shield) => total + (shield.mDefModifier || 0),
+      0
+    ) +
     (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
@@ -229,7 +231,10 @@ export default function PlayerCard({
     (equippedArmor !== null ? equippedArmor.init : 0) +
     (player.modifiers?.init || 0) +
     (equippedArmor !== null ? equippedArmor.initModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.initModifier || 0 : 0) +
+    equippedShields.reduce(
+      (total, shield) => total + (shield.initModifier || 0),
+      0
+    ) +
     (equippedAccessory !== null ? equippedAccessory.initModifier || 0 : 0);
 
   let crisis =

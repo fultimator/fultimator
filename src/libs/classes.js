@@ -377,14 +377,14 @@ const classList = [
         currentLvl: 0,
         maxLvl: 5,
         description: t("DefensiveMastery_desc", false, allowedLang),
-        specialSkill: "",
+        specialSkill: "Defensive Mastery",
       },
       {
         skillName: t("Dual Shieldbearer", false, allowedLang),
         currentLvl: 0,
         maxLvl: 1,
         description: t("DualShieldbearer_desc", false, allowedLang),
-        specialSkill: "",
+        specialSkill: "Dual Shieldbearer",
       },
       {
         skillName: t("Fortress", false, allowedLang),

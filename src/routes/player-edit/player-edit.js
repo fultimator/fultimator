@@ -156,6 +156,7 @@ export default function PlayerEdit() {
   const handleTabChange = (event, newTab) => {
     setOpenTab(newTab);
     updateMaxStats();
+    checkEquipment();
     setDrawerOpen(false);
   };
 
@@ -229,6 +230,35 @@ export default function PlayerEdit() {
           },
         };
       });
+    }
+  };
+
+  const checkEquipment = () => {
+    if (playerTemp) {
+      const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
+        playerClass.skills.some(
+          (skill) =>
+            skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
+        )
+      );
+      const equippedShields =
+        playerTemp.shields?.filter((shield) => shield.isEquipped) || [];
+
+      if (!hasDualShieldBearer && equippedShields.length > 1) {
+        // Unequip all shields but the first one
+        setPlayerTemp((prevPlayer) => {
+          const newShields = prevPlayer.shields.map((shield, index) => ({
+            ...shield,
+            isEquipped:
+              index === prevPlayer.shields.findIndex((s) => s.isEquipped),
+          }));
+
+          return {
+            ...prevPlayer,
+            shields: newShields,
+          };
+        });
+      }
     }
   };
 
