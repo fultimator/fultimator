@@ -18,7 +18,7 @@ import {
   Tooltip,
   Typography,
   Fab,
-  Stack
+  Stack,
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -53,7 +53,7 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { BugReport, Save } from "@mui/icons-material";
+import { BugReport, Save, Info } from "@mui/icons-material";
 import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
@@ -62,7 +62,15 @@ import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import {
+  CharacterSheetIcon,
+  StatsIcon,
+  ClassesIcon,
+  SpellsIcon,
+  EquipmentIcon,
+  NotesIcon2 as NotesIcon,
+} from "../../components/icons";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -242,55 +250,59 @@ export default function PlayerEdit() {
       <Tabs value={openTab} onChange={handleTabChange}>
         {isSmallScreen ? (
           <>
-             <Box
+            <Box
               sx={{
                 position: "fixed",
                 bottom: 16,
                 left: 14,
                 zIndex: 1200,
-                textAlign: "center"
+                textAlign: "center",
               }}
             >
-              <Fab
-                onClick={toggleDrawer(true)}
-                color="primary"
-              >
+              <Fab onClick={toggleDrawer(true)} color="primary">
                 <Stack direction="column" alignItems="center" spacing={0.5}>
                   <MenuBookIcon />
-                  <Typography variant="caption" sx={{ fontSize: '10px' }}>
+                  <Typography variant="caption" sx={{ fontSize: "10px" }}>
                     {t("Menu")}
                   </Typography>
                 </Stack>
               </Fab>
             </Box>
             <Drawer
-              anchor="left"
+              anchor="bottom"
               open={drawerOpen}
               onClose={toggleDrawer(false)}
               sx={{ zIndex: 1300 }}
             >
               <List>
                 <ListItem onClick={(e) => handleTabChange(e, 0)}>
-                  <ListItemText primary={t("Player Sheet")} />
+                  <CharacterSheetIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Player Sheet")} sx={{ ml: 1 }} />
                 </ListItem>
                 <Divider />
                 <ListItem onClick={(e) => handleTabChange(e, 1)}>
-                  <ListItemText primary={t("Informations")} />
+                  <Info />
+                  <ListItemText primary={t("Informations")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 2)}>
-                  <ListItemText primary={t("Stats")} />
+                  <StatsIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Stats")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 3)}>
-                  <ListItemText primary={t("Classes")} />
+                  <ClassesIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Classes")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 4)}>
-                  <ListItemText primary={t("Spells")} />
+                  <SpellsIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Spells")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 5)}>
-                  <ListItemText primary={t("Equipment")} />
+                  <EquipmentIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Equipment")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 6)}>
-                  <ListItemText primary={t("Notes")} />
+                  <NotesIcon color="black" size="1.5em" />
+                  <ListItemText primary={t("Notes")} sx={{ ml: 1 }} />
                 </ListItem>
               </List>
             </Drawer>
