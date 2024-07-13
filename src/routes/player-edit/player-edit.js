@@ -384,7 +384,7 @@ export default function PlayerEdit() {
                 setClockState={setRitualClockState}
               />
               <PlayerCompanion player={playerTemp} isEditMode={isOwner} />
-              <PlayerNotes player={playerTemp} isEditMode={isOwner} />
+              <PlayerNotes player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isOwner} />
             </>
           )}
           {isOwner && battleMode ? (
