@@ -734,7 +734,7 @@ function Special({ npc }) {
   if (npc.species === "Construct") {
     special.push({
       name: t("Construct"),
-      effect: t("Immune to **poisoned** status", true),
+      effect: t("Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.", true),
     });
   }
 
