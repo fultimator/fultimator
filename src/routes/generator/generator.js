@@ -264,7 +264,7 @@ function Rituals() {
                 onChange={(e) => {
                   setItemHeld(e.target.checked);
                 }}
-                label={t("Relevant item held")}
+                label={t("Override DL")}
               />
               {itemHeld && (
                 <FormControl variant="standard" fullWidth>
