@@ -1,5 +1,5 @@
-import { Card, Grid, Typography, Box } from "@mui/material";
-import React, { Fragment } from "react";
+import { Card, Grid, Typography, Box, Dialog } from "@mui/material";
+import React, { Fragment, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import attributes from "../../libs/attributes";
@@ -27,12 +27,12 @@ import {
 import { Martial } from "../icons";
 import { TypeAffinity } from "../types";
 import Study from "./Study";
-import EditableImage from "../EditableImage";
+// import EditableImage from "../EditableImage";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 
 function NpcPretty(
-  { npc, study, collapse, includeImage, onClick = () => {} },
+  { npc, study, npcImage, collapse, onClick = () => { } },
   ref
 ) {
   const { t } = useTranslate();
@@ -46,7 +46,7 @@ function NpcPretty(
                 boxShadow: collapse ? "none" : "1px 1px 5px",
               }}
             >
-              <Header npc={npc} includeImage={includeImage} />
+              <Header npc={npc} npcImage={npcImage} />
             </div>
             {collapse ? (
               <>
@@ -95,11 +95,20 @@ function NpcPretty(
   );
 }
 
-function Header({ npc, includeImage }) {
+function Header({ npc, npcImage }) {
   const { t } = useTranslate();
   const StyledMarkdown = styled(ReactMarkdown)({
     whiteSpace: "pre-line",
   });
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <Grid container alignItems="stretch">
       <Grid container>
@@ -144,21 +153,51 @@ function Header({ npc, includeImage }) {
       </Grid>
       <Box sx={{ display: "flex" }}>
         {/* EditableImage */}
-        {includeImage && (
+        {npcImage ? (
           <Box
             sx={{
-              flex: "0 0 120px",
-              minWidth: "120px",
-              minHeight: "120px",
+              minWidth: "128px",
+              width: "128px",
+              height: "auto",
               background: "white",
               border: "1px solid #684268",
               borderTop: "none",
               overflow: "hidden",
+              cursor: "pointer"
             }}
+            onClick={handleClickOpen}
           >
-            <EditableImage size={120} />
+            <img
+              src={npcImage}
+              alt="NPC Avatar"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center center", 
+                display: "block",
+              }}
+            />
           </Box>
-        )}
+        ) : null}
+        {/* Dialog for expanded image */}
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth="md"
+          fullWidth
+        >
+          <img
+            src={npc.imgurl}
+            alt="Expanded NPC Avatar"
+            style={{
+              width: "100%",
+              height: "auto",
+            }}
+            onClick={handleClose}
+          />
+        </Dialog>
+
         {/* Rows */}
         <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           {/* Row 1 */}
@@ -555,15 +594,15 @@ function Attacks({ npc }) {
                 })}
                 {(typeof myVar === "string" ||
                   attack.special instanceof String) && (
-                  <Typography component="span" key={i}>
-                    <StyledMarkdown
-                      allowedElements={["strong", "em"]}
-                      unwrapDisallowed={true}
-                    >
-                      {attack.special}
-                    </StyledMarkdown>
-                  </Typography>
-                )}
+                    <Typography component="span" key={i}>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed={true}
+                      >
+                        {attack.special}
+                      </StyledMarkdown>
+                    </Typography>
+                  )}
               </Typography>
             </Grid>
           </Fragment>

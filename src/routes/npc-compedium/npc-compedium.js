@@ -642,6 +642,7 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
       <NpcPretty
         npc={npc}
         ref={ref}
+        npcImage={""}
         collapse={collapse}
         onClick={() => {
           setCollapse(!collapse);

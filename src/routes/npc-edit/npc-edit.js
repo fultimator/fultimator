@@ -22,8 +22,6 @@ import {
   Share,
   ArrowUpward,
   ContentCopy,
-  Image,
-  HideImage,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
@@ -164,12 +162,6 @@ export default function NpcEdit() {
   const prettyRef = useRef();
   const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
 
-  // State and handler for including image
-  const [includeImage, setIncludeImage] = useState(false);
-  const toggleIncludeImage = () => {
-    setIncludeImage(!includeImage);
-  };
-
   // Check if the 'json' query parameter is true and return the JSON response
   const urlParams = new URLSearchParams(location.search);
   if (urlParams.get("json") === "true" && npc) {
@@ -293,8 +285,8 @@ export default function NpcEdit() {
             <NpcPretty
               npc={npcTemp}
               ref={prettyRef}
+              npcImage={npcTemp.imgurl}
               collapse={true}
-              includeImage={includeImage}
             />
           </Grid>
 
@@ -303,17 +295,6 @@ export default function NpcEdit() {
             {/* Skill Points */}
             <ExplainSkills npc={npcTemp} />
             <Divider sx={{ my: 1 }} />
-
-            {/* Upload NPC Image Button */}
-            <Tooltip
-              title={t(
-                "Upload Image: Images are temporarily stored and will reset on page refresh."
-              )}
-            >
-              <IconButton onClick={toggleIncludeImage}>
-                {includeImage ? <Image /> : <HideImage />}
-              </IconButton>
-            </Tooltip>
 
             {/* Download NPC Sheet Button */}
             <Tooltip title={t("Download as Image")}>

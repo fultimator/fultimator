@@ -378,7 +378,7 @@ const generateButtonLabel = (attack) => {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid item xs={6}>
-        <NpcPretty npc={npc} study={selectedStudy} ref={ref} collapse={true} includeImage={false} />
+        <NpcPretty npc={npc} study={selectedStudy} npcImage={npc.imgurl} ref={ref} collapse={true} />
         <Grid item container xs={12} mt={5}>
             <Grid item xs={2}>
               <Typography variant="h5">{t("Study Roll:")}</Typography>

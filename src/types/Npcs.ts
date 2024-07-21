@@ -99,6 +99,7 @@ export interface TypeNpc {
     uid: string,
     name: string,
     lvl: number,
+    imgurl?: string,
     attacks: NpcAttack[],
     affinities: NpcAffinities,
     attributes: NpcAttributes,

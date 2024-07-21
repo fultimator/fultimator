@@ -1,34 +1,28 @@
-import {MutableRefObject, useEffect, useState} from "react";
-import {useScreenshot} from "use-react-screenshot";
+import { useCallback } from "react";
+import html2canvas from "html2canvas";
 
-import useDownload from "./useDownload";
-
-// useDownloadImage exposes a function that takes a screenshot of the given ref and downloads it
-function useDownloadImage(name: string, ref: MutableRefObject<any>) {
-  const [download] = useDownload();
-  const [image, takeScreenShot] = useScreenshot();
-
-  // To avoid triggering a download every time the name change (see the useEffect method below), we explicitly trigger with this state
-  const [initiateDownload, setInitiateDownload] = useState(false);
-
-  useEffect(() => {
-    if (initiateDownload) {
-      download(image, name + ".png", "png");
-      setInitiateDownload(false);
+const useDownloadImage = (name, ref) => {
+  const downloadImage = useCallback(async () => {
+    if (ref.current) {
+      try {
+        const canvas = await html2canvas(ref.current, {
+          logging: true,
+          useCORS: true,
+          scale: 2
+        });
+        const dataURL = canvas.toDataURL('image/png', 1.0);
+        const formattedName = name.replace(/\s+/g, '_').toLowerCase();
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = `${formattedName}.png`;
+        link.click();
+      } catch (error) {
+        console.error('Failed to capture screenshot:', error);
+      }
     }
-  }, [initiateDownload, setInitiateDownload, download, name, image]);
+  }, [name, ref]);
 
-  useEffect(() => {
-    if (image) {
-      setInitiateDownload(true);
-    }
-  }, [image, setInitiateDownload]);
+  return [downloadImage];
+};
 
-  function downloadImage() {
-    takeScreenShot(ref.current);
-  }
-
-  return [downloadImage]
-}
-
-export default useDownloadImage
+export default useDownloadImage;

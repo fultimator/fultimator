@@ -116,6 +116,7 @@ function Personal({ user }) {
       name: "-",
       species: "Beast",
       lvl: 5,
+      imgurl: "",
       uid: user.uid,
       attributes: {
         dexterity: 8,
@@ -561,6 +562,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
       <NpcPretty
         npc={npc}
         ref={ref}
+        npcImage={npc.imgurl}
         collapse={collapse}
         onClick={() => {
           setCollapse(!collapse);
