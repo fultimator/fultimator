@@ -58,7 +58,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       ...prev,
       classes: prev.classes.map((cls) => {
         if (cls.name === selectedClass) {
+          // Helper function to check the count of specific spell types
+          const countSpellType = (type) =>
+            cls.spells.filter((sp) => sp.spellType === type).length;
+
           if (spell === "default") {
+            if (countSpellType("default") >= 10) {
+              alert("You can only have a maximum of 10 default spells");
+              return cls;
+            }
             return {
               ...cls,
               spells: [
@@ -79,6 +87,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "arcanist") {
+            if (countSpellType("arcanist") >= 10) {
+              alert("You can only have a maximum of 10 arcanist spells");
+              return cls;
+            }
             return {
               ...cls,
               spells: [
@@ -98,6 +110,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "arcanist-rework") {
+            if (countSpellType("arcanist-rework") >= 10) {
+              alert("You can only have a maximum of 10 arcanist-rework spells");
+              return cls;
+            }
             return {
               ...cls,
               spells: [
@@ -119,53 +135,39 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "tinkerer-alchemy") {
-            // Check if there's already a tinkerer-alchemy spell
-            const hasTinkererAlchemy = cls.spells.some(
-              (sp) => sp.spellType === "tinkerer-alchemy"
-            );
-
-            if (hasTinkererAlchemy) {
+            if (cls.spells.some((sp) => sp.spellType === "tinkerer-alchemy")) {
               alert("You already have a tinkerer-alchemy spell");
               return cls;
-            } else {
-              // Add a new tinkerer-alchemy spell
-              return {
-                ...cls,
-                spells: [
-                  ...cls.spells,
-                  {
-                    spellType: spell,
-                    showInPlayerSheet: true,
-                    // add from tinkererAlchemy const
-                    ...tinkererAlchemy,
-                  },
-                ],
-              };
             }
+            return {
+              ...cls,
+              spells: [
+                ...cls.spells,
+                {
+                  spellType: spell,
+                  showInPlayerSheet: true,
+                  // add from tinkererAlchemy const
+                  ...tinkererAlchemy,
+                },
+              ],
+            };
           } else if (spell === "tinkerer-infusion") {
-            // Check if there's already a tinkerer-infusion spell
-            const hasTinkererInfusion = cls.spells.some(
-              (sp) => sp.spellType === "tinkerer-infusion"
-            );
-
-            if (hasTinkererInfusion) {
+            if (cls.spells.some((sp) => sp.spellType === "tinkerer-infusion")) {
               alert("You already have a tinkerer-infusion spell");
               return cls;
-            } else {
-              // Add a new tinkerer-infusion spell
-              return {
-                ...cls,
-                spells: [
-                  ...cls.spells,
-                  {
-                    spellType: spell,
-                    showInPlayerSheet: true,
-                    // add from tinkererAlchemy const
-                    ...tinkererInfusion,
-                  },
-                ],
-              };
             }
+            return {
+              ...cls,
+              spells: [
+                ...cls.spells,
+                {
+                  spellType: spell,
+                  showInPlayerSheet: true,
+                  // add from tinkererInfusion const
+                  ...tinkererInfusion,
+                },
+              ],
+            };
           } else {
             alert(spell.toUpperCase() + " spell not implemented yet");
             return cls;

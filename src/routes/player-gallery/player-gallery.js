@@ -48,7 +48,7 @@ import {
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
-import PlayerCard from "../../components/player/playerSheet/PlayerCard";
+import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
 import { testUsers, moderators } from "../../libs/userGroups";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -463,12 +463,10 @@ function Personal({ user }) {
             key={index}
             sx={{ marginBottom: "20px" }}
           >
-            <PlayerCard
+            <PlayerCardGallery
               player={player}
-              setPlayer={null}
-              isEditMode={false}
-              sx={{ marginBottom: 1 }}
-              isCharacterSheet={false}
+              setPlayer={null}              
+              sx={{ marginBottom: 1 }}              
             />
             <div style={{ marginTop: "3px" }}>
               <Tooltip title={t("Copy")}>
