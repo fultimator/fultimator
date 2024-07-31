@@ -22,7 +22,7 @@ export const npcSpells = [
     attr2: "will",
     type: "offensive",
     damagetype: "physical",
-    mp: "20",
+    mp: "5",
     maxTargets: 1,
     target: t("One creature"),
     duration: t("Instantaneous"),
