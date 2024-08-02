@@ -9,7 +9,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
@@ -50,6 +50,7 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
 import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
 import { testUsers, moderators } from "../../libs/userGroups";
+import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
 
 export default function PlayerGallery() {
@@ -83,6 +84,8 @@ function Personal({ user }) {
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
 
+  const fileInputRef = useRef(null);
+
   const canAccessTest =
     testUsers.includes(user.uid) || moderators.includes(user.uid);
 
@@ -110,16 +113,11 @@ function Personal({ user }) {
           <Grid container direction="column" alignItems="center" spacing={3}>
             <Grid item>
               <Typography variant="h2" gutterBottom>
-                Join the Alpha Test!
+                Apply for Alpha Access to the Character Designer
               </Typography>
               <Typography variant="body1">
-                Be among the first to experience our Character Designer.
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="body2" color="textSecondary">
-                Sign up now for exclusive early access.
-              </Typography>
+                The Character Designer is currently a feature available only to alpha testers. If you want to use it within the Fultimator web app, please apply for alpha access below.
+              </Typography>            
             </Grid>
             {!hasApplied && (
               <Grid item>
@@ -130,7 +128,7 @@ function Personal({ user }) {
                     size="large"
                     onClick={() => setIsDialogOpen(true)}
                   >
-                    Apply for Test
+                    Apply for Test Access
                   </Button>
                 </Box>
               </Grid>
@@ -139,12 +137,28 @@ function Personal({ user }) {
               <Grid item>
                 <Box mt={2}>
                   <Typography variant="h2">
-                    Thank you for applying. Please check out our Discord Server
-                    for news and updates.
+                    Thank you for applying! Stay tuned for updates on your application status.
                   </Typography>
                 </Box>
               </Grid>
             )}
+            <Grid item>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                You can also download the Fultimator desktop app to start using the Character Designer immediately, without needing to apply.
+              </Typography>
+              <Box mt={2}>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  color="primary"
+                  href="https://github.com/fultimator/fultimator-desktop/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download the Desktop App
+                </Button>
+              </Box>
+            </Grid>
             <Grid item>
               <Box mt={2}>
                 <Button
@@ -170,14 +184,15 @@ function Personal({ user }) {
           onClose={handleDialogClose}
           userEmail={user.email}
           userUUID={user.uid}
-          title={"Apply for Test"}
-          placeholder="We'd love to know your reasons for joining our alpha test. Please leave a message in english!"
+          title={"Apply for Test Access"}
+          placeholder="We'd love to know your reasons for wanting to join our alpha test. Please provide your feedback in English!"
           onSuccess={handleApplicationSuccess}
           webhookUrl={process.env.REACT_APP_DISCORD_APPLICATIONS_WEBHOOK_URL}
         />
       </>
     );
-  }
+  }  
+  
 
   if (err?.code === "resource-exhausted") {
     return (
@@ -286,6 +301,31 @@ function Personal({ user }) {
     }
   };
 
+  const handleFileUpload = async (jsonData) => {
+    try {
+      if (
+        jsonData &&
+        typeof jsonData === "object" &&
+        !Array.isArray(jsonData)
+      ) {
+        delete jsonData.id; // Remove the id field if present
+        jsonData.uid = user.uid; // Assign the current user UID
+        jsonData.published = false; // Set the published field to false
+
+        // Reference to the Firestore collection
+        const ref = collection(firestore, "player-personal");
+
+        // Add document to Firestore
+        const res = await addDoc(ref, jsonData);
+        console.debug("Document added with ID: ", res.id);
+      } else {
+        console.error("Invalid JSON format. Must be a single PC object.");
+      }
+    } catch (error) {
+      console.error("Error uploading PC from JSON:", error);
+    }
+  };
+
   const copyPlayer = function (player) {
     return async function () {
       const data = Object.assign({}, player);
@@ -318,9 +358,8 @@ function Personal({ user }) {
     setOpen(false);
   };
 
-  
   const handleBugDialogClose = () => {
-    setIsBugDialogOpen(false)
+    setIsBugDialogOpen(false);
   };
 
   const sharePlayer = async (id) => {
@@ -329,7 +368,6 @@ function Personal({ user }) {
     await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
-
 
   return (
     <>
@@ -449,6 +487,36 @@ function Personal({ user }) {
                 {t("Create Player")}
               </Button>
             </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => fileInputRef.current.click()}
+              >
+                {t("Add PC from JSON")}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      try {
+                        const result = JSON.parse(reader.result);
+                        handleFileUpload(result);
+                      } catch (err) {
+                        console.error("Error parsing JSON:", err);
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                style={{ display: "none" }}
+              />
+            </Grid>
           </Grid>
         </Paper>
       </div>
@@ -465,8 +533,8 @@ function Personal({ user }) {
           >
             <PlayerCardGallery
               player={player}
-              setPlayer={null}              
-              sx={{ marginBottom: 1 }}              
+              setPlayer={null}
+              sx={{ marginBottom: 1 }}
             />
             <div style={{ marginTop: "3px" }}>
               <Tooltip title={t("Copy")}>
@@ -500,6 +568,7 @@ function Personal({ user }) {
                   <Badge />
                 </IconButton>
               </Tooltip>
+              <Export name={`${player.name}`} data={player} />
             </div>
           </Grid>
         ))}
@@ -507,8 +576,8 @@ function Personal({ user }) {
           <Button
             variant="outlined"
             startIcon={<BugReport />}
-            sx={{ marginTop: "5rem"}}
-            onClick={( ) => setIsBugDialogOpen(true)}
+            sx={{ marginTop: "5rem" }}
+            onClick={() => setIsBugDialogOpen(true)}
           >
             {t("Report a Bug")}
           </Button>
@@ -516,15 +585,15 @@ function Personal({ user }) {
       </Grid>
       <Box sx={{ height: "10vh" }} />
       <HelpFeedbackDialog
-          open={isBugDialogOpen}
-          onClose={handleBugDialogClose}
-          userEmail={user.email}
-          userUUID={user.uid}
-          title={"Report a Bug"}
-          placeholder="Please describe the bug. Please leave a message in english!"
-          onSuccess={null}
-          webhookUrl={process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL}
-        />
+        open={isBugDialogOpen}
+        onClose={handleBugDialogClose}
+        userEmail={user.email}
+        userUUID={user.uid}
+        title={"Report a Bug"}
+        placeholder="Please describe the bug. Please leave a message in english!"
+        onSuccess={null}
+        webhookUrl={process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL}
+      />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}

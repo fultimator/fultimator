@@ -82,6 +82,8 @@ function Personal({ user }) {
   const [tagSort, setTagSort] = useState(null);
   const [collapse, setCollapse] = useState(false);
 
+  const fileInputRef = useRef(null);
+
   const personalRef = collection(firestore, "npc-personal");
   const personalQuery = query(
     personalRef,
@@ -134,6 +136,31 @@ function Personal({ user }) {
       console.debug(res);
     } catch (e) {
       console.debug(e);
+    }
+  };
+
+  const handleFileUpload = async (jsonData) => {
+    try {
+      if (
+        jsonData &&
+        typeof jsonData === "object" &&
+        !Array.isArray(jsonData)
+      ) {
+        delete jsonData.id;  // Remove the id field if present
+        jsonData.uid = user.uid;  // Assign the current user UID
+        jsonData.published = false;  // Set the published field to false
+  
+        // Reference to the Firestore collection
+        const ref = collection(firestore, "npc-personal");
+  
+        // Add document to Firestore
+        const res = await addDoc(ref, jsonData);
+        console.debug("Document added with ID: ", res.id);
+      } else {
+        console.error("Invalid JSON format. Must be a single NPC object.");
+      }
+    } catch (error) {
+      console.error("Error uploading NPC from JSON:", error);
     }
   };
 
@@ -464,6 +491,36 @@ function Personal({ user }) {
               >
                 {t("Create NPC")}
               </Button>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => fileInputRef.current.click()}
+              >
+                {t("Add NPC from JSON")}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      try {
+                        const result = JSON.parse(reader.result);
+                        handleFileUpload(result);
+                      } catch (err) {
+                        console.error("Error parsing JSON:", err);
+                      }
+                    };
+                    reader.readAsText(file);
+                  }
+                }}
+                style={{ display: "none" }}
+              />
             </Grid>
           </Grid>
         </Paper>
