@@ -210,7 +210,7 @@ export default function PlayerWeaponModal({
     }
 
     // Bonus damage
-    if (damageBonus) {
+    if (!rework && damageBonus) {
       cost += 200;
     }
 
@@ -347,6 +347,7 @@ export default function PlayerWeaponModal({
     setMDefModifier(0);
     setIsEquipped(false);
     setModifiersExpanded(false);
+    setTotalBonus(0);
   };
 
   const cost = calcCost();
@@ -355,11 +356,9 @@ export default function PlayerWeaponModal({
 
   // Calculate totalBonus when damageReworkBonus changes
   useEffect(() => {
-    if (damageReworkBonus) {
-      const bonus = Math.floor(cost / 1000) * 2;
-      setTotalBonus(bonus);
-    }
-  }, [damageReworkBonus, cost]);
+    const bonus = Math.floor(cost / 1000) * 2;
+    setTotalBonus(bonus);
+  }, [damageReworkBonus, cost, qualityCost, rework]);
 
   return (
     <Dialog

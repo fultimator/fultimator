@@ -99,7 +99,7 @@ export default function PlayerShieldModal({
         name,
         quality,
         martial,
-        cost,
+        qualityCost,
         init,
         rework,
         defModifier,
@@ -126,8 +126,8 @@ export default function PlayerShieldModal({
         if (martial) {
           setMartial(martial);
         }
-        if (cost) {
-          setQualityCost(cost);
+        if (qualityCost) {
+          setQualityCost(qualityCost);
         }
         if (init) {
           setInit(init);

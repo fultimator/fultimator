@@ -99,7 +99,7 @@ export default function PlayerAccessoryModal({
       const {
         name,
         quality,
-        cost,
+        qualityCost,
         defModifier,
         mDefModifier,
         initModifier,
@@ -116,8 +116,8 @@ export default function PlayerAccessoryModal({
         setSelectedQuality("");
         setQuality(quality);
       }
-      if (cost) {
-        setQualityCost(cost);
+      if (qualityCost) {
+        setQualityCost(qualityCost);
       }
       if (defModifier) {
         setDefModifier(defModifier);

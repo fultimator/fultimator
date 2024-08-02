@@ -114,7 +114,7 @@ export default function PlayerArmorModal({
         name,
         quality,
         martial,
-        cost,
+        qualityCost,
         init,
         rework,
         defModifier,
@@ -141,8 +141,8 @@ export default function PlayerArmorModal({
         if (martial) {
           setMartial(martial);
         }
-        if (cost) {
-          setQualityCost(cost);
+        if (qualityCost) {
+          setQualityCost(qualityCost);
         }
         if (init) {
           setInit(init);
