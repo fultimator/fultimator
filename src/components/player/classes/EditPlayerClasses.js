@@ -73,7 +73,7 @@ export default function EditPlayerClasses({
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
-      const { name, lvl, benefits, skills, heroic, spells } = data;
+      const { name, lvl, benefits, skills, heroic, spells, isHomebrew } = data;
 
       /* Add class from data */
       const classExists = player.classes.some(
@@ -98,6 +98,7 @@ export default function EditPlayerClasses({
         skills: skills,
         heroic: heroic,
         spells: spells,
+        isHomebrew: isHomebrew || false,
       });
 
       setPlayer(updatedPlayer);
@@ -113,12 +114,12 @@ export default function EditPlayerClasses({
       if (selectedClass.name === "Blank Class") {
         setDialogOpen(true);
       } else {
-        addClassToPlayer(selectedClass.name);
+        addClassToPlayer(selectedClass.name, false);
       }
     }
   };
 
-  const addClassToPlayer = (name) => {
+  const addClassToPlayer = (name, isHomebrew) => {
     // Check if the selected class type already exists in player's classes
     const classExists = player.classes.some(
       (cls) => cls.name.toLowerCase() === name.toLowerCase()
@@ -154,6 +155,7 @@ export default function EditPlayerClasses({
         description: "",
       },
       spells: [],
+      isHomebrew: isHomebrew,
     });
 
     setPlayer(updatedPlayer);
@@ -439,6 +441,7 @@ export default function EditPlayerClasses({
                     setSelectedBook(newValue);
                     setSelectedClass(null); // Reset selected class when a new book is selected
                   }}
+                  disabled={player.classes.length >= 7}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -470,7 +473,7 @@ export default function EditPlayerClasses({
                   } // Disable options if no book is selected
                   getOptionLabel={(option) => t(option.name) || ""}
                   value={selectedClass}
-                  disabled={!selectedBook}
+                  disabled={!selectedBook || player.classes.length >= 7}
                   onChange={(event, newValue) => setSelectedClass(newValue)}
                   renderInput={(params) => (
                     <TextField
@@ -488,7 +491,11 @@ export default function EditPlayerClasses({
                   variant="contained"
                   onClick={handleAddClass}
                   sx={{ width: "100%", height: "100%" }}
-                  disabled={!selectedBook || !selectedClass} // Disable button if no book or class is selected
+                  disabled={
+                    !selectedBook ||
+                    !selectedClass ||
+                    player.classes.length >= 7
+                  } // Disable button if no book or class is selected
                 >
                   {t("Add")}
                 </Button>
@@ -497,6 +504,7 @@ export default function EditPlayerClasses({
                 <Button
                   variant="outlined"
                   onClick={() => fileInputRef.current.click()}
+                  disabled={player.classes.length >= 7}
                 >
                   {t("Upload JSON")}
                 </Button>
@@ -557,6 +565,7 @@ export default function EditPlayerClasses({
               }
               editHeroic={(heroic) => editHeroic(index, heroic)}
               userId={player.uid}
+              isHomebrew={cls.isHomebrew === undefined ? true : cls.isHomebrew}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
@@ -582,7 +591,7 @@ export default function EditPlayerClasses({
             {t("Cancel")}
           </Button>
           <Button
-            onClick={() => addClassToPlayer(newClassName)}
+            onClick={() => addClassToPlayer(newClassName, true)}
             color="primary"
             disabled={!newClassName}
           >

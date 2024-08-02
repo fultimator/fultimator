@@ -269,6 +269,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewWeapon}
                     startIcon={<MeleeIcon />}
+                    disabled={player.weapons && player.weapons.length >= 10}
                   >
                     {t("Add Weapon")}
                   </Button>
@@ -278,6 +279,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewArmor}
                     startIcon={<ArmorIcon />}
+                    disabled={player.armor && player.armor.length >= 10}
                   >
                     {t("Add Armor")}
                   </Button>
@@ -287,6 +289,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewShield}
                     startIcon={<ShieldIcon />}
+                    disabled={player.shields && player.shields.length >= 10}
                   >
                     {t("Add Shield")}
                   </Button>
@@ -296,6 +299,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewAccessory}
                     startIcon={<AccessoryIcon />}
+                    disabled={
+                      player.accessories && player.accessories.length >= 10
+                    }
                   >
                     {t("Add Accessory")}
                   </Button>

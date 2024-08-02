@@ -42,6 +42,7 @@ export default function PlayerClassCard({
   editClassName,
   editHeroic,
   userId,
+  isHomebrew
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -491,7 +492,7 @@ export default function PlayerClassCard({
           classItem.skills.map((skill, index) => (
             <Grid item xs={12} key={index}>
               <CustomHeader3
-                headerText={skill.skillName}
+                headerText={isHomebrew ? skill.skillName : t(skill.skillName)}
                 currentLvl={skill.currentLvl}
                 maxLvl={skill.maxLvl}
                 onIncrease={() => onIncreaseSkillLevel(index)}
@@ -509,7 +510,7 @@ export default function PlayerClassCard({
                   fontSize: "1rem",
                 }}
               >
-                {skill.description}
+                {isHomebrew ? skill.description : t(skill.description)}
               </StyledMarkdown>
             </Grid>
           ))}

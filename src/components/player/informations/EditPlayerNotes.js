@@ -135,7 +135,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                   }
                 : null
             }
-            showIconButton={isEditMode}
+            showIconButton={isEditMode && player.notes.length < 10}
             icon={Add}
           />
         </Grid>
