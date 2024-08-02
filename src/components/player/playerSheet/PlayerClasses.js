@@ -170,7 +170,7 @@ export default function PlayerClasses({ player, isCharacterSheet }) {
                   <>
                     <CustomHeader3
                       key={skillIndex}
-                      headerText={t(s.skillName)}
+                      headerText={(c.isHomebrew === undefined ? true : c.isHomebrew) ? s.skillName : t(s.skillName)}
                       currentLvl={s.currentLvl}
                       maxLvl={s.maxLvl}
                       isEditMode={false}
@@ -187,7 +187,7 @@ export default function PlayerClasses({ player, isCharacterSheet }) {
                         allowedElements={["strong", "em"]}
                         unwrapDisallowed={true}
                       >
-                        {s.description}
+                        {(c.isHomebrew === undefined ? true : c.isHomebrew) ? s.description : t(s.description)}
                       </StyledMarkdown>
                     </Typography>
                   </>

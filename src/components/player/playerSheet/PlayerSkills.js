@@ -40,7 +40,7 @@ export default function PlayerSkills({ player, setPlayer }) {
               ]
             : []
         )
-        .map((skill) => ({ ...skill, className: c.name }))
+        .map((skill) => ({ ...skill, className: c.name, isHomebrew: c.isHomebrew === undefined ? true : c.isHomebrew }))
     )
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
@@ -119,7 +119,7 @@ export default function PlayerSkills({ player, setPlayer }) {
                         width: "100%",
                       }}
                     >
-                      {skill.skillName}
+                      {skill.isHomebrew ?  skill.skillName : t(skill.skillName)}
                     </Typography>
                   </Grid>
                   <Grid
@@ -179,7 +179,7 @@ export default function PlayerSkills({ player, setPlayer }) {
                   sx={{ textTransform: "uppercase" }}
                   fontWeight={"bold"}
                 >
-                  {selectedSkill && selectedSkill.skillName}
+                  {selectedSkill && (selectedSkill.isHomebrew ?  selectedSkill.skillName : t(selectedSkill.skillName))}
                   {" - "}
                   {selectedSkill && t(selectedSkill.className)} {" -  "}{" "}
                   <Typography
@@ -197,7 +197,7 @@ export default function PlayerSkills({ player, setPlayer }) {
                   </Typography>
                 </Typography>
                 <ReactMarkdown>
-                  {selectedSkill && selectedSkill.description}
+                  {selectedSkill && (selectedSkill.isHomebrew ?  selectedSkill.description : t(selectedSkill.description))}
                 </ReactMarkdown>
                 <Button
                   variant="contained"
