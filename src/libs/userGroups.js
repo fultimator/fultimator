@@ -503,7 +503,8 @@ export const testUsers =
     "ssMa51wSQtfLGOMkHk4oIVSY9mq2",
     "jfnQLCPYt7cqkjLNygfpq0nwt8u1",
     "HMWUiMKIweRXu7pCWXdFPDPfqGp2",
-    "i6jqG0BnCqbv6E0Ctt8KHspm5ns2"
+    "i6jqG0BnCqbv6E0Ctt8KHspm5ns2",
+    "2x55t4YxR8QvAkUPtwRMkg3cwej2"
 ];
 
 export const moderators =
