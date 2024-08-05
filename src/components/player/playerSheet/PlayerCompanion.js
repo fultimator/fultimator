@@ -38,7 +38,7 @@ export default function PlayerCompanion({
 
   return (
     <>
-      {faithfulCompanionSkills.length === 1 && (
+      {faithfulCompanionSkills.length === 1 && companion !== null && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper

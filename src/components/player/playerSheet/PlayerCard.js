@@ -176,17 +176,16 @@ export default function PlayerCard({
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
-
-
   // Rogue - Dodge Skill Bonus
   const dodgeBonus =
+    equippedShields &&
     equippedShields.length === 0 &&
     (equippedArmor === null || equippedArmor.martial === false)
-      ? player.classes
-          .map((cls) => cls.skills)
+      ? (player.classes || [])
+          .map((cls) => cls.skills || [])
           .flat()
           .filter((skill) => skill.specialSkill === "Dodge")
-          .map((skill) => skill.currentLvl)
+          .map((skill) => skill.currentLvl || 0)
           .reduce((a, b) => a + b, 0)
       : 0;
 
@@ -551,7 +550,7 @@ export default function PlayerCard({
                       textTransform: "uppercase",
                     }}
                   >
-                    {player.info.identity.length > 40
+                    {player.info.identity && player.info.identity.length > 40
                       ? player.info.identity.slice(0, 40) + "..."
                       : player.info.identity}
                   </span>
@@ -574,7 +573,7 @@ export default function PlayerCard({
                       textTransform: "uppercase",
                     }}
                   >
-                    {t(player.info.theme).length > 20
+                    {t(player.info.theme) && t(player.info.theme).length > 20
                       ? t(player.info.theme).slice(0, 20) + "..."
                       : t(player.info.theme)}
                   </span>
@@ -597,7 +596,7 @@ export default function PlayerCard({
                       textTransform: "uppercase",
                     }}
                   >
-                    {player.info.origin.length > 20
+                    {player.info.origin && player.info.origin.length > 20
                       ? player.info.origin.slice(0, 20) + "..."
                       : player.info.origin}
                   </span>
