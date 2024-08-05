@@ -42,13 +42,18 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   };
 
   const handleThemeChange = (event, newValue) => {
-    setInputTheme(newValue);
+    // If newValue is null, set it to an empty string
+    const updatedValue = newValue === null ? '' : newValue;
+  
+    setInputTheme(updatedValue);
+    
     setPlayer((prevState) => {
       const newState = { ...prevState };
-      newState.info.theme = newValue;
+      newState.info.theme = updatedValue; // Update the theme in the player state
       return newState;
     });
   };
+  
   
   const handleThemeInputChange = (event, newInputValue) => {
     setInputTheme(newInputValue);

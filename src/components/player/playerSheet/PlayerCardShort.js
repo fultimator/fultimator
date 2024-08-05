@@ -277,7 +277,7 @@ export default function PlayerCardShort({
                           textTransform: "uppercase",
                         }}
                       >
-                        {t(player.info.theme).length > 20
+                        {player.info.theme && t(player.info.theme).length > 20
                           ? t(player.info.theme).slice(0, 20) + "..."
                           : t(player.info.theme)}
                       </span>
