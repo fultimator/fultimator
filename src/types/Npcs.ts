@@ -33,6 +33,7 @@ export interface NpcWeaponAttack {
     extraDamage?: false,
     weapon: Weapon,
     name: string,
+    type: string,
     special: string[]
 }
 

@@ -174,7 +174,7 @@ function Header({ npc, npcImage }) {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                objectPosition: "center center", 
+                objectPosition: "center center",
                 display: "block",
               }}
             />
@@ -639,13 +639,13 @@ function Attacks({ npc }) {
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {attack.weapon.type === "physical" ? (
+                {(attack.type || attack.weapon.type) === "physical" ? (
                   <span>
                     <ReactMarkdown
                       allowedElements={["strong"]}
                       unwrapDisallowed={true}
                     >
-                      {t(damageTypeLabels[attack.weapon.type])}
+                      {t(damageTypeLabels[attack.type || attack.weapon.type])}
                     </ReactMarkdown>
                   </span>
                 ) : (
@@ -655,7 +655,7 @@ function Attacks({ npc }) {
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {t(damageTypeLabels[attack.weapon.type])}
+                        {t(damageTypeLabels[attack.type || attack.weapon.type])}
                       </ReactMarkdown>
                     </span>
                   </>

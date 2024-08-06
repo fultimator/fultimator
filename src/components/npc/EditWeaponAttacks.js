@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Martial } from "../icons";
 import { useState } from "react";
+import types from "../../libs/types";
 import attributes from "../../libs/attributes";
 import { baseWeapons } from "../../libs/equip";
 import { CloseBracket, OpenBracket } from "../Bracket";
@@ -44,6 +45,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
       newState.weaponattacks.push({
         name: "",
         weapon: baseWeapons[0],
+        type: "physical",
         special: [],
       });
       return newState;
@@ -155,6 +157,32 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             }}
             size="small"
           ></TextField>
+        </FormControl>
+      </Grid>
+      <Grid item xs={3}>
+        <FormControl variant="outlined" fullWidth>
+          <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
+          <Select
+            value={attack.type || attack.weapon.type}
+            labelId={"attack-" + i + "-type"}
+            id={"attack-" + i + "-type"}
+            label={t("Type:")}
+            size="small"
+            onChange={(e, value) => {
+              return setAttack("type", e.target.value);
+            }}
+          >
+            {Object.keys(types).map((type) => {
+              return (
+                <MenuItem key={type} value={type}>
+                  {types[type].long}
+                </MenuItem>
+              );
+            })}
+            <MenuItem value={"nodmg"}>
+              {t("no damage")}
+            </MenuItem>
+          </Select>
         </FormControl>
       </Grid>
       {/* <Grid item xs={8} lg={3}>
