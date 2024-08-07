@@ -9,9 +9,9 @@ import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
-import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
+import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import useUploadJSON from "../../../hooks/useUploadJSON";
-import ApplyRework from '../common/ApplyRework';
+import ApplyRework from "../common/ApplyRework";
 
 function ArmorShield() {
   const { t } = useTranslate();
@@ -33,22 +33,14 @@ function ArmorShield() {
     cost += parseInt(qualityCost);
     return cost;
   }
-  
+
   const cost = calcCost();
 
   const fileInputRef = useRef(null);
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
-      const {
-        base,
-        name,
-        quality,
-        martial,
-        cost,
-        init,
-        rework
-      } = data;
+      const { base, name, quality, martial, cost, init, rework } = data;
 
       if (base) {
         setBase(base);
@@ -74,11 +66,10 @@ function ArmorShield() {
     }
   });
 
-
   const handleClearFields = () => {
     setBase(armor[0]);
     setName(armor[0].name);
-    setMartial(armor[0].martial)
+    setMartial(armor[0].martial);
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
@@ -100,7 +91,10 @@ function ArmorShield() {
           }}
         >
           {/* Header */}
-          <CustomHeaderAlt headerText={t("Armor and Shield")} icon={<AutoAwesome fontSize="large" />} />
+          <CustomHeaderAlt
+            headerText={t("Armor and Shield")}
+            icon={<AutoAwesome fontSize="large" />}
+          />
           <Grid container spacing={2} alignItems="center">
             {/* Change Base */}
             <Grid item xs={4}>
@@ -111,8 +105,8 @@ function ArmorShield() {
 
                   setBase(base);
                   setName(base.name);
-                  setMartial(base.martial)
-                  setInit(base.init)
+                  setMartial(base.martial);
+                  setInit(base.init);
                 }}
               />
             </Grid>
@@ -151,13 +145,16 @@ function ArmorShield() {
             <Grid item xs={12} sx={{ py: 0 }}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item>
-                  <Button variant="outlined" onClick={() => fileInputRef.current.click()}>
-                    Upload JSON
+                  <Button
+                    variant="outlined"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    {t("Upload JSON")}
                   </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" onClick={handleClearFields}>
-                    Clear All Fields
+                    {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}

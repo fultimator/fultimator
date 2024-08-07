@@ -337,7 +337,7 @@ function Personal({ user }) {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Tag Search"
+                    label={t("Tag Search")}
                     variant="outlined"
                     fullWidth
                   />
@@ -418,7 +418,7 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="sort">Sort:</InputLabel>
+                <InputLabel id="sort">{t("Sort:")}</InputLabel>
                 <Select
                   labelId="sort"
                   id="select-sort"
@@ -428,9 +428,9 @@ function Personal({ user }) {
                     setSort(evt.target.value);
                   }}
                 >
-                  <MenuItem value={"name"}>Name</MenuItem>
-                  <MenuItem value={"level"}>Level</MenuItem>
-                  <MenuItem value={"publishedAt"}>Published Date</MenuItem>
+                  <MenuItem value={"name"}>{t("Name")}</MenuItem>
+                  <MenuItem value={"level"}>{t("Level")}</MenuItem>
+                  <MenuItem value={"publishedAt"}>{t("Published Date")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -443,7 +443,7 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="direction">Direction:</InputLabel>
+                <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select
                   labelId="direction"
                   id="select-direction"
@@ -453,8 +453,8 @@ function Personal({ user }) {
                     setDirection(evt.target.value);
                   }}
                 >
-                  <MenuItem value={"ascending"}>Ascending</MenuItem>
-                  <MenuItem value={"descending"}>Descending</MenuItem>
+                  <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
+                  <MenuItem value={"descending"}>{t("Descending")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

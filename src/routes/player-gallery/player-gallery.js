@@ -116,8 +116,10 @@ function Personal({ user }) {
                 Apply for Alpha Access to the Character Designer
               </Typography>
               <Typography variant="body1">
-                The Character Designer is currently a feature available only to alpha testers. If you want to use it within the Fultimator web app, please apply for alpha access below.
-              </Typography>            
+                The Character Designer is currently a feature available only to
+                alpha testers. If you want to use it within the Fultimator web
+                app, please apply for alpha access below.
+              </Typography>
             </Grid>
             {!hasApplied && (
               <Grid item>
@@ -137,14 +139,16 @@ function Personal({ user }) {
               <Grid item>
                 <Box mt={2}>
                   <Typography variant="h2">
-                    Thank you for applying! Stay tuned for updates on your application status.
+                    Thank you for applying! Stay tuned for updates on your
+                    application status.
                   </Typography>
                 </Box>
               </Grid>
             )}
             <Grid item>
               <Typography variant="body1" sx={{ mt: 2 }}>
-                You can also download the Fultimator desktop app to start using the Character Designer immediately, without needing to apply.
+                You can also download the Fultimator desktop app to start using
+                the Character Designer immediately, without needing to apply.
               </Typography>
               <Box mt={2}>
                 <Button
@@ -191,8 +195,7 @@ function Personal({ user }) {
         />
       </>
     );
-  }  
-  
+  }
 
   if (err?.code === "resource-exhausted") {
     return (
@@ -385,12 +388,12 @@ function Personal({ user }) {
       >
         <Box>
           <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1 }}>
-            Help us improve the Character Designer!
+            {t("Help us improve the Character Designer!")}
           </AlertTitle>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            We value your input on this new feature. Please take a moment to
-            complete our quick survey and share your thoughts. Your feedback
-            will directly influence future updates and enhancements.
+            {t(
+              "We value your input on this new feature. Please take a moment to complete our quick survey and share your thoughts. Your feedback will directly influence future updates and enhancements."
+            )}
           </Typography>
           <Button
             href="https://forms.gle/4kfWcrZYRcoAErew5"
@@ -406,7 +409,7 @@ function Personal({ user }) {
               },
             }}
           >
-            TAKE QUICK SURVEY
+            {t("TAKE QUICK SURVEY")}
           </Button>
         </Box>
       </Alert>
@@ -455,7 +458,7 @@ function Personal({ user }) {
               sx={{ display: "flex" }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="direction">Direction:</InputLabel>
+                <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select
                   labelId="direction"
                   id="select-direction"
@@ -465,8 +468,8 @@ function Personal({ user }) {
                     setDirection(evt.target.value);
                   }}
                 >
-                  <MenuItem value={"ascending"}>Ascending</MenuItem>
-                  <MenuItem value={"descending"}>Descending</MenuItem>
+                  <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
+                  <MenuItem value={"descending"}>{t("Descending")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -560,7 +563,7 @@ function Personal({ user }) {
                   <Share />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t("Character Sheet")}>
+              <Tooltip title={t("Player Sheet")}>
                 <IconButton
                   component={RouterLink}
                   to={`/character-sheet/${player.id}`}

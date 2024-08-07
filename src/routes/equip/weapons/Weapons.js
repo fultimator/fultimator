@@ -13,9 +13,9 @@ import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
-import ApplyRework from '../common/ApplyRework';
+import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
-import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
+import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 
 function Weapons() {
   const { t } = useTranslate();
@@ -54,7 +54,7 @@ function Weapons() {
         damageBonus,
         damageReworkBonus,
         precBonus,
-        rework
+        rework,
       } = data;
 
       if (base) {
@@ -107,7 +107,7 @@ function Weapons() {
     setHands(weapons[0].hands);
     setAtt1(weapons[0].att1);
     setAtt2(weapons[0].att2);
-    setMartial(weapons[0].martial)
+    setMartial(weapons[0].martial);
     setDamageBonus(false);
     setDamageReworkBonus(false);
     setPrecBonus(false);
@@ -216,7 +216,10 @@ function Weapons() {
           }}
         >
           {/* Header */}
-          <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
+          <CustomHeaderAlt
+            headerText={t("Rare Weapons")}
+            icon={<AutoAwesome fontSize="large" />}
+          />
           <Grid container spacing={1} alignItems="center">
             {/* Change Base */}
             <Grid item xs={4}>
@@ -234,7 +237,7 @@ function Weapons() {
                   setPrecBonus(false);
                   setAtt1(base.att1);
                   setAtt2(base.att2);
-                  setMartial(base.martial)
+                  setMartial(base.martial);
                 }}
               />
             </Grid>
@@ -316,12 +319,12 @@ function Weapons() {
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
                   >
-                    Upload JSON
+                    {t("Upload JSON")}
                   </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" onClick={handleClearFields}>
-                    Clear All Fields
+                    {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}

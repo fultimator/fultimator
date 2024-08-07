@@ -29,11 +29,7 @@ function Accessories() {
 
   const handleFileUpload = (data) => {
     if (data) {
-      const {
-        name,
-        quality,
-        cost
-      } = data;
+      const { name, quality, cost } = data;
 
       if (name) {
         setName(name);
@@ -47,7 +43,6 @@ function Accessories() {
       }
     }
   };
-
 
   const handleClearFields = () => {
     setName("");
@@ -70,7 +65,10 @@ function Accessories() {
           }}
         >
           {/* Header */}
-          <CustomHeaderAlt headerText={t("Accessories")} icon={<AutoAwesome fontSize="large" />} />
+          <CustomHeaderAlt
+            headerText={t("Accessories")}
+            icon={<AutoAwesome fontSize="large" />}
+          />
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={6}>
               <ChangeName
@@ -107,12 +105,12 @@ function Accessories() {
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
                   >
-                    Upload JSON
+                    {t("Upload JSON")}
                   </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" onClick={handleClearFields}>
-                    Clear All Fields
+                    {t("Clear All Fields")}
                   </Button>
                 </Grid>
               </Grid>
