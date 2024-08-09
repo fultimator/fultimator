@@ -504,7 +504,25 @@ export const testUsers =
     "jfnQLCPYt7cqkjLNygfpq0nwt8u1",
     "HMWUiMKIweRXu7pCWXdFPDPfqGp2",
     "i6jqG0BnCqbv6E0Ctt8KHspm5ns2",
-    "2x55t4YxR8QvAkUPtwRMkg3cwej2"
+    "2x55t4YxR8QvAkUPtwRMkg3cwej2",
+    "ab4Ndv4bsGhK6aMv0F7t6qyhTH12",
+    "jBETtrDjb0aoINjV8SmPL2gVlVj1",
+    "PrkNhHovxAXu4syeWs6fTMwUkXi2",
+    "HraN2DvQigbkCgX5XZix37HrXj83",
+    "ZSL6iMCDE9T14u6AqQr15fQPSDx2",
+    "A4j1C14m2bS5rtbEyOl5ImzKiZz1",
+    "F0Z9KvnmlwPlePnqeDUb1JvkQah1",
+    "5L1DlH2tQNh4xa6lVELNAccb8Am2",
+    "ZRv1gUCmCXVze3PYUUO9t0F4kfE2",
+    "0dx5qmlzuQeajxTG7VxwMO4GJQI3",
+    "CIzMadTb9MU8sCr0vkkCoJd4xMz1",
+    "kbLpNuc58GcGoyue9RuD5NiH2fC2",
+    "j7b4NFbLarTncoIJWe3KluhBjoD3",
+    "KVUd1lQn2HVDDJNNwzR8k3GjpEb2",
+    "4xweBoKzUSgb539bxkrfPuAqDuY2",
+    "pJzEprWVRDTz8lNxDeSl1UdohY53",
+    "lSwcsTXgv5Scs3GNFCNmFXsQ8NK2",
+    "mBnA5c6XMdWk4wKIhEGMtendChM2"
 ];
 
 export const moderators =
