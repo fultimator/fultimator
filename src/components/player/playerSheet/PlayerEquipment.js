@@ -135,7 +135,7 @@ export default function PlayerEquipment({
     .reduce((a, b) => a + b, 0);
 
   const precMeleeModifier =
-    (player.modifiers.meleePrec || 0) +
+    (player.modifiers?.meleePrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.precModifier || 0),
@@ -148,7 +148,7 @@ export default function PlayerEquipment({
     meleeMasteryModifier;
 
   const precRangedModifier =
-    (player.modifiers.rangedPrec || 0) +
+    (player.modifiers?.rangedPrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.precModifier || 0),

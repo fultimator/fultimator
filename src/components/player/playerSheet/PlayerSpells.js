@@ -56,7 +56,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     : [];
 
   const magicModifier =
-    (player.modifiers.magicPrec || 0) +
+    (player.modifiers?.magicPrec || 0) +
     (equippedArmor.length > 0 ? equippedArmor[0].magicModifier || 0 : 0) +
     (equippedShields.length > 0 ? equippedShields[0].magicModifier || 0 : 0) +
     (equippedAccessories.length > 0
