@@ -52,6 +52,7 @@ import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGal
 import { testUsers, moderators } from "../../libs/userGroups";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
+import { validateCharacter } from "../../utility/validateJson";
 
 export default function PlayerGallery() {
   const { t } = useTranslate();
@@ -306,24 +307,23 @@ function Personal({ user }) {
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (
-        jsonData &&
-        typeof jsonData === "object" &&
-        !Array.isArray(jsonData)
-      ) {
-        delete jsonData.id; // Remove the id field if present
-        jsonData.uid = user.uid; // Assign the current user UID
-        jsonData.published = false; // Set the published field to false
-
-        // Reference to the Firestore collection
-        const ref = collection(firestore, "player-personal");
-
-        // Add document to Firestore
-        const res = await addDoc(ref, jsonData);
-        console.debug("Document added with ID: ", res.id);
-      } else {
-        console.error("Invalid JSON format. Must be a single PC object.");
+      if (!validateCharacter(jsonData)) {
+        console.error("Invalid character data.");
+        const alertMessage = t("Invalid character JSON data.");
+        alert(alertMessage);
+        return;
       }
+      
+      delete jsonData.id; // Remove the id field if present
+      jsonData.uid = user.uid; // Assign the current user UID
+      jsonData.published = false; // Set the published field to false
+
+      // Reference to the Firestore collection
+      const ref = collection(firestore, "player-personal");
+
+      // Add document to Firestore
+      const res = await addDoc(ref, jsonData);
+      console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading PC from JSON:", error);
     }

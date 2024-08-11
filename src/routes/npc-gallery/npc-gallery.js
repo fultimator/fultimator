@@ -48,6 +48,7 @@ import { useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
+import { validateNpc } from "../../utility/validateJson";
 
 export default function NpcGallery() {
   const { t } = useTranslate();
@@ -141,24 +142,23 @@ function Personal({ user }) {
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (
-        jsonData &&
-        typeof jsonData === "object" &&
-        !Array.isArray(jsonData)
-      ) {
-        delete jsonData.id;  // Remove the id field if present
-        jsonData.uid = user.uid;  // Assign the current user UID
-        jsonData.published = false;  // Set the published field to false
-  
-        // Reference to the Firestore collection
-        const ref = collection(firestore, "npc-personal");
-  
-        // Add document to Firestore
-        const res = await addDoc(ref, jsonData);
-        console.debug("Document added with ID: ", res.id);
-      } else {
-        console.error("Invalid JSON format. Must be a single NPC object.");
+      if (!validateNpc(jsonData)) {
+        console.error("Invalid NPC data.");
+        const alertMessage = t("Invalid NPC JSON data.");
+        alert(alertMessage);
+        return;
       }
+      
+      delete jsonData.id; // Remove the id field if present
+      jsonData.uid = user.uid; // Assign the current user UID
+      jsonData.published = false; // Set the published field to false
+
+      // Reference to the Firestore collection
+      const ref = collection(firestore, "npc-personal");
+
+      // Add document to Firestore
+      const res = await addDoc(ref, jsonData);
+      console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading NPC from JSON:", error);
     }
@@ -374,7 +374,9 @@ function Personal({ user }) {
                   <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
                   <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
                   <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
-                  <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
+                  <MenuItem value={"groupvehicle"}>
+                    {t("Group Vehicle")}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -430,7 +432,9 @@ function Personal({ user }) {
                 >
                   <MenuItem value={"name"}>{t("Name")}</MenuItem>
                   <MenuItem value={"level"}>{t("Level")}</MenuItem>
-                  <MenuItem value={"publishedAt"}>{t("Published Date")}</MenuItem>
+                  <MenuItem value={"publishedAt"}>
+                    {t("Published Date")}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
