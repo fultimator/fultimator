@@ -637,7 +637,7 @@ export default function PlayerClassCard({
           </Grid>
         )}
         <Grid item xs={12}>
-          <Export name={classItem.name} data={classItem} />
+          <Export name={classItem.name} dataType="class" data={classItem} />
         </Grid>
       </Grid>
       {/* Edit Class Name Modal */}

@@ -310,7 +310,7 @@ function PrettySingle({ arcana, showActions, rework }) {
               <Download />
             </IconButton>
           </Tooltip>
-          <Export name={`${arcana.name}`} data={arcana} />
+          <Export name={`${arcana.name}`} dataType="arcana" data={arcana} />
         </div>
       )}
     </>

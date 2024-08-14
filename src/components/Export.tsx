@@ -6,6 +6,7 @@ import { useTranslate } from "../translation/translate";
 
 type Props = {
   name?: string;
+  dataType: string;
   data?: any;
 };
 
@@ -14,9 +15,9 @@ enum ExportAction {
   CLIPBOARD,
 }
 
-function Export({ name = "", data = {} }: Props) {
+function Export({ name = "", dataType, data = {} }: Props) {
   const { t } = useTranslate();
-  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, data);
+  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, { ...data, dataType });
 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [exportAnchor, setExportAnchor] = useState(null);

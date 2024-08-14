@@ -668,7 +668,7 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
           <Report />
         </IconButton>
       </Tooltip>
-      <Export name={`${npc.name}`} data={npc} />
+      <Export name={`${npc.name}`} dataType="npc" data={npc} />
       <span style={{ fontSize: 14 }}>
         {t("Created By:")} {npc.createdBy}
       </span>

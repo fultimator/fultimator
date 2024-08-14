@@ -138,7 +138,7 @@ function PrettySingle({ accessory, showActions }) {
               <Download />
             </IconButton>
           </Tooltip>
-          <Export name={`${accessory.name}`} data={accessory} />
+          <Export name={`${accessory.name}`} dataType="accessory" data={accessory} />
         </div>
       )}
     </>

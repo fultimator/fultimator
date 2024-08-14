@@ -189,7 +189,7 @@ export default function PlayerAccessories({
                     )}
                   </Grid>
                   <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export name={accessory.name} data={accessory} />
+                    <Export name={accessory.name} dataType="accessory" data={accessory} />
                   </Grid>
                 </Grid>
               </Grid>

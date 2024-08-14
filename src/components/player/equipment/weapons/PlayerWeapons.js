@@ -225,7 +225,7 @@ export default function PlayerWeapons({
                     )}
                   </Grid>
                   <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export name={weapon.name} data={weapon} />
+                    <Export name={weapon.name} dataType="weapon" data={weapon} />
                   </Grid>
                 </Grid>
               </Grid>

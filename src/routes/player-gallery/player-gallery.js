@@ -571,7 +571,7 @@ function Personal({ user }) {
                   <Badge />
                 </IconButton>
               </Tooltip>
-              <Export name={`${player.name}`} data={player} />
+              <Export name={`${player.name}`} dataType="pc" data={player} />
             </div>
           </Grid>
         ))}

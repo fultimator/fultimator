@@ -227,7 +227,7 @@ export default function PlayerShields({
                     )}
                   </Grid>
                   <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export name={shield.name} data={shield} />
+                    <Export name={shield.name} dataType="shield" data={shield} />
                   </Grid>
                 </Grid>
               </Grid>

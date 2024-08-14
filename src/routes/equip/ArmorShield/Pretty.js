@@ -199,7 +199,7 @@ function PrettySingle({ armor, showActions }) {
               <Download />
             </IconButton>
           </Tooltip>
-          <Export name={`${armor.name}`} data={armor} />
+          <Export name={`${armor.name}`} dataType="armor" data={armor} />
         </div>
       )}
     </>

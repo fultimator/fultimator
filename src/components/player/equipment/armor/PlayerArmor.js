@@ -187,7 +187,7 @@ export default function PlayerArmor({
                     )}
                   </Grid>
                   <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export name={armorItem.name} data={armorItem} />
+                    <Export name={armorItem.name} dataType="armor" data={armorItem} />
                   </Grid>
                 </Grid>
               </Grid>

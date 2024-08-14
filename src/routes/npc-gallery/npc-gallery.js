@@ -659,7 +659,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
           <Download />
         </IconButton>
       </Tooltip>
-      <Export name={`${npc.name}`} data={npc} />
+      <Export name={`${npc.name}`} dataType="npc" data={npc} />
     </Grid>
   );
 }

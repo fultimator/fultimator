@@ -211,7 +211,7 @@ function PrettySingle({ weapon, showActions }) {
               <Download />
             </IconButton>
           </Tooltip>
-          <Export name={`${weapon.name}`} data={weapon} />
+          <Export name={`${weapon.name}`} dataType="weapon" data={weapon} />
         </div>
       )}
     </>
