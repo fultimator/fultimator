@@ -16,6 +16,7 @@ import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal
 import { tinkererAlchemy, tinkererInfusion } from "../../../libs/classes";
 import SpellTinkererInfusion from "./SpellTinkererInfusion";
 import SpellTinkererInfusionModal from "./SpellTinkererInfusionModal";
+import SpellCompendiumModal from "./SpellCompendiumModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -34,6 +35,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
+
+  const [openCompendiumModal, setOpenCompendiumModal] = useState(false);
 
   const handleClassChange = (event, newValue) => {
     setSelectedClass(
@@ -58,15 +61,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       ...prev,
       classes: prev.classes.map((cls) => {
         if (cls.name === selectedClass) {
-          // Helper function to check the count of specific spell types
-          const countSpellType = (type) =>
-            cls.spells.filter((sp) => sp.spellType === type).length;
-
           if (spell === "default") {
-            if (countSpellType("default") >= 10) {
-              alert("You can only have a maximum of 10 default spells");
-              return cls;
-            }
             return {
               ...cls,
               spells: [
@@ -87,10 +82,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "arcanist") {
-            if (countSpellType("arcanist") >= 10) {
-              alert("You can only have a maximum of 10 arcanist spells");
-              return cls;
-            }
             return {
               ...cls,
               spells: [
@@ -110,10 +101,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "arcanist-rework") {
-            if (countSpellType("arcanist-rework") >= 10) {
-              alert("You can only have a maximum of 10 arcanist-rework spells");
-              return cls;
-            }
             return {
               ...cls,
               spells: [
@@ -135,39 +122,53 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ],
             };
           } else if (spell === "tinkerer-alchemy") {
-            if (cls.spells.some((sp) => sp.spellType === "tinkerer-alchemy")) {
+            // Check if there's already a tinkerer-alchemy spell
+            const hasTinkererAlchemy = cls.spells.some(
+              (sp) => sp.spellType === "tinkerer-alchemy"
+            );
+
+            if (hasTinkererAlchemy) {
               alert("You already have a tinkerer-alchemy spell");
               return cls;
+            } else {
+              // Add a new tinkerer-alchemy spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    // add from tinkererAlchemy const
+                    ...tinkererAlchemy,
+                  },
+                ],
+              };
             }
-            return {
-              ...cls,
-              spells: [
-                ...cls.spells,
-                {
-                  spellType: spell,
-                  showInPlayerSheet: true,
-                  // add from tinkererAlchemy const
-                  ...tinkererAlchemy,
-                },
-              ],
-            };
           } else if (spell === "tinkerer-infusion") {
-            if (cls.spells.some((sp) => sp.spellType === "tinkerer-infusion")) {
+            // Check if there's already a tinkerer-infusion spell
+            const hasTinkererInfusion = cls.spells.some(
+              (sp) => sp.spellType === "tinkerer-infusion"
+            );
+
+            if (hasTinkererInfusion) {
               alert("You already have a tinkerer-infusion spell");
               return cls;
+            } else {
+              // Add a new tinkerer-infusion spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    // add from tinkererAlchemy const
+                    ...tinkererInfusion,
+                  },
+                ],
+              };
             }
-            return {
-              ...cls,
-              spells: [
-                ...cls.spells,
-                {
-                  spellType: spell,
-                  showInPlayerSheet: true,
-                  // add from tinkererInfusion const
-                  ...tinkererInfusion,
-                },
-              ],
-            };
           } else {
             alert(spell.toUpperCase() + " spell not implemented yet");
             return cls;
@@ -177,6 +178,38 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       }),
     }));
 
+    setSelectedClass(null);
+    setSelectedSpell(null);
+  };
+
+  const addSpellFromCompendium = (spell) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === selectedClass) {
+          return {
+            ...cls,
+            spells: [
+              ...cls.spells,
+              {
+                spellType: spell.spellType,
+                name: t(spell.name),
+                mp: spell.mp,
+                maxTargets: spell.maxTargets,
+                targetDesc: t(spell.targetDesc),
+                duration: t(spell.duration),
+                description: t(spell.description),
+                isOffensive: spell.isOffensive,
+                attr1: spell.attr1,
+                attr2: spell.attr2,
+                showInPlayerSheet: true,
+              },
+            ],
+          };
+        }
+        return cls;
+      }),
+    }));
     setSelectedClass(null);
     setSelectedSpell(null);
   };
@@ -300,7 +333,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm={4}>
                   <Autocomplete
                     options={player.classes
                       .filter(
@@ -329,7 +362,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm={4}>
                   <Autocomplete
                     options={filteredSpells}
                     value={selectedSpell}
@@ -345,14 +378,24 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     disabled={!selectedClass}
                   />
                 </Grid>
-                <Grid item xs={12} sm={2}>
+                <Grid item xs={6} sm={2}>
                   <Button
                     variant="contained"
                     sx={{ width: "100%", height: "100%" }}
                     disabled={!selectedSpell}
                     onClick={() => addNewSpell(selectedSpell)}
                   >
-                    {t("Add Spell")}
+                    {t("Add Blank Spell")}
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={2}>
+                  <Button
+                    variant="outlined"
+                    sx={{ width: "100%", height: "100%" }}
+                    disabled={!selectedClass}
+                    onClick={() => setOpenCompendiumModal(true)}
+                  >
+                    {t("Add from Compendium")}
                   </Button>
                 </Grid>
               </Grid>
@@ -400,7 +443,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       .sort((a, b) => a.spellType.localeCompare(b.spellType))
                       .map((spell, index) => (
                         <React.Fragment key={index}>
-                          <div style={{ marginTop: index === 0 ? 0 : 50 }}>
+                          <div
+                            style={{
+                              marginTop:
+                                index === 0 || spell.spellType === "default"
+                                  ? 0
+                                  : 50,
+                            }}
+                          >
                             {spell.spellType === "default" &&
                               !spellTypeHeaders.default && (
                                 <>
@@ -590,6 +640,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         infusion={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellCompendiumModal
+        open={openCompendiumModal}
+        onClose={() => setOpenCompendiumModal(false)}
+        typeName={selectedClass}
+        onSave={(spell) => addSpellFromCompendium(spell)}
       />
     </>
   );
