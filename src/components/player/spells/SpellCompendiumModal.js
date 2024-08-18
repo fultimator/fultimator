@@ -15,6 +15,8 @@ import {
   MenuItem,
   Divider,
   Box,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
@@ -30,6 +32,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("Elementalist");
   const [filteredSpells, setFilteredSpells] = useState([]);
+  const [isMagisphere, setIsMagisphere] = useState(false);
 
   // Extract unique classes from spellList
   useEffect(() => {
@@ -55,7 +58,12 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
 
   const handleSave = () => {
     if (selectedItem) {
-      onSave(selectedItem);
+      // Include isMagisphere in the selectedItem if checkbox is checked
+      const updatedItem = {
+        ...selectedItem,
+        isMagisphere,
+      };
+      onSave(updatedItem);
     }
     onClose();
   };
@@ -71,6 +79,10 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
 
   const handleClassChange = (event) => {
     setSelectedClass(event.target.value);
+  };
+
+  const handleToggleChange = (event) => {
+    setIsMagisphere(event.target.checked);
   };
 
   return (
@@ -184,6 +196,17 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       </DialogContent>
       <Divider />
       <DialogActions>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isMagisphere}
+              onChange={handleToggleChange}
+              name="isMagisphere"
+              color="primary"
+            />
+          }
+          label={t("Add as Magisphere")}
+        />
         <Button variant="contained" color="secondary" onClick={handleSave}>
           {t("Add")}
         </Button>

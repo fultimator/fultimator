@@ -31,7 +31,6 @@ import ChangeModifiers from "../ChangeModifiers";
 import ChangeCategory from "./ChangeCategory";
 import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
 import PrettyWeapon from "./PrettyWeapon";
 
 export default function PlayerWeaponModal({
@@ -614,7 +613,7 @@ export default function PlayerWeaponModal({
             {t("Delete")}
           </Button>
         )}
-        <Button onClick={handleSave} color="primary">
+        <Button onClick={handleSave} color="primary" disabled={/* disable if the weapon has a value "magitech" === true */ weapon?.magicannon }>
           {t("Save Changes")}
         </Button>
       </DialogActions>

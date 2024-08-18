@@ -155,6 +155,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                           description={spell.description}
                           isEditMode={false}
                           isOffensive={spell.isOffensive}
+                          isMagisphere={spell.isMagisphere || false}
                           attr1={spell.attr1}
                           attr2={spell.attr2}
                         />

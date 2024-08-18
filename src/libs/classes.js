@@ -706,6 +706,7 @@ const classList = [
         "tinkerer-alchemy",
         "tinkerer-infusion",
         "tinkerer-magitech",
+        "default",
       ],
     },
     skills: [

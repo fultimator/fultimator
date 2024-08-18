@@ -8,7 +8,7 @@ import {
   Icon,
   Tooltip,
 } from "@mui/material";
-import { Edit, VisibilityOff } from "@mui/icons-material";
+import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "../../icons"; // Ensure this path is correct
@@ -32,6 +32,7 @@ function ThemedSpellDefault({
   attr1,
   attr2,
   showInPlayerSheet,
+  isMagisphere,
   isEditMode,
   index,
 }) {
@@ -155,6 +156,11 @@ function ThemedSpellDefault({
               style={{ flexGrow: 1, marginRight: "5px" }}
               fontSize={{ xs: "0.8rem", sm: "1rem" }}
             >
+              {isMagisphere && (
+                <Tooltip title={t("Magisphere")}>
+                  <SettingsSuggest sx={{ fontSize: "1rem" }} />
+                </Tooltip>
+              )}{" "}
               {spellName} {isOffensive && <OffensiveSpellIcon />}
             </Typography>
           </Grid>

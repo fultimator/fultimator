@@ -341,6 +341,19 @@ export default function SpellDefaultModal({
               label={t("Show in Character Sheet")}
             />
           </Grid>
+          <Grid item xs={12} sm={12}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={editedSpell.isMagisphere || false}
+                  onChange={(e) =>
+                    handleChange("isMagisphere", e.target.checked)
+                  }
+                />
+              }
+              label={t("Is a Magisphere?")}
+            />
+          </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>

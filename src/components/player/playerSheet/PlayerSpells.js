@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { Casino, Info } from "@mui/icons-material";
+import { Casino, Info, SettingsSuggest } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
@@ -39,7 +39,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState(null);
   const [targets, setTargets] = useState(1);
-  const [useMp, setUseMp] = useState(true); // New state for MP usage
+  const [useMp, setUseMp] = useState(true);
+  const [useIp, setUseIp] = useState(true); // Used for Magispheres
 
   const [dialogSeverity, setDialogSeverity] = useState("");
 
@@ -262,6 +263,22 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
           });
         }
 
+        /* Remove ip to the player (player.stats.ip.current - 2) for MagiSphere */
+        if (selectedSpell?.isMagisphere && useIp) {
+          setPlayer((prevPlayer) => {
+            return {
+              ...prevPlayer,
+              stats: {
+                ...prevPlayer.stats,
+                ip: {
+                  ...prevPlayer.stats.ip,
+                  current: prevPlayer.stats.ip.current - 2,
+                },
+              },
+            };
+          });
+        }
+
         setIsRolling(true);
       }
     } else {
@@ -342,6 +359,11 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         width: "100%",
                       }}
                     >
+                      {spell.isMagisphere && (
+                        <Tooltip title={t("Magisphere")}>
+                          <SettingsSuggest />
+                        </Tooltip>
+                      )}
                       {spell.name}
                       {spell.isOffensive && <OffensiveSpellIcon />}
                     </Typography>
@@ -429,6 +451,12 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   fontWeight={"bold"}
                 >
                   {selectedSpell && selectedSpell.name}
+                  {selectedSpell && selectedSpell.isMagisphere && (
+                    <>
+                      {" - " + t("Magisphere")}{" "}
+                      <SettingsSuggest sx={{ fontSize: "1rem" }} />
+                    </>
+                  )}
                   {" - "}
                   {selectedSpell && t(selectedSpell.className)}
                 </Typography>
@@ -439,7 +467,10 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   {t("MP Cost")}: {selectedSpell && selectedSpell.mp}{" "}
                   {selectedSpell && selectedSpell.maxTargets !== 1
                     ? "x " + t("Target")
-                    : ""}
+                    : ""}{" "}
+                  {selectedSpell &&
+                    selectedSpell.isMagisphere &&
+                    "+ 2 " + t("IP")}
                 </Typography>
                 <Typography variant="h5">
                   {t("Max Targets")}:{" "}
@@ -537,6 +568,20 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                             )}
                           </>
                         )}
+                        {selectedSpell?.isMagisphere && useIp && (
+                          <>
+                            <Typography variant="body1">
+                              {t("IP Cost")}
+                              {": "}
+                              {2}
+                            </Typography>
+                            {2 > player.stats.ip.current && (
+                              <Typography variant="body1" color="error">
+                                {t("Not enough IP")}
+                              </Typography>
+                            )}
+                          </>
+                        )}
                       </Grid>
                       <Grid item xs={12}>
                         <FormControlLabel
@@ -549,6 +594,19 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           label={t("Use MP")}
                         />
                       </Grid>
+                      {selectedSpell?.isMagisphere && (
+                        <Grid item xs={12}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={useIp}
+                                onChange={(e) => setUseIp(e.target.checked)}
+                              />
+                            }
+                            label={t("Use IP")}
+                          />
+                        </Grid>
+                      )}
                     </Grid>
                   ) : (
                     <>{dialogMessage}</>
