@@ -140,7 +140,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                   <ListItemText
                     primary={
                       <>
-                        {item.name}
+                        {t(item.name) || t(item.spellName)}
                         {item.isOffensive && <OffensiveSpellIcon />}
                       </>
                     }
@@ -154,7 +154,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             xs={8}
             sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }}
           >
-            {selectedItem && (
+            {selectedItem && selectedItem.spellType === "default" && (
               <div>
                 <Typography variant="h3">
                   {t(selectedItem.name)}{" "}
@@ -188,6 +188,40 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                   unwrapDisallowed={true}
                 >
                   {t(selectedItem.description)}
+                </StyledMarkdown>
+              </div>
+            )}
+            {selectedItem && selectedItem.spellType === "gamble" && (
+              <div>
+                <Typography variant="h3">
+                  {t(selectedItem.name)}
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                  {t("Up to")} {selectedItem.mp * selectedItem.maxTargets} {t("MP")}
+                  <Box component="span" mx={1}>
+                    <Diamond />
+                  </Box>
+                  <StyledMarkdown
+                    allowedElements={["strong"]}
+                    unwrapDisallowed={true}
+                  >
+                    {t(selectedItem.targetDesc)}
+                  </StyledMarkdown>
+                  <Box component="span" mx={1}>
+                    <Diamond />
+                  </Box>
+                  <StyledMarkdown
+                    allowedElements={["strong"]}
+                    unwrapDisallowed={true}
+                  >
+                    {t(selectedItem.duration)}
+                  </StyledMarkdown>
+                </Typography>
+                <StyledMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {t("GambleSpell_desc")}
                 </StyledMarkdown>
               </div>
             )}
