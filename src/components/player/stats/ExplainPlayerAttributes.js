@@ -14,7 +14,7 @@ export default function ExplainPlayerAttributes() {
     const theme = useCustomTheme();
     const background = theme.mode === 'dark'
     ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
-    : `llinear-gradient(to right, ${theme.ternary}, transparent)`;
+    : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
 return (
     <Grid item>

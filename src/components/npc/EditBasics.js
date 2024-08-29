@@ -27,7 +27,7 @@ export default function EditBasics({ npc, setNpc }) {
   const theme = useCustomTheme();
   const background = theme.mode === 'dark'
   ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
-  : `llinear-gradient(to right, ${theme.ternary}, transparent)`;
+  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
   const [imgUrlTemp, setImgUrlTemp] = React.useState(npc.imgurl || "");
 

@@ -8,7 +8,7 @@ export default function ExplainAffinities({ npc }) {
   const theme = useCustomTheme();
   const background = theme.mode === 'dark'
   ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
-  : `llinear-gradient(to right, ${theme.ternary}, transparent)`;
+  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
   return (
     <Card
