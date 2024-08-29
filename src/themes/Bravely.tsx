@@ -1,24 +1,24 @@
 import { createTheme } from "@mui/material/styles";
 import { PaletteOptions } from "@mui/material/styles";
 
-// Light Mode Theme
-const lightTechno = createTheme({
+// Light theme
+const lightBravely = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: "#406376",
+      main: "#765f43",
     },
     secondary: {
-      main: "#879da9",
+      main: "#dccdc4",
     },
     ternary: {
-      main: "#eaf0f4",
+      main: "#fff3ec",
     },
     quaternary: {
-      main: "#2f4f4f",
+      main: "#756449",
     },
     background: {
-      default: "#e0e6e9",
+      default: "#fdf3eb",
       paper: "#ffffff",
     },
     red: {
@@ -83,24 +83,24 @@ const lightTechno = createTheme({
   },
 });
 
-// Dark Mode Theme
-const darkTechno = createTheme({
+// Dark theme
+const darkBravely = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: "#406376",
+      main: "#765f43",
     },
     secondary: {
-      main: "#879da9",
+      main: "#dccdc4",
     },
     ternary: {
-      main: "#212425",
+      main: "#3E1700",
     },
     quaternary: {
-      main: "#1A1D1E",
+      main: "#756449",
     },
     background: {
-      default: "#1a1a1a",
+      default: "#121212",
       paper: "#121212",
     },
     red: {
@@ -196,4 +196,4 @@ const darkTechno = createTheme({
   },
 });
 
-export { lightTechno, darkTechno };
+export { lightBravely, darkBravely };

@@ -4,22 +4,24 @@ import {
     Grid,
     Card,
     Typography,
-    Divider,
-    useTheme
+    Divider
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function ExplainPlayerAttributes() {
     const { t } = useTranslate();
-    const theme = useTheme();
-    const ternary = theme.palette.ternary.main;
+    const theme = useCustomTheme();
+    const background = theme.mode === 'dark'
+    ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+    : `llinear-gradient(to right, ${theme.ternary}, transparent)`;
 
 return (
     <Grid item>
             <Card
               sx={{
                 p: 1.61,
-                background: `linear-gradient(to right, ${ternary}, transparent)`,
+                background,
               }}
             >
               <Typography>

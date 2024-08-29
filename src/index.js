@@ -16,11 +16,12 @@ import Roller from "./routes/roller/roller";
 import RollerScoped from "./routes/roller/roller-scoped";
 import Combat from "./routes/combat/combat";
 import CharacterSheet from "./routes/character-sheet/character-sheet";
-import Fabula from "./themes/Fabula";
-import High from "./themes/High";
-import Techno from "./themes/Techno";
-import Natural from "./themes/Natural";
-import Midnight from "./themes/Midnight";
+import { lightFabula, darkFabula } from "./themes/Fabula";
+import { lightHigh, darkHigh } from "./themes/High";
+import { lightTechno, darkTechno } from "./themes/Techno";
+import { lightNatural, darkNatural } from "./themes/Natural";
+import { lightBravely, darkBravely } from "./themes/Bravely";
+import { lightObscura, darkObscura } from "./themes/Obscura";
 
 import {
   ThemeProvider as AppThemeProvider,
@@ -31,19 +32,24 @@ import PlayerEdit from "./routes/player-edit/player-edit";
 import ErrorBoundary from "./ErrorBoundary";
 
 const themes = {
-  Fabula,
-  High,
-  Techno,
-  Natural,
-  Midnight,
+  Fabula: { light: lightFabula, dark: darkFabula },
+  High: { light: lightHigh, dark: darkHigh },
+  Techno: { light: lightTechno, dark: darkTechno },
+  Natural: { light: lightNatural, dark: darkNatural },
+  Bravely: { light: lightBravely, dark: darkBravely },
+  Obscura: { light: lightObscura, dark: darkObscura },
 };
 
 const App = () => {
-  const { selectedTheme } = useThemeContext();
+  const { selectedTheme, isDarkMode } = useThemeContext();
+  const currentTheme = themes[selectedTheme] 
+    ? (isDarkMode ? themes[selectedTheme].dark : themes[selectedTheme].light)
+    : themes.Fabula.light;
+
 
   return (
     <React.StrictMode>
-      <ThemeProvider theme={themes[selectedTheme]}>
+      <ThemeProvider theme={currentTheme}>
         <CssBaseline />
         <BrowserRouter>
           <ErrorBoundary>

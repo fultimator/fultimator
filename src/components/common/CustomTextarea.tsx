@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
-import { TextareaAutosize, useTheme, Button } from "@mui/material";
+import { TextareaAutosize, Button } from "@mui/material";
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
   label: string;
@@ -28,9 +29,11 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   maxRows,
   maxLength,
 }) => {
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
   const [isFocused, setIsFocused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(true);
@@ -43,20 +46,14 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   }, [onBlur]);
 
   const handleMouseOver = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!isFocused) {
-      e.currentTarget.style.outlineColor = "black";
-    }
+    setIsHovered(true);
     if (onMouseOver) onMouseOver(e);
-  }, [isFocused, onMouseOver]);
+  }, [onMouseOver]);
 
   const handleMouseOut = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!isFocused) {
-      e.currentTarget.style.outlineColor = primary;
-    }
+    setIsHovered(false);
     if (onMouseOut) onMouseOut(e);
-  }, [isFocused, onMouseOut, primary]);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  }, [onMouseOut]);
 
   const handleFormat = useCallback((format: string) => {
     const textarea = textareaRef.current;
@@ -98,29 +95,31 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     fontSize: "1rem",
     fontFamily: "inherit",
     borderRadius: "4px",
-    border: isFocused ? "none" : "1px solid #c4c4c4",
-    outline: "none",
+    border: isFocused ? "none" : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "#c4c4c4"}`,
+    outline: isHovered ? `2px solid white` : "none",  // Outline when hovered
     resize: "vertical",
-    boxShadow: isFocused ? `0 0 0 2px ${primary}` : "none",
-    backgroundColor: readOnly ? "#f5f5f5" : "white",
+    boxShadow: isFocused ? `0 0 0 2px ${theme.primary}` : "none",
+    backgroundColor: readOnly ? "#f5f5f5" : `${theme.transparent}`,
     cursor: readOnly ? "not-allowed" : "text",
+    color: isDarkMode ? "white" : "black",
   };
 
   const labelStyle: React.CSSProperties = {
     position: "absolute",
     padding: "0 2px",
     top: isFocused || value ? "-8px" : "12px",
-    background: "white",
+    backgroundColor: isDarkMode ? "#252525" : "white",
     left: "14px",
     transition: "top 0.2s ease, font-size 0.2s ease",
     fontSize: isFocused || value ? "0.8rem" : "1rem",
-    color: isFocused ? primary : "#757575",
+    color: isFocused ? `${theme.primary}` : isDarkMode ? "white" : "black",
     pointerEvents: "none",
+    borderRadius: "4px",
   };
 
   const helperStyle: React.CSSProperties = {
     fontSize: "0.8rem",
-    color: "#757575",
+    color: isDarkMode ? "white" : "#252525",
     marginTop: "4px",
     marginRight: "14px",
     marginBottom: "0",
@@ -132,10 +131,10 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     top: "-10px",
     right: "10px",
     display: "flex",
-    border: `1px solid ${primary}`,
+    border: `1px solid ${theme.primary}`,
     borderRadius: "50px",
     overflow: "hidden",
-    backgroundColor: "white",
+    backgroundColor: isDarkMode ? "#252525" : `${theme.ternary}`,
   };
 
   const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } = {
@@ -144,6 +143,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     marginRight: "8px",
     transition: "font-weight 0.3s ease",
     fontWeight: "normal",
+    color: isDarkMode ? "white" : "black",
   };
 
   buttonStyle["&:hover"] = {

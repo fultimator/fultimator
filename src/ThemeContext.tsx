@@ -1,52 +1,55 @@
 import React, { createContext, useContext, ReactNode, useState } from 'react';
-import Fabula from './themes/Fabula';
-import High from './themes/High';
-import Techno from './themes/Techno';
-import Natural from './themes/Natural';
-import Midnight from './themes/Midnight';
-
-interface ThemeProviderProps {
-  children: ReactNode;
-}
 
 interface ThemeContextProps {
-  selectedTheme: string;
-  setTheme: (themeName: string) => void;
+  selectedTheme: ThemeValue;
+  isDarkMode: boolean;
+  setTheme: (theme: ThemeValue) => void;
+  toggleDarkMode: () => void;
 }
+
+type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
-const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const storedTheme = localStorage.getItem('selectedTheme') || 'Fabula';
-  const [selectedTheme, setSelectedTheme] = useState<string>(storedTheme);
-  const themes = {
-    Fabula,
-    High,
-    Techno,
-    Natural,
-    Midnight,
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
+    return (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula";
+  });
+
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    try {
+      const storedValue = localStorage.getItem("isDarkMode");
+      return storedValue ? JSON.parse(storedValue) : false;
+    } catch {
+      // If parsing fails, fallback to default value
+      return false;
+    }
+  });
+
+  const setTheme = (theme: ThemeValue) => {
+    setSelectedTheme(theme);
+    localStorage.setItem("selectedTheme", theme);
   };
 
-  const setTheme = (themeName: string) => {
-    if (themes[themeName]) {
-      setSelectedTheme(themeName);
-      localStorage.setItem('selectedTheme', themeName);
-    }
+  const toggleDarkMode = () => {
+    setIsDarkMode(prevMode => {
+      const newMode = !prevMode;
+      localStorage.setItem("isDarkMode", JSON.stringify(newMode));
+      return newMode;
+    });
   };
 
   return (
-    <ThemeContext.Provider value={{ selectedTheme, setTheme }}>
+    <ThemeContext.Provider value={{ selectedTheme, setTheme, isDarkMode, toggleDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-const useThemeContext = () => {
+export const useThemeContext = () => {
   const context = useContext(ThemeContext);
   if (!context) {
     throw new Error('Oops! It seems like useThemeContext is not wrapped in a ThemeProvider.');
   }
   return context;
 };
-
-export { ThemeProvider, useThemeContext };

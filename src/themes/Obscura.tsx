@@ -2,23 +2,23 @@ import { createTheme } from "@mui/material/styles";
 import { PaletteOptions } from "@mui/material/styles";
 
 // Light Mode Theme
-const lightTechno = createTheme({
+const lightObscura = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: "#406376",
+      main: "#1B1F47",
     },
     secondary: {
-      main: "#879da9",
+      main: "#9176AC",
     },
     ternary: {
-      main: "#eaf0f4",
+      main: "#E1E7FF",
     },
     quaternary: {
-      main: "#2f4f4f",
+      main: "#4C5D8B",
     },
     background: {
-      default: "#e0e6e9",
+      default: "#D9E3FF",
       paper: "#ffffff",
     },
     red: {
@@ -84,20 +84,20 @@ const lightTechno = createTheme({
 });
 
 // Dark Mode Theme
-const darkTechno = createTheme({
+const darkObscura = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: "#406376",
+      main: "#1B1F47",
     },
     secondary: {
-      main: "#879da9",
+      main: "#9176AC",
     },
     ternary: {
-      main: "#212425",
+      main: "#202325",
     },
     quaternary: {
-      main: "#1A1D1E",
+      main: "#4C5D8B",
     },
     background: {
       default: "#1a1a1a",
@@ -196,4 +196,4 @@ const darkTechno = createTheme({
   },
 });
 
-export { lightTechno, darkTechno };
+export { lightObscura, darkObscura };

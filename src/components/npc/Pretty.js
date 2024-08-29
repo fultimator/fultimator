@@ -30,6 +30,7 @@ import Study from "./Study";
 // import EditableImage from "../EditableImage";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 function NpcPretty(
   { npc, study, npcImage, collapse, onClick = () => { } },
@@ -97,6 +98,30 @@ function NpcPretty(
 
 function Header({ npc, npcImage }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, #4C3D51 100%);`
+    : `linear-gradient(90deg, #674168 0%, #b9a9be 100%);`;
+
+  const borderImage = theme.mode === 'dark'
+    ? "linear-gralinear-gradient(45deg, #b9a9be, #ffffff) 1"
+    : "linear-gradient(45deg, #b9a9be, #ffffff) 1";
+  const borderImageBody = theme.mode === 'dark'
+    ? "linear-gradient(45deg, #674168, #ffffff) 1;"
+    : "linear-gradient(45deg, #674168, #ffffff) 1;";
+  const borderRight = theme.mode === 'dark'
+    ? `4px solid #1f1f1f`
+    : `4px solid white`;
+
+  const borderLeft = theme.mode === 'dark'
+    ? "2px solid #4C3D51"
+    : "2px solid #b9a9be";
+
+  const borderBottom = theme.mode === 'dark'
+    ? "2px solid #4C3D51"
+    : "2px solid #b9a9be";
+
   const StyledMarkdown = styled(ReactMarkdown)({
     whiteSpace: "pre-line",
   });
@@ -116,8 +141,8 @@ function Header({ npc, npcImage }) {
           item
           xs
           sx={{
-            background: "linear-gradient(90deg, #674168 0%, #b9a9be 100%);",
-            borderRight: "4px solid white",
+            background,
+            borderRight,
             px: 2,
           }}
         >
@@ -136,9 +161,9 @@ function Header({ npc, npcImage }) {
           sx={{
             px: 2,
             py: 0.5,
-            borderLeft: "2px solid #b9a9be",
-            borderBottom: "2px solid #b9a9be",
-            borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
+            borderLeft,
+            borderBottom,
+            borderImage
           }}
         >
           <Typography
@@ -206,8 +231,8 @@ function Header({ npc, npcImage }) {
               sx={{
                 px: 2,
                 py: 0.5,
-                borderBottom: "1px solid #b9a9be",
-                borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+                borderBottom,
+                borderImageBody,
               }}
             >
               <Typography
@@ -224,8 +249,8 @@ function Header({ npc, npcImage }) {
             sx={{
               px: 2,
               py: 0.5,
-              borderBottom: "1px solid #b9a9be",
-              borderImage: "linear-gradient(45deg, #674168, #ffffff) 1;",
+              borderBottom,
+              borderImageBody,
               flexGrow: 1,
             }}
           >
@@ -285,7 +310,9 @@ function Rank({ npc }) {
 
 function Stats({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
   const isMobile = window.innerWidth < 900;
+  const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
   return (
     <Typography
       component="div"
@@ -312,8 +339,8 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: "#efecf5",
-                borderRight: "1px solid #ffffff",
+                bgcolor: theme.mode === 'dark' ? '#1E2122' : '#efecf5',
+                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                 py: 0.4,
               }}
             >
@@ -323,8 +350,8 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: "#f3f0f7",
-                borderRight: "1px solid #ffffff",
+                bgcolor: theme.mode === 'dark' ? '#1E2122' : '#f3f0f7',
+                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                 py: 0.4,
               }}
             >
@@ -334,14 +361,21 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: "#f6f4f9",
-                borderRight: "1px solid #ffffff",
+                bgcolor: theme.mode === 'dark' ? '#1D1F20' : '#f6f4f9',
+                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                 py: 0.4,
               }}
             >
               {t("MIG")} d{npc.attributes?.might}
             </Grid>
-            <Grid item xs sx={{ bgcolor: "#f9f8fb", py: 0.4 }}>
+            <Grid
+              item
+              xs
+              sx={{
+                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#f9f8fb',
+                py: 0.4,
+              }}
+            >
               {t("WLP")} d{npc.attributes?.will}
             </Grid>
           </Grid>
@@ -399,7 +433,7 @@ function Stats({ npc }) {
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
             borderRight: "1px solid #281127",
-            borderImage: "linear-gradient(90deg, #432846, #432846) 1;",
+            borderImage,
             mr: isMobile ? "1px" : "2px",
             flexBasis: "calc(25% - 2px)",
           }}
@@ -409,8 +443,8 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: "#efecf5",
-                borderRight: "1px solid #ffffff",
+                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#efecf5',
+                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                 py: 0.4,
               }}
             >
@@ -428,7 +462,7 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: "#efecf5",
+                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#efecf5',
                 py: 0.4,
               }}
             >
@@ -443,14 +477,14 @@ function Stats({ npc }) {
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
             borderLeft: "1px solid #281127",
-            borderImage: "linear-gradient(90deg, #432846, #ffffff) 1;",
+            borderImage,
             ml: isMobile ? "1px" : "2px",
             mt: 0,
           }}
         >
           {npc.affinities && (
             <Grid container>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #513455" }}>
+              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #42484B" }}>
                 <TypeAffinity
                   type="physical"
                   affinity={npc.affinities.physical}
@@ -490,6 +524,10 @@ function Stats({ npc }) {
 
 function Attacks({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const damageTypeLabels = {
     physical: "physical_damage",
     wind: "air_damage",
@@ -516,7 +554,7 @@ function Attacks({ npc }) {
           mt: 1,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -685,6 +723,10 @@ function Attacks({ npc }) {
 
 function Spells({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   if (!npc.spells || npc.spells.length === 0) {
     return null;
   }
@@ -700,7 +742,7 @@ function Spells({ npc }) {
         sx={{
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -761,6 +803,10 @@ function Spells({ npc }) {
 
 function Special({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const special = [];
 
   if (npc.special) {
@@ -812,7 +858,7 @@ function Special({ npc }) {
           mt: 0,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -851,6 +897,10 @@ function Special({ npc }) {
 
 function Actions({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const actions = [];
 
   if (npc.actions) {
@@ -877,7 +927,7 @@ function Actions({ npc }) {
           mt: 0,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -919,6 +969,10 @@ function Actions({ npc }) {
 
 function Notes({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const notes = [];
 
   if (npc.notes) {
@@ -945,7 +999,7 @@ function Notes({ npc }) {
           mt: 0,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -987,6 +1041,10 @@ function Notes({ npc }) {
 
 function RareGear({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const raregear = [];
 
   if (npc.raregear) {
@@ -1013,7 +1071,7 @@ function RareGear({ npc }) {
           mt: 0,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
@@ -1055,6 +1113,10 @@ function RareGear({ npc }) {
 
 function Equip({ npc }) {
   const { t } = useTranslate();
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const weapons = [];
 
   npc.weaponattacks?.forEach((attack) => {
@@ -1092,7 +1154,7 @@ function Equip({ npc }) {
           mt: 0,
           px: 2,
           py: 0.3,
-          background: "linear-gradient(90deg, #6e468d 0%, #ffffff 100%);",
+          background,
         }}
       >
         <Typography
