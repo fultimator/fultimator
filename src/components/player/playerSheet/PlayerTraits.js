@@ -12,7 +12,6 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const StyledMarkdown = styled(ReactMarkdown)({
     whiteSpace: "pre-line",

@@ -3,7 +3,6 @@ import {
   Typography,
   IconButton,
   Grid,
-  useTheme,
   ThemeProvider,
   Tooltip,
   Icon,

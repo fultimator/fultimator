@@ -32,7 +32,6 @@ export default function PlayerEquipment({
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [dialogMessage, setDialogMessage] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);

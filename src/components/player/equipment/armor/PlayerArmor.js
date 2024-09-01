@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@mui/material/styles";
 import {
   Grid,
-  Typography,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyArmor from "./PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";

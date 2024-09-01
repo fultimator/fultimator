@@ -14,7 +14,6 @@ export default function PlayerNotes({ player, setPlayer, isCharacterSheet }) {
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
     "& ul, & ol": {

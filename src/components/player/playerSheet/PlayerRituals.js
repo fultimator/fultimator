@@ -33,7 +33,6 @@ export default function PlayerRituals({
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
