@@ -6,13 +6,14 @@ import CustomHeader2 from "../../common/CustomHeader2";
 import CustomHeader3 from "../../common/CustomHeader3";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerClasses({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const StyledMarkdown = styled(ReactMarkdown)({
     whiteSpace: "pre-line",
@@ -55,7 +56,7 @@ export default function PlayerClasses({ player, isCharacterSheet }) {
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1.5em",
                 }}
