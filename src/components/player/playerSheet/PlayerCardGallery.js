@@ -14,10 +14,12 @@ import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
 import { styled } from "@mui/system";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerCardGallery({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -292,7 +294,7 @@ export default function PlayerCardGallery({ player, setPlayer }) {
                 marginTop: "-1px",
                 marginBottom: "-1px",
                 backgroundColor: primary,
-                color: ternary,
+                color: custom.white,
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "1.2rem",

@@ -4,7 +4,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTranslate } from "../../translation/translate";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
+type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
 
 export interface ThemeSwitcherProps {
   selectedTheme: ThemeValue;
@@ -16,7 +16,8 @@ const themes = [
   { value: "High", label: "High Fantasy" },
   { value: "Techno", label: "Techno Fantasy" },
   { value: "Natural", label: "Natural Fantasy" },
-  { value: "Midnight", label: "Fabula Obscura" },
+  { value: "Bravely", label: "Bravely Ordinary" },
+  { value: "Obscura", label: "Fabula Obscura" },
 ];
 
 const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
@@ -47,7 +48,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
     <>
       <MenuItem onClick={handleToggle}>
         <ListItemIcon>
-          {selectedTheme === "Midnight" ? (
+          {selectedTheme === "Fabula" ? (
             <Brightness4Icon />
           ) : (
             <Brightness7Icon />

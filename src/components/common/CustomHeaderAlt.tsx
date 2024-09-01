@@ -27,8 +27,8 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({ headerText, icon }) =
                         background: `linear-gradient(to right, ${primary}, ${primary}, ${secondary})`,
                         textTransform: 'uppercase',
                         padding: '2px',
-                        borderRadius: '8px 8px 0 0',
-                        margin: '-30px 0 0 -30px',
+                        borderRadius: '6px 6px 0 0',
+                        margin: '-29px 0 0 -29px',
                         display: 'flex',
                         alignItems: 'center',
                         

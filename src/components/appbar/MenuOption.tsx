@@ -26,15 +26,18 @@ import {
 import { auth, googleAuthProvider } from "../../firebase";
 import { signInWithPopup } from "@firebase/auth";
 
+import DarkModeToggle, { DarkModeToggleProps } from "./DarkModeToggle";
 import ThemeSwitcher, { ThemeSwitcherProps } from "./ThemeSwitcher";
 import LanguageMenu from "./LanguageMenu";
 import HelpFeedbackDialog from "./HelpFeedbackDialog"; // Import the dialog component
 
-interface MenuOptionProps extends ThemeSwitcherProps {}
+interface MenuOptionProps extends ThemeSwitcherProps, DarkModeToggleProps {}
 
 const MenuOption: React.FC<MenuOptionProps> = ({
   selectedTheme,
   onSelectTheme,
+  isDarkMode,
+  onToggleDarkMode,
 }) => {
   const { t } = useTranslate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -186,6 +189,14 @@ const MenuOption: React.FC<MenuOptionProps> = ({
           </MenuItem>
         )}
         <Divider key="sign-in-out-divider" />
+
+        <MenuItem>
+          <DarkModeToggle
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={onToggleDarkMode}
+          />
+        </MenuItem>
+        <Divider key="darkmode-switcher-divider" />
 
         <ThemeSwitcher
           key="theme-switcher"

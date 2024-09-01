@@ -12,7 +12,6 @@ import {
   Stack,
   TextField,
   Typography,
-  useTheme,
   Button,
   Snackbar
 } from "@mui/material";
@@ -21,11 +20,14 @@ import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 export default function EditBasics({ npc, setNpc }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
   const [imgUrlTemp, setImgUrlTemp] = React.useState(npc.imgurl || "");
 
@@ -383,7 +385,7 @@ export default function EditBasics({ npc, setNpc }) {
           <Card
             sx={{
               p: 1.61,
-              background: `linear-gradient(to right, ${ternary}, transparent)`,
+              background,
             }}
           >
             <Typography>

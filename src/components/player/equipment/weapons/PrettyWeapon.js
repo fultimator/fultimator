@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Grid, useTheme, Card, Stack, Typography } from "@mui/material";
+import { Grid, Card, Stack, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../../translation/translate";
@@ -10,14 +10,24 @@ import types from "../../../../libs/types";
 import { Martial } from "../../../icons";
 import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
+import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
 export default function PrettyWeapon({ weapon, showActions }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+
+  const background2 = theme.mode === 'dark'
+  ? `black`
+  : `white`;
+
+  const cardBackground = theme.mode === 'dark'
+  ? `backgroundColor: "#181a1b", background: "#181a1b"`
+  : `backgroundColor: "white", background: "white"`
+
 
   const ref = useRef();
 
@@ -30,7 +40,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
       <Card>
         <div
           ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
+          style={{ cardBackground }}
         >
           <Stack>
             <Grid
@@ -39,7 +49,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
               alignItems="center"
               sx={{
                 p: 1,
-                background: `${primary}`,
+                background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.6rem", sm: "1.2rem" },
@@ -77,8 +87,8 @@ export default function PrettyWeapon({ weapon, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
-                    borderBottom: `1px solid ${secondary}`,
+                    background,
+                    borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
                     "& .MuiTypography-root": {
                       fontSize: { xs: "0.7rem", sm: "1.0rem" },
@@ -129,7 +139,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
                   justifyContent="flex-end"
                   sx={{
                     background: "transparent",
-                    borderBottom: `1px solid ${secondary}`,
+                    borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
                     "& .MuiTypography-root": {
                       fontSize: { xs: "0.7rem", sm: "1.0rem" },
@@ -142,7 +152,7 @@ export default function PrettyWeapon({ weapon, showActions }) {
                     </Typography>
                   </Grid>
                   <Grid item xs={1}>
-                    <Diamond color={primary} />
+                    <Diamond color={theme.primary} />
                   </Grid>
                   <Grid item xs={4}>
                     <Typography textAlign="center">
@@ -165,14 +175,14 @@ export default function PrettyWeapon({ weapon, showActions }) {
             <div
               style={{
                 fontSize: "0.7rem",
-                background: "transparent",
+                background2,
               }}
             >
               {!weapon.quality && (
                 <Typography
                   fontSize={{ xs: "0.7rem", sm: "1.0rem" }}
                   sx={{
-                    background: "transparent",
+                    background2,
                     px: 1,
                     py: 1,
                   }}

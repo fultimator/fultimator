@@ -14,14 +14,14 @@ import {
 import { Edit, VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
 
   const showInPlayerSheet =
     magitech.showInPlayerSheet || magitech.showInPlayerSheet === undefined;
@@ -32,13 +32,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
     <>
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           marginBottom: "5px",
           justifyContent: "space-between",
-          borderBottom: `1px solid ${secondary}`,
-          borderTop: `1px solid ${secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -74,7 +74,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -83,12 +83,12 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 1 && (
         <div
           style={{
-            backgroundColor: primary,
+            backgroundColor: theme.primary,
             fontFamily: "Antonio",
             fontWeight: "normal",
             fontSize: "1.1em",
             padding: "2px 17px",
-            color: white,
+            color: theme.white,
             textTransform: "uppercase",
             display: "flex",
             justifyContent: "space-between",
@@ -132,7 +132,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 1 && (
         <Accordion sx={{ marginY: 1 }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
-            <Icon sx={{ color: primary, marginRight: 1 }}>
+            <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>
@@ -150,12 +150,12 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 2 && (
         <div
           style={{
-            backgroundColor: primary,
+            backgroundColor: theme.primary,
             fontFamily: "Antonio",
             fontWeight: "normal",
             fontSize: "1.1em",
             padding: "2px 17px",
-            color: white,
+            color: theme.white,
             textTransform: "uppercase",
             display: "flex",
             justifyContent: "space-between",
@@ -200,7 +200,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 2 && (
         <Accordion sx={{ marginY: 1 }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
-            <Icon sx={{ color: primary, marginRight: 1 }}>
+            <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>
@@ -223,12 +223,12 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 3 && (
         <div
           style={{
-            backgroundColor: primary,
+            backgroundColor: theme.primary,
             fontFamily: "Antonio",
             fontWeight: "normal",
             fontSize: "1.1em",
             padding: "2px 17px",
-            color: white,
+            color: theme.white,
             textTransform: "uppercase",
             display: "flex",
             justifyContent: "space-between",
@@ -273,7 +273,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       {magitech.rank >= 3 && (
         <Accordion sx={{ marginY: 1 }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
-            <Icon sx={{ color: primary, marginRight: 1 }}>
+            <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>

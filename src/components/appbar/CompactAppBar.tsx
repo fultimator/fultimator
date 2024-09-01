@@ -12,13 +12,15 @@ import { useNpc } from "../npc/NpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
 import EditCompendiumModal from "../npc/EditCompendiumModal";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
+type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
 
 interface CompactAppBarProps {
   isNpcEdit: boolean;
   isPcEdit: boolean;
   selectedTheme: ThemeValue;
   handleSelectTheme: (theme: ThemeValue) => void;
+  isDarkMode: boolean;
+  handleToggleDarkMode: () => void;
   showGoBackButton: boolean;
   handleNavigation: () => void;
 }
@@ -28,6 +30,8 @@ const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
   isPcEdit,
   selectedTheme,
   handleSelectTheme,
+  isDarkMode,
+  handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
 }) => {
@@ -35,13 +39,9 @@ const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const openCompendiumModal = () => {
-    setModalOpen(true);
-  };
+  const openCompendiumModal = () => setModalOpen(true);
 
-  const closeCompendiumModal = () => {
-    setModalOpen(false);
-  };
+  const closeCompendiumModal = () => setModalOpen(false);
 
   return (
     <MuiAppBar position="fixed">
@@ -62,7 +62,7 @@ const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
           <Grid item xs={3} textAlign="right">
             <Grid container alignItems="center" justifyContent="flex-end">
               {showGoBackButton && !isPcEdit && (
-                <Tooltip title={"Open Compendium"}>
+                <Tooltip title="Open Compendium">
                   <IconButton color="inherit" onClick={openCompendiumModal}>
                     <Search />
                   </IconButton>
@@ -71,15 +71,19 @@ const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
               <MenuOption
                 selectedTheme={selectedTheme}
                 onSelectTheme={handleSelectTheme}
+                isDarkMode={isDarkMode}
+                onToggleDarkMode={handleToggleDarkMode}
               />
             </Grid>
           </Grid>
         </Grid>
       </Container>
-      <EditCompendiumModal typeName="spells" open={modalOpen} onClose={closeCompendiumModal} onSave={(selectedItem) => {
-          // Handle saving selected item from modal
+      <EditCompendiumModal
+        typeName="spells"
+        open={modalOpen}
+        onClose={closeCompendiumModal}
+        onSave={(selectedItem) => {
           console.log("Selected Item from Compendium Modal:", selectedItem);
-          // Add snackbar when item successfully added
         }}
       />
     </MuiAppBar>
@@ -91,18 +95,18 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
   isPcEdit,
   selectedTheme,
   handleSelectTheme,
+  isDarkMode,
+  handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
-
+  
   // const openCompendiumModal = () => {
   //   setModalOpen(true);
   // };
 
-  const closeCompendiumModal = () => {
-    setModalOpen(false);
-  };
+  const closeCompendiumModal = () => setModalOpen(false);
 
   return (
     <MuiAppBar position="fixed">
@@ -115,13 +119,11 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
               </IconButton>
             )}
           </Grid>
-
           <Grid item xs={6} textAlign="center">
             <Grid container justifyContent="center">
               <span>Welcome to Character Designer Alpha!</span>
             </Grid>
           </Grid>
-
           <Grid item xs={3} textAlign="right">
             <Grid container alignItems="center" justifyContent="flex-end">
               {/* {showGoBackButton && (
@@ -134,13 +136,18 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
               <MenuOption
                 selectedTheme={selectedTheme}
                 onSelectTheme={handleSelectTheme}
+                isDarkMode={isDarkMode}
+                onToggleDarkMode={handleToggleDarkMode}
               />
             </Grid>
           </Grid>
         </Grid>
       </Container>
-      <EditCompendiumModal typeName="spells" open={modalOpen} onClose={closeCompendiumModal} onSave={(selectedItem) => {
-          // Handle saving selected item from modal
+      <EditCompendiumModal
+        typeName="spells"
+        open={modalOpen}
+        onClose={closeCompendiumModal}
+        onSave={(selectedItem) => {
           console.log("Selected Item from Compendium Modal:", selectedItem);
           // Add snackbar when item successfully added
         }}

@@ -1,16 +1,20 @@
-import { Card, Typography, useTheme } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
 import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 export default function ExplainAffinities({ npc }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
+
   return (
     <Card
       sx={{
         p: 1.61,
-        background: `linear-gradient(to right, ${ternary}, transparent)`,
+        background,
       }}
     >
       <Typography>{t("Gain 1 skill per vulnerability.")}</Typography>

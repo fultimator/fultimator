@@ -1,24 +1,24 @@
 import { createTheme } from "@mui/material/styles";
 import { PaletteOptions } from "@mui/material/styles";
 
-// Light Mode Theme
-const lightHigh = createTheme({
+// Light theme
+const lightBravely = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: "#861628",
+      main: "#765f43",
     },
     secondary: {
-      main: "#cd9c9f",
+      main: "#dccdc4",
     },
     ternary: {
-      main: "#fdeae1",
+      main: "#fff3ec",
     },
     quaternary: {
-      main: "#a24b4d",
+      main: "#756449",
     },
     background: {
-      default: "#fef3ee",
+      default: "#fdf3eb",
       paper: "#ffffff",
     },
     red: {
@@ -83,24 +83,24 @@ const lightHigh = createTheme({
   },
 });
 
-// Dark Mode Theme
-const darkHigh = createTheme({
+// Dark theme
+const darkBravely = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: "#6B1220",
+      main: "#765f43",
     },
     secondary: {
-      main: "#725759",
+      main: "#dccdc4",
     },
     ternary: {
-      main: "#421804",
+      main: "#3E1700",
     },
     quaternary: {
-      main: "#a24b4d",
+      main: "#756449",
     },
     background: {
-      default: "#1a1a1a",
+      default: "#121212",
       paper: "#121212",
     },
     red: {
@@ -203,4 +203,4 @@ const darkHigh = createTheme({
   },
 });
 
-export { lightHigh, darkHigh };
+export { lightBravely, darkBravely };

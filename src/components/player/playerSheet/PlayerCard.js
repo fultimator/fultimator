@@ -19,6 +19,7 @@ import { ReactComponent as DefIcon } from "../../svgs/def.svg";
 import { ReactComponent as MdefIcon } from "../../svgs/mdef.svg";
 import { ReactComponent as InitIcon } from "../../svgs/init.svg";
 import { TypeAffinity } from "../stats/types";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 const AffinityGrid = styled(Grid)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -38,6 +39,7 @@ export default function PlayerCard({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -502,7 +504,7 @@ export default function PlayerCard({
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1em",
                 }}
@@ -521,7 +523,7 @@ export default function PlayerCard({
                   marginTop: "-1px",
                   marginBottom: "-1px",
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "0 8px 8px 0",
                   transform: "rotate(180deg)",
                   fontSize: "1.2rem",

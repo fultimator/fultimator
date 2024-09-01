@@ -127,8 +127,8 @@ export default function EditPublish({
               npc.published
                 ? t("This NPC is part of the Adversary Compendium.")
                 : t(
-                    "Help the Adversary Compendium grow by publishing your finished work!"
-                  )
+                  "Help the Adversary Compendium grow by publishing your finished work!"
+                )
             }
             fullWidth
             value={npc.createdBy}
@@ -171,8 +171,13 @@ export default function EditPublish({
                 <Typography variant="body2">
                   Ensure that your submission follows the
                 </Typography>
-                <Link href="#" onClick={handleDialogOpen}>
-                  Submission Guidelines for Adversary Compendium
+                <Link href="#" onClick={handleDialogOpen} style={{ textDecoration: 'none' }}>
+                  <Typography
+                    variant="body1"
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                     {t("Submission Guidelines for Adversary Compendium")}
+                  </Typography>
                 </Link>
               </Box>
               <Box

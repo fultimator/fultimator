@@ -2,23 +2,23 @@ import { createTheme } from "@mui/material/styles";
 import { PaletteOptions } from "@mui/material/styles";
 
 // Light Mode Theme
-const lightHigh = createTheme({
+const lightObscura = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: "#861628",
+      main: "#1B1F47",
     },
     secondary: {
-      main: "#cd9c9f",
+      main: "#9176AC",
     },
     ternary: {
-      main: "#fdeae1",
+      main: "#E1E7FF",
     },
     quaternary: {
-      main: "#a24b4d",
+      main: "#4C5D8B",
     },
     background: {
-      default: "#fef3ee",
+      default: "#D9E3FF",
       paper: "#ffffff",
     },
     red: {
@@ -84,20 +84,20 @@ const lightHigh = createTheme({
 });
 
 // Dark Mode Theme
-const darkHigh = createTheme({
+const darkObscura = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: "#6B1220",
+      main: "#1B1F47",
     },
     secondary: {
-      main: "#725759",
+      main: "#9176AC",
     },
     ternary: {
-      main: "#421804",
+      main: "#202325",
     },
     quaternary: {
-      main: "#a24b4d",
+      main: "#4C5D8B",
     },
     background: {
       default: "#1a1a1a",
@@ -203,4 +203,4 @@ const darkHigh = createTheme({
   },
 });
 
-export { lightHigh, darkHigh };
+export { lightObscura, darkObscura };

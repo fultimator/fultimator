@@ -4,7 +4,6 @@ import {
   Grid,
   Stack,
   Typography,
-  useTheme,
   ThemeProvider,
   Tooltip,
   IconButton,
@@ -17,9 +16,10 @@ import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function Pretty({ custom, rework }) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -31,11 +31,19 @@ function Pretty({ custom, rework }) {
 
 function PrettySingle({ arcana, showActions, rework }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+
+  const background2 = theme.mode === 'dark'
+  ? `black`
+  : `white`;
+
+  const cardBackground = theme.mode === 'dark'
+  ? `backgroundColor: "#181a1b", background: "#181a1b"`
+  : `backgroundColor: "white", background: "white"`
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(arcana.name, ref);
@@ -49,7 +57,7 @@ function PrettySingle({ arcana, showActions, rework }) {
       <Card>
         <div
           ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
+          style={{ cardBackground }}
         >
           <Stack>
             <Grid container>
@@ -59,7 +67,7 @@ function PrettySingle({ arcana, showActions, rework }) {
                   flex: "0 0 128px",
                   minWidth: "128px",
                   minHeight: "128px",
-                  background: `white`,
+                  background2,
                 }}
               >
                 <EditableImage size={128} />
@@ -73,7 +81,7 @@ function PrettySingle({ arcana, showActions, rework }) {
                   sx={{
                     px: 2,
                     py: 1,
-                    background: `${primary}`,
+                    background: `${theme.primary}`,
                     color: "#ffffff",
                     "& .MuiTypography-root": {
                       textTransform: "uppercase",
@@ -93,7 +101,7 @@ function PrettySingle({ arcana, showActions, rework }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
+                    background,
                     px: "10px",
                     py: "5px"
                   }}
@@ -143,15 +151,15 @@ function PrettySingle({ arcana, showActions, rework }) {
                 justifyContent="space-between"
                 item
                 sx={{
-                  borderTop: `1px solid ${primary}`,
+                  borderTop: `1px solid ${theme.primary}`,
                 }}
               >
                 {/* Merge Label */}
                 <Grid item xs={2} sx={{
                   textAlign: 'center',
-                  backgroundImage: `linear-gradient(to right, ${primary}, ${darken(secondary, 0.3)})`,
+                  backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                   padding: "1px",
-                  color: `${white}`,
+                  color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
                 }}>
@@ -162,7 +170,7 @@ function PrettySingle({ arcana, showActions, rework }) {
 
                 {/* Arcana Merge Name */}
                 <Grid item xs={10} sx={{
-                  backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                  background,
                   px: 3,
                   display: 'flex',
                   alignItems: 'center',
@@ -198,15 +206,15 @@ function PrettySingle({ arcana, showActions, rework }) {
                     justifyContent="space-between"
                     item
                     sx={{
-                      borderTop: `1px solid ${primary}`,
+                      borderTop: `1px solid ${theme.primary}`,
                     }}
                   >
                     {/* Pulse Grid Item */}
                     <Grid item xs={2} sx={{
                       textAlign: 'center',
-                      backgroundImage: `linear-gradient(to right, ${primary}, ${darken(secondary, 0.3)})`,
+                      backgroundImage: `linear-gradient(to right, ${theme.theme.primary}, ${darken(theme.secondary, 0.3)})`,
                       padding: "1px",
-                      color: `${white}`,
+                      color: `${theme.white}`,
                       display: 'flex',
                       alignItems: 'center',
                     }}>
@@ -217,7 +225,7 @@ function PrettySingle({ arcana, showActions, rework }) {
 
                     {/* Arcana Pulse Name */}
                     <Grid item xs={10} sx={{
-                      backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                      backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${theme.white})`,
                       px: 3,
                       display: 'flex',
                       alignItems: 'center',
@@ -253,15 +261,15 @@ function PrettySingle({ arcana, showActions, rework }) {
                 justifyContent="space-between"
                 item
                 sx={{
-                  borderTop: `1px solid ${primary}`,
+                  borderTop: `1px solid ${theme.primary}`,
                 }}
               >
                 {/* Dismiss Label */}
                 <Grid item xs={2} sx={{
                   textAlign: 'center',
-                  backgroundImage: `linear-gradient(to right, ${primary}, ${darken(secondary, 0.3)})`,
+                  backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                   padding: "1px",
-                  color: `${white}`,
+                  color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
                 }}>
@@ -272,7 +280,7 @@ function PrettySingle({ arcana, showActions, rework }) {
 
                 {/* Dismiss Name */}
                 <Grid item xs={10} sx={{
-                  backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                  background,
                   px: 3,
                   display: 'flex',
                   alignItems: 'center',

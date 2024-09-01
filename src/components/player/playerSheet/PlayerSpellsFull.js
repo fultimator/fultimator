@@ -5,13 +5,14 @@ import { useTranslate } from "../../../translation/translate";
 import SpellDefault from "../spells/SpellDefault";
 import SpellArcanist from "../spells/SpellArcanist";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   return (
     <>
@@ -65,7 +66,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                         textTransform: "uppercase",
                         padding: "5px", // Adjust padding instead of margins
                         backgroundColor: primary,
-                        color: ternary,
+                        color: custom.white,
                         borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                         fontSize: "1.5em",
                       }}
@@ -232,7 +233,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                         textTransform: "uppercase",
                         padding: "5px", // Adjust padding instead of margins
                         backgroundColor: primary,
-                        color: ternary,
+                        color: custom.white,
                         borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                         fontSize: "1.5em",
                       }}

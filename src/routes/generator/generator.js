@@ -29,6 +29,7 @@ import Arcana from "../equip/Arcana/Arcana";
 import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from '../../components/common/CustomHeaderAlt';
 import CopyToClipboard from '../../components/common/CopyToClipboard';
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 const powerPMs = {
   minor: 20,
@@ -565,9 +566,10 @@ const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 
 function QualitiesGenerator() {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
   const [selectedDamageType, setSelectedDamageType] = useState("All");
   const [selectedSpecies, setSelectedSpecies] = useState("All");
   const [selectedAttributes, setSelectedAttributes] = useState("All");
@@ -695,7 +697,7 @@ function QualitiesGenerator() {
           p: "14px",
           borderRadius: "8px",
           border: "2px solid",
-          borderColor: secondary,
+          borderColor: theme.secondary,
         }}
       >
         {/* Header */}
@@ -778,7 +780,7 @@ function QualitiesGenerator() {
 
         <Paper
           sx={{
-            background: `linear-gradient(to right, ${ternary}, transparent)`,
+            background,
             padding: 2,
             display: "flex",
             justifyContent: "flex-start",

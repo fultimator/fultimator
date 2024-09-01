@@ -4,19 +4,20 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
-import { useTheme } from '@mui/system';
-import { Grid, Tooltip, Box } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import { Grid, Tooltip, Box } from '@mui/material';
 import { SvgIconComponent } from '@mui/icons-material';
+import { useCustomTheme } from '../../hooks/useCustomTheme';
 
 interface CustomHeaderProps {
     addItem: () => void;
     openCompendium: () => void;
     headerText: string;
-    type: 'top' | 'middle';
-    icon?: SvgIconComponent; // Optional icon prop
-    showIconButton?: boolean; // Optional prop to control icon button visibility
-    disableIconButton?: boolean; // Optional prop to control icon button clickability
-    customTooltip?: string; // Optional prop to add custom tooltip
+    type: "top" | "middle";
+    icon?: SvgIconComponent;
+    showIconButton?: boolean;
+    disableIconButton?: boolean;
+    customTooltip?: string;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -29,29 +30,26 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
     disableIconButton = false,
     customTooltip = '',
 }) => {
-    const theme = useTheme();
-    const primary = theme.palette.primary.main;
-    const secondary = theme.palette.secondary.main;
-    const ternary = theme.palette.ternary.main;
-
+    const theme = useCustomTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const isTop = type === 'top';
     const isMiddle = type === 'middle';
 
     return (
-        <>
+        <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
             {isTop && (
-                <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
+                <>
                     <Typography
                         variant="h2"
                         component="legend"
                         sx={{
-                            color: primary,
-                            background: `linear-gradient(to right, ${ternary}, transparent, ${ternary})`,
+                            color: theme.white,
+                            background: theme.primary,
                             textTransform: 'uppercase',
                             padding: '0 5px',
-                            borderRadius: '8px 8px 0 0',
-                            margin: '-30px 0 0 -30px',
-                            fontSize: '1.5em',
+                            borderRadius: type === "top" ? "6px 6px 0 0" : 0,
+                            margin: type === "top" ? "-30px 0 0 -30px" : "0 0 0 -30px",
+                            fontSize: isMobile ? "1em" : "1.5em",
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
@@ -61,10 +59,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         <div style={{ marginLeft: '15px' }}>{headerText}</div>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {openCompendium && (
-                                <Tooltip title={"Open Compendium"}>
+                                <Tooltip title="Open Compendium">
                                     <IconButton
-                                        sx={{ px: 1, '&:hover': { color: primary } }}
+                                        sx={{
+                                            px: 1,
+                                            color: theme.white,
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                transition: 'background-color 0.3s ease',
+                                            },
+                                        }}
                                         onClick={openCompendium}
+                                        aria-label="Open Compendium"
                                     >
                                         <SearchIcon fontSize="large" />
                                     </IconButton>
@@ -74,10 +80,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                                 disableIconButton ? (
                                     <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
                                 ) : (
-                                    <Tooltip title={"Add " + headerText}>
+                                    <Tooltip title={customTooltip || `Add ${headerText}`}>
                                         <IconButton
-                                            sx={{ px: 1, '&:hover': { color: primary } }}
+                                            sx={{
+                                                px: 1,
+                                                color: theme.white,
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                    transition: 'background-color 0.3s ease',
+                                                },
+                                            }}
                                             onClick={addItem}
+                                            aria-label={`Add ${headerText}`}
                                         >
                                             <Icon fontSize="large" />
                                         </IconButton>
@@ -91,23 +105,23 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                     <Divider
                         orientation="horizontal"
                         sx={{
-                            color: secondary,
-                            borderBottom: '2px solid',
-                            borderColor: secondary,
+                            color: theme.secondary,
+                            outlineBottom: '2px solid',
+                            outlineColor: theme.secondary,
                             margin: '0 0 0 -30px',
                         }}
                     />
-                </Grid>
+                </>
             )}
 
             {isMiddle && (
-                <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
+                <>
                     <Divider
                         orientation="horizontal"
                         sx={{
-                            color: secondary,
-                            borderBottom: '2px solid',
-                            borderColor: secondary,
+                            color: theme.secondary,
+                            outlineBottom: '2px solid',
+                            outlineColor: theme.secondary,
                             margin: '0 0 0 -30px',
                         }}
                     />
@@ -115,13 +129,13 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         variant="h2"
                         component="legend"
                         sx={{
-                            color: primary,
-                            background: `linear-gradient(to right, ${ternary}, transparent, ${ternary})`,
+                            color: theme.white,
+                            background: theme.primary,
                             textTransform: 'uppercase',
                             padding: '0 5px',
                             borderRadius: 0,
                             margin: '0 0 0 -30px',
-                            fontSize: '1.5em',
+                            fontSize: isMobile ? "1em" : "1.5em",
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
@@ -131,10 +145,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                         <div style={{ marginLeft: '15px' }}>{headerText}</div>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {openCompendium && (
-                                <Tooltip title={"Open Compendium"}>
+                                <Tooltip title={customTooltip || 'Open Compendium'}>
                                     <IconButton
-                                        sx={{ px: 1, '&:hover': { color: primary } }}
+                                        sx={{
+                                            px: 1,
+                                            color: theme.white,
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                transition: 'background-color 0.3s ease',
+                                            },
+                                        }}
                                         onClick={openCompendium}
+                                        aria-label="Open Compendium"
                                     >
                                         <SearchIcon fontSize="large" />
                                     </IconButton>
@@ -144,10 +166,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                                 disableIconButton ? (
                                     <Icon fontSize="large" sx={{ px: 1, fontSize: '2.45em' }} />
                                 ) : (
-                                    <Tooltip title={"Add " + headerText}>
+                                    <Tooltip title={customTooltip || `Add ${headerText}`}>
                                         <IconButton
-                                            sx={{ px: 1, '&:hover': { color: primary } }}
+                                            sx={{
+                                                px: 1,
+                                                color: theme.white,
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                    transition: 'background-color 0.3s ease',
+                                                },
+                                            }}
                                             onClick={addItem}
+                                            aria-label={`Add ${headerText}`}
                                         >
                                             <Icon fontSize="large" />
                                         </IconButton>
@@ -161,15 +191,15 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                     <Divider
                         orientation="horizontal"
                         sx={{
-                            color: secondary,
-                            borderBottom: '2px solid',
-                            borderColor: 'secondary',
+                            color: theme.secondary,
+                            outlineBottom: '2px solid',
+                            outlineColor: theme.secondary,
                             margin: '0 0 0 -30px',
                         }}
                     />
-                </Grid>
+                </>
             )}
-        </>
+        </Grid>
     );
 };
 

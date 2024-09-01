@@ -3,7 +3,6 @@ import {
   Grid,
   Stack,
   Typography,
-  useTheme,
   darken,
   IconButton,
   Tooltip,
@@ -14,15 +13,15 @@ import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Edit from "@mui/icons-material/Edit";
 import { VisibilityOff } from "@mui/icons-material";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
-
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const backgroundColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
   const StyledMarkdown = styled(ReactMarkdown)({
     whiteSpace: "pre-line",
   });
@@ -33,7 +32,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
   return (
     <>
       <Card sx={{ marginBottom: 2 }}>
-        <div style={{ backgroundColor: "white", background: "white" }}>
+        <div style={{ background: `${backgroundColor}` }}>
           <Stack>
             <Grid container>
               <Grid container direction="column" item xs>
@@ -44,7 +43,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   sx={{
                     px: 2,
                     py: 1,
-                    background: `${primary}`,
+                    background: `${theme.primary}`,
                     color: "#ffffff",
                     "& .MuiTypography-root": {
                       textTransform: "uppercase",
@@ -68,7 +67,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   justifyContent="space-between"
                   alignItems="center"
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
+                    background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: "10px",
                     py: "5px",
                     flexGrow: 1,
@@ -108,7 +107,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                         </Tooltip>
                       )}
                       <IconButton size="small" onClick={onEdit}>
-                        <Edit style={{ color: "black" }} />
+                        <Edit style={{ color:  iconColor }} />
                       </IconButton>
                     </Grid>
                   )}
@@ -155,7 +154,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 justifyContent="space-between"
                 item
                 sx={{
-                  borderTop: `1px solid ${primary}`,
+                  borderTop: `1px solid ${theme.primary}`,
                 }}
               >
                 {/* Merge Label */}
@@ -164,12 +163,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   xs={2}
                   sx={{
                     textAlign: "center",
-                    backgroundImage: `linear-gradient(to right, ${primary}, ${darken(
-                      secondary,
+                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
+                      theme.secondary,
                       0.3
                     )})`,
                     padding: "1px",
-                    color: `${white}`,
+                    color: `${theme.white}`,
                     display: "flex",
                     alignItems: "center",
                   }}
@@ -188,7 +187,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   item
                   xs={10}
                   sx={{
-                    backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                    backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: 3,
                     display: "flex",
                     alignItems: "center",
@@ -242,7 +241,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     justifyContent="space-between"
                     item
                     sx={{
-                      borderTop: `1px solid ${primary}`,
+                      borderTop: `1px solid ${theme.primary}`,
                     }}
                   >
                     {/* Pulse Grid Item */}
@@ -251,12 +250,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                       xs={2}
                       sx={{
                         textAlign: "center",
-                        backgroundImage: `linear-gradient(to right, ${primary}, ${darken(
-                          secondary,
+                        backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
+                          theme.secondary,
                           0.3
                         )})`,
                         padding: "1px",
-                        color: `${white}`,
+                        color: `${theme.white}`,
                         display: "flex",
                         alignItems: "center",
                       }}
@@ -275,7 +274,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                       item
                       xs={10}
                       sx={{
-                        backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                        backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                         px: 3,
                         display: "flex",
                         alignItems: "center",
@@ -329,7 +328,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 justifyContent="space-between"
                 item
                 sx={{
-                  borderTop: `1px solid ${primary}`,
+                  borderTop: `1px solid ${theme.primary}`,
                 }}
               >
                 {/* Dismiss Label */}
@@ -338,12 +337,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   xs={2}
                   sx={{
                     textAlign: "center",
-                    backgroundImage: `linear-gradient(to right, ${primary}, ${darken(
-                      secondary,
+                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
+                      theme.secondary,
                       0.3
                     )})`,
                     padding: "1px",
-                    color: `${white}`,
+                    color: `${theme.white}`,
                     display: "flex",
                     alignItems: "center",
                   }}
@@ -362,7 +361,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   item
                   xs={10}
                   sx={{
-                    backgroundImage: `linear-gradient(to right, ${ternary}, ${white})`,
+                    backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: 3,
                     display: "flex",
                     alignItems: "center",

@@ -6,13 +6,14 @@ import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import Clock from "./Clock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerNotes({ player, setPlayer, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
     "& ul, & ol": {
@@ -83,7 +84,7 @@ export default function PlayerNotes({ player, setPlayer, isCharacterSheet }) {
                 textTransform: "uppercase",
                 padding: "5px",
                 backgroundColor: primary,
-                color: ternary,
+                color: custom.white,
                 borderRadius: "8px 8px 0 0",
                 fontSize: "1.5em",
               }}

@@ -1,17 +1,26 @@
 import React, { useRef } from "react";
 import { useTranslate } from "../../../../translation/translate";
-import { useTheme, Typography, Stack, Grid, Card } from "@mui/material";
+import { Typography, Stack, Grid, Card } from "@mui/material";
 import { Martial } from "../../../icons";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
+import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
 export default function PrettyArmor({ armor, showActions }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+
+  const background2 = theme.mode === 'dark'
+  ? `black`
+  : `white`;
+
+  const cardBackground = theme.mode === 'dark'
+  ? `backgroundColor: "#181a1b", background: "#181a1b"`
+  : `backgroundColor: "white", background: "white"`
 
   const ref = useRef();
 
@@ -24,7 +33,7 @@ export default function PrettyArmor({ armor, showActions }) {
       <Card>
         <div
           ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
+          style={{ cardBackground }}
         >
           <Stack>
             <Grid
@@ -33,7 +42,7 @@ export default function PrettyArmor({ armor, showActions }) {
               alignItems="center"
               sx={{
                 p: 1,
-                background: `${primary}`,
+                background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.6rem", sm: "1.2rem" },
@@ -78,8 +87,8 @@ export default function PrettyArmor({ armor, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
-                    borderBottom: `1px solid ${secondary}`,
+                    background,
+                    borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
                     "& .MuiTypography-root": {
                       fontSize: { xs: "0.7rem", sm: "1.0rem" },
@@ -152,7 +161,7 @@ export default function PrettyArmor({ armor, showActions }) {
                   container
                   justifyContent="flex-start"
                   sx={{
-                    background: "transparent",
+                    background2,
                     padding: "5px",
                     px: 1,
                     py: 1,
@@ -161,7 +170,7 @@ export default function PrettyArmor({ armor, showActions }) {
                   <div
                     style={{
                       fontSize: "0.7rem",
-                      background: "transparent",
+                      background2,
                     }}
                   >
                     <Typography fontSize={{ xs: "0.7rem", sm: "1.0rem" }}>

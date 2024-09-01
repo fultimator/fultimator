@@ -4,6 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
 import Pretty from "../../npc/Pretty";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerCompanion({
   player,
@@ -12,9 +13,9 @@ export default function PlayerCompanion({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
   const navigate = useNavigate(); // useNavigate instead of useHistory
 
   // Check if the player has a faithful companion skill
@@ -68,7 +69,7 @@ export default function PlayerCompanion({
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1.5em",
                 }}
@@ -91,7 +92,7 @@ export default function PlayerCompanion({
                   marginTop: "-1px",
                   marginBottom: "-1px",
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "0 8px 8px 0",
                   transform: "rotate(180deg)",
                   fontSize: "2em",

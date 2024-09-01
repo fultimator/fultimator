@@ -16,12 +16,14 @@ import logo from "./../logo.webp";
 import logo929 from "./../logo_929.webp";
 import logo1400 from "./../logo_1400.webp";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Midnight";
+type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
 
 interface AppBarProps {
   isNpcEdit: boolean;
   selectedTheme: ThemeValue;
   handleSelectTheme: (theme: ThemeValue) => void;
+  isDarkMode: boolean;
+  handleToggleDarkMode: () => void;
   showGoBackButton: boolean;
   handleNavigation: () => void;
 }
@@ -41,6 +43,8 @@ const AppBar: React.FC<AppBarProps> = ({
   isNpcEdit,
   selectedTheme,
   handleSelectTheme,
+  isDarkMode,
+  handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
 }) => {
@@ -122,6 +126,8 @@ const AppBar: React.FC<AppBarProps> = ({
                   <MenuOption
                     selectedTheme={selectedTheme}
                     onSelectTheme={handleSelectTheme}
+                    isDarkMode={isDarkMode}
+                    onToggleDarkMode={handleToggleDarkMode}
                   />
                 </Grid>
               </Grid>

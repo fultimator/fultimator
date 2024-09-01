@@ -3,7 +3,6 @@ import {
   Typography,
   IconButton,
   Grid,
-  useTheme,
   ThemeProvider,
   Icon,
   Tooltip,
@@ -15,6 +14,7 @@ import { OffensiveSpellIcon } from "../../icons"; // Ensure this path is correct
 import attributes from "../../../libs/attributes";
 import { CloseBracket, OpenBracket } from "../../Bracket";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 const StyledMarkdown = styled(ReactMarkdown)({
   whiteSpace: "pre-line",
@@ -37,11 +37,10 @@ function ThemedSpellDefault({
   index,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
 
   return (
     <>
@@ -49,12 +48,12 @@ function ThemedSpellDefault({
       {index === 0 && (
         <div
           style={{
-            backgroundColor: primary,
+            backgroundColor: theme.primary,
             fontFamily: "Antonio",
             fontWeight: "normal",
             fontSize: "1.1em",
             padding: "2px 17px",
-            color: white,
+            color: theme.white,
             textTransform: "uppercase",
             display: "flex",
             justifyContent: "space-between",
@@ -132,12 +131,12 @@ function ThemedSpellDefault({
       {/* Row 2 */}
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${secondary}`,
-          borderBottom: `1px solid ${secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -221,7 +220,7 @@ function ThemedSpellDefault({
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -235,7 +234,7 @@ function ThemedSpellDefault({
           background: "transparent",
           padding: "3px 17px",
           marginBottom: "6px",
-          borderBottom: `1px solid ${secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid item xs={12}>
@@ -271,7 +270,7 @@ function ThemedSpellDefault({
 }
 
 export default function SpellDefault(props) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <ThemedSpellDefault {...props} />

@@ -4,7 +4,6 @@ import {
   Grid,
   Stack,
   Typography,
-  useTheme,
   ThemeProvider,
   Tooltip,
   IconButton,
@@ -16,9 +15,10 @@ import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function Pretty({ custom }) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -30,11 +30,19 @@ function Pretty({ custom }) {
 
 function PrettySingle({ accessory, showActions }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+
+  const background2 = theme.mode === 'dark'
+  ? `black`
+  : `white`;
+
+  const cardBackground = theme.mode === 'dark'
+  ? `backgroundColor: "#181a1b", background: "#181a1b"`
+  : `backgroundColor: "white", background: "white"`
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(accessory.name, ref);
@@ -48,7 +56,7 @@ function PrettySingle({ accessory, showActions }) {
       <Card>
         <div
           ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
+          style={{ cardBackground }}
         >
           <Stack>
             <Grid
@@ -57,7 +65,7 @@ function PrettySingle({ accessory, showActions }) {
               alignItems="center"
               sx={{
                 p: 1,
-                background: `${primary}`,
+                background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
                   fontSize: "1.2rem",
@@ -84,7 +92,7 @@ function PrettySingle({ accessory, showActions }) {
                   flex: "0 0 70px",
                   minWidth: "70px",
                   minHeight: "70px",
-                  background: `white`,
+                  background2,
                 }}
               >
                 <EditableImage size={70} />
@@ -97,8 +105,8 @@ function PrettySingle({ accessory, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
-                    borderBottom: `1px solid ${secondary}`,
+                    background,
+                    borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
                   }}
                 >
@@ -115,7 +123,7 @@ function PrettySingle({ accessory, showActions }) {
                   container
                   justifyContent="flex-start"
                   sx={{
-                    background: "transparent",
+                    background2,
                     padding: "5px",
                   }}
                 >

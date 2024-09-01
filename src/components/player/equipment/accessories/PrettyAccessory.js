@@ -1,16 +1,25 @@
 import { useRef } from "react";
-import { Card, Grid, Stack, Typography, useTheme } from "@mui/material";
+import { Card, Grid, Stack, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
+import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
 function PrettyAccessory({ accessory, showActions }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+
+  const background2 = theme.mode === 'dark'
+  ? `black`
+  : `white`;
+
+  const cardBackground = theme.mode === 'dark'
+  ? `backgroundColor: "#181a1b", background: "#181a1b"`
+  : `backgroundColor: "white", background: "white"`
 
   const ref = useRef();
 
@@ -23,7 +32,7 @@ function PrettyAccessory({ accessory, showActions }) {
       <Card>
         <div
           ref={ref}
-          style={{ backgroundColor: "white", background: "white" }}
+          style={{ cardBackground }}
         >
           <Stack>
             <Grid
@@ -32,7 +41,7 @@ function PrettyAccessory({ accessory, showActions }) {
               alignItems="center"
               sx={{
                 p: 1,
-                background: `${primary}`,
+                background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
                     fontSize: { xs: "0.6rem", sm: "1.2rem" },
@@ -60,8 +69,8 @@ function PrettyAccessory({ accessory, showActions }) {
                   justifyContent="space-between"
                   item
                   sx={{
-                    background: `linear-gradient(to right, ${ternary}, ${white})`,
-                    borderBottom: `1px solid ${secondary}`,
+                    background,
+                    borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
                     "& .MuiTypography-root": {
                       fontSize: { xs: "0.7rem", sm: "1.0rem" },
@@ -81,7 +90,7 @@ function PrettyAccessory({ accessory, showActions }) {
                   container
                   justifyContent="flex-start"
                   sx={{
-                    background: "transparent",
+                    background2,
                     padding: "5px",
                   }}
                 >

@@ -17,6 +17,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import Clock from "./Clock";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerRituals({
   player,
@@ -29,9 +30,9 @@ export default function PlayerRituals({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
@@ -144,7 +145,7 @@ export default function PlayerRituals({
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1.5em",
                 }}
@@ -163,7 +164,7 @@ export default function PlayerRituals({
                   marginTop: "-1px",
                   marginBottom: "-1px",
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "0 8px 8px 0",
                   transform: "rotate(180deg)",
                   fontSize: "2em",

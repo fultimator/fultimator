@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
-import { TextareaAutosize, useTheme, Button } from "@mui/material";
+import { TextareaAutosize, Button } from "@mui/material";
+import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
   label: string;
@@ -28,9 +29,11 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   maxRows,
   maxLength,
 }) => {
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
   const [isFocused, setIsFocused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(true);
@@ -43,20 +46,14 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   }, [onBlur]);
 
   const handleMouseOver = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!isFocused) {
-      e.currentTarget.style.outlineColor = "black";
-    }
+    setIsHovered(true);
     if (onMouseOver) onMouseOver(e);
-  }, [isFocused, onMouseOver]);
+  }, [onMouseOver]);
 
   const handleMouseOut = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    if (!isFocused) {
-      e.currentTarget.style.outlineColor = primary;
-    }
+    setIsHovered(false);
     if (onMouseOut) onMouseOut(e);
-  }, [isFocused, onMouseOut, primary]);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  }, [onMouseOut]);
 
   const handleFormat = useCallback((format: string) => {
     const textarea = textareaRef.current;
@@ -92,35 +89,45 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     textarea.focus();
   }, [value, onChange]);
 
+  const { fontFamily, fontSize } = theme.typography.body1;
+
   const textareaStyle: React.CSSProperties = {
     width: "100%",
     padding: "14px",
     fontSize: "1rem",
-    fontFamily: "inherit",
+    lineHeight: fontSize,
+    fontFamily: fontFamily,
     borderRadius: "4px",
-    border: isFocused ? "none" : "1px solid #c4c4c4",
-    outline: "none",
+    border: isFocused ? "none" : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)"}`,
+    outline: isHovered && !isFocused ? `1px solid white` : "none",
     resize: "vertical",
-    boxShadow: isFocused ? `0 0 0 2px ${primary}` : "none",
-    backgroundColor: readOnly ? "#f5f5f5" : "white",
+    boxShadow: isFocused ? `0 0 0 1px ${isDarkMode ? "#ffffff": theme.primary}` : "none",
+    backgroundColor: readOnly ? "#f5f5f5" : `${theme.transparent}`,
     cursor: readOnly ? "not-allowed" : "text",
+    color: isDarkMode ? "white" : "black",
+    transition: 'border 0.3s ease, box-shadow 0.3s ease',
+    display: "flex",
+    alignItems: "center",
   };
 
   const labelStyle: React.CSSProperties = {
     position: "absolute",
     padding: "0 2px",
-    top: isFocused || value ? "-8px" : "12px",
-    background: "white",
+    top: isFocused || value ? "-8px" : "16px",
+    backgroundColor: isDarkMode ? "#252525" : "white",
     left: "14px",
     transition: "top 0.2s ease, font-size 0.2s ease",
     fontSize: isFocused || value ? "0.8rem" : "1rem",
-    color: isFocused ? primary : "#757575",
+    lineHeight: fontSize,
+    fontFamily: fontFamily,
+    color: isFocused ? (isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'black') : (isDarkMode ? '#b0b0b0' : 'black'),
     pointerEvents: "none",
+    borderRadius: "4px",
   };
 
   const helperStyle: React.CSSProperties = {
     fontSize: "0.8rem",
-    color: "#757575",
+    color: isDarkMode ? "white" : "#252525",
     marginTop: "4px",
     marginRight: "14px",
     marginBottom: "0",
@@ -132,24 +139,23 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     top: "-10px",
     right: "10px",
     display: "flex",
-    border: `1px solid ${primary}`,
+    border: isFocused 
+    ? `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'rgba(0, 0, 0, 0.87)'}` 
+    : `1px solid ${isDarkMode ? '#b0b0b0' : theme.ternary}`,
+  outline: isHovered && !isFocused ? `1px solid white` : "none",
     borderRadius: "50px",
     overflow: "hidden",
-    backgroundColor: "white",
+    backgroundColor: isDarkMode ? "#252525" : `${theme.ternary}`,
   };
 
-  const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } = {
+  const buttonStyle: React.CSSProperties = {
     fontSize: "12px",
     padding: "0",
     marginRight: "8px",
     transition: "font-weight 0.3s ease",
     fontWeight: "normal",
+    color: isDarkMode ? "white" : "black",
   };
-
-  buttonStyle["&:hover"] = {
-    fontWeight: "bold",
-  };
-
   return (
     <div style={{ position: "relative", margin: "5px 0" }}>
       <div style={toolbarStyle}>
