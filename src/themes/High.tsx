@@ -91,7 +91,7 @@ const darkHigh = createTheme({
       main: "#6B1220",
     },
     secondary: {
-      main: "#cd9c9f",
+      main: "#725759",
     },
     ternary: {
       main: "#421804",
@@ -164,9 +164,20 @@ const darkHigh = createTheme({
     },
   },
   components: {
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: "#b0b0b0",
+          '&.Mui-focused': {
+            color: "#ffffff",
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         outlined: {
+          borderColor: "rgba(255, 255, 255, 0.23)",
           color: "#ffffff",
           '&:hover': {
             borderColor: "#ffffff",
@@ -180,12 +191,8 @@ const darkHigh = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              // borderColor: "#ffffff",
-            },
-            '&:hover fieldset': {
-              // borderColor: "#ffffff",
-            },
+            '& fieldset': {},
+            '&:hover fieldset': {},
             '&.Mui-focused fieldset': {
               borderColor: "#ffffff",
             },

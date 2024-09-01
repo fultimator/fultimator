@@ -89,30 +89,38 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     textarea.focus();
   }, [value, onChange]);
 
+  const { fontFamily, fontSize } = theme.typography.body1;
+
   const textareaStyle: React.CSSProperties = {
     width: "100%",
     padding: "14px",
     fontSize: "1rem",
-    fontFamily: "inherit",
+    lineHeight: fontSize,
+    fontFamily: fontFamily,
     borderRadius: "4px",
-    border: isFocused ? "none" : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "#c4c4c4"}`,
-    outline: isHovered ? `2px solid white` : "none",  // Outline when hovered
+    border: isFocused ? "none" : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)"}`,
+    outline: isHovered && !isFocused ? `1px solid white` : "none",
     resize: "vertical",
-    boxShadow: isFocused ? `0 0 0 2px ${theme.primary}` : "none",
+    boxShadow: isFocused ? `0 0 0 1px ${isDarkMode ? "#ffffff": theme.primary}` : "none",
     backgroundColor: readOnly ? "#f5f5f5" : `${theme.transparent}`,
     cursor: readOnly ? "not-allowed" : "text",
     color: isDarkMode ? "white" : "black",
+    transition: 'border 0.3s ease, box-shadow 0.3s ease',
+    display: "flex",
+    alignItems: "center",
   };
 
   const labelStyle: React.CSSProperties = {
     position: "absolute",
     padding: "0 2px",
-    top: isFocused || value ? "-8px" : "12px",
+    top: isFocused || value ? "-8px" : "16px",
     backgroundColor: isDarkMode ? "#252525" : "white",
     left: "14px",
     transition: "top 0.2s ease, font-size 0.2s ease",
     fontSize: isFocused || value ? "0.8rem" : "1rem",
-    color: isFocused ? `${theme.primary}` : isDarkMode ? "white" : "black",
+    lineHeight: fontSize,
+    fontFamily: fontFamily,
+    color: isFocused ? (isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'black') : (isDarkMode ? '#b0b0b0' : 'black'),
     pointerEvents: "none",
     borderRadius: "4px",
   };
@@ -131,13 +139,16 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     top: "-10px",
     right: "10px",
     display: "flex",
-    border: `1px solid ${theme.primary}`,
+    border: isFocused 
+    ? `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'rgba(0, 0, 0, 0.87)'}` 
+    : `1px solid ${isDarkMode ? '#b0b0b0' : theme.ternary}`,
+  outline: isHovered && !isFocused ? `1px solid white` : "none",
     borderRadius: "50px",
     overflow: "hidden",
     backgroundColor: isDarkMode ? "#252525" : `${theme.ternary}`,
   };
 
-  const buttonStyle: React.CSSProperties & { "&:hover"?: React.CSSProperties } = {
+  const buttonStyle: React.CSSProperties = {
     fontSize: "12px",
     padding: "0",
     marginRight: "8px",
@@ -145,11 +156,6 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     fontWeight: "normal",
     color: isDarkMode ? "white" : "black",
   };
-
-  buttonStyle["&:hover"] = {
-    fontWeight: "bold",
-  };
-
   return (
     <div style={{ position: "relative", margin: "5px 0" }}>
       <div style={toolbarStyle}>

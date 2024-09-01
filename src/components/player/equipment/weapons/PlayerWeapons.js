@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@mui/material/styles";
 import {
   Grid,
-  Typography,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyWeapon from "./PrettyWeapon";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
+import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
+import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
 export default function PlayerWeapons({
   player,
@@ -24,10 +22,7 @@ export default function PlayerWeapons({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -143,32 +138,18 @@ export default function PlayerWeapons({
         p: "15px",
         borderRadius: "8px",
         border: "2px solid",
-        borderColor: secondary,
+        borderColor: theme.secondary,
         marginBottom: 3,
       }}
       expanded={expanded}
       onChange={handleAccordionChange}
     >
-      <AccordionSummary
-        expandIcon={<ArrowDownwardIcon />}
-        aria-controls="panel1-content"
-        id="panel1-header"
-      >
-        <Typography
-          variant="h2"
-          component="legend"
-          sx={{
-            color: primary,
-            textTransform: "uppercase",
-            padding: "5px 10px",
-            borderRadius: 0,
-            margin: "0 0 0 0",
-            fontSize: "1.5em",
-          }}
-        >
-          {t("Weapons")}
-        </Typography>
-      </AccordionSummary>
+      <CustomHeaderAccordion
+        expanded={expanded}
+        handleAccordionChange={handleAccordionChange}
+        headerText={t("Weapon")}
+        showIconButton={false}
+      />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
@@ -211,7 +192,7 @@ export default function PlayerWeapons({
                           sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
                         >
                           <Equip
-                            color={weapon.isEquipped ? "green" : ternary}
+                            color={weapon.isEquipped ? "green" : theme.ternary}
                             strokeColor={"#000"}
                           />
                         </IconButton>

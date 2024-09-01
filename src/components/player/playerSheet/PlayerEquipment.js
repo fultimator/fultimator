@@ -19,6 +19,7 @@ import PrettyArmor from "../equipment/armor/PrettyArmor";
 import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerEquipment({
   player,
@@ -28,6 +29,7 @@ export default function PlayerEquipment({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -420,7 +422,7 @@ export default function PlayerEquipment({
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1.5em",
                 }}
@@ -440,7 +442,7 @@ export default function PlayerEquipment({
                   marginBottom: "-1px",
                   paddingY: "10px",
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "0 8px 8px 0",
                   transform: "rotate(180deg)",
                   fontSize: "2em",

@@ -3,7 +3,6 @@ import {
   Typography,
   IconButton,
   Grid,
-  useTheme,
   ThemeProvider,
   Icon,
   Tooltip,
@@ -11,14 +10,14 @@ import {
 import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
 
   return (
     <>
@@ -26,12 +25,12 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
 
       <div
         style={{
-          backgroundColor: primary,
+          backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
           padding: "2px 17px",
-          color: white,
+          color: theme.white,
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
@@ -117,12 +116,12 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       {/* Row 2 */}
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${secondary}`,
-          borderBottom: `1px solid ${secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -205,7 +204,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -218,7 +217,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
         sx={{
           background: "transparent",
           marginBottom: "6px",
-          borderBottom: `1px solid ${secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         {gamble.targets.map((target, index) => (
@@ -226,7 +225,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             container
             key={index}
             sx={{
-              background: ternary,
+              background: theme.ternary,
               borderTop: `1px solid white`,
               borderBottom: `1px solid white`,
               padding: "3px 17px",
@@ -296,7 +295,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
 }
 
 export default function SpellEntropistGamble(props) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <ThemedSpellEntropistGamble {...props} />

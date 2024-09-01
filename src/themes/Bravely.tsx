@@ -164,9 +164,20 @@ const darkBravely = createTheme({
     },
   },
   components: {
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: "#b0b0b0",
+          '&.Mui-focused': {
+            color: "#ffffff",
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         outlined: {
+          borderColor: "rgba(255, 255, 255, 0.23)",
           color: "#ffffff",
           '&:hover': {
             borderColor: "#ffffff",
@@ -180,12 +191,8 @@ const darkBravely = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              // borderColor: "#ffffff",
-            },
-            '&:hover fieldset': {
-              // borderColor: "#ffffff",
-            },
+            '& fieldset': {},
+            '&:hover fieldset': {},
             '&.Mui-focused fieldset': {
               borderColor: "#ffffff",
             },

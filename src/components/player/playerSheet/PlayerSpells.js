@@ -24,10 +24,12 @@ import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
 import { OpenBracket, CloseBracket } from "../../Bracket";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -435,7 +437,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 marginBottom: "-1px",
                 paddingY: "10px",
                 backgroundColor: primary,
-                color: ternary,
+                color: custom.white,
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "2em",

@@ -15,6 +15,8 @@ import PrettyArmor from "./PrettyArmor";
 import { Edit, Error } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
+import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
+import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
 export default function PlayerArmor({
   player,
@@ -24,10 +26,7 @@ export default function PlayerArmor({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -105,32 +104,18 @@ export default function PlayerArmor({
         p: "15px",
         borderRadius: "8px",
         border: "2px solid",
-        borderColor: secondary,
+        borderColor: theme.secondary,
         marginBottom: 3,
       }}
       expanded={expanded}
       onChange={handleAccordionChange}
     >
-      <AccordionSummary
-        expandIcon={<ArrowDownwardIcon />}
-        aria-controls="panel1-content"
-        id="panel1-header"
-      >
-        <Typography
-          variant="h2"
-          component="legend"
-          sx={{
-            color: primary,
-            textTransform: "uppercase",
-            padding: "5px 10px",
-            borderRadius: 0,
-            margin: "0 0 0 0",
-            fontSize: "1.5em",
-          }}
-        >
-          {t("Armor")}
-        </Typography>
-      </AccordionSummary>
+      <CustomHeaderAccordion
+        expanded={expanded}
+        handleAccordionChange={handleAccordionChange}
+        headerText={t("Armor")}
+        showIconButton={false}
+      />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
@@ -173,7 +158,7 @@ export default function PlayerArmor({
                           sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
                         >
                           <Equip
-                            color={armorItem.isEquipped ? "green" : ternary}
+                            color={armorItem.isEquipped ? "green" : theme.ternary}
                             strokeColor={"#000"}
                           />
                         </IconButton>

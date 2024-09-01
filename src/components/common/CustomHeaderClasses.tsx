@@ -31,7 +31,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
 }) => {
 
   const theme = useCustomTheme();
-
+  
   const background = theme.mode === 'dark'
   ? `181a1b`
   : `white`;
@@ -45,8 +45,8 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
         variant="h2"
         component="legend"
         sx={{
-          color: theme.primary,
-          background: `linear-gradient(to right, ${theme.ternary}, transparent, ${theme.ternary})`,
+          color: theme.white,
+          backgroundColor: theme.primary,
           textTransform: "uppercase",
           padding: "5px 10px",
           borderRadius: type === "top" ? "8px 8px 0 0" : 0,
@@ -64,10 +64,10 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             sx={{ px: 1, "&:hover": { color: theme.primary } }}
             onClick={editClassName}
           >
-            <Edit fontSize="large" />
+            <Edit fontSize="large" style={{ color: "white" }}/>
           </IconButton>
         </Tooltip>}
-        <div style={{ flex: 1, textAlign: "left", paddingBottom: 7, paddingLeft: isEditMode ? 0 : 10 }}>
+        <div style={{ flex: 1, textAlign: "left", paddingLeft: isEditMode ? 0 : 10 }}>
           {headerText}
         </div>
         <div
@@ -77,7 +77,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             alignItems: "center",
           }}
         >
-          <div style={{ marginRight: "10px", paddingBottom: 7 }}>
+          <div style={{ marginRight: "10px" }}>
             {rightHeaderText}
           </div>
           <TextField

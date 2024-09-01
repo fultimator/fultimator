@@ -14,14 +14,14 @@ import {
 import { Edit, VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
 
   const showInPlayerSheet =
     infusion.showInPlayerSheet || infusion.showInPlayerSheet === undefined;
@@ -39,7 +39,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
     <>
       <Accordion sx={{ marginY: 1 }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <Icon sx={{ color: primary, marginRight: 1 }}>
+          <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
           </Icon>
           <Typography variant="h4">{t("Infusion Details")}</Typography>
@@ -60,12 +60,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       {/* Row 1 */}
       <div
         style={{
-          backgroundColor: primary,
+          backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
           padding: "2px 17px",
-          color: white,
+          color: theme.white,
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
@@ -120,12 +120,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       {infusion.rank >= 1 && (
         <div
           style={{
-            background: `linear-gradient(to right, ${ternary}, ${white})`,
+            background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
             padding: "3px 17px",
             display: "flex",
             justifyContent: "space-between",
-            borderTop: `1px solid ${secondary}`,
-            borderBottom: `1px solid ${secondary}`,
+            borderTop: `1px solid ${theme.secondary}`,
+            borderBottom: `1px solid ${theme.secondary}`,
           }}
         >
           <Grid container style={{ flexGrow: 1 }}>
@@ -161,7 +161,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 </Tooltip>
               )}
               <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color: "black" }} />
+                <Edit style={{ color:  iconColor }} />
               </IconButton>
             </Grid>
           )}
@@ -179,7 +179,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
-                borderBottom: `1px solid ${secondary}`,
+                borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
@@ -221,12 +221,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       {infusion.rank >= 2 && (
         <div
           style={{
-            background: `linear-gradient(to right, ${ternary}, ${white})`,
+            background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
             padding: "3px 17px",
             display: "flex",
             justifyContent: "space-between",
-            borderTop: `1px solid ${secondary}`,
-            borderBottom: `1px solid ${secondary}`,
+            borderTop: `1px solid ${theme.secondary}`,
+            borderBottom: `1px solid ${theme.secondary}`,
           }}
         >
           <Grid container style={{ flexGrow: 1 }}>
@@ -274,7 +274,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
-                borderBottom: `1px solid ${secondary}`,
+                borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
@@ -316,12 +316,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       {infusion.rank >= 3 && (
         <div
           style={{
-            background: `linear-gradient(to right, ${ternary}, ${white})`,
+            background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
             padding: "3px 17px",
             display: "flex",
             justifyContent: "space-between",
-            borderTop: `1px solid ${secondary}`,
-            borderBottom: `1px solid ${secondary}`,
+            borderTop: `1px solid ${theme.secondary}`,
+            borderBottom: `1px solid ${theme.secondary}`,
           }}
         >
           <Grid container style={{ flexGrow: 1 }}>
@@ -369,7 +369,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
-                borderBottom: `1px solid ${secondary}`,
+                borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
@@ -412,7 +412,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
 }
 
 export default function SpellTinkererInfusion(props) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <ThemedSpellTinkererInfusion {...props} />

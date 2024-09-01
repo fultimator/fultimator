@@ -3,7 +3,6 @@ import {
   Typography,
   IconButton,
   Grid,
-  useTheme,
   ThemeProvider,
   Tooltip,
   Icon,
@@ -14,6 +13,7 @@ import {
 import { Edit, VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 function ThemedSpellTinkererAlchemy({
   alchemy,
@@ -23,11 +23,10 @@ function ThemedSpellTinkererAlchemy({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const white = theme.palette.white.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const iconColor = isDarkMode ? '#ffffff' : '#000000';
+  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
 
   const ranks = [t("Basic"), t("Advanced"), t("Superior")];
 
@@ -38,7 +37,7 @@ function ThemedSpellTinkererAlchemy({
     <>
       <Accordion sx={{ marginY: 1 }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
-          <Icon sx={{ color: primary, marginRight: 1 }}>
+          <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
           </Icon>
           <Typography variant="h4">{t("Alchemy Details")}</Typography>
@@ -65,12 +64,12 @@ function ThemedSpellTinkererAlchemy({
 
       <div
         style={{
-          backgroundColor: primary,
+          backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
           padding: "2px 17px",
-          color: white,
+          color: theme.white,
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
@@ -135,12 +134,12 @@ function ThemedSpellTinkererAlchemy({
       {/* MIX Row 2 */}
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${secondary}`,
-          borderBottom: `1px solid ${secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -210,7 +209,7 @@ function ThemedSpellTinkererAlchemy({
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEditRank}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -220,12 +219,12 @@ function ThemedSpellTinkererAlchemy({
 
       <div
         style={{
-          backgroundColor: primary,
+          backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
           padding: "2px 17px",
-          color: white,
+          color: theme.white,
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
@@ -269,12 +268,12 @@ function ThemedSpellTinkererAlchemy({
       {/* TARGETS Row 2 */}
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${secondary}`,
-          borderBottom: `1px solid ${secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -314,7 +313,7 @@ function ThemedSpellTinkererAlchemy({
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
           >
             <IconButton size="small" onClick={onEditTargets}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -328,7 +327,7 @@ function ThemedSpellTinkererAlchemy({
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
-            borderBottom: `1px solid ${secondary}`,
+            borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
         >
@@ -369,12 +368,12 @@ function ThemedSpellTinkererAlchemy({
 
       <div
         style={{
-          backgroundColor: primary,
+          backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
           padding: "2px 17px",
-          color: white,
+          color: theme.white,
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
@@ -418,12 +417,12 @@ function ThemedSpellTinkererAlchemy({
       {/* EFFECTS Row 2 */}
       <div
         style={{
-          background: `linear-gradient(to right, ${ternary}, ${white})`,
+          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${secondary}`,
-          borderBottom: `1px solid ${secondary}`,
+          borderTop: `1px solid ${theme.secondary}`,
+          borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -465,7 +464,7 @@ function ThemedSpellTinkererAlchemy({
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
           >
             <IconButton size="small" onClick={onEditEffects}>
-              <Edit style={{ color: "black" }} />
+              <Edit style={{ color:  iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -479,7 +478,7 @@ function ThemedSpellTinkererAlchemy({
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
-            borderBottom: `1px solid ${secondary}`,
+            borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
         >
@@ -520,7 +519,7 @@ function ThemedSpellTinkererAlchemy({
 }
 
 export default function SpellTinkererAlchemy(props) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <ThemedSpellTinkererAlchemy {...props} />

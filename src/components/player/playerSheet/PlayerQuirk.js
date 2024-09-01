@@ -1,25 +1,13 @@
 import React from "react";
 import { Paper, Grid, Typography, Divider } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
-import { styled } from "@mui/system";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerQuirk({ player, isCharacterSheet }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-
-  const DescriptionMarkdown = styled(ReactMarkdown)(({ theme }) => ({
-    whiteSpace: "pre-line",
-    background: `linear-gradient(to right, ${theme.palette.ternary.main}, white)`,
-  }));
-
-  const EffectMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-  });
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
 
   return (
     <>
@@ -31,7 +19,7 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
             sx={{
               borderRadius: "8px",
               border: "2px solid",
-              borderColor: secondary,
+              borderColor: theme.secondary,
               display: "flex",
               flexDirection: "column",
               boxShadow: "none",
@@ -42,8 +30,8 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
               sx={{
                 textTransform: "uppercase",
                 padding: "5px", // Adjust padding instead of margins
-                backgroundColor: primary,
-                color: ternary,
+                backgroundColor: theme.primary,
+                color: theme.white,
                 borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                 fontSize: "1.5em",
               }}
@@ -52,35 +40,39 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
               {t("Quirk") + ": " + player.quirk.name}
             </Typography>
 
-            <Grid container >
+            <Grid container>
               {player.quirk.description && (
                 <Grid item xs={12}>
-                  <DescriptionMarkdown
-                    sx={{
+                  <div
+                    style={{
+                      whiteSpace: "pre-line",
+                      background: `linear-gradient(to right, ${theme.ternary}, ${isDarkMode ? "#252525" : "white"})`,
                       fontFamily: "PT Sans Narrow",
                       fontSize: "1rem",
                       fontStyle: "italic",
-                      paddingX: "10px",
-                      paddingY: "5px",
-                      
+                      padding: "5px 10px",
                     }}
                   >
-                    {player.quirk.description}
-                  </DescriptionMarkdown>
+                    <ReactMarkdown>
+                      {player.quirk.description}
+                    </ReactMarkdown>
+                  </div>
                 </Grid>
               )}
               {player.quirk.effect && (
                 <Grid item xs={12}>
-                  <EffectMarkdown
-                    sx={{
+                  <div
+                    style={{
+                      whiteSpace: "pre-line",
                       fontFamily: "PT Sans Narrow",
                       fontSize: "1rem",
-                      paddingX: "10px",
-                      paddingY: "5px",
+                      padding: "5px 10px",
                     }}
                   >
-                    {player.quirk.effect}
-                  </EffectMarkdown>
+                    <ReactMarkdown>
+                      {player.quirk.effect}
+                    </ReactMarkdown>
+                  </div>
                 </Grid>
               )}
             </Grid>

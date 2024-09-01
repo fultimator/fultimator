@@ -5,6 +5,7 @@ import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
 import powered_by_fu from "../../../routes/powered_by_fu.png";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerCardShort({
   player,
@@ -14,6 +15,7 @@ export default function PlayerCardShort({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
@@ -228,7 +230,7 @@ export default function PlayerCardShort({
                     textTransform: "uppercase",
                     padding: "5px", // Adjust padding instead of margins
                     backgroundColor: primary,
-                    color: ternary,
+                    color: custom.white,
                     borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                     fontSize: "1em",
                   }}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography, Button } from "@mui/material";
-import { useTheme } from '@mui/system';
+import { useCustomTheme } from '../../hooks/useCustomTheme';
 
 interface CustomHeaderProps {
   headerText: string;
@@ -10,8 +10,8 @@ interface CustomHeaderProps {
 }
 
 const CustomHeader2: React.FC<CustomHeaderProps> = ({ headerText, buttonText, onButtonClick, isEditMode }) => {
-  const theme = useTheme();
-  const ternary = theme.palette.ternary.main;
+  const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
 
   return (
     <div style={{
@@ -23,12 +23,12 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({ headerText, buttonText, on
       fontSize: '1em',
       paddingLeft: '17px',
       paddingTop: '5px',
-      paddingBottom: '7px',
-      color: 'black',
+      paddingBottom: '5px',
+      color: isDarkMode ? "white" : "black",
       textAlign: 'left',
       marginBottom: '10px',
       textTransform: 'uppercase',
-      backgroundColor: ternary,
+      backgroundColor: theme.ternary,
       backgroundSize: '100% 100%',
       backgroundRepeat: 'no-repeat',
     }}>

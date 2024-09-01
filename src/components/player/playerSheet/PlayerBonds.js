@@ -2,13 +2,14 @@ import React from "react";
 import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
   const positiveColor = theme.palette.success.main; // Positive color (green)
   const negativeColor = "red"; // Negative color (red)
 
@@ -74,7 +75,7 @@ export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
                   textTransform: "uppercase",
                   padding: "5px", // Adjust padding instead of margins
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "8px 8px 0 0", // Rounded corners only at the top
                   fontSize: "1.5em",
                 }}
@@ -93,7 +94,7 @@ export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
                   marginTop: "-1px",
                   marginBottom: "-1px",
                   backgroundColor: primary,
-                  color: ternary,
+                  color: custom.white,
                   borderRadius: "0 8px 8px 0",
                   transform: "rotate(180deg)",
                   fontSize: "2em",
