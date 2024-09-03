@@ -161,9 +161,9 @@ function Header({ npc, npcImage }) {
           sx={{
             px: 2,
             py: 0.5,
-            borderLeft,
-            borderBottom,
-            borderImage
+            borderLeft: borderLeft,
+            borderBottom: borderBottom,
+            borderImage: borderImage,
           }}
         >
           <Typography
@@ -176,7 +176,7 @@ function Header({ npc, npcImage }) {
           </Typography>
         </Grid>
       </Grid>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", width: 1  }}>
         {/* EditableImage */}
         {npcImage ? (
           <Box
@@ -231,8 +231,8 @@ function Header({ npc, npcImage }) {
               sx={{
                 px: 2,
                 py: 0.5,
-                borderBottom,
-                borderImageBody,
+                borderBottom: borderBottom,
+                borderImage: borderImageBody,
               }}
             >
               <Typography
@@ -249,8 +249,8 @@ function Header({ npc, npcImage }) {
             sx={{
               px: 2,
               py: 0.5,
-              borderBottom,
-              borderImageBody,
+              borderBottom: borderBottom,
+              borderImage: borderImageBody,
               flexGrow: 1,
             }}
           >

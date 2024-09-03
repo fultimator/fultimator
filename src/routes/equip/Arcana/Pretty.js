@@ -212,7 +212,7 @@ function PrettySingle({ arcana, showActions, rework }) {
                     {/* Pulse Grid Item */}
                     <Grid item xs={2} sx={{
                       textAlign: 'center',
-                      backgroundImage: `linear-gradient(to right, ${theme.theme.primary}, ${darken(theme.secondary, 0.3)})`,
+                      backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                       padding: "1px",
                       color: `${theme.white}`,
                       display: 'flex',
