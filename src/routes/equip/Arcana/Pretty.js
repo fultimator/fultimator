@@ -225,7 +225,7 @@ function PrettySingle({ arcana, showActions, rework }) {
 
                     {/* Arcana Pulse Name */}
                     <Grid item xs={10} sx={{
-                      backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${theme.white})`,
+                      background,
                       px: 3,
                       display: 'flex',
                       alignItems: 'center',
