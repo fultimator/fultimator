@@ -32,9 +32,13 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
 
   const theme = useCustomTheme();
   
+  const color = theme.mode === 'dark'
+  ? `#ffffff`
+  : `#000000`;
+
   const background = theme.mode === 'dark'
-  ? `181a1b`
-  : `white`;
+  ? `#212425`
+  : `#ffffff`;
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslate();
@@ -75,6 +79,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             textAlign: "right",
             display: "flex",
             alignItems: "center",
+            gap: "2px",
           }}
         >
           <div style={{ marginRight: "10px" }}>
@@ -84,6 +89,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             InputProps={{
               inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
               style: {
+                color: color,
                 fontFamily: "inherit",
                 fontSize: "inherit",
                 backgroundColor: background,
@@ -123,6 +129,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             InputProps={{
               inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
               style: {
+                color: color,
                 fontFamily: "inherit",
                 fontSize: "inherit",
                 backgroundColor: background,
