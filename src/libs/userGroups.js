@@ -526,7 +526,11 @@ export const testUsers =
     "xD2XNjNyiWNO0fIq7HuquzjQDeB2",
     "gG3OiBXSGPawNvmprlELPh35NnJ2",
     "JBfskOb7gPRwKbXRAIbS1O1oCqG2",
-    "0MLsCqAU7Gdoh3cVJS5kKvVyhDB2"
+    "0MLsCqAU7Gdoh3cVJS5kKvVyhDB2",
+    "NZiY4tcDWEghKXvVv7xMhuSfA393",
+    "T339KR70khhGg9l9LwVDi0S74qP2",
+    "AM3k5IjZLfavI52Z8nbWi2Iv23B2",
+    "L7vq1mT4FLajxDyxJ8BUQpPgICZ2"
 ];
 
 export const moderators =
