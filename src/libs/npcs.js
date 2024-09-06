@@ -191,7 +191,7 @@ export function calcDamage(attack, npc) {
 }
 
 export function calcPrecision(attack, npc) {
-  console.debug(attack, npc);
+  // console.debug(attack, npc);
   let number = 0;
 
   // Level
@@ -533,11 +533,11 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.armor) {
+  if (npc.armor && npc.armor.cost !== 0) {
     equip = true;
   }
 
-  if (npc.shield) {
+  if (npc.shield && npc.shield.cost !== 0) {
     equip = true;
   }
 
