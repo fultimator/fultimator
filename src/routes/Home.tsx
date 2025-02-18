@@ -8,7 +8,7 @@ import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
-import character_designer from "./character_designer_alpha_2_00.webp";
+import character_designer from "./character_designer.webp";
 import PublicIcon from '@mui/icons-material/Public';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import DesktopMacIcon from '@mui/icons-material/DesktopMac';

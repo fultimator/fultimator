@@ -54,10 +54,10 @@ import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import { BugReport, Save, Info } from "@mui/icons-material";
-import { testUsers, moderators } from "../../libs/userGroups";
+// import { testUsers, moderators } from "../../libs/userGroups";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
@@ -84,11 +84,13 @@ export default function PlayerEdit() {
 
   const [user] = useAuthState(auth); // Authentication state hook
 
+  /*
   let canAccessTest = false;
 
   if (user && (testUsers.includes(user.uid) || moderators.includes(user.uid))) {
     canAccessTest = true;
   }
+  */  
 
   const [player] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
 
@@ -106,7 +108,7 @@ export default function PlayerEdit() {
 
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Effect to update temporary Player state and check for unsaved changes
   useEffect(() => {
@@ -270,10 +272,12 @@ export default function PlayerEdit() {
     return null;
   }
 
+  /*
   if (!canAccessTest) {
     navigate("/pc-gallery");
     return null;
   }
+  */
 
   return (
     <Layout>
