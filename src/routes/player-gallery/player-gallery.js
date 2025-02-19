@@ -49,7 +49,7 @@ import {
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useTranslate } from "../../translation/translate";
 import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
-import { testUsers, moderators } from "../../libs/userGroups";
+// import { testUsers, moderators } from "../../libs/userGroups";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
 import { validateCharacter } from "../../utility/validateJson";
@@ -81,14 +81,16 @@ function Personal({ user }) {
   const [name, setName] = useState("");
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  //const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
+  //const [hasApplied, setHasApplied] = useState(false);
 
   const fileInputRef = useRef(null);
 
+  /*
   const canAccessTest =
     testUsers.includes(user.uid) || moderators.includes(user.uid);
+  */
 
   const personalRef = collection(firestore, "player-personal");
   const personalQuery = query(personalRef, where("uid", "==", user.uid));
@@ -96,6 +98,7 @@ function Personal({ user }) {
     idField: "id",
   });
 
+  /*
   const handleDialogClose = () => {
     setIsDialogOpen(false);
   };
@@ -103,7 +106,9 @@ function Personal({ user }) {
   const handleApplicationSuccess = () => {
     setHasApplied(true);
   };
+  */
 
+  /*
   if (!canAccessTest) {
     return (
       <>
@@ -197,6 +202,7 @@ function Personal({ user }) {
       </>
     );
   }
+  */
 
   if (err?.code === "resource-exhausted") {
     return (
@@ -313,7 +319,7 @@ function Personal({ user }) {
         alert(alertMessage);
         return;
       }
-      
+
       delete jsonData.id; // Remove the id field if present
       jsonData.uid = user.uid; // Assign the current user UID
       jsonData.published = false; // Set the published field to false
@@ -390,7 +396,7 @@ function Personal({ user }) {
           <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1 }}>
             {t("Help us improve the Character Designer!")}
           </AlertTitle>
-          <Typography variant="body2" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="inherit" sx={{ mb: 2 }}>
             {t(
               "We value your input on this new feature. Please take a moment to complete our quick survey and share your thoughts. Your feedback will directly influence future updates and enhancements."
             )}
@@ -413,11 +419,11 @@ function Personal({ user }) {
           </Button>
         </Box>
       </Alert>
-      <Alert variant="filled" severity="warning" sx={{ marginBottom: 3 }}>
+      {/*<Alert variant="filled" severity="warning" sx={{ marginBottom: 3 }}>
         {t(
           "Character Designer is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
         )}
-      </Alert>
+      </Alert>*/}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
           <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
