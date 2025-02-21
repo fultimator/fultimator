@@ -91,7 +91,7 @@ function ThemedSpellChanter({
             variant="outlined"
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
-            {t("magichant_edit_button")}
+            {t("magichant_settings_button")}
           </Button>
           <Button
             onClick={onEditKeys}

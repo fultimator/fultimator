@@ -50,7 +50,7 @@ export default function SpellChanterModal({
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        {t("magichant_edit_modal")}
+        {t("magichant_settings_modal")}
       </DialogTitle>
       <Button
         aria-label="close"
