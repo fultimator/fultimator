@@ -13,10 +13,7 @@ import SpellTinkererAlchemy from "./SpellTinkererAlchemy";
 import SpellTinkererAlchemyRankModal from "./SpellTinkererAlchemyRankModal";
 import SpellTinkererAlchemyTargetModal from "./SpellTinkererAlchemyTargetModal";
 import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal";
-import {
-  tinkererAlchemy,
-  tinkererInfusion,
-} from "../../../libs/classes";
+import { tinkererAlchemy, tinkererInfusion } from "../../../libs/classes";
 import SpellTinkererInfusion from "./SpellTinkererInfusion";
 import SpellTinkererInfusionModal from "./SpellTinkererInfusionModal";
 import SpellCompendiumModal from "./SpellCompendiumModal";
@@ -24,6 +21,10 @@ import SpellTinkererMagitech from "./SpellTinkererMagitech";
 import SpellTinkererMagitechRankModal from "./SpellTinkererMagitechRankModal";
 import SpellEntropistGambleModal from "./SpellEntropistGambleModal";
 import SpellEntropistGamble from "./SpellEntropistGamble";
+import SpellChanter from "./SpellChanter";
+import SpellChanterModal from "./SpellChanterModal";
+import SpellChanterKeysModal from "./SpellChanterKeysModal";
+import SpellChanterTonesModal from "./SpellChanterTonesModal";
 import GambleExplain from "./GambleExplain";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
@@ -42,6 +43,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [openInfusionModal, setOpenInfusionModal] = useState(false);
   const [openMagitechRankModal, setOpenMagitechRankModal] = useState(false);
   const [openGambleModal, setOpenGambleModal] = useState(false);
+  const [openChantModal, setOpenChantModal] = useState(false);
+  const [openChantKeyModal, setOpenChantKeyModal] = useState(false);
+  const [openChantToneModal, setOpenChantToneModal] = useState(false);
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
@@ -257,6 +261,34 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 },
               ],
             };
+          } else if (spell === "magichant") {
+            // Check if there's already a magichant spell
+            const hasMagichant = cls.spells.some(
+              (sp) => sp.spellType === "magichant"
+            );
+
+            if (hasMagichant) {
+              if (window.electron) {
+                window.electron.alert("You already have a magichant spell");
+              } else {
+                alert("You already have a magichant spell");
+              }
+              return cls;
+            } else {
+              // Add a new magichant spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    keys: [],
+                    tones: [],
+                  },
+                ],
+              };
+            }
           } else {
             if (window.electron) {
               window.electron.alert(
@@ -387,6 +419,27 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenGambleModal(true);
   };
 
+  const handleEditChantSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantModal(true);
+  };
+
+  const handleEditChantKey = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantKeyModal(true);
+  };
+
+  const handleEditChantTone = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantToneModal(true);
+  };
+
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
@@ -410,12 +463,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   };
 
   const handleDeleteSpell = (spellIndex) => {
-    console.log(
+    /*console.log(
       "spellIndex",
       spellIndex,
       "editingSpellClass",
       editingSpellClass
-    );
+    );*/
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls) => {
@@ -441,6 +494,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenGambleModal(false);
     setSpellBeingEdited(null);
     setOpenMagitechRankModal(false);
+    setOpenChantModal(false);
+    setOpenChantKeyModal(false);
+    setOpenChantToneModal(false);
     setEditingSpellClass(null);
   };
 
@@ -552,6 +608,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             tinkererInfusion: false,
             tinkererMagitech: false,
             gamble: false,
+            magichant: false,
           };
 
           return (
@@ -640,6 +697,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   <CustomHeader2 headerText={t("Gamble")} />
                                   {(spellTypeHeaders.gamble = true)}
                                   <GambleExplain />
+                                </>
+                              )}
+                            {spell.spellType === "magichant" &&
+                              !spellTypeHeaders.magichant && (
+                                <>
+                                  <CustomHeader2 headerText={t("Magichant")} />
+                                  {(spellTypeHeaders.magichant = true)}
                                 </>
                               )}
                           </div>
@@ -735,6 +799,22 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               key={index}
                               onEdit={() =>
                                 handleEditGambleSpell(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "magichant" && (
+                            <SpellChanter
+                              magichant={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditChantSpell(spell, cls.name, index)
+                              }
+                              onEditKeys={() =>
+                                handleEditChantKey(spell, cls.name, index)
+                              }
+                              onEditTones={() =>
+                                handleEditChantTone(spell, cls.name, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -835,6 +915,38 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         gamble={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellChanterModal
+        open={openChantModal}
+        onClose={() => {
+          setOpenChantModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+
+      <SpellChanterKeysModal
+        open={openChantKeyModal}
+        onClose={() => {
+          setOpenChantKeyModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellChanterTonesModal
+        open={openChantToneModal}
+        onClose={() => {
+          setOpenChantToneModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellCompendiumModal
         open={openCompendiumModal}

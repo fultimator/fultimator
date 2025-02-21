@@ -1019,7 +1019,7 @@ const classList = [
       rituals: {
         ritualism: false,
       },
-      spellClasses: ["default"],
+      spellClasses: ["magichant"],
     },
     skills: [
       {
