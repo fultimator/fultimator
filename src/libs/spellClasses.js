@@ -6,6 +6,7 @@ const spellClasses = [
     "tinkerer-infusion",
     "tinkerer-magitech",
     "gamble",
+    "magichant"
 ];
 
 export default spellClasses;

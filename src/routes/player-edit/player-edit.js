@@ -62,6 +62,7 @@ import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
+import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -417,6 +418,11 @@ export default function PlayerEdit() {
                 isEditMode={isOwner}
               />
               <PlayerGadgets
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
+              <PlayerMagichant
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}
