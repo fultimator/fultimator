@@ -1193,7 +1193,7 @@ const classList = [
       rituals: {
         ritualism: false,
       },
-      spellClasses: ["default"],
+      spellClasses: ["symbol"],
     },
     skills: [
       {
