@@ -8,6 +8,7 @@ const spellClasses = [
     "gamble",
     "magichant",
     "symbol",
+    "dance",
 ];
 
 export default spellClasses;

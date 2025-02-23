@@ -64,6 +64,7 @@ import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
 import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
 import PlayerSymbol from "../../components/player/playerSheet/PlayerSymbol";
+import PlayerDance from "../../components/player/playerSheet/PlayerDance";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -433,6 +434,11 @@ export default function PlayerEdit() {
                 isEditMode={isOwner}
               />
               <PlayerSymbol
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isOwner}
+              />
+              <PlayerDance
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}
