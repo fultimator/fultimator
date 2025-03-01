@@ -46,8 +46,18 @@ import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
+import blacklist from "../../translation/blacklist";
 import deepEqual from "deep-equal";
 import { NpcProvider } from "../../components/npc/NpcContext";
+
+// Combine all blacklisted names into a single array
+const mergedBlacklistNames = blacklist.flatMap(item => Object.values(item));
+
+// Function to check if the NPC name is blacklisted
+const isBlacklisted = (npcName) => {
+  const lowerCaseNpcName = npcName.toLowerCase();
+  return mergedBlacklistNames.some(blacklistedName => blacklistedName.toLowerCase() === lowerCaseNpcName);
+};
 
 export default function NpcEdit() {
   const { t } = useTranslate(); // Translation hook
@@ -184,6 +194,9 @@ export default function NpcEdit() {
         .split(" "),
       publishedAt: Date.now(),
     });
+    if (isBlacklisted(npcTemp.name)) {
+      sendWebhook(npcTemp);
+    }
   };
 
   // Function to unpublish NPC
@@ -235,6 +248,37 @@ export default function NpcEdit() {
           console.log("An unknown error occurred");
         }
       }
+    }
+  };
+
+  const sendWebhook = (npc) => {
+    const webhookUrl = process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
+    const payload = {
+      content: null,
+      embeds: [
+        {
+          title: `BLACKLISTED NPC FOUND: ${npc.name}`,
+          description: `Author UUID: ${npc.uid}
+          \nFlagged Content: ${npc.name} - ${npc.id} (NPC)
+          \nhttps://fabula-ultima-helper.web.app/npc-gallery/${npc.id})
+          \n\n**Reasons:** This content has been flagged and may violate Rule 1.`,
+          color: 16248815,
+        },
+      ],
+      username: "Fultimator-Support",
+      attachments: [],
+    };
+
+    try {
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.error("Error sending webhook: ", error);
     }
   };
 

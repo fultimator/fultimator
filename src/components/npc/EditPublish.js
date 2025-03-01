@@ -176,7 +176,7 @@ export default function EditPublish({
                     variant="body1"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                   >
-                     {t("Submission Guidelines for Adversary Compendium")}
+                    {t("Submission Guidelines for Adversary Compendium")}
                   </Typography>
                 </Link>
               </Box>
@@ -216,66 +216,52 @@ export default function EditPublish({
                 PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
               >
                 <DialogTitle variant="h3">
-                  Submission Guidelines for Adversary Compendium
+                  {t("submission_rule_title")}
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText>
                     <ol>
                       <li>
-                        <strong>Original Content Only:</strong> Avoid using NPC
-                        data from official publications or translations, and
-                        refrain from copyrighted material.
+                        <strong>{t("submission_rule_1")}</strong>
+                        {t("submission_rule_1_desc")}
                       </li>
                       <ul>
                         <li>
-                          <strong>Deviations from Official Work:</strong> When
-                          creating NPCs inspired by official sources (e.g., an
-                          ice drake inspired by the core rulebook bestiary
-                          drake), ensure changes go beyond the{" "}
-                          <strong>"bare minimum"</strong>.
+                          <strong>{t("submission_rule_2")}</strong>
+                          {t("submission_rule_2_desc")}
                         </li>
                       </ul>
                       <li>
-                        <strong>Respectful Submissions:</strong> Tag sexually
-                        explicit content appropriately and provide warnings
-                        where necessary.
+                        <strong>{t("submission_rule_3")}</strong>
+                        {t("submission_rule_3_desc")}
                       </li>
                       <li>
-                        <strong>Supported Languages Only:</strong> Entries must
-                        be in supported languages (English, Italian, Spanish,
-                        German, Polish, French, Brazilian Portuguese). Entries
-                        in unsupported languages will be flagged.
+                        <strong>{t("submission_rule_4")}</strong>
+                        {t("submission_rule_4_desc")}
                       </li>
                     </ol>
                     <p>
-                      <strong>Note:</strong> Content violating these guidelines
-                      may be unpublished. Each submission includes a report
-                      button. While I'm hesitant to ban accounts, repeated
-                      disregard for guidelines may lead to account termination.
+                      <strong>{t("submission_rule_note")}</strong>
+                      {t("submission_rule_note_desc")}
                     </p>
                     <p>
-                      <strong>Deviation from Official Work Guidelines:</strong>
+                      <strong>{t("submission_rule_deviation")}</strong>
                     </p>
                     <ul>
                       <li>
-                        <strong>Bare Minimum Modifications:</strong>
+                        <strong>{t("submission_rule_bare_minimum")}</strong>
                         <ul>
                           <li>
-                            Alter NPC names, descriptions, skill names, etc.
+                            {t("submission_rule_bare_minimum_types")}
                           </li>
                           <li>
-                            Avoid using copyrighted names, terms, or mechanics
-                            directly from official sources (e.g., "Bite" or
-                            "Dragonbreath"). Instead, use unique variations like
-                            "Vicious Bite" or "Frost Breath" for compliance and
-                            originality.
+                            {t("submission_rule_bare_minimum_example")}
                           </li>
                         </ul>
                       </li>
                     </ul>
                     <p>
-                      Example provided by RoosterEma on what could constitute
-                      "bare minimum":
+                      {t("submission_rule_bare_minimum_caption")}
                     </p>
                     <img
                       src={emaExample}

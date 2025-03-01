@@ -1,0 +1,517 @@
+[
+    {
+        "en": "CUTTERPILLAR",
+        "it": "GHIGLIOPENDRA",
+        "fr": "TRANCHENILLE"
+    },
+    {
+        "en": "GIANT RAT",
+        "it": "RATTO GIGANTE",
+        "fr": "GARGANTURAT"
+    },
+    {
+        "en": "GREY HOWLER",
+        "it": "ULULANTE GRIGIO",
+        "fr": "HURLEUR GRIS"
+    },
+    {
+        "en": "VAMPIRE BAT",
+        "it": "PIPISTRELLO VAMPIRO",
+        "fr": "CHAUVE-SOURIS VAMPIRE"
+    },
+    {
+        "en": "BOMBARD ANT",
+        "it": "FORMICA BOMBARDA",
+        "fr": "FOURMI-BOMBARDIER"
+    },
+    {
+        "en": "THORNFISH",
+        "it": "PESCESPINA",
+        "fr": "POISSON ÉPINEUX"
+    },
+    {
+        "en": "SUN BEAR",
+        "it": "ORSO SOLARE",
+        "fr": "OURS SOLAIRE"
+    },
+    {
+        "en": "WHITE HOWLER",
+        "it": "ULULANTE BIANCO",
+        "fr": "HURLEUR BLANC"
+    },
+    {
+        "en": "ARCANE LANTERN",
+        "it": "LANTERNA ARCANA",
+        "fr": "LANTERNE ARCANIQUE"
+    },
+    {
+        "en": "CLATTERCLOWN",
+        "it": "CLANGORMATTO",
+        "fr": "BOUFFON BAFOUÉ"
+    },
+    {
+        "en": "GARGOYLE",
+        "it": "GARGOYLE",
+        "fr": "GARGOUILLE"
+    },
+    {
+        "en": "MAGITECH TROOPER",
+        "it": "FANTE MAGITECH",
+        "fr": "SOLDAT TECHNOMAGIQUE"
+    },
+    {
+        "en": "BRONZE GOLEM",
+        "it": "GOLEM DI BRONZO",
+        "fr": "GOLEM DE BRONZE"
+    },
+    {
+        "en": "RAZORBIRD",
+        "it": "FENDICIELI",
+        "fr": "VOLATILAME"
+    },
+    {
+        "en": "FOREST GOLEM",
+        "it": "GOLEM DELLE FORESTE",
+        "fr": "GOLEM FORESTIER"
+    },
+    {
+        "en": "IMP",
+        "it": "IMP",
+        "fr": "DIABLOTIN"
+    },
+    {
+        "en": "LIGHTNING WHEEL",
+        "it": "RUOTA DI LAMPI",
+        "fr": "ROUE DE FOUDRE"
+    },
+    {
+        "en": "SHADOW HOWLER",
+        "it": "ULULANTE TENEBROSO",
+        "fr": "HURLEUR D’OMBRE"
+    },
+    {
+        "en": "ECHIDNA",
+        "it": "ECHIDNA",
+        "fr": "ECHIDNA"
+    },
+    {
+        "en": "ACORN PIXIE",
+        "it": "GHIANDINA",
+        "fr": "PIXIE DU CHÊNE"
+    },
+    {
+        "en": "CHAOS SHARD",
+        "it": "SCHEGGIA DEL CAOS",
+        "fr": "ÉCLAT DU CHAOS"
+    },
+    {
+        "en": "GRENADO",
+        "it": "GRENADO",
+        "fr": "GRENADO"
+    },
+    {
+        "en": "STATIC OOZE",
+        "it": "FULMIBUDINO",
+        "fr": "VASE ÉLECTROSTATIQUE"
+    },
+    {
+        "en": "NYMPH",
+        "it": "NINFA",
+        "fr": "NYMPHE"
+    },
+    {
+        "en": "SPIKEFLAKE",
+        "it": "PUNGINEVE",
+        "fr": "FLOCON À POINTE"
+    },
+    {
+        "en": "CRAGBOAR",
+        "it": "VERROCCIOSO",
+        "fr": "SANGLIROC"
+    },
+    {
+        "en": "BRIGAND",
+        "it": "BRIGANTE",
+        "fr": "BRIGAND"
+    },
+    {
+        "en": "GUARD",
+        "it": "GUARDIA",
+        "fr": "GARDE"
+    },
+    {
+        "en": "KOBOLD SCOUT",
+        "it": "SCOUT COBOLDO",
+        "fr": "ÉCLAIREUR KOBOLD"
+    },
+    {
+        "en": "KOBOLD WITCH",
+        "it": "STREGA COBOLDA",
+        "fr": "SORCIER KOBOLD"
+    },
+    {
+        "en": "HIVEKIN",
+        "it": "ALVEARIDE",
+        "fr": "APIDÉ"
+    },
+    {
+        "en": "MERCENARY",
+        "it": "MERCENARIO",
+        "fr": "MERCENAIRE"
+    },
+    {
+        "en": "SNIPER",
+        "it": "CECCHINO",
+        "fr": "TIREUR EMBUSQUÉ"
+    },
+    {
+        "en": "BATTLEMAGE",
+        "it": "MAGO DA GUERRA",
+        "fr": "MAGE DE GUERRE"
+    },
+    {
+        "en": "CAIT SITH",
+        "it": "CAIT SITH",
+        "fr": "CAIT SITH"
+    },
+    {
+        "en": "DREADMOTH",
+        "it": "TERRORDOTTERO",
+        "fr": "PAPILLON D’EFFROI"
+    },
+    {
+        "en": "MELLOW OOZE",
+        "it": "MELM CARAMEL",
+        "fr": "VASE VELOUTÉE"
+    },
+    {
+        "en": "DRAKE",
+        "it": "DRACO",
+        "fr": "DRAC"
+    },
+    {
+        "en": "HEXEYE",
+        "it": "MALOCCHIO",
+        "fr": "HEXŒIL"
+    },
+    {
+        "en": "HYDROZOA",
+        "it": "IDROZOA",
+        "fr": "HYDROZOAIRE"
+    },
+    {
+        "en": "COCKATRICE",
+        "it": "COCCATRICE",
+        "fr": "COCATRICE"
+    },
+    {
+        "en": "MIMIC",
+        "it": "MIMIC",
+        "fr": "MIMIQUE"
+    },
+    {
+        "en": "ALRAUNE",
+        "it": "MANDRAGOLA",
+        "fr": "ALRAUNE"
+    },
+    {
+        "en": "CURSED PUMPKIN",
+        "it": "MALEDIZUCCA",
+        "fr": "CITROUILLE MAUDITE"
+    },
+    {
+        "en": "PESTERVINE",
+        "it": "MALERBA",
+        "fr": "TOURMENTINE"
+    },
+    {
+        "en": "SHROOMKIN",
+        "it": "MICOIDE",
+        "fr": "FONGOÏDE"
+    },
+    {
+        "en": "CACTROLL",
+        "it": "CACTROLL",
+        "fr": "CACTROLL"
+    },
+    {
+        "en": "DRAGONTRAP",
+        "it": "ACCHIAPPADRAGHI",
+        "fr": "GOBE-DRAGON"
+    },
+    {
+        "en": "DREAD URN",
+        "it": "URNA TEMIBILE",
+        "fr": "URNE FUNESTE"
+    },
+    {
+        "en": "ZOMBIE",
+        "it": "ZOMBI",
+        "fr": "ZOMBIE"
+    },
+    {
+        "en": "SKELETAL MAGE",
+        "it": "MAGO SCHELETRICO",
+        "fr": "MAGE SQUELETTE"
+    },
+    {
+        "en": "SKELETAL SOLDIER",
+        "it": "SOLDATO SCHELETRICO",
+        "fr": "SOLDAT SQUELETTE"
+    },
+    {
+        "en": "BONE HOWLER",
+        "it": "ULULANTE OSSEO",
+        "fr": "HURLEUR SQUELETTIQUE"
+    },
+    {
+        "en": "GHOUL",
+        "it": "GHOUL",
+        "fr": "GOULE"
+    },
+    {
+        "en": "MUMMY",
+        "it": "MUMMIA",
+        "fr": "MOMIE"
+    },
+    {
+        "en": "SHACKLED SOUL",
+        "it": "ANIMA INCATENATA",
+        "fr": "ÂME EN CHAÎNES"
+    },
+    {
+        "en": "EILEEN",
+        "it": "EILEEN",
+        "fr": "EILEEN"
+    },
+    {
+        "en": "SALAMANDER",
+        "it": "SALAMANDRA",
+        "fr": "SALAMANDER"
+    },
+    {
+        "en": "CRYOMANDER",
+        "it": "CRIOMANDRA",
+        "fr": "CRYOMANDER"
+    },
+    {
+        "en": "PIRATE",
+        "it": "PIRATA",
+        "fr": "PIRATE"
+    },
+    {
+        "en": "FLAME DRAGON",
+        "it": "DRAGO DI FUOCO",
+        "fr": "FLAME DRAGON"
+    },
+    {
+        "en": "CERINE",
+        "it": "CERINE",
+        "fr": "CERINE"
+    },
+    {
+        "en": "CECILIA",
+        "it": "CECILIA",
+        "fr": "CECILIA"
+    },
+    {
+        "en": "SPECTRAL SERVANT",
+        "it": "SERVITORE SPETTRALE",
+        "fr": "SPECTRAL SERVANT"
+    },
+    {
+        "en": "MAXIMILIAN, THE PRINCE",
+        "it": "MAXIMILIAN, IL PRINCIPE",
+        "fr": "MAXIMILIAN, THE PRINCE"
+    },
+    {
+        "en": "MAXIMILIAN, THE BASTION",
+        "it": "MAXIMILIAN, IL BASTIONE",
+        "fr": "MAXIMILIAN, THE BASTION"
+    },
+    {
+        "en": "NIKE",
+        "it": "NIKE",
+        "fr": "NIKE"
+    },
+    {
+        "en": "THEO",
+        "it": "THEO",
+        "fr": "THEO"
+    },
+    {
+        "en": "MIMESIS",
+        "it": "MIMESI",
+        "fr": "MIMESIS"
+    },
+    {
+        "en": "ANAGNORISIS",
+        "it": "AGNIZIONE",
+        "fr": "ANAGNORISIS"
+    },
+    {
+        "en": "DRAMATIST’S QUILL",
+        "it": "PENNA DEL TRAGEDIOGRAFO",
+        "fr": "DRAMATIST’S QUILL"
+    },
+    {
+        "en": "CATHARSIS",
+        "it": "CATARSI",
+        "fr": "CATHARSIS"
+    },
+    {
+        "en": "COMMISSIONER VYNE",
+        "it": "COMMISSARIO VYNE",
+        "fr": "COMMISSIONER VYNE"
+    },
+    {
+        "en": "SYNTECH COP",
+        "it": "POLIZIOTTO SYNTECH",
+        "fr": "SYNTECH COP"
+    },
+    {
+        "en": "SURVEILLANCE DRONE",
+        "it": "DRONE DI SORVEGLIANZA",
+        "fr": "SURVEILLANCE DRONE"
+    },
+    {
+        "en": "PRIMARY CORE",
+        "it": "PROCESSORE PRIMARIO",
+        "fr": "PRIMARY CORE"
+    },
+    {
+        "en": "DIGITAL LIMB A",
+        "it": "ARTO DIGITALE A",
+        "fr": "DIGITAL LIMB A"
+    },
+    {
+        "en": "DIGITAL LIMB B",
+        "it": "ARTO DIGITALE B",
+        "fr": "DIGITAL LIMB B"
+    },
+    {
+        "en": "THE RELENTLESS",
+        "it": "L’INSTANCABILE",
+        "fr": "THE RELENTLESS"
+    },
+    {
+        "en": "ATTACK WING",
+        "it": "SCIAME D’ASSALTO",
+        "fr": "ATTACK WING"
+    },
+    {
+        "en": "SUPPORT WING",
+        "it": "SCIAME DI SUPPORTO",
+        "fr": "SUPPORT WING"
+    },
+    {
+        "en": "ADMIRAL CERYON",
+        "it": "AMMIRAGLIO CERYON",
+        "fr": "ADMIRAL CERYON"
+    },
+    {
+        "en": "BIOENGINE",
+        "it": "BIOMOTRICE",
+        "fr": "BIOENGINE"
+    },
+    {
+        "en": "THE PATRIARCH",
+        "it": "IL PATRIARCA",
+        "fr": "THE PATRIARCH"
+    },
+    {
+        "en": "RIGHT HAND",
+        "it": "MANO DESTRA",
+        "fr": "RIGHT HAND"
+    },
+    {
+        "en": "LEFT HAND",
+        "it": "MANO SINISTRA",
+        "fr": "LEFT HAND"
+    },
+    {
+        "en": "CONCEPTUAL DYAD",
+        "it": "DIADE CONCETTUALE",
+        "fr": "CONCEPTUAL DYAD"
+    },
+    {
+        "en": "THE PURE CONCEPT",
+        "it": "IL CONCETTO PURO",
+        "fr": "THE PURE CONCEPT"
+    },
+    {
+        "en": "ADDOME",
+        "it": "ADDOME",
+        "fr": "ADDOME"
+    },
+    {
+        "en": "TORACE",
+        "it": "TORACE",
+        "fr": "TORACE"
+    },
+    {
+        "en": "NODE",
+        "it": "NODE",
+        "fr": "NODE"
+    },
+    {
+        "en": "DYLON",
+        "it": "DYLON",
+        "fr": "DYLON"
+    },
+    {
+        "en": "DORSO DI CHIARAVALLE",
+        "it": "DORSO DI CHIARAVALLE",
+        "fr": "DORSO DI CHIARAVALLE"
+    },
+    {
+        "en": "FUOCO FATUO",
+        "it": "FUOCO FATUO",
+        "fr": "FUOCO FATUO"
+    },
+    {
+        "en": "LANTERNA FUNERARIA",
+        "it": "LANTERNA FUNERARIA",
+        "fr": "LANTERNA FUNERARIA"
+    },
+    {
+        "en": "TESTA DI CHIARAVALLE",
+        "it": "TESTA DI CHIARAVALLE",
+        "fr": "TESTA DI CHIARAVALLE"
+    },
+    {
+        "en": "REGINA DI MEZZOGIORNO",
+        "it": "REGINA DI MEZZOGIORNO",
+        "fr": "REGINA DI MEZZOGIORNO"
+    },
+    {
+        "en": "PAPAVERO SOLARE",
+        "it": "PAPAVERO SOLARE",
+        "fr": "PAPAVERO SOLARE"
+    },
+    {
+        "en": "REGINA DI MEZZANOTTE",
+        "it": "REGINA DI MEZZANOTTE",
+        "fr": "REGINA DI MEZZANOTTE"
+    },
+    {
+        "en": "ORCHIDEA LUNARE",
+        "it": "ORCHIDEA LUNARE",
+        "fr": "ORCHIDEA LUNARE"
+    },
+    {
+        "en": "RÅDANDE CINEREA",
+        "it": "RÅDANDE CINEREA",
+        "fr": "RÅDANDE CINEREA"
+    },
+    {
+        "en": "ELDGREN, L’ANTICA ",
+        "it": "ELDGREN, L’ANTICA ",
+        "fr": "ELDGREN, L’ANTICA "
+    },
+    {
+        "en": "IL CUORE",
+        "it": "IL CUORE",
+        "fr": "IL CUORE"
+    }
+]
