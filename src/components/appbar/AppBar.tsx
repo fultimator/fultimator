@@ -12,7 +12,6 @@ import { Link as RouterLink } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 
-import logo from "./../logo.webp";
 import logo929 from "./../logo_929.webp";
 import logo1400 from "./../logo_1400.webp";
 
@@ -82,11 +81,11 @@ const AppBar: React.FC<AppBarProps> = ({
                   xs={8}
                   textAlign="center"
                   sx={{
-                    height: "85px",
+                    height: "60px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    margin: "2px 0",
+                    margin: "4px 0 0",
                   }}
                 >
                   <RouterLink
@@ -97,14 +96,14 @@ const AppBar: React.FC<AppBarProps> = ({
                       textAlign: "center",
                     }}
                   >
-                    <Typography variant="h1" textAlign="center">
+                    <Typography textAlign="center">
                       <img
-                        style={{ height: "100%", maxHeight: "90px" }}
-                        src={isSmallViewport ? logo : undefined}
+                        style={{ height: "100%", maxHeight: "60px" }}
+                        src={isSmallViewport ? logo929 : undefined}
                         srcSet={
                           isSmallViewport
                             ? undefined
-                            : `${logo} 600w, ${logo929} 929w, ${logo1400} 1400w`
+                            : `${logo929} 600w, ${logo929} 929w, ${logo1400} 1400w`
                         }
                         sizes={isSmallViewport ? undefined : "100vw"}
                         alt="Fultimator"

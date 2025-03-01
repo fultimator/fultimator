@@ -1019,7 +1019,7 @@ const classList = [
       rituals: {
         ritualism: false,
       },
-      spellClasses: ["default"],
+      spellClasses: ["magichant"],
     },
     skills: [
       {
@@ -1136,7 +1136,7 @@ const classList = [
       custom: [
         "You may choose to permanently increase your maximum Hit Points or Mind Points by 5 (your choice).",
       ],
-      spellClasses: ["default"],
+      spellClasses: ["dance"],
     },
     skills: [
       {
@@ -1193,7 +1193,7 @@ const classList = [
       rituals: {
         ritualism: false,
       },
-      spellClasses: ["default"],
+      spellClasses: ["symbol"],
     },
     skills: [
       {

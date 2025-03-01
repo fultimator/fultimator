@@ -13,10 +13,7 @@ import SpellTinkererAlchemy from "./SpellTinkererAlchemy";
 import SpellTinkererAlchemyRankModal from "./SpellTinkererAlchemyRankModal";
 import SpellTinkererAlchemyTargetModal from "./SpellTinkererAlchemyTargetModal";
 import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal";
-import {
-  tinkererAlchemy,
-  tinkererInfusion,
-} from "../../../libs/classes";
+import { tinkererAlchemy, tinkererInfusion } from "../../../libs/classes";
 import SpellTinkererInfusion from "./SpellTinkererInfusion";
 import SpellTinkererInfusionModal from "./SpellTinkererInfusionModal";
 import SpellCompendiumModal from "./SpellCompendiumModal";
@@ -24,6 +21,16 @@ import SpellTinkererMagitech from "./SpellTinkererMagitech";
 import SpellTinkererMagitechRankModal from "./SpellTinkererMagitechRankModal";
 import SpellEntropistGambleModal from "./SpellEntropistGambleModal";
 import SpellEntropistGamble from "./SpellEntropistGamble";
+import SpellChanter from "./SpellChanter";
+import SpellChanterModal from "./SpellChanterModal";
+import SpellChanterKeysModal from "./SpellChanterKeysModal";
+import SpellChanterTonesModal from "./SpellChanterTonesModal";
+import SpellSymbolist from "./SpellSymbolist";
+import SpellSymbolistModal from "./SpellSymbolistModal";
+import SpellSymbolistSymbolsModal from "./SpellSymbolistSymbolsModal";
+import SpellDancer from "./SpellDancer";
+import SpellDancerModal from "./SpellDancerModal";
+import SpellDancerDancesModal from "./SpellDancerDancesModal";
 import GambleExplain from "./GambleExplain";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
@@ -42,6 +49,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [openInfusionModal, setOpenInfusionModal] = useState(false);
   const [openMagitechRankModal, setOpenMagitechRankModal] = useState(false);
   const [openGambleModal, setOpenGambleModal] = useState(false);
+  const [openChantModal, setOpenChantModal] = useState(false);
+  const [openChantKeyModal, setOpenChantKeyModal] = useState(false);
+  const [openChantToneModal, setOpenChantToneModal] = useState(false);
+  const [openSymbolModal, setOpenSymbolModal] = useState(false);
+  const [openSymbolSymbolsModal, setOpenSymbolSymbolsModal] = useState(false);
+  const [openDancerModal, setOpenDancerModal] = useState(false);
+  const [openDancerDancesModal, setOpenDancerDancesModal] = useState(false);
+
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
   const [editingSpellIndex, setEditingSpellIndex] = useState(null);
@@ -257,6 +272,86 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 },
               ],
             };
+          } else if (spell === "magichant") {
+            // Check if there's already a magichant spell
+            const hasMagichant = cls.spells.some(
+              (sp) => sp.spellType === "magichant"
+            );
+
+            if (hasMagichant) {
+              if (window.electron) {
+                window.electron.alert("You already have a magichant spell");
+              } else {
+                alert("You already have a magichant spell");
+              }
+              return cls;
+            } else {
+              // Add a new magichant spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    keys: [],
+                    tones: [],
+                  },
+                ],
+              };
+            }
+          } else if (spell === "symbol") {
+            // Check if there's already a symbol spell
+            const hasSymbol = cls.spells.some(
+              (sp) => sp.spellType === "symbol"
+            );
+
+            if (hasSymbol) {
+              if (window.electron) {
+                window.electron.alert("You already have a symbol spell");
+              } else {
+                alert("You already have a symbol spell");
+              }
+              return cls;
+            } else {
+              // Add a new symbol spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    symbols: [],
+                  },
+                ],
+              };
+            }
+          } else if (spell === "dance") {
+            // Check if there's already a dance spell
+            const hasDance = cls.spells.some((sp) => sp.spellType === "dance");
+
+            if (hasDance) {
+              if (window.electron) {
+                window.electron.alert("You already have a dance spell");
+              } else {
+                alert("You already have a dance spell");
+              }
+              return cls;
+            } else {
+              // Add a new dance spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    dances: [],
+                  },
+                ],
+              };
+            }
           } else {
             if (window.electron) {
               window.electron.alert(
@@ -387,6 +482,55 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenGambleModal(true);
   };
 
+  const handleEditChantSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantModal(true);
+  };
+
+  const handleEditChantKey = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantKeyModal(true);
+  };
+
+  const handleEditChantTone = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenChantToneModal(true);
+  };
+
+  const handleEditSymbol = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenSymbolModal(true);
+  };
+
+  const handleEditSymbolSymbols = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenSymbolSymbolsModal(true);
+  };
+
+  const handleEditDanceSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenDancerModal(true);
+  };
+
+  const handleEditDancerDances = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenDancerDancesModal(true);
+  };
+
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
       ...prev,
@@ -410,12 +554,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   };
 
   const handleDeleteSpell = (spellIndex) => {
-    console.log(
+    /*console.log(
       "spellIndex",
       spellIndex,
       "editingSpellClass",
       editingSpellClass
-    );
+    );*/
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls) => {
@@ -441,6 +585,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenGambleModal(false);
     setSpellBeingEdited(null);
     setOpenMagitechRankModal(false);
+    setOpenChantModal(false);
+    setOpenChantKeyModal(false);
+    setOpenChantToneModal(false);
+    setOpenSymbolModal(false);
+    setOpenSymbolSymbolsModal(false);
+    setOpenDancerModal(false);
+    setOpenDancerDancesModal(false);
     setEditingSpellClass(null);
   };
 
@@ -552,6 +703,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             tinkererInfusion: false,
             tinkererMagitech: false,
             gamble: false,
+            magichant: false,
+            symbol: false,
+            dance: false,
           };
 
           return (
@@ -640,6 +794,31 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   <CustomHeader2 headerText={t("Gamble")} />
                                   {(spellTypeHeaders.gamble = true)}
                                   <GambleExplain />
+                                </>
+                              )}
+                            {spell.spellType === "magichant" &&
+                              !spellTypeHeaders.magichant && (
+                                <>
+                                  <CustomHeader2 headerText={t("Magichant")} />
+                                  {(spellTypeHeaders.magichant = true)}
+                                </>
+                              )}
+                            {spell.spellType === "symbol" &&
+                              !spellTypeHeaders.symbol && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("symbol_symbol")}
+                                  />
+                                  {(spellTypeHeaders.symbol = true)}
+                                </>
+                              )}
+                            {spell.spellType === "dance" &&
+                              !spellTypeHeaders.dance && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("dance_dance")}
+                                  />
+                                  {(spellTypeHeaders.dance = true)}
                                 </>
                               )}
                           </div>
@@ -735,6 +914,48 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               key={index}
                               onEdit={() =>
                                 handleEditGambleSpell(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "magichant" && (
+                            <SpellChanter
+                              magichant={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditChantSpell(spell, cls.name, index)
+                              }
+                              onEditKeys={() =>
+                                handleEditChantKey(spell, cls.name, index)
+                              }
+                              onEditTones={() =>
+                                handleEditChantTone(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "symbol" && (
+                            <SpellSymbolist
+                              symbol={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditSymbol(spell, cls.name, index)
+                              }
+                              onEditSymbols={() =>
+                                handleEditSymbolSymbols(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "dance" && (
+                            <SpellDancer
+                              dance={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditDanceSpell(spell, cls.name, index)
+                              }
+                              onEditDances={() =>
+                                handleEditDancerDances(spell, cls.name, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -835,6 +1056,80 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         gamble={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellChanterModal
+        open={openChantModal}
+        onClose={() => {
+          setOpenChantModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+
+      <SpellChanterKeysModal
+        open={openChantKeyModal}
+        onClose={() => {
+          setOpenChantKeyModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellChanterTonesModal
+        open={openChantToneModal}
+        onClose={() => {
+          setOpenChantToneModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellSymbolistModal
+        open={openSymbolModal}
+        onClose={() => {
+          setOpenSymbolModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellSymbolistSymbolsModal
+        open={openSymbolSymbolsModal}
+        onClose={() => {
+          setOpenSymbolSymbolsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellDancerModal
+        open={openDancerModal}
+        onClose={() => {
+          setOpenDancerModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={handleDeleteSpell}
+        dance={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellDancerDancesModal
+        open={openDancerDancesModal}
+        onClose={() => {
+          setOpenDancerDancesModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        dance={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellCompendiumModal
         open={openCompendiumModal}
