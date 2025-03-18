@@ -222,6 +222,7 @@ export default function CombatLog({
   open: controlledOpen = false,
   onToggle = () => {},
   clearLogs,
+  isDifferentUser
 }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -297,7 +298,7 @@ export default function CombatLog({
         </Button>
 
         {/* Clear Logs Button (Only visible if expanded) */}
-        {open && (
+        {open && !isDifferentUser && (
           <Tooltip title={t("combat_sim_log_clear")} placement="top">
             <Button
               onClick={clearLogs}

@@ -115,6 +115,10 @@ const CombatSim = ({ user }) => {
     setLogOpen(newState);
   };
 
+  // User states
+  const isDifferentUser = encounter?.uid !== user?.uid;
+  const isPrivate = encounter?.private && isDifferentUser;
+
   function addLog(
     logText,
     value1 = null,
@@ -178,7 +182,7 @@ const CombatSim = ({ user }) => {
       const npcQuery = query(
         collection(firestore, "npc-personal"),
         where("__name__", "in", npcIds),
-        where("uid", "==", user.uid)
+        where("uid", "==", encounterData.uid)
       );
 
       try {
@@ -266,7 +270,8 @@ const CombatSim = ({ user }) => {
       round: encounter.round,
       lastSaved: currentTime,
       logs: logs,
-      private: encounter.private
+      private: encounter.private,
+      uid: user.uid,
     });
   };
 
@@ -830,6 +835,17 @@ const CombatSim = ({ user }) => {
     );
   }
 
+  // If encounter's uuid is different from user's uid and encounter is private, show error message
+  if (isPrivate) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 10 }}>
+        <Typography variant="h5" color="error">
+          {t("combat_sim_encounter_is_private")}
+        </Typography>
+      </Box>
+    );
+  }
+
   // If encounter is not found
   if (!encounter) {
     return (
@@ -865,8 +881,9 @@ const CombatSim = ({ user }) => {
         handleIncreaseRound={handleIncreaseRound}
         handleDecreaseRound={handleDecreaseRound}
         isMobile={isMobile}
+        isDifferentUser={isDifferentUser}
       />
-      {isMobile && (
+      {isMobile && !isDifferentUser && (
         <NpcSelector // NPC Selector
           isMobile={isMobile}
           npcDrawerOpen={npcDrawerOpen}
@@ -886,7 +903,7 @@ const CombatSim = ({ user }) => {
         }}
       >
         {/* NPC Selector */}
-        {!isMobile && (
+        {!isMobile && !isDifferentUser && (
           <NpcSelector
             isMobile={isMobile}
             npcDrawerOpen={npcDrawerOpen}
@@ -922,6 +939,7 @@ const CombatSim = ({ user }) => {
             handleHpMpClick={(type, npc) => handleOpen(type, npc)}
             isMobile={isMobile}
             selectedNpcID={selectedNPC?.combatId}
+            isDifferentUser={isDifferentUser}
           />
           {/* Combat Log */}
           <CombatLog
@@ -930,6 +948,7 @@ const CombatSim = ({ user }) => {
             open={logOpen}
             onToggle={handleLogToggle}
             clearLogs={clearLogs}
+            isDifferentUser={isDifferentUser}
           />
         </Box>
         {/* NPC Detail Resize Handle */}

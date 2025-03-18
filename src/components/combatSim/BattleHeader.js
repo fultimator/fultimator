@@ -24,6 +24,7 @@ export default function BattleHeader({
   handleIncreaseRound,
   handleDecreaseRound,
   isMobile,
+  isDifferentUser
 }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -71,9 +72,9 @@ export default function BattleHeader({
             >
               {encounterName}
             </Typography>
-            <Icon onClick={handleEditClick} sx={{ cursor: "pointer" }}>
+            {!isDifferentUser && <Icon onClick={handleEditClick} sx={{ cursor: "pointer" }}>
               <Edit fontSize={isMobile ? "small" : "medium"} />
-            </Icon>
+            </Icon>}
           </>
         )}
       </Box>
@@ -88,13 +89,13 @@ export default function BattleHeader({
           alignItems: "center",
         }}
       >
-        <IconButton
+        {!isDifferentUser && <IconButton
           onClick={handleDecreaseRound}
           color={isDarkMode ? "#fff" : "primary"}
           sx={{ padding: 1 }}
         >
           <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
-        </IconButton>
+        </IconButton>}
         <Typography
           variant="h5"
           sx={{
@@ -105,13 +106,13 @@ export default function BattleHeader({
         >
           {t("combat_sim_round") + `: ${round}`}
         </Typography>
-        <IconButton
+        {!isDifferentUser && <IconButton
           onClick={handleIncreaseRound}
           color={isDarkMode ? "#fff" : "primary"}
           sx={{ padding: 1 }}
         >
           <ArrowRight fontSize={isMobile ? "small" : "medium"} />
-        </IconButton>
+        </IconButton>}
       </Box>
 
       {/* Save Button & Time Ago Section */}
@@ -123,6 +124,7 @@ export default function BattleHeader({
           <IconButton
             onClick={handleSaveState}
             color="white"
+            disabled={isDifferentUser}
             sx={{
               backgroundColor: "primary.main",
               margin: 0,
@@ -136,6 +138,7 @@ export default function BattleHeader({
             color="primary"
             onClick={handleSaveState}
             startIcon={<Save />}
+            disabled={isDifferentUser}
             sx={{
               fontWeight: "bold",
               fontSize: { sm: "0.7rem", md: "0.8rem", lg: "0.9rem" },

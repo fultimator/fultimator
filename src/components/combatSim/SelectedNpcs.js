@@ -43,6 +43,7 @@ export default function SelectedNpcs({
   handleHpMpClick,
   isMobile,
   selectedNpcID,
+  isDifferentUser
 }) {
   const [anchorMenu, setAnchorMenu] = useState(null);
   const [selectedNpcMenu, setSelectedNpcMenu] = useState(null);
@@ -105,6 +106,7 @@ export default function SelectedNpcs({
             variant="outlined"
             onClick={handleResetTurns}
             endIcon={<Replay />}
+            disabled={isDifferentUser}
           >
             {t("combat_sim_next_round")}
           </Button>
@@ -144,8 +146,9 @@ export default function SelectedNpcs({
                 <ListItem
                   key={npc.combatId}
                   button
-                  onClick={(e) =>
-                    npc.id && handleListItemClick(e, npc.combatId)
+                  onClick={
+                    (e) =>
+                    !isDifferentUser && npc.id && handleListItemClick(e, npc.combatId)
                   }
                   sx={{
                     border: isDarkMode
@@ -247,7 +250,7 @@ export default function SelectedNpcs({
                       </Typography>
                     }
                     secondary={
-                      npc.id && (
+                      !isDifferentUser && npc.id && (
                         <>
                           <Tooltip
                             title={t("combat_sim_edit_hp")}
@@ -354,6 +357,7 @@ export default function SelectedNpcs({
                         <Checkbox
                           key={turnIndex}
                           checked={turnTaken}
+                          disabled={isDifferentUser}
                           onChange={(e) => {
                             e.stopPropagation();
                             const newTurns = [...npc.combatStats.turns];
@@ -430,12 +434,13 @@ export default function SelectedNpcs({
                                   handleUpdateNpcTurns(npc.combatId, newTurns);
                                 }}
                                 color="success"
+                                disabled={isDifferentUser}
                                 sx={{ padding: "2px", zIndex: 10 }}
                               />
                             </Tooltip>
                           ))
                       )}
-                      {isMobile ? (
+                      {!isDifferentUser && (isMobile ? (
                         <>
                           <IconButton
                             edge="end"
@@ -544,7 +549,7 @@ export default function SelectedNpcs({
                             </Tooltip>
                           </IconButton>
                         </>
-                      )}
+                      ))}
                     </ListItemSecondaryAction>
                   ) : (
                     <ListItemSecondaryAction
