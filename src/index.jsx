@@ -14,7 +14,6 @@ import NpcCompedium from "./routes/npc-compedium/npc-compedium";
 import NpcEdit from "./routes/npc-edit/npc-edit";
 import Roller from "./routes/roller/roller";
 import RollerScoped from "./routes/roller/roller-scoped";
-import Combat from "./routes/combat/combat";
 import CharacterSheet from "./routes/character-sheet/character-sheet";
 import { lightFabula, darkFabula } from "./themes/Fabula";
 import { lightHigh, darkHigh } from "./themes/High";
@@ -22,6 +21,8 @@ import { lightTechno, darkTechno } from "./themes/Techno";
 import { lightNatural, darkNatural } from "./themes/Natural";
 import { lightBravely, darkBravely } from "./themes/Bravely";
 import { lightObscura, darkObscura } from "./themes/Obscura";
+import CombatSimulatorEncounters from "./routes/combat/combatSimulatorEncounters";
+import CombatSimulator from "./routes/combat/combatSimulator";
 
 import {
   ThemeProvider as AppThemeProvider,
@@ -63,7 +64,8 @@ const App = () => {
               <Route path="/generate" element={<Generator />} />
               <Route path="/roller" element={<Roller />} />
               <Route path="/roller/:scope" element={<RollerScoped />} />
-              <Route path="/combat" element={<Combat />} />
+              <Route path="/combat" element={<CombatSimulatorEncounters />} />
+              <Route path="/combat-sim/:id" element={<CombatSimulator />} />
               <Route
                 path="/character-sheet/:playerId"
                 element={<CharacterSheet />}
