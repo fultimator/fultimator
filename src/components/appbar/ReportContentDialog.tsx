@@ -65,7 +65,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
   };
 
   const handleSubmit = async () => {
-    const webhookUrl = process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
+    const webhookUrl = import.meta.env.VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
 
     if (!webhookUrl) {
       setErrorMessage("Webhook URL is not defined");

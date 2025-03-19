@@ -601,7 +601,7 @@ function Personal({ user }) {
         title={"Report a Bug"}
         placeholder="Please describe the bug. Please leave a message in english!"
         onSuccess={null}
-        webhookUrl={process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL}
+        webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
