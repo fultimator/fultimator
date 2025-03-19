@@ -11,13 +11,13 @@ import {
 import { format, isToday } from "date-fns";
 import { useTheme } from "@mui/material/styles";
 import DragHandleIcon from "@mui/icons-material/DragHandle"; // Handle icon
-import { TypeIcon } from "../../components/types";
+import { TypeIcon } from "../types";
 import {
   DistanceIcon,
   MeleeIcon,
   OffensiveSpellIcon,
   SpellIcon,
-} from "../icons.js";
+} from "../icons.jsx";
 import { GiDeathSkull } from "react-icons/gi";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { t } from "../../translation/translate";

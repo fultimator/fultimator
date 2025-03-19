@@ -2,9 +2,9 @@ import React from "react";
 import { Paper, Grid, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { ReactComponent as ZenitIcon } from "../../svgs/zenit.svg";
-import { ReactComponent as ExpIcon } from "../../svgs/exp.svg";
-import { ReactComponent as FabulaIcon } from "../../svgs/fabula.svg";
+import * as ZenitIcon  from "../../svgs/zenit.svg";
+import * as ExpIcon  from "../../svgs/exp.svg";
+import  * as FabulaIcon  from "../../svgs/fabula.svg";
 
 export default function PlayerNumbers({ player, isCharacterSheet }) {
   const { t } = useTranslate();
@@ -66,7 +66,7 @@ export default function PlayerNumbers({ player, isCharacterSheet }) {
               >
                 {player.info.fabulapoints}
               </span>
-              <FabulaIcon
+              <FabulaIcon.ReactComponent
                 style={{ width: "24px", height: "24px", marginLeft: "4px" }}
               />
             </span>
@@ -98,7 +98,7 @@ export default function PlayerNumbers({ player, isCharacterSheet }) {
               >
                 {player.info.exp}
               </span>
-              <ExpIcon
+              <ExpIcon.ReactComponent
                 style={{ width: "24px", height: "24px", marginLeft: "4px" }}
               />
             </span>
@@ -130,7 +130,7 @@ export default function PlayerNumbers({ player, isCharacterSheet }) {
               >
                 {player.info.zenit}
               </span>
-              <ZenitIcon
+              <ZenitIcon.ReactComponent
                 style={{ width: "24px", height: "24px", marginLeft: "4px" }}
               />
             </span>

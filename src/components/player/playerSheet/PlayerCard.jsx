@@ -15,9 +15,9 @@ import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
 import { styled } from "@mui/system";
-import { ReactComponent as DefIcon } from "../../svgs/def.svg";
-import { ReactComponent as MdefIcon } from "../../svgs/mdef.svg";
-import { ReactComponent as InitIcon } from "../../svgs/init.svg";
+import * as DefIcon from '../../svgs/def.svg';
+import * as MdefIcon from '../../svgs/mdef.svg';
+import * as InitIcon from '../../svgs/init.svg';
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -284,7 +284,7 @@ export default function PlayerCard({
             {t("DEF")}
           </Typography>
           <span style={{ marginLeft: "-4px" }}>
-            <DefIcon style={{ width: "24px", height: "24px" }} />
+            <DefIcon.ReactComponent style={{ width: "24px", height: "24px" }} />
             <span style={{ fontFamily: "'Antonio', sans-serif" }}>
               {" "}
               {currDef}
@@ -313,7 +313,7 @@ export default function PlayerCard({
             {t("M.DEF")}
           </Typography>
           <span style={{ marginLeft: "-4px" }}>
-            <MdefIcon style={{ width: "24px", height: "24px" }} />
+            <MdefIcon.ReactComponent  style={{ width: "24px", height: "24px" }} />
             <span style={{ fontFamily: "'Antonio', sans-serif" }}>
               {" "}
               {currMDef}
@@ -343,7 +343,7 @@ export default function PlayerCard({
               {t("INIT")}
             </Typography>
             <span style={{ marginLeft: "-4px" }}>
-              <InitIcon style={{ width: "24px", height: "24px" }} />
+              <InitIcon.ReactComponent  style={{ width: "24px", height: "24px" }} />
               <span style={{ fontFamily: "'Antonio', sans-serif" }}>
                 {" "}
                 {(currInit > 0 ? "+" : "") + currInit}

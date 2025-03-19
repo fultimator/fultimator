@@ -14,10 +14,10 @@ import {
   MeleeIcon,
   OffensiveSpellIcon,
   SpellIcon,
-} from "../icons.js";
-import Diamond from "../Diamond";
-import { calcPrecision, calcDamage, calcMagic } from "../../libs/npcs";
-import { t } from "../../translation/translate";
+} from "../icons.jsx";
+import Diamond from "../Diamond.jsx";
+import { calcPrecision, calcDamage, calcMagic } from "../../libs/npcs.js";
+import { t } from "../../translation/translate.jsx";
 
 const RollsTab = ({ selectedNPC, setClickedData, setOpen, handleAttack }) => {
 

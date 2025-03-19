@@ -185,7 +185,7 @@ export default function NpcEdit() {
   }
 
   async function sendDiscordWebhook(title, description, color = 16248815) {
-    const webhookUrl = process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
+    const webhookUrl = import.meta.env.VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
 
     if (!webhookUrl) {
       console.error("Webhook URL is missing in environment variables!");
