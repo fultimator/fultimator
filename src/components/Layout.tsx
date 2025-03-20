@@ -10,11 +10,9 @@ type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscur
 interface LayoutProps {
   children: React.ReactNode;
   fullWidth?: boolean; // New prop for controlling Container width
-  loading?: boolean;
-  unsavedChanges?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading, unsavedChanges }) => {
+const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
   const { selectedTheme, isDarkMode, setTheme, toggleDarkMode } = useThemeContext();
 
   const handleSelectTheme = (theme: ThemeValue) => {
@@ -31,14 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading, unsavedCh
   const navigate = useNavigate();
 
   const handleNavigation = () => {
-    if (unsavedChanges) {
-      const confirmLeave = window.confirm("You have unsaved changes. Are you sure you want to leave?");
-      if (confirmLeave) {
-        navigate(-1); // Navigate back if the user confirms
-      }
-    } else {
-      navigate(-1); // No changes, navigate normally
-    }
+    navigate(-1);
   };
 
   const npcRoutes = ["/npc-gallery/:npcId"];
@@ -56,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading, unsavedCh
 
   return (
     <>
-      {!loading && (isNpcEdit || isPcEdit) ? (
+      {isNpcEdit || isPcEdit ? (
         <CompactAppBar
           isNpcEdit={isNpcEdit}
           isPcEdit={isPcEdit}

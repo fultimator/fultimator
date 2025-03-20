@@ -135,11 +135,11 @@ export default function PlayerEdit() {
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       if (isUpdated) {
-        console.log(3);
         event.preventDefault();
         event.returnValue = "";
       }
     };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
@@ -275,8 +275,15 @@ export default function PlayerEdit() {
     return null;
   }
 
+  /*
+  if (!canAccessTest) {
+    navigate("/pc-gallery");
+    return null;
+  }
+  */
+
   return (
-    <Layout unsavedChanges={isUpdated}>
+    <Layout>
       <Tabs value={openTab} onChange={handleTabChange}>
         {isSmallScreen ? (
           <>
