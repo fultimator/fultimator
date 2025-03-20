@@ -89,7 +89,7 @@ class ErrorBoundary extends Component {
 
     // Send a message to a Discord webhook
     axios
-      .post(import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL, {
+      .post(process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL, {
         content: reportContent,
       })
       .then(() => {

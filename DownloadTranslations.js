@@ -1,6 +1,6 @@
-import https from 'https';
-import fs from 'node:fs';
-import Papa from 'papaparse';
+const https = require("https");
+const fs = require("node:fs");
+const Papa = require("papaparse");
 
 https
   .get(
