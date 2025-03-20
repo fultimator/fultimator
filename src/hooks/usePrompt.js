@@ -1,20 +1,32 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { UNSAFE_NavigationContext as NavigationContext } from "react-router-dom";
-import { useContext } from "react";
 
 export const usePrompt = (message, when) => {
-  const { navigator } = useContext(NavigationContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!when) return;
 
-    const unblock = navigator.block((tx) => {
+    // Handle navigation logic when the user tries to navigate
+    const handleNavigate = (event) => {
       if (window.confirm(message)) {
-        unblock();
-        tx.retry();
+        // Proceed with navigation
+        return;
+      } else {
+        // Prevent navigation by pushing the current location again
+        event.preventDefault();
       }
-    });
+    };
 
-    return unblock;
-  }, [navigator, message, when]);
+    // Listen for location change and block navigation if necessary
+    window.addEventListener("beforeunload", handleNavigate);
+
+    // Cleanup the event listener when the component is unmounted
+    return () => {
+      window.removeEventListener("beforeunload", handleNavigate);
+    };
+  }, [message, when, navigate, location]);
+
+  return null;
 };

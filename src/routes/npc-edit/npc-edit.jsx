@@ -319,7 +319,7 @@ export default function NpcEdit() {
 
   return (
     <NpcProvider npcData={npcTemp}>
-      <Layout>
+      <Layout unsavedChanges={isUpdated}>
         {/* Main Grid Container */}
         {user && isModerator && user.uid !== npc.uid && (
           <Alert
