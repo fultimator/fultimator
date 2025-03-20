@@ -197,6 +197,7 @@ const CombatSim = ({ user }) => {
         // Merge combatId and combatStats
         const loadedNPCs = encounterData.selectedNPCs.map((npcData) => ({
           ...npcMap.get(npcData.id), // Get fetched NPC data
+          id: npcData.id,
           combatId: npcData.combatId,
           combatStats: npcData.combatStats,
         }));
@@ -427,6 +428,7 @@ const CombatSim = ({ user }) => {
         ...prev,
         {
           ...npc,
+          id: npcId,
           combatId: `${npc.id}-${Date.now()}`,
           combatStats: combatStats,
         },
