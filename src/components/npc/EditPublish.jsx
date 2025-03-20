@@ -33,6 +33,8 @@ export default function EditPublish({
   handleCheckboxChange,
   publish,
   unPublish,
+  updatePublishLanguage,
+  isUpdated,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -127,8 +129,8 @@ export default function EditPublish({
               npc.published
                 ? t("This NPC is part of the Adversary Compendium.")
                 : t(
-                  "Help the Adversary Compendium grow by publishing your finished work!"
-                )
+                    "Help the Adversary Compendium grow by publishing your finished work!"
+                  )
             }
             fullWidth
             value={npc.createdBy}
@@ -144,7 +146,7 @@ export default function EditPublish({
             value={npc.language || ""}
             onChange={(evt) => setNpc({ ...npc, language: evt.target.value })}
             fullWidth
-            disabled={user && isModerator && user.uid !== npc.uid}
+            disabled={user.uid !== npc.uid && !isModerator}
           >
             {languageOptions.map((option) => (
               <MenuItem key={option.code} value={option.code}>
@@ -171,10 +173,14 @@ export default function EditPublish({
                 <Typography variant="body2">
                   Ensure that your submission follows the
                 </Typography>
-                <Link href="#" onClick={handleDialogOpen} style={{ textDecoration: 'none' }}>
+                <Link
+                  href="#"
+                  onClick={handleDialogOpen}
+                  style={{ textDecoration: "none" }}
+                >
                   <Typography
                     variant="body1"
-                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
                   >
                     {t("Submission Guidelines for Adversary Compendium")}
                   </Typography>
@@ -251,18 +257,12 @@ export default function EditPublish({
                       <li>
                         <strong>{t("submission_rule_bare_minimum")}</strong>
                         <ul>
-                          <li>
-                            {t("submission_rule_bare_minimum_types")}
-                          </li>
-                          <li>
-                            {t("submission_rule_bare_minimum_example")}
-                          </li>
+                          <li>{t("submission_rule_bare_minimum_types")}</li>
+                          <li>{t("submission_rule_bare_minimum_example")}</li>
                         </ul>
                       </li>
                     </ul>
-                    <p>
-                      {t("submission_rule_bare_minimum_caption")}
-                    </p>
+                    <p>{t("submission_rule_bare_minimum_caption")}</p>
                     <img
                       src={emaExample}
                       alt="emaExample"
@@ -288,15 +288,27 @@ export default function EditPublish({
             </>
           )}
           {npc.published && (
-            <Button
-              variant="outlined"
-              sx={{ marginTop: 1 }}
-              onClick={unPublish}
-            >
-              {user && isModerator && user.uid !== npc.uid
-                ? t("Unpublish as Moderator")
-                : t("Unpublish")}
-            </Button>
+            <>
+              <Button
+                variant="outlined"
+                sx={{ marginTop: 1 }}
+                onClick={unPublish}
+              >
+                {user && isModerator && user.uid !== npc.uid
+                  ? t("Unpublish as Moderator")
+                  : t("Unpublish")}
+              </Button>
+              {isUpdated && npc.language !== "" && isModerator && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ marginTop: 1 }}
+                  onClick={() => updatePublishLanguage(npc.language || "")}
+                >
+                  {t("Update as Moderator")}
+                </Button>
+              )}
+            </>
           )}
 
           {/* Message for Publish Criteria */}
