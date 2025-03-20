@@ -2,9 +2,9 @@ import React from "react";
 import { Paper, Grid, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import ZenitIcon  from "../../svgs/zenit.svg?react";
-import  ExpIcon  from "../../svgs/exp.svg?react";
-import  FabulaIcon  from "../../svgs/fabula.svg?react";
+import { ReactComponent as ZenitIcon } from "../../svgs/zenit.svg";
+import { ReactComponent as ExpIcon } from "../../svgs/exp.svg";
+import { ReactComponent as FabulaIcon } from "../../svgs/fabula.svg";
 
 export default function PlayerNumbers({ player, isCharacterSheet }) {
   const { t } = useTranslate();
