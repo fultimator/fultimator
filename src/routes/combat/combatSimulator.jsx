@@ -170,13 +170,13 @@ const CombatSim = ({ user }) => {
       setEncounter(encounterData);
       setEncounterName(encounterData?.name || "");
       setLogs(encounterData?.logs || []);
-
+    
       if (!encounterData?.selectedNPCs?.length) {
         setSelectedNPCs([]);
         setLoading(false);
         return;
       }
-
+    
       // Fetch all NPCs in one query
       const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
       const npcQuery = query(
@@ -184,30 +184,37 @@ const CombatSim = ({ user }) => {
         where("__name__", "in", npcIds),
         where("uid", "==", encounterData.uid)
       );
-
+    
       try {
         console.log("Fetching NPCs...");
         const querySnapshot = await getDocs(npcQuery);
         const npcMap = new Map();
-
+    
         querySnapshot.forEach((doc) => {
           npcMap.set(doc.id, doc.data());
         });
-
-        // Merge combatId and combatStats
-        const loadedNPCs = encounterData.selectedNPCs.map((npcData) => ({
-          ...npcMap.get(npcData.id), // Get fetched NPC data
-          id: npcData.id,
-          combatId: npcData.combatId,
-          combatStats: npcData.combatStats,
-        }));
-
+    
+        const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
+          const fetchedNpc = npcMap.get(npcData.id);
+          return fetchedNpc
+            ? {
+                ...fetchedNpc, 
+                id: npcData.id,
+                combatId: npcData.combatId,
+                combatStats: npcData.combatStats,
+              }
+            : {
+                combatId: npcData.combatId, 
+                combatStats: npcData.combatStats, 
+              };
+        });
+    
         setSelectedNPCs(loadedNPCs);
       } catch (error) {
         console.error("Error fetching NPCs:", error);
         setSelectedNPCs([]);
       }
-
+    
       setLoading(false);
     };
 
@@ -239,6 +246,14 @@ const CombatSim = ({ user }) => {
 
   // Save encounter state
   const handleSaveState = () => {
+
+    // if selectedNPCs doesn't have any npc without id, then save the state
+    if (selectedNPCs.some((npc) => !npc.id)) {
+      // Alert
+      alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
+      return;
+    }
+
     const currentTime = new Date();
     setLastSaved(currentTime);
 
