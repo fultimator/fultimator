@@ -19,10 +19,10 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import * as ZenitIcon  from "../../svgs/zenit.svg";
-import * as ExpIcon  from "../../svgs/exp.svg";
-import * as ExpDisabledIcon  from "../../svgs/exp_disabled.svg";
-import * as FabulaIcon  from "../../svgs/fabula.svg";
+import ZenitIcon  from "../../svgs/zenit.svg?react";
+import ExpIcon  from "../../svgs/exp.svg?react";
+import ExpDisabledIcon  from "../../svgs/exp_disabled.svg?react";
+import FabulaIcon  from "../../svgs/fabula.svg?react";
 import { Code } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import Confetti from "react-confetti";
@@ -211,7 +211,7 @@ export default function EditPlayerBasics({
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton>
-                      <FabulaIcon.ReactComponent style={{ width: "28px", height: "28px" }} />
+                      <FabulaIcon style={{ width: "28px", height: "28px" }} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -279,7 +279,7 @@ export default function EditPlayerBasics({
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton>
-                      <ZenitIcon.ReactComponent style={{ width: "28px", height: "28px" }} />
+                      <ZenitIcon style={{ width: "28px", height: "28px" }} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -466,7 +466,7 @@ function ExpAdornment({
           disabled={!isEditMode}
         >
           {exp >= 10 ? (
-            <ExpIcon.ReactComponent
+            <ExpIcon
               style={{
                 width: "28px",
                 height: "28px",
@@ -474,7 +474,7 @@ function ExpAdornment({
               }}
             />
           ) : (
-            <ExpDisabledIcon.ReactComponent
+            <ExpDisabledIcon
               style={{
                 width: "28px",
                 height: "28px",

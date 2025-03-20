@@ -1,36 +1,56 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import reportWebVitals from "./reportWebVitals";
-
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 
 import Home from "./routes/Home";
-import Generator from "./routes/generator/generator";
-import NpcGallery from "./routes/npc-gallery/npc-gallery";
-import NpcCompedium from "./routes/npc-compedium/npc-compedium";
-import NpcEdit from "./routes/npc-edit/npc-edit";
-import Roller from "./routes/roller/roller";
-import RollerScoped from "./routes/roller/roller-scoped";
-import CharacterSheet from "./routes/character-sheet/character-sheet";
+//import Generator from "./routes/generator/generator";
+//import NpcGallery from "./routes/npc-gallery/npc-gallery";
+//import NpcCompedium from "./routes/npc-compedium/npc-compedium";
+//import NpcEdit from "./routes/npc-edit/npc-edit";
+//import CombatSimulator from "./routes/combat/combatSimulator";
+//import CombatSimulatorEncounters from "./routes/combat/combatSimulatorEncounters";
+//import PlayerGallery from "./routes/player-gallery/player-gallery";
+//import PlayerEdit from "./routes/player-edit/player-edit";
+//import Roller from "./routes/roller/roller";
+//import RollerScoped from "./routes/roller/roller-scoped";
+//import CharacterSheet from "./routes/character-sheet/character-sheet";
 import { lightFabula, darkFabula } from "./themes/Fabula";
 import { lightHigh, darkHigh } from "./themes/High";
 import { lightTechno, darkTechno } from "./themes/Techno";
 import { lightNatural, darkNatural } from "./themes/Natural";
 import { lightBravely, darkBravely } from "./themes/Bravely";
 import { lightObscura, darkObscura } from "./themes/Obscura";
-import CombatSimulatorEncounters from "./routes/combat/combatSimulatorEncounters";
-import CombatSimulator from "./routes/combat/combatSimulator";
 
 import {
   ThemeProvider as AppThemeProvider,
   useThemeContext,
 } from "./ThemeContext";
-import PlayerGallery from "./routes/player-gallery/player-gallery";
-import PlayerEdit from "./routes/player-edit/player-edit";
 import ErrorBoundary from "./ErrorBoundary";
+import LoadingPage from "./components/common/LoadingPage";
+
+const NpcGallery = React.lazy(() => import("./routes/npc-gallery/npc-gallery"));
+const NpcEdit = React.lazy(() => import("./routes/npc-edit/npc-edit"));
+const NpcCompedium = React.lazy(() =>
+  import("./routes/npc-compedium/npc-compedium")
+);
+const PlayerEdit = React.lazy(() => import("./routes/player-edit/player-edit"));
+const PlayerGallery = React.lazy(() =>
+  import("./routes/player-gallery/player-gallery")
+);
+const CharacterSheet = React.lazy(() =>
+  import("./routes/character-sheet/character-sheet")
+);
+const CombatSimulator = React.lazy(() =>
+  import("./routes/combat/combatSimulator")
+);
+const CombatSimulatorEncounters = React.lazy(() =>
+  import("./routes/combat/combatSimulatorEncounters")
+);
+const Generator = React.lazy(() => import("./routes/generator/generator"));
+const Roller = React.lazy(() => import("./routes/roller/roller"));
+const RollerScoped = React.lazy(() => import("./routes/roller/roller-scoped"));
 
 const themes = {
   Fabula: { light: lightFabula, dark: darkFabula },
@@ -43,10 +63,11 @@ const themes = {
 
 const App = () => {
   const { selectedTheme, isDarkMode } = useThemeContext();
-  const currentTheme = themes[selectedTheme] 
-    ? (isDarkMode ? themes[selectedTheme].dark : themes[selectedTheme].light)
+  const currentTheme = themes[selectedTheme]
+    ? isDarkMode
+      ? themes[selectedTheme].dark
+      : themes[selectedTheme].light
     : themes.Fabula.light;
-
 
   return (
     <React.StrictMode>
@@ -56,19 +77,93 @@ const App = () => {
           <ErrorBoundary>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/pc-gallery/:playerId" element={<PlayerEdit />} />
-              <Route path="/pc-gallery" element={<PlayerGallery />} />
-              <Route path="/npc-gallery/:npcId" element={<NpcEdit />} />
-              <Route path="/npc-gallery" element={<NpcGallery />} />
-              <Route path="/npc-compedium" element={<NpcCompedium />} />
-              <Route path="/generate" element={<Generator />} />
-              <Route path="/roller" element={<Roller />} />
-              <Route path="/roller/:scope" element={<RollerScoped />} />
-              <Route path="/combat" element={<CombatSimulatorEncounters />} />
-              <Route path="/combat-sim/:id" element={<CombatSimulator />} />
+              <Route
+                path="/pc-gallery/:playerId"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <PlayerEdit />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/pc-gallery"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <PlayerGallery />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/npc-gallery/:npcId"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <NpcEdit />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/npc-gallery"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <NpcGallery />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/npc-compedium"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <NpcCompedium />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/generate"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <Generator />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/roller"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <Roller />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/roller/:scope"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <RollerScoped />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/combat"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <CombatSimulatorEncounters />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/combat-sim/:id"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <CombatSimulator />
+                  </Suspense>
+                }
+              />
               <Route
                 path="/character-sheet/:playerId"
-                element={<CharacterSheet />}
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <CharacterSheet />
+                  </Suspense>
+                }
               />
             </Routes>
           </ErrorBoundary>
@@ -87,7 +182,3 @@ const Root = () => (
 const root = document.getElementById("root");
 const rootElement = ReactDOM.createRoot(root);
 rootElement.render(<Root />);
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

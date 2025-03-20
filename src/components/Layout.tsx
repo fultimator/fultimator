@@ -10,9 +10,10 @@ type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscur
 interface LayoutProps {
   children: React.ReactNode;
   fullWidth?: boolean; // New prop for controlling Container width
+  loading?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
+const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading }) => {
   const { selectedTheme, isDarkMode, setTheme, toggleDarkMode } = useThemeContext();
 
   const handleSelectTheme = (theme: ThemeValue) => {
@@ -47,7 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth }) => {
 
   return (
     <>
-      {isNpcEdit || isPcEdit ? (
+      {!loading && (isNpcEdit || isPcEdit) ? (
         <CompactAppBar
           isNpcEdit={isNpcEdit}
           isPcEdit={isPcEdit}

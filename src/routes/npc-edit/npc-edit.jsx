@@ -46,7 +46,7 @@ import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
-import blacklist from "../../translation/blacklist";
+import blacklist from "../../translation/blacklist.json";
 import deepEqual from "deep-equal";
 import { NpcProvider } from "../../components/npc/NpcContext";
 
