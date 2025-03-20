@@ -40,7 +40,7 @@ import {
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-const MAX_ENCOUNTERS = 10;
+const MAX_ENCOUNTERS = 3;
 
 export default function CombatSimulatorEncounters() {
   const [user, loading, error] = useAuthState(auth);
