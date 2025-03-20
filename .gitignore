@@ -13,7 +13,6 @@
 
 # production
 /build
-/dist
 Instructions.txt
 # misc
 .DS_Store

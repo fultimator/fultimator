@@ -30,16 +30,4 @@ const types = {
   },
 };
 
-export const typesList = [
-  "physical",
-  "wind",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];
-
 export default types;
