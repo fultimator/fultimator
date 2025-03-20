@@ -46,17 +46,19 @@ import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../../components/common/CustomHeader";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
-import blacklist from "../../translation/blacklist";
+import blacklist from "../../translation/blacklist.json";
 import deepEqual from "deep-equal";
 import { NpcProvider } from "../../components/npc/NpcContext";
 
 // Combine all blacklisted names into a single array
-const mergedBlacklistNames = blacklist.flatMap(item => Object.values(item));
+const mergedBlacklistNames = blacklist.flatMap((item) => Object.values(item));
 
 // Function to check if the NPC name is blacklisted
 const isBlacklisted = (npcName) => {
   const lowerCaseNpcName = npcName.toLowerCase();
-  return mergedBlacklistNames.some(blacklistedName => blacklistedName.toLowerCase() === lowerCaseNpcName);
+  return mergedBlacklistNames.some(
+    (blacklistedName) => blacklistedName.toLowerCase() === lowerCaseNpcName
+  );
 };
 
 export default function NpcEdit() {
@@ -182,6 +184,46 @@ export default function NpcEdit() {
     return null;
   }
 
+  async function sendDiscordWebhook(title, description, color = 16248815) {
+    const webhookUrl = import.meta.env.VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      console.error("Webhook URL is missing in environment variables!");
+      return;
+    }
+
+    const payload = {
+      content: null,
+      embeds: [
+        {
+          title: title,
+          description: description,
+          color: color,
+        },
+      ],
+      username: "Fultimator-Support 🤖",
+      attachments: [],
+    };
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      console.log("Webhook sent successfully!");
+    } catch (error) {
+      console.error("Error sending webhook:", error.message || error);
+    }
+  }
+
   // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
@@ -195,7 +237,34 @@ export default function NpcEdit() {
       publishedAt: Date.now(),
     });
     if (isBlacklisted(npcTemp.name)) {
-      sendWebhook(npcTemp);
+      sendDiscordWebhook(
+        "⚠️ BLACKLISTED NPC NAME PUBLISHED! ⚠️",
+        `🚨 **Alert!** An NPC with a **blacklisted name** has been published.
+        \n🆔 **NPC:** \`${npcTemp.name} - ${npcTemp.id}\`
+        \n🆔 **Author UUID:** ${npcTemp.uid}
+        \n👮 **Moderator Review Needed!**
+        \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npcTemp.id})`,
+        0xE74C3C // Red color
+      );
+      
+    }
+  };
+
+  // Function to update publish language as moderator
+  const updatePublishLanguage = async (newLang) => {
+    setIsUpdated(false);
+    setDoc(ref, { ...npcTemp, language: newLang });
+
+    // Send message to webhook when updating publish language as moderator
+    if (user && isModerator && user.uid !== npc.uid) {
+      sendDiscordWebhook(
+        "🏴 NPC LANGUAGE UPDATED BY MODERATOR! 🏴",
+        `👮 **Moderator:** ${user.uid}
+        \n🆔 **Author UUID:** ${npc.uid}
+        \n📌 **Updated Content:** \`${npc.name} - ${npc.id}\` (NPC)
+        \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npc.id})`,
+        0xf7a633 // Orange color
+      );
     }
   };
 
@@ -209,76 +278,14 @@ export default function NpcEdit() {
 
     // Send message to webhook when unpublishing as moderator
     if (user && isModerator && user.uid !== npc.uid) {
-      const webhookUrl =
-        process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
-      const payload = {
-        content: null,
-        embeds: [
-          {
-            title: `UNPUBLISHED BY MODERATOR! (NPC)`,
-            description: `Moderator: ${user.uid}
-          \nAuthor UUID: ${npc.uid}
-          \n Reported Content: ${npc.name} - ${npc.id} (NPC)
-          \n https://fabula-ultima-helper.web.app/npc-gallery/${npc.id}`,
-            color: 16248815,
-          },
-        ],
-        username: "Fultimator-Support",
-        attachments: [],
-      };
-
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          console.log(
-            "There was a problem with the fetch operation: " + error.message
-          );
-        } else {
-          console.log("An unknown error occurred");
-        }
-      }
-    }
-  };
-
-  const sendWebhook = (npc) => {
-    const webhookUrl = process.env.REACT_APP_DISCORD_REPORT_CONTENT_WEBHOOK_URL;
-    const payload = {
-      content: null,
-      embeds: [
-        {
-          title: `BLACKLISTED NPC FOUND: ${npc.name}`,
-          description: `Author UUID: ${npc.uid}
-          \nFlagged Content: ${npc.name} - ${npc.id} (NPC)
-          \nhttps://fabula-ultima-helper.web.app/npc-gallery/${npc.id})
-          \n\n**Reasons:** This content has been flagged and may violate Rule 1.`,
-          color: 16248815,
-        },
-      ],
-      username: "Fultimator-Support",
-      attachments: [],
-    };
-
-    try {
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      console.error("Error sending webhook: ", error);
+      sendDiscordWebhook(
+        "✅ NPC UNPUBLISHED BY MODERATOR ✅",
+        `👮 **Moderator:** ${user.uid}
+        \n🆔 **Unpublished NPC:** \`${npc.name} - ${npc.id}\`
+        \n🚫 This NPC is no longer visible to the public.
+        \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npc.id})`,
+        0x2ECC71 // Green color
+      );      
     }
   };
 
@@ -384,6 +391,8 @@ export default function NpcEdit() {
               handleCheckboxChange={handleCheckboxChange}
               publish={publish}
               unPublish={unPublish}
+              updatePublishLanguage={updatePublishLanguage}
+              isUpdated={isUpdated}
             />
             {/* Tags Section */}
             {user && user.uid === npc.uid && (
@@ -531,7 +540,9 @@ export default function NpcEdit() {
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* Save Button, shown if there are unsaved changes */}
         {isUpdated && (
-          <Grid style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}>
+          <Grid
+            style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}
+          >
             <Fade in={showScrollTop} timeout={300}>
               <Tooltip title="Save" placement="bottom">
                 <Fab

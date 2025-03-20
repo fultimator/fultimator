@@ -32,6 +32,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -81,129 +82,15 @@ function Personal({ user }) {
   const [name, setName] = useState("");
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
-  //const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
-  //const [hasApplied, setHasApplied] = useState(false);
 
   const fileInputRef = useRef(null);
 
-  /*
-  const canAccessTest =
-    testUsers.includes(user.uid) || moderators.includes(user.uid);
-  */
-
   const personalRef = collection(firestore, "player-personal");
   const personalQuery = query(personalRef, where("uid", "==", user.uid));
-  const [personalList, err] = useCollectionData(personalQuery, {
+  const [personalList, loading, err] = useCollectionData(personalQuery, {
     idField: "id",
   });
-
-  /*
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-  };
-
-  const handleApplicationSuccess = () => {
-    setHasApplied(true);
-  };
-  */
-
-  /*
-  if (!canAccessTest) {
-    return (
-      <>
-        <Paper
-          elevation={3}
-          sx={{ marginBottom: 5, padding: 4, textAlign: "center" }}
-        >
-          <Grid container direction="column" alignItems="center" spacing={3}>
-            <Grid item>
-              <Typography variant="h2" gutterBottom>
-                Apply for Alpha Access to the Character Designer
-              </Typography>
-              <Typography variant="body1">
-                The Character Designer is currently a feature available only to
-                alpha testers. If you want to use it within the Fultimator web
-                app, please apply for alpha access below.
-              </Typography>
-            </Grid>
-            {!hasApplied && (
-              <Grid item>
-                <Box mt={2}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    onClick={() => setIsDialogOpen(true)}
-                  >
-                    Apply for Test Access
-                  </Button>
-                </Box>
-              </Grid>
-            )}
-            {hasApplied && (
-              <Grid item>
-                <Box mt={2}>
-                  <Typography variant="h2">
-                    Thank you for applying! Stay tuned for updates on your
-                    application status.
-                  </Typography>
-                </Box>
-              </Grid>
-            )}
-            <Grid item>
-              <Typography variant="body1" sx={{ mt: 2 }}>
-                You can also download the Fultimator desktop app to start using
-                the Character Designer immediately, without needing to apply.
-              </Typography>
-              <Box mt={2}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  color="primary"
-                  href="https://github.com/fultimator/fultimator-desktop/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download the Desktop App
-                </Button>
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box mt={2}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    backgroundColor: "#7289da",
-                    color: "#fff",
-                    ":hover": { backgroundColor: "#7289da" },
-                  }}
-                  href="https://discord.gg/9yYc6R93Cd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Join our Discord
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
-        <HelpFeedbackDialog
-          open={isDialogOpen}
-          onClose={handleDialogClose}
-          userEmail={user.email}
-          userUUID={user.uid}
-          title={"Apply for Test Access"}
-          placeholder="We'd love to know your reasons for wanting to join our alpha test. Please provide your feedback in English!"
-          onSuccess={handleApplicationSuccess}
-          webhookUrl={process.env.REACT_APP_DISCORD_APPLICATIONS_WEBHOOK_URL}
-        />
-      </>
-    );
-  }
-  */
-
   if (err?.code === "resource-exhausted") {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
@@ -529,7 +416,19 @@ function Personal({ user }) {
           </Grid>
         </Paper>
       </div>
+      {loading && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: 50,
+            }}
+          >
+           <CircularProgress />
+          </div>
+        )}
       <Grid container spacing={1} sx={{ py: 1 }}>
+        
         {filteredList.map((player, index) => (
           <Grid
             item
@@ -601,7 +500,7 @@ function Personal({ user }) {
         title={"Report a Bug"}
         placeholder="Please describe the bug. Please leave a message in english!"
         onSuccess={null}
-        webhookUrl={process.env.REACT_APP_DISCORD_REPORT_BUG_WEBHOOK_URL}
+        webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
