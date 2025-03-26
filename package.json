@@ -38,6 +38,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "translate:build": "node DownloadTranslations.js && vite build",
     "build-size": "du -sh dist/",
     "serve": "npx serve dist",
     "local-deploy": "node DownloadTranslations.js && vite build && npx serve dist",
