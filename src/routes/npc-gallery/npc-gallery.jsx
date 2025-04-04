@@ -1,4 +1,9 @@
-import { Link as RouterLink } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useSearchParams,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 
 import {
   query,
@@ -42,6 +47,7 @@ import {
   Download,
   Edit,
   HistoryEdu,
+  UploadFile,
 } from "@mui/icons-material";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -49,6 +55,9 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
+import ExportAllNPCs from "../../components/common/ExportAllNPCs";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 
 export default function NpcGallery() {
   const { t } = useTranslate();
@@ -74,14 +83,22 @@ export default function NpcGallery() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [rank, setRank] = useState("");
-  const [sort, setSort] = useState("name");
-  const [direction, setDirection] = useState("ascending");
-  const [species, setSpecies] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [searchParams] = useSearchParams();
+
+  const [name, setName] = useState(searchParams.get("name") || "");
+  const [rank, setRank] = useState(searchParams.get("rank") || "");
+  const [species, setSpecies] = useState(searchParams.get("species") || "");
+  const [sort, setSort] = useState(searchParams.get("sort") || "name");
+  const [direction, setDirection] = useState(
+    searchParams.get("direction") || "ascending"
+  );
   const [tagSearch] = useState("");
-  const [tagSort, setTagSort] = useState(null);
+  const [tagSort, setTagSort] = useState(searchParams.get("tagSort") || null);
   const [collapse, setCollapse] = useState(false);
+  const [filteredParams, setFilteredParams] = useState(location.search || "");
 
   const fileInputRef = useRef(null);
 
@@ -113,6 +130,84 @@ function Personal({ user }) {
   const sortedTags = Object.keys(tagCounts).sort(
     (a, b) => tagCounts[b] - tagCounts[a]
   );
+
+  // Create wrapper functions for state updates that also update URL
+  const updateName = (value) => {
+    setName(value);
+    updateUrlParams({ name: value });
+  };
+
+  const updateRank = (value) => {
+    setRank(value);
+    updateUrlParams({ rank: value });
+  };
+
+  const updateSpecies = (value) => {
+    setSpecies(value);
+    updateUrlParams({ species: value });
+  };
+
+  const updateSort = (value) => {
+    setSort(value);
+    updateUrlParams({ sort: value });
+  };
+
+  const updateDirection = (value) => {
+    setDirection(value);
+    updateUrlParams({ direction: value });
+  };
+
+  const updateTagSort = (value) => {
+    setTagSort(value);
+    updateUrlParams({ tagSort: value });
+  };
+
+  // Function to update URL parameters
+  const updateUrlParams = (updatedParams) => {
+    if (loading) return; // Don't update URL while loading
+
+    const currentParams = {
+      name,
+      rank,
+      species,
+      tagSort,
+      sort,
+      direction,
+      ...updatedParams,
+    };
+
+    // Build the query string
+    const queryString = new URLSearchParams(
+      Object.entries(currentParams).reduce((acc, [key, value]) => {
+        if (value) acc[key] = value; // Only include non-empty values
+        return acc;
+      }, {})
+    ).toString();
+
+    // Set it for later use
+    setFilteredParams(queryString);
+
+    // Update the URL with the new query string
+    navigate(`${location.pathname}?${queryString}`, {
+      replace: true,
+    });
+  };
+
+  const clearSearchFilters = () => {
+    // Reset all filter states
+    setName("");
+    setRank("");
+    setSpecies("");
+    setTagSort(null);
+    setSort("name"); // Reset to default sort
+    setDirection("ascending"); // Reset to default direction
+
+    // Clear the URL parameters
+    setFilteredParams("");
+
+    // Update the URL to remove all query parameters
+    navigate(location.pathname, { replace: true });
+  };
 
   const addNpc = async function () {
     const data = {
@@ -148,7 +243,7 @@ function Personal({ user }) {
         alert(alertMessage);
         return;
       }
-      
+
       delete jsonData.id; // Remove the id field if present
       jsonData.uid = user.uid; // Assign the current user UID
       jsonData.published = false; // Set the published field to false
@@ -306,7 +401,7 @@ function Personal({ user }) {
                 fullWidth
                 value={name}
                 onChange={(evt) => {
-                  setName(evt.target.value);
+                  updateName(evt.target.value);
                 }}
               />
             </Grid>
@@ -314,7 +409,7 @@ function Personal({ user }) {
             <Grid
               item
               xs={12}
-              md={3}
+              md={2}
               alignItems="center"
               justifyContent="center"
               sx={{ display: "flex" }}
@@ -325,7 +420,7 @@ function Personal({ user }) {
                 options={sortedTags}
                 value={tagSort}
                 onChange={(event, newValue) => {
-                  setTagSort(newValue);
+                  updateTagSort(newValue);
                 }}
                 filterOptions={(options, { inputValue }) => {
                   const inputValueUpper = inputValue.toUpperCase();
@@ -347,7 +442,7 @@ function Personal({ user }) {
 
             <Grid
               item
-              xs={4}
+              xs={6}
               md={1.5}
               alignItems="center"
               justifyContent="center"
@@ -360,8 +455,8 @@ function Personal({ user }) {
                   id="select-rank"
                   value={rank}
                   label={t("Rank:")}
-                  onChange={(evt, val2) => {
-                    setRank(evt.target.value);
+                  onChange={(evt) => {
+                    updateRank(evt.target.value);
                   }}
                 >
                   <MenuItem value={""}>{t("All")}</MenuItem>
@@ -382,7 +477,7 @@ function Personal({ user }) {
             </Grid>
             <Grid
               item
-              xs={4}
+              xs={6}
               md={1.5}
               alignItems="center"
               justifyContent="center"
@@ -395,8 +490,8 @@ function Personal({ user }) {
                   id="select-species"
                   value={species}
                   label={t("Species:")}
-                  onChange={(evt, val2) => {
-                    setSpecies(evt.target.value);
+                  onChange={(evt) => {
+                    updateSpecies(evt.target.value);
                   }}
                 >
                   <MenuItem value={""}>{t("All")}</MenuItem>
@@ -413,7 +508,7 @@ function Personal({ user }) {
             </Grid>
             <Grid
               item
-              xs={4}
+              xs={5}
               md={1.5}
               alignItems="center"
               justifyContent="center"
@@ -426,8 +521,8 @@ function Personal({ user }) {
                   id="select-sort"
                   value={sort}
                   label="Sort:"
-                  onChange={(evt, val2) => {
-                    setSort(evt.target.value);
+                  onChange={(evt) => {
+                    updateSort(evt.target.value);
                   }}
                 >
                   <MenuItem value={"name"}>{t("Name")}</MenuItem>
@@ -440,7 +535,7 @@ function Personal({ user }) {
             </Grid>
             <Grid
               item
-              xs={4}
+              xs={5}
               md={1.5}
               alignItems="center"
               justifyContent="center"
@@ -453,8 +548,8 @@ function Personal({ user }) {
                   id="select-direction"
                   value={direction}
                   label="direction:"
-                  onChange={(evt, val2) => {
-                    setDirection(evt.target.value);
+                  onChange={(evt) => {
+                    updateDirection(evt.target.value);
                   }}
                 >
                   <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
@@ -464,28 +559,34 @@ function Personal({ user }) {
             </Grid>
             <Grid
               item
-              xs={4}
-              md={2}
+              xs={2}
+              md={1}
               alignItems="center"
+              justifyContent="center"
               sx={{ display: "flex" }}
             >
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={() => {
-                  setCollapse(!collapse);
-                }}
-              >
-                {collapse ? t("Collapse") : t("Expand")}
-              </Button>
+              <Tooltip title={t("clear_search_filters")} placement="top">
+                <Button
+                  onClick={clearSearchFilters}
+                  variant="outlined"
+                  fullWidth
+                  sx={{
+                    height: "100%",
+                    padding: 0, // Remove default padding
+                    minWidth: 0, // Ensure the button doesn't enforce a minimum width
+                  }}
+                >
+                  <DeleteSweepIcon />
+                </Button>
+              </Tooltip>
             </Grid>
             <Grid
               item
               xs={12}
-              md={2}
-              sx={{}}
+              md={4}
               alignItems="center"
               justifyContent="center"
+              sx={{ display: "flex" }}
             >
               <Button
                 fullWidth
@@ -496,9 +597,16 @@ function Personal({ user }) {
                 {t("Create NPC")}
               </Button>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid item xs={12} md={3} sx={{ display: "flex" }}>
+              <ExportAllNPCs
+                npcs={filteredList?.length > 0 ? filteredList : []}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={3}>
               <Button
                 variant="outlined"
+                startIcon={<UploadFile />}
                 fullWidth
                 onClick={() => fileInputRef.current.click()}
               >
@@ -526,6 +634,29 @@ function Personal({ user }) {
                 style={{ display: "none" }}
               />
             </Grid>
+            <Grid
+              item
+              xs={12}
+              md={2}
+              alignItems="center"
+              sx={{ display: "flex" }}
+            >
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={collapse ? <ExpandLess /> : <ExpandMore />}
+                onClick={() => {
+                  setCollapse(!collapse);
+                }}
+              >
+                {collapse ? t("Collapse") : t("Expand")}
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6" align="center" mt={1} mb={-1}>
+                {t("filtered_npc_count") + " " + filteredList?.length}
+              </Typography>
+            </Grid>
           </Grid>
         </Paper>
       </div>
@@ -541,6 +672,7 @@ function Personal({ user }) {
                 deleteNpc={deleteNpc}
                 shareNpc={shareNpc}
                 collapseGet={collapse}
+                filterParams={filteredParams}
               />
             );
           })}
@@ -560,6 +692,7 @@ function Personal({ user }) {
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
                   collapseGet={collapse}
+                  filterParams={filteredParams}
                 />
               );
             })}
@@ -575,6 +708,7 @@ function Personal({ user }) {
                   deleteNpc={deleteNpc}
                   shareNpc={shareNpc}
                   collapseGet={collapse}
+                  filterParams={filteredParams}
                 />
               );
             })}
@@ -602,7 +736,7 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
+function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams }) {
   const { t } = useTranslate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
@@ -636,9 +770,19 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Tooltip title={t("Edit")}>
-        <IconButton component={RouterLink} to={`/npc-gallery/${npc.id}`}>
-          <Edit />
-        </IconButton>
+        <RouterLink
+          to={`/npc-gallery/${npc.id}${
+            filterParams
+              ? filterParams.startsWith("?")
+                ? filterParams
+                : `?${filterParams}`
+              : ""
+          }`}
+        >
+          <IconButton>
+            <Edit />
+          </IconButton>
+        </RouterLink>
       </Tooltip>
       <Tooltip title={t("Delete")}>
         <IconButton onClick={deleteNpc(npc)}>
