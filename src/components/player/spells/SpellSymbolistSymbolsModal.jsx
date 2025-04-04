@@ -104,7 +104,6 @@ export default function SpellSymbolistSymbolsModal({
   open,
   onClose,
   onSave,
-  onDelete,
   symbol,
 }) {
   const { t } = useTranslate();
@@ -171,7 +170,7 @@ export default function SpellSymbolistSymbolsModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("symbol_edit_symbols_modal")}
       </DialogTitle>
       <Button
@@ -343,7 +342,7 @@ export default function SpellSymbolistSymbolsModal({
         {/* Add Symbol Button */}
         <Button
           variant="contained"
-          color="primary"
+          color="quaternary"
           onClick={handleAddSymbol}
           sx={{
             width: "100%",
@@ -356,7 +355,7 @@ export default function SpellSymbolistSymbolsModal({
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

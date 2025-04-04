@@ -1,10 +1,12 @@
 import {
   Badge,
   Button,
-  Divider,
+  Typography,
   Grid,
   IconButton,
+  Paper,
   TextField,
+  Card,
 } from "@mui/material";
 import {
   AddCircleOutline,
@@ -18,9 +20,12 @@ import { D10Icon, D12Icon, D20Icon, D4Icon, D6Icon, D8Icon } from "../icons";
 import { useCallback, useEffect, useState } from "react";
 import { prepareDice } from "../../libs/rolls";
 import { useTranslate } from "../../translation/translate";
+import { useTheme } from "@mui/material/styles";
 
 export default function PrepareRoll({ savePreparedRoll, createRoll }) {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
   const [d4, setd4] = useState(0);
   const [d6, setd6] = useState(0);
   const [d8, setd8] = useState(0);
@@ -109,192 +114,127 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
   });
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      rowSpacing={1}
-      sx={{ mt: 1 }}
-    >
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd4)}
-          onClick={onRaise(setd4)}
-        >
-          <Badge
-            badgeContent={d4}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D4Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd6)}
-          onClick={onRaise(setd6)}
-        >
-          <Badge
-            badgeContent={d6}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D6Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd8)}
-          onClick={onRaise(setd8)}
-        >
-          <Badge
-            badgeContent={d8}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D8Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd10)}
-          onClick={onRaise(setd10)}
-        >
-          <Badge
-            badgeContent={d10}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D10Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd12)}
-          onClick={onRaise(setd12)}
-        >
-          <Badge
-            badgeContent={d12}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D12Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ fontSize: "4rem", color: "primary.main" }}
-          onContextMenu={onLower(setd20)}
-          onClick={onRaise(setd20)}
-        >
-          <Badge
-            badgeContent={d20}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <D20Icon />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Divider
-        orientation="vertical"
-        flexItem
-        sx={{ p: 0.1, bgcolor: "primary.main" }}
-      />
-      <Grid item>
-        <IconButton
-          sx={{ color: "primary.main" }}
-          onContextMenu={onLower(setBonus)}
-          onClick={onRaise(setBonus)}
-        >
-          <Badge
-            badgeContent={bonus}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <AddCircleOutline sx={{ fontSize: "4rem" }} />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item>
-        <IconButton
-          sx={{ color: "primary.main" }}
-          onContextMenu={onLower(setMalus)}
-          onClick={onRaise(setMalus)}
-        >
-          <Badge
-            badgeContent={malus}
-            color="secondary"
-            sx={{ "& .MuiBadge-badge": { fontSize: "1.2rem" } }}
-          >
-            <RemoveCircleOutline sx={{ fontSize: "4rem" }} />
-          </Badge>
-        </IconButton>
-      </Grid>
-      <Grid item xs={12} sm={8}>
-        <TextField
-          fullWidth
-          label="Description"
-          value={label}
-          onChange={(e) => {
-            setLabel(e.target.value);
-          }}
-        ></TextField>
-      </Grid>
-      <Grid item xs={12} sm={8}>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          spacing={1}
-          rowSpacing={0}
-          sx={{}}
-        >
-          <Grid item>
-            <Button
-              variant="contained"
-              startIcon={
-                <SouthWest sx={{ display: { xs: "none", sm: "inline" } }} />
-              }
-              onClick={onRoll}
-            >
-              {t("Roll")}
-            </Button>
+    <Paper elevation={1} sx={{ p: 2, mx: "auto" }}>
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12}>
+          <Card sx={{ p: 2, bgcolor: "background.default" }}>
+            <Typography>
+              {t("Left-click on a die to add it to your pool")}
+              <br />
+              {t("Right-click a die to remove it from your hand")}
+              <br />
+              {t("Press enter to roll")}
+            </Typography>
+          </Card>
+        </Grid>
+        {/* Dice Row */}
+        <Grid item xs={12}>
+          <Grid container justifyContent="space-around" spacing={2}>
+            {[
+              { icon: <D4Icon />, count: d4, set: setd4 },
+              { icon: <D6Icon />, count: d6, set: setd6 },
+              { icon: <D8Icon />, count: d8, set: setd8 },
+              { icon: <D10Icon />, count: d10, set: setd10 },
+              { icon: <D12Icon />, count: d12, set: setd12 },
+              { icon: <D20Icon />, count: d20, set: setd20 },
+            ].map(({ icon, count, set }, index) => (
+              <Grid item key={index}>
+                <IconButton
+                  sx={{
+                    fontSize: "3rem",
+                    color: isDarkMode ? "secondary.main" : "primary.main",
+                  }}
+                  onClick={onRaise(set)}
+                  onContextMenu={onLower(set)}
+                >
+                  <Badge
+                    badgeContent={count}
+                    color="secondary"
+                    sx={{ "& .MuiBadge-badge": { fontSize: "1rem" } }}
+                  >
+                    {icon}
+                  </Badge>
+                </IconButton>
+              </Grid>
+            ))}
           </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              startIcon={
-                <Close sx={{ display: { xs: "none", sm: "inline" } }} />
-              }
-              onClick={onReset}
-            >
-              {t("Reset")}
-            </Button>
+        </Grid>
+
+        {/* Modifiers */}
+        <Grid item xs={12}>
+          <Grid container justifyContent="center" spacing={2}>
+            <Grid item>
+              <IconButton
+                onClick={onRaise(setBonus)}
+                onContextMenu={onLower(setBonus)}
+                sx={{ color: isDarkMode ? "#fff" : "#333" }}
+              >
+                <Badge badgeContent={bonus} color="success">
+                  <AddCircleOutline sx={{ fontSize: "3rem" }} />
+                </Badge>
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <IconButton
+                onClick={onRaise(setMalus)}
+                onContextMenu={onLower(setMalus)}
+                sx={{ color: isDarkMode ? "#fff" : "#333" }}
+              >
+                <Badge badgeContent={malus} color="error">
+                  <RemoveCircleOutline sx={{ fontSize: "3rem" }} />
+                </Badge>
+              </IconButton>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button
-              variant="outlined"
-              startIcon={
-                <SouthEast sx={{ display: { xs: "none", sm: "inline" } }} />
-              }
-              onClick={onSave}
-            >
-              {t("Prepare")}
-            </Button>
+        </Grid>
+
+        {/* Label */}
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label={t("Description")}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            variant="outlined"
+          />
+        </Grid>
+
+        {/* Buttons */}
+        <Grid item xs={12}>
+          <Grid container spacing={2} justifyContent="center" wrap="nowrap">
+            <Grid item>
+              <Button
+                variant="contained"
+                startIcon={<SouthWest sx={{ display: { xs: "none", sm: "inline-flex" } }} />}
+                onClick={onRoll}
+                color="primary"
+              >
+                {t("Roll")}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                startIcon={<Close />}
+                onClick={onReset}
+                color="inherit"
+              >
+                {t("Reset")}
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                startIcon={<SouthEast sx={{ display: { xs: "none", sm: "inline-flex" } }} />}
+                onClick={onSave}
+                color="primary"
+              >
+                {t("Prepare")}
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </Paper>
   );
 }

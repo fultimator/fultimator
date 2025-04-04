@@ -101,7 +101,7 @@ const darkNatural = createTheme({
     },
     background: {
       default: "#1a1a1a",
-      paper: "#121212",
+      paper: "#1e1e1e",
     },
     red: {
       main: "#d1232a",
@@ -196,6 +196,138 @@ const darkNatural = createTheme({
             '&.Mui-focused fieldset': {
               borderColor: "#ffffff",
             },
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#1e1e1e",
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: () => ({
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor:  "#fff",
+          },
+        }),
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: "#2b2b2b",
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            backgroundColor: "#8d4c24",
+            "&:hover": {
+              backgroundColor: "#756449",
+            },
+          },
+        },
+      },
+    },
+    MuiListSubheader: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#1e1e1e",
+          color: "#ffffff",
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: "#dccdc4",
+          "&.Mui-checked": {
+            color: "#dccdc4",
+          },
+          "&.Mui-disabled": {
+            color: "#7564491A",
+          },
+          "&:hover": {
+            backgroundColor: "#51370E1A",
+          },
+        },
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        switchBase: {
+          "&.Mui-checked": {
+            color: "#dccdc4",
+            "& + .MuiSwitch-track": {
+              backgroundColor: "#756449",
+            },
+          },
+        },
+        thumb: {
+          backgroundColor: "#dccdc4", 
+        },
+        track: {
+          backgroundColor: "#1e1e1e",
+          transition: "background-color 0.3s",
+        },
+      },
+    },
+    MuiSlider: {
+      styleOverrides: {
+        root: {
+          color: "#dccdc4",
+        },
+        thumb: {
+          backgroundColor: "#dccdc4",
+          "&:hover, &.Mui-focusVisible": {
+            backgroundColor: "#756449", 
+          },
+          "&.Mui-disabled": {
+            backgroundColor: "#7564491A", 
+          },
+        },
+        track: {
+          backgroundColor: "#dccdc4",
+        },
+        rail: {
+          backgroundColor: "#756449",
+        },
+        mark: {
+          backgroundColor: "#756449", 
+        },
+        markActive: {
+          backgroundColor: "#dccdc4", 
+        },
+      },
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          color: "#dccdc4", // Secondary
+          "&.Mui-checked": {
+            color: "#dccdc4", // Secondary
+          },
+          "&.Mui-disabled": {
+            color: "#7564491A", // Quaternary with 10% opacity
+          },
+          "&:hover": {
+            backgroundColor: "#51370E1A", // Ternary with 10% opacity
+          },
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: "#fff",
+          "&.Mui-focused": {
+            color: "#fff",
           },
         },
       },

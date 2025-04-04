@@ -4,8 +4,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "./appbar/AppBar";
 import CompactAppBar from "./appbar/CompactAppBar";
 import { useThemeContext } from "../ThemeContext";
+import { useTranslate } from "../translation/translate";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
+type ThemeValue =
+  | "Fabula"
+  | "High"
+  | "Techno"
+  | "Natural"
+  | "Bravely"
+  | "Obscura";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,8 +21,15 @@ interface LayoutProps {
   unsavedChanges?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading, unsavedChanges }) => {
-  const { selectedTheme, isDarkMode, setTheme, toggleDarkMode } = useThemeContext();
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  fullWidth,
+  loading,
+  unsavedChanges,
+}) => {
+  const { selectedTheme, isDarkMode, setTheme, toggleDarkMode } =
+    useThemeContext();
+  const { t } = useTranslate();
 
   const handleSelectTheme = (theme: ThemeValue) => {
     setTheme(theme);
@@ -30,24 +44,39 @@ const Layout: React.FC<LayoutProps> = ({ children, fullWidth, loading, unsavedCh
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleNavigation = () => {
+  const handleNavigation = async () => {
     if (unsavedChanges) {
-      const confirmLeave = window.confirm("You have unsaved changes. Are you sure you want to leave?");
-      if (confirmLeave) {
-        navigate(-1); // Navigate back if the user confirms
-      }
+      const message = t(
+        "You have unsaved changes. Are you sure you want to leave?"
+      );
+      const confirmation = window.confirm(message);
+      if (!confirmation) return;
+    }
+
+    if (isNpcEdit) {
+      // When in NPC edit page, navigate directly to the gallery with params
+      const params = new URLSearchParams(location.search).toString();
+      navigate(`/npc-gallery${params ? `?${params}` : ""}`);
     } else {
-      navigate(-1); // No changes, navigate normally
+      // From other pages, check where we are
+      const currentPath = location.pathname;
+
+      // If we're in the NPC gallery, go directly to home
+      if (currentPath === "/npc-gallery") {
+        navigate("/");
+      } else {
+        navigate(-1);
+      }
     }
   };
 
   const npcRoutes = ["/npc-gallery/:npcId"];
-  const isNpcEdit = npcRoutes.some(route =>
+  const isNpcEdit = npcRoutes.some((route) =>
     new RegExp(route.replace(/:\w+/, "\\w+")).test(location.pathname)
   );
 
   const pcRoutes = ["/pc-gallery/:playerId", "/character-sheet/:playerId"];
-  const isPcEdit = pcRoutes.some(route =>
+  const isPcEdit = pcRoutes.some((route) =>
     new RegExp(route.replace(/:\w+/, "\\w+")).test(location.pathname)
   );
 

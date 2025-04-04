@@ -18,7 +18,6 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { Close } from "@mui/icons-material";
@@ -72,10 +71,26 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     setSelectedItem(item);
   };
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+const StyledMarkdown = ({ children, ...props }) => {
+    return (
+      <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 1 }}>
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: (props) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </div>
+    );
+  };
 
   const handleClassChange = (event) => {
     setSelectedClass(event.target.value);
@@ -241,7 +256,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
           }
           label={t("Add as Magisphere")}
         />
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Add")}
         </Button>
       </DialogActions>

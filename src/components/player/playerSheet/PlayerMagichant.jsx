@@ -16,7 +16,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import SpellChanter from "../spells/SpellChanter";
 
-export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
+export default function PlayerMagichant({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -72,7 +72,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                 marginBottom: "-1px",
                 paddingY: "10px",
                 backgroundColor: primary,
-                color: ternary,
+                color: "#fff",
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "2em",
@@ -161,7 +161,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" onClick={handleCloseModal}>
+                <Button variant="contained" color="primary" onClick={handleCloseModal}>
                   OK
                 </Button>
               </DialogActions>

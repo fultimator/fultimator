@@ -238,13 +238,11 @@ export default function SelectedNpcs({
                             component="span"
                             variant="h5"
                             sx={{
-                              ml: 1,
-                              // something that differentiates the notes from the NPC name
                               color: isDarkMode ? secondary : primary,
                               fontWeight: "bold",                              
                             }}
                           >
-                            {"( " + npc.combatStats.combatNotes + " )"}
+                            {"【" + npc.combatStats.combatNotes + "】"}
                           </Typography>
                         )}
                       </Typography>
@@ -497,7 +495,7 @@ export default function SelectedNpcs({
                         <>
                           <IconButton
                             edge="end"
-                            color="primary"
+                            color={isDarkMode ? "white" : "primary"}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMoveUp(npc.combatId);
@@ -515,7 +513,7 @@ export default function SelectedNpcs({
                           </IconButton>
                           <IconButton
                             edge="end"
-                            color="primary"
+                            color={isDarkMode ? "white" : "primary"}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMoveDown(npc.combatId);

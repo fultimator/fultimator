@@ -39,30 +39,30 @@ const availableKeys = [
   },
   {
     name: "magichant_radiance",
-    type: "bolt",
-    status: "Shaken",
-    attribute: "DEX",
-    recovery: "HP",
-  },
-  {
-    name: "magichant_shadow",
     type: "light",
     status: "Dazed",
     attribute: "INS",
     recovery: "HP",
   },
   {
-    name: "magichant_stone",
+    name: "magichant_shadow",
     type: "dark",
     status: "Weak",
     attribute: "DEX",
     recovery: "MP",
   },
   {
-    name: "magichant_thunder",
+    name: "magichant_stone",
     type: "earth",
     status: "Dazed",
     attribute: "MIG",
+    recovery: "HP",
+  },
+  {
+    name: "magichant_thunder",
+    type: "bolt",
+    status: "Shaken",
+    attribute: "DEX",
     recovery: "HP",
   },
   {
@@ -86,7 +86,6 @@ export default function SpellChanterKeysModal({
   open,
   onClose,
   onSave,
-  onDelete,
   magichant,
 }) {
   const { t } = useTranslate();
@@ -126,7 +125,9 @@ export default function SpellChanterKeysModal({
         updatedKeys[index] = {
           ...selectedKey,
           customName:
-            selectedKey.name === "magichant_custom_name" ? updatedKeys[index].customName : "",
+            selectedKey.name === "magichant_custom_name"
+              ? updatedKeys[index].customName
+              : "",
         };
       }
     } else {
@@ -154,7 +155,7 @@ export default function SpellChanterKeysModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("magichant_edit_keys_modal")}
       </DialogTitle>
       <Button
@@ -224,7 +225,11 @@ export default function SpellChanterKeysModal({
               <Grid item xs={12} sm={4} md={2}>
                 <TextField
                   label={t("magichant_name")}
-                  value={key.name === "magichant_custom_name" ? key.customName : t(key.name)}
+                  value={
+                    key.name === "magichant_custom_name"
+                      ? key.customName
+                      : t(key.name)
+                  }
                   onChange={(e) =>
                     handleKeyChange(index, "customName", e.target.value)
                   }
@@ -245,7 +250,11 @@ export default function SpellChanterKeysModal({
               <Grid item xs={6} sm={4} md={1}>
                 <TextField
                   label={t("magichant_type")}
-                  value={key.name === "magichant_custom_name" ? key.type : t(key.type)}
+                  value={
+                    key.name === "magichant_custom_name"
+                      ? key.type
+                      : t(key.type)
+                  }
                   onChange={(e) =>
                     handleKeyChange(index, "type", e.target.value)
                   }
@@ -266,7 +275,11 @@ export default function SpellChanterKeysModal({
               <Grid item xs={6} sm={4} md={2}>
                 <TextField
                   label={t("magichant_status_effect")}
-                  value={key.name === "magichant_custom_name" ? key.status : t(key.status)}
+                  value={
+                    key.name === "magichant_custom_name"
+                      ? key.status
+                      : t(key.status)
+                  }
                   onChange={(e) =>
                     handleKeyChange(index, "status", e.target.value)
                   }
@@ -287,7 +300,11 @@ export default function SpellChanterKeysModal({
               <Grid item xs={6} sm={4} md={2}>
                 <TextField
                   label={t("magichant_attribute")}
-                  value={key.name === "magichant_custom_name" ? key.attribute : t(key.attribute)}
+                  value={
+                    key.name === "magichant_custom_name"
+                      ? key.attribute
+                      : t(key.attribute)
+                  }
                   onChange={(e) =>
                     handleKeyChange(index, "attribute", e.target.value)
                   }
@@ -308,7 +325,11 @@ export default function SpellChanterKeysModal({
               <Grid item xs={6} sm={4} md={2}>
                 <TextField
                   label={t("magichant_recovery")}
-                  value={key.name === "magichant_custom_name" ? key.recovery : t(key.recovery)}
+                  value={
+                    key.name === "magichant_custom_name"
+                      ? key.recovery
+                      : t(key.recovery)
+                  }
                   onChange={(e) =>
                     handleKeyChange(index, "recovery", e.target.value)
                   }
@@ -362,7 +383,7 @@ export default function SpellChanterKeysModal({
         {/* Add Key Button */}
         <Button
           variant="contained"
-          color="primary"
+          color="quaternary"
           onClick={handleAddKey}
           sx={{
             width: "100%",
@@ -375,7 +396,7 @@ export default function SpellChanterKeysModal({
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

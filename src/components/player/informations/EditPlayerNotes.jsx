@@ -46,7 +46,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     });
   };
 
-  const removeItem = (key) => () => {
+  const removeItem = (key) => async () => {
     const confirmDelete = window.confirm(
       t("Are you sure you want to delete this note?")
     );
@@ -73,12 +73,22 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
 
   const handleConfirm = () => {
     if (!clockName.trim()) {
-      alert(t("Clock name is required."));
+      if (window.electron) {
+        window.electron.alert(t("Clock name is required."));
+      } else {
+        alert(t("Clock name is required."));
+      }
+
       return;
     }
 
     if (clockSections < 2 || clockSections > 30) {
-      alert(t("Sections must be between 2 and 30."));
+      if (window.electron) {
+        window.electron.alert(t("Sections must be between 2 and 30."));
+      } else {
+        alert(t("Sections must be between 2 and 30."));
+      }
+
       return;
     }
 
@@ -135,7 +145,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                   }
                 : null
             }
-            showIconButton={isEditMode && player.notes.length < 10}
+            showIconButton={isEditMode}
             icon={Add}
           />
         </Grid>
@@ -208,7 +218,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                         <strong style={{ fontSize: "1.4em" }}>
                           {clock.name}
                         </strong>{" "}
-                        ({t("Sections")}: {clock.sections})
+                        ({t("Clock Sections")}: {clock.sections})
                       </Typography>
                     </Grid>
                     {isEditMode && (
@@ -235,7 +245,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         ))}
       </Grid>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{t("Add Clock")}</DialogTitle>
+        <DialogTitle variant="h3">{t("Add Clock")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t("Enter the clock details below:")}
@@ -247,7 +257,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             label={t("Clock Name")}
             type="text"
             fullWidth
-            variant="standard"
+            variant="outlined"
             value={clockName}
             onChange={(e) => setClockName(e.target.value)}
             inputProps={{ maxLength: 30 }}
@@ -258,7 +268,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             label={t("Clock Sections")}
             type="number"
             fullWidth
-            variant="standard"
+            variant="outlined"
             value={clockSections}
             onChange={(e) => {
               const value = parseInt(e.target.value, 10);
@@ -268,8 +278,12 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>{t("Cancel")}</Button>
-          <Button onClick={handleConfirm}>{t("Add")}</Button>
+          <Button onClick={handleClose} color="secondary" variant="contained">
+            {t("Cancel")}
+          </Button>
+          <Button onClick={handleConfirm} color="primary" variant="contained">
+            {t("Add")}
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>

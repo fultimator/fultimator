@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
+export default function PlayerBonds({ player, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -21,9 +21,9 @@ export default function PlayerBonds({ player, isEditMode, isCharacterSheet }) {
       height="18"
     >
       <path
-        fill="black" // Adjust the fill color to match the gold star
+        fill={theme.palette.mode === 'dark' ? "white" : "black"}
         opacity=".96"
-        stroke="black"
+        stroke={theme.palette.mode === 'dark' ? "white" : "black"}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="6px"

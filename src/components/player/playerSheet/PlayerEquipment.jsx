@@ -612,13 +612,14 @@ export default function PlayerEquipment({
                 </DialogContent>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleDialogClose} color="primary">
+                <Button onClick={handleDialogClose} color="secondary" variant="contained">
                   {t("Close")}
                 </Button>
                 <Button
                   onClick={() => handleDiceRoll(currentWeapon)}
                   color="primary"
                   autoFocus
+                  variant="contained"
                 >
                   {t("Re-roll")}
                 </Button>

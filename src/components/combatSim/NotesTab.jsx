@@ -2,7 +2,7 @@ import React from "react";
 import { TextField } from "@mui/material";
 import { t } from "../../translation/translate";
 
-const NotesTab = ({ selectedNPC, selectedNPCs, setSelectedNPCs }) => {
+const NotesTab = ({ selectedNPC, setSelectedNPC, selectedNPCs, setSelectedNPCs }) => {
   return (
     <>
       <TextField
@@ -30,7 +30,16 @@ const NotesTab = ({ selectedNPC, selectedNPCs, setSelectedNPCs }) => {
             return npc;
           });
 
-          setSelectedNPCs(updatedNPCs);
+          setSelectedNPCs(updatedNPCs);     
+          
+          // Update selectedNPC
+          setSelectedNPC((prev) => ({
+            ...prev,
+            combatStats: {
+              ...prev.combatStats,
+              combatNotes: e.target.value,
+            },
+          }));          
         }}
         sx={{ mt: 2 }}
       />

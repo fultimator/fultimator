@@ -108,7 +108,9 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
 
     // Check if player has enough IP
     if (player.stats.ip.current < ipCost && useIP) {
-      alert(t("You don't have enough IP to roll this alchemy!"));
+      window.electron.alert(
+        t("You don't have enough IP to roll this alchemy!")
+      );
       return;
     }
 
@@ -244,49 +246,44 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       player.stats.ip.current -= 3;
       setPlayer({ ...player });
     }
-
+  
     // Check if player already has a Magicannon
     const weapons = player.weapons || [];
-    const hasMagicannon = weapons.some((weapon) => weapon.magicannon === true);
-
+    const hasMagicannon = weapons.some(weapon => weapon.magicannon === true);
+  
     if (hasMagicannon) {
       // Delete the existing Magicannon
-      setPlayer((prevPlayer) => ({
+      setPlayer(prevPlayer => ({
         ...prevPlayer,
-        weapons: prevPlayer.weapons
-          ? prevPlayer.weapons.filter((weapon) => !weapon.magicannon)
-          : [],
+        weapons: prevPlayer.weapons ? prevPlayer.weapons.filter(weapon => !weapon.magicannon) : []
       }));
     }
-
+  
     if (equipMagicannon) {
       // Unequip any currently equipped weapons or shields
-      setPlayer((prevPlayer) => ({
+      setPlayer(prevPlayer => ({
         ...prevPlayer,
-        weapons: prevPlayer.weapons
-          ? prevPlayer.weapons.map((weapon) => ({
-              ...weapon,
-              isEquipped: false,
-            }))
-          : [],
-        shields: prevPlayer.shields
-          ? prevPlayer.shields.map((shield) => ({
-              ...shield,
-              isEquipped: false,
-            }))
-          : [],
+        weapons: prevPlayer.weapons ? prevPlayer.weapons.map(weapon => ({
+          ...weapon,
+          isEquipped: false
+        })) : [],
+        shields: prevPlayer.shields ? prevPlayer.shields.map(shield => ({
+          ...shield,
+          isEquipped: false
+        })) : []
       }));
     }
-
+  
     // Add Magicannon weapon to the player weapons
-    setPlayer((prevPlayer) => ({
+    setPlayer(prevPlayer => ({
       ...prevPlayer,
-      weapons: [...(prevPlayer.weapons || []), magicannonItem],
+      weapons: [...(prevPlayer.weapons || []), magicannonItem]
     }));
-
+  
     // Close modal
     handleCloseModal();
   };
+  
 
   /* All alchemy spells from all classes */
   const alchemySpells = player.classes
@@ -346,7 +343,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                 marginBottom: "-1px",
                 paddingY: "10px",
                 backgroundColor: primary,
-                color: ternary,
+                color: "#fff",
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "2em",
@@ -648,7 +645,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" onClick={handleCloseModal}>
+                <Button variant="contained" color="primary" onClick={handleCloseModal}>
                   OK
                 </Button>
               </DialogActions>
@@ -792,6 +789,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                 <Button
                   variant="contained"
                   onClick={handleCloseRollAlchemyModal}
+                  color="secondary"
                 >
                   {t("Cancel")}
                 </Button>
@@ -822,8 +820,16 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     marginBottom: "10px",
                   }}
                 >
-                  <ReactMarkdown>{t("Magicannon_desc1")}</ReactMarkdown>
-                  <ReactMarkdown>{t("Magicannon_desc2")}</ReactMarkdown>
+                  <ReactMarkdown>
+                    {t(
+                      "Magicannon_desc1"
+                    )}
+                  </ReactMarkdown>
+                  <ReactMarkdown>
+                    {t(
+                      "Magicannon_desc2"
+                    )}
+                  </ReactMarkdown>
                 </div>
                 <Typography variant="body1">
                   {t(
@@ -865,7 +871,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               <DialogActions>
                 <Button
                   variant="contained"
-                  color="error"
+                  color="secondary"
                   onClick={handleCloseModal}
                 >
                   {t("Cancel")}
@@ -874,6 +880,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   variant="contained"
                   onClick={handleCreateMagicannon}
                   disabled={useMagicannonIP && player.stats.ip.current < 3}
+                  color="primary"
                 >
                   {t("Create Magicannon")}
                 </Button>

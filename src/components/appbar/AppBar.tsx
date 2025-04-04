@@ -15,7 +15,13 @@ import MenuOption from "./MenuOption";
 import logo929 from "./../logo_929.webp";
 import logo1400 from "./../logo_1400.webp";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
+type ThemeValue =
+  | "Fabula"
+  | "High"
+  | "Techno"
+  | "Natural"
+  | "Bravely"
+  | "Obscura";
 
 interface AppBarProps {
   isNpcEdit: boolean;
@@ -52,7 +58,14 @@ const AppBar: React.FC<AppBarProps> = ({
   return (
     <>
       <HideOnScroll>
-        <MuiAppBar position="fixed">
+        <MuiAppBar
+          position="fixed"
+          sx={(theme) => ({
+            background: isDarkMode
+              ? `linear-gradient(to bottom, ${theme.palette.secondary.dark}, ${theme.palette.primary.dark})`
+              : theme.palette.primary.main,
+          })}
+        >
           <Container>
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid
@@ -66,10 +79,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 }}
               >
                 {showGoBackButton && (
-                  <IconButton
-                    color="inherit"
-                    onClick={handleNavigation}
-                  >
+                  <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
                   </IconButton>
                 )}

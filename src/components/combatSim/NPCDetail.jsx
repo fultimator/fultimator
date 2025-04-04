@@ -110,7 +110,7 @@ const NPCDetail = ({
       } = rollAttack(clickedData, "spell");
       // log the spell
       addLog("combat_sim_log_spell_offensive_roll", "--isSpell--", {
-        npcName: selectedNPC.name,
+        npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
         spellName: clickedData.name,
         targets: numTargets,
         dice1: diceResults.attribute1,
@@ -123,19 +123,19 @@ const NPCDetail = ({
 
       if (isCriticalFailure) {
         setTimeout(() => {
-          addLog("combat_sim_log_crit_failure", selectedNPC.name);
+          addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
         }, 100);
       }
 
       if (isCriticalSuccess) {
         setTimeout(() => {
-          addLog("combat_sim_log_crit_success", selectedNPC.name);
+          addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
         }, 100);
       }
     } else {
       addLog(
         "combat_sim_log_spell_use",
-        selectedNPC.name,
+        selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
         clickedData.name,
         numTargets
       );
@@ -162,7 +162,7 @@ const NPCDetail = ({
 
     // Add the attack to the log
     addLog("combat_sim_log_attack", "--isAttack--", {
-      npcName: selectedNPC.name,
+      npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
       attackName: attack.name,
       range: attackType === "attack" ? attack.range : attack.weapon.range,
       damageType: attackType === "attack" ? attack.type : attack.weapon.type,
@@ -180,13 +180,13 @@ const NPCDetail = ({
 
     if (isCriticalFailure) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_failure", selectedNPC.name);
+        addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
       }, 100);
     }
 
     if (isCriticalSuccess) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_success", selectedNPC.name);
+        addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
       }, 100);
     }
 
@@ -312,7 +312,7 @@ const NPCDetail = ({
 
     // log the roll
     addLog("combat_sim_log_standard_roll", "--isStandardRoll--", {
-      npcName: selectedNPC.name,
+      npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
       dice1: roll1,
       dice2: roll2,
       dice1Label: attr1label,
@@ -322,13 +322,13 @@ const NPCDetail = ({
 
     if (isCriticalFailure) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_failure", selectedNPC.name);
+        addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
       }, 100);
     }
 
     if (isCriticalSuccess) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_success", selectedNPC.name);
+        addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
       }, 100);
     }
 
@@ -424,7 +424,7 @@ const NPCDetail = ({
               textTransform: "uppercase",
             }}
           >
-            {selectedNPC.name}
+            {selectedNPC.name}{selectedNPC?.combatStats?.combatNotes && ` 【${selectedNPC.combatStats.combatNotes}】`}
           </Typography>
           <Tooltip
             title={t("Close")}
@@ -481,6 +481,7 @@ const NPCDetail = ({
         {tabIndex === 3 && (
           <NotesTab
             selectedNPC={selectedNPC}
+            setSelectedNPC={setSelectedNPC}
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
           />
@@ -509,9 +510,9 @@ const NPCDetail = ({
             }}
           >
             <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
-            <MenuItem value={1}>7+</MenuItem>
-            <MenuItem value={2}>10+</MenuItem>
-            <MenuItem value={3}>13+</MenuItem>
+            <MenuItem value={1}>10+</MenuItem>
+            <MenuItem value={2}>13+</MenuItem>
+            <MenuItem value={3}>16+</MenuItem>
           </Select>
           <Tooltip title="Download Sheet" placement="bottom">
             <Button
@@ -636,7 +637,7 @@ const NPCDetail = ({
           textTransform: "uppercase",
         }}
       >
-        {selectedNPC.name}
+        {selectedNPC.name}{selectedNPC?.combatStats?.combatNotes && ` 【${selectedNPC.combatStats.combatNotes}】`}
         <IconButton onClick={() => setSelectedNPC(null)}>
           <Close />
         </IconButton>

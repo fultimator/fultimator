@@ -11,14 +11,17 @@ import {
   TextField,
   Divider,
   ToggleButton,
-  Autocomplete
+  Autocomplete,
+  Box,
+  ListItemText,
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
-import CompendiumHandler from './CompendiumHandler';
+import CompendiumHandler from "./CompendiumHandler";
+import { TypeIcon } from "../types";
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -75,7 +78,13 @@ export default function EditSpells({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" openCompendium={openCompendiumModal} addItem={addSpell} headerText={t("Spells")} icon={Add} />
+      <CustomHeader
+        type="top"
+        openCompendium={openCompendiumModal}
+        addItem={addSpell}
+        headerText={t("Spells")}
+        icon={Add}
+      />
       {npc.spells?.map((spell, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -94,7 +103,13 @@ export default function EditSpells({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <CompendiumHandler npc={npc} setNpc={setNpc} typeName="spell" open={modalOpen} onClose={closeCompendiumModal} />
+      <CompendiumHandler
+        npc={npc}
+        setNpc={setNpc}
+        typeName="spell"
+        open={modalOpen}
+        onClose={closeCompendiumModal}
+      />
     </>
   );
 }
@@ -104,11 +119,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
   const [inputDuration, setInputDuration] = useState(spell.duration || "");
   const [inputTarget, setInputTarget] = useState(spell.target || "");
 
-  const duration = [
-    t("Scene"),
-    t("Instantaneous"),
-    t("Special"),
-  ];
+  const duration = [t("Scene"), t("Instantaneous"), t("Special")];
 
   const target = [
     t("Self"),
@@ -149,7 +160,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={6}>
         <TextField
           label={t("Spell Name:")}
           variant="outlined"
@@ -160,15 +171,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           size="small"
         />
       </Grid>
-      <Grid item xs={12} sm={1}>
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ height: "100%" }}
-        >
+      <Grid item xs={12} sm={1} md={1}>
+        <FormControl variant="standard" fullWidth style={{ height: "100%" }}>
           <ToggleButton
             selected={spell.type === "offensive"}
-            onChange={(e) => {
+            onChange={() => {
               const newValue = spell.type === "offensive" ? "" : "offensive";
               setSpell("type", newValue);
             }}
@@ -189,8 +196,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           fullWidth
           placeholder="10"
           value={
-            spell.mp === null ||
-              spell.mp === undefined
+            spell.mp === null || spell.mp === undefined
               ? ""
               : spell.mp.toString()
           }
@@ -209,8 +215,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           size="small"
           placeholder="1"
           value={
-            spell.maxTargets === null ||
-              spell.maxTargets === undefined
+            spell.maxTargets === null || spell.maxTargets === undefined
               ? "0"
               : spell.maxTargets.toString()
           }
@@ -333,7 +338,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               id={"spell-" + i + "-attr2"}
               label={t("Attr 2:")}
               size="small"
-              onChange={(e, value) => {
+              onChange={(e) => {
                 return setSpell("attr2", e.target.value);
               }}
             >
@@ -355,19 +360,64 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               id={"attack-" + i + "-type"}
               label={t("Type:")}
               size="small"
-              onChange={(e, value) => {
+              onChange={(e) => {
                 return setSpell("damagetype", e.target.value);
               }}
             >
               {Object.keys(types).map((damagetype) => {
                 return (
-                  <MenuItem key={damagetype} value={damagetype}>
-                    {types[damagetype].long}
+                  <MenuItem
+                    key={damagetype}
+                    value={damagetype}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      paddingY: "6px",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        minWidth: 70,
+                      }}
+                    >
+                      <TypeIcon type={damagetype} />
+                      <ListItemText
+                        sx={{
+                          ml: 1,
+                          marginBottom: 0,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {types[damagetype].long}
+                      </ListItemText>
+                    </Box>
                   </MenuItem>
                 );
               })}
-              <MenuItem value={"nodmg"}>
-                {t("no damage")}
+              <MenuItem
+                value={"nodmg"}
+                sx={{
+                  textTransform: "capitalize",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    minWidth: 70,
+                  }}
+                >
+                  <ListItemText
+                    sx={{
+                      marginBottom: 0,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {t("no damage")}
+                  </ListItemText>
+                </Box>
               </MenuItem>
             </Select>
           </FormControl>

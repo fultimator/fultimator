@@ -4,12 +4,11 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import SpellArcanist from "../spells/SpellArcanist";
 
-export default function PlayerArcana({ player, setPlayer, isEditMode }) {
+export default function PlayerArcana({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   /* All arcana from all classes */
   const arcana = player.classes
@@ -48,7 +47,7 @@ export default function PlayerArcana({ player, setPlayer, isEditMode }) {
                 marginBottom: "-1px",
                 paddingY: "10px",
                 backgroundColor: primary,
-                color: ternary,
+                color: "#fff",
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "2em",

@@ -15,6 +15,7 @@ import {
   useTheme,
   useMediaQuery,
   Alert,
+  Snackbar
 } from "@mui/material";
 import {
   Download,
@@ -76,6 +77,7 @@ export default function NpcEdit() {
 
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
+  const [openShareSnackbar, setOpenShareSnackbar] = useState(false);
 
   const handleCheckboxChange = (event) => {
     setCheckedRules(event.target.checked);
@@ -244,9 +246,8 @@ export default function NpcEdit() {
         \n🆔 **Author UUID:** ${npcTemp.uid}
         \n👮 **Moderator Review Needed!**
         \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npcTemp.id})`,
-        0xE74C3C // Red color
+        0xe74c3c // Red color
       );
-      
     }
   };
 
@@ -284,8 +285,8 @@ export default function NpcEdit() {
         \n🆔 **Unpublished NPC:** \`${npc.name} - ${npc.id}\`
         \n🚫 This NPC is no longer visible to the public.
         \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npc.id})`,
-        0x2ECC71 // Green color
-      );      
+        0x2ecc71 // Green color
+      );
     }
   };
 
@@ -308,8 +309,16 @@ export default function NpcEdit() {
   };
 
   // Function to share NPC link
-  const shareNpc = async (id) => {
-    await navigator.clipboard.writeText(window.location.href + "/");
+  const shareNpc = async () => {
+    const url = new URL(window.location.href);
+    url.search = ""; // Strip query params
+    await navigator.clipboard.writeText(url.toString());
+    setOpenShareSnackbar(true); // Show snackbar
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setOpenShareSnackbar(false);
   };
 
   // Function to download NPC as image
@@ -576,6 +585,13 @@ export default function NpcEdit() {
             </Fab>
           </Fade>
         </Grid>
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={openShareSnackbar}
+          autoHideDuration={2000}
+          onClose={handleClose}
+          message={t("Copied to Clipboard!")}
+        />
       </Layout>
     </NpcProvider>
   );

@@ -49,7 +49,7 @@ export default function SpellSymbolistModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("symbol_settings_modal")}
       </DialogTitle>
       <Button
@@ -84,7 +84,7 @@ export default function SpellSymbolistModal({
         <Button variant="contained" color="error" onClick={handleDelete}>
           {t("symbol_delete_button")}
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

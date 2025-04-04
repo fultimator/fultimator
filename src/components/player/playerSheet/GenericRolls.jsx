@@ -15,7 +15,7 @@ import {
 import { Casino } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 
-export default function GenericRolls({ player, isEditMode }) {
+export default function GenericRolls({ player }) {
   const { t } = useTranslate();
   const [open, setOpen] = useState(false);
   const [attribute1, setAttribute1] = useState("");
@@ -205,10 +205,12 @@ export default function GenericRolls({ player, isEditMode }) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>{t("Close")}</Button>
+          <Button onClick={handleClose} variant="contained" color="secondary" >{t("Close")}</Button>
           <Button
             onClick={handleRollDice}
             disabled={!attribute1 || !attribute2}
+            variant="contained"
+            color="primary"
           >
             {t("Roll")}
           </Button>

@@ -114,7 +114,6 @@ export default function SpellDancerDancesModal({
   open,
   onClose,
   onSave,
-  onDelete,
   dance,
 }) {
   const { t } = useTranslate();
@@ -182,7 +181,7 @@ export default function SpellDancerDancesModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("dance_edit_dances_modal")}
       </DialogTitle>
       <Button
@@ -379,7 +378,7 @@ export default function SpellDancerDancesModal({
         {/* Add Dance Button */}
         <Button
           variant="contained"
-          color="primary"
+          color="quaternary"
           onClick={handleAddDance}
           sx={{
             width: "100%",
@@ -392,7 +391,7 @@ export default function SpellDancerDancesModal({
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

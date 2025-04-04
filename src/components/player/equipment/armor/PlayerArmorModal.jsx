@@ -32,14 +32,13 @@ export default function PlayerArmorModal({
   onClose,
   editArmorIndex,
   armorPlayer,
-  setArmorPlayer,
   onAddArmor,
   onDeleteArmor,
 }) {
   const { t } = useTranslate();
 
   const [base, setBase] = useState(armorPlayer?.base || armor[0]);
-  const [name, setName] = useState(armorPlayer?.name || armor[0].name);
+  const [name, setName] = useState(armorPlayer?.name || t(armor[0].name));
   const [quality, setQuality] = useState(armorPlayer?.quality || "");
   const [martial, setMartial] = useState(armorPlayer?.martial || false);
   const [qualityCost, setQualityCost] = useState(armorPlayer?.qualityCost || 0);
@@ -77,7 +76,7 @@ export default function PlayerArmorModal({
 
   useEffect(() => {
     setBase(armorPlayer?.base || armor[0]);
-    setName(armorPlayer?.name || armor[0].name);
+    setName(armorPlayer?.name || t(armor[0].name));
     setQuality(armorPlayer?.quality || "");
     setMartial(armorPlayer?.martial || false);
     setQualityCost(armorPlayer?.qualityCost || 0);
@@ -105,6 +104,7 @@ export default function PlayerArmorModal({
         ? true
         : false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armorPlayer]);
 
   const { handleFileUpload } = useUploadJSON((data) => {
@@ -238,7 +238,7 @@ export default function PlayerArmorModal({
     onAddArmor(updatedArmor);
   };
 
-  const handleDelete = (armorIndex) => {
+  const handleDelete = async (armorIndex) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this armor?"
     );
@@ -261,7 +261,7 @@ export default function PlayerArmorModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Add Armor")}
       </DialogTitle>
       <IconButton
@@ -288,7 +288,7 @@ export default function PlayerArmorModal({
                 const base = armor.find((el) => el.name === e.target.value);
 
                 setBase(base);
-                setName(base.name);
+                setName(t(base.name));
                 setMartial(base.martial);
                 setInit(base.init);
               }}
@@ -447,11 +447,15 @@ export default function PlayerArmorModal({
       </DialogContent>
       <DialogActions>
         {editArmorIndex !== null && (
-          <Button onClick={() => handleDelete(editArmorIndex)} color="error">
+          <Button
+            onClick={() => handleDelete(editArmorIndex)}
+            color="error"
+            variant="contained"
+          >
             {t("Delete")}
           </Button>
         )}
-        <Button onClick={handleSave} color="primary">
+        <Button onClick={handleSave} color="primary" variant="contained">
           {t("Save Changes")}
         </Button>
       </DialogActions>

@@ -275,15 +275,15 @@ function Personal({ user }) {
           mb: 3,
           backgroundColor: "rgb(22, 163, 74)", // emerald-600 equivalent
           "& .MuiAlert-icon": {
-            color: "inherit",
+            color: "#fff",
           },
         }}
       >
         <Box>
-          <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1 }}>
+          <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1, color: "#fff" }}>
             {t("Help us improve the Character Designer!")}
           </AlertTitle>
-          <Typography variant="body2" color="inherit" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="#fff" sx={{ mb: 2 }}>
             {t(
               "We value your input on this new feature. Please take a moment to complete our quick survey and share your thoughts. Your feedback will directly influence future updates and enhancements."
             )}
