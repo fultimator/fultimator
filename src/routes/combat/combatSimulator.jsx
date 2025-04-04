@@ -164,113 +164,113 @@ const CombatSim = ({ user }) => {
   };
 
   // Fetch encounter and NPCs on initial load
-  useEffect(() => {
-    if (document.hidden) return; // Prevent fetch on tab switch
-    const fetchEncounter = async () => {
-      setEncounter(encounterData);
-      setEncounterName(encounterData?.name || "");
-      setLogs(encounterData?.logs || []);
-    
-      if (!encounterData?.selectedNPCs?.length) {
-        setSelectedNPCs([]);
-        setLoading(false);
-        return;
-      }
-    
-      // Fetch all NPCs in one query
-      const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
-      const npcQuery = query(
-        collection(firestore, "npc-personal"),
-        where("__name__", "in", npcIds),
-        where("uid", "==", encounterData.uid)
-      );
-    
-      try {
-        console.log("Fetching NPCs...");
-        const querySnapshot = await getDocs(npcQuery);
-        const npcMap = new Map();
-    
-        querySnapshot.forEach((doc) => {
-          npcMap.set(doc.id, doc.data());
-        });
-    
-        const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
-          const fetchedNpc = npcMap.get(npcData.id);
-          return fetchedNpc
-            ? {
-                ...fetchedNpc, 
-                id: npcData.id,
-                combatId: npcData.combatId,
-                combatStats: npcData.combatStats,
-              }
-            : {
-                combatId: npcData.combatId, 
-                combatStats: npcData.combatStats, 
-              };
-        });
-    
-        setSelectedNPCs(loadedNPCs);
-      } catch (error) {
-        console.error("Error fetching NPCs:", error);
-        setSelectedNPCs([]);
-      }
-    
+useEffect(() => {
+  if (document.hidden) return; // Prevent fetch on tab switch
+  const fetchEncounter = async () => {
+    setEncounter(encounterData);
+    setEncounterName(encounterData?.name || "");
+    setLogs(encounterData?.logs || []);
+  
+    if (!encounterData?.selectedNPCs?.length) {
+      setSelectedNPCs([]);
       setLoading(false);
-    };
-
-    const fetchNpcs = async () => {
-      setNpcList(npcsList);
-    };
-
-    fetchEncounter();
-    fetchNpcs();
-  }, [id, encounterData, npcsList, user.uid]);
-
-  // Fetch single NPC
-  const getNpc = async (npcId) => {
-    try {
-      const npcDocRef = doc(firestore, "npc-personal", npcId);
-      const npcDocSnap = await getDoc(npcDocRef); // Fetch document
-      console.log("Fetching selected NPC...");
-      if (npcDocSnap.exists()) {
-        return npcDocSnap.data(); // Return the NPC data
-      } else {
-        console.error("NPC not found:", npcId);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching NPC:", error);
-      return null;
-    }
-  };
-
-  // Save encounter state
-  const handleSaveState = () => {
-
-    // if selectedNPCs doesn't have any npc without id, then save the state
-    if (selectedNPCs.some((npc) => !npc.id)) {
-      // Alert
-      alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
       return;
     }
+  
+    // Fetch all NPCs in one query
+    const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
+    const npcQuery = query(
+      collection(firestore, "npc-personal"),
+      where("__name__", "in", npcIds),
+      where("uid", "==", encounterData.uid)
+    );
+  
+    try {
+      console.log("Fetching NPCs...");
+      const querySnapshot = await getDocs(npcQuery);
+      const npcMap = new Map();
+  
+      querySnapshot.forEach((doc) => {
+        npcMap.set(doc.id, doc.data());
+      });
+  
+      const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
+        const fetchedNpc = npcMap.get(npcData.id);
+        return fetchedNpc
+          ? {
+              ...fetchedNpc, 
+              id: npcData.id,
+              combatId: npcData.combatId,
+              combatStats: npcData.combatStats,
+            }
+          : {
+              combatId: npcData.combatId, 
+              combatStats: npcData.combatStats, 
+            };
+      });
+  
+      setSelectedNPCs(loadedNPCs);
+    } catch (error) {
+      console.error("Error fetching NPCs:", error);
+      setSelectedNPCs([]);
+    }
+  
+    setLoading(false);
+  };
 
-    const currentTime = new Date();
-    setLastSaved(currentTime);
+  const fetchNpcs = async () => {
+    setNpcList(npcsList);
+  };
 
-    // Save encounter state (only store necessary identifiers: id and combatId)
+  fetchEncounter();
+  fetchNpcs();
+}, [id, encounterData, npcsList, user.uid]);
 
-    setDoc(doc(firestore, "encounters", id), {
-      ...encounter,
-      name: encounterName,
-      selectedNPCs: selectedNPCs.map((npc) => ({
-        id: npc.id,
-        combatId: npc.combatId,
-        combatStats: npc.combatStats,
-      })), // Only save ids and combatIds
-      round: encounter.round,
-      logs: logs,
-      private: encounter.private || true,
-    });
+// Fetch single NPC
+const getNpc = async (npcId) => {
+  try {
+    const npcDocRef = doc(firestore, "npc-personal", npcId);
+    const npcDocSnap = await getDoc(npcDocRef); // Fetch document
+    console.log("Fetching selected NPC...");
+    if (npcDocSnap.exists()) {
+      return npcDocSnap.data(); // Return the NPC data
+    } else {
+      console.error("NPC not found:", npcId);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching NPC:", error);
+    return null;
+  }
+};
+
+// Save encounter state
+const handleSaveState = () => {
+
+  // if selectedNPCs doesn't have any npc without id, then save the state
+  if (selectedNPCs.some((npc) => !npc.id)) {
+    // Alert
+    alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
+    return;
+  }
+
+  const currentTime = new Date();
+  setLastSaved(currentTime);
+
+  // Save encounter state (only store necessary identifiers: id and combatId)
+
+  setDoc(doc(firestore, "encounters", id), {
+    ...encounter,
+    name: encounterName,
+    selectedNPCs: selectedNPCs.map((npc) => ({
+      id: npc.id,
+      combatId: npc.combatId,
+      combatStats: npc.combatStats,
+    })), // Only save ids and combatIds
+    round: encounter.round,
+    logs: logs,
+    private: encounter.private || true,
+  });
 
     // Add log entry
     addLog("combat_sim_log_encounter_saved");
@@ -390,7 +390,14 @@ const CombatSim = ({ user }) => {
       const newTurnsCount = newTurns.filter((turn) => turn).length;
       const oldTurnsCount = oldTurns.filter((turn) => turn).length;
       if (newTurnsCount > oldTurnsCount) {
-        addLog("combat_sim_log_turn_checked", npc.name, newTurnsCount);
+        addLog(
+          "combat_sim_log_turn_checked",
+          npc.name +
+            (npc?.combatStats?.combatNotes
+              ? "【" + npc.combatStats.combatNotes + "】"
+              : ""),
+          newTurnsCount
+        );
       }
     }
   };
@@ -473,7 +480,13 @@ const CombatSim = ({ user }) => {
     // Add log entry to logs array
     const npc = selectedNPCs.find((npc) => npc.combatId === npcCombatId);
     if (npc) {
-      addLog("combat_sim_log_npc_removed", npc.name);
+      addLog(
+        "combat_sim_log_npc_removed",
+        npc.name +
+          (npc?.combatStats?.combatNotes
+            ? "【" + npc.combatStats.combatNotes + "】"
+            : "")
+      );
     }
   };
 
@@ -615,26 +628,38 @@ const CombatSim = ({ user }) => {
     if (adjustedValue < 0 && statType === "HP" && damageType !== "") {
       addLog(
         "combat_sim_log_npc_damage",
-        npcClicked.name,
+        npcClicked.name +
+          (npcClicked?.combatStats?.combatNotes
+            ? "【" + npcClicked.combatStats.combatNotes + "】"
+            : ""),
         Math.abs(adjustedValue),
         damageType
       );
     } else if (adjustedValue < 0 && statType === "HP") {
       addLog(
         "combat_sim_log_npc_damage_no_type",
-        npcClicked.name,
+        npcClicked.name +
+          (npcClicked?.combatStats?.combatNotes
+            ? "【" + npcClicked.combatStats.combatNotes + "】"
+            : ""),
         Math.abs(adjustedValue)
       );
     } else if (adjustedValue < 0 && statType === "MP") {
       addLog(
         "combat_sim_log_npc_used_mp",
-        npcClicked.name,
+        npcClicked.name +
+          (npcClicked?.combatStats?.combatNotes
+            ? "【" + npcClicked.combatStats.combatNotes + "】"
+            : ""),
         Math.abs(adjustedValue)
       );
     } else if (adjustedValue > 0) {
       addLog(
         "combat_sim_log_npc_heal",
-        npcClicked.name,
+        npcClicked.name +
+          (npcClicked?.combatStats?.combatNotes
+            ? "【" + npcClicked.combatStats.combatNotes + "】"
+            : ""),
         Math.abs(adjustedValue),
         statType
       );
@@ -647,7 +672,13 @@ const CombatSim = ({ user }) => {
       0
     ) {
       setTimeout(() => {
-        addLog("combat_sim_log_npc_fainted", npcClicked.name);
+        addLog(
+          "combat_sim_log_npc_fainted",
+          npcClicked.name +
+            (npcClicked?.combatStats?.combatNotes
+              ? "【" + npcClicked.combatStats.combatNotes + "】"
+              : "")
+        );
       }, 500);
     }
   };
@@ -740,9 +771,25 @@ const CombatSim = ({ user }) => {
 
     // Add log entry if status effect is added or removed
     if (updatedStatusEffects.includes(status)) {
-      addLog("combat_sim_log_status_effect_added", npc.name, null, status);
+      addLog(
+        "combat_sim_log_status_effect_added",
+        npc.name +
+          (npc?.combatStats?.combatNotes
+            ? "【" + npc.combatStats.combatNotes + "】"
+            : ""),
+        null,
+        status
+      );
     } else {
-      addLog("combat_sim_log_status_effect_removed", npc.name, null, status);
+      addLog(
+        "combat_sim_log_status_effect_removed",
+        npc.name +
+          (npc?.combatStats?.combatNotes
+            ? "【" + npc.combatStats.combatNotes + "】"
+            : ""),
+        null,
+        status
+      );
     }
   };
 
@@ -814,7 +861,13 @@ const CombatSim = ({ user }) => {
     );
 
     // Add log entry
-    addLog("combat_sim_log_used_ultima_point", selectedNPC.name);
+    addLog(
+      "combat_sim_log_used_ultima_point",
+      selectedNPC.name +
+        (selectedNPC?.combatStats?.combatNotes
+          ? "【" + selectedNPC.combatStats.combatNotes + "】"
+          : "")
+    );
   };
 
   // NPC Detail width resizing
@@ -851,7 +904,7 @@ const CombatSim = ({ user }) => {
       </Box>
     );
   }
-
+  
   // If encounter's uuid is different from user's uid and encounter is private, show error message
   if (isPrivate) {
     return (

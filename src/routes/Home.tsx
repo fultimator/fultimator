@@ -230,8 +230,8 @@ function Home() {
 
                 {/* OS Icons */}
                 <Box sx={{ display: "flex", gap: 1, fontSize: 24 }}>
-                  <FaWindows color="#1976d2" />
-                  <FaApple color={isDarkMode ? "#ffffff" : "#000000"} />
+                  <FaWindows color={isDarkMode ? "#e0e0e0" : "#111111"} />
+                  <FaApple color={isDarkMode ? "#e0e0e0" : "#111111"} />
                   <FaLinux color={isDarkMode ? "#e0e0e0" : "#111111"} />
                 </Box>
               </Box>
