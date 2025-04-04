@@ -2,8 +2,10 @@ import { Button, Grid, Typography } from "@mui/material";
 import { ArrowBack, Delete } from "@mui/icons-material";
 import { diceList } from "../../libs/rolls";
 import Diamond from "../Diamond";
+import { useTranslate } from "../../translation/translate";
 
 export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
+  const {t} = useTranslate();
   if (!rolls) {
     return null;
   }
@@ -27,12 +29,12 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
                 }
                 onClick={handleRoll(roll)}
               >
-                Roll
+                {t("Roll")}
               </Button>
             </Grid>
             <Grid item xs>
               <Typography fontSize="1.1rem">
-                <Roll roll={roll} /> <Diamond /> {roll.label}
+                <Roll roll={roll} /> { roll.label && <Diamond />} {roll.label}
               </Typography>
             </Grid>
             <Grid item>
@@ -44,7 +46,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
                 }
                 onClick={handleDelete(roll.id)}
               >
-                Remove
+                {t("Remove")}
               </Button>
             </Grid>
           </Grid>

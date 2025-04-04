@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { Button, Card, Divider, Grid, Stack, Typography } from "@mui/material";
 import { diceList, random } from "../../libs/rolls";
 import Diamond from "../Diamond";
+import { useTranslate } from "../../translation/translate";
 
 export default function Roll({ roll, saveRoll, currentUser }) {
   if (roll.dice.length === 2) {
@@ -57,6 +58,7 @@ function RegularRoll({ roll }) {
 }
 
 function FabulaRoll({ roll, saveRoll, currentUser }) {
+  const { t } = useTranslate();
   const lastRoll = roll.attempts[roll.attempts.length - 1].attempt;
 
   const sum = () => {
@@ -137,33 +139,35 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               {sum() + roll.modifier}
             </Typography>
             <Typography fontWeight="bold" textAlign={"center"} fontSize="1rem">
-              Result
+              {t("Result")}
             </Typography>
           </Grid>
           <Grid item xs={7} sm={6}>
             <Grid container alignItems="center" spacing={1}>
               <Grid item xs={6}>
-                <Typography textAlign="right">Calculation: </Typography>
+                <Typography textAlign="right">
+                  {t("roller_calculation")}:{" "}
+                </Typography>
               </Grid>
               <Grid item xs={6}>
                 {roll.modifier < 0 && (
                   <Typography textAlign="center" fontSize="1.2rem">
-                    ({lastRoll[0]} + {lastRoll[1]} - {Math.abs(roll.modifier)})
+                    【{lastRoll[0]} + {lastRoll[1]} - {Math.abs(roll.modifier)}】
                   </Typography>
                 )}
                 {roll.modifier === 0 && (
                   <Typography textAlign="center" fontSize="1.2rem">
-                    ({lastRoll[0]} + {lastRoll[1]})
+                    【{lastRoll[0]} + {lastRoll[1]}】
                   </Typography>
                 )}
                 {roll.modifier > 0 && (
                   <Typography textAlign="center" fontSize="1.2rem">
-                    ({lastRoll[0]} + {lastRoll[1]} + {Math.abs(roll.modifier)})
+                    【{lastRoll[0]} + {lastRoll[1]} + {Math.abs(roll.modifier)}】
                   </Typography>
                 )}
               </Grid>
               <Grid item xs={6}>
-                <Typography textAlign="right">HR: </Typography>
+                <Typography textAlign="right">{t("HR")}: </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography
@@ -180,12 +184,12 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
           <Grid item xs={12}>
             {crit() && (
               <Typography textAlign={"center"} fontSize="1.5rem">
-                🎉 Critical Success! 🎉
+                🎉 {t("Critical Success")}! 🎉
               </Typography>
             )}
             {fumble() && (
               <Typography textAlign={"center"} fontSize="1.5rem">
-                😭 Critical Failure! 😭
+                😭 {t("Critical Failure")}! 😭
               </Typography>
             )}
           </Grid>
@@ -208,17 +212,17 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               </Grid>
               <Grid item xs={6} sx={{ px: 1 }}>
                 <Button fullWidth variant="outlined" onClick={reRoll("first")}>
-                  Reroll {roll.dice[0]}
+                  {t("roller_reroll")} {roll.dice[0]}
                 </Button>
               </Grid>
               <Grid item xs={6} sx={{ px: 1 }}>
                 <Button fullWidth variant="outlined" onClick={reRoll("second")}>
-                  Reroll {roll.dice[1]}
+                  {t("roller_reroll")} {roll.dice[1]}
                 </Button>
               </Grid>
               <Grid item xs={12} sx={{ px: 1, py: 1 }}>
                 <Button fullWidth variant="outlined" onClick={reRoll("both")}>
-                  Reroll both
+                  {t("roller_reroll_both")}
                 </Button>
               </Grid>
             </Grid>

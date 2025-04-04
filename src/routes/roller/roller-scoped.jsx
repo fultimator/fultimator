@@ -119,10 +119,10 @@ function RollerScopedAuthenticated({ user }) {
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={1}>
-        <Grid item xs={12} sm={5} sx={{ order: 1 }}>
+        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
           <ShareLink scope={scope} />
         </Grid>
-        <Grid item xs={12} sm={3} sx={{ order: 1 }}>
+        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
           <Card sx={{ p: 2 }}>
             <Typography sx={{ marginBottom: "8px" }}>
               {t("Set name to display here:")}
@@ -138,18 +138,7 @@ function RollerScopedAuthenticated({ user }) {
               fullWidth
             ></TextField>
           </Card>
-        </Grid>
-        <Grid item sx={{ order: 2 }}>
-          <Card sx={{ p: 2 }}>
-            <Typography>
-              {t("Left-click on a die to add it to your pool")}
-              <br />
-              {t("Right-click a die to remove it from your hand")}
-              <br />
-              {t("Press enter to roll")}
-            </Typography>
-          </Card>
-        </Grid>
+        </Grid>        
 
         <Grid item xs={12} sx={{ order: 3 }}>
           <PrepareRoll
@@ -157,11 +146,11 @@ function RollerScopedAuthenticated({ user }) {
             createRoll={createRoll}
           />
         </Grid>
-        <Grid item xs={12} sm={5} sx={{ order: { xs: 6, sm: 5 } }}>
+        <Grid item xs={12} sm={5.5} sx={{ order: { xs: 6, sm: 5 } }}>
           <RollList scope={scope} saveRoll={saveRoll} user={user} />
         </Grid>
         <Grid item xs={0} sm={1} sx={{ order: { xs: 6, sm: 5 } }} />
-        <Grid item xs={12} sm={5} sx={{ my: 1, order: { xs: 5, sm: 6 } }}>
+        <Grid item xs={12} sm={5.5} sx={{ my: 1, order: { xs: 5, sm: 6 } }}>
           <PreparedRolls user={user} scope={scope} createRoll={createRoll} />
         </Grid>
       </Grid>
