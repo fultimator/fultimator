@@ -726,7 +726,7 @@ function Personal({ user }) {
       </div>
 
       <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
