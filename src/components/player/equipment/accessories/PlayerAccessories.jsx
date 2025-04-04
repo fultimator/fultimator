@@ -12,7 +12,8 @@ import { Equip } from "../../../icons";
 import PrettyAccessory from "./PrettyAccessory";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { useTheme } from "@mui/material/styles";
+import { AccessoryIcon } from "../../../icons";
 
 export default function PlayerAccessories({
   player,
@@ -22,7 +23,7 @@ export default function PlayerAccessories({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useCustomTheme();
+  const theme = useTheme();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -78,9 +79,15 @@ export default function PlayerAccessories({
       updatedAcc[index].isEquipped = checked;
       onEquipAccessory(updatedAcc);
     } else {
-      alert(
-        t("You cannot equip this accessory as you have already equipped one.")
-      );
+      if (window.electron) {
+        window.electron.alert(
+          t("You cannot equip this accessory as you have already equipped one.")
+        );
+      } else {
+        alert(
+          "You cannot equip this accessory as you have already equipped one."
+        );
+      }
     }
   };
 
@@ -99,23 +106,23 @@ export default function PlayerAccessories({
     <Accordion
       elevation={3}
       sx={{
-        p: "15px",
         borderRadius: "8px",
         border: "2px solid",
-        borderColor: theme.secondary,
+        borderColor: theme.palette.secondary.main,
         marginBottom: 3,
       }}
       expanded={expanded}
       onChange={handleAccordionChange}
     >
       <CustomHeaderAccordion
-        expanded={expanded}
+        isExpanded={expanded}
         handleAccordionChange={handleAccordionChange}
         headerText={t("Accessories")}
         showIconButton={false}
+        icon={<AccessoryIcon />}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container justifyContent="flex-end" spacing={3}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {accessories.map((accessory, index) => (
             <React.Fragment key={index}>
@@ -153,11 +160,34 @@ export default function PlayerAccessories({
                             handleEquipAccessory(index, !accessory.isEquipped)
                           }
                           disabled={!isEditMode}
-                          sx={{ mt: 1, boxShadow: "1px 1px 5px" }}
+                          sx={{
+                            mt: 1,
+                            boxShadow: "1px 1px 5px",
+                            backgroundColor: accessory.isEquipped
+                              ? theme.palette.ternary.main
+                              : theme.palette.background.paper,
+                            "&:hover": {
+                              backgroundColor: accessory.isEquipped
+                                ? theme.palette.quaternary.main // Darker for equipped state
+                                : theme.palette.secondary.main, // Highlight when not equipped
+                            },
+                            transition: "background-color 0.3s",
+                          }}
                         >
                           <Equip
-                            color={accessory.isEquipped ? "green" : theme.ternary}
-                            strokeColor={"#000"}
+                            color={
+                              accessory.isEquipped
+                                ? theme.palette.mode === "dark"
+                                  ? theme.palette.white.main // White in dark mode
+                                  : theme.palette.primary.main // Primary in light mode
+                                : theme.palette.background.default
+                            }
+                            strokeColor={
+                              accessory.isEquipped &&
+                              theme.palette.mode === "dark"
+                                ? theme.palette.white.main // White stroke in dark mode
+                                : theme.palette.secondary.main // Default primary stroke
+                            }
                           />
                         </IconButton>
                       </Tooltip>
@@ -170,7 +200,11 @@ export default function PlayerAccessories({
                     )}
                   </Grid>
                   <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export name={accessory.name} dataType="accessory" data={accessory} />
+                    <Export
+                      name={accessory.name}
+                      dataType="accessory"
+                      data={accessory}
+                    />
                   </Grid>
                 </Grid>
               </Grid>

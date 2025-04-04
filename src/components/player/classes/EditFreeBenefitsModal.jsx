@@ -34,7 +34,7 @@ export default function EditFreeBenefitsModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Edit Benefits")}
       </DialogTitle>
       <IconButton
@@ -213,12 +213,12 @@ export default function EditFreeBenefitsModal({
       <DialogActions>
         <Button
           variant="contained"
-          color="primary"
+          color="quaternary"
           onClick={onAddCustomBenefit}
         >
           {t("Add Custom Benefit")}
         </Button>
-        <Button variant="contained" color="secondary" onClick={onSaveBenefits}>
+        <Button variant="contained" color="primary" onClick={onSaveBenefits}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

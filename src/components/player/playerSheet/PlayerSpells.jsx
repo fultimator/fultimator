@@ -704,6 +704,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 )}
                 <Button
                   variant="contained"
+                  color="primary"
                   onClick={handleOK}
                   sx={{ marginTop: 2, width: "100%" }}
                 >
@@ -823,13 +824,15 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 </DialogContent>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleDialogClose}>{t("Close")}</Button>
+                <Button onClick={handleDialogClose} variant="contained" color="secondary">{t("Close")}</Button>
                 <Button
                   onClick={
                     selectedSpell && selectedSpell?.spellType === "default"
                       ? handleRoll
                       : handleGambleRoll
                   }
+                  variant="contained"
+                  color="primary"
                 >
                   {isRolling ? t("Re-Roll") : t("Roll")}
                 </Button>

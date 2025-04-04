@@ -241,8 +241,8 @@ export default function SpellEntropistGambleModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        {t("Edit Gamble Spell")}
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
+        {t("edit_gamble_spell")}
       </DialogTitle>
       <IconButton
         aria-label="close"
@@ -566,7 +566,7 @@ export default function SpellEntropistGambleModal({
         </Button>
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={handleSave}
           disabled={!!validationError}
         >

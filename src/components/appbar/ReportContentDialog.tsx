@@ -147,9 +147,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
         },
       }}
     >
-      <DialogTitle sx={{ fontSize: "1.4rem" }}>
-        {t("Report Content")}
-      </DialogTitle>
+      <DialogTitle variant="h3">{t("Report Content")}</DialogTitle>
       <DialogContent>
         <FormControl component="fieldset" sx={{ mt: 2 }}>
           <Typography variant="body2">
@@ -196,12 +194,18 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={isSubmitting}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleClose}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button
           onClick={handleSubmit}
           color="primary"
+          variant="contained"
           disabled={isSubmitting || cooldown > 0}
         >
           {cooldown > 0 ? `Submit (wait ${cooldown}s)` : "Submit"}

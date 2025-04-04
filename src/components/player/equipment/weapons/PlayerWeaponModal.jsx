@@ -38,11 +38,11 @@ export default function PlayerWeaponModal({
   onClose,
   editWeaponIndex,
   weapon,
-  setWeapon,
   onAddWeapon,
   onDeleteWeapon,
 }) {
   const { t } = useTranslate();
+
   const [base, setBase] = useState(weapon?.base || weapons[0]);
   const [name, setName] = useState(weapon?.name || weapons[0].name);
   const [category, setCategory] = useState(weapon?.category || "");
@@ -75,7 +75,7 @@ export default function PlayerWeaponModal({
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
-    setName(weapon?.name || weapons[0].name);
+    setName(weapon?.name || t(weapons[0].name));
     setCategory(weapon?.category || weapons[0].category);
     setType(weapon?.type || weapons[0].type);
     setHands(weapon?.hands || weapons[0].hands);
@@ -103,6 +103,7 @@ export default function PlayerWeaponModal({
         ? true
         : false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weapon]);
 
   const handleFileUpload = (data) => {
@@ -312,10 +313,8 @@ export default function PlayerWeaponModal({
     onAddWeapon(updatedWeapon);
   };
 
-  const handleDelete = () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this weapon?"
-    );
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(t("delete_equipment_confirm"));
     if (confirmDelete) {
       if (editWeaponIndex !== null) {
         onDeleteWeapon(editWeaponIndex);
@@ -370,7 +369,7 @@ export default function PlayerWeaponModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Add Weapon")}
       </DialogTitle>
       <IconButton
@@ -395,7 +394,7 @@ export default function PlayerWeaponModal({
                 const base = weapons.find((el) => el.name === e.target.value);
 
                 setBase(base);
-                setName(base.name);
+                setName(t(base.name));
                 setCategory(base.category);
                 setType(base.type);
                 setHands(base.hands);
@@ -609,11 +608,22 @@ export default function PlayerWeaponModal({
       </DialogContent>
       <DialogActions>
         {editWeaponIndex !== null && (
-          <Button onClick={() => handleDelete(editWeaponIndex)} color="error">
+          <Button
+            onClick={() => handleDelete(editWeaponIndex)}
+            color="error"
+            variant="contained"
+          >
             {t("Delete")}
           </Button>
         )}
-        <Button onClick={handleSave} color="primary" disabled={/* disable if the weapon has a value "magitech" === true */ weapon?.magicannon }>
+        <Button
+          onClick={handleSave}
+          color="primary"
+          variant="contained"
+          disabled={
+            /* disable if the weapon has a value "magitech" === true */ weapon?.magicannon
+          }
+        >
           {t("Save Changes")}
         </Button>
       </DialogActions>

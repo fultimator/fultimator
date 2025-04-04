@@ -18,7 +18,6 @@ export default function PlayerControls({ player, setPlayer }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [zenitChange, setZenitChange] = useState(0);
   const [changeType, setChangeType] = useState("+");
@@ -152,7 +151,7 @@ export default function PlayerControls({ player, setPlayer }) {
             marginTop: "-1px",
             marginBottom: "-1px",
             backgroundColor: primary,
-            color: ternary,
+            color: "#fff",
             borderRadius: "0 8px 8px 0",
             transform: "rotate(180deg)",
             fontSize: "2em",

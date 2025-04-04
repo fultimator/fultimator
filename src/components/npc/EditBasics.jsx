@@ -222,7 +222,7 @@ export default function EditBasics({ npc, setNpc }) {
       {npc.rank === "companion" && (
         <Grid item xs={4}>
           <FormControl fullWidth>
-            <InputLabel id="companionlvl">SL</InputLabel>
+            <InputLabel id="companionlvl">{t("Skill Level:")}</InputLabel>
             <Select
               labelid="companionlvl"
               id="select-companionlvl"
@@ -421,7 +421,7 @@ export default function EditBasics({ npc, setNpc }) {
 
 function EditLevel({ npc, setnpc }) {
   const { t } = useTranslate();
-  const onRaiseLevel = (e) => {
+  const onRaiseLevel = () => {
     setnpc((prevState) => {
       if (prevState.lvl >= 60) {
         return prevState;
@@ -433,7 +433,7 @@ function EditLevel({ npc, setnpc }) {
       return newState;
     });
   };
-  const onLowerLevel = (e) => {
+  const onLowerLevel = () => {
     setnpc((prevState) => {
       if (prevState.lvl <= 5) {
         return prevState;

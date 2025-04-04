@@ -29,7 +29,6 @@ export default function PlayerAccessoryModal({
   onClose,
   editAccIndex,
   accessory,
-  setAccessory,
   onAddAccessory,
   onDeleteAccessory,
 }) {
@@ -192,15 +191,14 @@ export default function PlayerAccessoryModal({
     onAddAccessory(updatedAccessory);
   };
 
-  const handleDelete = (accIndex) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this accessory?"
-    );
-    if (confirmDelete) {
+  const handleDelete = async (accIndex) => {
+    const confirmed = window.confirm(t("Are you sure you want to delete this accessory?"));
+
+    if (confirmed) {
       if (accIndex !== null) {
-        onDeleteAccessory(accIndex);
+        onDeleteAccessory(accIndex); // Call the delete function if confirmed
       }
-      onClose();
+      onClose(); // Close the dialog or perform any necessary cleanup
     }
   };
 
@@ -215,7 +213,7 @@ export default function PlayerAccessoryModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Add Accessory")}
       </DialogTitle>
       <IconButton
@@ -373,11 +371,15 @@ export default function PlayerAccessoryModal({
       </DialogContent>
       <DialogActions>
         {editAccIndex !== null && (
-          <Button onClick={() => handleDelete(editAccIndex)} color="error">
+          <Button onClick={() => handleDelete(editAccIndex)} color="error" variant="contained" >
             {t("Delete")}
           </Button>
         )}
-        <Button onClick={handleSave} color="primary">
+        <Button
+          onClick={handleSave}
+          color= "primary"
+          variant="contained"
+        >
           {t("Save Changes")}
         </Button>
       </DialogActions>

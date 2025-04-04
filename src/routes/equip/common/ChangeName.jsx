@@ -8,7 +8,7 @@ function ChangeName({ value, onChange }) {
       <TextField
         id="name"
         label={t("Change Name")}
-        value={t(value)}
+        value={value}
         onChange={onChange}
       />
     </FormControl>

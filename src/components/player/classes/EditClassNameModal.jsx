@@ -32,12 +32,12 @@ export default function EditClassNameModal({
       onClose={onClose}
       PaperProps={{
         sx: {
-          width: "80%",
+          width: { xs: "80%", md: "40%" },
           maxWidth: "lg",
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold"}}>
         {t("Edit Class Name")}
       </DialogTitle>
       <IconButton
@@ -62,7 +62,7 @@ export default function EditClassNameModal({
         />
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

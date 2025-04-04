@@ -1,4 +1,17 @@
-import { CardMedia, Typography, Link, Box, Divider, Stack, Grid } from "@mui/material";
+import {
+  CardMedia,
+  Typography,
+  Link,
+  Box,
+  Divider,
+  Stack,
+  Grid,
+  Button,
+  Paper,
+  useMediaQuery,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
@@ -9,19 +22,26 @@ import combat_simulator from "./combat_simulator.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
 import character_designer from "./character_designer.webp";
-import PublicIcon from '@mui/icons-material/Public';
-import FeedbackIcon from '@mui/icons-material/Feedback';
-import DesktopMacIcon from '@mui/icons-material/DesktopMac';
-import DiscordIcon from '../components/svgs/discord.svg'; // Import your SVG
-import CopyrightIcon from '@mui/icons-material/Copyright';
-import { useCustomTheme } from '../hooks/useCustomTheme'
+import PublicIcon from "@mui/icons-material/Public";
+import FeedbackIcon from "@mui/icons-material/Feedback";
+import DesktopMacIcon from "@mui/icons-material/DesktopMac";
+import { DiscordIcon } from "../components/icons";
+import CopyrightIcon from "@mui/icons-material/Copyright";
+import { useCustomTheme } from "../hooks/useCustomTheme";
+import { useTheme } from "@mui/material/styles";
+import DownloadIcon from "@mui/icons-material/Download";
+import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
+import EmailIcon from "@mui/icons-material/Email";
+import powered_by_fu from "./powered_by_fu.png";
 
 function Home() {
   const theme = useCustomTheme();
+  const muiTheme = useTheme();
   const isDarkMode = theme.mode === "dark";
   const navigate = useNavigate();
   const [hover, setHover] = useState("");
   const { t } = useTranslate();
+  const isSmallScreen = useMediaQuery(muiTheme.breakpoints.down("md"));
 
   const mediaItems = [
     {
@@ -77,7 +97,7 @@ function Home() {
               objectFit: "contain",
               width: 360,
               cursor: "pointer",
-              transform: hover === item.hoverKey ? "scale(1.1)" : "none",
+              transform: hover === item.hoverKey ? "scale(1.05)" : "none",
               transition: "transform 0.3s",
             }}
             onMouseEnter={() => {
@@ -95,145 +115,382 @@ function Home() {
 
       <Box
         sx={{
-          textAlign: "center",
           mt: 5,
           mb: 5,
-          padding: "1em",
+          padding: "2em",
           backgroundColor: isDarkMode ? `#252525` : "#f5f5f5",
-          borderRadius: "8px",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         }}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              <img src={DiscordIcon} alt="Discord" style={{ verticalAlign: 'middle', width: 24, height: 24, marginRight: 8 }} />
-              {t("Join the Fultimator Community!")}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              {t("We would love to have you on board!")}{" "}
-              <Link
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                height: "100%",
+                borderRadius: "8px",
+                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                },
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  fontWeight: "bold",
+                  color: isDarkMode ? "#e0e0e0" : "#333333",
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    display: "inline-flex",
+                  }}
+                >
+                  <DiscordIcon
+                    size={24}
+                    color={isDarkMode ? "#7289da" : "#7289da"}
+                  />
+                </Box>
+                {t("Join the Fultimator Community!")}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {t("We would love to have you on board!")}
+              </Typography>
+              <Button
+                variant="contained"
                 href="https://discord.gg/9yYc6R93Cd"
                 target="_blank"
                 rel="noreferrer"
-                underline="hover"
-                sx={{ color: "#7289da", fontWeight: "bold" }}
+                sx={{
+                  backgroundColor: "#7289da",
+                  "&:hover": { backgroundColor: "#5f73bc" },
+                  fontWeight: "bold",
+                }}
               >
                 {t("Dive into the Discord Hub!")}
-              </Link>
-            </Typography>
+              </Button>
+            </Paper>
           </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              <DesktopMacIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              {t("Download the Fultimator Desktop App")}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              {t("Fultimator is also available as a desktop app for Windows and Linux. Download it from the following link:")}{" "}
-              <Link
-                href="https://github.com/fultimator/fultimator-desktop/releases"
-                target="_blank"
-                rel="noreferrer"
-                underline="hover"
-                sx={{ color: "#47645b", fontWeight: "bold" }}
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                height: "100%",
+                borderRadius: "8px",
+                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                },
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  fontWeight: "bold",
+                  color: isDarkMode ? "#e0e0e0" : "#333333",
+                }}
               >
-                {t("Fultimator Desktop App")}
-              </Link>
-            </Typography>
+                <DesktopMacIcon
+                  sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    color: isDarkMode ? theme.secondary : theme.primary,
+                  }}
+                />
+                {t("Download the Fultimator Desktop App")}
+              </Typography>
+
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {t("desktop_app_description") ||
+                  "Get the full experience with our desktop app, available for Windows, macOS, and Linux."}
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Button
+                  variant="contained"
+                  href="https://github.com/fultimator/fultimator-desktop/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  startIcon={<DownloadIcon />}
+                  color="primary"
+                >
+                  {t("download_now") || "Download Now"}
+                </Button>
+
+                {/* OS Icons */}
+                <Box sx={{ display: "flex", gap: 1, fontSize: 24 }}>
+                  <FaWindows color="#1976d2" />
+                  <FaApple color={isDarkMode ? "#ffffff" : "#000000"} />
+                  <FaLinux color={isDarkMode ? "#e0e0e0" : "#111111"} />
+                </Box>
+              </Box>
+            </Paper>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              <PublicIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              {t("Extra")}
-            </Typography>
-            <Stack spacing={2} sx={{ mb: 2 }}>
-              <Typography variant="body1">
-                {t("The wonderful Fultimator Icons are made by Runty! Email:")}{" "}
-                <Link
-                  href="mailto:contactrunty@iCloud.com"
-                  underline="hover"
-                  sx={{ color: "#47645b", fontWeight: "bold" }}
-                >
-                  contactrunty@iCloud.com
-                </Link>
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                height: "100%",
+                borderRadius: "8px",
+                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                },
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  fontWeight: "bold",
+                  color: isDarkMode ? "#e0e0e0" : "#333333",
+                }}
+              >
+                <PublicIcon
+                  sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    color: isDarkMode ? "#81c784" : "#388e3c",
+                  }}
+                />
+                {t("extra_resources")}
               </Typography>
-              <Typography variant="body1">
-                {t("Monster Icons are taken from:")}{" "}
-                <Link
-                  href="http://www.akashics.moe/"
+              <Stack spacing={2}>
+                <Typography variant="body1">
+                  {t("contact_runty")}
+                  <Tooltip title="Email contactrunty@iCloud.com" arrow>
+                    <IconButton
+                      component="a"
+                      href="mailto:contactrunty@iCloud.com"
+                      sx={{
+                        color: isDarkMode ? "#81c784" : "#388e3c",
+                        ml: 1,
+                      }}
+                      size="small"
+                    >
+                      <EmailIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Typography>
+                <Typography variant="body1">
+                  {t("Monster Icons are taken from:")}
+                  <Button
+                    variant="text"
+                    href="http://www.akashics.moe/"
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{
+                      color: isDarkMode ? "#81c784" : "#388e3c",
+                      fontWeight: "bold",
+                      ml: 1,
+                      p: 0,
+                      minWidth: "auto",
+                    }}
+                  >
+                    akashics.moe
+                  </Button>
+                </Typography>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                height: "100%",
+                borderRadius: "8px",
+                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                },
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  fontWeight: "bold",
+                  color: isDarkMode ? "#e0e0e0" : "#333333",
+                }}
+              >
+                <FeedbackIcon
+                  sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    color: isDarkMode ? "#ffb74d" : "#f57c00",
+                  }}
+                />
+                {t("Contact Us")}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {t("feedback_description")}
+              </Typography>
+              <Stack direction="row" spacing={2} flexWrap="wrap">
+                <Button
+                  variant="outlined"
+                  href="mailto:fultimator@gmail.com"
+                  sx={{
+                    borderColor: isDarkMode ? "#ffb74d" : "#f57c00",
+                    color: isDarkMode ? "#ffb74d" : "#f57c00",
+                    "&:hover": {
+                      borderColor: isDarkMode ? "#ffca28" : "#ffa726",
+                      backgroundColor: "rgba(255, 199, 40, 0.1)",
+                    },
+                    fontWeight: "bold",
+                  }}
+                >
+                  fultimator@gmail.com
+                </Button>
+                <Button
+                  variant="outlined"
+                  href="https://forms.gle/3P7Bq1CtZrnFwQsm8"
                   target="_blank"
                   rel="noreferrer"
-                  underline="hover"
-                  sx={{ color: "#47645b", fontWeight: "bold" }}
+                  sx={{
+                    borderColor: isDarkMode ? "#ffb74d" : "#f57c00",
+                    color: isDarkMode ? "#ffb74d" : "#f57c00",
+                    "&:hover": {
+                      borderColor: isDarkMode ? "#ffca28" : "#ffa726",
+                      backgroundColor: "rgba(255, 199, 40, 0.1)",
+                    },
+                    fontWeight: "bold",
+                  }}
                 >
-                  akashics.moe
-                </Link>
-              </Typography>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              <FeedbackIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              {t("Contact Us")}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              {t("If you have any feedback or questions, feel free to reach out to us via email or our feedback form.")}{" "}
-              <Link
-                href="mailto:fultimator@gmail.com"
-                underline="hover"
-                sx={{ color: "#47645b", fontWeight: "bold" }}
-              >
-                fultimator@gmail.com
-              </Link>
-              {" | "}
-              <Link
-                href="https://forms.gle/3P7Bq1CtZrnFwQsm8"
-                target="_blank"
-                rel="noreferrer"
-                underline="hover"
-                sx={{ color: "#47645b", fontWeight: "bold" }}
-              >
-                {t("Google Form.")}
-              </Link>
-            </Typography>
+                  {t("google_form")}
+                </Button>
+              </Stack>
+            </Paper>
           </Grid>
 
           <Grid item xs={12}>
-            <Divider sx={{ my: 3 }} />
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              <CopyrightIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              {t("Copyright Notice")}
-            </Typography>
-            <Typography variant="body1">
-              {t("Fultimator is an independent production by")}{" "}
-              <Link
-                href="https://github.com/fultimator"
-                target="_blank"
-                rel="noreferrer"
-                underline="hover"
-                sx={{ color: "#47645b", fontWeight: "bold" }}
+            <Divider sx={{ marginBottom: 3 }} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isSmallScreen ? "column" : "row",
+                alignItems: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  flex: 1,
+                  mr: isSmallScreen ? 0 : 3,
+                  mb: isSmallScreen ? 3 : 0,
+                }}
               >
-                {t("Fultimator Dev Team")}
-              </Link>
-              {t(" and is not affiliated with Need Games or Rooster Games.")}
-              <br />
-              {t("It is published under the")}
-              <Link
-                href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
-                target="_blank"
-                rel="noreferrer"
-                underline="hover"
-                sx={{ color: "#47645b", fontWeight: "bold" }}
+                <Typography
+                  variant="h5"
+                  sx={{
+                    mb: 2,
+                    fontWeight: "bold",
+                    color: isDarkMode ? "#e0e0e0" : "#333333",
+                  }}
+                >
+                  <CopyrightIcon
+                    sx={{
+                      verticalAlign: "middle",
+                      mr: 1,
+                      color: isDarkMode ? "#bbdefb" : "#1976d2",
+                    }}
+                  />
+                  {t("Copyright Notice")}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, color: isDarkMode ? "#e0e0e0" : "#555555" }}
+                >
+                  {"Fultimator is an independent production by"}{" "}
+                  <Link
+                    href="https://github.com/fultimator"
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="hover"
+                    sx={{
+                      color: isDarkMode ? theme.secondary : theme.primary,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {t("Fultimator Dev Team")}
+                  </Link>
+                  {" and is not affiliated with Need Games or Rooster Games."}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, color: isDarkMode ? "#e0e0e0" : "#555555" }}
+                >
+                  {"It is published under the"}{" "}
+                  <Link
+                    href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
+                    target="_blank"
+                    rel="noreferrer"
+                    underline="hover"
+                    sx={{
+                      color: isDarkMode ? theme.secondary : theme.primary,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {"Fabula Ultima Third Party Tabletop License 1.0"}
+                  </Link>
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: isDarkMode ? "#e0e0e0" : "#555555" }}
+                >
+                  {
+                    "Fabula Ultima is a roleplaying game created by Emanuele Galletto and published by Need Games."
+                  }
+                  <br />
+                  {"Fabula Ultima is © Need Games and Rooster Games."}
+                </Typography>
+              </Box>
+
+              {/* Powered by FU image */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: isSmallScreen ? "center" : "flex-end",
+                  alignItems: "center",
+                  mt: isSmallScreen ? 2 : 0,
+                  transition: "transform 0.3s",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    cursor: "pointer",
+                  },
+                }}
               >
-                {t(" Fabula Ultima Third Party Tabletop License 1.0")}
-              </Link>
-              <br />
-              {t("Fabula Ultima is a roleplaying game created by Emanuele Galletto and published by Need Games.")}
-              <br />
-              {t("Fabula Ultima is © Need Games and Rooster Games.")}
-            </Typography>
+                <img
+                  src={powered_by_fu}
+                  alt="Powered by Fabula Ultima"
+                  onClick={() =>
+                    window.open(
+                      "https://need.games/fabula-ultima/",
+                      "_blank"
+                    )
+                  }
+                  style={{
+                    maxWidth: "200px",
+                    height: "auto",
+                  }}
+                />
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </Box>

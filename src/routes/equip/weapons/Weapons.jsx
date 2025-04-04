@@ -13,16 +13,16 @@ import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
-import ApplyRework from "../common/ApplyRework";
+import ApplyRework from '../common/ApplyRework';
 import { useTranslate } from "../../../translation/translate";
-import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
+import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
 
 function Weapons() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [base, setBase] = useState(weapons[0]);
-  const [name, setName] = useState(weapons[0].name);
+  const [name, setName] = useState(t(weapons[0].name));
   const [type, setType] = useState(weapons[0].type);
   const [hands, setHands] = useState(weapons[0].hands);
   const [att1, setAtt1] = useState(weapons[0].att1);
@@ -39,6 +39,11 @@ function Weapons() {
 
   const fileInputRef = useRef(null);
 
+  useEffect(() => {
+    // Translate the name after the component mounts
+    setName(t(base.name));
+  }, [t, base.name]);
+
   const handleFileUpload = (data) => {
     if (data) {
       const {
@@ -54,7 +59,7 @@ function Weapons() {
         damageBonus,
         damageReworkBonus,
         precBonus,
-        rework,
+        rework
       } = data;
 
       if (base) {
@@ -102,12 +107,12 @@ function Weapons() {
 
   const handleClearFields = () => {
     setBase(weapons[0]);
-    setName(weapons[0].name);
+    setName(t(weapons[0].name));
     setType(weapons[0].type);
     setHands(weapons[0].hands);
     setAtt1(weapons[0].att1);
     setAtt2(weapons[0].att2);
-    setMartial(weapons[0].martial);
+    setMartial(weapons[0].martial)
     setDamageBonus(false);
     setDamageReworkBonus(false);
     setPrecBonus(false);
@@ -216,10 +221,7 @@ function Weapons() {
           }}
         >
           {/* Header */}
-          <CustomHeaderAlt
-            headerText={t("Rare Weapons")}
-            icon={<AutoAwesome fontSize="large" />}
-          />
+          <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
           <Grid container spacing={1} alignItems="center">
             {/* Change Base */}
             <Grid item xs={4}>
@@ -229,7 +231,7 @@ function Weapons() {
                   const base = weapons.find((el) => el.name === e.target.value);
 
                   setBase(base);
-                  setName(base.name);
+                  setName(t(base.name));
                   setType(base.type);
                   setHands(base.hands);
                   setDamageBonus(false);
@@ -237,7 +239,7 @@ function Weapons() {
                   setPrecBonus(false);
                   setAtt1(base.att1);
                   setAtt2(base.att2);
-                  setMartial(base.martial);
+                  setMartial(base.martial)
                 }}
               />
             </Grid>

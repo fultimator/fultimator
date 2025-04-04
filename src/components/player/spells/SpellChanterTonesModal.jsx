@@ -56,7 +56,6 @@ export default function SpellChanterTonesModal({
   open,
   onClose,
   onSave,
-  onDelete,
   magichant,
 }) {
   const { t } = useTranslate();
@@ -123,7 +122,7 @@ export default function SpellChanterTonesModal({
       onClose={onClose}
       PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("magichant_edit_tones_modal")}
       </DialogTitle>
       <Button
@@ -295,7 +294,7 @@ export default function SpellChanterTonesModal({
         {/* Add Tone Button */}
         <Button
           variant="contained"
-          color="primary"
+          color="quaternary"
           onClick={handleAddTone}
           sx={{
             width: "100%",
@@ -308,7 +307,7 @@ export default function SpellChanterTonesModal({
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

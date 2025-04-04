@@ -1,7 +1,6 @@
 import { Card, Grid, Typography, Box, Dialog } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { styled } from "@mui/system";
 import attributes from "../../libs/attributes";
 import {
   calcDamage,
@@ -31,12 +30,15 @@ import Study from "./Study";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
+import { useTheme } from "@mui/material/styles";
 
 function NpcPretty(
-  { npc, study, npcImage, collapse, onClick = () => { } },
+  { npc, study, npcImage, collapse, onClick = () => {} },
   ref
 ) {
   const { t } = useTranslate();
+  const theme = useTheme();
+
   return (
     <Card>
       <div ref={ref} onClick={() => onClick()} style={{ cursor: "pointer" }}>
@@ -73,7 +75,7 @@ function NpcPretty(
                 >
                   <ArrowDropDown />
                   <Typography
-                    color="black"
+                    color={theme.palette.text.primary}
                     fontSize="1.1rem"
                     fontWeight="medium"
                   >
@@ -100,31 +102,48 @@ function Header({ npc, npcImage }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, #4C3D51 100%);`
-    : `linear-gradient(90deg, #674168 0%, #b9a9be 100%);`;
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, #4C3D51 100%);`
+      : `linear-gradient(90deg, #674168 0%, #b9a9be 100%);`;
 
-  const borderImage = theme.mode === 'dark'
-    ? "linear-gralinear-gradient(45deg, #b9a9be, #ffffff) 1"
-    : "linear-gradient(45deg, #b9a9be, #ffffff) 1";
-  const borderImageBody = theme.mode === 'dark'
-    ? "linear-gradient(45deg, #674168, #ffffff) 1;"
-    : "linear-gradient(45deg, #674168, #ffffff) 1;";
-  const borderRight = theme.mode === 'dark'
-    ? `4px solid #1f1f1f`
-    : `4px solid white`;
+  const borderImage =
+    theme.mode === "dark"
+      ? "linear-gralinear-gradient(45deg, #b9a9be, #ffffff) 1"
+      : "linear-gradient(45deg, #b9a9be, #ffffff) 1";
+  const borderImageBody =
+    theme.mode === "dark"
+      ? "linear-gradient(45deg, #674168, #ffffff) 1;"
+      : "linear-gradient(45deg, #674168, #ffffff) 1;";
+  const borderRight =
+    theme.mode === "dark" ? `4px solid #1f1f1f` : `4px solid white`;
 
-  const borderLeft = theme.mode === 'dark'
-    ? "2px solid #4C3D51"
-    : "2px solid #b9a9be";
+  const borderLeft =
+    theme.mode === "dark" ? "2px solid #4C3D51" : "2px solid #b9a9be";
 
-  const borderBottom = theme.mode === 'dark'
-    ? "2px solid #4C3D51"
-    : "2px solid #b9a9be";
+  const borderBottom =
+    theme.mode === "dark" ? "2px solid #4C3D51" : "2px solid #b9a9be";
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-  });
+  const StyledMarkdown = ({ children, ...props }) => {
+    return (
+      <div style={{ whiteSpace: "pre-line", margin: 0, padding: 0 }}>
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: (props) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </div>
+    );
+  };
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -176,7 +195,7 @@ function Header({ npc, npcImage }) {
           </Typography>
         </Grid>
       </Grid>
-      <Box sx={{ display: "flex", width: 1  }}>
+      <Box sx={{ display: "flex", width: 1 }}>
         {/* EditableImage */}
         {npcImage ? (
           <Box
@@ -188,7 +207,7 @@ function Header({ npc, npcImage }) {
               border: "1px solid #684268",
               borderTop: "none",
               overflow: "hidden",
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={handleClickOpen}
           >
@@ -206,12 +225,7 @@ function Header({ npc, npcImage }) {
           </Box>
         ) : null}
         {/* Dialog for expanded image */}
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          maxWidth="md"
-          fullWidth
-        >
+        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
           <img
             src={npc.imgurl}
             alt="Expanded NPC Avatar"
@@ -255,8 +269,6 @@ function Header({ npc, npcImage }) {
             }}
           >
             <StyledMarkdown
-              allowedElements={["strong", "em"]}
-              unwrapDisallowed={true}
               sx={{
                 fontFamily: "PT Sans Narrow",
                 fontSize: "1rem",
@@ -300,7 +312,7 @@ function Rank({ npc }) {
           {npc.sizes === "small" && t("Small")}
           {npc.sizes === "medium" && t("Medium")}
           {npc.sizes === "large" && t("Large")}
-          {npc.sizes && ' '}
+          {npc.sizes && " "}
           {t("Group Vehicle")}
         </>
       )}
@@ -339,8 +351,11 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1E2122' : '#efecf5',
-                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
+                bgcolor: theme.mode === "dark" ? "#1E2122" : "#efecf5",
+                borderRight:
+                  theme.mode === "dark"
+                    ? "1px solid #42484B"
+                    : "1px solid #ffffff",
                 py: 0.4,
               }}
             >
@@ -350,8 +365,11 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1E2122' : '#f3f0f7',
-                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
+                bgcolor: theme.mode === "dark" ? "#1E2122" : "#f3f0f7",
+                borderRight:
+                  theme.mode === "dark"
+                    ? "1px solid #42484B"
+                    : "1px solid #ffffff",
                 py: 0.4,
               }}
             >
@@ -361,8 +379,11 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1D1F20' : '#f6f4f9',
-                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
+                bgcolor: theme.mode === "dark" ? "#1D1F20" : "#f6f4f9",
+                borderRight:
+                  theme.mode === "dark"
+                    ? "1px solid #42484B"
+                    : "1px solid #ffffff",
                 py: 0.4,
               }}
             >
@@ -372,7 +393,7 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#f9f8fb',
+                bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#f9f8fb",
                 py: 0.4,
               }}
             >
@@ -443,8 +464,11 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#efecf5',
-                borderRight: theme.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
+                bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
+                borderRight:
+                  theme.mode === "dark"
+                    ? "1px solid #42484B"
+                    : "1px solid #ffffff",
                 py: 0.4,
               }}
             >
@@ -462,7 +486,7 @@ function Stats({ npc }) {
               item
               xs
               sx={{
-                bgcolor: theme.mode === 'dark' ? '#1B1D1E' : '#efecf5',
+                bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
                 py: 0.4,
               }}
             >
@@ -525,9 +549,10 @@ function Stats({ npc }) {
 function Attacks({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const damageTypeLabels = {
     physical: "physical_damage",
     wind: "air_damage",
@@ -540,10 +565,34 @@ function Attacks({ npc }) {
     poison: "poison_damage",
   };
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
+  };
 
   return (
     <Grid container>
@@ -597,21 +646,15 @@ function Attacks({ npc }) {
                     </strong>
                     {attack.type === "physical" ? (
                       <span>
-                        <ReactMarkdown
-                          allowedElements={["strong"]}
-                          unwrapDisallowed={true}
-                        >
+                        <SpanMarkdown>
                           {t(damageTypeLabels[attack.type])}
-                        </ReactMarkdown>
+                        </SpanMarkdown>
                       </span>
                     ) : (
                       <span style={{ textTransform: "lowercase" }}>
-                        <ReactMarkdown
-                          allowedElements={["strong"]}
-                          unwrapDisallowed={true}
-                        >
+                        <SpanMarkdown>
                           {t(damageTypeLabels[attack.type])}
-                        </ReactMarkdown>
+                        </SpanMarkdown>
                       </span>
                     )}
                   </>
@@ -620,27 +663,27 @@ function Attacks({ npc }) {
                   return (
                     <Typography component="span" key={i}>
                       {" "}
-                      -{" "}
-                      <StyledMarkdown
-                        allowedElements={["strong", "em"]}
-                        unwrapDisallowed={true}
-                      >
-                        {effect}
-                      </StyledMarkdown>{" "}
+                      - <SpanMarkdown>{effect}</SpanMarkdown>{" "}
                     </Typography>
                   );
                 })}
                 {(typeof myVar === "string" ||
                   attack.special instanceof String) && (
-                    <Typography component="span" key={i}>
-                      <StyledMarkdown
-                        allowedElements={["strong", "em"]}
-                        unwrapDisallowed={true}
-                      >
-                        {attack.special}
-                      </StyledMarkdown>
-                    </Typography>
-                  )}
+                  <Typography component="span" key={i}>
+                    <SpanMarkdown
+                      components={{
+                        strong: (props) => (
+                          <strong style={{ fontWeight: "bold" }} {...props} />
+                        ),
+                        em: (props) => (
+                          <em style={{ fontStyle: "italic" }} {...props} />
+                        ),
+                      }}
+                    >
+                      {attack.special}
+                    </SpanMarkdown>
+                  </Typography>
+                )}
               </Typography>
             </Grid>
           </Fragment>
@@ -679,22 +722,24 @@ function Attacks({ npc }) {
                 </strong>{" "}
                 {(attack.type || attack.weapon.type) === "physical" ? (
                   <span>
-                    <ReactMarkdown
-                      allowedElements={["strong"]}
-                      unwrapDisallowed={true}
+                    <SpanMarkdown
+                      components={{
+                        strong: (props) => <strong {...props} />,
+                      }}
                     >
                       {t(damageTypeLabels[attack.type || attack.weapon.type])}
-                    </ReactMarkdown>
+                    </SpanMarkdown>
                   </span>
                 ) : (
                   <>
                     <span style={{ textTransform: "lowercase" }}>
-                      <ReactMarkdown
-                        allowedElements={["strong"]}
-                        unwrapDisallowed={true}
+                      <SpanMarkdown
+                        components={{
+                          strong: (props) => <strong {...props} />,
+                        }}
                       >
                         {t(damageTypeLabels[attack.type || attack.weapon.type])}
-                      </ReactMarkdown>
+                      </SpanMarkdown>
                     </span>
                   </>
                 )}{" "}
@@ -703,12 +748,18 @@ function Attacks({ npc }) {
                     <Typography component="span" key={i}>
                       {" "}
                       -{" "}
-                      <StyledMarkdown
-                        allowedElements={["strong", "em"]}
-                        unwrapDisallowed={true}
+                      <SpanMarkdown
+                        components={{
+                          strong: (props) => (
+                            <strong style={{ fontWeight: "bold" }} {...props} />
+                          ),
+                          em: (props) => (
+                            <em style={{ fontStyle: "italic" }} {...props} />
+                          ),
+                        }}
                       >
                         {effect}
-                      </StyledMarkdown>{" "}
+                      </SpanMarkdown>{" "}
                     </Typography>
                   );
                 })}
@@ -724,16 +775,34 @@ function Attacks({ npc }) {
 function Spells({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   if (!npc.spells || npc.spells.length === 0) {
     return null;
   }
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const StyledMarkdown = ({ children, ...props }) => {
+    return (
+      <div style={{ whiteSpace: "pre-line", margin: 0, padding: 0 }}>
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: (props) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </div>
+    );
+  };
+
   return (
     <Grid container>
       <Grid
@@ -786,8 +855,14 @@ function Spells({ npc }) {
                 <br />
                 <Typography component="span" key={i}>
                   <StyledMarkdown
-                    allowedElements={["strong", "em"]}
-                    unwrapDisallowed={true}
+                    components={{
+                      strong: (props) => (
+                        <strong style={{ fontWeight: "bold" }} {...props} />
+                      ),
+                      em: (props) => (
+                        <em style={{ fontStyle: "italic" }} {...props} />
+                      ),
+                    }}
                   >
                     {spell.effect}
                   </StyledMarkdown>{" "}
@@ -804,9 +879,10 @@ function Spells({ npc }) {
 function Special({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const special = [];
 
   if (npc.special) {
@@ -819,7 +895,10 @@ function Special({ npc }) {
   if (npc.species === "Construct") {
     special.push({
       name: t("Construct"),
-      effect: t("Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.", true),
+      effect: t(
+        "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
+        true
+      ),
     });
   }
 
@@ -844,10 +923,34 @@ function Special({ npc }) {
     return null;
   }
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
+  };
 
   return (
     <Grid container>
@@ -880,12 +983,18 @@ function Special({ npc }) {
                 <span style={{ display: "inline" }}>
                   <strong>{special.name}</strong> <Diamond />{" "}
                 </span>
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
+                <SpanMarkdown
+                  components={{
+                    strong: (props) => (
+                      <strong style={{ fontWeight: "bold" }} {...props} />
+                    ),
+                    em: (props) => (
+                      <em style={{ fontStyle: "italic" }} {...props} />
+                    ),
+                  }}
                 >
                   {special.effect}
-                </StyledMarkdown>
+                </SpanMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -898,9 +1007,10 @@ function Special({ npc }) {
 function Actions({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const actions = [];
 
   if (npc.actions) {
@@ -913,10 +1023,34 @@ function Actions({ npc }) {
     return null;
   }
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
+  };
 
   return (
     <Grid container>
@@ -952,12 +1086,18 @@ function Actions({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography component="div">
                 <strong>{actions.name}</strong> <Diamond />{" "}
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
+                <SpanMarkdown
+                  components={{
+                    strong: (props) => (
+                      <strong style={{ fontWeight: "bold" }} {...props} />
+                    ),
+                    em: (props) => (
+                      <em style={{ fontStyle: "italic" }} {...props} />
+                    ),
+                  }}
                 >
                   {actions.effect}
-                </StyledMarkdown>
+                </SpanMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -970,9 +1110,10 @@ function Actions({ npc }) {
 function Notes({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const notes = [];
 
   if (npc.notes) {
@@ -985,10 +1126,34 @@ function Notes({ npc }) {
     return null;
   }
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
+  };
 
   return (
     <Grid container>
@@ -1024,12 +1189,18 @@ function Notes({ npc }) {
             <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
               <Typography component="div">
                 <strong>{notes.name}</strong> <Diamond />{" "}
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
+                <SpanMarkdown
+                  components={{
+                    strong: (props) => (
+                      <strong style={{ fontWeight: "bold" }} {...props} />
+                    ),
+                    em: (props) => (
+                      <em style={{ fontStyle: "italic" }} {...props} />
+                    ),
+                  }}
                 >
                   {notes.effect}
-                </StyledMarkdown>
+                </SpanMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -1042,9 +1213,10 @@ function Notes({ npc }) {
 function RareGear({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const raregear = [];
 
   if (npc.raregear) {
@@ -1057,10 +1229,34 @@ function RareGear({ npc }) {
     return null;
   }
 
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-    display: "inline",
-  });
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
+  };
 
   return (
     <Grid container>
@@ -1096,12 +1292,18 @@ function RareGear({ npc }) {
             <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
               <Typography component="div">
                 <strong>{raregear.name}</strong> <Diamond />{" "}
-                <StyledMarkdown
-                  allowedElements={["strong", "em"]}
-                  unwrapDisallowed={true}
+                <SpanMarkdown
+                  components={{
+                    strong: (props) => (
+                      <strong style={{ fontWeight: "bold" }} {...props} />
+                    ),
+                    em: (props) => (
+                      <em style={{ fontStyle: "italic" }} {...props} />
+                    ),
+                  }}
                 >
                   {raregear.effect}
-                </StyledMarkdown>
+                </SpanMarkdown>
               </Typography>
             </Grid>
           </Fragment>
@@ -1114,9 +1316,10 @@ function RareGear({ npc }) {
 function Equip({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
-    : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #583871 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient with transparent end
+      : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const weapons = [];
 
   npc.weaponattacks?.forEach((attack) => {
@@ -1139,6 +1342,35 @@ function Equip({ npc }) {
     ice: "ice_damage",
     light: "light_damage",
     poison: "poison_damage",
+  };
+
+  const SpanMarkdown = ({ children, ...props }) => {
+    return (
+      <span
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <ReactMarkdown
+          {...props}
+          components={{
+            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ ...props }) => (
+              <strong style={{ fontWeight: "bold" }} {...props} />
+            ),
+            em: ({ ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
+            span: ({ ...props }) => <span {...props} />,
+          }}
+        >
+          {children}
+        </ReactMarkdown>
+      </span>
+    );
   };
 
   if (!hasWeapons && !hasArmor && !hasShield) {
@@ -1188,22 +1420,24 @@ function Equip({ npc }) {
             </strong>{" "}
             {weapon.type === "physical" ? (
               <span>
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
+                <SpanMarkdown
+                  components={{
+                    strong: (props) => <strong {...props} />,
+                  }}
                 >
                   {t(damageTypeLabels[weapon.type])}
-                </ReactMarkdown>
+                </SpanMarkdown>
               </span>
             ) : (
               <>
                 <span style={{ textTransform: "lowercase" }}>
-                  <ReactMarkdown
-                    allowedElements={["strong"]}
-                    unwrapDisallowed={true}
+                  <SpanMarkdown
+                    components={{
+                      strong: (props) => <strong {...props} />,
+                    }}
                   >
                     {t(damageTypeLabels[weapon.type])}
-                  </ReactMarkdown>
+                  </SpanMarkdown>
                 </span>
               </>
             )}{" "}
@@ -1286,15 +1520,7 @@ function RenderVillainPhase({ villain, phases, multipart }) {
 
   const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
 
-  return (
-    <>
-      {combinedString && (
-        <>
-          {combinedString}
-        </>
-      )}
-    </>
-  );
+  return <>{combinedString && <>{combinedString}</>}</>;
 }
 
 export default React.forwardRef(NpcPretty);

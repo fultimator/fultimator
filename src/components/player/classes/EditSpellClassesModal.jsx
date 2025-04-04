@@ -34,7 +34,7 @@ export default function EditSpellClassesModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold"}}>
         {t("Edit Class Spell Types")}
       </DialogTitle>
       <IconButton
@@ -68,7 +68,7 @@ export default function EditSpellClassesModal({
         </FormGroup>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={onSave}>
+        <Button variant="contained" color="primary" onClick={onSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

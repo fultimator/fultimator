@@ -11,22 +11,10 @@ import MenuOption from "./MenuOption";
 import { useNpc } from "../npc/NpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
 import EditCompendiumModal from "../npc/EditCompendiumModal";
+import { t } from "../../translation/translate";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
-
-interface CompactAppBarProps {
-  isNpcEdit: boolean;
-  isPcEdit: boolean;
-  selectedTheme: ThemeValue;
-  handleSelectTheme: (theme: ThemeValue) => void;
-  isDarkMode: boolean;
-  handleToggleDarkMode: () => void;
-  showGoBackButton: boolean;
-  handleNavigation: () => void;
-}
-
-const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
-  isNpcEdit,
+const NpcEditAppBar = ({
+  //isNpcEdit,
   isPcEdit,
   selectedTheme,
   handleSelectTheme,
@@ -90,9 +78,9 @@ const NpcEditAppBar: React.FC<CompactAppBarProps> = ({
   );
 };
 
-const PcEditAppBar: React.FC<CompactAppBarProps> = ({
-  isNpcEdit,
-  isPcEdit,
+const PcEditAppBar = ({
+  //isNpcEdit,
+  //isPcEdit,
   selectedTheme,
   handleSelectTheme,
   isDarkMode,
@@ -101,10 +89,6 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
   handleNavigation,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
-  
-  // const openCompendiumModal = () => {
-  //   setModalOpen(true);
-  // };
 
   const closeCompendiumModal = () => setModalOpen(false);
 
@@ -121,18 +105,11 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
           </Grid>
           <Grid item xs={6} textAlign="center">
             <Grid container justifyContent="center">
-              <span>Welcome to Character Designer Alpha!</span>
+              <span>{t("Character Designer")}</span>
             </Grid>
           </Grid>
           <Grid item xs={3} textAlign="right">
             <Grid container alignItems="center" justifyContent="flex-end">
-              {/* {showGoBackButton && (
-                <Tooltip title={"Open Compendium"}>
-                  <IconButton color="inherit" onClick={openCompendiumModal}>
-                    <Search />
-                  </IconButton>
-                </Tooltip>
-              )} */}
               <MenuOption
                 selectedTheme={selectedTheme}
                 onSelectTheme={handleSelectTheme}
@@ -156,7 +133,7 @@ const PcEditAppBar: React.FC<CompactAppBarProps> = ({
   );
 };
 
-const CompactAppBar: React.FC<CompactAppBarProps> = (props) => {
+const CompactAppBar = (props) => {
   const { isNpcEdit, isPcEdit } = props;
 
   if (isNpcEdit && !isPcEdit) {

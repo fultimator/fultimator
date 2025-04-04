@@ -104,7 +104,7 @@ export default function SpellTinkererAlchemyTargetModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Edit Target")}
       </DialogTitle>
       <IconButton
@@ -200,7 +200,7 @@ export default function SpellTinkererAlchemyTargetModal({
       <DialogActions>
         <Button
           variant="contained"
-          color="secondary"
+          color="primary"
           onClick={handleSave}
           disabled={!!validationError}
         >

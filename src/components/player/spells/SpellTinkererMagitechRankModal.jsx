@@ -62,7 +62,7 @@ export default function SpellTinkererMagitechRankModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Select Rank")}
       </DialogTitle>
       <Button
@@ -113,7 +113,7 @@ export default function SpellTinkererMagitechRankModal({
         <Button variant="contained" color="error" onClick={handleDelete}>
           {t("Delete Magitech")}
         </Button>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

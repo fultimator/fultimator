@@ -67,7 +67,7 @@ export default function AddSkillModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {editSkillIndex !== null ? t("Edit Skill") : t("Add Skill")}
       </DialogTitle>
       <IconButton
@@ -184,7 +184,7 @@ export default function AddSkillModal({
             {t("Delete")}
           </Button>
         )}
-        <Button variant="contained" color="secondary" onClick={onAddSkill}>
+        <Button variant="contained" color="primary" onClick={onAddSkill}>
           {editSkillIndex !== null ? t("Save Changes") : t("Add")}
         </Button>
       </DialogActions>

@@ -13,15 +13,18 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Box,
+  ListItemText,
 } from "@mui/material";
 import { useState } from "react";
 import types from "../../libs/types";
 import { DistanceIcon, MeleeIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
-import CompendiumHandler from './CompendiumHandler';
+import CompendiumHandler from "./CompendiumHandler";
+import { TypeIcon } from "../types";
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -77,7 +80,13 @@ export default function EditAttacks({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" openCompendium={openCompendiumModal} addItem={addAttack} headerText={t("Basic Attacks")} icon={Add} />
+      <CustomHeader
+        type="top"
+        openCompendium={openCompendiumModal}
+        addItem={addAttack}
+        headerText={t("Basic Attacks")}
+        icon={Add}
+      />
       {npc.attacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -102,7 +111,13 @@ export default function EditAttacks({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <CompendiumHandler npc={npc} setNpc={setNpc} typeName="basic" open={modalOpen} onClose={closeCompendiumModal} />
+      <CompendiumHandler
+        npc={npc}
+        setNpc={setNpc}
+        typeName="basic"
+        open={modalOpen}
+        onClose={closeCompendiumModal}
+      />
     </>
   );
 }
@@ -162,7 +177,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             id={"attack-" + i + "-attr2"}
             label={t("Attr 2:")}
             size="small"
-            onChange={(e, value) => {
+            onChange={(e) => {
               return setAttack("attr2", e.target.value);
             }}
           >
@@ -182,19 +197,64 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             id={"attack-" + i + "-type"}
             label={t("Type:")}
             size="small"
-            onChange={(e, value) => {
+            onChange={(e) => {
               return setAttack("type", e.target.value);
             }}
           >
             {Object.keys(types).map((type) => {
               return (
-                <MenuItem key={type} value={type}>
-                  {types[type].long}
+                <MenuItem
+                  key={type}
+                  value={type}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    paddingY: "6px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      minWidth: 70,
+                    }}
+                  >
+                    <TypeIcon type={type} />
+                    <ListItemText
+                      sx={{
+                        ml: 1,
+                        marginBottom: 0,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {types[type].long}
+                    </ListItemText>
+                  </Box>
                 </MenuItem>
               );
             })}
-            <MenuItem value={"nodmg"}>
-              {t("no damage")}
+            <MenuItem
+              value={"nodmg"}
+              sx={{
+                textTransform: "capitalize",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  minWidth: 70,
+                }}
+              >
+                <ListItemText
+                  sx={{
+                    marginBottom: 0,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {t("no damage")}
+                </ListItemText>
+              </Box>
             </MenuItem>
           </Select>
         </FormControl>
@@ -257,7 +317,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 size="medium"
                 checked={attack.extraDamage}
                 value={attack.extraDamage}
-                onChange={(e, value) => {
+                onChange={(e) => {
                   return setAttack("extraDamage", e.target.checked);
                 }}
               />

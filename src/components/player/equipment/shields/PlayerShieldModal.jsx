@@ -32,7 +32,6 @@ export default function PlayerShieldModal({
   onClose,
   editShieldIndex,
   shield,
-  setShield,
   onAddShield,
   onDeleteShield,
 }) {
@@ -68,7 +67,7 @@ export default function PlayerShieldModal({
 
   useEffect(() => {
     setBase(shield?.base || shields[0]);
-    setName(shield?.name || shields[0].name);
+    setName(shield?.name || t(shields[0].name));
     setQuality(shield?.quality || "");
     setMartial(shield?.martial || false);
     setQualityCost(shield?.qualityCost || 0);
@@ -90,6 +89,7 @@ export default function PlayerShieldModal({
         ? true
         : false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shield]);
 
   const { handleFileUpload } = useUploadJSON((data) => {
@@ -179,7 +179,7 @@ export default function PlayerShieldModal({
 
   const handleClearFields = () => {
     setBase(shields[0]);
-    setName(shields[0].name);
+    setName(t(shields[0].name));
     setMartial(shields[0].martial);
     setQuality("");
     setQualityCost(0);
@@ -219,7 +219,7 @@ export default function PlayerShieldModal({
     onAddShield(updatedShield);
   };
 
-  const handleDelete = (shieldIndex) => {
+  const handleDelete = async (shieldIndex) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this shield?"
     );
@@ -242,7 +242,7 @@ export default function PlayerShieldModal({
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Add Shield")}
       </DialogTitle>
       <IconButton
@@ -269,7 +269,7 @@ export default function PlayerShieldModal({
                 const base = shields.find((el) => el.name === e.target.value);
 
                 setBase(base);
-                setName(base.name);
+                setName(t(base.name));
                 setMartial(base.martial);
                 setInit(base.init);
               }}
@@ -428,11 +428,15 @@ export default function PlayerShieldModal({
       </DialogContent>
       <DialogActions>
         {editShieldIndex !== null && (
-          <Button onClick={() => handleDelete(editShieldIndex)} color="error">
+          <Button
+            onClick={() => handleDelete(editShieldIndex)}
+            color="error"
+            variant="contained"
+          >
             {t("Delete")}
           </Button>
         )}
-        <Button onClick={handleSave} color="primary">
+        <Button onClick={handleSave} color="primary" variant="contained">
           {t("Save Changes")}
         </Button>
       </DialogActions>

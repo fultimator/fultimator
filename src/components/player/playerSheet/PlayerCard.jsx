@@ -15,9 +15,8 @@ import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
 import { styled } from "@mui/system";
-import DefIcon from '../../svgs/def.svg?react';
-import MdefIcon from '../../svgs/mdef.svg?react';
-import InitIcon from '../../svgs/init.svg?react';
+import { DefIcon, MdefIcon, InitIcon } from "../../icons";
+
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -125,7 +124,7 @@ export default function PlayerCard({
     ({ theme, color1, color2 }) => ({
       height: 15,
       borderRadius: 0,
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.default : theme.palette.grey[200],
       position: "relative",
       overflow: "hidden",
       "& .MuiLinearProgress-bar": {
@@ -140,7 +139,7 @@ export default function PlayerCard({
     left: "50%",
     top: "50%",
     transform: "translate(-50%, -50%)",
-    color: theme.palette.text.secondary,
+    color: theme.palette.mode === "dark" ? "#fff" : theme.palette.text.secondary ,
     fontFamily: "'Antonio', fantasy, sans-serif",
     fontSize: "0.7rem",
     pointerEvents: "none",
@@ -284,7 +283,10 @@ export default function PlayerCard({
             {t("DEF")}
           </Typography>
           <span style={{ marginLeft: "-4px" }}>
-            <DefIcon style={{ width: "24px", height: "24px" }} />
+            <DefIcon
+              size={"24px"}
+              color={theme.palette.mode === "dark" ? "white" : "black"}
+            />
             <span style={{ fontFamily: "'Antonio', sans-serif" }}>
               {" "}
               {currDef}
@@ -313,7 +315,10 @@ export default function PlayerCard({
             {t("M.DEF")}
           </Typography>
           <span style={{ marginLeft: "-4px" }}>
-            <MdefIcon  style={{ width: "24px", height: "24px" }} />
+            <MdefIcon
+              size={"24px"}
+              color={theme.palette.mode === "dark" ? "white" : "black"}
+            />
             <span style={{ fontFamily: "'Antonio', sans-serif" }}>
               {" "}
               {currMDef}
@@ -343,7 +348,10 @@ export default function PlayerCard({
               {t("INIT")}
             </Typography>
             <span style={{ marginLeft: "-4px" }}>
-              <InitIcon  style={{ width: "24px", height: "24px" }} />
+              <InitIcon
+                size={"24px"}
+                color={theme.palette.mode === "dark" ? "white" : "black"}
+              />
               <span style={{ fontFamily: "'Antonio', sans-serif" }}>
                 {" "}
                 {(currInit > 0 ? "+" : "") + currInit}
@@ -455,21 +463,21 @@ export default function PlayerCard({
             t("HP"),
             player.stats.hp.current,
             player.stats.hp.max,
-            newShade(theme.palette.error.main, 80),
+            theme.palette.mode === 'dark' ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80),
             theme.palette.error.main
           )}
           {renderStatBar(
             t("MP"),
             player.stats.mp.current,
             player.stats.mp.max,
-            newShade(theme.palette.info.main, 80),
+            theme.palette.mode === 'dark' ? newShade(theme.palette.info.main, 10) :newShade(theme.palette.info.main, 80),
             theme.palette.info.main
           )}
           {renderStatBar(
             t("IP"),
             player.stats.ip.current,
             player.stats.ip.max,
-            newShade(theme.palette.success.main, 80),
+            theme.palette.mode === 'dark' ? newShade(theme.palette.success.main, 10) :newShade(theme.palette.success.main, 80),
             theme.palette.success.main
           )}
         </Grid>
