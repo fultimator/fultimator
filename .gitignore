@@ -14,6 +14,7 @@
 # production
 /build
 /dist
+/.firebase
 Instructions.txt
 # misc
 .DS_Store

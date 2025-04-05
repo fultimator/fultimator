@@ -13,16 +13,16 @@ import Pretty from "./Pretty";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
-import ApplyRework from '../common/ApplyRework';
+import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
-import CustomHeaderAlt from '../../../components/common/CustomHeaderAlt';
+import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 
 function Weapons() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [base, setBase] = useState(weapons[0]);
-  const [name, setName] = useState(t(weapons[0].name));
+  const [name, setName] = useState(weapons[0].name);
   const [type, setType] = useState(weapons[0].type);
   const [hands, setHands] = useState(weapons[0].hands);
   const [att1, setAtt1] = useState(weapons[0].att1);
@@ -36,13 +36,9 @@ function Weapons() {
   const [qualityCost, setQualityCost] = useState(0);
   const [totalBonus, setTotalBonus] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const fileInputRef = useRef(null);
-
-  useEffect(() => {
-    // Translate the name after the component mounts
-    setName(t(base.name));
-  }, [t, base.name]);
 
   const handleFileUpload = (data) => {
     if (data) {
@@ -59,7 +55,7 @@ function Weapons() {
         damageBonus,
         damageReworkBonus,
         precBonus,
-        rework
+        rework,
       } = data;
 
       if (base) {
@@ -107,12 +103,12 @@ function Weapons() {
 
   const handleClearFields = () => {
     setBase(weapons[0]);
-    setName(t(weapons[0].name));
+    setName(t(weapons[0].name)); // Use translated name when clearing
     setType(weapons[0].type);
     setHands(weapons[0].hands);
     setAtt1(weapons[0].att1);
     setAtt2(weapons[0].att2);
-    setMartial(weapons[0].martial)
+    setMartial(weapons[0].martial);
     setDamageBonus(false);
     setDamageReworkBonus(false);
     setPrecBonus(false);
@@ -221,25 +217,31 @@ function Weapons() {
           }}
         >
           {/* Header */}
-          <CustomHeaderAlt headerText={t("Rare Weapons")} icon={<AutoAwesome fontSize="large" />} />
+          <CustomHeaderAlt
+            headerText={t("Rare Weapons")}
+            icon={<AutoAwesome fontSize="large" />}
+          />
           <Grid container spacing={1} alignItems="center">
             {/* Change Base */}
             <Grid item xs={4}>
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
-                  const base = weapons.find((el) => el.name === e.target.value);
+                  const selectedBase = weapons.find(
+                    (el) => el.name === e.target.value
+                  );
 
-                  setBase(base);
-                  setName(t(base.name));
-                  setType(base.type);
-                  setHands(base.hands);
+                  setBase(selectedBase);
+                  // Set the name to the translated version when base changes
+                  setName(t(selectedBase.name));
+                  setType(selectedBase.type);
+                  setHands(selectedBase.hands);
                   setDamageBonus(false);
                   setDamageReworkBonus(false);
                   setPrecBonus(false);
-                  setAtt1(base.att1);
-                  setAtt2(base.att2);
-                  setMartial(base.martial)
+                  setAtt1(selectedBase.att1);
+                  setAtt2(selectedBase.att2);
+                  setMartial(selectedBase.martial);
                 }}
               />
             </Grid>
@@ -250,8 +252,12 @@ function Weapons() {
             {/* Change Name */}
             <Grid item xs={6}>
               <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={isLoaded ? name : t(name)}
+                onChange={(e) =>
+                  isLoaded
+                    ? setName(e.target.value)
+                    : (setName(e.target.value), setIsLoaded(true))
+                }
               />
             </Grid>
             {/* Change Type */}
