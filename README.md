@@ -6,7 +6,8 @@
 An unofficial Fabula Ultima Tool
 
 - Fabula Ultima: https://www.needgames.it/fabula-ultima-en/
-- Fultimator: https://fabula-ultima-helper.web.app/
+- Fultimator: https://fultimator.com/
+- Backup Fultimator (used if the main site is down): https://fultimator-backup.web.app/
 
 It contains multiple tools to manage a game of Fabula Ultima.
 
