@@ -70,6 +70,7 @@ const CombatSim = ({ user }) => {
   const isResizing = useRef(false); // NPC detail Resizing ref
   const startX = useRef(0);
   const startWidth = useRef(npcDetailWidth);
+  const useDragAndDrop = localStorage.getItem("combatSimUseDragAndDrop") === "true";
 
   // Firebase start
   const encounterRef = doc(firestore, "encounters", id);
@@ -510,6 +511,10 @@ const handleSaveState = () => {
       updatedNPCs.splice(index + 1, 0, movedNpc);
       setSelectedNPCs(updatedNPCs);
     }
+  };
+
+  const handleSortEnd = (sortedNPCs) => {
+    setSelectedNPCs(sortedNPCs);
   };
 
   // Handle NPC Click in the selected NPCs list
@@ -1010,6 +1015,8 @@ const handleSaveState = () => {
             isMobile={isMobile}
             selectedNpcID={selectedNPC?.combatId}
             isDifferentUser={isDifferentUser}
+            useDragAndDrop={useDragAndDrop}
+            onSortEnd={handleSortEnd}
           />
           {/* Combat Log */}
           <CombatLog

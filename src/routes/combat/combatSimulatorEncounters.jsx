@@ -39,6 +39,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
+import SettingsDialog from "../../components/combatSim/SettingsDialog";
 
 const MAX_ENCOUNTERS = 3;
 
@@ -80,26 +81,41 @@ const CombatSimEncounters = ({ user }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  const [autoUseMP, setAutoUseMP] = useState(() => {
-    const storedSetting = localStorage.getItem("combatSimAutoUseMP");
-    return storedSetting === null ? true : storedSetting === "true";
+  // Combine settings into a single state object
+  const [settings, setSettings] = useState({
+    autoUseMP: localStorage.getItem("combatSimAutoUseMP") === null ? true : localStorage.getItem("combatSimAutoUseMP") === "true",
+    autoOpenLogs: localStorage.getItem("combatSimAutoOpenLogs") === null ? true : localStorage.getItem("combatSimAutoOpenLogs") === "true",
+    useDragAndDrop: localStorage.getItem("combatSimUseDragAndDrop") === null ? true : localStorage.getItem("combatSimUseDragAndDrop") === "true",
   });
 
-  const [autoOpenLogs, setAutoOpenLogs] = useState(() => {
-    const storedSetting = localStorage.getItem("combatSimAutoOpenLogs");
-    return storedSetting === null ? true : storedSetting === "true";
-  });
+  // Handler to update individual settings
+  const handleSettingChange = (name, value) => {
+    setSettings(prevSettings => ({
+      ...prevSettings,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
-    const storedSetting = localStorage.getItem("combatSimAutoUseMP");
-    if (storedSetting === null) {
-      localStorage.setItem("combatSimAutoUseMP", "true"); // Set default value in localStorage
-    }
+    // Ensure default values are set in localStorage if they don't exist
+    const defaultSettings = {
+      combatSimAutoUseMP: "true",
+      combatSimAutoOpenLogs: "true",
+      combatSimUseDragAndDrop: "true",
+    };
 
-    const storedSetting2 = localStorage.getItem("combatSimAutoOpenLogs");
-    if (storedSetting2 === null) {
-      localStorage.setItem("combatSimAutoOpenLogs", "true"); // Set default value in localStorage
-    }
+    Object.entries(defaultSettings).forEach(([key, defaultValue]) => {
+      if (localStorage.getItem(key) === null) {
+        localStorage.setItem(key, defaultValue);
+      }
+    });
+
+    // Initialize state from localStorage - This part might be redundant now with the initial state definition, but safe to keep.
+    setSettings({
+      autoUseMP: localStorage.getItem("combatSimAutoUseMP") === "true",
+      autoOpenLogs: localStorage.getItem("combatSimAutoOpenLogs") === "true",
+      useDragAndDrop: localStorage.getItem("combatSimUseDragAndDrop") === "true",
+    });
   }, []);
 
   useEffect(() => {
@@ -112,15 +128,21 @@ const CombatSimEncounters = ({ user }) => {
   }, [encountersList, loading]);
 
   const handleSaveSettings = () => {
-    localStorage.setItem("combatSimAutoUseMP", autoUseMP);
-    localStorage.setItem("combatSimAutoOpenLogs", autoOpenLogs);
+    // Save settings from the state object
+    localStorage.setItem("combatSimAutoUseMP", settings.autoUseMP);
+    localStorage.setItem("combatSimAutoOpenLogs", settings.autoOpenLogs);
+    localStorage.setItem("combatSimUseDragAndDrop", settings.useDragAndDrop);
     setSettingsOpen(false);
   };
 
   const handleCloseSettings = () => {
     setSettingsOpen(false);
-    setAutoUseMP(localStorage.getItem("combatSimAutoUseMP") === "true");
-    setAutoOpenLogs(localStorage.getItem("combatSimAutoOpenLogs") === "true");
+    // Reset settings state from localStorage on close/cancel
+    setSettings({
+      autoUseMP: localStorage.getItem("combatSimAutoUseMP") === "true",
+      autoOpenLogs: localStorage.getItem("combatSimAutoOpenLogs") === "true",
+      useDragAndDrop: localStorage.getItem("combatSimUseDragAndDrop") === "true",
+    });
   };
 
   const handleEncounterNameChange = (event) => {
@@ -319,86 +341,14 @@ const CombatSimEncounters = ({ user }) => {
         ))}
       </Grid>
 
-      {/* Settings Dialog */}
-      <Dialog
+       {/* Settings Dialog */}
+       <SettingsDialog
         open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        sx={{ "& .MuiDialog-paper": { borderRadius: 3, padding: 2 } }}
-      >
-        <DialogTitle
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            textAlign: "center",
-            borderBottom: "1px solid #ddd",
-            pb: 1,
-          }}
-        >
-          {t("combat_sim_settings")}
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "left",
-            mt: 1,
-          }}
-        >
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={autoUseMP}
-                onChange={(e) => setAutoUseMP(e.target.checked)}
-                sx={{
-                  mt: 0,
-                  "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
-                  "&.Mui-checked": {
-                    color: isDarkMode
-                      ? "white !important"
-                      : "primary !important",
-                  },
-                }}
-              />
-            }
-            label={t("combat_sim_auto_use_mp")}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={autoOpenLogs}
-                onChange={(e) => setAutoOpenLogs(e.target.checked)}
-                sx={{
-                  mt: 0,
-                  "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
-                  "&.Mui-checked": {
-                    color: isDarkMode
-                      ? "white !important"
-                      : "primary !important",
-                  },
-                }}
-              />
-            }
-            label={t("combat_sim_auto_open_logs")}
-          />
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button
-            onClick={() => handleCloseSettings()}
-            color={isDarkMode ? "white" : "primary"}
-            sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
-          >
-            {t("Close")}
-          </Button>
-          <Button
-            onClick={handleSaveSettings}
-            variant="contained"
-            color="primary"
-            sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
-          >
-            {t("Save Changes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onClose={handleCloseSettings}
+        onSave={handleSaveSettings}
+        settings={settings}
+        onSettingChange={handleSettingChange}
+      />
     </Box>
   );
 };
