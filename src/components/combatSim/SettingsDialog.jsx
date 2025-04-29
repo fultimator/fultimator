@@ -21,7 +21,7 @@ const SettingsDialog = ({
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  const { autoUseMP, autoOpenLogs, useDragAndDrop } = settings;
+  const { autoUseMP, autoOpenLogs, useDragAndDrop, autosaveEnabled } = settings;
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
@@ -53,6 +53,7 @@ const SettingsDialog = ({
           mt: 1,
         }}
       >
+        {/* Setting to use MP when using a spell*/}
         <FormControlLabel
           control={
             <Checkbox
@@ -70,6 +71,7 @@ const SettingsDialog = ({
           }
           label={t("combat_sim_auto_use_mp")}
         />
+        {/* Setting to open automatically the logs when rolling a dice */}
         <FormControlLabel
           control={
             <Checkbox
@@ -87,6 +89,7 @@ const SettingsDialog = ({
           }
           label={t("combat_sim_auto_open_logs")}
         />
+        {/* Setting to use Drag and Drop for the NPC list instead of the Move Up/Down buttons */}
         <FormControlLabel
           control={
             <Checkbox
@@ -103,6 +106,24 @@ const SettingsDialog = ({
             />
           }
           label={t("combat_sim_use_drag_and_drop")}
+        />
+        {/* Setting to trigger autosave when dirty */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="autosaveEnabled"
+              checked={autosaveEnabled}
+              onChange={handleCheckboxChange}
+              sx={{
+                mt: 0,
+                "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
+                "&.Mui-checked": {
+                  color: isDarkMode ? "white !important" : "primary !important",
+                },
+              }}
+            />
+          }
+          label={t("combat_sim_autosave_setting")}
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center", pb: 2 }}>

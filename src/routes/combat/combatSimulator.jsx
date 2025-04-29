@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../../components/Layout";
 import {
@@ -6,6 +6,8 @@ import {
   Box,
   CircularProgress,
   useMediaQuery,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
@@ -33,13 +35,16 @@ import {
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useDocumentData } from "react-firebase-hooks/firestore";
+import debounce from "lodash.debounce";
+import { set } from "date-fns";
 
 export default function CombatSimulator() {
   const [user, loading, error] = useAuthState(auth);
   console.debug("user, loading, error", user, loading, error);
+  const [isDirty, setIsDirty] = useState(false);
 
   return (
-    <Layout fullWidth={user}>
+    <Layout fullWidth={user} unsavedChanges={isDirty}>
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
           <CircularProgress />
@@ -53,12 +58,14 @@ export default function CombatSimulator() {
           <SignIn />
         </>
       )}
-      {user && <CombatSim user={user} />}
+      {user && (
+        <CombatSim user={user} setIsDirty={setIsDirty} isDirty={isDirty} />
+      )}
     </Layout>
   );
 }
 
-const CombatSim = ({ user }) => {
+const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Base states
   const { id } = useParams(); // Get the encounter ID from the URL
   const theme = useTheme();
@@ -70,7 +77,18 @@ const CombatSim = ({ user }) => {
   const isResizing = useRef(false); // NPC detail Resizing ref
   const startX = useRef(0);
   const startWidth = useRef(npcDetailWidth);
-  const useDragAndDrop = localStorage.getItem("combatSimUseDragAndDrop") === "true";
+  const useDragAndDrop =
+    localStorage.getItem("combatSimUseDragAndDrop") === "true";
+  const [initialized, setInitialized] = useState(false);
+  const [lastAutoSaved, setLastAutoSaved] = useState(null);
+  const autosaveEnabled = localStorage.getItem("combatSimAutosave") === "true";
+  const AUTO_SAVE_DELAY = 30000; // 30 seconds between autosaves
+  const prevSelectedNpcsRef = useRef(null);
+  const prevRoundRef = useRef(null);
+  const prevLogsRef = useRef(null);
+  const prevEncounterNameRef = useRef(null);
+
+  const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false);
 
   // Firebase start
   const encounterRef = doc(firestore, "encounters", id);
@@ -164,132 +182,314 @@ const CombatSim = ({ user }) => {
     setLogs([]);
   };
 
-  // Fetch encounter and NPCs on initial load
-useEffect(() => {
-  if (document.hidden) return; // Prevent fetch on tab switch
-  const fetchEncounter = async () => {
-    setEncounter(encounterData);
-    setEncounterName(encounterData?.name || "");
-    setLogs(encounterData?.logs || []);
-  
-    if (!encounterData?.selectedNPCs?.length) {
-      setSelectedNPCs([]);
-      setLoading(false);
+  // Debounced save function
+  const debouncedSave = useCallback(
+    debounce(() => {
+      // Skip the isDirty check here since we're only calling this when isDirty is true
+      if (autosaveEnabled) {
+        // Use the same validation as in handleSaveState
+        if (selectedNPCs.some((npc) => !npc.id)) {
+          console.warn("Skipping autosave due to invalid NPCs");
+          return;
+        }
+
+        const currentTime = new Date();
+        setLastAutoSaved(currentTime);
+
+        // Save encounter state (only necessary data)
+        setDoc(doc(firestore, "encounters", id), {
+          ...encounter,
+          name: encounterName,
+          selectedNPCs: selectedNPCs.map((npc) => ({
+            id: npc.id,
+            combatId: npc.combatId,
+            combatStats: npc.combatStats,
+          })),
+          round: encounter?.round,
+          logs: logs,
+          private: encounter?.private || true,
+          lastAutoSaved: currentTime,
+        });
+
+        console.log("Autosaved encounter state");
+        setIsSaveSnackbarOpen(true);
+        setIsDirty(false);
+      }
+    }, AUTO_SAVE_DELAY),
+    [autosaveEnabled, selectedNPCs, encounter, encounterName, logs, id]
+  );
+
+  // useEffect to detect actual encounter changes
+  useEffect(() => {
+    if (!initialized) return;
+    // Skip first render
+    if (prevSelectedNpcsRef.current === null) {
+      prevSelectedNpcsRef.current = selectedNPCs;
+      prevRoundRef.current = encounter?.round;
+      prevLogsRef.current = logs;
+      prevEncounterNameRef.current = encounterName;
       return;
     }
-  
-    // Fetch all NPCs in one query
-    const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
-    const npcQuery = query(
-      collection(firestore, "npc-personal"),
-      where("__name__", "in", npcIds),
-      where("uid", "==", encounterData.uid)
-    );
-  
-    try {
-      console.log("Fetching NPCs...");
-      const querySnapshot = await getDocs(npcQuery);
-      const npcMap = new Map();
-  
-      querySnapshot.forEach((doc) => {
-        npcMap.set(doc.id, doc.data());
-      });
-  
-      const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
-        const fetchedNpc = npcMap.get(npcData.id);
-        return fetchedNpc
-          ? {
-              ...fetchedNpc, 
-              id: npcData.id,
-              combatId: npcData.combatId,
-              combatStats: npcData.combatStats,
-            }
-          : {
-              combatId: npcData.combatId, 
-              combatStats: npcData.combatStats, 
-            };
-      });
-  
-      setSelectedNPCs(loadedNPCs);
-    } catch (error) {
-      console.error("Error fetching NPCs:", error);
-      setSelectedNPCs([]);
+
+    // Only trigger dirty if something actually changed
+    let hasChanges = false;
+
+    // Check if round changed
+    if (prevRoundRef.current !== encounter?.round) {
+      console.log(
+        "Round changed from",
+        prevRoundRef.current,
+        "to",
+        encounter?.round
+      );
+      hasChanges = true;
     }
-  
-    setLoading(false);
-  };
 
-  const fetchNpcs = async () => {
-    setNpcList(npcsList);
-  };
+    // Check if name changed
+    if (prevEncounterNameRef.current !== encounterName) {
+      console.log(
+        "Name changed from",
+        prevEncounterNameRef.current,
+        "to",
+        encounterName
+      );
+      hasChanges = true;
+    }
 
-  fetchEncounter();
-  fetchNpcs();
-}, [id, encounterData, npcsList, user.uid]);
+    // Check if logs changed
+    if (prevLogsRef.current?.length !== logs?.length) {
+      console.log("Logs length changed");
+      hasChanges = true;
+    }
 
-// Fetch single NPC
-const getNpc = async (npcId) => {
-  try {
-    const npcDocRef = doc(firestore, "npc-personal", npcId);
-    const npcDocSnap = await getDoc(npcDocRef); // Fetch document
-    console.log("Fetching selected NPC...");
-    if (npcDocSnap.exists()) {
-      return npcDocSnap.data(); // Return the NPC data
+    // Complex deep comparison for NPCs
+    if (selectedNPCs.length !== prevSelectedNpcsRef.current?.length) {
+      console.log("NPC count changed");
+      hasChanges = true;
     } else {
-      console.error("NPC not found:", npcId);
+      // Check if any NPC stats changed
+      for (let i = 0; i < selectedNPCs.length; i++) {
+        const currentNpc = selectedNPCs[i];
+        const prevNpc = prevSelectedNpcsRef.current[i];
+
+        if (currentNpc.combatId !== prevNpc.combatId) {
+          console.log("NPC changed at index", i);
+          hasChanges = true;
+          break;
+        }
+
+        // Check HP/MP changes
+        if (
+          currentNpc.combatStats.currentHp !== prevNpc.combatStats.currentHp ||
+          currentNpc.combatStats.currentMp !== prevNpc.combatStats.currentMp
+        ) {
+          console.log("HP/MP changed for NPC", currentNpc.name);
+          hasChanges = true;
+          break;
+        }
+
+        // Check status effects changes
+        const currentEffects = currentNpc.combatStats.statusEffects || [];
+        const prevEffects = prevNpc.combatStats.statusEffects || [];
+        if (JSON.stringify(currentEffects) !== JSON.stringify(prevEffects)) {
+          console.log("Status effects changed for NPC", currentNpc.name);
+          hasChanges = true;
+          break;
+        }
+
+        // Check turns changes
+        const currentTurns = currentNpc.combatStats.turns || [];
+        const prevTurns = prevNpc.combatStats.turns || [];
+        if (JSON.stringify(currentTurns) !== JSON.stringify(prevTurns)) {
+          console.log("Turns changed for NPC", currentNpc.name);
+          hasChanges = true;
+          break;
+        }
+      }
+    }
+
+    // Only set dirty flag if actual changes were detected
+    if (
+      hasChanges &&
+      encounter &&
+      !isDifferentUser &&
+      !selectedNPCs.some((npc) => !npc.id)
+    ) {
+      console.log("Detected meaningful changes, marking as dirty");
+      setIsDirty(true);
+    }
+
+    // Update all refs for next comparison
+    prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(selectedNPCs));
+    prevRoundRef.current = encounter?.round;
+    prevLogsRef.current = [...logs];
+    prevEncounterNameRef.current = encounterName;
+  }, [selectedNPCs, encounter?.round, logs, encounterName, isDifferentUser]);
+
+  // Window event listener for beforeunload to prevent leaving the page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty && !autosaveEnabled) {
+        e.preventDefault();
+        // Some browsers require setting returnValue to show the dialog
+        e.returnValue =
+          "You have unsaved changes. Are you sure you want to leave?";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // useEffect for triggering the autosave when dirty
+  useEffect(() => {
+    if (isDirty && autosaveEnabled) {
+      console.log("isDirty is true, triggering debounced save");
+      debouncedSave();
+    }
+
+    return () => {
+      debouncedSave.cancel();
+    };
+  }, [isDirty, autosaveEnabled, debouncedSave]);
+
+  // Window event listener for beforeunload to save when leaving
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty && autosaveEnabled) {
+        handleSaveState();
+        console.log("Saved before unload");
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty, autosaveEnabled]);
+
+  // Fetch encounter and NPCs on initial load
+  useEffect(() => {
+    if (document.hidden) return; // Prevent fetch on tab switch
+    const fetchEncounter = async () => {
+      setEncounter(encounterData);
+      setEncounterName(encounterData?.name || "");
+      setLogs(encounterData?.logs || []);
+      prevSelectedNpcsRef.current = JSON.parse(
+        JSON.stringify(encounterData?.selectedNPCs || [])
+      );
+      prevEncounterNameRef.current = encounterData?.name || "";
+      prevLogsRef.current = [...(encounterData?.logs || [])];
+      prevRoundRef.current = encounterData?.round;
+
+      if (!encounterData?.selectedNPCs?.length) {
+        setSelectedNPCs([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch all NPCs in one query
+      const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
+      const npcQuery = query(
+        collection(firestore, "npc-personal"),
+        where("__name__", "in", npcIds),
+        where("uid", "==", encounterData.uid)
+      );
+
+      try {
+        console.log("Fetching NPCs...");
+        const querySnapshot = await getDocs(npcQuery);
+        const npcMap = new Map();
+
+        querySnapshot.forEach((doc) => {
+          npcMap.set(doc.id, doc.data());
+        });
+
+        const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
+          const fetchedNpc = npcMap.get(npcData.id);
+          return fetchedNpc
+            ? {
+                ...fetchedNpc,
+                id: npcData.id,
+                combatId: npcData.combatId,
+                combatStats: npcData.combatStats,
+              }
+            : {
+                combatId: npcData.combatId,
+                combatStats: npcData.combatStats,
+              };
+        });
+
+        setSelectedNPCs(loadedNPCs);
+        prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(loadedNPCs));
+      } catch (error) {
+        console.error("Error fetching NPCs:", error);
+        setSelectedNPCs([]);
+      }
+
+      setLoading(false);
+      setInitialized(true);
+    };
+
+    const fetchNpcs = async () => {
+      setNpcList(npcsList);
+    };
+
+    fetchEncounter();
+    fetchNpcs();
+  }, [id, encounterData, npcsList, user.uid]);
+
+  // Fetch single NPC
+  const getNpc = async (npcId) => {
+    try {
+      const npcDocRef = doc(firestore, "npc-personal", npcId);
+      const npcDocSnap = await getDoc(npcDocRef); // Fetch document
+      console.log("Fetching selected NPC...");
+      if (npcDocSnap.exists()) {
+        return npcDocSnap.data(); // Return the NPC data
+      } else {
+        console.error("NPC not found:", npcId);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching NPC:", error);
       return null;
     }
-  } catch (error) {
-    console.error("Error fetching NPC:", error);
-    return null;
-  }
-};
+  };
 
-// Save encounter state
-const handleSaveState = () => {
+  // Save encounter state
+  const handleSaveState = () => {
+    // if selectedNPCs doesn't have any npc without id, then save the state
+    if (selectedNPCs.some((npc) => !npc.id)) {
+      // Alert
+      alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
+      return;
+    }
 
-  // if selectedNPCs doesn't have any npc without id, then save the state
-  if (selectedNPCs.some((npc) => !npc.id)) {
-    // Alert
-    alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
-    return;
-  }
+    const currentTime = new Date();
+    setLastSaved(currentTime);
 
-  const currentTime = new Date();
-  setLastSaved(currentTime);
-
-  // Save encounter state (only store necessary identifiers: id and combatId)
-
-  setDoc(doc(firestore, "encounters", id), {
-    ...encounter,
-    name: encounterName,
-    selectedNPCs: selectedNPCs.map((npc) => ({
-      id: npc.id,
-      combatId: npc.combatId,
-      combatStats: npc.combatStats,
-    })), // Only save ids and combatIds
-    round: encounter.round,
-    logs: logs,
-    private: encounter.private || true,
-  });
-
-    // Add log entry
-    addLog("combat_sim_log_encounter_saved");
-
-    // Log full state for debugging (showing only IDs and combatIds)
-    console.log("Saved Encounter State", {
+    // Save encounter state (only store necessary identifiers: id and combatId)
+    setDoc(doc(firestore, "encounters", id), {
+      ...encounter,
       name: encounterName,
       selectedNPCs: selectedNPCs.map((npc) => ({
         id: npc.id,
         combatId: npc.combatId,
         combatStats: npc.combatStats,
-      })),
+      })), // Only save ids and combatIds
       round: encounter.round,
-      lastSaved: currentTime,
       logs: logs,
-      private: encounter.private,
-      uid: user.uid,
+      private: encounter.private || true,
     });
+
+    setIsSaveSnackbarOpen(true);
+
+    // Clear dirty flag after manual save
+    setIsDirty(false);
   };
 
   // Calculate time since last save
@@ -909,7 +1109,7 @@ const handleSaveState = () => {
       </Box>
     );
   }
-  
+
   // If encounter's uuid is different from user's uid and encounter is private, show error message
   if (isPrivate) {
     return (
@@ -957,6 +1157,10 @@ const handleSaveState = () => {
         handleDecreaseRound={handleDecreaseRound}
         isMobile={isMobile}
         isDifferentUser={isDifferentUser}
+        isAutoSaveEnabled={autosaveEnabled}
+        lastManualSaved={lastSaved}
+        lastAutoSaved={lastAutoSaved}
+        isDirty={isDirty}
       />
       {isMobile && !isDifferentUser && (
         <NpcSelector // NPC Selector
@@ -1101,6 +1305,21 @@ const handleSaveState = () => {
         setIsGuarding={setIsGuarding}
         inputRef={inputRef}
       />
+      {/* Save Snackbar to inform user that it has been saved */}
+      <Snackbar
+        open={isSaveSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setIsSaveSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
+          onClose={() => setIsSaveSnackbarOpen(false)}
+          severity={"success"}
+          sx={{ width: "100%" }}
+        >
+          {t("combat_sim_log_encounter_saved")}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
