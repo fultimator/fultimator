@@ -50,6 +50,15 @@ export interface PlayerStatuses {
     poisoned: boolean
 }
 
+export interface PlayerImmunities {
+    slow: boolean
+    dazed: boolean,
+    weak: boolean,
+    shaken: boolean,
+    enraged: boolean,
+    poisoned: boolean,
+}
+
 export interface PlayerAffinities {
     physical: Affinities,
     wind: Affinities,
@@ -208,6 +217,7 @@ export interface TypePlayer {
     attributes: PlayerAttributes,
     stats: PlayerStats,
     statuses: PlayerStatuses,
+    immunities: PlayerImmunities,
     affinities: PlayerAffinities,
     classes: PlayerClass[],
     equipment: PlayerEquipment[],

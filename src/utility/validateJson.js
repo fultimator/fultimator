@@ -137,12 +137,66 @@ export const validateCharacter = (character) => {
         }
       }
     }
-  
-    // Validate 'classes', 'weapons', 'armor', 'notes' arrays
-    const arrayProps = ["classes", "weapons", "armor", "notes"];
-    for (const prop of arrayProps) {
-      if (!Array.isArray(character[prop])) {
-        errors.push(`Missing or invalid: ${prop}`);
+
+  // Validate 'immunities' object
+  const immunityProps = [
+    "slow",
+    "dazed",
+    "enraged",
+    "weak",
+    "shaken",
+    "poisoned",
+  ];
+  if (
+    typeof character.immunity !== "object" ||
+    Array.isArray(character.immunity) ||
+    character.immunity === null
+  ) {
+    errors.push("Missing: immunity");
+  } else {
+    for (const prop of immunityProps) {
+      if (
+        !character.immunity.hasOwnProperty(prop) ||
+        typeof character.immunity[prop] !== "boolean"
+      ) {
+        errors.push(`Missing or invalid: ${prop} in immunity`);
+      }
+    }
+  }
+
+  // Validate 'classes', 'weapons', 'armor', 'notes' arrays
+  const arrayProps = ["classes", "weapons", "armor", "notes"];
+  for (const prop of arrayProps) {
+    if (!Array.isArray(character[prop])) {
+      errors.push(`Missing or invalid: ${prop}`);
+    }
+  }
+
+  // Validate 'modifiers' object
+  const modifierProps = [
+    "hp",
+    "mp",
+    "ip",
+    "def",
+    "mdef",
+    "init",
+    "meleePrec",
+    "rangedPrec",
+    "magicPrec",
+  ];
+  if (
+    typeof character.modifiers !== "object" ||
+    Array.isArray(character.modifiers) ||
+    character.modifiers === null
+  ) {
+    errors.push("Missing: modifiers");
+  } else {
+    for (const prop of modifierProps) {
+      if (
+        !character.modifiers.hasOwnProperty(prop) ||
+        typeof character.modifiers[prop] !== "number"
+      ) {
+        errors.push(`Missing or invalid: ${prop} in modifiers`);
       }
     }
   
@@ -183,6 +237,7 @@ export const validateCharacter = (character) => {
   
     return true;
   };
+}
   
   export const validateNpc = (npc) => {
     // Error messages array

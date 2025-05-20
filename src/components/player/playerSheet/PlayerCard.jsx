@@ -373,6 +373,8 @@ export default function PlayerCard({
     }));
   };
 
+  const isImmune = (status) => player.immunities && player.immunities[status] === true;
+
   return (
     <Card
       elevation={3}
@@ -816,7 +818,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.slow}
                       onChange={onStatusChange("slow")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("slow")} 
                     />
                   }
                   label={
@@ -848,7 +850,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.dazed}
                       onChange={onStatusChange("dazed")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("dazed")} 
                     />
                   }
                   label={
@@ -880,7 +882,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.weak}
                       onChange={onStatusChange("weak")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("weak")} 
                     />
                   }
                   label={
@@ -912,7 +914,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.shaken}
                       onChange={onStatusChange("shaken")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("shaken")} 
                     />
                   }
                   label={
@@ -955,7 +957,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.enraged}
                       onChange={onStatusChange("enraged")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("enraged")} 
                     />
                   }
                   label={
@@ -990,7 +992,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.poisoned}
                       onChange={onStatusChange("poisoned")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("poisoned")} 
                     />
                   }
                   label={

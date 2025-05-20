@@ -54,6 +54,7 @@ function NpcPretty(
             {collapse ? (
               <>
                 <Stats npc={npc} />
+                <Immunities npc={npc} />
                 <Attacks npc={npc} />
                 <Spells npc={npc} />
                 <Actions npc={npc} />
@@ -543,6 +544,91 @@ function Stats({ npc }) {
         </Grid>
       </Grid>
     </Typography>
+  );
+}
+
+function Immunities({ npc }) {
+  const { t } = useTranslate();
+  const theme = useCustomTheme();
+
+  const background = theme.mode === 'dark'
+    ? `linear-gradient(90deg, #1E2122 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient
+    : `linear-gradient(90deg, #f6f4f9 0%, #ffffff 100%)`; // Light mode gradient
+
+  const backgroundColor = theme.mode === 'dark'
+    ? `#583871` // Dark mode background color
+    : `#6e468d`; // Light mode background color
+
+  // Immunities labels
+  const immunitiesLabels = {
+    slow: t("slow"),
+    dazed: t("dazed"),
+    weak: t("weak"),
+    shaken: t("shaken"),
+    enraged: t("enraged"),
+    poisoned: t("poisoned"),
+  };
+
+  // Only list immunities that are true
+  const trueImmunities = Object.keys(immunitiesLabels)
+    .filter((key) => npc.immunities?.[key]) // Check if npc is immune to this status
+    .map((key) => immunitiesLabels[key]);
+
+  if (trueImmunities.length === 0) {
+    return null;
+  }
+
+  const immunitiesList = trueImmunities.join(", ") + ".";
+
+  return (
+    <Grid
+      container
+      justifyContent="space-between"
+      item
+      sx={{
+        mt: 1,
+        py: 0.1,
+      }}
+    >
+      {/* Immunity Label */}
+      <Grid
+        item
+        xs={2}
+        sx={{
+          textAlign: 'center',
+          backgroundColor: backgroundColor,
+          color: `${theme.white}`,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <Typography
+          color="white.main"
+          fontFamily="Antonio"
+          fontSize="1.1rem"
+          fontWeight="medium"
+          sx={{ textTransform: "uppercase", margin: "auto" }}
+        >
+          {t("Immunities")}
+        </Typography>
+      </Grid>
+
+      {/* Immunities List */}
+      <Grid
+        item
+        xs={10}
+        sx={{
+          px: 1,
+          display: 'flex',
+          alignItems: 'center',
+          background: background,
+        }}
+      >
+        <Typography sx={{ fontWeight: "bold", margin: "auto 0" }}>
+          {immunitiesList}
+        </Typography>
+      </Grid>
+    </Grid>
   );
 }
 

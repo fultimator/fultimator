@@ -86,6 +86,15 @@ export interface NpcAffinities {
     poison?: Affinities,
 }
 
+export interface NpcImmunities {
+    slow: boolean
+    dazed: boolean,
+    weak: boolean,
+    shaken: boolean,
+    enraged: boolean,
+    poisoned: boolean,
+}
+
 export interface NpcNotes {
     name: string,
     effect: string
@@ -103,6 +112,7 @@ export interface TypeNpc {
     imgurl?: string,
     attacks: NpcAttack[],
     affinities: NpcAffinities,
+    immunities: NpcImmunities,
     attributes: NpcAttributes,
     species: string,
     sizes?: string,

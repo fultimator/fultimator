@@ -41,9 +41,64 @@ export default function EditExtra({ npc, setNpc }) {
           </Stack>
         </Grid>
       </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Immunities npc={npc} setNpc={setNpc} />
+        </Grid>
+      </Grid>
     </>
   );
 }
+
+
+const Immunities = React.memo(({ npc, setNpc }) => {
+  const { t } = useTranslate();
+
+  // List of all immunities from NpcImmunities
+  const allImmunities = {
+    slow: false,
+    dazed: false,
+    weak: false,
+    shaken: false,
+    enraged: false,
+    poisoned: false,
+  };
+
+  const immunities = { ...allImmunities, ...(npc.immunities || {}) };
+
+  const onChange = useCallback(
+    (e) => {
+      const { name, checked } = e.target;
+      setNpc((prevState) => ({
+        ...prevState,
+        immunities: {
+          ...prevState.immunities,
+          [name]: checked,
+        },
+      }));
+    },
+    [setNpc]
+  );
+
+  return (
+    <FormGroup>
+      <FormLabel id="extra-defenses">{t("Immunities")}</FormLabel>
+      {Object.keys(allImmunities).map((immunity) => (
+        <FormControlLabel
+          key={immunity}
+          control={
+            <Checkbox
+              checked={immunities[immunity]}
+              onChange={onChange}
+              name={immunity}
+            />
+          }
+          label={`${t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}`}
+        />
+      ))}
+    </FormGroup>
+  );
+});
 
 const Defenses = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();

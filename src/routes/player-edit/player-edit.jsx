@@ -35,6 +35,7 @@ import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffini
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
+import EditPlayerImmunities from "../../components/player/stats/EditPlayerImmunities";
 import EditManualStats from "../../components/player/stats/EditManualStats";
 import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
@@ -487,6 +488,12 @@ export default function PlayerEdit() {
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStatuses
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+          <Divider sx={{ my: 1 }} />
+          <EditPlayerImmunities
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isOwner}
