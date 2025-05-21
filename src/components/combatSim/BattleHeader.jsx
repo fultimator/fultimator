@@ -204,6 +204,8 @@ export default function BattleHeader({
               />
             </Tooltip>
           )}
+          
+          {/* Save time text */}
           {isAutoSaveEnabled && lastAutoSaved > lastManualSaved ? (
             <>
               {autoSaveTimeText && (

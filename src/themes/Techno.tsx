@@ -4,7 +4,7 @@ import { PaletteOptions } from "@mui/material/styles";
 // Light Mode Theme
 const lightTechno = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
       main: "#406376",
     },
@@ -86,7 +86,7 @@ const lightTechno = createTheme({
 // Dark Mode Theme
 const darkTechno = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
       main: "#406376",
     },
@@ -168,7 +168,7 @@ const darkTechno = createTheme({
       styleOverrides: {
         root: {
           color: "#b0b0b0",
-          '&.Mui-focused': {
+          "&.Mui-focused": {
             color: "#ffffff",
           },
         },
@@ -179,7 +179,7 @@ const darkTechno = createTheme({
         outlined: {
           borderColor: "rgba(255, 255, 255, 0.23)",
           color: "#ffffff",
-          '&:hover': {
+          "&:hover": {
             borderColor: "#ffffff",
             backgroundColor: "#333333",
             color: "#ffffff",
@@ -190,11 +190,17 @@ const darkTechno = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {},
-            '&:hover fieldset': {},
-            '&.Mui-focused fieldset': {
-              borderColor: "#ffffff",
+          "& .MuiOutlinedInput-root": {
+            backgroundColor: "#2b2b2b", // Darker background for textfield
+            borderColor: "#555555", // Lighter border color for better contrast
+            "&:hover fieldset": {
+              borderColor: "#ffffff", // White border on hover
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#ffffff", // White border when focused
+            },
+            "& .MuiInputBase-input": {
+              color: "#ffffff", // White text color for better readability in dark mode
             },
           },
         },
@@ -211,7 +217,7 @@ const darkTechno = createTheme({
       styleOverrides: {
         root: () => ({
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor:  "#fff",
+            borderColor: "#fff",
           },
         }),
       },
@@ -265,16 +271,17 @@ const darkTechno = createTheme({
           "&.Mui-checked": {
             color: "#879da9",
             "& + .MuiSwitch-track": {
-              backgroundColor: "#1A1D1E",
+              backgroundColor: "#879da9",
             },
           },
         },
         thumb: {
-          backgroundColor: "#879da9", 
+          backgroundColor: "#406376",
         },
         track: {
           backgroundColor: "#1e1e1e",
           transition: "background-color 0.3s",
+          border: "1px solid  #879da9",
         },
       },
     },
@@ -286,10 +293,10 @@ const darkTechno = createTheme({
         thumb: {
           backgroundColor: "#879da9",
           "&:hover, &.Mui-focusVisible": {
-            backgroundColor: "#1A1D1E", 
+            backgroundColor: "#1A1D1E",
           },
           "&.Mui-disabled": {
-            backgroundColor: "#1A1D1E1A", 
+            backgroundColor: "#1A1D1E1A",
           },
         },
         track: {
@@ -299,10 +306,10 @@ const darkTechno = createTheme({
           backgroundColor: "#1A1D1E",
         },
         mark: {
-          backgroundColor: "#1A1D1E", 
+          backgroundColor: "#1A1D1E",
         },
         markActive: {
-          backgroundColor: "#879da9", 
+          backgroundColor: "#879da9",
         },
       },
     },

@@ -190,6 +190,10 @@ function Personal({ user }) {
     // Update the URL with the new query string
     navigate(`${location.pathname}?${queryString}`, {
       replace: true,
+      state: {
+        from: "/npc-gallery",
+        search: location.search,
+      },
     });
   };
 

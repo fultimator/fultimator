@@ -1,8 +1,32 @@
-import React from "react";
-import { TextField } from "@mui/material";
-import { t } from "../../translation/translate";
+import React, { useState } from "react";
+import { TextField, Button } from "@mui/material";
+import { Send } from "@mui/icons-material";
+import { t } from "../../../translation/translate";
 
-const NotesTab = ({ selectedNPC, setSelectedNPC, selectedNPCs, setSelectedNPCs }) => {
+const NotesTab = ({
+  selectedNPC,
+  setSelectedNPC,
+  selectedNPCs,
+  setSelectedNPCs,
+  addLog,
+}) => {
+  const [customLog, setCustomLog] = useState("");
+
+  const handleSendLog = () => {
+    const npcName =
+      selectedNPC.name +
+      (selectedNPC?.combatStats?.combatNotes
+        ? "【" + selectedNPC.combatStats.combatNotes + "】"
+        : "");
+    const trimmedLog = customLog.trim();
+    if (!trimmedLog) return;
+
+    // Add log entry
+    addLog(npcName + ": " + trimmedLog);
+
+    setCustomLog(""); // Clear the textfield after sending
+  };
+
   return (
     <>
       <TextField
@@ -30,8 +54,8 @@ const NotesTab = ({ selectedNPC, setSelectedNPC, selectedNPCs, setSelectedNPCs }
             return npc;
           });
 
-          setSelectedNPCs(updatedNPCs);     
-          
+          setSelectedNPCs(updatedNPCs);
+
           // Update selectedNPC
           setSelectedNPC((prev) => ({
             ...prev,
@@ -39,7 +63,7 @@ const NotesTab = ({ selectedNPC, setSelectedNPC, selectedNPCs, setSelectedNPCs }
               ...prev.combatStats,
               combatNotes: e.target.value,
             },
-          }));          
+          }));
         }}
         sx={{ mt: 2 }}
       />
@@ -71,6 +95,27 @@ const NotesTab = ({ selectedNPC, setSelectedNPC, selectedNPCs, setSelectedNPCs }
           setSelectedNPCs(updatedNPCs);
         }}
         sx={{ mt: 2 }}
+      />
+      <TextField
+        label={t("combat_sim_custom_log")}
+        variant="outlined"
+        fullWidth
+        value={customLog}
+        onChange={(e) => setCustomLog(e.target.value)}
+        sx={{ mt: 2 }}
+        InputProps={{
+          endAdornment: (
+            <Button
+              onClick={handleSendLog}
+              color="primary"
+              variant="contained"
+              startIcon={<Send />}
+              disabled={!customLog}
+            >
+              {t("combat_sim_send_log")}
+            </Button>
+          ),
+        }}
       />
     </>
   );

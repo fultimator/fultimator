@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { t } from "../../translation/translate";
+import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 
 const AttributeSection = ({ selectedNPC, calcAttr }) => {

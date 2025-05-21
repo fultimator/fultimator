@@ -142,7 +142,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/combat"
+                path="/combat-sim"
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <CombatSimulatorEncounters />
