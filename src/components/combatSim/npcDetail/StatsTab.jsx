@@ -8,7 +8,7 @@ import {
 import HealthBar from "./HealthBar";
 import { GiHearts } from "react-icons/gi";
 import { FaStar } from "react-icons/fa";
-import { t } from "../../translation/translate";
+import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 
 const StatsTab = ({

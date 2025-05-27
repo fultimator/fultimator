@@ -128,7 +128,13 @@ export default function PlayerCompanion({
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => navigate(`/npc-gallery/${companion.id}`)}
+                      onClick={() => navigate(`/npc-gallery/${companion.id}`,
+                        {
+                          state: {
+                            from: `/pc-gallery/${player.id}`,
+                          }
+                        }
+                      )}
                       sx={{ marginTop: 2 }}
                     >
                       {t("View Companion")}

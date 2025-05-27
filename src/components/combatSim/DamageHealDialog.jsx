@@ -20,6 +20,8 @@ import {
   Box,
 } from "@mui/material";
 import { IoShield } from "react-icons/io5";
+import { GiPiercedHeart } from "react-icons/gi";
+import { GiBrokenShield } from "react-icons/gi";
 import { TypeIcon } from "../../components/types";
 import ReactMarkdown from "react-markdown";
 import { t } from "../../translation/translate";
@@ -39,19 +41,24 @@ const DamageHealDialog = ({
   setIsHealing,
   damageType,
   setDamageType,
-  isGuarding,
+  isGuarding,  
   setIsGuarding,
+  isIgnoreResistance,
+  setIsIgnoreResistance,
+  isIgnoreImmunity,
+  setIsIgnoreImmunity,
   inputRef,
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  // Calculate damage with affinities
   function calculateDamage(
     npc,
     damageValue,
     damageType = "",
-    isGuarding = false
+    isGuarding = false,
+    isIgnoreResistance = false,
+    isIgnoreImmunity = false
   ) {
     const affinities = npc.affinities || {};
     const damage = parseInt(damageValue, 10) || 0;
@@ -65,23 +72,31 @@ const DamageHealDialog = ({
           finalDamage = isGuarding ? damage : damage * 2;
           break;
         case "rs": // Resistant (x0.5, rounded down)
-          finalDamage = Math.floor(damage * 0.5);
+          if (isIgnoreResistance) {
+            finalDamage = damage;
+          } else {
+            finalDamage = Math.floor(damage * 0.5);
+          }
           break;
         case "ab": // Absorb (turn damage into healing)
           finalDamage = -damage;
           break;
         case "im": // Immune (no damage)
-          finalDamage = 0;
+          if (isIgnoreImmunity) {
+            finalDamage = damage;
+          } else {
+            finalDamage = 0;
+          }
           break;
         default:
           break;
       }
     } else if (isGuarding) {
-      finalDamage = Math.floor(damage * 0.5);
-    }
-
-    if (isGuarding && damageType === "") {
-      finalDamage = Math.floor(damage * 0.5);
+      if (isIgnoreResistance) {
+        finalDamage = damage;
+      } else {
+        finalDamage = Math.floor(damage * 0.5);
+      }
     }
 
     return finalDamage;
@@ -238,6 +253,62 @@ const DamageHealDialog = ({
                   </Box>
                 }
               />
+              {(damageType !== "" || isGuarding) && <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isIgnoreResistance}
+                    onChange={(e) => {
+                      setIsIgnoreResistance(e.target.checked);
+                    }}
+                    sx={{
+                      mt: 0,
+                      "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
+                      "&.Mui-checked": {
+                        color: isDarkMode
+                          ? "white !important"
+                          : "primary !important",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <GiPiercedHeart
+                      size={20}
+                      color={isIgnoreResistance ? "#cc0000" : "gray"}
+                    />
+                    {t("combat_sim_ignore_resistance")}
+                  </Box>
+                }
+              />}
+              {damageType !== "" && <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isIgnoreImmunity}
+                    onChange={(e) => {
+                      setIsIgnoreImmunity(e.target.checked);
+                    }}
+                    sx={{
+                      mt: 0,
+                      "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
+                      "&.Mui-checked": {
+                        color: isDarkMode
+                          ? "white !important"
+                          : "primary !important",
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <GiBrokenShield
+                      size={20}
+                      color={isIgnoreImmunity ? "#ffcc00" : "gray"}
+                    />
+                    {t("combat_sim_ignore_immunity")}
+                  </Box>
+                }
+              />}
               {npcClicked &&
                 (damageType !== "" || isGuarding) &&
                 value !== "" && (
@@ -250,7 +321,9 @@ const DamageHealDialog = ({
                             npcClicked,
                             value,
                             damageType,
-                            isGuarding
+                            isGuarding,
+                            isIgnoreResistance,
+                            isIgnoreImmunity
                           );
                           return calculated < 0 ? "green" : "#cc0000";
                         })(),
@@ -264,7 +337,9 @@ const DamageHealDialog = ({
                             npcClicked,
                             value,
                             damageType,
-                            isGuarding
+                            isGuarding,
+                            isIgnoreResistance,
+                            isIgnoreImmunity
                           );
                           return calculated < 0
                             ? `${Math.abs(calculated)} ${damageType} healing`

@@ -61,7 +61,7 @@ function Home() {
     },
     {
       image: combat_simulator,
-      link: "/combat",
+      link: "/combat-sim",
       hoverKey: "combat_simulator",
     },
     {
@@ -107,7 +107,11 @@ function Home() {
               setHover("");
             }}
             onClick={() => {
-              navigate(item.link);
+              navigate(item.link, {
+                state: {
+                  from: "/",
+                },
+              });
             }}
           />
         ))}
@@ -479,10 +483,7 @@ function Home() {
                   src={powered_by_fu}
                   alt="Powered by Fabula Ultima"
                   onClick={() =>
-                    window.open(
-                      "https://need.games/fabula-ultima/",
-                      "_blank"
-                    )
+                    window.open("https://need.games/fabula-ultima/", "_blank")
                   }
                   style={{
                     maxWidth: "200px",

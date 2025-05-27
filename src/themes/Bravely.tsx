@@ -191,10 +191,16 @@ const darkBravely = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            '& fieldset': {},
-            '&:hover fieldset': {},
+            backgroundColor: "#2b2b2b", // Darker background for textfield
+            borderColor: "#555555", // Lighter border color for better contrast
+            '&:hover fieldset': {
+              borderColor: "#ffffff", // White border on hover
+            },
             '&.Mui-focused fieldset': {
-              borderColor: "#ffffff",
+              borderColor: "#ffffff", // White border when focused
+            },
+            '& .MuiInputBase-input': {
+              color: "#ffffff", // White text color for better readability in dark mode
             },
           },
         },
@@ -275,6 +281,7 @@ const darkBravely = createTheme({
         track: {
           backgroundColor: "#1e1e1e",
           transition: "background-color 0.3s",
+          border: "1px solid #756449",
         },
       },
     },

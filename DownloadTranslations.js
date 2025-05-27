@@ -4,7 +4,7 @@ import Papa from "papaparse";
 import { Buffer } from "node:buffer";
 
 // Configuration - specify the sheets you want to download
-const sheetNames = ["General", "Classes", "Skills"]; // Add or remove sheet names as needed
+const sheetNames = ["General", "Classes", "Skills", "CombatSim", "Notes-Editor"]; // Add or remove sheet names as needed
 const googleSheetId = "1H3GQGaND7PuyiWvFlfIUtmKYquJYEbgs5k8gGbqwUbs";
 const outputPath = "./src/translation/data.json";
 
