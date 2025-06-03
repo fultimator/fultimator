@@ -204,15 +204,6 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
       return;
     }
 
-    if (formData.usesAIContent) {
-      setErrorMessage(
-        t(
-          "Resources containing AI-generated content are not accepted. Please ensure all content is original or properly attributed human-created work."
-        )
-      );
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
@@ -541,21 +532,11 @@ ${formData.additionalNotes || "None"}
             label={
               <Typography variant="body2">
                 {t(
-                  "This resource contains AI-generated content (ChatGPT, Claude, etc.)"
+                  "This resource contains AI-generated content"
                 )}
               </Typography>
             }
           />
-
-          {formData.usesAIContent && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              <Typography variant="body2">
-                {t(
-                  "Resources containing AI-generated content are not accepted. Please ensure all content is original human work or properly attributed."
-                )}
-              </Typography>
-            </Alert>
-          )}
 
           <Divider sx={{ my: 2 }} />
 
@@ -652,7 +633,7 @@ ${formData.additionalNotes || "None"}
           onClick={handleSubmit}
           color="primary"
           variant="contained"
-          disabled={isSubmitting || cooldown > 0 || formData.usesAIContent}
+          disabled={isSubmitting || cooldown > 0}
         >
           {cooldown > 0
             ? t(`Please wait ${cooldown}s before submitting again`)
