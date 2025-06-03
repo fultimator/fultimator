@@ -5,14 +5,9 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import FreeBreakfastIcon from "@mui/icons-material/FreeBreakfast";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import ExtensionIcon from "@mui/icons-material/Extension";
-import CopyrightIcon from "@mui/icons-material/Copyright";
 import StarIcon from "@mui/icons-material/Star";
-import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import InfoIcon from "@mui/icons-material/Info";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
+import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 
 export const getTypeIcon = (type) => {
   switch (type) {
@@ -34,6 +29,8 @@ export const getTypeIcon = (type) => {
       return <StarIcon />;
     case "crowdfunding":
       return <Diversity1Icon />;
+    case "social_media":
+      return <ConnectWithoutContactIcon />;
     default:
       return <LaunchIcon />;
   }
@@ -41,23 +38,28 @@ export const getTypeIcon = (type) => {
 
 export const getTypeColor = ({type, isDarkMode = false}) => {
   switch (type) {
-    case "free":
-      return isDarkMode ? "#81c784" : "#388e3c";
-    case "coming_soon":
-      return isDarkMode ? "#ffb74d" : "#f57c00";
-    case "pdf":
-      return isDarkMode ? "#90caf9" : "#1976d2";
-    case "physical":
     case "both":
+      return isDarkMode ? "#64b5f6" : "#1565c0";
+    case "free":
+      return isDarkMode ? "#81c784" : "#2e7d32";
+    case "pdf":
       return isDarkMode ? "#f48fb1" : "#c2185b";
+    case "physical":
+      return isDarkMode ? "#ffb74d" : "#e65100";
     case "website":
-      return isDarkMode ? "#ce93d8" : "#7b1fa2";
+      return isDarkMode ? "#ba68c8" : "#6a1b9a";
     case "tools":
-      return isDarkMode ? "#a5d6a7" : "#4caf50";
+      return isDarkMode ? "#4db6ac" : "#00695c";
     case "content":
-      return isDarkMode ? "#ffcc02" : "#ff9800";
+      return isDarkMode ? "#ffd54f" : "#f57c00";
+    case "coming_soon":
+      return isDarkMode ? "#ff8a65" : "#d84315";
+    case "crowdfunding":
+      return isDarkMode ? "#f48fb1" : "#ad1457";
+    case "social_media":
+      return isDarkMode ? "#90a4ae" : "#455a64";
     default:
-      return isDarkMode ? "#e0e0e0" : "#666666";
+      return isDarkMode ? "#bdbdbd" : "#757575";
   }
 };
 
@@ -79,6 +81,10 @@ export const getTypeLabel = (type) => {
       return "Tool";
     case "content":
       return "Content";
+    case "crowdfunding":
+      return "Crowdfunding";
+    case "social_media":
+      return "Social Media";
     default:
       return "Resource";
   }

@@ -78,6 +78,70 @@ function Resources() {
   const [languageFilter, setLanguageFilter] = useState("all");
   const [expandedLicenseInfo, setExpandedLicenseInfo] = useState(false);
 
+  // Get selected language from localStorage
+  const selectedLanguage = useMemo(() => {
+    try {
+      return localStorage.getItem("selectedLanguage") || "en";
+    } catch (error) {
+      console.warn("Could not access localStorage:", error);
+      return "en";
+    }
+  }, []);
+
+  // Sorting utility functions
+  const getCollectionPriority = (collection) => {
+    // Higher priority = lower number (sorts first)
+    const priorities = {
+      'rulebook': 1,
+      'website': 2,
+      'social_media': 3,
+      'tools': 4,
+      'content': 5
+    };
+    return priorities[collection] || 6;
+  };
+
+  const getTagPriority = (tags) => {
+    if (!tags || !Array.isArray(tags)) return 4;
+    
+    // Higher priority = lower number (sorts first)
+    if (tags.includes('corebook')) return 1;
+    if (tags.includes('expansion')) return 2;
+    if (tags.includes('adventure')) return 3;
+    return 4;
+  };
+
+  const sortResourcesWithinLanguage = (resources) => {
+    return resources.sort((a, b) => {
+      // 1. Sort by collection priority (rulebook first, then website, etc.)
+      const collectionDiff = getCollectionPriority(a.collection) - getCollectionPriority(b.collection);
+      if (collectionDiff !== 0) return collectionDiff;
+
+      // 2. For rulebooks, sort by publish date (newest first) if both have dates
+      if (a.collection === 'rulebook' && b.collection === 'rulebook') {
+        const aDate = a.publish_date ? new Date(a.publish_date) : null;
+        const bDate = b.publish_date ? new Date(b.publish_date) : null;
+        
+        if (aDate && bDate) {
+          return bDate - aDate; // Newest first
+        }
+        
+        // If no dates available, sort by tag priority (corebook, expansion, adventure)
+        if (!aDate && !bDate) {
+          const tagDiff = getTagPriority(a.tags) - getTagPriority(b.tags);
+          if (tagDiff !== 0) return tagDiff;
+        }
+        
+        // If one has date and other doesn't, prioritize the one with date
+        if (aDate && !bDate) return -1;
+        if (!aDate && bDate) return 1;
+      }
+
+      // 3. Final sort by title alphabetically
+      return a.name.localeCompare(b.name);
+    });
+  };
+
   // Process resources from Supabase data
   const allResources = useMemo(() => {
     if (!resources.length) return { official: [], homebrew: [] };
@@ -94,6 +158,7 @@ function Resources() {
         collection: resource.collection,
         tags: resource.tags,
         publish_date: resource.publish_date,
+        purchase_options: resource.purchase_options,
         category: "official",
       }));
 
@@ -110,6 +175,7 @@ function Resources() {
         collection: resource.collection,
         tags: resource.tags,
         publish_date: resource.publish_date,
+        purchase_options: resource.purchase_options,
         category: "homebrew",
       }));
 
@@ -148,7 +214,12 @@ function Resources() {
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           (resource.author &&
-            resource.author.toLowerCase().includes(searchQuery.toLowerCase()))
+            resource.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          // Also search in purchase options reseller names
+          (resource.purchase_options &&
+            resource.purchase_options.some((option) =>
+              option.reseller.toLowerCase().includes(searchQuery.toLowerCase())
+            ))
       );
     }
 
@@ -172,6 +243,7 @@ function Resources() {
   const groupedOfficialResources = useMemo(() => {
     if (activeTab !== 0) return {};
 
+    // First, group resources by language
     const grouped = {};
     filteredResources.forEach((resource) => {
       const languageKey = resource.language || "other";
@@ -184,8 +256,34 @@ function Resources() {
       }
       grouped[languageKey].resources.push(resource);
     });
-    return grouped;
-  }, [filteredResources, activeTab]);
+
+    // Sort resources within each language group
+    Object.keys(grouped).forEach((langKey) => {
+      grouped[langKey].resources = sortResourcesWithinLanguage(grouped[langKey].resources);
+    });
+
+    // Create ordered object with selected language first
+    const orderedGrouped = {};
+    
+    // Add selected language first if it exists
+    if (grouped[selectedLanguage]) {
+      orderedGrouped[selectedLanguage] = grouped[selectedLanguage];
+    }
+    
+    // Add all other languages in alphabetical order
+    Object.keys(grouped)
+      .filter(langKey => langKey !== selectedLanguage)
+      .sort((a, b) => {
+        const langA = languages[a]?.lang || "Other";
+        const langB = languages[b]?.lang || "Other";
+        return langA.localeCompare(langB);
+      })
+      .forEach(langKey => {
+        orderedGrouped[langKey] = grouped[langKey];
+      });
+
+    return orderedGrouped;
+  }, [filteredResources, activeTab, selectedLanguage]);
 
   // Show loading state
   if (loading) {
