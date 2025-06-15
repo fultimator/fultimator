@@ -467,7 +467,7 @@ function Personal({ user }) {
               <Tooltip title={t("Edit")}>
                 <IconButton
                   onClick={() =>
-                    handleNavigation(`/character-sheet/${player.id}`)
+                    handleNavigation(`/pc-gallery/${player.id}`)
                   }
                 >
                   <Edit />
@@ -485,8 +485,7 @@ function Personal({ user }) {
               </Tooltip>
               <Tooltip title={t("Player Sheet")}>
                 <IconButton
-                  component={RouterLink}
-                  to={`/character-sheet/${player.id}`}
+                  onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
                 >
                   <Badge />
                 </IconButton>
