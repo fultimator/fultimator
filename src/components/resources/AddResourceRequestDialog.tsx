@@ -16,6 +16,7 @@ import {
   Checkbox,
   Alert,
   Divider,
+  useMediaQuery,
 } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -63,6 +64,7 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const resourceTypes = [
     { value: "adventure", label: "Adventure" },
@@ -362,12 +364,13 @@ ${formData.additionalNotes || "None"}
         },
       }}
       maxWidth="md"
+      fullScreen={isMobile}
     >
-      <DialogTitle variant="h3">
-        {t("Request Homebrew Resource Addition")}
-      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          <Typography variant={isMobile ? "h5" : "h3"}>
+            {t("Request Homebrew Resource Addition")}
+          </Typography>
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="body2">
               {t(
@@ -531,9 +534,7 @@ ${formData.additionalNotes || "None"}
             }
             label={
               <Typography variant="body2">
-                {t(
-                  "This resource contains AI-generated content"
-                )}
+                {t("This resource contains AI-generated content")}
               </Typography>
             }
           />
