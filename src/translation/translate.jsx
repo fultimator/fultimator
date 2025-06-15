@@ -100,3 +100,11 @@ export const t = (key, noSpan, allowedLanguages) => {
   }
   return replaceKey(key, noSpan, language);
 };
+
+export const replacePlaceholders = (translatedText, replacements) => {
+  let result = translatedText;
+  for (const [key, value] of Object.entries(replacements)) {
+    result = result.replace(new RegExp(`{{${key}}}`, "g"), value);
+  }
+  return result;
+};

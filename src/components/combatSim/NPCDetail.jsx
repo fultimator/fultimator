@@ -26,14 +26,15 @@ import {
   Download,
 } from "@mui/icons-material";
 import NpcPretty from "../npc/Pretty";
-import StatsTab from "./StatsTab";
-import NotesTab from "./NotesTab";
-import AttributeSection from "./AttributeSection";
+import StatsTab from "./npcDetail/StatsTab";
+import NotesTab from "./npcDetail/NotesTab";
+import AttributeSection from "./npcDetail/AttributeSection";
 import { calcPrecision, calcDamage, calcMagic } from "../../libs/npcs";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import RollsTab from "./RollsTab";
-import StandardRollsSection from "./StandardRollsSection";
+import RollsTab from "./npcDetail/RollsTab";
+import StandardRollsSection from "./npcDetail/StandardRollsSection";
+import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 
 const NPCDetail = ({
   selectedNPC,
@@ -57,6 +58,8 @@ const NPCDetail = ({
   addLog,
   openLogs,
   npcDetailWidth,
+  checkNewTurn,
+  handleEditNPC,
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -68,8 +71,24 @@ const NPCDetail = ({
   const [error, setError] = useState("");
   const [clickedData, setClickedData] = useState({});
 
-  const autoUseMP = localStorage.getItem("combatSimAutoUseMP") === "true";
-  const autoOpenLogs = localStorage.getItem("combatSimAutoOpenLogs") === "true";
+  const {
+    autoUseMP,
+    autoOpenLogs,
+    showBaseAttackEffect,
+    showWeaponAttackEffect,
+    showSpellEffect,
+    autoCheckTurnAfterRoll,
+    hideLogs,
+    logAttack,
+    logCritFailure,
+    logCritSuccess,
+    logSpellOffensiveRoll,
+    logSpellUse,
+    logStandardRoll,
+    studyValues,
+  } = useCombatSimSettingsStore.getState().settings;
+
+  //console.log(studyValues);
 
   if (!selectedNPC) return null;
 
@@ -85,8 +104,8 @@ const NPCDetail = ({
       ? clickedData.maxTargets
       : 1;
 
-  const handleConfirmSpell = () => {
-    const finalMpCost = clickedData.mp * numTargets;
+  const handleConfirmSpell = (spellData) => {
+    const finalMpCost = spellData.mp * numTargets;
 
     if (autoUseMP && finalMpCost > selectedNPC?.combatStats?.currentMp) {
       setError("Not enough MP!");
@@ -99,7 +118,7 @@ const NPCDetail = ({
     if (autoUseMP) {
       handleUseMP(finalMpCost);
     }
-    if (clickedData.type === "offensive") {
+    if (spellData.type === "offensive") {
       // Roll the attack
       const {
         diceResults,
@@ -107,38 +126,67 @@ const NPCDetail = ({
         damage,
         isCriticalFailure,
         isCriticalSuccess,
-      } = rollAttack(clickedData, "spell");
-      // log the spell
-      addLog("combat_sim_log_spell_offensive_roll", "--isSpell--", {
-        npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
-        spellName: clickedData.name,
-        targets: numTargets,
-        dice1: diceResults.attribute1,
-        dice2: diceResults.attribute2,
-        extraMagic:
-          calcMagic(selectedNPC) !== 0 ? " + " + calcMagic(selectedNPC) : "",
-        totalHitScore: totalHitScore,
-        hr: damage,
-      });
+      } = rollAttack(spellData, "spell");
 
-      if (isCriticalFailure) {
+      if (logSpellOffensiveRoll) {
+        // log the spell
+        addLog("combat_sim_log_spell_offensive_roll", "--isSpell--", {
+          npcName:
+            selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : ""),
+          spellName: spellData.name,
+          targets: numTargets,
+          dice1: diceResults.attribute1,
+          dice2: diceResults.attribute2,
+          extraMagic:
+            calcMagic(selectedNPC) !== 0 ? " + " + calcMagic(selectedNPC) : "",
+          totalHitScore: totalHitScore,
+          hr: damage,
+          effect: showSpellEffect && spellData.effect ? spellData.effect : "",
+        });
+      }
+
+      if (isCriticalFailure && logCritFailure) {
         setTimeout(() => {
-          addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+          addLog(
+            "combat_sim_log_crit_failure",
+            selectedNPC.name +
+              (selectedNPC?.combatStats?.combatNotes
+                ? "【" + selectedNPC.combatStats.combatNotes + "】"
+                : "")
+          );
         }, 100);
       }
 
-      if (isCriticalSuccess) {
+      if (isCriticalSuccess && logCritSuccess) {
         setTimeout(() => {
-          addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+          addLog(
+            "combat_sim_log_crit_success",
+            selectedNPC.name +
+              (selectedNPC?.combatStats?.combatNotes
+                ? "【" + selectedNPC.combatStats.combatNotes + "】"
+                : "")
+          );
         }, 100);
       }
     } else {
-      addLog(
-        "combat_sim_log_spell_use",
-        selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
-        clickedData.name,
-        numTargets
-      );
+      if (logSpellUse) {
+        addLog(
+          "combat_sim_log_spell_use",
+          selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : ""),
+          spellData.name,
+          numTargets,
+          {
+            effect: showSpellEffect && spellData.effect ? spellData.effect : "",
+            markdown: true,
+          }
+        );
+      }
     }
     if (autoOpenLogs) {
       openLogs();
@@ -147,6 +195,14 @@ const NPCDetail = ({
       /* close dialog */
       setSelectedNPC(null);
     }
+    if (autoCheckTurnAfterRoll) {
+      setTimeout(() => {
+        checkNewTurn(selectedNPC.combatId);
+      }, 100);
+    }
+
+    // reset numTargets
+    setNumTargets(1);
   };
 
   const handleAttack = (attack, attackType) => {
@@ -160,33 +216,60 @@ const NPCDetail = ({
       isCriticalSuccess,
     } = rollAttack(attack, attackType);
 
-    // Add the attack to the log
-    addLog("combat_sim_log_attack", "--isAttack--", {
-      npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
-      attackName: attack.name,
-      range: attackType === "attack" ? attack.range : attack.weapon.range,
-      damageType: attackType === "attack" ? attack.type : attack.weapon.type,
-      dice1: diceResults.attribute1,
-      dice2: diceResults.attribute2,
-      prec:
-        calcPrecision(attack, selectedNPC) !== 0
-          ? " + " + calcPrecision(attack, selectedNPC)
-          : "",
-      totalHitScore,
-      hr,
-      extraDamage: calcDamage(attack, selectedNPC),
-      damage,
-    });
+    if (logAttack) {
+      // Add the attack to the log
+      addLog("combat_sim_log_attack", "--isAttack--", {
+        npcName:
+          selectedNPC.name +
+          (selectedNPC?.combatStats?.combatNotes
+            ? "【" + selectedNPC.combatStats.combatNotes + "】"
+            : ""),
+        attackName: attack.name,
+        range: attackType === "attack" ? attack.range : attack.weapon.range,
+        damageType: attackType === "attack" ? attack.type : attack.weapon.type,
+        dice1: diceResults.attribute1,
+        dice2: diceResults.attribute2,
+        prec:
+          calcPrecision(attack, selectedNPC) !== 0
+            ? " + " + calcPrecision(attack, selectedNPC)
+            : "",
+        totalHitScore,
+        hr,
+        extraDamage: calcDamage(attack, selectedNPC),
+        damage,
+        attackType,
+        effect:
+          attackType === "attack"
+            ? showBaseAttackEffect && attack.special[0]
+              ? attack.special[0]
+              : ""
+            : showWeaponAttackEffect && attack.special[0]
+            ? attack.special[0]
+            : "",
+      });
+    }
 
-    if (isCriticalFailure) {
+    if (isCriticalFailure && logCritFailure) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+        addLog(
+          "combat_sim_log_crit_failure",
+          selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : "")
+        );
       }, 100);
     }
 
-    if (isCriticalSuccess) {
+    if (isCriticalSuccess && logCritSuccess) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+        addLog(
+          "combat_sim_log_crit_success",
+          selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : "")
+        );
       }, 100);
     }
 
@@ -197,6 +280,12 @@ const NPCDetail = ({
     if (isMobile) {
       /* close dialog */
       setSelectedNPC(null);
+    }
+
+    if (autoCheckTurnAfterRoll) {
+      setTimeout(() => {
+        checkNewTurn(selectedNPC.combatId);
+      }, 100);
     }
   };
 
@@ -310,30 +399,54 @@ const NPCDetail = ({
       `Rolling ${attr1label} (${roll1}) + ${attr2label} (${roll2}) = ${totalHitScore}`
     );
 
-    // log the roll
-    addLog("combat_sim_log_standard_roll", "--isStandardRoll--", {
-      npcName: selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""),
-      dice1: roll1,
-      dice2: roll2,
-      dice1Label: attr1label,
-      dice2Label: attr2label,
-      totalHitScore,
-    });
+    if (logStandardRoll) {
+      // log the roll
+      addLog("combat_sim_log_standard_roll", "--isStandardRoll--", {
+        npcName:
+          selectedNPC.name +
+          (selectedNPC?.combatStats?.combatNotes
+            ? "【" + selectedNPC.combatStats.combatNotes + "】"
+            : ""),
+        dice1: roll1,
+        dice2: roll2,
+        dice1Label: attr1label,
+        dice2Label: attr2label,
+        totalHitScore,
+      });
+    }
 
-    if (isCriticalFailure) {
+    if (isCriticalFailure && logCritFailure) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_failure", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+        addLog(
+          "combat_sim_log_crit_failure",
+          selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : "")
+        );
       }, 100);
     }
 
-    if (isCriticalSuccess) {
+    if (isCriticalSuccess && logCritSuccess) {
       setTimeout(() => {
-        addLog("combat_sim_log_crit_success", selectedNPC.name + (selectedNPC?.combatStats?.combatNotes ? "【" + selectedNPC.combatStats.combatNotes + "】" : ""));
+        addLog(
+          "combat_sim_log_crit_success",
+          selectedNPC.name +
+            (selectedNPC?.combatStats?.combatNotes
+              ? "【" + selectedNPC.combatStats.combatNotes + "】"
+              : "")
+        );
       }, 100);
     }
 
     if (autoOpenLogs) {
       openLogs();
+    }
+
+    if (autoCheckTurnAfterRoll) {
+      setTimeout(() => {
+        checkNewTurn(selectedNPC.combatId);
+      }, 100);
     }
   };
 
@@ -424,7 +537,9 @@ const NPCDetail = ({
               textTransform: "uppercase",
             }}
           >
-            {selectedNPC.name}{selectedNPC?.combatStats?.combatNotes && ` 【${selectedNPC.combatStats.combatNotes}】`}
+            {selectedNPC.name}
+            {selectedNPC?.combatStats?.combatNotes &&
+              ` 【${selectedNPC.combatStats.combatNotes}】`}
           </Typography>
           <Tooltip
             title={t("Close")}
@@ -476,6 +591,7 @@ const NPCDetail = ({
             setClickedData={setClickedData}
             setOpen={setOpen}
             handleAttack={handleAttack}
+            handleSpell={handleConfirmSpell}
           />
         )}
         {tabIndex === 3 && (
@@ -484,6 +600,7 @@ const NPCDetail = ({
             setSelectedNPC={setSelectedNPC}
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
+            addLog={addLog}
           />
         )}
       </Box>
@@ -492,40 +609,61 @@ const NPCDetail = ({
         <Box
           sx={{
             borderTop: "1px solid " + theme.palette.divider,
-            paddingTop: 1,
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingTop: 1,
             marginBottom: 1,
+            paddingX: 3,
           }}
         >
-          <Select
-            value={selectedStudy}
-            onChange={handleStudyChange}
-            size="small"
-            sx={{
-              // when selected, change border color
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDarkMode ? "#fff" : "primary",
-              },
-            }}
-          >
-            <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
-            <MenuItem value={1}>10+</MenuItem>
-            <MenuItem value={2}>13+</MenuItem>
-            <MenuItem value={3}>16+</MenuItem>
-          </Select>
-          <Tooltip title="Download Sheet" placement="bottom">
-            <Button
-              color={isDarkMode ? "white" : "primary"}
-              aria-label="download"
-              onClick={downloadImage}
+          {/* Left side: Select + Download */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Select
+              value={selectedStudy}
+              onChange={handleStudyChange}
+              size="small"
+              sx={{
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: isDarkMode ? "#fff" : "primary",
+                },
+              }}
             >
-              <Download />
-            </Button>
-          </Tooltip>
+              <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
+              <MenuItem value={1}>
+                {studyValues === "default" ? "10+" : "7+"}
+              </MenuItem>
+              <MenuItem value={2}>
+                {studyValues === "default" ? "13+" : "10+"}
+              </MenuItem>
+              <MenuItem value={3}>
+                {studyValues === "default" ? "16+" : "13+"}
+              </MenuItem>
+            </Select>
+
+            <Tooltip title="Download Sheet" placement="bottom">
+              <Button
+                color={isDarkMode ? "white" : "primary"}
+                aria-label="download"
+                onClick={downloadImage}
+              >
+                <Download />
+              </Button>
+            </Tooltip>
+          </Box>
+
+          {/* Right side: Edit button */}
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleEditNPC}
+            startIcon={<Edit />}
+          >
+            {t("Edit")}
+          </Button>
         </Box>
       )}
-      {tabIndex === 2 && !isMobile && (
+      {tabIndex === 2 && !isMobile && !hideLogs && (
         <Box
           sx={{
             borderTop: "1px solid " + theme.palette.divider,
@@ -608,7 +746,7 @@ const NPCDetail = ({
             {t("Cancel")}
           </Button>
           <Button
-            onClick={handleConfirmSpell}
+            onClick={() => handleConfirmSpell(clickedData)}
             variant="contained"
             color="primary"
             sx={{ borderRadius: 2, textTransform: "uppercase", px: 3 }}
@@ -637,7 +775,9 @@ const NPCDetail = ({
           textTransform: "uppercase",
         }}
       >
-        {selectedNPC.name}{selectedNPC?.combatStats?.combatNotes && ` 【${selectedNPC.combatStats.combatNotes}】`}
+        {selectedNPC.name}
+        {selectedNPC?.combatStats?.combatNotes &&
+          ` 【${selectedNPC.combatStats.combatNotes}】`}
         <IconButton onClick={() => setSelectedNPC(null)}>
           <Close />
         </IconButton>
@@ -651,39 +791,60 @@ const NPCDetail = ({
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                   marginY: 1,
+                  marginX: 3,
                 }}
               >
-                <Select
-                  value={selectedStudy}
-                  onChange={handleStudyChange}
-                  size="small"
-                  sx={{
-                    // when selected, change border color
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: isDarkMode ? "#fff" : "primary",
-                    },
-                  }}
-                >
-                  <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
-                  <MenuItem value={1}>7+</MenuItem>
-                  <MenuItem value={2}>10+</MenuItem>
-                  <MenuItem value={3}>13+</MenuItem>
-                </Select>
-                <Tooltip title="Download Sheet" placement="bottom">
-                  <Button
-                    color={isDarkMode ? "white" : "primary"}
-                    aria-label="download"
-                    onClick={downloadImage}
+                {/* Left side: Select + Download */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Select
+                    value={selectedStudy}
+                    onChange={handleStudyChange}
+                    size="small"
+                    sx={{
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: isDarkMode ? "#fff" : "primary",
+                      },
+                    }}
                   >
-                    <Download />
-                  </Button>
-                </Tooltip>
+                    <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
+                    <MenuItem value={1}>
+                      {studyValues === "default" ? "10+" : "7+"}
+                    </MenuItem>
+                    <MenuItem value={2}>
+                      {studyValues === "default" ? "13+" : "10+"}
+                    </MenuItem>
+                    <MenuItem value={3}>
+                      {studyValues === "default" ? "16+" : "13+"}
+                    </MenuItem>
+                  </Select>
+
+                  <Tooltip title="Download Sheet" placement="bottom">
+                    <Button
+                      color={isDarkMode ? "white" : "primary"}
+                      aria-label="download"
+                      onClick={downloadImage}
+                    >
+                      <Download />
+                    </Button>
+                  </Tooltip>
+                </Box>
+
+                {/* Right side: Edit button */}
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleEditNPC}
+                  startIcon={<Edit />}
+                >
+                  {t("Edit")}
+                </Button>
               </Box>
             </Grid>
           )}
-          {tabIndex === 2 && (
+          {tabIndex === 2 && !hideLogs && (
             <Grid item xs={12}>
               <StandardRollsSection
                 selectedNPC={selectedNPC}

@@ -33,6 +33,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
 import EmailIcon from "@mui/icons-material/Email";
 import powered_by_fu from "./powered_by_fu.png";
+import LanguageIcon from "@mui/icons-material/Language";
 
 function Home() {
   const theme = useCustomTheme();
@@ -61,7 +62,7 @@ function Home() {
     },
     {
       image: combat_simulator,
-      link: "/combat",
+      link: "/combat-sim",
       hoverKey: "combat_simulator",
     },
     {
@@ -107,7 +108,11 @@ function Home() {
               setHover("");
             }}
             onClick={() => {
-              navigate(item.link);
+              navigate(item.link, {
+                state: {
+                  from: "/",
+                },
+              });
             }}
           />
         ))}
@@ -380,6 +385,63 @@ function Home() {
           </Grid>
 
           <Grid item xs={12}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                borderRadius: "8px",
+                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
+                transition: "transform 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                },
+              }}
+            >
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  fontWeight: "bold",
+                  color: isDarkMode ? "#e0e0e0" : "#333333",
+                }}
+              >
+                <LanguageIcon
+                  sx={{
+                    verticalAlign: "middle",
+                    mr: 1,
+                    color: isDarkMode ? "#ffb74d" : "#f57c00",
+                  }}
+                />
+                {t("Fabula Ultima Resources")}
+              </Typography>
+
+              <Typography variant="body1" sx={{ mb: 3 }}>
+                {t(
+                  "Access the list of official and homebrew Fabula Ultima resources in multiple languages."
+                )}
+              </Typography>
+
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/resources")}
+                  sx={{
+                    backgroundColor: isDarkMode ? "#ffb74d" : "#f57c00",
+                    "&:hover": {
+                      backgroundColor: isDarkMode ? "#ffca28" : "#ffa726",
+                    },
+                    fontWeight: "bold",
+                    px: 4,
+                    py: 1.5,
+                  }}
+                >
+                  {t("View All Resources")}
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+
+          <Grid item xs={12}>
             <Divider sx={{ marginBottom: 3 }} />
             <Box
               sx={{
@@ -479,10 +541,7 @@ function Home() {
                   src={powered_by_fu}
                   alt="Powered by Fabula Ultima"
                   onClick={() =>
-                    window.open(
-                      "https://need.games/fabula-ultima/",
-                      "_blank"
-                    )
+                    window.open("https://need.games/fabula-ultima/", "_blank")
                   }
                   style={{
                     maxWidth: "200px",

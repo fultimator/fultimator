@@ -1,5 +1,3 @@
-import { Link as RouterLink } from "react-router-dom";
-
 import {
   query,
   collection,
@@ -13,6 +11,7 @@ import React, { useState, useRef } from "react";
 import { firestore } from "../../firebase";
 import { auth } from "../../firebase";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
+import { useNavigate } from "react-router-dom";
 
 import {
   IconButton,
@@ -83,6 +82,7 @@ function Personal({ user }) {
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -265,6 +265,14 @@ function Personal({ user }) {
     setOpen(true);
   };
 
+  const handleNavigation = (path) => {
+    navigate(path, {
+      state: {
+        from: "/pc-gallery",
+      },
+    });
+  };
+
   return (
     <>
       <Alert
@@ -280,7 +288,14 @@ function Personal({ user }) {
         }}
       >
         <Box>
-          <AlertTitle sx={{ fontSize: "1.1rem", fontWeight: "bold", mb: 1, color: "#fff" }}>
+          <AlertTitle
+            sx={{
+              fontSize: "1.1rem",
+              fontWeight: "bold",
+              mb: 1,
+              color: "#fff",
+            }}
+          >
             {t("Help us improve the Character Designer!")}
           </AlertTitle>
           <Typography variant="body2" color="#fff" sx={{ mb: 2 }}>
@@ -417,18 +432,17 @@ function Personal({ user }) {
         </Paper>
       </div>
       {loading && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: 50,
-            }}
-          >
-           <CircularProgress />
-          </div>
-        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 50,
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
       <Grid container spacing={1} sx={{ py: 1 }}>
-        
         {filteredList.map((player, index) => (
           <Grid
             item
@@ -452,8 +466,9 @@ function Personal({ user }) {
               </Tooltip>
               <Tooltip title={t("Edit")}>
                 <IconButton
-                  component={RouterLink}
-                  to={`/pc-gallery/${player.id}`}
+                  onClick={() =>
+                    handleNavigation(`/pc-gallery/${player.id}`)
+                  }
                 >
                   <Edit />
                 </IconButton>
@@ -470,8 +485,7 @@ function Personal({ user }) {
               </Tooltip>
               <Tooltip title={t("Player Sheet")}>
                 <IconButton
-                  component={RouterLink}
-                  to={`/character-sheet/${player.id}`}
+                  onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
                 >
                   <Badge />
                 </IconButton>
