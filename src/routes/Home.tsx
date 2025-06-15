@@ -33,8 +33,6 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
 import EmailIcon from "@mui/icons-material/Email";
 import powered_by_fu from "./powered_by_fu.png";
-import NewsIcon from "@mui/icons-material/Newspaper";
-import LaunchIcon from "@mui/icons-material/Launch";
 import LanguageIcon from "@mui/icons-material/Language";
 
 function Home() {
@@ -78,136 +76,6 @@ function Home() {
       hoverKey: "dice_roller",
     },
   ];
-
-  const [news, setNews] = useState([
-    {
-      id: 1,
-      title: "Welcome to Fultimator 2.0!",
-      date: "2024-01-15",
-      content:
-        "We're excited to announce the latest version of Fultimator with improved character creation tools and enhanced combat simulation features.",
-      isNew: true,
-    },
-    {
-      id: 2,
-      title: "New Adversary Templates Added",
-      date: "2024-01-10",
-      content:
-        "Discover new adversary templates in our compendium, including elemental creatures and mechanical constructs.",
-      isNew: false,
-    },
-    {
-      id: 3,
-      title: "Desktop App Now Available",
-      date: "2024-01-05",
-      content:
-        "Download our new desktop application for Windows, macOS, and Linux for an enhanced offline experience.",
-      isNew: false,
-    },
-  ]);
-
-  // Official Fabula Ultima links by language
-  const officialLinks = {
-    en: [
-      {
-        name: "Core Rulebook (PDF)",
-        url: "https://www.drivethrurpg.com/en/publisher/17072/need-games/category/43538/fabula-ultima-ttjrpg",
-        type: "pdf",
-      },
-      {
-        name: "Core Rulebook (Physical)",
-        url: "https://studio2publishing.com/collections/fabula-ultima",
-        type: "physical",
-      },
-      {
-        name: "Press Start Tutorial",
-        url: "https://www.drivethrurpg.com/en/product/411240/fabula-ultima-ttjrpg-press-start",
-        type: "free",
-      },
-      {
-        name: "Official Website",
-        url: "https://www.needgames.it/fabula-ultima-en",
-        type: "website",
-      },
-    ],
-    it: [
-      {
-        name: "Manuale Base (PDF & Fisico)",
-        url: "https://www.needgames.it/categoria-prodotto/fabula-ultima/",
-        type: "both",
-      },
-      {
-        name: "Premi Start Tutorial",
-        url: "https://www.needgames.it/prodotto/premi-start-fabula-ultima-quickstart-pdf/",
-        type: "free",
-      },
-      {
-        name: "Sito Ufficiale",
-        url: "https://www.needgames.it/giochi/fabula-ultima/",
-        type: "website",
-      },
-    ],
-    fr: [
-      {
-        name: "Livre de Règles (PDF)",
-        url: "https://www.drivethrurpg.com/en/publisher/26836/don-t-panic-games/category/48615/fabula-ultima",
-        type: "pdf",
-      },
-      {
-        name: "Livre de Règles (Physique)",
-        url: "https://www.dontpanicgames.com/fr/nos-jeux/?_sfm_licence=fabulaultima",
-        type: "physical",
-      },
-      {
-        name: "Appuyez sur Start Tutorial",
-        url: "https://www.drivethrurpg.com/en/product/473233/fabula-ultima-appuyez-sur-start",
-        type: "free",
-      },
-    ],
-    de: [
-      {
-        name: "Grundregelwerk (PDF)",
-        url: "https://www.drivethrurpg.com/en/publisher/3444/ulisses-spiele/category/50444/fabula-ultima",
-        type: "pdf",
-      },
-      {
-        name: "Grundregelwerk (Physisch)",
-        url: "https://www.f-shop.de/fabula-ultima/",
-        type: "physical",
-      },
-    ],
-    pl: [
-      {
-        name: "Podstawowa Książka Zasad (PDF)",
-        url: "https://www.drivethrurpg.com/en/publisher/14087/black-monk-games/category/47458/fabula-ultima",
-        type: "pdf",
-      },
-      {
-        name: "Podstawowa Książka Zasad (Fizyczna)",
-        url: "https://blackmonk.pl/92-fabula-ultima",
-        type: "physical",
-      },
-      {
-        name: "Starter Tutorial (PDF)",
-        url: "https://blackmonk.pl/black-monk-games/1907-pdf-fabula-ultima-starter.html",
-        type: "free",
-      },
-    ],
-    "pt-BR": [
-      {
-        name: "Livro Básico (Em Breve)",
-        url: "https://site.jamboeditora.com.br/fabula-ultima/",
-        type: "coming_soon",
-      },
-    ],
-  };
-
-  const getCurrentLanguage = () => {
-    // Assuming you have access to current language from your translation context
-    // Adjust this based on your actual translation setup
-    const currentLang = localStorage.getItem("selectedLanguage") || "en";
-    return officialLinks[currentLang] ? currentLang : "en";
-  };
 
   return (
     <Layout>
@@ -537,103 +405,6 @@ function Home() {
                   color: isDarkMode ? "#e0e0e0" : "#333333",
                 }}
               >
-                <NewsIcon
-                  sx={{
-                    verticalAlign: "middle",
-                    mr: 1,
-                    color: isDarkMode ? "#90caf9" : "#1976d2",
-                  }}
-                />
-                {t("Latest News")}
-              </Typography>
-
-              <Stack spacing={2}>
-                {news.slice(0, 3).map((item) => (
-                  <Box
-                    key={item.id}
-                    sx={{
-                      p: 2,
-                      borderRadius: "4px",
-                      backgroundColor: isDarkMode ? "#424242" : "#f8f9fa",
-                      border: item.isNew
-                        ? `2px solid ${isDarkMode ? "#90caf9" : "#1976d2"}`
-                        : "1px solid transparent",
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: "bold",
-                          color: isDarkMode ? "#e0e0e0" : "#333333",
-                          flex: 1,
-                        }}
-                      >
-                        {item.title}
-                        {item.isNew && (
-                          <Box
-                            component="span"
-                            sx={{
-                              ml: 1,
-                              px: 1,
-                              py: 0.5,
-                              fontSize: "0.75rem",
-                              fontWeight: "bold",
-                              color: "#fff",
-                              backgroundColor: isDarkMode
-                                ? "#90caf9"
-                                : "#1976d2",
-                              borderRadius: "12px",
-                            }}
-                          >
-                            NEW
-                          </Box>
-                        )}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: isDarkMode ? "#b0b0b0" : "#666666",
-                        }}
-                      >
-                        {new Date(item.date).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: isDarkMode ? "#e0e0e0" : "#555555",
-                      }}
-                    >
-                      {item.content}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                borderRadius: "8px",
-                backgroundColor: isDarkMode ? "#333333" : "#ffffff",
-                transition: "transform 0.3s",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                },
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  mb: 2,
-                  fontWeight: "bold",
-                  color: isDarkMode ? "#e0e0e0" : "#333333",
-                }}
-              >
                 <LanguageIcon
                   sx={{
                     verticalAlign: "middle",
@@ -641,65 +412,14 @@ function Home() {
                     color: isDarkMode ? "#ffb74d" : "#f57c00",
                   }}
                 />
-                {t("Official Fabula Ultima Resources")}
+                {t("Fabula Ultima Resources")}
               </Typography>
 
               <Typography variant="body1" sx={{ mb: 3 }}>
                 {t(
-                  "Quick access to official content in your language. Find rulebooks, tutorials, and more."
+                  "Access the list of official and homebrew Fabula Ultima resources in multiple languages."
                 )}
               </Typography>
-
-              <Grid container spacing={2} sx={{ mb: 3 }}>
-                {officialLinks[getCurrentLanguage()]
-                  ?.slice(0, 4)
-                  .map((link, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index}>
-                      <Button
-                        variant="outlined"
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        endIcon={<LaunchIcon />}
-                        fullWidth
-                        disabled={link.type === "coming_soon"}
-                        sx={{
-                          borderColor:
-                            link.type === "coming_soon"
-                              ? isDarkMode
-                                ? "#666"
-                                : "#ccc"
-                              : isDarkMode
-                              ? "#ffb74d"
-                              : "#f57c00",
-                          color:
-                            link.type === "coming_soon"
-                              ? isDarkMode
-                                ? "#666"
-                                : "#ccc"
-                              : isDarkMode
-                              ? "#ffb74d"
-                              : "#f57c00",
-                          "&:hover":
-                            link.type !== "coming_soon"
-                              ? {
-                                  borderColor: isDarkMode
-                                    ? "#ffca28"
-                                    : "#ffa726",
-                                  backgroundColor: "rgba(255, 183, 77, 0.1)",
-                                }
-                              : {},
-                          fontWeight: "bold",
-                          textAlign: "left",
-                          justifyContent: "flex-start",
-                          minHeight: "48px",
-                        }}
-                      >
-                        {link.name}
-                      </Button>
-                    </Grid>
-                  ))}
-              </Grid>
 
               <Box sx={{ display: "flex", justifyContent: "center" }}>
                 <Button
@@ -715,7 +435,7 @@ function Home() {
                     py: 1.5,
                   }}
                 >
-                  {t("View All Resources & Languages")}
+                  {t("View All Resources")}
                 </Button>
               </Box>
             </Paper>
