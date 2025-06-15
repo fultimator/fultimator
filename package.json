@@ -17,6 +17,7 @@
     "@mui/base": "^5.0.0-beta.67",
     "@mui/icons-material": "^5.14.5",
     "@mui/material": "^5.14.5",
+    "@supabase/supabase-js": "^2.49.8",
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
     "axios": "^1.7.4",

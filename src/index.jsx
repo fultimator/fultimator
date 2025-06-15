@@ -51,6 +51,9 @@ const CombatSimulatorEncounters = React.lazy(() =>
 const Generator = React.lazy(() => import("./routes/generator/generator"));
 const Roller = React.lazy(() => import("./routes/roller/roller"));
 const RollerScoped = React.lazy(() => import("./routes/roller/roller-scoped"));
+const Resources = React.lazy(() =>
+  import("./routes/resources/resources")
+);
 
 const themes = {
   Fabula: { light: lightFabula, dark: darkFabula },
@@ -162,6 +165,14 @@ const App = () => {
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <CharacterSheet />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/resources"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <Resources />
                   </Suspense>
                 }
               />
