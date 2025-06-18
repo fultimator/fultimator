@@ -1,5 +1,10 @@
 {
   "version": 1,
-  "include": ["/*"],
-  "exclude": []
+  "routes": [
+    {
+      "handle": "rewrite",
+      "src": "/.*",
+      "dest": "/index.html"
+    }
+  ]
 }
