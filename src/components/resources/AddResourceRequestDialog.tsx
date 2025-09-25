@@ -201,11 +201,6 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!webhookUrl) {
-      setErrorMessage(t("Webhook URL is not configured"));
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
@@ -213,7 +208,61 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
     setIsSubmitting(true);
     setErrorMessage("");
 
-    const embedDescription = `
+    try {
+      // Save submission to submissions table
+      const { data, error } = await supabase
+        .from("submissions")
+        .insert([
+          {
+            title: formData.resourceName,
+            descr_short: formData.description,
+            url: formData.resourceUrl,
+            type: formData.resourceType,
+            language: formData.language,
+            author: formData.author,
+            pricing_type: formData.pricingType,
+            uses_ai_content: formData.usesAIContent,
+            additional_notes: formData.additionalNotes,
+            discord_account: formData.discordAccount,
+            requester_email: userEmail,
+            requester_uuid: userUUID,
+            requester_display_name: user?.displayName,
+            terms_accepted: formData.termsAccepted,
+            contact_consent: formData.contactConsent,
+            license_accepted: formData.licenseAccepted,
+            status: 'pending'
+          }
+        ])
+        .select();
+
+      if (error) {
+        // Handle rate limiting errors specifically
+        if (error.message && error.message.includes('new row violates row-level security policy')) {
+          throw new Error('Rate limit exceeded. Please wait before submitting again. (Max 3 per hour, 10 per day)');
+        }
+        throw new Error(`Submission failed: ${error.message}`);
+      }
+
+      // Try to update author info if possible
+      if (user?.uid) {
+        try {
+          await supabase
+            .from("authors")
+            .upsert({
+              uuid: user.uid,
+              name: user.displayName || formData.author,
+              contact: userEmail,
+            }, {
+              onConflict: 'uuid'
+            });
+        } catch (authorError) {
+          console.warn("Could not update author info:", authorError);
+        }
+      }
+
+      // Also send Discord notification if webhook is configured
+      if (webhookUrl) {
+        const embedDescription = `
 **Resource Details:**
 • **Name:** ${formData.resourceName}
 • **URL:** ${formData.resourceUrl}
@@ -231,44 +280,59 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
 • **Google Phone Number:** ${user?.phoneNumber || "Not provided"}
 • **Google Photo URL:** ${user?.photoURL || "Not provided"}
 
-**Additional Notes:**
+**Additional Details:**
+• **Additional Notes:**
 ${formData.additionalNotes || "None"}
 
 **Confirmations:**
-• Terms Accepted: ✅
-• Responsibility Accepted: ✅
-• Contact Consent: ✅
-• License Compliance: ✅
-• AI Content: ${formData.usesAIContent ? "❌ Contains AI" : "✅ No AI Content"}
-    `.trim();
+• **Terms Accepted:** ✅
+• **Contact Consent:** ✅
+• **License Compliance:** ✅
+• **AI Content:** ${formData.usesAIContent ? "❌ Contains AI" : "✅ No AI Content"}
 
-    const payload = {
-      content: null,
-      embeds: [
-        {
-          title: "📚 New Homebrew Resource Addition Request",
-          description: embedDescription,
-          color: 3447003, // Blue color
-          footer: {
-            text: "Fultimator Resource System",
+
+**Status:** 🟡 Pending Manual Review
+*A moderator will manually add this resource to the database after review.*
+
+**Moderator Instructions:**
+To approve this resource, accept it through moderate submissions dialog or manually add it to the Supabase resources table with:
+- Title: "${formData.resourceName}"
+- URL: "${formData.resourceUrl}"
+- Type: "${formData.resourceType}"
+- Author: "${formData.author}"
+- Language: "${formData.language}"
+- Collection: "homebrew"
+- is_official: false
+- is_visible: true
+      `.trim();
+
+        const payload = {
+          content: null,
+          embeds: [
+            {
+              title: "📚 New Homebrew Resource Submission",
+              description: embedDescription,
+              color: 16776960, // Yellow color for pending
+              footer: {
+                text: "Fultimator Resource System",
+              },
+            },
+          ],
+          username: "Fultimator-Resources",
+          attachments: [],
+        };
+
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        },
-      ],
-      username: "Fultimator-Resources",
-      attachments: [],
-    };
+          body: JSON.stringify(payload),
+        });
 
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`Discord notification failed: HTTP ${response.status}`);
+        }
       }
 
       console.log("Resource request submitted successfully");
@@ -639,8 +703,8 @@ ${formData.additionalNotes || "None"}
           {cooldown > 0
             ? t(`Please wait ${cooldown}s before submitting again`)
             : isSubmitting
-            ? t("Submitting...")
-            : t("Submit Request")}
+              ? t("Submitting...")
+              : t("Submit Request")}
         </Button>
       </DialogActions>
     </Dialog>

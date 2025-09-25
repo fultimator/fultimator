@@ -13,6 +13,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { useTranslate } from "../../translation/translate";
 import ResourceCard from "./ResourceCard";
 import { useTheme } from "@mui/material/styles";
@@ -23,6 +24,8 @@ export default function CommunityResources({
   isMobile,
   expandedLicenseInfo,
   setExpandedLicenseInfo,
+  isModerator,
+  setShowModerationPanel,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -79,34 +82,63 @@ export default function CommunityResources({
               </Typography>
             </Box>
 
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<AddIcon />}
-              onClick={() => setShowAddResourceDialog(true)}
-              sx={{
-                borderRadius: "12px",
-                textTransform: "none",
-                fontWeight: 600,
-                px: 4,
-                py: 1.5,
-                minWidth: isMobile ? "100%" : "auto",
-                background: isDarkMode
-                  ? "linear-gradient(135deg, #3f51b5, #303f9f)"
-                  : "linear-gradient(135deg, #2196f3, #1976d2)",
-                boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
-                "&:hover": {
+            <Box sx={{ display: "flex", gap: 2, flexDirection: isMobile ? "column" : "row" }}>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<AddIcon />}
+                onClick={() => setShowAddResourceDialog(true)}
+                sx={{
+                  borderRadius: "12px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  minWidth: isMobile ? "100%" : "auto",
                   background: isDarkMode
-                    ? "linear-gradient(135deg, #303f9f, #283593)"
-                    : "linear-gradient(135deg, #1976d2, #1565c0)",
-                  boxShadow: "0 6px 16px rgba(33, 150, 243, 0.4)",
-                  transform: "translateY(-1px)",
-                },
-                transition: "all 0.3s ease",
-              }}
-            >
-              {t("Request New Resource")}
-            </Button>
+                    ? "linear-gradient(135deg, #3f51b5, #303f9f)"
+                    : "linear-gradient(135deg, #2196f3, #1976d2)",
+                  boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
+                  "&:hover": {
+                    background: isDarkMode
+                      ? "linear-gradient(135deg, #303f9f, #283593)"
+                      : "linear-gradient(135deg, #1976d2, #1565c0)",
+                    boxShadow: "0 6px 16px rgba(33, 150, 243, 0.4)",
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {t("Request New Resource")}
+              </Button>
+
+              {isModerator && (
+                <Button
+                  variant="outlined"
+                  size="large"
+                  startIcon={<AdminPanelSettingsIcon />}
+                  onClick={() => setShowModerationPanel(true)}
+                  sx={{
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 4,
+                    py: 1.5,
+                    minWidth: isMobile ? "100%" : "auto",
+                    borderColor: isDarkMode ? "#ff9800" : "#ff6f00",
+                    color: isDarkMode ? "#ff9800" : "#ff6f00",
+                    "&:hover": {
+                      borderColor: isDarkMode ? "#ffb74d" : "#e65100",
+                      backgroundColor: isDarkMode ? "rgba(255, 152, 0, 0.1)" : "rgba(255, 111, 0, 0.1)",
+                      transform: "translateY(-1px)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  {t("Moderate Submissions")}
+                </Button>
+              )}
+            </Box>
           </Box>
 
           {/* Integrated License Information */}
@@ -151,9 +183,8 @@ export default function CommunityResources({
               <Box
                 sx={{
                   pt: 2,
-                  borderTop: `1px solid ${
-                    isDarkMode ? "#3f51b530" : "#2196f330"
-                  }`,
+                  borderTop: `1px solid ${isDarkMode ? "#3f51b530" : "#2196f330"
+                    }`,
                 }}
               >
                 <Typography variant="body2" sx={{ mb: 2 }}>

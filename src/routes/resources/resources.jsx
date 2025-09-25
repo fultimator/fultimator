@@ -18,10 +18,12 @@ import OfficialResources from "../../components/resources/OfficialResources";
 import CommunityResources from "../../components/resources/CommunityResources";
 import StatisticsFooter from "../../components/resources/StatisticsFooter";
 import AddResourceRequestDialog from "../../components/resources/AddResourceRequestDialog";
+import ResourceModerationPanel from "../../components/resources/ResourceModerationPanel";
 import { createClient } from "@supabase/supabase-js";
 import { languages } from "../../components/resources/resourceUtils";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase";
+import { moderators } from "../../libs/userGroups";
 
 function Resources() {
   const [user, loadingUser] = useAuthState(auth);
@@ -35,7 +37,11 @@ function Resources() {
   const [error, setError] = useState(null);
 
   const [showAddResourceDialog, setShowAddResourceDialog] = useState(false);
+  const [showModerationPanel, setShowModerationPanel] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  // Check if user is moderator
+  const isModerator = user && moderators.includes(user.uid);
 
   const fetchResources = async () => {
     try {
@@ -103,7 +109,7 @@ function Resources() {
 
   const getTagPriority = (tags) => {
     if (!tags || !Array.isArray(tags)) return 4;
-    
+
     // Higher priority = lower number (sorts first)
     if (tags.includes('corebook')) return 1;
     if (tags.includes('expansion')) return 2;
@@ -121,17 +127,17 @@ function Resources() {
       if (a.collection === 'rulebook' && b.collection === 'rulebook') {
         const aDate = a.publish_date ? new Date(a.publish_date) : null;
         const bDate = b.publish_date ? new Date(b.publish_date) : null;
-        
+
         if (aDate && bDate) {
           return bDate - aDate; // Newest first
         }
-        
+
         // If no dates available, sort by tag priority (corebook, expansion, adventure)
         if (!aDate && !bDate) {
           const tagDiff = getTagPriority(a.tags) - getTagPriority(b.tags);
           if (tagDiff !== 0) return tagDiff;
         }
-        
+
         // If one has date and other doesn't, prioritize the one with date
         if (aDate && !bDate) return -1;
         if (!aDate && bDate) return 1;
@@ -264,12 +270,12 @@ function Resources() {
 
     // Create ordered object with selected language first
     const orderedGrouped = {};
-    
+
     // Add selected language first if it exists
     if (grouped[selectedLanguage]) {
       orderedGrouped[selectedLanguage] = grouped[selectedLanguage];
     }
-    
+
     // Add all other languages in alphabetical order
     Object.keys(grouped)
       .filter(langKey => langKey !== selectedLanguage)
@@ -358,6 +364,8 @@ function Resources() {
           isMobile={isMobile}
           expandedLicenseInfo={expandedLicenseInfo}
           setExpandedLicenseInfo={setExpandedLicenseInfo}
+          isModerator={isModerator}
+          setShowModerationPanel={setShowModerationPanel}
         />
       )}
 
@@ -377,6 +385,12 @@ function Resources() {
         onSuccess={() => {
           setShowSuccessMessage(true);
         }}
+      />
+
+      {/* Resource Moderation Panel */}
+      <ResourceModerationPanel
+        open={showModerationPanel}
+        onClose={() => setShowModerationPanel(false)}
       />
 
       {/* Success Message Snackbar */}
