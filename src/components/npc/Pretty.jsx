@@ -473,7 +473,7 @@ function Stats({ npc }) {
                 py: 0.4,
               }}
             >
-              {npc.armor?.def > 0 ? (
+              {npc.armor?.def > 0 || npc.extra?.defOverride ? (
                 <>
                   {t("DEF")} {calcDef(npc)}
                 </>
@@ -491,7 +491,15 @@ function Stats({ npc }) {
                 py: 0.4,
               }}
             >
-              {t("M.DEF")} +{calcMDef(npc)}
+              {npc.extra?.mDefOverride ? (
+                <>
+                  {t("M.DEF")} {calcMDef(npc)}
+                </>
+              ) : (
+                <>
+                  {t("M.DEF")} +{calcMDef(npc)}
+                </>
+              )}
             </Grid>
           </Grid>
         </Grid>

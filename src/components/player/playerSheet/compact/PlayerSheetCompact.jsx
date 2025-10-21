@@ -115,6 +115,10 @@ export default function PlayerCardSheet({
     const equippedWeapons =
         player.weapons?.filter((weapon) => weapon.isEquipped) || [];
 
+    /* player.customWeapons.isEquipped (can be more than one) */
+    const equippedCustomWeapons =
+        player.customWeapons?.filter((weapon) => weapon.isEquipped) || [];
+
     /* player.accessories.isEquipped (should be only one) */
     const equippedAccessory =
         player.accessories?.find((accessory) => accessory.isEquipped) || null;
@@ -128,6 +132,7 @@ export default function PlayerCardSheet({
     // Gather all equipped items
     const equippedItems = [
         ...equippedWeapons.map(formatItemName),
+        ...equippedCustomWeapons.map(weapon => weapon.name || "Custom Weapon"),
         equippedArmor ? formatItemName(equippedArmor) : null,
         equippedShield ? formatItemName(equippedShield) : null,
         equippedAccessory ? equippedAccessory.name : null,
@@ -213,6 +218,10 @@ export default function PlayerCardSheet({
             (total, weapon) => total + (weapon.defModifier || 0),
             0
         ) +
+        equippedCustomWeapons.reduce(
+            (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
+            0
+        ) +
         dodgeBonus;
 
     const currMDef =
@@ -226,6 +235,10 @@ export default function PlayerCardSheet({
         (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
         equippedWeapons.reduce(
             (total, weapon) => total + (weapon.mDefModifier || 0),
+            0
+        ) +
+        equippedCustomWeapons.reduce(
+            (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
             0
         );
 

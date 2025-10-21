@@ -106,6 +106,19 @@ const BenefitChips = ({ benefits, t }) => {
   const getValueByPath = (obj, path) =>
     path.split(".").reduce((acc, part) => acc?.[part], obj);
 
+  // Helper function to format custom benefit text for compact display
+  const getCustomBenefitDisplayText = (text) => {
+    // Check if this is the Gourmet Projects text
+    if (text.includes("You may start Projects to create unique foods and drinks")) {
+      return "Project";
+    }
+    // Check if this is the HP/MP choice text
+    if (text.includes("You may choose to permanently increase your maximum Hit Points or Mind Points by 5")) {
+      return "HP/MP +5 (Choice)";
+    }
+    return text;
+  };
+
   return (
     <>
       {chipConfigs.map(({ key, label, tooltip }) => {
@@ -123,7 +136,11 @@ const BenefitChips = ({ benefits, t }) => {
       })}
 
       {benefits.custom?.map((text, i) => (
-        <BenefitChip key={`custom-${i}`} label={text} tooltipText={text} />
+        <BenefitChip 
+          key={`custom-${i}`} 
+          label={getCustomBenefitDisplayText(text)} 
+          tooltipText={text} 
+        />
       ))}
     </>
   );

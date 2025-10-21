@@ -72,7 +72,11 @@ export interface NpcExtra {
     init?: boolean,
     precision?: boolean,
     hp?: string,
-    magic?: boolean
+    magic?: boolean,
+    def?: number,
+    mDef?: number,
+    defOverride?: boolean,
+    mDefOverride?: boolean
 }
 
 export interface NpcAffinities {

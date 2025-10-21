@@ -9,6 +9,13 @@ const spellClasses = [
     "magichant",
     "symbol",
     "dance",
+    "gift",
+    "therioform",
+    "pilot-vehicle",
+    "magiseed",
+    "cooking",
+    "invocation",
+    "deck"
 ];
 
 export default spellClasses;

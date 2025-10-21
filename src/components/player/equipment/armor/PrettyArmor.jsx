@@ -142,11 +142,13 @@ export default function PrettyArmor({ armor }) {
                         ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0))
                         : ""}
                       {armor.category === "Armor"
-                        ? armor.mdef + (armor.mDefModifier || 0) === 0
-                          ? t("INS die")
-                          : `${t("INS die")} + ${
-                              armor.mdef + (armor.mDefModifier || 0)
-                            }`
+                        ? armor.martial
+                          ? armor.mdef + (armor.mDefModifier || 0)
+                          : armor.mdef + (armor.mDefModifier || 0) === 0
+                            ? t("INS die")
+                            : `${t("INS die")} + ${
+                                armor.mdef + (armor.mDefModifier || 0)
+                              }`
                         : ""}
                     </Typography>
                   </Grid>

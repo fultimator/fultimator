@@ -31,6 +31,26 @@ import SpellSymbolistSymbolsModal from "./SpellSymbolistSymbolsModal";
 import SpellDancer from "./SpellDancer";
 import SpellDancerModal from "./SpellDancerModal";
 import SpellDancerDancesModal from "./SpellDancerDancesModal";
+import SpellGift from "./SpellGift";
+import SpellGiftModal from "./SpellGiftModal";
+import SpellGiftGiftsModal from "./SpellGiftGiftsModal";
+import SpellMutant from "./SpellMutant";
+import SpellMutantModal from "./SpellMutantModal";
+import SpellMutantTherioformsModal from "./SpellMutantTherioformsModal";
+import SpellPilot from "./SpellPilot";
+import SpellPilotModal from "./SpellPilotModal";
+import SpellPilotVehiclesModal from "./SpellPilotVehiclesModal";
+import SpellMagiseed from "./SpellMagiseed";
+import SpellMagiseedModal from "./SpellMagiseedModal";
+import SpellMagiseedMagiseedsModal from "./SpellMagiseedMagiseedsModal";
+import SpellGourmet from "./SpellGourmet";
+import SpellGourmetModal from "./SpellGourmetModal";
+import SpellGourmetCookingModal from "./SpellGourmetCookingModal";
+import SpellInvoker from "./SpellInvoker";
+import SpellInvokerModal from "./SpellInvokerModal";
+import SpellInvokerInvocationsModal from "./SpellInvokerInvocationsModal";
+import SpellDeck from "./SpellDeck";
+import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
@@ -56,6 +76,19 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [openSymbolSymbolsModal, setOpenSymbolSymbolsModal] = useState(false);
   const [openDancerModal, setOpenDancerModal] = useState(false);
   const [openDancerDancesModal, setOpenDancerDancesModal] = useState(false);
+  const [openGiftModal, setOpenGiftModal] = useState(false);
+  const [openGiftGiftsModal, setOpenGiftGiftsModal] = useState(false);
+  const [openMutantModal, setOpenMutantModal] = useState(false);
+  const [openMutantTherioformsModal, setOpenMutantTherioformsModal] = useState(false);
+  const [openPilotModal, setOpenPilotModal] = useState(false);
+  const [openPilotVehiclesModal, setOpenPilotVehiclesModal] = useState(false);
+  const [openMagiseedModal, setOpenMagiseedModal] = useState(false);
+  const [openMagiseedMagiseedsModal, setOpenMagiseedMagiseedsModal] = useState(false);
+  const [openGourmetModal, setOpenGourmetModal] = useState(false);
+  const [openGourmetCookingModal, setOpenGourmetCookingModal] = useState(false);
+  const [openInvokerModal, setOpenInvokerModal] = useState(false);
+  const [openInvokerInvocationsModal, setOpenInvokerInvocationsModal] = useState(false);
+  const [openDeckModal, setOpenDeckModal] = useState(false);
 
   const [spellBeingEdited, setSpellBeingEdited] = useState(null);
   const [editingSpellClass, setEditingSpellClass] = useState(null);
@@ -352,6 +385,184 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 ],
               };
             }
+          } else if (spell === "gift") {
+            // Check if there's already a gift spell
+            const hasGift = cls.spells.some((sp) => sp.spellType === "gift");
+            if (hasGift) {
+              if (window.electron) {
+                window.electron.alert("You already have a gift spell");
+              } else {
+                alert("You already have a gift spell");
+              }
+              return cls;
+            } else {
+              // Add a new gift spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    gifts: [],
+                  },
+                ],
+              };
+            }
+          } else if (spell === "therioform") {
+            // Check if there's already a mutant spell
+            const hasTherioform = cls.spells.some((sp) => sp.spellType === "therioform");
+            if (hasTherioform) {
+              if (window.electron) {
+                window.electron.alert("You already have a mutant spell");
+              } else {
+                alert("You already have a mutant spell");
+              }
+              return cls;
+            } else {
+              // Add a new mutant spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    therioforms: [],
+                  },
+                ],
+              };
+            }
+          } else if (spell === "pilot-vehicle") {
+            // Check if there's already a pilot spell
+            const hasPilot = cls.spells.some((sp) => sp.spellType === "pilot-vehicle");
+            if (hasPilot) {
+              if (window.electron) {
+                window.electron.alert("You already have a pilot spell");
+              } else {
+                alert("You already have a pilot spell");
+              }
+              return cls;
+            } else {
+              // Add a new pilot spell
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    vehicles: [],
+                  },
+                ],
+              };
+            }
+          } else if (spell === "magiseed") {
+            const hasMagiseed = cls.spells.some((sp) => sp.spellType === "magiseed");
+            if (hasMagiseed) {
+              if (window.electron) {
+                window.electron.alert("You already have a magiseed spell");
+              } else {
+                alert("You already have a magiseed spell");
+              }
+              return cls;
+            } else {
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    showInPlayerSheet: true,
+                    availableMagiseeds: [],
+                    currentMagiseed: null,
+                    growthClock: 0,
+                    gardenDescription: "",
+                  },
+                ],
+              };
+            }
+          } else if (spell === "cooking") {
+            const hasCooking = cls.spells.some((sp) => sp.spellType === "cooking");
+            if (hasCooking) {
+              if (window.electron) {
+                window.electron.alert("You already have a cooking spell");
+              } else {
+                alert("You already have a cooking spell");
+              }
+              return cls;
+            } else {
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    spellName: "New Cooking Spell",
+                    mp: 0,
+                    target: "",
+                    attr: "will",
+                    cookbookEffects: [],
+                    showInPlayerSheet: true,
+                  },
+                ],
+              };
+            }
+          } else if (spell === "invocation") {
+            const hasInvocation = cls.spells.some((sp) => sp.spellType === "invocation");
+            if (hasInvocation) {
+              if (window.electron) {
+                window.electron.alert("You already have an invocation spell");
+              } else {
+                alert("You already have an invocation spell");
+              }
+              return cls;
+            } else {
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: spell,
+                    spellName: "Invocation",
+                    invocations: [],
+                    activeWellsprings: [],
+                    showInPlayerSheet: true,
+                  },
+                ],
+              };
+            }
+          } else if (spell === "deck") {
+            const hasDeck = cls.spells.some((sp) => sp.spellType === "deck");
+            if (hasDeck) {
+              if (window.electron) {
+                window.electron.alert("You already have a deck spell");
+              } else {
+                alert("You already have a deck spell");
+              }
+              return cls;
+            } else {
+              return {
+                ...cls,
+                spells: [
+                  ...cls.spells,
+                  {
+                    spellType: "deck",
+                    spellName: "Ace of Cards Deck",
+                    suitConfiguration: {
+                      Air: 'air',
+                      Earth: 'earth',
+                      Fire: 'fire',
+                      Ice: 'ice'
+                    },
+                    cardsInDeck: 30,
+                    hand: [],
+                    discardPile: [],
+                    showInPlayerSheet: true,
+                  },
+                ],
+              };
+            }
           } else {
             if (window.electron) {
               window.electron.alert(
@@ -530,6 +741,331 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setEditingSpellIndex(spellIndex);
     setOpenDancerDancesModal(true);
   };
+  const handleEditGiftSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenGiftModal(true);
+  };
+  const handleEditGiftGifts = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenGiftGiftsModal(true);
+  };
+  const handleEditMutantSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenMutantModal(true);
+  };
+  const handleEditMutantTherioforms = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenMutantTherioformsModal(true);
+  };
+
+  const handleEditPilotSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenPilotModal(true);
+  };
+
+  const handleEditPilotVehicles = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenPilotVehiclesModal(true);
+  };
+
+  const handleEditMagiseedSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenMagiseedModal(true);
+  };
+
+  const handleEditGourmetSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenGourmetModal(true);
+  };
+
+  const handleEditGourmetCooking = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenGourmetCookingModal(true);
+  };
+
+  const handleEditInvokerSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenInvokerModal(true);
+  };
+
+  const handleEditInvokerInvocations = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenInvokerInvocationsModal(true);
+  };
+
+  const handleEditDeckSpell = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenDeckModal(true);
+  };
+
+  const handleDeckUpdate = (spellClass, spellIndex, updatedDeck) => {
+    setPlayer(prev => ({
+      ...prev,
+      classes: prev.classes.map(cls => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, idx) => 
+              idx === spellIndex ? { ...spell, ...updatedDeck } : spell
+            )
+          };
+        }
+        return cls;
+      })
+    }));
+  };
+
+  const handleWellspringToggle = (className, spellIndex, wellspringName) => {
+    setPlayer(prev => ({
+      ...prev,
+      classes: prev.classes.map(cls => {
+        if (cls.name === className) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, idx) => {
+              if (idx === spellIndex && spell.spellType === "invocation") {
+                const currentWellsprings = spell.activeWellsprings || [];
+                const hasInnerWellspring = spell.innerWellspring && spell.chosenWellspring;
+                const isInnerWellspring = hasInnerWellspring && spell.chosenWellspring === wellspringName;
+                
+                // Don't allow toggling the inner wellspring
+                if (isInnerWellspring) {
+                  return spell;
+                }
+                
+                let newWellsprings;
+                
+                if (currentWellsprings.includes(wellspringName)) {
+                  // Remove wellspring
+                  newWellsprings = currentWellsprings.filter(w => w !== wellspringName);
+                } else {
+                  // Add wellspring, but limit to 2
+                  if (currentWellsprings.length < 2) {
+                    newWellsprings = [...currentWellsprings, wellspringName];
+                  } else {
+                    // Replace the first wellspring with the new one
+                    newWellsprings = [currentWellsprings[1], wellspringName];
+                  }
+                }
+                
+                return {
+                  ...spell,
+                  activeWellsprings: newWellsprings,
+                };
+              }
+              return spell;
+            })
+          };
+        }
+        return cls;
+      })
+    }));
+  };
+
+  const handleEditMagiseedMagiseeds = (spell, spellClass, spellIndex) => {
+    setSpellBeingEdited(spell);
+    setEditingSpellClass(spellClass);
+    setEditingSpellIndex(spellIndex);
+    setOpenMagiseedMagiseedsModal(true);
+  };
+
+  const handleMagiseedChange = (spellClass, spellIndex, newMagiseed) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, spellIdx) => {
+              if (spellIdx === spellIndex && spell.spellType === "magiseed") {
+                return {
+                  ...spell,
+                  currentMagiseed: newMagiseed,
+                };
+              }
+              return spell;
+            }),
+          };
+        }
+        return cls;
+      }),
+    }));
+  };
+
+  const handleGrowthClockChange = (spellClass, spellIndex, newValue) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, spellIdx) => {
+              if (spellIdx === spellIndex && spell.spellType === "magiseed") {
+                return {
+                  ...spell,
+                  growthClock: newValue,
+                };
+              }
+              return spell;
+            }),
+          };
+        }
+        return cls;
+      }),
+    }));
+  };
+
+  const handlePilotModuleChange = (spellClass, spellIndex, vehicleIndex, moduleIndex, field, value) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, spellIdx) => {
+              if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
+                const updatedVehicles = [...spell.vehicles];
+                const updatedModules = [...updatedVehicles[vehicleIndex].modules];
+                
+                if (field === "equipped") {
+                  const module = updatedModules[moduleIndex];
+                  
+                  if (value) {
+                    // Equipping - determine default slot
+                    if (module.type === "pilot_module_armor") {
+                      module.equippedSlot = "armor";
+                    } else if (module.type === "pilot_module_weapon" || module.type === "pilot_module_shield") {
+                      module.equippedSlot = module.cumbersome ? "both" : "main";
+                    } else if (module.type === "pilot_module_support") {
+                      module.equippedSlot = "support";
+                    }
+                    
+                    // If weapon is cumbersome, disable other weapon modules
+                    if (module.cumbersome && (module.type === "pilot_module_weapon" || module.type === "pilot_module_shield")) {
+                      updatedModules.forEach((otherModule, otherIndex) => {
+                        if (otherIndex !== moduleIndex && 
+                            (otherModule.type === "pilot_module_weapon" || otherModule.type === "pilot_module_shield")) {
+                          otherModule.equipped = false;
+                          otherModule.enabled = false;
+                          otherModule.equippedSlot = null;
+                        }
+                      });
+                    }
+                  } else {
+                    // Unequipping
+                    module.equippedSlot = null;
+                  }
+                  
+                  module.equipped = value;
+                  module.enabled = value;
+                } else if (field === "equippedSlot") {
+                  // Handle equipped slot changes with smart swapping logic
+                  const module = updatedModules[moduleIndex];
+                  module.equippedSlot = value;
+                  
+                  // Smart weapon hand swapping logic
+                  if (module.type === "pilot_module_weapon" && !module.isShield && !module.cumbersome) {
+                    // Find other equipped weapons that are not shields or cumbersome
+                    updatedModules.forEach((otherModule, otherIndex) => {
+                      if (otherIndex !== moduleIndex && 
+                          otherModule.equipped && 
+                          otherModule.type === "pilot_module_weapon" &&
+                          !otherModule.isShield && 
+                          !otherModule.cumbersome) {
+                        
+                        // If we're switching to main hand and other weapon is in main hand
+                        if (value === "main" && otherModule.equippedSlot === "main") {
+                          otherModule.equippedSlot = "off";
+                        }
+                        // If we're switching to off hand and other weapon is in off hand  
+                        else if (value === "off" && otherModule.equippedSlot === "off") {
+                          otherModule.equippedSlot = "main";
+                        }
+                      }
+                    });
+                  }
+                } else {
+                  // Handle other field changes
+                  updatedModules[moduleIndex][field] = value;
+                }
+                
+                updatedVehicles[vehicleIndex].modules = updatedModules;
+                
+                // Update enabled modules list for display
+                const enabledModules = updatedVehicles[vehicleIndex].modules
+                  .filter((m) => m.enabled || m.equipped)
+                  .map((m) => m.name === "pilot_custom_module" ? m.customName : m.name);
+                updatedVehicles[vehicleIndex].enabledModules = enabledModules;
+                
+                return {
+                  ...spell,
+                  vehicles: updatedVehicles,
+                };
+              }
+              return spell;
+            }),
+          };
+        }
+        return cls;
+      }),
+    }));
+  };
+
+  const handlePilotVehicleChange = (spellClass, spellIndex, vehicleIndex, field, value) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, spellIdx) => {
+              if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
+                const updatedVehicles = [...spell.vehicles];
+                
+                if (field === "enabled") {
+                  // Only one vehicle can be enabled at a time
+                  updatedVehicles.forEach((vehicle, idx) => {
+                    vehicle.enabled = idx === vehicleIndex ? value : false;
+                  });
+                }
+                
+                return {
+                  ...spell,
+                  vehicles: updatedVehicles,
+                };
+              }
+              return spell;
+            }),
+          };
+        }
+        return cls;
+      }),
+    }));
+  };
 
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
     setPlayer((prev) => ({
@@ -592,6 +1128,19 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setOpenSymbolSymbolsModal(false);
     setOpenDancerModal(false);
     setOpenDancerDancesModal(false);
+    setOpenGiftModal(false);
+    setOpenGiftGiftsModal(false);
+    setOpenMutantModal(false);
+    setOpenMutantTherioformsModal(false);
+    setOpenPilotModal(false);
+    setOpenPilotVehiclesModal(false);
+    setOpenMagiseedModal(false);
+    setOpenMagiseedMagiseedsModal(false);
+    setOpenGourmetModal(false);
+    setOpenGourmetCookingModal(false);
+    setOpenInvokerModal(false);
+    setOpenInvokerInvocationsModal(false);
+    setOpenDeckModal(false);
     setEditingSpellClass(null);
   };
 
@@ -706,6 +1255,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             magichant: false,
             symbol: false,
             dance: false,
+            gift: false,
+            therioform: false,
+            pilot: false,
+            magiseed: false,
+            cooking: false,
+            invocation: false,
+            deck: false,
           };
 
           return (
@@ -819,6 +1375,69 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                     headerText={t("dance_dance")}
                                   />
                                   {(spellTypeHeaders.dance = true)}
+                                </>
+                              )}
+                            {spell.spellType === "gift" &&
+                              !spellTypeHeaders.gift && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("esper_gift")}
+                                  />
+                                  {(spellTypeHeaders.gift = true)}
+                                </>
+                              )}
+                            {spell.spellType === "therioform" &&
+                              !spellTypeHeaders.therioform && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("mutant_therioforms")}
+                                  />
+                                  {(spellTypeHeaders.therioform = true)}
+                                </>
+                              )}
+                            {spell.spellType === "pilot-vehicle" &&
+                              !spellTypeHeaders.pilot && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("pilot_vehicles")}
+                                  />
+                                  {(spellTypeHeaders.pilot = true)}
+                                </>
+                              )}
+                            {spell.spellType === "magiseed" &&
+                              !spellTypeHeaders.magiseed && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("magiseed_garden")}
+                                  />
+                                  {(spellTypeHeaders.magiseed = true)}
+                                </>
+                              )}
+                            {spell.spellType === "cooking" &&
+                              !spellTypeHeaders.cooking && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("gourmet_cookbook")}
+                                  />
+                                  {(spellTypeHeaders.cooking = true)}
+                                </>
+                              )}
+                            {spell.spellType === "invocation" &&
+                              !spellTypeHeaders.invocation && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("invoker_invocation")}
+                                  />
+                                  {(spellTypeHeaders.invocation = true)}
+                                </>
+                              )}
+                            {spell.spellType === "deck" &&
+                              !spellTypeHeaders.deck && (
+                                <>
+                                  <CustomHeader2
+                                    headerText={t("ace_deck_of_cards")}
+                                  />
+                                  {(spellTypeHeaders.deck = true)}
                                 </>
                               )}
                           </div>
@@ -956,6 +1575,114 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               }
                               onEditDances={() =>
                                 handleEditDancerDances(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "gift" && (
+                            <SpellGift
+                              gift={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditGiftSpell(spell, cls.name, index)
+                              }
+                              onEditGifts={() =>
+                                handleEditGiftGifts(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "therioform" && (
+                            <SpellMutant
+                              mutant={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditMutantSpell(spell, cls.name, index)
+                              }
+                              onEditTherioforms={() =>
+                                handleEditMutantTherioforms(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "pilot-vehicle" && (
+                            <SpellPilot
+                              pilot={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditPilotSpell(spell, cls.name, index)
+                              }
+                              onEditVehicles={() =>
+                                handleEditPilotVehicles(spell, cls.name, index)
+                              }
+                              onModuleChange={(vehicleIndex, moduleIndex, field, value) =>
+                                handlePilotModuleChange(cls.name, index, vehicleIndex, moduleIndex, field, value)
+                              }
+                              onVehicleChange={(vehicleIndex, field, value) =>
+                                handlePilotVehicleChange(cls.name, index, vehicleIndex, field, value)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "magiseed" && (
+                            <SpellMagiseed
+                              magiseed={spell}
+                              key={index}
+                              onEdit={() =>
+                                handleEditMagiseedSpell(spell, cls.name, index)
+                              }
+                              onEditMagiseeds={() =>
+                                handleEditMagiseedMagiseeds(spell, cls.name, index)
+                              }
+                              onMagiseedChange={(newMagiseed) =>
+                                handleMagiseedChange(cls.name, index, newMagiseed)
+                              }
+                              onGrowthClockChange={(newValue) =>
+                                handleGrowthClockChange(cls.name, index, newValue)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "cooking" && (
+                            <SpellGourmet
+                              spell={spell}
+                              key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                              onEdit={() =>
+                                handleEditGourmetSpell(spell, cls.name, index)
+                              }
+                              onEditCooking={() =>
+                                handleEditGourmetCooking(spell, cls.name, index)
+                              }
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "invocation" && (
+                            <SpellInvoker
+                              invoker={spell}
+                              key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                              onEdit={() =>
+                                handleEditInvokerSpell(spell, cls.name, index)
+                              }
+                              onEditInvocations={() =>
+                                handleEditInvokerInvocations(spell, cls.name, index)
+                              }
+                              onWellspringToggle={(wellspringName) =>
+                                handleWellspringToggle(cls.name, index, wellspringName)
+                              }
+                              player={player}
+                              index={index}
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {spell.spellType === "deck" && (
+                            <SpellDeck
+                              deck={spell}
+                              key={`${cls.name}-deck-${index}-${spell.spellName}`}
+                              onEdit={() =>
+                                handleEditDeckSpell(spell, cls.name, index)
+                              }
+                              onDeckUpdate={(updatedDeck) =>
+                                handleDeckUpdate(cls.name, index, updatedDeck)
                               }
                               isEditMode={isEditMode}
                             />
@@ -1130,6 +1857,174 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         }}
         onSave={handleSaveEditedSpell}
         dance={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellGiftModal
+        open={openGiftModal}
+        onClose={() => {
+          setOpenGiftModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        gift={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellGiftGiftsModal
+        open={openGiftGiftsModal}
+        onClose={() => {
+          setOpenGiftGiftsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        gift={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellMutantModal
+        open={openMutantModal}
+        onClose={() => {
+          setOpenMutantModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellMutantTherioformsModal
+        open={openMutantTherioformsModal}
+        onClose={() => {
+          setOpenMutantTherioformsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellPilotModal
+        open={openPilotModal}
+        onClose={() => {
+          setOpenPilotModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellPilotVehiclesModal
+        open={openPilotVehiclesModal}
+        onClose={() => {
+          setOpenPilotVehiclesModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellMagiseedModal
+        open={openMagiseedModal}
+        onClose={() => {
+          setOpenMagiseedModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellMagiseedMagiseedsModal
+        open={openMagiseedMagiseedsModal}
+        onClose={() => {
+          setOpenMagiseedMagiseedsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellGourmetModal
+        open={openGourmetModal}
+        onClose={() => {
+          setOpenGourmetModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        player={player}
+        onPlayerUpdate={setPlayer}
+      />
+      <SpellGourmetCookingModal
+        open={openGourmetCookingModal}
+        onClose={() => {
+          setOpenGourmetCookingModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={(cookbookEffects, inventory, spellData) => {
+          const updatedSpell = { 
+            ...spellBeingEdited, 
+            cookbookEffects,
+            ingredientInventory: inventory || [],
+            ...spellData
+          };
+          handleSaveEditedSpell(editingSpellIndex, updatedSpell);
+        }}
+        cookbookEffects={spellBeingEdited?.cookbookEffects || []}
+        ingredientInventory={spellBeingEdited?.ingredientInventory || []}
+        player={player}
+        onPlayerUpdate={setPlayer}
+        spell={spellBeingEdited}
+      />
+      <SpellInvokerModal
+        open={openInvokerModal}
+        onClose={() => {
+          setOpenInvokerModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellInvokerInvocationsModal
+        open={openInvokerInvocationsModal}
+        onClose={() => {
+          setOpenInvokerInvocationsModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        invoker={{ ...spellBeingEdited, index: editingSpellIndex }}
+      />
+      <SpellDeckModal
+        open={openDeckModal}
+        onClose={() => {
+          setOpenDeckModal(false);
+          setEditingSpellClass(null);
+          setSpellBeingEdited(null);
+        }}
+        onSave={handleSaveEditedSpell}
+        onDelete={(spellIndex) =>
+          handleDeleteSpell(spellIndex, editingSpellClass)
+        }
+        deck={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellCompendiumModal
         open={openCompendiumModal}

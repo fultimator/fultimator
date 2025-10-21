@@ -32,7 +32,7 @@ const translate = (key) => {
   return data.find((item) => item.key === key);
 };
 
-const replaceKey = (key, noSpan, language) => {
+const replaceKey = (key, noSpan, language, params) => {
   if (debugMode) {
     if (!translate(key) || !translate(key)[language]) {
       if (!window.allUntranslatedKeys) {
@@ -43,13 +43,21 @@ const replaceKey = (key, noSpan, language) => {
     }
 
     if (noSpan) {
-      return !translate(key)
+      let text = !translate(key)
         ? key + "***NO_KEY***"
         : !translate(key)[language]
         ? key + "***NO_TRANSLATION**"
         : translate(key)[language]
         ? translate(key)[language] + "*TRANSLATED*"
         : key;
+      
+      // Handle parameter substitution
+      if (params && Array.isArray(params)) {
+        params.forEach((param, index) => {
+          text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
+        });
+      }
+      return text;
     } else {
       return !translate(key) ? (
         <span style={{ color: "red" }}>{key}</span>
@@ -62,9 +70,17 @@ const replaceKey = (key, noSpan, language) => {
       );
     }
   } else {
-    return translate(key) && translate(key)[language]
+    let text = translate(key) && translate(key)[language]
       ? translate(key)[language]
       : key;
+    
+    // Handle parameter substitution
+    if (params && Array.isArray(params)) {
+      params.forEach((param, index) => {
+        text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
+      });
+    }
+    return text;
   }
 };
 
@@ -82,14 +98,14 @@ export const useTranslate = (allowedLanguages) => {
   ) {
     setLanguage("en");
   }
-  const t = (key, noSpan) => {
-    return replaceKey(key, noSpan, language);
+  const t = (key, params, noSpan) => {
+    return replaceKey(key, noSpan, language, params);
   };
 
   return { t };
 };
 
-export const t = (key, noSpan, allowedLanguages) => {
+export const t = (key, params, noSpan, allowedLanguages) => {
   let language = localStorage.getItem("selectedLanguage") || "en";
   if (
     allowedLanguages &&
@@ -98,7 +114,7 @@ export const t = (key, noSpan, allowedLanguages) => {
   ) {
     language = "en";
   }
-  return replaceKey(key, noSpan, language);
+  return replaceKey(key, noSpan, language, params);
 };
 
 export const replacePlaceholders = (translatedText, replacements) => {

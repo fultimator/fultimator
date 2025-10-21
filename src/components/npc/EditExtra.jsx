@@ -152,8 +152,10 @@ const Defenses = React.memo(({ npc, setNpc }) => {
     return "00";
   }, [npc.extra]);
 
+  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
+
   return (
-    <FormControl>
+    <FormControl disabled={isDefenseOverridden}>
       <FormLabel id="extra-defenses">{t("Defenses")}</FormLabel>
       <RadioGroup
         size="small"
@@ -356,8 +358,10 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
     armor = baseArmors[0];
   }
 
+  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
+
   return (
-    <FormControl fullWidth sx={{ mt: 1 }}>
+    <FormControl fullWidth sx={{ mt: 1 }} disabled={isDefenseOverridden}>
       <InputLabel id="type">{t("Armor")}</InputLabel>
       <Select
         size="medium"
@@ -366,6 +370,7 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
         value={armor.name}
         label={t("Armor")}
         onChange={onChange}
+        disabled={isDefenseOverridden}
       >
         {options}
       </Select>
@@ -405,8 +410,10 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
     shield = baseShields[0];
   }
 
+  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
+
   return (
-    <FormControl fullWidth sx={{ mt: 1 }}>
+    <FormControl fullWidth sx={{ mt: 1 }} disabled={isDefenseOverridden}>
       <InputLabel id="type">{t("Shield")}</InputLabel>
       <Select
         size="medium"
@@ -415,6 +422,7 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
         value={shield.name}
         label={t("Shield")}
         onChange={onChange}
+        disabled={isDefenseOverridden}
       >
         {options}
       </Select>

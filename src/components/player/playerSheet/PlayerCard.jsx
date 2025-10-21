@@ -168,12 +168,14 @@ export default function PlayerCard({
     </Box>
   );
 
-  // Retrieve equipped armor, shields, weapons, and accessories
+  // Retrieve equipped armor, shields, weapons, accessories, and custom weapons
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
   const equippedShields =
     player.shields?.filter((shield) => shield.isEquipped) || [];
   const equippedWeapons =
     player.weapons?.filter((weapon) => weapon.isEquipped) || [];
+  const equippedCustomWeapons =
+    player.customWeapons?.filter((weapon) => weapon.isEquipped) || [];
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
@@ -209,6 +211,10 @@ export default function PlayerCard({
       (total, weapon) => total + (weapon.defModifier || 0),
       0
     ) +
+    equippedCustomWeapons.reduce(
+      (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
+      0
+    ) +
     dodgeBonus;
 
   const currMDef =
@@ -223,6 +229,10 @@ export default function PlayerCard({
     (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
+      0
+    ) +
+    equippedCustomWeapons.reduce(
+      (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
       0
     );
 
