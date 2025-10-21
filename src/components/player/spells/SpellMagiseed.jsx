@@ -243,7 +243,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "flex-start",
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>

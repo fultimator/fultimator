@@ -405,6 +405,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     spellType: spell,
                     showInPlayerSheet: true,
                     gifts: [],
+                    clock: 0,
                   },
                 ],
               };
@@ -928,6 +929,29 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 return {
                   ...spell,
                   growthClock: newValue,
+                };
+              }
+              return spell;
+            }),
+          };
+        }
+        return cls;
+      }),
+    }));
+  };
+
+  const handleGiftClockChange = (spellClass, spellIndex, newValue) => {
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name === spellClass) {
+          return {
+            ...cls,
+            spells: cls.spells.map((spell, spellIdx) => {
+              if (spellIdx === spellIndex && spell.spellType === "gift") {
+                return {
+                  ...spell,
+                  clock: newValue,
                 };
               }
               return spell;
@@ -1588,6 +1612,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               }
                               onEditGifts={() =>
                                 handleEditGiftGifts(spell, cls.name, index)
+                              }
+                              onClockChange={(newValue) =>
+                                handleGiftClockChange(cls.name, index, newValue)
                               }
                               isEditMode={isEditMode}
                             />
