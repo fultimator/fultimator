@@ -32,20 +32,29 @@ export default function PlayerCustomWeapons({
 
     // Check if any customizations make this weapon martial
     const martialCustomizations = ['weapon_customization_quick', 'weapon_customization_magicdefenseboost', 'weapon_customization_powerful'];
-    const isMartial = customWeapon.customizations && customWeapon.customizations.some(c => martialCustomizations.includes(c.name));
-    
+    const isMartialFromCustomization = customWeapon.customizations && customWeapon.customizations.some(c => martialCustomizations.includes(c.name));
+    const isMartial = customWeapon.martial || isMartialFromCustomization;
+
     // If the weapon is not martial, it is always equippable
     if (!isMartial) {
       return true;
     }
 
+    const isRanged = customWeapon.range === "weapon_range_ranged";
+    const isMelee =
+      customWeapon.range === "weapon_range_melee" ||
+      customWeapon.range === "weapon_range_reach";
+
     // Iterate through each class to check if the weapon is equippable based on their benefits
     for (const playerClass of classes) {
       const { benefits } = playerClass;
 
-      // Check if the class benefits allow equipping martial weapons
+      // Check if the class benefits allow equipping armor, shields, melee, or ranged weapons
       if (benefits.martials) {
-        if (isMartial && benefits.martials.melee) {
+        if (
+          (isMelee && benefits.martials.melee) ||
+          (isRanged && benefits.martials.ranged)
+        ) {
           return true;
         }
       }

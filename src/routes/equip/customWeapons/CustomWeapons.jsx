@@ -47,6 +47,7 @@ function CustomWeapons() {
   const [weaponName, setWeaponName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [selectedRange, setSelectedRange] = useState(range[0]);
+  const [martial, setMartial] = useState(false);
   const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(accuracyChecks[0]);
   const [selectedType, setSelectedType] = useState(types[0]);
   const [currentCustomizations, setCurrentCustomizations] = useState([]);
@@ -59,6 +60,7 @@ function CustomWeapons() {
   const [secondWeaponName, setSecondWeaponName] = useState("");
   const [secondSelectedCategory, setSecondSelectedCategory] = useState(categories[0]);
   const [secondSelectedRange, setSecondSelectedRange] = useState(range[0]);
+  const [secondMartial, setSecondMartial] = useState(false);
   const [secondSelectedAccuracyCheck, setSecondSelectedAccuracyCheck] = useState(accuracyChecks[0]);
   const [secondSelectedType, setSecondSelectedType] = useState(types[0]);
   const [secondCurrentCustomizations, setSecondCurrentCustomizations] = useState([]);
@@ -202,6 +204,7 @@ function CustomWeapons() {
     setWeaponName("");
     setSelectedCategory(categories[0]);
     setSelectedRange(range[0]);
+    setMartial(false);
     setSelectedAccuracyCheck(accuracyChecks[0]);
     setSelectedType(types[0]);
     setCurrentCustomizations([]);
@@ -213,6 +216,7 @@ function CustomWeapons() {
     setSecondWeaponName("");
     setSecondSelectedCategory(categories[0]);
     setSecondSelectedRange(range[0]);
+    setSecondMartial(false);
     setSecondSelectedAccuracyCheck(accuracyChecks[0]);
     setSecondSelectedType(types[0]);
     setSecondCurrentCustomizations([]);
@@ -254,6 +258,7 @@ function CustomWeapons() {
       setWeaponName("");
       setSelectedCategory("");
       setSelectedRange("");
+      setMartial(false);
       setSelectedAccuracyCheck(accuracyChecks[0]);
       setSelectedType("");
       setCurrentCustomizations([]);
@@ -269,6 +274,9 @@ function CustomWeapons() {
         }
         if (data.range && range.includes(data.range)) {
           setSelectedRange(data.range);
+        }
+        if (data.martial) {
+          setMartial(data.martial);
         }
         if (data.accuracyCheck && data.accuracyCheck.att1 && data.accuracyCheck.att2) {
           const matchingCheck = accuracyChecks.find(
@@ -335,6 +343,9 @@ function CustomWeapons() {
         }
         if (data.secondSelectedRange && range.includes(data.secondSelectedRange)) {
           setSecondSelectedRange(data.secondSelectedRange);
+        }
+        if (data.secondMartial) {
+          setSecondMartial(data.secondMartial);
         }
         if (data.secondSelectedAccuracyCheck) {
           const matchingCheck = accuracyChecks.find(
@@ -494,6 +505,20 @@ function CustomWeapons() {
                 onChange={(e) => setSelectedRange(e.target.value)}
               />
             </Grid>
+
+            {selectedRange === "weapon_range_ranged" && (
+              <Grid item xs={12} sm={6}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={martial}
+                      onChange={(e) => setMartial(e.target.checked)}
+                    />
+                  }
+                  label={t("Requires Martial Proficiency")}
+                />
+              </Grid>
+            )}
 
             <Grid item xs={12} sm={6}>
               <ChangeAccuracyCheck
@@ -717,6 +742,20 @@ function CustomWeapons() {
                   />
                 </Grid>
 
+                {secondSelectedRange === "weapon_range_ranged" && (
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={secondMartial}
+                          onChange={(e) => setSecondMartial(e.target.checked)}
+                        />
+                      }
+                      label={t("Requires Martial Proficiency")}
+                    />
+                  </Grid>
+                )}
+
                 <Grid item xs={12} sm={6}>
                   <ChangeAccuracyCheck
                     value={secondSelectedAccuracyCheck}
@@ -922,6 +961,7 @@ function CustomWeapons() {
                 name: weaponName,
                 category: selectedCategory,
                 range: selectedRange,
+                martial: martial,
                 accuracyCheck: selectedAccuracyCheck,
                 type: selectedType,
                 customizations: currentCustomizations,
@@ -948,6 +988,7 @@ function CustomWeapons() {
                     name: secondWeaponName,
                     category: secondSelectedCategory,
                     range: secondSelectedRange,
+                    martial: secondMartial,
                     accuracyCheck: secondSelectedAccuracyCheck,
                     type: secondSelectedType,
                     customizations: secondCurrentCustomizations,
@@ -983,6 +1024,7 @@ function CustomWeapons() {
                     name: weaponName,
                     category: selectedCategory,
                     range: selectedRange,
+                    martial: martial,
                     accuracyCheck: selectedAccuracyCheck,
                     type: selectedType,
                     customizations: currentCustomizations,
@@ -993,6 +1035,7 @@ function CustomWeapons() {
                     name: secondWeaponName,
                     category: secondSelectedCategory,
                     range: secondSelectedRange,
+                    martial: secondMartial,
                     accuracyCheck: secondSelectedAccuracyCheck,
                     type: secondSelectedType,
                     customizations: secondCurrentCustomizations,

@@ -70,7 +70,7 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
     let totalCost = baseCost;
     let damage = 5;
     let precision = 0;
-    let isMartial = false;
+    let isMartial = weaponData.martial || false;
     let damageType = weaponData.type || "physical";
 
     weaponData.customizations?.forEach((customization) => {
