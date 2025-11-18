@@ -435,7 +435,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
                   >
                     {/* Description */}
                     <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 2 }}>
-                      {seed.description || (magiseedTemplate && t(magiseedTemplate.description)) || t("No description available")}
+                      {seed.description ? t(seed.description) : (magiseedTemplate && t(magiseedTemplate.description)) || t("No description available")}
                     </Typography>
                     
                     {/* Effect Range */}
