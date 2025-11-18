@@ -99,9 +99,18 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
     const module = vehicle.modules[moduleIndex];
     const frameType = getModuleTypeForLimits(module);
     const frameLimits = getFrameLimits(vehicle);
+    const maxEnabledModules = vehicle.maxEnabledModules || (frameLimits.weapon + frameLimits.armor);
 
-    // Custom modules are always allowed
-    if (frameType === "custom") return true;
+    // Calculate total equipped modules
+    const equippedWeapons = getEquippedCount(vehicle, "weapon");
+    const equippedArmor = getEquippedCount(vehicle, "armor");
+    const equippedSupport = getEquippedCount(vehicle, "support");
+    const totalEquippedModules = equippedWeapons + equippedArmor + equippedSupport;
+
+    // If we are trying to equip a new module and we are at or over the max, we can't.
+    if (!module.equipped && totalEquippedModules >= maxEnabledModules) {
+        return false;
+    }
 
     // Check if unlimited slots for this type
     if (frameLimits[frameType] === -1) return true; // Unlimited
@@ -344,7 +353,16 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                         const passengers = frame.passengers;
                         const distance = frame.distance;
 
-                        return `${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(passengers)} | ${t("pilot_distance")}: ${getDistanceText(distance)}`;
+                        // Calculate total equipped modules
+                        const equippedWeapons = getEquippedCount(vehicle, "weapon");
+                        const equippedArmor = getEquippedCount(vehicle, "armor");
+                        const equippedSupport = getEquippedCount(vehicle, "support");
+                        const total = equippedWeapons + equippedArmor + equippedSupport;
+
+                        // Use maxEnabledModules from vehicle data, or calculate it if not present
+                        const maxDisplay = vehicle.maxEnabledModules || (frame.limits.weapon + frame.limits.armor);
+
+                        return `${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(passengers)} | ${t("pilot_distance")}: ${getDistanceText(distance)} | ${t("pilot_max_enabled_modules")}: ${total}/${maxDisplay}`;
                       })()}
                     </Typography>
                   </div>

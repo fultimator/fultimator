@@ -65,6 +65,7 @@ export const vehicleReducer = (state, action) => {
             frame: "pilot_frame_exoskeleton",
             modules: [],
             enabledModules: [],
+            maxEnabledModules: 3,
           },
         ],
       };
@@ -256,6 +257,9 @@ export const vehicleReducer = (state, action) => {
 };
 
 export const createInitialState = (pilot) => ({
-  currentVehicles: pilot?.vehicles || [],
+  currentVehicles: pilot?.vehicles?.map(vehicle => ({
+    ...vehicle,
+    maxEnabledModules: vehicle.maxEnabledModules ?? 3,
+  })) || [],
   showInPlayerSheet: pilot ? !!pilot.showInPlayerSheet : true,
 });

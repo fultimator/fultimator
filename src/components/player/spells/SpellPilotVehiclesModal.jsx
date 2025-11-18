@@ -114,6 +114,18 @@ export default function SpellPilotVehiclesModal({
 
   const canEquipModule = useCallback((vehicle, moduleIndex) => {
     const module = vehicle.modules[moduleIndex];
+    const maxEnabledModules = vehicle.maxEnabledModules || 3; // Default to 3 if not set
+
+    // Calculate total equipped modules, excluding the current one if it's already equipped
+    const totalEquippedModules = vehicle.modules.filter((m, idx) => 
+      m.equipped && idx !== moduleIndex
+    ).length;
+
+    // If trying to equip a new module and maxEnabledModules limit is reached
+    if (!module.equipped && totalEquippedModules >= maxEnabledModules) {
+      return false;
+    }
+
     const frameType = getModuleTypeForLimits(module);
     const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton", vehicle);
     
@@ -351,6 +363,22 @@ export default function SpellPilotVehiclesModal({
                               </div>
                             );
                           })()}
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            fullWidth
+                            label={t("pilot_max_enabled_modules")}
+                            type="number"
+                            inputProps={{ min: 3 }}
+                            value={vehicle.maxEnabledModules || 3}
+                            onChange={(e) =>
+                              handleVehicleChange(
+                                vehicleIndex,
+                                "maxEnabledModules",
+                                parseInt(e.target.value, 10)
+                              )
+                            }
+                          />
                         </Grid>
                       </Grid>
                     </Grid>
