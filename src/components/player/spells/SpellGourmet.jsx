@@ -10,19 +10,109 @@ import {
 } from "@mui/material";
 import { Edit, VisibilityOff } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import {
+  getStatusEffects,
+  getDamageTypes,
+  getAttributes,
+} from "../../../libs/gourmetCookingData";
 
 export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
+  // ReactMarkdown component configuration for consistent styling
+  const MarkdownComponents = {
+    p: (props) => <span style={{ margin: 0, padding: 0 }} {...props} />,
+    strong: (props) => <strong {...props} />,
+    em: (props) => <em {...props} />
+  };
+
+  // Helper function to get effect choices
+  const getEffectChoices = (effectText, t) => {
+    const choices = [];
+    
+    // Safety check: ensure effectText is a string
+    if (!effectText || typeof effectText !== 'string') {
+      return choices;
+    }
+    
+    if (effectText.includes(t("gourmet_delicacy_effect_choose_all_statuses"))) {
+      choices.push({ type: "statusEffect", options: getStatusEffects(t) });
+    } else if (effectText.includes(t("gourmet_delicacy_effect_choose_some_statuses"))) {
+      choices.push({ type: "statusEffect", options: [t("dazed"), t("shaken"), t("slow"), t("weak")] });
+    }
+    
+    if (effectText.includes(t("gourmet_delicacy_effect_choose_damage_type"))) {
+      choices.push({ type: "damageType", options: getDamageTypes(t) });
+    }
+    
+    if (effectText.includes(t("gourmet_delicacy_effect_choose_attributte"))) {
+      choices.push({ type: "attribute", options: getAttributes(t) });
+    }
+    
+    return choices;
+  };
+
+  // Helper function to render effect with custom choices
+  const renderEffectWithChoices = (effect, t) => {
+    const choices = getEffectChoices(effect.effect, t);
+    
+    let displayText = effect.effect;
+    
+    // Replace choice placeholders with selected values
+    choices.forEach(choice => {
+      const selectedValue = effect.customChoices[choice.type];
+      if (selectedValue) {
+        if (choice.type === "statusEffect") {
+          displayText = displayText.replace(
+            new RegExp(t("gourmet_delicacy_effect_choose_all_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            selectedValue
+          ).replace(
+            new RegExp(t("gourmet_delicacy_effect_choose_some_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            selectedValue
+          );
+        } else if (choice.type === "damageType") {
+          displayText = displayText.replace(
+            new RegExp(t("gourmet_delicacy_effect_choose_damage_type").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            selectedValue
+          );
+        } else if (choice.type === "attribute") {
+          displayText = displayText.replace(
+            new RegExp(t("gourmet_delicacy_effect_choose_attributte").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            selectedValue
+          );
+        }
+      }
+    });
+    
+    // Return ReactMarkdown component for proper rendering of markdown syntax
+    return <ReactMarkdown components={MarkdownComponents}>{displayText}</ReactMarkdown>;
+  };
+
   // Memoize spell data to prevent unnecessary re-renders
   const spellData = useMemo(() => {
     if (!spell) return null;
     
+    // Convert cookbook effects from object format to array for display
+    let cookbookEffectsArray = [];
+    if (spell.cookbookEffects) {
+      cookbookEffectsArray = Object.entries(spell.cookbookEffects).map(([key, data]) => ({
+        tasteCombination: data.taste1 && data.taste2 
+          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+          : key.split('_').map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' + '),
+        effect: data.effect,
+        customChoices: data.customChoices || {},
+        taste1: data.taste1,
+        taste2: data.taste2,
+        key: key
+      }));
+    }
+    
     return {
       name: spell.spellName || "Unnamed Cooking Spell",
-      cookbookEffects: spell.cookbookEffects || [],
+      cookbookEffects: cookbookEffectsArray,
       showInPlayerSheet: spell.showInPlayerSheet !== false,
     };
   }, [spell]);
@@ -140,7 +230,7 @@ export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode 
         {spellData.cookbookEffects.length > 0 ? (
           spellData.cookbookEffects.map((effect, index) => (
             <Box
-              key={`effect-${index}`}
+              key={effect.key || `effect-${index}`}
               sx={{
                 background: theme.ternary,
                 borderTop: `1px solid white`,
@@ -148,7 +238,7 @@ export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode 
                 px: 2,
                 py: 0.5,
                 display: "flex",
-                gap: 2,
+                // gap: 2,
               }}
             >
               <Box sx={{ width: { xs: "30%", md: "25%" } }}>
@@ -167,7 +257,7 @@ export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode 
                     fontSize: { xs: "0.8rem", sm: "1rem" },
                   }}
                 >
-                  {effect.effect || "—"}
+                  {renderEffectWithChoices(effect, t)}
                 </Typography>
               </Box>
             </Box>

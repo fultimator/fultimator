@@ -65,15 +65,17 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
       .filter(selected => selected.amount > 0)
       .forEach(selected => {
         const ingredient = inventory.find(i => i.id === selected.id);
-        if (ingredient?.taste && ingredient.taste.trim() && ingredient.taste !== t("gourmet_taste_your_choice")) {
+        if (ingredient?.taste && ingredient.taste.trim() && ingredient.taste !== "choice") {
           // Add the taste multiple times based on the amount selected
+          // Capitalize for display but store as lowercase
+          const displayTaste = ingredient.taste.charAt(0).toUpperCase() + ingredient.taste.slice(1).toLowerCase();
           for (let i = 0; i < selected.amount; i++) {
-            tastes.push(ingredient.taste);
+            tastes.push(displayTaste);
           }
         }
       });
     setSelectedTastesPreview(tastes);
-  }, [selectedIngredients, inventory, t]);
+  }, [selectedIngredients, inventory]);
 
   const updateSelectedIngredient = (id, amount) => {
     const existing = selectedIngredients.find(s => s.id === id);
@@ -108,7 +110,7 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
   // Find all possible 2-ingredient combinations from selected tastes
   const possibleCombinations = [];
   const addedCombinations = new Set(); // Track to avoid duplicates
-  
+
   if (selectedTastesPreview.length >= 2) {
     // Generate all pairs of tastes
     for (let i = 0; i < selectedTastesPreview.length; i++) {
@@ -118,9 +120,9 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
         
         // Find matching combination in taste combinations list
         const foundCombo = getTasteCombinations(t).find(combo => {
-          const combinationTastes = combo.combination.split(' + ').map(t => t.trim());
-          const cleanTaste1 = taste1.trim();
-          const cleanTaste2 = taste2.trim();
+          const combinationTastes = combo.combination.split(' + ').map(t => t.trim().toLowerCase());
+          const cleanTaste1 = taste1.trim().toLowerCase();
+          const cleanTaste2 = taste2.trim().toLowerCase();
           
           // For exact matching, check if the combination contains exactly these two tastes
           return (
@@ -131,7 +133,6 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
             )
           );
         });
-        
         
         if (foundCombo && !addedCombinations.has(foundCombo.combination)) {
           addedCombinations.add(foundCombo.combination);
@@ -218,14 +219,16 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
                             
                             // Map stored taste values to localized display names
                             const tasteMap = {
-                              "Bitter": t("gourmet_taste_bitter"),
-                              "Salty": t("gourmet_taste_salty"), 
-                              "Sour": t("gourmet_taste_sour"),
-                              "Sweet": t("gourmet_taste_sweet"),
-                              "Umami": t("gourmet_taste_umami")
+                              "bitter": t("gourmet_taste_bitter"),
+                              "salty": t("gourmet_taste_salty"), 
+                              "sour": t("gourmet_taste_sour"),
+                              "sweet": t("gourmet_taste_sweet"),
+                              "umami": t("gourmet_taste_umami")
                             };
                             
-                            return tasteMap[ingredient.taste] || ingredient.taste;
+                            // Fallback to capitalize first letter if not found in map
+                            return tasteMap[ingredient.taste.toLowerCase()] || 
+                                  ingredient.taste.charAt(0).toUpperCase() + ingredient.taste.slice(1).toLowerCase();
                           })()}
                         </Typography>
                       </TableCell>
@@ -236,23 +239,28 @@ function CookingTab({ inventory, onCook, effects, renderEffectWithChoices, allYo
                       </TableCell>
                       <TableCell align="center">
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, justifyContent: "center" }}>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => updateSelectedIngredient(ingredient.id, Math.max(0, amount - 1))}
-                            disabled={amount <= 0 || ingredient.taste === t("gourmet_taste_your_choice")}
-                          >
-                            <Remove />
-                          </IconButton>
-                          <Typography variant="body2" sx={{ minWidth: "24px", textAlign: "center", fontWeight: "bold" }}>
-                            {amount}
-                          </Typography>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => updateSelectedIngredient(ingredient.id, Math.min(ingredient.quantity, amount + 1))}
-                            disabled={amount >= ingredient.quantity || (amount === 0 && totalSelectedIngredients >= maxIngredients) || ingredient.taste === t("gourmet_taste_your_choice")}
-                          >
-                            <Add />
-                          </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => updateSelectedIngredient(ingredient.id, Math.max(0, amount - 1))}
+                          disabled={amount <= 0 || ingredient.taste === "choice" || !ingredient.taste}
+                        >
+                          <Remove />
+                        </IconButton>
+                        <Typography variant="body2" sx={{ minWidth: "24px", textAlign: "center", fontWeight: "bold" }}>
+                          {amount}
+                        </Typography>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => updateSelectedIngredient(ingredient.id, Math.min(ingredient.quantity, amount + 1))}
+                          disabled={
+                            amount >= ingredient.quantity || 
+                            (amount === 0 && totalSelectedIngredients >= maxIngredients) || 
+                            ingredient.taste === "choice" || 
+                            !ingredient.taste
+                          }
+                        >
+                          <Add />
+                        </IconButton>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -434,9 +442,34 @@ export default function SpellGourmetCookingModal({
   }, [spell?.usedAllYouCanEat]);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
 
+  // Helper to generate taste combination key
+  const generateTasteKey = (taste1, taste2) => {
+    const t1 = taste1.toLowerCase();
+    const t2 = taste2.toLowerCase();
+    // Sort alphabetically for consistency
+    return t1 <= t2 ? `${t1}_${t2}` : `${t2}_${t1}`;
+  };
+
+  // Helper to extract tastes from combination string
+  const getTastesFromCombination = (combination) => {
+    const parts = combination.split(' + ').map(t => t.trim().toLowerCase());
+    return parts.length === 2 ? { taste1: parts[0], taste2: parts[1] } : null;
+  };
+
   useEffect(() => {
-    if (cookbookEffects.length > 0) {
-      setEffects([...cookbookEffects]);
+    if (cookbookEffects && typeof cookbookEffects === 'object' && !Array.isArray(cookbookEffects)) {
+      // New object format: { "bitter_salty": { effect: "...", taste1: "bitter", taste2: "salty", customChoices: {} } }
+      const effectsArray = Object.entries(cookbookEffects).map(([key, data]) => ({
+        tasteCombination: data.taste1 && data.taste2 
+          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+          : key.split('_').map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' + '),
+        effect: data.effect,
+        customChoices: data.customChoices || {},
+        taste1: data.taste1,
+        taste2: data.taste2,
+        key: key
+      }));
+      setEffects(effectsArray);
     } else {
       setEffects([]);
     }
@@ -474,10 +507,14 @@ export default function SpellGourmetCookingModal({
   const addCombinationEffect = (combination) => {
     const existingEffect = effects.find(e => e.tasteCombination === combination.combination);
     if (!existingEffect) {
+      const tastes = getTastesFromCombination(combination.combination);
       const newEffect = {
         tasteCombination: combination.combination,
         effect: "",
         customChoices: {},
+        taste1: tastes?.taste1 || "",
+        taste2: tastes?.taste2 || "",
+        key: combination.key
       };
       setEffects([...effects, newEffect]);
     }
@@ -518,7 +555,22 @@ export default function SpellGourmetCookingModal({
   };
 
   const handleSave = () => {
-    onSave(effects, inventory);
+    // Convert effects array to object format for storage
+    const effectsObject = {};
+    effects.forEach(effect => {
+      const tastes = getTastesFromCombination(effect.tasteCombination);
+      if (tastes) {
+        const key = generateTasteKey(tastes.taste1, tastes.taste2);
+        effectsObject[key] = {
+          taste1: tastes.taste1,
+          taste2: tastes.taste2,
+          effect: effect.effect,
+          customChoices: effect.customChoices || {}
+        };
+      }
+    });
+    
+    onSave(effectsObject, inventory, { usedAllYouCanEat });
   };
 
   // Ingredient inventory management functions
@@ -546,7 +598,7 @@ export default function SpellGourmetCookingModal({
         id: Date.now(),
         name: `${rolledIngredient.name}`,
         quantity: 1,
-        taste: rolledIngredient.name,
+        taste: rolledIngredient.name.toLowerCase(),
       };
       setInventory([...inventory, newIngredient]);
       setRollResultOpen(false);
@@ -559,7 +611,7 @@ export default function SpellGourmetCookingModal({
         id: Date.now() + index,
         name: `${ingredient.name}`,
         quantity: 1,
-        taste: ingredient.name,
+        taste: ingredient.name.toLowerCase(),
       }));
       setInventory([...inventory, ...newIngredients]);
       setRollResultOpen(false);
@@ -574,7 +626,7 @@ export default function SpellGourmetCookingModal({
         id: Date.now(),
         name: `${randomTaste.name}`,
         quantity: 1,
-        taste: randomTaste.name,
+        taste: randomTaste.name.toLowerCase(),
       };
       setInventory([...inventory, newIngredient]);
       
@@ -597,7 +649,7 @@ export default function SpellGourmetCookingModal({
         id: Date.now(),
         name: `${taste}`,
         quantity: 1,
-        taste: taste,
+        taste: taste.toLowerCase(),
       };
       setInventory([...inventory, newIngredient]);
       
@@ -618,7 +670,7 @@ export default function SpellGourmetCookingModal({
   const updateIngredientTaste = (id, taste) => {
     setInventory(inventory.map(ingredient => 
       ingredient.id === id 
-        ? { ...ingredient, taste }
+        ? { ...ingredient, taste: taste.toLowerCase() }
         : ingredient
     ));
   };
@@ -645,7 +697,7 @@ export default function SpellGourmetCookingModal({
       .filter(selected => selected.amount > 0)
       .map(selected => {
         const ingredient = inventory.find(i => i.id === selected.id);
-        return ingredient?.taste;
+        return ingredient?.taste ? ingredient.taste.toLowerCase() : null;
       })
       .filter(taste => taste && taste.trim())
       .slice(0, 2); // Maximum 2 tastes for combination
@@ -653,7 +705,7 @@ export default function SpellGourmetCookingModal({
     if (tastes.length === 2) {
       const combination = getTasteCombinations(t).find(combo => {
         // Parse tastes from combination string (e.g., "Bitter + Sweet" -> ["Bitter", "Sweet"])
-        const combinationTastes = combo.combination.split(' + ');
+        const combinationTastes = combo.combination.split(' + ').map(t => t.trim().toLowerCase());
         return (
           (combinationTastes.includes(tastes[0]) && combinationTastes.includes(tastes[1])) ||
           (combinationTastes.includes(tastes[1]) && combinationTastes.includes(tastes[0]))
@@ -661,7 +713,21 @@ export default function SpellGourmetCookingModal({
       });
       
       if (combination) {
-        addCombinationEffect(combination);
+        const tastesData = getTastesFromCombination(combination.combination);
+        const existingEffect = effects.find(e => e.tasteCombination === combination.combination);
+        
+        if (!existingEffect) {
+          const newEffect = {
+            tasteCombination: combination.combination,
+            effect: "",
+            customChoices: {},
+            taste1: tastesData?.taste1 || "",
+            taste2: tastesData?.taste2 || "",
+            key: combination.key
+          };
+          setEffects([...effects, newEffect]);
+        }
+        
         setActiveTab(0); // Switch back to cookbook tab
       }
     }
@@ -680,7 +746,7 @@ export default function SpellGourmetCookingModal({
       if (existingEffect) {
         // Show confirmation dialog for overwrite
         if (window.confirm(
-          `${t("gourmet_delete_effect_confirm_1")}:\n\n"${existingEffect.effect}"\n\n${t("gourmet_delete_effect_confirm_1")}?`
+          `${t("gourmet_delete_effect_confirm_1")}:\n\n"${existingEffect.effect}"\n\n${t("gourmet_delete_effect_confirm_2")}?`
         )) {
           // Update existing effect
           updateEffectText(combination, `#${rollResult.effectData.id} - ${rollResult.effectData.effect}`);
@@ -689,10 +755,16 @@ export default function SpellGourmetCookingModal({
         }
       } else {
         // Add new effect
+        const tastes = getTastesFromCombination(combination);
+        const key = tastes ? generateTasteKey(tastes.taste1, tastes.taste2) : null;
+        
         const newEffect = {
           tasteCombination: combination,
           effect: `#${rollResult.effectData.id} - ${rollResult.effectData.effect}`,
           customChoices: {},
+          taste1: tastes?.taste1 || "",
+          taste2: tastes?.taste2 || "",
+          key: key
         };
         setEffects([...effects, newEffect]);
         setCombinationSelectOpen(false);
@@ -711,10 +783,15 @@ export default function SpellGourmetCookingModal({
           updateEffectText(rollResult.targetCombination, `#${rollResult.effectData.id} - ${rollResult.effectData.effect}`);
         } else {
           // Add new effect for this combination
+          const tastes = getTastesFromCombination(rollResult.targetCombination);
+          const key = tastes ? generateTasteKey(tastes.taste1, tastes.taste2) : null;
           const newEffect = {
             tasteCombination: rollResult.targetCombination,
             effect: `#${rollResult.effectData.id} - ${rollResult.effectData.effect}`,
             customChoices: {},
+            taste1: tastes?.taste1 || "",
+            taste2: tastes?.taste2 || "",
+            key: key
           };
           setEffects([...effects, newEffect]);
         }
@@ -1266,17 +1343,20 @@ export default function SpellGourmetCookingModal({
                       <TableCell>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
                           <Select
-                            value={ingredient.taste}
+                            value={ingredient.taste || ""}
                             onChange={(e) => updateIngredientTaste(ingredient.id, e.target.value)}
                             displayEmpty
                           >
+                            <MenuItem value="">
+                              <em>{t("gourmet_taste_no_assigned")}</em>
+                            </MenuItem>
                             {getIngredientTastes(t)
                               .filter(taste => taste.name !== t("gourmet_taste_your_choice"))
                               .map((taste) => (
-                              <MenuItem key={taste.id} value={taste.name}>
-                                {taste.name}
-                              </MenuItem>
-                            ))}
+                                <MenuItem key={taste.id} value={taste.name.toLowerCase()}>
+                                  {taste.name}
+                                </MenuItem>
+                              ))}
                           </Select>
                         </FormControl>
                       </TableCell>
@@ -1513,7 +1593,7 @@ export default function SpellGourmetCookingModal({
                 .map((taste) => {
                   // Count how many ingredients of this taste the player has
                   const currentAmount = inventory.filter(ingredient => 
-                    ingredient.taste === taste.name && ingredient.quantity > 0
+                    ingredient.taste && ingredient.taste.toLowerCase() === taste.name.toLowerCase() && ingredient.quantity > 0
                   ).reduce((total, ingredient) => total + ingredient.quantity, 0);
                   
                   return (

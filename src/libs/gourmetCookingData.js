@@ -121,42 +121,56 @@ export const ingredientTastes = [
   { id: 6, name: "choice" }
 ];
 
+// Add a new helper function to convert taste names to keys
+export const generateTasteKey = (taste1, taste2) => {
+  const t1 = taste1.toLowerCase();
+  const t2 = taste2.toLowerCase();
+  // Sort alphabetically to ensure consistency
+  return t1 <= t2 ? `${t1}_${t2}` : `${t2}_${t1}`;
+};
+
+// Add new helper to get individual taste from key
+export const getTastesFromKey = (key) => {
+  const [taste1, taste2] = key.split('_');
+  return { taste1, taste2 };
+};
+
 // All possible taste combinations (15 total)
 export const getTasteCombinations = (t) => [
-  { combination: t("gourmet_bitter_bitter"), key: "bitter_bitter" },
-  { combination: t("gourmet_bitter_salty"), key: "bitter_salty" },
-  { combination: t("gourmet_bitter_sour"), key: "bitter_sour" },
-  { combination: t("gourmet_bitter_sweet"), key: "bitter_sweet" },
-  { combination: t("gourmet_bitter_umami"), key: "bitter_umami" },
-  { combination: t("gourmet_salty_salty"), key: "salty_salty" },
-  { combination: t("gourmet_salty_sour"), key: "salty_sour" },
-  { combination: t("gourmet_salty_sweet"), key: "salty_sweet" },
-  { combination: t("gourmet_salty_umami"), key: "salty_umami" },
-  { combination: t("gourmet_sour_sour"), key: "sour_sour" },
-  { combination: t("gourmet_sour_sweet"), key: "sour_sweet" },
-  { combination: t("gourmet_sour_umami"), key: "sour_umami" },
-  { combination: t("gourmet_sweet_sweet"), key: "sweet_sweet" },
-  { combination: t("gourmet_sweet_umami"), key: "sweet_umami" },
-  { combination: t("gourmet_umami_umami"), key: "umami_umami" }
+  { combination: t("gourmet_bitter_bitter"), key: "bitter_bitter", taste1: "bitter", taste2: "bitter" },
+  { combination: t("gourmet_bitter_salty"), key: "bitter_salty", taste1: "bitter", taste2: "salty" },
+  { combination: t("gourmet_bitter_sour"), key: "bitter_sour", taste1: "bitter", taste2: "sour" },
+  { combination: t("gourmet_bitter_sweet"), key: "bitter_sweet", taste1: "bitter", taste2: "sweet" },
+  { combination: t("gourmet_bitter_umami"), key: "bitter_umami", taste1: "bitter", taste2: "umami" },
+  { combination: t("gourmet_salty_salty"), key: "salty_salty", taste1: "salty", taste2: "salty" },
+  { combination: t("gourmet_salty_sour"), key: "salty_sour", taste1: "salty", taste2: "sour" },
+  { combination: t("gourmet_salty_sweet"), key: "salty_sweet", taste1: "salty", taste2: "sweet" },
+  { combination: t("gourmet_salty_umami"), key: "salty_umami", taste1: "salty", taste2: "umami" },
+  { combination: t("gourmet_sour_sour"), key: "sour_sour", taste1: "sour", taste2: "sour" },
+  { combination: t("gourmet_sour_sweet"), key: "sour_sweet", taste1: "sour", taste2: "sweet" },
+  { combination: t("gourmet_sour_umami"), key: "sour_umami", taste1: "sour", taste2: "umami" },
+  { combination: t("gourmet_sweet_sweet"), key: "sweet_sweet", taste1: "sweet", taste2: "sweet" },
+  { combination: t("gourmet_sweet_umami"), key: "sweet_umami", taste1: "sweet", taste2: "umami" },
+  { combination: t("gourmet_umami_umami"), key: "umami_umami", taste1: "umami", taste2: "umami" }
 ];
 
 // Fallback for components that don't have access to translation function
 export const tasteCombinations = [
-  { combination: "Bitter + Bitter", key: "bitter_bitter" },
-  { combination: "Bitter + Salty", key: "bitter_salty" },
-  { combination: "Bitter + Sour", key: "bitter_sour" },
-  { combination: "Bitter + Sweet", key: "bitter_sweet" },
-  { combination: "Bitter + Umami", key: "bitter_umami" },
-  { combination: "Salty + Salty", key: "salty_salty" },
-  { combination: "Salty + Sour", key: "salty_sour" },
-  { combination: "Salty + Sweet", key: "salty_sweet" },
-  { combination: "Salty + Umami", key: "salty_umami" },
-  { combination: "Sour + Sour", key: "sour_sour" },
-  { combination: "Sour + Sweet", key: "sour_sweet" },
-  { combination: "Sour + Umami", key: "sour_umami" },
-  { combination: "Sweet + Sweet", key: "sweet_sweet" },
-  { combination: "Sweet + Umami", key: "sweet_umami" },
-  { combination: "Umami + Umami", key: "umami_umami" }
+  { combination: "Bitter + Bitter", key: "bitter_bitter", taste1: "bitter", taste2: "bitter" },
+  { combination: "Bitter + Salty", key: "bitter_salty", taste1: "bitter", taste2: "salty" },
+  { combination: "Bitter + Sour", key: "bitter_sour", taste1: "bitter", taste2: "sour" },
+  { combination: "Bitter + Sweet", key: "bitter_sweet", taste1: "bitter", taste2: "sweet" },
+  { combination: "Bitter + Umami", key: "bitter_umami", taste1: "bitter", taste2: "umami" },
+  { combination: "Salty + Salty", key: "salty_salty", taste1: "salty", taste2: "salty" },
+  { combination: "Salty + Sour", key: "salty_sour", taste1: "salty", taste2: "sour" },
+  { combination: "Salty + Sweet", key: "salty_sweet", taste1: "salty", taste2: "sweet" },
+  { combination: "Salty + Umami", key: "salty_umami", taste1: "salty", taste2: "umami" },
+  { combination: "Sour + Sour", key: "sour_sour", taste1: "sour", taste2: "sour" },
+  { combination: "Sour + Sweet", key: "sour_sweet", taste1: "sour", taste2: "sweet" },
+  { combination: "Sour + Umami", key: "sour_umami", taste1: "sour", taste2: "umami" },
+  { combination: "Sweet + Sweet", key: "sweet_sweet", taste1: "sweet", taste2: "sweet" },
+  { combination: "Sweet + Umami", key: "sweet_umami", taste1: "sweet", taste2: "umami" },
+  { combination: "Umami + Umami", key: "umami_umami", taste1: "umami", taste2: "umami" }
 ];
 
 // Status effects for delicacy effect options

@@ -31,9 +31,10 @@ export default function SpellGourmetModal({
       mp: 0,
       target: "",
       attr: "will",
-      cookbookEffects: [],
+      cookbookEffects: {},
       showInPlayerSheet: true,
       allYouCanEat: false,
+      usedAllYouCanEat: false,
     }
   );
   const [cookingModalOpen, setCookingModalOpen] = useState(false);
@@ -45,10 +46,11 @@ export default function SpellGourmetModal({
         mp: spell.mp || 0,
         target: spell.target || "",
         attr: spell.attr || "will",
-        cookbookEffects: spell.cookbookEffects || [],
+        cookbookEffects: spell.cookbookEffects || {},
         ingredientInventory: spell.ingredientInventory || [],
         showInPlayerSheet: spell.showInPlayerSheet !== undefined ? spell.showInPlayerSheet : true,
         allYouCanEat: spell.allYouCanEat || false,
+        usedAllYouCanEat: spell.usedAllYouCanEat || false,
         index: spell.index,
       });
     }
@@ -62,15 +64,16 @@ export default function SpellGourmetModal({
     // Ensure spell has a name and all required fields
     const spellToSave = {
       ...editedSpell,
-      spellName: editedSpell.spellName.trim() || '{t("gourmet_cookbook")}',
+      spellName: editedSpell.spellName.trim() || t("gourmet_cookbook"),
       spellType: "cooking", // Ensure spell type is preserved
       mp: editedSpell.mp || 0,
       target: editedSpell.target || "",
       attr: editedSpell.attr || "will",
-      cookbookEffects: editedSpell.cookbookEffects || [],
+      cookbookEffects: editedSpell.cookbookEffects || {},
       ingredientInventory: editedSpell.ingredientInventory || [],
       showInPlayerSheet: editedSpell.showInPlayerSheet !== undefined ? editedSpell.showInPlayerSheet : true,
       allYouCanEat: editedSpell.allYouCanEat || false,
+      usedAllYouCanEat: editedSpell.usedAllYouCanEat || false,
     };
     onSave(editedSpell.index, spellToSave);
   };
@@ -79,11 +82,12 @@ export default function SpellGourmetModal({
     onDelete(editedSpell.index);
   };
 
-  const handleCookingModalSave = (cookbookEffects, inventory) => {
+  const handleCookingModalSave = (cookbookEffects, inventory, metadata) => {
     setEditedSpell((prev) => ({ 
       ...prev, 
       cookbookEffects,
-      ingredientInventory: inventory || prev.ingredientInventory || []
+      ingredientInventory: inventory || prev.ingredientInventory || [],
+      usedAllYouCanEat: metadata?.usedAllYouCanEat !== undefined ? metadata.usedAllYouCanEat : prev.usedAllYouCanEat
     }));
     setCookingModalOpen(false);
   };
