@@ -40,17 +40,6 @@ export const availableFrames = [
       support: -1,
     },
   },
-  {
-    name: "pilot_custom_frame",
-    description: "",
-    passengers: 0, // 0=none, 1=up to one, 2=up to two, 3=up to three
-    distance: 1, // 1, 2, 3
-    limits: {
-      weapon: 2,
-      armor: 1,
-      support: -1, // -1 means unlimited
-    },
-  },
 ];
 
 // Available modules organized by slot type

@@ -48,17 +48,7 @@ const availableFrames = [
       armor: 1,
       support: -1,
     },
-  },
-  {
-    name: "pilot_custom_frame",
-    passengers: 0,
-    distance: 1,
-    limits: {
-      weapon: 2,
-      armor: 1,
-      support: -1,
-    },
-  },
+  }
 ];
 
 function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleChange, onVehicleChange }) {
@@ -81,14 +71,6 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
 
   const getFrameLimits = (vehicle) => {
     const frame = availableFrames.find(f => f.name === (vehicle.frame || "pilot_frame_exoskeleton"));
-    
-    if ((vehicle.frame === "pilot_custom_frame") && vehicle) {
-      return {
-        weapon: vehicle.customWeaponLimit !== undefined ? vehicle.customWeaponLimit : 1,
-        armor: vehicle.customArmorLimit !== undefined ? vehicle.customArmorLimit : 1,
-        support: -1
-      };
-    }
     
     return frame ? frame.limits : { weapon: 2, armor: 1, support: -1 };
   };
@@ -359,25 +341,12 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                           return distance === 1 ? t("pilot_distance_no_mod") : `×${distance}`;
                         };
 
-                        // For custom frames, use custom values if available
-                        const passengers = vehicle.frame === "pilot_custom_frame" && typeof vehicle.customPassengers !== 'undefined'
-                          ? vehicle.customPassengers
-                          : frame.passengers;
-                        const distance = vehicle.frame === "pilot_custom_frame" && typeof vehicle.customDistance !== 'undefined'
-                          ? vehicle.customDistance
-                          : frame.distance;
+                        const passengers = frame.passengers;
+                        const distance = frame.distance;
 
                         return `${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(passengers)} | ${t("pilot_distance")}: ${getDistanceText(distance)}`;
                       })()}
                     </Typography>
-                    {vehicle.frame === "pilot_custom_frame" && vehicle.customFrameDescription && (
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "text.secondary", fontSize: "0.8em", fontStyle: "italic", marginTop: 0.5 }}
-                      >
-                        {vehicle.customFrameDescription}
-                      </Typography>
-                    )}
                   </div>
                 </Grid>
                 <Grid

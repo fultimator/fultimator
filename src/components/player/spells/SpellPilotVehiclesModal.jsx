@@ -99,17 +99,8 @@ export default function SpellPilotVehiclesModal({
     });
   }, []);
 
-  const getFrameLimits = useCallback((frameName, vehicle = null) => {
+  const getFrameLimits = useCallback((frameName) => {
     const frame = availableFrames.find(f => f.name === frameName);
-    
-    // For custom frames, use custom limits if available
-    if (frameName === "pilot_custom_frame" && vehicle) {
-      return {
-        weapon: vehicle.customWeaponLimit !== undefined ? vehicle.customWeaponLimit : 1,
-        armor: vehicle.customArmorLimit !== undefined ? vehicle.customArmorLimit : 1,
-        support: -1 // Support modules are always unlimited for custom frames
-      };
-    }
     
     return frame ? frame.limits : { weapon: 2, armor: 1, support: -1 };
   }, []);
@@ -338,93 +329,6 @@ export default function SpellPilotVehiclesModal({
                             const getDistanceText = (distance) => {
                               return distance === 1 ? t("pilot_distance_no_mod") : `×${distance}`;
                             };
-                            
-                            // For custom frames, show editable fields
-                            if (vehicle.frame === "pilot_custom_frame") {
-                              return (
-                                <div>
-                                  <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                      <CustomTextarea
-                                        label={t("pilot_vehicles_description")}
-                                        value={vehicle.customFrameDescription || ""}
-                                        onChange={(e) =>
-                                          handleVehicleChange(vehicleIndex, "customFrameDescription", e.target.value)
-                                        }
-                                        fullWidth
-                                        multiline
-                                        rows={3}
-                                      />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                      <FormControl fullWidth>
-                                        <InputLabel>{t("pilot_passenger")}</InputLabel>
-                                        <Select
-                                          value={vehicle.customPassengers || 0}
-                                          onChange={(e) =>
-                                            handleVehicleChange(vehicleIndex, "customPassengers", e.target.value)
-                                          }
-                                        >
-                                          <MenuItem value={0}>{t("None")}</MenuItem>
-                                          <MenuItem value={1}>{t("pilot_passengers_up_1")}</MenuItem>
-                                          <MenuItem value={2}>{t("pilot_passengers_up_2")}</MenuItem>
-                                          <MenuItem value={3}>{t("pilot_passengers_up_3")}</MenuItem>
-                                        </Select>
-                                      </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                      <FormControl fullWidth>
-                                        <InputLabel>{t("pilot_distance")}</InputLabel>
-                                        <Select
-                                          value={vehicle.customDistance || 1}
-                                          onChange={(e) =>
-                                            handleVehicleChange(vehicleIndex, "customDistance", e.target.value)
-                                          }
-                                        >
-                                          <MenuItem value={1}>{t("pilot_distance_no_mod")}</MenuItem>
-                                          <MenuItem value={2}>×2</MenuItem>
-                                          <MenuItem value={3}>×3</MenuItem>
-                                        </Select>
-                                      </FormControl>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                      <FormControl fullWidth>
-                                        <InputLabel>{t("pilot_module_weapon_limit")}</InputLabel>
-                                        <Select
-                                          value={vehicle.customWeaponLimit || 1}
-                                          onChange={(e) =>
-                                            handleVehicleChange(vehicleIndex, "customWeaponLimit", e.target.value)
-                                          }
-                                        >
-                                          <MenuItem value={0}>0</MenuItem>
-                                          <MenuItem value={1}>1</MenuItem>
-                                          <MenuItem value={2}>2</MenuItem>
-                                          <MenuItem value={3}>3</MenuItem>
-                                          <MenuItem value={-1}>{t("Unlimited")}</MenuItem>
-                                        </Select>
-                                      </FormControl>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                      <FormControl fullWidth>
-                                        <InputLabel>{t("pilot_module_armor_limit")}</InputLabel>
-                                        <Select
-                                          value={vehicle.customArmorLimit || 1}
-                                          onChange={(e) =>
-                                            handleVehicleChange(vehicleIndex, "customArmorLimit", e.target.value)
-                                          }
-                                        >
-                                          <MenuItem value={0}>0</MenuItem>
-                                          <MenuItem value={1}>1</MenuItem>
-                                          <MenuItem value={2}>2</MenuItem>
-                                          <MenuItem value={3}>3</MenuItem>
-                                          <MenuItem value={-1}>{t("Unlimited")}</MenuItem>
-                                        </Select>
-                                      </FormControl>
-                                    </Grid>
-                                  </Grid>
-                                </div>
-                              );
-                            }
                             
                             return (
                               <div>
