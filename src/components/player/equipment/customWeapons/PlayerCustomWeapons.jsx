@@ -293,15 +293,13 @@ export default function PlayerCustomWeapons({
                     <Grid item xs={11}>
                       {(() => {
                         const secondWeaponData = {
+                          ...customWeapon,
                           name: customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`,
                           category: customWeapon.secondSelectedCategory || "weapon_category_brawling",
                           range: customWeapon.secondSelectedRange || "weapon_range_melee", 
                           accuracyCheck: customWeapon.secondSelectedAccuracyCheck || {att1: "dexterity", att2: "might"},
                           type: customWeapon.secondSelectedType || "physical",
                           customizations: customWeapon.secondCurrentCustomizations || [],
-                          selectedQuality: customWeapon.secondSelectedQuality || "",
-                          quality: customWeapon.secondQuality || "",
-                          qualityCost: customWeapon.secondQualityCost || 0,
                           hands: 2, // Custom weapons are always two-handed
                           cost: customWeapon.cost || 300, // Same cost as primary
                           damageModifier: customWeapon.secondDamageModifier || 0,

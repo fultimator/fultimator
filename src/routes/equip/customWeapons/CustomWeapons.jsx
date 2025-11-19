@@ -65,13 +65,8 @@ function CustomWeapons() {
   const [secondSelectedType, setSecondSelectedType] = useState(types[0]);
   const [secondCurrentCustomizations, setSecondCurrentCustomizations] = useState([]);
   const [secondSelectedCustomization, setSecondSelectedCustomization] = useState("");
-  const [secondSelectedQuality, setSecondSelectedQuality] = useState("");
-  const [secondQuality, setSecondQuality] = useState("");
-  const [secondQualityCost, setSecondQualityCost] = useState(0);
 
   // Override states for manual adjustments
-  const [overrideAccuracy, setOverrideAccuracy] = useState(false);
-  const [overrideDamage, setOverrideDamage] = useState(false);
   const [overrideType, setOverrideType] = useState(false);
   const [customAccuracyMod, setCustomAccuracyMod] = useState(0);
   const [customDamageMod, setCustomDamageMod] = useState(0);
@@ -83,8 +78,6 @@ function CustomWeapons() {
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
 
   // Secondary weapon overrides
-  const [secondOverrideAccuracy, setSecondOverrideAccuracy] = useState(false);
-  const [secondOverrideDamage, setSecondOverrideDamage] = useState(false);
   const [secondOverrideType, setSecondOverrideType] = useState(false);
   const [secondCustomAccuracyMod, setSecondCustomAccuracyMod] = useState(0);
   const [secondCustomDamageMod, setSecondCustomDamageMod] = useState(0);
@@ -110,7 +103,7 @@ function CustomWeapons() {
 
   // Combined download for transforming weapons
   const [downloadCombinedImage, downloadSnackbar] = useDownloadImage(
-    `${weaponName || "Custom Weapon"}_transforming`,
+    `${weaponName || "Custom Weapon"}`,
     weaponCardsRef
   );
 
@@ -221,13 +214,8 @@ function CustomWeapons() {
     setSecondSelectedType(types[0]);
     setSecondCurrentCustomizations([]);
     setSecondSelectedCustomization("");
-    setSecondSelectedQuality("");
-    setSecondQuality("");
-    setSecondQualityCost(0);
 
     // Reset override states
-    setOverrideAccuracy(false);
-    setOverrideDamage(false);
     setOverrideType(false);
     setCustomAccuracyMod(0);
     setCustomDamageMod(0);
@@ -239,8 +227,6 @@ function CustomWeapons() {
     setModifiersExpanded(false);
 
     // Reset secondary weapon overrides
-    setSecondOverrideAccuracy(false);
-    setSecondOverrideDamage(false);
     setSecondOverrideType(false);
     setSecondCustomAccuracyMod(0);
     setSecondCustomDamageMod(0);
@@ -305,11 +291,9 @@ function CustomWeapons() {
 
         // Handle modifiers (map standard format to generator fields)
         if (data.damageModifier !== undefined) {
-          setOverrideDamage(data.damageModifier !== 0);
           setCustomDamageMod(data.damageModifier);
         }
         if (data.precModifier !== undefined) {
-          setOverrideAccuracy(data.precModifier !== 0);
           setCustomAccuracyMod(data.precModifier);
         }
         if (data.defModifier !== undefined) {
@@ -364,21 +348,12 @@ function CustomWeapons() {
           );
           setSecondCurrentCustomizations(validCustomizations);
         }
-        if (data.secondQuality) {
-          setSecondSelectedQuality("");
-          setSecondQuality(data.secondQuality);
-        }
-        if (data.secondQualityCost !== undefined) {
-          setSecondQualityCost(data.secondQualityCost);
-        }
 
         // Handle secondary weapon modifiers (map standard format to generator fields)
         if (data.secondDamageModifier !== undefined) {
-          setSecondOverrideDamage(data.secondDamageModifier !== 0);
           setSecondCustomDamageMod(data.secondDamageModifier);
         }
         if (data.secondPrecModifier !== undefined) {
-          setSecondOverrideAccuracy(data.secondPrecModifier !== 0);
           setSecondCustomAccuracyMod(data.secondPrecModifier);
         }
         if (data.secondDefModifier !== undefined) {
@@ -409,6 +384,12 @@ function CustomWeapons() {
 
   const handleUploadJSON = () => {
     fileInputRef.current.click();
+  };
+
+  const calculateWeaponCost = () => {
+    const baseCost = 300; // Custom weapons have base cost of 300
+    const customizationCost = hasTransforming ? 100 : 0;
+    return baseCost + customizationCost;
   };
 
   return (
@@ -506,20 +487,6 @@ function CustomWeapons() {
               />
             </Grid>
 
-            {selectedRange === "weapon_range_ranged" && (
-              <Grid item xs={12} sm={6}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={martial}
-                      onChange={(e) => setMartial(e.target.checked)}
-                    />
-                  }
-                  label={t("Requires Martial Proficiency")}
-                />
-              </Grid>
-            )}
-
             <Grid item xs={12} sm={6}>
               <ChangeAccuracyCheck
                 value={selectedAccuracyCheck}
@@ -602,52 +569,28 @@ function CustomWeapons() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
-                    {/* Override Accuracy */}
+                    {/* Accuracy Modifier */}
                     <Grid item xs={12} sm={4}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={overrideAccuracy}
-                            onChange={(e) => setOverrideAccuracy(e.target.checked)}
-                          />
-                        }
-                        label={t("Override Accuracy Mod")}
+                      <TextField
+                        fullWidth
+                        type="number"
+                        label={t("Accuracy Modifier")}
+                        value={customAccuracyMod}
+                        onChange={(e) => setCustomAccuracyMod(parseInt(e.target.value) || 0)}
+                        size="small"
                       />
-                      {overrideAccuracy && (
-                        <TextField
-                          fullWidth
-                          type="number"
-                          label={t("Accuracy Modifier")}
-                          value={customAccuracyMod}
-                          onChange={(e) => setCustomAccuracyMod(parseInt(e.target.value) || 0)}
-                          size="small"
-                          sx={{ mt: 1 }}
-                        />
-                      )}
                     </Grid>
 
-                    {/* Override Damage */}
+                    {/* Damage Modifier */}
                     <Grid item xs={12} sm={4}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={overrideDamage}
-                            onChange={(e) => setOverrideDamage(e.target.checked)}
-                          />
-                        }
-                        label={t("Override Damage Mod")}
+                      <TextField
+                        fullWidth
+                        type="number"
+                        label={t("Damage Modifier")}
+                        value={customDamageMod}
+                        onChange={(e) => setCustomDamageMod(parseInt(e.target.value) || 0)}
+                        size="small"
                       />
-                      {overrideDamage && (
-                        <TextField
-                          fullWidth
-                          type="number"
-                          label={t("Damage Modifier")}
-                          value={customDamageMod}
-                          onChange={(e) => setCustomDamageMod(parseInt(e.target.value) || 0)}
-                          size="small"
-                          sx={{ mt: 1 }}
-                        />
-                      )}
                     </Grid>
 
                     {/* Override Type */}
@@ -742,20 +685,6 @@ function CustomWeapons() {
                   />
                 </Grid>
 
-                {secondSelectedRange === "weapon_range_ranged" && (
-                  <Grid item xs={12} sm={6}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={secondMartial}
-                          onChange={(e) => setSecondMartial(e.target.checked)}
-                        />
-                      }
-                      label={t("Requires Martial Proficiency")}
-                    />
-                  </Grid>
-                )}
-
                 <Grid item xs={12} sm={6}>
                   <ChangeAccuracyCheck
                     value={secondSelectedAccuracyCheck}
@@ -787,45 +716,6 @@ function CustomWeapons() {
                   isSecondForm={true}
                 />
 
-                {/* Quality Selection */}
-                <Grid item xs={12} sm={5}>
-                  <SelectQuality
-                    quality={secondSelectedQuality}
-                    setQuality={(e) => {
-                      const quality = qualities.find(
-                        (el) => el.name === e.target.value
-                      );
-                      setSecondSelectedQuality(quality.name);
-                      setSecondQuality(quality.quality);
-                      setSecondQualityCost(quality.cost);
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={1}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
-                      setSecondSelectedQuality("");
-                      setSecondQuality("");
-                      setSecondQualityCost(0);
-                    }}
-                    disabled={!secondSelectedQuality}
-                    sx={{ height: "100%", minWidth: "40px", px: 1 }}
-                  >
-                    ×
-                  </Button>
-                </Grid>
-
-                {/* Quality Text Area */}
-                <Grid item xs={12}>
-                  <ChangeQuality
-                    quality={secondQuality}
-                    setQuality={(e) => setSecondQuality(e.target.value)}
-                    qualityCost={secondQualityCost}
-                    setQualityCost={(e) => setSecondQualityCost(e.target.value)}
-                  />
-                </Grid>
-
                 {/* Advanced Overrides Section for Transforming Form */}
                 <Grid item xs={12}>
                   <Accordion>
@@ -838,52 +728,28 @@ function CustomWeapons() {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Grid container spacing={2}>
-                        {/* Override Accuracy */}
+                        {/* Accuracy Modifier */}
                         <Grid item xs={12} sm={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={secondOverrideAccuracy}
-                                onChange={(e) => setSecondOverrideAccuracy(e.target.checked)}
-                              />
-                            }
-                            label={t("Override Accuracy Mod")}
+                          <TextField
+                            fullWidth
+                            type="number"
+                            label={t("Accuracy Modifier")}
+                            value={secondCustomAccuracyMod}
+                            onChange={(e) => setSecondCustomAccuracyMod(parseInt(e.target.value) || 0)}
+                            size="small"
                           />
-                          {secondOverrideAccuracy && (
-                            <TextField
-                              fullWidth
-                              type="number"
-                              label={t("Accuracy Modifier")}
-                              value={secondCustomAccuracyMod}
-                              onChange={(e) => setSecondCustomAccuracyMod(parseInt(e.target.value) || 0)}
-                              size="small"
-                              sx={{ mt: 1 }}
-                            />
-                          )}
                         </Grid>
 
-                        {/* Override Damage */}
+                        {/* Damage Modifier */}
                         <Grid item xs={12} sm={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={secondOverrideDamage}
-                                onChange={(e) => setSecondOverrideDamage(e.target.checked)}
-                              />
-                            }
-                            label={t("Override Damage Mod")}
+                          <TextField
+                            fullWidth
+                            type="number"
+                            label={t("Damage Modifier")}
+                            value={secondCustomDamageMod}
+                            onChange={(e) => setSecondCustomDamageMod(parseInt(e.target.value) || 0)}
+                            size="small"
                           />
-                          {secondOverrideDamage && (
-                            <TextField
-                              fullWidth
-                              type="number"
-                              label={t("Damage Modifier")}
-                              value={secondCustomDamageMod}
-                              onChange={(e) => setSecondCustomDamageMod(parseInt(e.target.value) || 0)}
-                              size="small"
-                              sx={{ mt: 1 }}
-                            />
-                          )}
                         </Grid>
 
                         {/* Override Type */}
@@ -992,8 +858,8 @@ function CustomWeapons() {
                     accuracyCheck: secondSelectedAccuracyCheck,
                     type: secondSelectedType,
                     customizations: secondCurrentCustomizations,
-                    quality: secondQuality,
-                    qualityCost: secondQualityCost,
+                    quality: quality,
+                    qualityCost: qualityCost,
                     // Map to standard format for transforming form
                     damageModifier: secondCustomDamageMod,
                     precModifier: secondCustomAccuracyMod,
@@ -1017,31 +883,43 @@ function CustomWeapons() {
                 </IconButton>
               </Tooltip>
               <Export
-                name={`${weaponName || "Custom Weapon"}_combined`}
+                name={`${weaponName || "Custom Weapon"}`}
                 dataType="weapon"
                 data={{
-                  primary: {
-                    name: weaponName,
-                    category: selectedCategory,
-                    range: selectedRange,
-                    martial: martial,
-                    accuracyCheck: selectedAccuracyCheck,
-                    type: selectedType,
-                    customizations: currentCustomizations,
-                    quality: quality,
-                    qualityCost: qualityCost
-                  },
-                  transforming: {
-                    name: secondWeaponName,
-                    category: secondSelectedCategory,
-                    range: secondSelectedRange,
-                    martial: secondMartial,
-                    accuracyCheck: secondSelectedAccuracyCheck,
-                    type: secondSelectedType,
-                    customizations: secondCurrentCustomizations,
-                    quality: secondQuality,
-                    qualityCost: secondQualityCost
-                  }
+                  name: weaponName,
+                  category: selectedCategory,
+                  range: selectedRange,
+                  martial: martial,
+                  accuracyCheck: selectedAccuracyCheck,
+                  type: selectedType,
+                  customizations: currentCustomizations,
+                  selectedQuality: selectedQuality,
+                  quality: quality,
+                  qualityCost: qualityCost,
+                  cost: calculateWeaponCost(),
+                  hands: 2,
+                  isEquipped: false,
+                  damageModifier: customDamageMod,
+                  precModifier: customAccuracyMod,
+                  defModifier: defModifier,
+                  mDefModifier: mDefModifier,
+                  overrideDamageType: overrideType,
+                  customDamageType: customDamageType,
+                  secondWeaponName: secondWeaponName,
+                  secondSelectedCategory: secondSelectedCategory,
+                  secondSelectedRange: secondSelectedRange,
+                  secondMartial: secondMartial,
+                  secondSelectedAccuracyCheck: secondSelectedAccuracyCheck,
+                  secondSelectedType: secondSelectedType,
+                  secondCurrentCustomizations: secondCurrentCustomizations,
+                  secondDamageModifier: secondCustomDamageMod,
+                  secondPrecModifier: secondCustomAccuracyMod,
+                  secondDefModifier: secondDefModifier,
+                  secondMDefModifier: secondMDefModifier,
+                  secondOverrideDamageType: secondOverrideType,
+                  secondCustomDamageType: secondCustomDamageType,
+                  
+                  dataType: "weapon"
                 }}
               />
             </Box>

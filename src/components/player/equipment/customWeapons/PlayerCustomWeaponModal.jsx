@@ -78,9 +78,6 @@ export default function PlayerCustomWeaponModal({
   const [secondSelectedType, setSecondSelectedType] = useState(customWeapon?.secondSelectedType || types[0]);
   const [secondCurrentCustomizations, setSecondCurrentCustomizations] = useState(customWeapon?.secondCurrentCustomizations || []);
   const [secondSelectedCustomization, setSecondSelectedCustomization] = useState("");
-  const [secondSelectedQuality, setSecondSelectedQuality] = useState(customWeapon?.secondSelectedQuality || "");
-  const [secondQuality, setSecondQuality] = useState(customWeapon?.secondQuality || "");
-  const [secondQualityCost, setSecondQualityCost] = useState(customWeapon?.secondQualityCost || 0);
 
   // Secondary weapon modifier states
   const [secondDamageModifier, setSecondDamageModifier] = useState(customWeapon?.secondDamageModifier || 0);
@@ -127,9 +124,6 @@ export default function PlayerCustomWeaponModal({
       setSecondSelectedType(customWeapon.secondSelectedType || types[0]);
       setSecondCurrentCustomizations(customWeapon.secondCurrentCustomizations || []);
       setSecondSelectedCustomization("");
-      setSecondSelectedQuality(customWeapon.secondSelectedQuality || "");
-      setSecondQuality(customWeapon.secondQuality || "");
-      setSecondQualityCost(customWeapon.secondQualityCost || 0);
       
       // Set secondary weapon modifiers
       setSecondDamageModifier(customWeapon.secondDamageModifier || 0);
@@ -182,9 +176,6 @@ export default function PlayerCustomWeaponModal({
       setSecondSelectedType(types[0]);
       setSecondCurrentCustomizations([]);
       setSecondSelectedCustomization("");
-      setSecondSelectedQuality("");
-      setSecondQuality("");
-      setSecondQualityCost(0);
       
       // Reset secondary modifiers
       setSecondDamageModifier(0);
@@ -258,13 +249,10 @@ export default function PlayerCustomWeaponModal({
 
   const calculateTotalCost = () => {
     const baseCost = 300; // Custom weapons have base cost of 300
-    const customizationCost = currentCustomizations.reduce((total, c) => total + (c.customCost || 0), 0) * 100;
-    const qualityCostValue = parseInt(qualityCost) || 0;
-    
-    // For transforming weapons, add secondary quality cost as well
-    const secondQualityCostValue = hasTransforming ? (parseInt(secondQualityCost) || 0) : 0;
-    
-    return baseCost + customizationCost + qualityCostValue + secondQualityCostValue;
+    const customizationCost = hasTransforming ? 100 : 0;
+
+    return baseCost + customizationCost;
+
   };
 
   const isMartial = () => {
@@ -300,9 +288,6 @@ export default function PlayerCustomWeaponModal({
       secondSelectedAccuracyCheck,
       secondSelectedType,
       secondCurrentCustomizations,
-      secondSelectedQuality,
-      secondQuality,
-      secondQualityCost: parseInt(secondQualityCost) || 0,
       // Secondary weapon modifiers
       secondDamageModifier: parseInt(secondDamageModifier) || 0,
       secondPrecModifier: parseInt(secondPrecModifier) || 0,
@@ -388,10 +373,6 @@ export default function PlayerCustomWeaponModal({
         setSecondCurrentCustomizations(validCustomizations);
       }
       
-      setSecondQuality(data.secondQuality || "");
-      setSecondQualityCost(data.secondQualityCost || 0);
-      setSecondSelectedQuality("");
-      
       // Handle secondary weapon modifiers
       setSecondDamageModifier(data.secondDamageModifier || 0);
       setSecondPrecModifier(data.secondPrecModifier || 0);
@@ -421,6 +402,14 @@ export default function PlayerCustomWeaponModal({
 
   const handleUploadJSON = () => {
     fileInputRef.current.click();
+  };
+
+  const calculatePreviewCost = () => {
+    const baseCost = 300; // Custom weapons have base cost of 300
+    const customizationCost = hasTransforming ? 100 : 0;
+    const qualityCostValue = parseInt(qualityCost) || 0;
+    
+    return baseCost + customizationCost + qualityCostValue;
   };
 
   return (
@@ -737,44 +726,6 @@ export default function PlayerCustomWeaponModal({
                       isSecondForm={true}
                     />
                   </Grid>
-
-                  {/* Secondary Quality Section */}
-                  <Grid item xs={12} sm={8}>
-                    <SelectQuality
-                      quality={secondSelectedQuality}
-                      setQuality={(e) => {
-                        const qualityData = qualities.find(q => q.name === e.target.value);
-                        if (qualityData) {
-                          setSecondSelectedQuality(qualityData.name);
-                          setSecondQuality(qualityData.quality);
-                          setSecondQualityCost(qualityData.cost);
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setSecondSelectedQuality("");
-                        setSecondQuality("");
-                        setSecondQualityCost(0);
-                      }}
-                      disabled={!secondSelectedQuality}
-                      sx={{ height: "100%", minWidth: "40px" }}
-                    >
-                      ×
-                    </Button>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <ChangeQuality
-                      quality={secondQuality}
-                      setQuality={(e) => setSecondQuality(e.target.value)}
-                      qualityCost={secondQualityCost}
-                      setQualityCost={(e) => setSecondQualityCost(e.target.value)}
-                    />
-                  </Grid>
                   
                   {/* Secondary Modifiers Section */}
                   <Grid item xs={12}>
@@ -854,6 +805,7 @@ export default function PlayerCustomWeaponModal({
             </Typography>
             <PrettyCustomWeapon
               weaponData={{
+                ...customWeapon,
                 name: weaponName,
                 category: selectedCategory,
                 range: selectedRange,
@@ -861,7 +813,7 @@ export default function PlayerCustomWeaponModal({
                 type: selectedType,
                 customizations: currentCustomizations,
                 quality,
-                cost: calculateTotalCost(),
+                cost: calculatePreviewCost(),
                 hands: 2,
                 martial: isMartial(),
                 damageModifier: parseInt(damageModifier) || 0,
@@ -881,14 +833,14 @@ export default function PlayerCustomWeaponModal({
                 </Typography>
                 <PrettyCustomWeapon
                   weaponData={{
+                    ...customWeapon,
                     name: secondWeaponName || `${weaponName} (Transforming)`,
                     category: secondSelectedCategory,
                     range: secondSelectedRange,
                     accuracyCheck: secondSelectedAccuracyCheck,
                     type: secondSelectedType,
                     customizations: secondCurrentCustomizations,
-                    quality: secondQuality,
-                    cost: calculateTotalCost(),
+                    cost: calculatePreviewCost(),
                     hands: 2,
                     martial: isMartial(),
                     damageModifier: parseInt(secondDamageModifier) || 0,
