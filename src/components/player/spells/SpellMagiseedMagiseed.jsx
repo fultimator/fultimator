@@ -19,7 +19,7 @@ import { Delete, ExpandMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
-import { availableMagiseeds } from "../../../libs/floralistMagiseedData";
+import { magiseeds } from "../../../libs/floralistMagiseedData";
 
 export default function SpellMagiseedMagiseed({
   magiseed,
@@ -42,7 +42,7 @@ export default function SpellMagiseedMagiseed({
   };
 
   const getPresetMagiseed = (magiseedName) => {
-    return availableMagiseeds.find(m => m.name === magiseedName);
+    return magiseeds.find(m => m.name === magiseedName);
   };
 
   const isCustomMagiseed = magiseed.name === "magiseed_custom";
@@ -97,7 +97,7 @@ export default function SpellMagiseedMagiseed({
                   }
                 }}
               >
-                {availableMagiseeds.map((preset) => (
+                {magiseeds.map((preset) => (
                   <MenuItem key={preset.name} value={preset.name}>
                     {t(preset.name)}
                   </MenuItem>
@@ -162,7 +162,7 @@ export default function SpellMagiseedMagiseed({
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">
-                  {t("magiseed_effects_by_growth_section")}
+                  {t("magiseed_effect_by_growth_clock")}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -178,7 +178,7 @@ export default function SpellMagiseedMagiseed({
                   })().map((section) => (
                     <Grid item xs={12} key={section}>
                       <Typography variant="subtitle1" gutterBottom>
-                        {t("magiseed_section_effect", { section })} (T = {section})
+                        {t("magiseed_details", { section })} (T = {section})
                       </Typography>
                       {isCustomMagiseed ? (
                         <CustomTextarea

@@ -215,10 +215,10 @@ export default function SpellGiftGiftsModal({
               </Grid>
 
               {gift.name === "esper_gift_custom_name" && (
-                <Grid item xs={12} sm={3}>
+                <Grid item xs={12} sm={4}>
                   <TextField
                     fullWidth
-                    label={t("Custom Gift Name")}
+                    label={t("esper_gift_custom_name")}
                     value={gift.customName}
                     onChange={(e) =>
                       handleGiftChange(index, "customName", e.target.value)
@@ -227,7 +227,7 @@ export default function SpellGiftGiftsModal({
                 </Grid>
               )}
 
-              <Grid item xs={12} sm={gift.name === "esper_gift_custom_name" ? 2 : 4}>
+              <Grid item xs={12} sm={4}>
                 <CustomTextarea
                   label={t("Gift Effect")}
                   value={

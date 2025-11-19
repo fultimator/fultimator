@@ -18,7 +18,7 @@ import { VisibilityOff, ExpandMore, LocalFlorist, KeyboardArrowDown, KeyboardArr
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { availableMagiseeds } from "../../../libs/floralistMagiseedData";
+import { magiseeds } from "../../../libs/floralistMagiseedData";
 import Clock from "../../player/playerSheet/Clock";
 
 function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
@@ -90,7 +90,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
   const getCurrentEffect = () => {
     if (!currentMagiseed) return null;
     
-    const magiseedTemplate = availableMagiseeds.find(m => m.name === currentMagiseed.name);
+    const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
     if (!magiseedTemplate) return null;
 
     const effectKey = Math.min(growthClock, 3);
@@ -348,7 +348,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
       )}
 
       {/* Available Magiseeds */}
-      {magiseed.availableMagiseeds && magiseed.availableMagiseeds.length > 0 && (
+      {magiseed.magiseeds && magiseed.magiseeds.length > 0 && (
         <>
           <div
             style={{
@@ -366,9 +366,9 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
               {t("magiseed_available_magiseeds")}
             </Typography>
           </div>
-          {magiseed.availableMagiseeds.map((seed, index) => {
+          {magiseed.magiseeds.map((seed, index) => {
             const isExpanded = expandedMagiseeds.has(index);
-            const magiseedTemplate = availableMagiseeds.find(m => m.name === seed.name);
+            const magiseedTemplate = magiseeds.find(m => m.name === seed.name);
             
             return (
               <div key={index}>

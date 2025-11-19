@@ -207,7 +207,7 @@ export default function SpellMutantTherioformsModal({
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={3}>
+              <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
                   label={t("mutant_genoclepsis_suggestions")}
@@ -226,7 +226,7 @@ export default function SpellMutantTherioformsModal({
               </Grid>
 
               {therioform.name === "mutant_therioform_custom_name" && (
-                <Grid item xs={12} sm={3}>
+                <Grid item xs={12} sm={4}>
                   <TextField
                     fullWidth
                     label={t("mutant_therioform_custom_name")}
@@ -238,7 +238,7 @@ export default function SpellMutantTherioformsModal({
                 </Grid>
               )}
 
-              <Grid item xs={12} sm={therioform.name === "mutant_therioform_custom_name" ? 2 : 4}>
+              <Grid item xs={12} sm={3}>
                 <CustomTextarea
                   label={t("mutant_therioform_description")}
                   value={

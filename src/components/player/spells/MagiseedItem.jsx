@@ -21,7 +21,7 @@ import { Delete, ExpandMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
-import { availableMagiseeds, magiseedTypes } from "../../../libs/floralistMagiseedData";
+import { magiseeds, magiseedTypes } from "../../../libs/floralistMagiseedData";
 
 export default function MagiseedItem({
   magiseed,
@@ -44,7 +44,7 @@ export default function MagiseedItem({
   };
 
   const getPresetMagiseed = (magiseedName) => {
-    return availableMagiseeds.find(m => m.name === magiseedName);
+    return magiseeds.find(m => m.name === magiseedName);
   };
 
   const isCustomMagiseed = magiseed.name === "floralist_custom_magiseed";
@@ -102,7 +102,7 @@ export default function MagiseedItem({
                   }
                 }}
               >
-                {availableMagiseeds.map((preset) => (
+                {magiseeds.map((preset) => (
                   <MenuItem key={preset.name} value={preset.name}>
                     {t(preset.name)}
                   </MenuItem>

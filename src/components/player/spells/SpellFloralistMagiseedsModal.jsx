@@ -13,7 +13,7 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import { Close, Add } from "@mui/icons-material";
 import MagiseedItem from "./MagiseedItem";
-import { availableMagiseeds } from "../../../libs/floralistMagiseedData";
+import { magiseeds } from "../../../libs/floralistMagiseedData";
 
 export default function SpellFloralistMagiseedsModal({
   open,
@@ -27,7 +27,7 @@ export default function SpellFloralistMagiseedsModal({
 
   useEffect(() => {
     if (floralist) {
-      setCurrentMagiseeds(floralist.availableMagiseeds || []);
+      setCurrentMagiseeds(floralist.magiseeds || []);
       setShowInPlayerSheet(!!floralist.showInPlayerSheet || floralist.showInPlayerSheet === undefined);
     }
   }, [floralist]);
@@ -70,7 +70,7 @@ export default function SpellFloralistMagiseedsModal({
   }, []);
 
   const handleAddPresetMagiseed = useCallback((presetName) => {
-    const preset = availableMagiseeds.find(m => m.name === presetName);
+    const preset = magiseeds.find(m => m.name === presetName);
     if (!preset) return;
 
     const newMagiseed = {
@@ -85,7 +85,7 @@ export default function SpellFloralistMagiseedsModal({
     if (onSave && floralist) {
       const updatedFloralist = {
         ...floralist,
-        availableMagiseeds: currentMagiseeds,
+        magiseeds: currentMagiseeds,
         showInPlayerSheet: showInPlayerSheet,
       };
       onSave(floralist.index, updatedFloralist);
@@ -95,7 +95,7 @@ export default function SpellFloralistMagiseedsModal({
   // Get available preset magiseeds that haven't been added yet
   const getAvailablePresets = () => {
     const addedPresetNames = currentMagiseeds.map(m => m.name).filter(name => name !== "floralist_custom_magiseed");
-    return availableMagiseeds.filter(preset => 
+    return magiseeds.filter(preset => 
       preset.name !== "floralist_custom_magiseed" && 
       !addedPresetNames.includes(preset.name)
     );

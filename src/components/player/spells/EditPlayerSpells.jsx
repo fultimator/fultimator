@@ -475,7 +475,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   {
                     spellType: spell,
                     showInPlayerSheet: true,
-                    availableMagiseeds: [],
+                    magiseeds: [],
                     currentMagiseed: null,
                     growthClock: 0,
                     gardenDescription: "",
@@ -500,9 +500,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   {
                     spellType: spell,
                     spellName: "New Cooking Spell",
-                    mp: 0,
-                    target: "",
-                    attr: "will",
                     cookbookEffects: [],
                     showInPlayerSheet: true,
                   },

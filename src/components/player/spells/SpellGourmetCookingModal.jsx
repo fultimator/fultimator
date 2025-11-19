@@ -35,15 +35,11 @@ import ReactMarkdown from "react-markdown";
 import {
   getDelicacyEffects,
   getIngredientTastes,
-  tasteCombinations,
   getTasteCombinations,
   rollDelicacyEffect,
   rollIngredientTaste,
-  statusEffects,
   getStatusEffects,
-  damageTypes,
   getDamageTypes,
-  attributes as delicacyAttributes,
   getAttributes,
 } from "../../../libs/gourmetCookingData";
 

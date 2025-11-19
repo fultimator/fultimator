@@ -198,11 +198,6 @@ export const getAttributes = (t) => [
   t("Dexterity"), t("Insight"), t("Might"), t("Willpower")
 ];
 
-// Fallback for components that don't have access to translation function
-export const attributes = [
-  "Dexterity", "Insight", "Might", "Willpower"
-];
-
 // Helper function to roll for a random delicacy effect
 export const rollDelicacyEffect = (t = null) => {
   const roll = Math.floor(Math.random() * 12) + 1;
@@ -236,7 +231,6 @@ export default {
   getStatusEffects,
   damageTypes,
   getDamageTypes,
-  attributes,
   getAttributes,
   rollDelicacyEffect,
   rollIngredientTaste,

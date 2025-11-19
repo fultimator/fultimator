@@ -300,7 +300,7 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                 fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
               }}
             >
-              {t("esper_gift_name")}
+              {t("esper_psychic_gifts")}
             </Typography>
           </Grid>
           <Grid
@@ -366,7 +366,7 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                     fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
                   >
-                    {gft.name === "gift_custom_name"
+                    {gft.name === "esper_gift_custom_name"
                       ? gft.customName
                       : t(gft.name)}
                   </Typography>

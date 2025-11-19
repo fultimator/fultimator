@@ -28,9 +28,6 @@ export default function SpellGourmetModal({
   const [editedSpell, setEditedSpell] = useState(
     spell || {
       spellName: "",
-      mp: 0,
-      target: "",
-      attr: "will",
       cookbookEffects: {},
       showInPlayerSheet: true,
       allYouCanEat: false,
@@ -43,9 +40,6 @@ export default function SpellGourmetModal({
     if (spell) {
       setEditedSpell({
         spellName: spell.spellName || "",
-        mp: spell.mp || 0,
-        target: spell.target || "",
-        attr: spell.attr || "will",
         cookbookEffects: spell.cookbookEffects || {},
         ingredientInventory: spell.ingredientInventory || [],
         showInPlayerSheet: spell.showInPlayerSheet !== undefined ? spell.showInPlayerSheet : true,
@@ -66,9 +60,6 @@ export default function SpellGourmetModal({
       ...editedSpell,
       spellName: editedSpell.spellName.trim() || t("gourmet_cookbook"),
       spellType: "cooking", // Ensure spell type is preserved
-      mp: editedSpell.mp || 0,
-      target: editedSpell.target || "",
-      attr: editedSpell.attr || "will",
       cookbookEffects: editedSpell.cookbookEffects || {},
       ingredientInventory: editedSpell.ingredientInventory || [],
       showInPlayerSheet: editedSpell.showInPlayerSheet !== undefined ? editedSpell.showInPlayerSheet : true,

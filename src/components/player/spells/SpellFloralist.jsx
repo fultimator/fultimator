@@ -16,7 +16,7 @@ import { VisibilityOff, ExpandMore, Eco, Circle, CheckCircle } from "@mui/icons-
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { availableMagiseeds } from "../../../libs/floralistMagiseedData";
+import { magiseeds } from "../../../libs/floralistMagiseedData";
 
 function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
   const { t } = useTranslate();
@@ -49,7 +49,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
   const getCurrentEffect = () => {
     if (!currentMagiseed || growthClock === 0) return null;
     
-    const magiseedTemplate = availableMagiseeds.find(m => m.name === currentMagiseed.name);
+    const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
     if (!magiseedTemplate) return null;
 
     const effectKey = Math.min(growthClock, 4);
@@ -308,7 +308,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               </ReactMarkdown>
             </div>
             {(() => {
-              const magiseedTemplate = availableMagiseeds.find(m => m.name === currentMagiseed.name);
+              const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
               const isEndOfTurn = magiseedTemplate?.endOfTurnEffect || currentMagiseed.endOfTurnEffect;
               const isPassive = magiseedTemplate?.passive || currentMagiseed.passive;
               
@@ -323,7 +323,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
       )}
 
       {/* Available Magiseeds */}
-      {floralist.availableMagiseeds && floralist.availableMagiseeds.length > 0 && (
+      {floralist.magiseeds && floralist.magiseeds.length > 0 && (
         <>
           <div
             style={{
@@ -341,7 +341,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               {t("floralist_available_magiseeds")}
             </Typography>
           </div>
-          {floralist.availableMagiseeds.map((magiseed, index) => (
+          {floralist.magiseeds.map((magiseed, index) => (
             <div
               key={index}
               style={{

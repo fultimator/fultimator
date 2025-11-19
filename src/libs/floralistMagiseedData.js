@@ -1,4 +1,4 @@
-const availableMagiseeds = [
+const magiseeds = [
   {
     name: "magiseed_arctic_narcissus",
     description: "magiseed_arctic_narcissus_desc",
@@ -242,4 +242,4 @@ const availableMagiseeds = [
   }
 ];
 
-export { availableMagiseeds };
+export { magiseeds };
