@@ -282,11 +282,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (!initialized) return;
     // Skip first render
     if (prevSelectedNpcsRef.current === null) {
-      prevSelectedNpcsRef.current = selectedNPCs;
+      prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(selectedNPCs));
       prevRoundRef.current = encounter?.round;
-      prevLogsRef.current = logs;
+      prevLogsRef.current = [...logs];
       prevEncounterNameRef.current = encounterName;
-      prevEncounterNotesRef.current = encounterNotes;
+      prevEncounterNotesRef.current = JSON.parse(JSON.stringify(encounterNotes));
       return;
     }
 
