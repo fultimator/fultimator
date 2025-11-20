@@ -171,7 +171,7 @@ function Home() {
               </Typography>
               <Button
                 variant="contained"
-                href="https://discord.gg/9yYc6R93Cd"
+                href="https://discord.gg/aNEgvHm3Re"
                 target="_blank"
                 rel="noreferrer"
                 sx={{
