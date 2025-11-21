@@ -282,11 +282,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (!initialized) return;
     // Skip first render
     if (prevSelectedNpcsRef.current === null) {
-      prevSelectedNpcsRef.current = selectedNPCs;
+      prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(selectedNPCs));
       prevRoundRef.current = encounter?.round;
-      prevLogsRef.current = logs;
+      prevLogsRef.current = [...logs];
       prevEncounterNameRef.current = encounterName;
-      prevEncounterNotesRef.current = encounterNotes;
+      prevEncounterNotesRef.current = JSON.parse(JSON.stringify(encounterNotes));
       return;
     }
 
@@ -295,47 +295,31 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     // Check if round changed
     if (prevRoundRef.current !== encounter?.round) {
-      console.log(
-        "Round changed from",
-        prevRoundRef.current,
-        "to",
-        encounter?.round
-      );
       hasChanges = true;
     }
 
     // Check if name changed
     if (prevEncounterNameRef.current !== encounterName) {
-      console.log(
-        "Name changed from",
-        prevEncounterNameRef.current,
-        "to",
-        encounterName
-      );
       hasChanges = true;
     }
 
     // Check if logs changed
     if (prevLogsRef.current?.length !== logs?.length) {
-      console.log("Logs length changed");
       hasChanges = true;
     }
 
     // Check if clocks changed
     if (JSON.stringify(encounter?.clocks) !== JSON.stringify(encounterClocks)) {
-      console.log("Clocks state changed");
       hasChanges = true;
     }
 
     // Check if notes changed
     if (JSON.stringify(encounter?.notes) !== JSON.stringify(encounterNotes)) {
-      console.log("Notes state changed");
       hasChanges = true;
     }
 
     // Complex deep comparison for NPCs
     if (selectedNPCs.length !== prevSelectedNpcsRef.current?.length) {
-      console.log("NPC count changed");
       hasChanges = true;
     } else {
       // Check if any NPC stats changed
@@ -344,7 +328,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const prevNpc = prevSelectedNpcsRef.current[i];
 
         if (currentNpc.combatId !== prevNpc.combatId) {
-          console.log("NPC changed at index", i);
           hasChanges = true;
           break;
         }
@@ -354,7 +337,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           currentNpc.combatStats.currentHp !== prevNpc.combatStats.currentHp ||
           currentNpc.combatStats.currentMp !== prevNpc.combatStats.currentMp
         ) {
-          console.log("HP/MP changed for NPC", currentNpc.name);
           hasChanges = true;
           break;
         }
@@ -363,7 +345,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const currentEffects = currentNpc.combatStats.statusEffects || [];
         const prevEffects = prevNpc.combatStats.statusEffects || [];
         if (JSON.stringify(currentEffects) !== JSON.stringify(prevEffects)) {
-          console.log("Status effects changed for NPC", currentNpc.name);
           hasChanges = true;
           break;
         }
@@ -372,7 +353,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const currentTurns = currentNpc.combatStats.turns || [];
         const prevTurns = prevNpc.combatStats.turns || [];
         if (JSON.stringify(currentTurns) !== JSON.stringify(prevTurns)) {
-          console.log("Turns changed for NPC", currentNpc.name);
           hasChanges = true;
           break;
         }
@@ -381,8 +361,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     // Only set dirty flag if actual changes were detected
     if (hasChanges && encounter && !selectedNPCs.some((npc) => !npc.id)) {
-      console.log("Detected meaningful changes, marking as dirty");
       setIsDirty(true);
+    } else {
+      setIsDirty(false);
     }
 
     // Update all refs for next comparison
@@ -390,16 +371,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     prevRoundRef.current = encounter?.round;
     prevLogsRef.current = [...logs];
     prevEncounterNameRef.current = encounterName;
-  }, [
-    selectedNPCs,
-    encounter,
-    logs,
-    encounterName,
-    encounterClocks,
-    encounterNotes,
-    initialized,
-    setIsDirty,
-  ]);
+  }, [selectedNPCs, encounter, logs, encounterName, encounterClocks, encounterNotes, initialized]);
 
   // Window event listener for beforeunload to prevent leaving the page with unsaved changes
   useEffect(() => {
@@ -466,6 +438,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (!encounterData?.selectedNPCs?.length) {
         setSelectedNPCs([]);
         setLoading(false);
+        setInitialized(true);
         return;
       }
 
@@ -533,7 +506,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
         setSelectedNPCs(loadedNPCs);
         prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(loadedNPCs));
-        setInitialized(true);
       } catch (error) {
         console.error("Error fetching NPCs:", error);
         setSelectedNPCs([]);
@@ -571,9 +543,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // Save encounter state
   const handleSaveState = () => {
-    // if selectedNPCs doesn't have any npc without id, then save the state
     if (selectedNPCs.some((npc) => !npc.id)) {
-      // Alert
       alert(t("combat_sim_error_saving_encounter_deleted_npcs"));
       return;
     }
@@ -611,7 +581,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     setIsSaveSnackbarOpen(true);
 
-    // Clear dirty flag after manual save
     setIsDirty(false);
   };
 
