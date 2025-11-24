@@ -26,6 +26,7 @@ export const validateCharacter = (character) => {
       "armor",
       "notes",
       "modifiers",
+      "immunities",
     ];
     for (const prop of basicProperties) {
       if (!character.hasOwnProperty(prop)) {
@@ -148,18 +149,18 @@ export const validateCharacter = (character) => {
     "poisoned",
   ];
   if (
-    typeof character.immunity !== "object" ||
-    Array.isArray(character.immunity) ||
-    character.immunity === null
+    typeof character.immunities !== "object" ||
+    Array.isArray(character.immunities) ||
+    character.immunities === null
   ) {
-    errors.push("Missing: immunity");
+    errors.push("Missing: immunities");
   } else {
     for (const prop of immunityProps) {
       if (
-        !character.immunity.hasOwnProperty(prop) ||
-        typeof character.immunity[prop] !== "boolean"
+        !character.immunities.hasOwnProperty(prop) ||
+        typeof character.immunities[prop] !== "boolean"
       ) {
-        errors.push(`Missing or invalid: ${prop} in immunity`);
+        errors.push(`Missing or invalid: ${prop} in immunities`);
       }
     }
   }
