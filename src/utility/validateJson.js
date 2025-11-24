@@ -26,7 +26,6 @@ export const validateCharacter = (character) => {
       "armor",
       "notes",
       "modifiers",
-      "immunities",
     ];
     for (const prop of basicProperties) {
       if (!character.hasOwnProperty(prop)) {
@@ -148,19 +147,20 @@ export const validateCharacter = (character) => {
     "shaken",
     "poisoned",
   ];
-  if (
-    typeof character.immunities !== "object" ||
-    Array.isArray(character.immunities) ||
-    character.immunities === null
-  ) {
-    errors.push("Missing: immunities");
-  } else {
-    for (const prop of immunityProps) {
-      if (
-        !character.immunities.hasOwnProperty(prop) ||
-        typeof character.immunities[prop] !== "boolean"
-      ) {
-        errors.push(`Missing or invalid: ${prop} in immunities`);
+  if (character.immunities !== undefined && character.immunities !== null) {
+    if (
+      typeof character.immunities !== "object" ||
+      Array.isArray(character.immunities)
+    ) {
+      errors.push("Immunities must be an object");
+    } else {
+      for (const prop of immunityProps) {
+        if (
+          !character.immunities.hasOwnProperty(prop) ||
+          typeof character.immunities[prop] !== "boolean"
+        ) {
+          errors.push(`Missing or invalid: ${prop} in immunities`);
+        }
       }
     }
   }
@@ -200,35 +200,7 @@ export const validateCharacter = (character) => {
         errors.push(`Missing or invalid: ${prop} in modifiers`);
       }
     }
-  
-    // Validate 'modifiers' object
-    const modifierProps = [
-      "hp",
-      "mp",
-      "ip",
-      "def",
-      "mdef",
-      "init",
-      "meleePrec",
-      "rangedPrec",
-      "magicPrec",
-    ];
-    if (
-      typeof character.modifiers !== "object" ||
-      Array.isArray(character.modifiers) ||
-      character.modifiers === null
-    ) {
-      errors.push("Missing: modifiers");
-    } else {
-      for (const prop of modifierProps) {
-        if (
-          !character.modifiers.hasOwnProperty(prop) ||
-          typeof character.modifiers[prop] !== "number"
-        ) {
-          errors.push(`Missing or invalid: ${prop} in modifiers`);
-        }
-      }
-    }
+  }
   
     // Log all errors if any
     if (errors.length > 0) {
@@ -238,7 +210,6 @@ export const validateCharacter = (character) => {
   
     return true;
   };
-}
   
   export const validateNpc = (npc) => {
     // Error messages array
@@ -307,4 +278,3 @@ export const validateCharacter = (character) => {
   
     return true;
   };
-  
