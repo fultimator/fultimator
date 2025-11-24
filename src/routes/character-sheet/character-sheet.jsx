@@ -4,7 +4,7 @@ import { useTranslate } from "../../translation/translate";
 import { firestore } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc } from "@firebase/firestore";
-import { Grid, Button, Typography, Stack } from "@mui/material";
+import { Grid, Button, Typography, Stack, IconButton, useMediaQuery } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
@@ -20,12 +20,17 @@ import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
 import { Download } from "@mui/icons-material";
-import PlayerCardShort from "../../components/player/playerSheet/PlayerCardShort";
+import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
+// import { getPc } from "../../utility/db";
+import { useTheme } from "@mui/material/styles";
+import { FullscreenTwoTone, FullscreenExitTwoTone } from '@mui/icons-material';
+import useDownload from "../../hooks/useDownload";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
   let params = useParams();
   const ref = doc(firestore, "player-personal", params.playerId);
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [player] = useDocumentData(ref, { idField: "id" });
 
   const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -72,7 +77,11 @@ export default function CharacterSheet() {
     const originalStyle = {
       width: element.style.width,
     };
-    element.style.width = fullCharacterSheet ? "2000px" : "1000px"; // Example: Set to a fixed width
+
+    // Calculate the scale factor (2000px for full sheet, 1000px for short)
+    const targetWidth = fullCharacterSheet ? 2000 : 266;
+    const currentWidth = element.offsetWidth;
+    const scale = targetWidth / currentWidth;
 
     try {
       const canvas = await html2canvas(element, {
@@ -120,11 +129,26 @@ export default function CharacterSheet() {
             color="primary"
             onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
             style={{ marginBottom: "16px", width: "100%" }} // Add margin to separate from grid
+            sx={{ display: isMobile ? "none" : "flex" }}
           >
             {fullCharacterSheet
               ? t("Short Character Sheet")
               : t("Full Character Sheet")}
           </Button>
+
+          {/* Render icons for mobile */}
+          {isMobile && (
+            <IconButton
+              onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
+              style={{ marginBottom: '16px' }}
+            >
+              {fullCharacterSheet ? (
+                <FullscreenExitTwoTone />
+              ) : (
+                <FullscreenTwoTone />
+              )}
+            </IconButton>
+          )}
         </Grid>
       </Grid>
       {fullCharacterSheet ? (
@@ -186,13 +210,18 @@ export default function CharacterSheet() {
           </Grid>
         </Grid>
       ) : (
-        <Grid container sx={{ padding: 1 }} justifyContent={"center"} id="character-sheet-short" >
-          <Grid container item xs={12} >
-              <PlayerCardShort
-                player={player}
-                isCharacterSheet={true}
-                characterImage={player.info.imgurl}
-              />
+        <Grid
+          container
+          sx={{ padding: 1 }}
+          justifyContent={"center"}
+          id="character-sheet-short"
+        >
+          <Grid container item xs={12}>
+            <PlayerCardSheet
+              player={player}
+              isCharacterSheet={true}
+              characterImage={player.info.imgurl}
+            />
           </Grid>
         </Grid>
       )}

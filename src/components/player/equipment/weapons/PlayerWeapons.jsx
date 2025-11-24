@@ -96,6 +96,7 @@ export default function PlayerWeapons({
     let oneHandedCount = 0;
     let twoHandedCount = 0;
 
+    // Count regular weapons
     weapons.forEach((weapon) => {
       if (weapon.isEquipped) {
         if (weapon.hands === 1) {
@@ -105,6 +106,15 @@ export default function PlayerWeapons({
         }
       }
     });
+
+    // Count custom weapons (all are two-handed)
+    if (player.customWeapons) {
+      player.customWeapons.forEach((customWeapon) => {
+        if (customWeapon.isEquipped) {
+          twoHandedCount++;
+        }
+      });
+    }
 
     return { oneHandedCount, twoHandedCount };
   };

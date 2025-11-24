@@ -217,7 +217,7 @@ const ReturnHomeButton = () => {
         Return to Home
       </Button>
       <Button
-        href="https://discord.gg/9yYc6R93Cd"
+        href="https://discord.gg/aNEgvHm3Re"
         target="_blank"
         rel="noreferrer"
         variant="contained"

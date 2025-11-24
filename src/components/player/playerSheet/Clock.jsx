@@ -10,7 +10,7 @@ function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   };
 }
 
-const Clock = ({ numSections, size, state, setState }) => {
+const Clock = ({ numSections, size, state, setState, isCharacterSheet, onReset }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -22,6 +22,20 @@ const Clock = ({ numSections, size, state, setState }) => {
     const updatedSections = [...state];
     updatedSections[index] = !updatedSections[index];
     setState(updatedSections);
+  };
+
+  const handleRightClick = (e) => {
+    e.preventDefault(); // Prevent context menu
+    if (onReset && !isCharacterSheet) {
+      onReset();
+    }
+  };
+
+  const handleMouseDown = (index) => {
+    if (!isCharacterSheet && !isMobile) {
+      setIsMouseDown(true);
+      handleSectionClick(index); // Trigger click logic on mousedown
+    }
   };
 
   const handleMouseEnter = (index) => {
@@ -75,7 +89,12 @@ const Clock = ({ numSections, size, state, setState }) => {
   }
 
   return (
-    <svg width={size} height={size}>
+    <svg 
+      width={size} 
+      height={size}
+      onContextMenu={handleRightClick}
+      style={{ cursor: isCharacterSheet ? "default" : "pointer" }}
+    >
       {sections}
     </svg>
   );

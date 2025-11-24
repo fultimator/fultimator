@@ -17,9 +17,50 @@ import { useTranslate } from "../../../translation/translate";
 import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
 import PrettyArmor from "../equipment/armor/PrettyArmor";
 import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
+import PrettyCustomWeapon from "../equipment/customWeapons/PrettyCustomWeapon";
 import { Casino } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+
+/**
+ * Utility function to calculate custom weapon damage and precision stats
+ * @param {Object} weapon - The custom weapon object
+ * @returns {Object} Object containing calculated damage and precision values
+ */
+const calculateCustomWeaponStats = (weapon) => {
+  let damage = 5; // Base damage for custom weapons
+  let precision = 0;
+
+  // Get customizations for primary or secondary form
+  const customizations = weapon.isSecondaryForm
+    ? weapon.secondCurrentCustomizations || []
+    : weapon.customizations || [];
+
+  // Apply customization bonuses
+  customizations.forEach((customization) => {
+    const category = weapon.isSecondaryForm ? weapon.secondSelectedCategory : weapon.category;
+    switch (customization?.name) {
+      case "weapon_customization_powerful":
+        damage += category === "weapon_category_heavy" ? 7 : 5;
+        break;
+      case "weapon_customization_accurate":
+        precision += 2;
+        break;
+      case "weapon_customization_elemental":
+        damage += 2;
+        break;
+      default:
+        // Handle unknown customizations gracefully
+        break;
+    }
+  });
+
+  // Apply modifiers with safe parsing
+  damage += parseInt(weapon.damageModifier || 0, 10);
+  precision += parseInt(weapon.precModifier || 0, 10);
+
+  return { damage, precision };
+};
 
 export default function PlayerEquipment({
   player,
@@ -48,11 +89,11 @@ export default function PlayerEquipment({
 
   // Guardian - Defensive Mastery
   const defensiveMasteryBonus = player.classes
-  .map((cls) => cls.skills)
-  .flat()
-  .filter((skill) => skill.specialSkill === "Defensive Mastery")
-  .map((skill) => skill.currentLvl)
-  .reduce((a, b) => a + b, 0);
+    .map((cls) => cls.skills)
+    .flat()
+    .filter((skill) => skill.specialSkill === "Defensive Mastery")
+    .map((skill) => skill.currentLvl)
+    .reduce((a, b) => a + b, 0);
 
   // Twin Shields object as described in the comments
   const twinShields = {
@@ -102,6 +143,11 @@ export default function PlayerEquipment({
     ? player.weapons.filter((weapon) => weapon.isEquipped)
     : [];
 
+  // Retrieve equipped custom weapons
+  const equippedCustomWeapons = player.customWeapons
+    ? player.customWeapons.filter((weapon) => weapon.isEquipped)
+    : [];
+
   const equippedArmor = player.armor
     ? player.armor.filter((armor) => armor.isEquipped)
     : [];
@@ -114,9 +160,62 @@ export default function PlayerEquipment({
     ? player.accessories.filter((accessory) => accessory.isEquipped)
     : [];
 
+  // Helper function to format custom weapon for display
+  const formatCustomWeaponForDisplay = (customWeapon, isSecondaryForm = false) => {
+    const baseData = {
+      ...customWeapon,
+      isCustomWeapon: true,
+      hands: 2, // Custom weapons are always two-handed
+    };
+
+    if (isSecondaryForm) {
+      return {
+        ...baseData,
+        name: customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`,
+        category: customWeapon.secondSelectedCategory || "weapon_category_brawling",
+        range: customWeapon.secondSelectedRange || "weapon_range_melee",
+        accuracyCheck: customWeapon.secondSelectedAccuracyCheck || { att1: "dexterity", att2: "might" },
+        type: customWeapon.secondSelectedType || "physical",
+        customizations: customWeapon.secondCurrentCustomizations || [],
+        quality: customWeapon.secondQuality || "",
+        qualityCost: customWeapon.secondQualityCost || 0,
+        isSecondaryForm: true,
+        melee: (customWeapon.secondSelectedRange || "weapon_range_melee") === "weapon_range_melee",
+        ranged: (customWeapon.secondSelectedRange || "weapon_range_melee") === "weapon_range_ranged"
+      };
+    }
+
+    return {
+      ...baseData,
+      category: customWeapon.category || "weapon_category_brawling",
+      melee: (customWeapon.range || "weapon_range_melee") === "weapon_range_melee",
+      ranged: (customWeapon.range || "weapon_range_melee") === "weapon_range_ranged"
+    };
+  };
+
+  // Combine regular weapons and custom weapons
+  const allEquippedWeapons = [
+    ...equippedWeapons,
+    // Add custom weapons with proper formatting
+    ...equippedCustomWeapons.flatMap((customWeapon) => {
+      const weapons = [formatCustomWeaponForDisplay(customWeapon)];
+
+      // Add secondary form if it's a transforming weapon
+      const hasTransforming = customWeapon.customizations?.some(
+        (c) => c.name === "weapon_customization_transforming"
+      );
+
+      if (hasTransforming && customWeapon.secondWeaponName) {
+        weapons.push(formatCustomWeaponForDisplay(customWeapon, true));
+      }
+
+      return weapons;
+    })
+  ];
+
   // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
   if (hasDualShieldBearer && equippedShields.length >= 2) {
-    equippedWeapons.push(twinShields);
+    allEquippedWeapons.push(twinShields);
   }
 
   // Weaponmaster - Melee Weapon Mastery Skill Bonus
@@ -245,12 +344,27 @@ export default function PlayerEquipment({
   const handleDiceRoll = (weapon) => {
     setCurrentWeapon(weapon);
 
-    const att1 = weapon.att1;
-    const att2 = weapon.att2;
-    let att1Value = attributeMap[att1];
-    let att2Value = attributeMap[att2];
+    // Handle attribute mapping for custom weapons
+    const att1 = weapon.isCustomWeapon
+      ? weapon.accuracyCheck?.att1 || weapon.att1 || "dexterity"
+      : weapon.att1 || "dexterity";
+    const att2 = weapon.isCustomWeapon
+      ? weapon.accuracyCheck?.att2 || weapon.att2 || "might"
+      : weapon.att2 || "might";
 
-    const weaponPrec = weapon.prec;
+    let att1Value = attributeMap[att1] || 8;
+    let att2Value = attributeMap[att2] || 8;
+
+    // Calculate weapon stats for custom weapons
+    let weaponPrec = weapon.prec || 0;
+    let weaponDamage = weapon.damage || 5;
+
+    if (weapon.isCustomWeapon) {
+      const stats = calculateCustomWeaponStats(weapon);
+      weaponDamage = stats.damage;
+      weaponPrec = stats.precision;
+    }
+
     const meleeModifier = precMeleeModifier;
     const rangedModifier = precRangedModifier;
 
@@ -272,7 +386,7 @@ export default function PlayerEquipment({
       (weapon.melee ? meleeModifier : rangedModifier);
 
     const maxDie = Math.max(die1, die2);
-    const damage = weapon.damage;
+    const damage = weaponDamage;
 
     const damageDealt =
       maxDie + damage + (weapon.melee ? meleeDmgModifier : rangedDmgModifier);
@@ -314,17 +428,15 @@ export default function PlayerEquipment({
           </Grid>
           <Grid item xs={12} sx={{ marginTop: "20px" }}>
             <Typography component="span">
-              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
-                attributes[att2].shortcaps
-              }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${
-                weapon.melee
+              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${attributes[att2].shortcaps
+                }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${weapon.melee
                   ? meleeModifier !== 0
                     ? "+" + meleeModifier
                     : rangedModifier
                   : rangedModifier !== 0
-                  ? "+" + rangedModifier
-                  : ""
-              }`}
+                    ? "+" + rangedModifier
+                    : ""
+                }`}
             </Typography>
             <br />
             <Typography
@@ -340,8 +452,8 @@ export default function PlayerEquipment({
                   ? " + " + meleeDmgModifier
                   : ""
                 : rangedDmgModifier !== 0
-                ? " + " + rangedDmgModifier
-                : ""}
+                  ? " + " + rangedDmgModifier
+                  : ""}
             </Typography>
           </Grid>
         </Grid>
@@ -391,7 +503,7 @@ export default function PlayerEquipment({
 
   return (
     <>
-      {(equippedWeapons.length > 0 || equippedArmor.length > 0) && (
+      {(allEquippedWeapons.length > 0 || equippedArmor.length > 0) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -399,19 +511,19 @@ export default function PlayerEquipment({
             sx={
               isCharacterSheet
                 ? {
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                    flexDirection: "column",
-                    boxShadow: "none",
-                  }
+                  borderRadius: "8px",
+                  border: "2px solid",
+                  borderColor: secondary,
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: "none",
+                }
                 : {
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                  }
+                  borderRadius: "8px",
+                  border: "2px solid",
+                  borderColor: secondary,
+                  display: "flex",
+                }
             }
           >
             {isCharacterSheet ? (
@@ -452,7 +564,7 @@ export default function PlayerEquipment({
               </Typography>
             )}
             <Grid container spacing={2} sx={{ padding: "1em" }}>
-              {equippedWeapons.length > 0 && (
+              {allEquippedWeapons.length > 0 && (
                 <>
                   <Grid item xs={12}>
                     <Typography variant="h2" sx={{ fontWeight: "bold" }}>
@@ -460,15 +572,24 @@ export default function PlayerEquipment({
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    {equippedWeapons.map((weapon, index) => (
+                    {allEquippedWeapons.map((weapon, index) => (
                       <React.Fragment key={index}>
                         <Grid container>
                           <Grid item xs={isEditMode ? 11 : 12}>
-                            <PrettyWeapon
-                              weapon={weapon}
-                              player={player}
-                              setPlayer={setPlayer}
-                            />
+                            {weapon.isCustomWeapon ? (
+                              <PrettyCustomWeapon
+                                weaponData={weapon}
+                                isCharacterSheet={isCharacterSheet}
+                                showActions={false}
+                              />
+                            ) : (
+                              <PrettyWeapon
+                                weapon={weapon}
+                                player={player}
+                                setPlayer={setPlayer}
+                                isCharacterSheet={isCharacterSheet}
+                              />
+                            )}
                           </Grid>
                           {isEditMode && (
                             <Grid item xs={1}>
@@ -558,32 +679,32 @@ export default function PlayerEquipment({
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
                 damageRangedModifier !== 0) && (
-                <Grid item xs={12}>
-                  <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                    {t("Modifiers")}
-                  </Typography>
-                  {precMeleeModifier !== 0 && (
-                    <Typography variant="h4">
-                      {t("Melee Accuracy Bonus")}: {precMeleeModifier}
+                  <Grid item xs={12}>
+                    <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                      {t("Modifiers")}
                     </Typography>
-                  )}
-                  {precRangedModifier !== 0 && (
-                    <Typography variant="h4">
-                      {t("Ranged Accuracy Bonus")}: {precRangedModifier}
-                    </Typography>
-                  )}
-                  {damageMeleeModifier !== 0 && (
-                    <Typography variant="h4">
-                      {t("Melee Damage Bonus")}: {damageMeleeModifier}
-                    </Typography>
-                  )}
-                  {damageRangedModifier !== 0 && (
-                    <Typography variant="h4">
-                      {t("Ranged Damage Bonus")}: {damageRangedModifier}
-                    </Typography>
-                  )}
-                </Grid>
-              )}
+                    {precMeleeModifier !== 0 && (
+                      <Typography variant="h4">
+                        {t("Melee Accuracy Bonus")}: {precMeleeModifier}
+                      </Typography>
+                    )}
+                    {precRangedModifier !== 0 && (
+                      <Typography variant="h4">
+                        {t("Ranged Accuracy Bonus")}: {precRangedModifier}
+                      </Typography>
+                    )}
+                    {damageMeleeModifier !== 0 && (
+                      <Typography variant="h4">
+                        {t("Melee Damage Bonus")}: {damageMeleeModifier}
+                      </Typography>
+                    )}
+                    {damageRangedModifier !== 0 && (
+                      <Typography variant="h4">
+                        {t("Ranged Damage Bonus")}: {damageRangedModifier}
+                      </Typography>
+                    )}
+                  </Grid>
+                )}
             </Grid>
             <Dialog
               open={dialogOpen}
@@ -600,8 +721,8 @@ export default function PlayerEquipment({
                     dialogSeverity === "error"
                       ? "#bb2124"
                       : dialogSeverity === "success"
-                      ? "#22bb33"
-                      : "#aaaaaa",
+                        ? "#22bb33"
+                        : "#aaaaaa",
                 }}
               >
                 {t("Result")}

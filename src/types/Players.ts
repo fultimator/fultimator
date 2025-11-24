@@ -50,6 +50,15 @@ export interface PlayerStatuses {
     poisoned: boolean
 }
 
+export interface PlayerImmunities {
+    slow: boolean
+    dazed: boolean,
+    weak: boolean,
+    shaken: boolean,
+    enraged: boolean,
+    poisoned: boolean,
+}
+
 export interface PlayerAffinities {
     physical: Affinities,
     wind: Affinities,
@@ -129,6 +138,64 @@ export interface Weapons {
     isEquipped: boolean
 }
 
+export interface CustomWeaponCustomization {
+    name: string,
+    effect: string,
+    martial: boolean,
+    customCost: number
+}
+
+export interface CustomWeaponAccuracyCheck {
+    att1: string,
+    att2: string
+}
+
+export interface CustomWeapons {
+    name: string,
+    category: string,
+    range: string,
+    accuracyCheck: CustomWeaponAccuracyCheck,
+    type: string,
+    customizations: CustomWeaponCustomization[],
+    selectedQuality?: string,
+    quality: string,
+    qualityCost: number,
+    cost?: number,
+    hands?: number,
+    martial?: boolean,
+    isEquipped?: boolean,
+    
+    // Primary weapon modifiers (standard format)
+    damageModifier?: number,
+    precModifier?: number,
+    defModifier?: number,
+    mDefModifier?: number,
+    overrideDamageType?: boolean,
+    customDamageType?: string,
+    
+    // Secondary weapon data (for transforming weapons)
+    secondWeaponName?: string,
+    secondSelectedCategory?: string,
+    secondSelectedRange?: string,
+    secondSelectedAccuracyCheck?: CustomWeaponAccuracyCheck,
+    secondSelectedType?: string,
+    secondCurrentCustomizations?: CustomWeaponCustomization[],
+    secondSelectedQuality?: string,
+    secondQuality?: string,
+    secondQualityCost?: number,
+    
+    // Secondary weapon modifiers
+    secondDamageModifier?: number,
+    secondPrecModifier?: number,
+    secondDefModifier?: number,
+    secondMDefModifier?: number,
+    secondOverrideDamageType?: boolean,
+    secondCustomDamageType?: string,
+    
+    // Data type identifier
+    dataType?: string
+}
+
 export interface Shields {
     name: string,
     quality: string,
@@ -160,6 +227,7 @@ export interface Armor {
 
 export interface PlayerEquipment {
     weapons: Weapons[],
+    customWeapons: CustomWeapons[],
     shields: Shields[],
     accessories: Accessories[],
     armor: Armor[]
@@ -208,6 +276,7 @@ export interface TypePlayer {
     attributes: PlayerAttributes,
     stats: PlayerStats,
     statuses: PlayerStatuses,
+    immunities: PlayerImmunities,
     affinities: PlayerAffinities,
     classes: PlayerClass[],
     equipment: PlayerEquipment[],

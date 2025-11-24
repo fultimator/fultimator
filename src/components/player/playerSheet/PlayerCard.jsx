@@ -168,12 +168,14 @@ export default function PlayerCard({
     </Box>
   );
 
-  // Retrieve equipped armor, shields, weapons, and accessories
+  // Retrieve equipped armor, shields, weapons, accessories, and custom weapons
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
   const equippedShields =
     player.shields?.filter((shield) => shield.isEquipped) || [];
   const equippedWeapons =
     player.weapons?.filter((weapon) => weapon.isEquipped) || [];
+  const equippedCustomWeapons =
+    player.customWeapons?.filter((weapon) => weapon.isEquipped) || [];
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
@@ -209,6 +211,10 @@ export default function PlayerCard({
       (total, weapon) => total + (weapon.defModifier || 0),
       0
     ) +
+    equippedCustomWeapons.reduce(
+      (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
+      0
+    ) +
     dodgeBonus;
 
   const currMDef =
@@ -223,6 +229,10 @@ export default function PlayerCard({
     (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
+      0
+    ) +
+    equippedCustomWeapons.reduce(
+      (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
       0
     );
 
@@ -372,6 +382,8 @@ export default function PlayerCard({
       },
     }));
   };
+
+  const isImmune = (status) => player.immunities && player.immunities[status] === true;
 
   return (
     <Card
@@ -816,7 +828,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.slow}
                       onChange={onStatusChange("slow")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("slow")} 
                     />
                   }
                   label={
@@ -848,7 +860,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.dazed}
                       onChange={onStatusChange("dazed")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("dazed")} 
                     />
                   }
                   label={
@@ -880,7 +892,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.weak}
                       onChange={onStatusChange("weak")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("weak")} 
                     />
                   }
                   label={
@@ -912,7 +924,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.shaken}
                       onChange={onStatusChange("shaken")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("shaken")} 
                     />
                   }
                   label={
@@ -955,7 +967,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.enraged}
                       onChange={onStatusChange("enraged")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("enraged")} 
                     />
                   }
                   label={
@@ -990,7 +1002,7 @@ export default function PlayerCard({
                       }}
                       checked={player.statuses.poisoned}
                       onChange={onStatusChange("poisoned")}
-                      disabled={!isEditMode}
+                      disabled={!isEditMode || isImmune("poisoned")} 
                     />
                   }
                   label={

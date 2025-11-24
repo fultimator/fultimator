@@ -4,12 +4,14 @@ import {
   Card,
   Divider,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   Stack,
+  Switch,
   TextField,
   Typography,
   Button,
@@ -54,19 +56,26 @@ export default function EditBasics({ npc, setNpc }) {
       const value = e.target.value;
       setNpc((prevNpc) => {
         let affinities = {};
+        let immunities = {}
 
         if (value === "Construct") {
           affinities = { poison: "im", earth: "rs" };
+          immunities = { poisoned: true };
         } else if (value === "Elemental") {
           affinities = { poison: "im" };
+          immunities = { poisoned: true };
+        } else if (value === "Plant") {
+          immunities = { dazed: true, shaken: true, enraged: true, };
         } else if (value === "Undead") {
           affinities = { dark: "im", poison: "im", light: "vu" };
+          immunities = { poisoned: true };
         }
 
         return {
           ...prevNpc,
           species: value,
           affinities: affinities,
+          immunities: immunities,
         };
       });
     },
@@ -156,6 +165,7 @@ export default function EditBasics({ npc, setNpc }) {
             <MenuItem value={"Plant"}>{t("Plant")}</MenuItem>
             <MenuItem value={"Undead"}>{t("Undead")}</MenuItem>
             <MenuItem value={"Humanoid"}>{t("Humanoid")}</MenuItem>
+            <MenuItem value={"Variant Humanoid"}>{t("Variant Humanoid")}</MenuItem>
           </Select>
         </FormControl>
       </Grid>
@@ -414,6 +424,151 @@ export default function EditBasics({ npc, setNpc }) {
             </Typography>
           </Card>
         </Grid>
+      </Grid>
+
+      {/* DEF/M.DEF Override Section */}
+      <Grid item xs={12}>
+        <CustomHeader
+          type="top"
+          headerText={t("Defense Override")}
+          showIconButton={false}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Card
+          sx={{
+            p: 2,
+            background,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            {t("DEF Override")}
+          </Typography>
+          <FormControl fullWidth>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={npc.extra?.defOverride || false}
+                  onChange={(e) => {
+                    setNpc((prevNpc) => ({
+                      ...prevNpc,
+                      extra: {
+                        ...prevNpc.extra,
+                        defOverride: e.target.checked,
+                        def: e.target.checked ? (prevNpc.extra?.def || 0) : undefined
+                      }
+                    }));
+                  }}
+                />
+              }
+              label={t("Override DEF")}
+            />
+          </FormControl>
+          {npc.extra?.defOverride && (
+            <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+              <TextField
+                type="number"
+                label={t("DEF Value")}
+                value={npc.extra?.def || 0}
+                onChange={(e) => {
+                  setNpc((prevNpc) => ({
+                    ...prevNpc,
+                    extra: {
+                      ...prevNpc.extra,
+                      def: parseInt(e.target.value) || 0
+                    }
+                  }));
+                }}
+              />
+            </FormControl>
+          )}
+          {!npc.extra?.defOverride && (
+            <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+              <TextField
+                type="number"
+                label={t("DEF Bonus")}
+                value={npc.extra?.def || 0}
+                onChange={(e) => {
+                  setNpc((prevNpc) => ({
+                    ...prevNpc,
+                    extra: {
+                      ...prevNpc.extra,
+                      def: parseInt(e.target.value) || 0
+                    }
+                  }));
+                }}
+              />
+            </FormControl>
+          )}
+        </Card>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Card
+          sx={{
+            p: 2,
+            background,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            {t("M.DEF Override")}
+          </Typography>
+          <FormControl fullWidth>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={npc.extra?.mDefOverride || false}
+                  onChange={(e) => {
+                    setNpc((prevNpc) => ({
+                      ...prevNpc,
+                      extra: {
+                        ...prevNpc.extra,
+                        mDefOverride: e.target.checked,
+                        mDef: e.target.checked ? (prevNpc.extra?.mDef || 0) : undefined
+                      }
+                    }));
+                  }}
+                />
+              }
+              label={t("Override M.DEF")}
+            />
+          </FormControl>
+          {npc.extra?.mDefOverride && (
+            <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+              <TextField
+                type="number"
+                label={t("M.DEF Value")}
+                value={npc.extra?.mDef || 0}
+                onChange={(e) => {
+                  setNpc((prevNpc) => ({
+                    ...prevNpc,
+                    extra: {
+                      ...prevNpc.extra,
+                      mDef: parseInt(e.target.value) || 0
+                    }
+                  }));
+                }}
+              />
+            </FormControl>
+          )}
+          {!npc.extra?.mDefOverride && (
+            <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+              <TextField
+                type="number"
+                label={t("M.DEF Bonus")}
+                value={npc.extra?.mDef || 0}
+                onChange={(e) => {
+                  setNpc((prevNpc) => ({
+                    ...prevNpc,
+                    extra: {
+                      ...prevNpc.extra,
+                      mDef: parseInt(e.target.value) || 0
+                    }
+                  }));
+                }}
+              />
+            </FormControl>
+          )}
+        </Card>
       </Grid>
     </Grid>
   );

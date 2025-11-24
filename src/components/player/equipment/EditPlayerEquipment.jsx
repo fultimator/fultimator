@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Paper, Grid, Button, Divider } from "@mui/material";
+import { UploadFile } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import useUploadJSON from "../../../hooks/useUploadJSON";
 import CustomHeader from "../../common/CustomHeader";
 import PlayerWeapons from "./weapons/PlayerWeapons";
+import PlayerCustomWeapons from "./customWeapons/PlayerCustomWeapons";
 import PlayerArmor from "./armor/PlayerArmor";
 import PlayerShields from "./shields/PlayerShields";
 import PlayerAccessories from "./accessories/PlayerAccessories";
 import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "./customWeapons/PlayerCustomWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
@@ -23,6 +27,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [editWeaponIndex, setEditWeaponIndex] = React.useState(null);
   const [weapon, setWeapon] = React.useState(null);
 
+  const [openNewCustomWeapon, setOpenNewCustomWeapon] = React.useState(false);
+  const [editCustomWeaponIndex, setEditCustomWeaponIndex] = React.useState(null);
+  const [customWeapon, setCustomWeapon] = React.useState(null);
+
   const [openNewArmor, setOpenNewArmor] = React.useState(false);
   const [editArmorIndex, setEditArmorIndex] = React.useState(null);
   const [armor, setArmor] = React.useState(null);
@@ -35,11 +43,51 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [editAccessoryIndex, setEditAccessoryIndex] = React.useState(null);
   const [accessory, setAccessory] = React.useState(null);
 
+  // FILE UPLOAD
+  const fileInputRef = useRef(null);
+
+  const { handleFileUpload } = useUploadJSON((data) => {
+    if (data && data.dataType) {
+      switch (data.dataType) {
+        case "weapon":
+          if (data.customizations) {
+            // This is a custom weapon
+            handleAddCustomWeapon(data);
+          } else {
+            // This is a regular weapon
+            handleAddWeapon(data);
+          }
+          break;
+        case "armor":
+          handleAddArmor(data);
+          break;
+        case "shield":
+          handleAddShield(data);
+          break;
+        case "accessory":
+          handleAddAccessory(data);
+          break;
+        default:
+          console.warn("Unknown equipment type:", data.dataType);
+      }
+    }
+  });
+
+  const handleUploadJSON = () => {
+    fileInputRef.current.click();
+  };
+
   // OPEN MODALS
   const handleOpenNewWeapon = () => {
     setWeapon(null);
     setEditWeaponIndex(null);
     setOpenNewWeapon(true);
+  };
+
+  const handleOpenNewCustomWeapon = () => {
+    setCustomWeapon(null);
+    setEditCustomWeaponIndex(null);
+    setOpenNewCustomWeapon(true);
   };
 
   const handleOpenNewArmor = () => {
@@ -67,6 +115,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setEditWeaponIndex(null);
   };
 
+  const handleCloseNewCustomWeapon = () => {
+    setOpenNewCustomWeapon(false);
+    setCustomWeapon(null);
+    setEditCustomWeaponIndex(null);
+  };
+
   const handleCloseNewArmor = () => {
     setOpenNewArmor(false);
     setArmor(null);
@@ -91,6 +145,11 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setPlayer({ ...player, weapons: updatedWeapons });
   };
 
+  const handleAddCustomWeapon = (newCustomWeapon) => {
+    const updatedCustomWeapons = [...(player.customWeapons || []), newCustomWeapon];
+    setPlayer({ ...player, customWeapons: updatedCustomWeapons });
+  };
+
   const handleAddArmor = (newArmor) => {
     const updatedArmors = [...(player.armor || []), newArmor];
     setPlayer({ ...player, armor: updatedArmors });
@@ -110,6 +169,11 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const handleDeleteWeapon = (index) => {
     const updatedWeapons = (player.weapons || []).filter((_, i) => i !== index);
     setPlayer({ ...player, weapons: updatedWeapons });
+  };
+
+  const handleDeleteCustomWeapon = (index) => {
+    const updatedCustomWeapons = (player.customWeapons || []).filter((_, i) => i !== index);
+    setPlayer({ ...player, customWeapons: updatedCustomWeapons });
   };
 
   const handleDeleteArmor = (index) => {
@@ -134,6 +198,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     setWeapon(player.weapons[index]);
     setEditWeaponIndex(index);
     setOpenNewWeapon(true);
+  };
+
+  const handleEditCustomWeapon = (index) => {
+    setCustomWeapon(player.customWeapons[index]);
+    setEditCustomWeaponIndex(index);
+    setOpenNewCustomWeapon(true);
   };
 
   const handleEditArmor = (index) => {
@@ -165,6 +235,18 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       handleAddWeapon(updatedWeapon);
     }
     setOpenNewWeapon(false);
+  };
+
+  const handleSaveCustomWeapon = (updatedCustomWeapon) => {
+    if (editCustomWeaponIndex !== null) {
+      const updatedCustomWeapons = (player.customWeapons || []).map((customWeapon, i) =>
+        i === editCustomWeaponIndex ? updatedCustomWeapon : customWeapon
+      );
+      setPlayer({ ...player, customWeapons: updatedCustomWeapons });
+    } else {
+      handleAddCustomWeapon(updatedCustomWeapon);
+    }
+    setOpenNewCustomWeapon(false);
   };
 
   const handleSaveArmor = (updatedArmor) => {
@@ -205,13 +287,42 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   };
 
   // TOGGLE EQUIPPED
-  const handleEquipWeapon = (weaponIndex) => {
-    // Toggle equipped weapon (weapon.isEquipped)
-    /* Note: there can be only one Two Handed Weapon or two One Handed weapons equipped at a time */
-    const updatedWeapons = (player.weapons || []).map((weapon, i) =>
-      i === weaponIndex ? { ...weapon, isEquipped: !weapon.isEquipped } : weapon
-    );
-    setPlayer({ ...player, weapons: updatedWeapons });
+  const handleEquipWeapon = (updatedWeapons) => {
+    // PlayerWeapons passes the full updated weapons array
+    let updatedCustomWeapons = player.customWeapons || [];
+    
+    // Check if any weapon is being equipped for the first time
+    const previousWeapons = player.weapons || [];
+    const newlyEquippedWeapon = updatedWeapons.find((weapon, index) => {
+      const previousWeapon = previousWeapons[index];
+      return weapon.isEquipped && (!previousWeapon || !previousWeapon.isEquipped);
+    });
+    
+    // If a weapon is being equipped (not just unequipped), unequip all custom weapons
+    if (newlyEquippedWeapon) {
+      updatedCustomWeapons = updatedCustomWeapons.map(cw => ({ ...cw, isEquipped: false }));
+    }
+    
+    setPlayer({ 
+      ...player, 
+      weapons: updatedWeapons,
+      customWeapons: updatedCustomWeapons 
+    });
+  };
+
+  const handleEquipCustomWeapon = (updatedCustomWeapons, updatedWeapons, updatedShields) => {
+    // Custom weapons are always two-handed, so when equipping one, unequip all other weapons
+    const updatedPlayer = { ...player, customWeapons: updatedCustomWeapons };
+    
+    // If we need to update other equipment types
+    if (updatedWeapons) {
+      updatedPlayer.weapons = updatedWeapons;
+    }
+    if (updatedShields) {
+      updatedPlayer.shields = updatedShields;
+    }
+    
+    setPlayer(updatedPlayer);
   };
 
   const handleEquipArmor = (armorIndex) => {
@@ -264,37 +375,49 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
               <Grid container justifyContent="center" spacing={2}>
-                <Grid item xs={6} sm={3} container justifyContent="center">
+                <Grid item xs={6} sm={2.4} container justifyContent="center">
                   <Button
                     variant="contained"
                     onClick={handleOpenNewWeapon}
                     startIcon={<MeleeIcon />}
-                    disabled={player.weapons && player.weapons.length >= 10}
+                    size="small"
                   >
                     {t("Add Weapon")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={3} container justifyContent="center">
+                <Grid item xs={6} sm={2.4} container justifyContent="center">
+                  <Button
+                    variant="contained"
+                    onClick={handleOpenNewCustomWeapon}
+                    startIcon={<MeleeIcon />}
+                    size="small"
+                  >
+                    {t("Add Custom Weapon")}
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={2.4} container justifyContent="center">
                   <Button
                     variant="contained"
                     onClick={handleOpenNewArmor}
                     startIcon={<ArmorIcon />}
                     disabled={player.armor && player.armor.length >= 10}
+                    size="small"
                   >
                     {t("Add Armor")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={3} container justifyContent="center">
+                <Grid item xs={6} sm={2.4} container justifyContent="center">
                   <Button
                     variant="contained"
                     onClick={handleOpenNewShield}
                     startIcon={<ShieldIcon />}
                     disabled={player.shields && player.shields.length >= 10}
+                    size="small"
                   >
                     {t("Add Shield")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={3} container justifyContent="center">
+                <Grid item xs={6} sm={2.4} container justifyContent="center">
                   <Button
                     variant="contained"
                     onClick={handleOpenNewAccessory}
@@ -302,13 +425,31 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     disabled={
                       player.accessories && player.accessories.length >= 10
                     }
+                    size="small"
                   >
                     {t("Add Accessory")}
+                  </Button>
+                </Grid>
+                <Grid item xs={12} container justifyContent="center">
+                  <Button
+                    variant="outlined"
+                    onClick={handleUploadJSON}
+                    startIcon={<UploadFile />}
+                    size="small"
+                  >
+                    {t("Upload JSON")}
                   </Button>
                 </Grid>
               </Grid>
             </Grid>
           </Paper>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
+          />
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
@@ -319,6 +460,15 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditWeapon={handleEditWeapon}
         onDeleteWeapon={handleDeleteWeapon}
         onEquipWeapon={handleEquipWeapon}
+        isEditMode={isEditMode}
+      />
+
+      <PlayerCustomWeapons
+        player={player}
+        customWeapons={player.customWeapons || []}
+        onEditCustomWeapon={handleEditCustomWeapon}
+        onDeleteCustomWeapon={handleDeleteCustomWeapon}
+        onEquipCustomWeapon={handleEquipCustomWeapon}
         isEditMode={isEditMode}
       />
 
@@ -358,6 +508,15 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         setWeapon={setWeapon}
         onAddWeapon={handleSaveWeapon}
         onDeleteWeapon={handleDeleteWeapon}
+      />
+      <PlayerCustomWeaponModal
+        open={openNewCustomWeapon}
+        onClose={handleCloseNewCustomWeapon}
+        editCustomWeaponIndex={editCustomWeaponIndex}
+        customWeapon={customWeapon}
+        setCustomWeapon={setCustomWeapon}
+        onAddCustomWeapon={handleSaveCustomWeapon}
+        onDeleteCustomWeapon={handleDeleteCustomWeapon}
       />
       <PlayerArmorModal
         open={openNewArmor}

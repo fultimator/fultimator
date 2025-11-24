@@ -17,8 +17,8 @@ Welcome to the contribution guidelines for Fultimator! We appreciate your intere
 
 If you have any questions or concerns, feel free to reach out to us through the following channels:
 
-- Developer Discord: [Fultimator](https://discord.gg/9yYc6R93Cd) - `#development` channel 
-- Discord: [Rooster Games](https://discord.gg/G9qGbn2) - `#bot-and-tool-discussion` channel
+- Developer Discord: [Fultimator](https://discord.gg/aNEgvHm3Re) - `#development` channel 
+- Discord: [Rooster Games](https://discord.gg/ZSjM6yFUPx) - `#bot-and-tool-discussion` channel
 
 ## Submitting Issues
 

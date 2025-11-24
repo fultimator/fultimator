@@ -114,6 +114,13 @@ export function calcInit(npc) {
 export function calcDef(npc) {
   let def = 0;
 
+  // Check if DEF is overridden
+  if (npc.extra?.defOverride) {
+    // When overridden, only use the override value
+    return npc.extra?.def || 0;
+  }
+
+  // Normal calculation when not overridden
   // Armor
   if (npc.armor?.def) {
     def += npc.armor?.def;
@@ -132,7 +139,7 @@ export function calcDef(npc) {
     def += npc.shield?.defbonus;
   }
 
-  // Skill Extra def
+  // Skill Extra def (bonus)
   if (npc.extra?.def) {
     def += npc.extra?.def;
   }
@@ -143,11 +150,13 @@ export function calcDef(npc) {
 export function calcMDef(npc) {
   let mdef = 0;
 
-  // Skill Extra M def
-  if (npc.extra?.mDef) {
-    mdef += npc.extra?.mDef;
+  // Check if M.DEF is overridden
+  if (npc.extra?.mDefOverride) {
+    // When overridden, only use the override value
+    return npc.extra?.mDef || 0;
   }
 
+  // Normal calculation when not overridden
   // Armor
   if (npc.armor?.mdefbonus) {
     mdef += npc.armor?.mdefbonus;
@@ -156,6 +165,11 @@ export function calcMDef(npc) {
   // Shield
   if (npc.shield?.mdefbonus) {
     mdef += npc.shield?.mdefbonus;
+  }
+
+  // Skill Extra M def (bonus)
+  if (npc.extra?.mDef) {
+    mdef += npc.extra?.mDef;
   }
 
   return mdef;
@@ -266,6 +280,10 @@ export function calcAvailableSkillsFromSpecies(npc) {
     npc.species === "Humanoid"
   ) {
     number = 3;
+  }
+
+  if (npc.species === "Variant Humanoid") {
+    number = 4;
   }
 
   return number;
@@ -395,10 +413,24 @@ export function calcUsedSkillsFromSpecialAttacks(npc) {
 }
 
 export function calcUsedSkillsFromExtraDefs(npc) {
-  if (!npc.extra?.def || !npc.extra?.mDef) {
+  let defCost = 0;
+  let mDefCost = 0;
+
+  // Only count def bonus if not overridden
+  if (npc.extra?.def && !npc.extra?.defOverride) {
+    defCost = npc.extra.def;
+  }
+
+  // Only count mDef bonus if not overridden
+  if (npc.extra?.mDef && !npc.extra?.mDefOverride) {
+    mDefCost = npc.extra.mDef;
+  }
+
+  if (defCost === 0 && mDefCost === 0) {
     return 0;
   }
-  return (npc.extra.def + npc.extra.mDef) / 3;
+
+  return (defCost + mDefCost) / 3;
 }
 
 export function calcUsedSkillsFromExtraHP(npc) {
@@ -541,7 +573,7 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.species === "Humanoid") {
+  if (npc.species === "Humanoid" || npc.species === "Variant Humanoid") {
     equip = false;
   }
 

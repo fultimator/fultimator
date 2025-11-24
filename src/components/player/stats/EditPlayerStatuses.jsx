@@ -11,13 +11,18 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
 
   const handleStatusChange = (status) => {
-    setPlayer((prevPlayer) => ({
-      ...prevPlayer,
-      statuses: {
-        ...prevPlayer.statuses,
-        [status]: !prevPlayer.statuses[status],
-      },
-    }));
+    setPlayer((prevPlayer) => {
+      // Check if the current status corresponds to an immunity
+      const isImmune = player.immunities && player.immunities[status] === true;
+
+      return {
+        ...prevPlayer,
+        statuses: {
+          ...prevPlayer.statuses,
+          [status]: isImmune ? false : !prevPlayer.statuses[status],
+        },
+      };
+    });
   };
 
   const statusDescriptions = {
@@ -51,14 +56,18 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
         />
       </Grid>
       <Grid container spacing={1}>
-        {Object.keys(statusDescriptions).map((status) => (
+        {Object.keys(statusDescriptions).map((status) =>  {
+          // Check if the immunity for the current status is true
+          const isImmune = player.immunities && player.immunities[status] === true;
+
+          return (
           <Grid item xs={12} md={6} key={status}>
             <FormControlLabel
               control={
                 <Checkbox
                   checked={player.statuses[status]}
                   onChange={() => handleStatusChange(status)}
-                  disabled={!isEditMode}
+                  disabled={!isEditMode || isImmune}
                 />
               }
               label={t(status.charAt(0).toUpperCase() + status.slice(1))}
@@ -73,7 +82,8 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
               </ReactMarkdown>
             </Typography>
           </Grid>
-        ))}
+          );
+        })}
       </Grid>
     </Paper>
   );
