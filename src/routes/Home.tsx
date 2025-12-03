@@ -11,6 +11,8 @@ import {
   useMediaQuery,
   Tooltip,
   IconButton,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
@@ -117,7 +119,13 @@ function Home() {
           />
         ))}
       </div>
-
+      <Alert severity="warning" sx={{ mx: "1em" }}>
+        <AlertTitle>Important Announcement!</AlertTitle>
+        Our URL has been updated! Please use the new address:{" "}
+        <Link href="https://fultimator.com" target="_blank" rel="noopener noreferrer">
+          https://fultimator.com
+        </Link>
+      </Alert>
       <Box
         sx={{
           mt: 5,
@@ -516,7 +524,7 @@ function Home() {
                   sx={{ color: isDarkMode ? "#e0e0e0" : "#555555" }}
                 >
                   {
-                    "Fabula Ultima is a roleplaying game created by Emanuele Galletto and published by Need Games."
+                    "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games."
                   }
                   <br />
                   {"Fabula Ultima is © Need Games and Rooster Games."}
