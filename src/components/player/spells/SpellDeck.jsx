@@ -47,12 +47,52 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
   const theme = useCustomTheme();
   const handleDeckUpdate = onDeckUpdate || (() => {});
 
+  // Helper function to generate a fresh shuffled deck of 30 cards
+  const generateShuffledDeck = useCallback(() => {
+    const newDeck = [];
+
+    // Add 2 jokers
+    newDeck.push({ isJoker: true, jokerValue: null, jokerSuit: null });
+    newDeck.push({ isJoker: true, jokerValue: null, jokerSuit: null });
+
+    // Add cards for each suit (1-7)
+    const suits = ['Air', 'Earth', 'Fire', 'Ice'];
+    suits.forEach(suit => {
+      for (let value = 1; value <= 7; value++) {
+        newDeck.push({
+          isJoker: false,
+          suit: suit,
+          value: value,
+        });
+      }
+    });
+
+    // Fisher-Yates shuffle
+    for (let i = newDeck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
+    }
+
+    return newDeck;
+  }, []);
+
+  // Helper function to shuffle an array (Fisher-Yates)
+  const shuffleArray = useCallback((array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, []);
+
   // Memoized deck state to prevent unnecessary recalculations
   const deckState = useMemo(() => ({
-    cardsInDeck: deck?.cardsInDeck !== undefined ? deck.cardsInDeck : 30,
+    fullDeck: deck?.fullDeck || [],
+    cardsInDeck: deck?.fullDeck?.length ?? (deck?.cardsInDeck !== undefined ? deck.cardsInDeck : 30),
     hand: deck?.hand || [],
     discardPile: deck?.discardPile || [],
-  }), [deck?.cardsInDeck, deck?.hand, deck?.discardPile]);
+  }), [deck?.fullDeck, deck?.cardsInDeck, deck?.hand, deck?.discardPile]);
   
 
   const [selectedCards, setSelectedCards] = useState([]);
@@ -64,7 +104,16 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
 
   const handleTrapCard = (suit) => {
     setTrapCardDialogOpen(false);
-    if (deckState.cardsInDeck <= 0) {
+
+    // Initialize fullDeck if it doesn't exist
+    let currentFullDeck = deck?.fullDeck || [];
+
+    // If fullDeck is empty but cardsInDeck > 0, generate a fresh deck
+    if (currentFullDeck.length === 0 && deckState.cardsInDeck > 0) {
+      currentFullDeck = generateShuffledDeck();
+    }
+
+    if (currentFullDeck.length <= 0) {
       const logEntry = {
         id: Date.now(),
         timestamp: new Date(),
@@ -76,32 +125,23 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
       return;
     }
 
-    const suits = ['Air', 'Earth', 'Fire', 'Ice'];
-    const isJoker = Math.random() < (2 / 30);
-    let revealedCard;
-    if (isJoker) {
-      revealedCard = { isJoker: true, suit: 'Joker', value: 'J' };
-    } else {
-      revealedCard = {
-        isJoker: false,
-        suit: suits[Math.floor(Math.random() * suits.length)],
-        value: Math.floor(Math.random() * 7) + 1,
-      };
-    }
+    // Draw the top card from the actual deck
+    const revealedCard = currentFullDeck[0];
+    const remainingDeck = currentFullDeck.slice(1);
 
     const success = revealedCard.isJoker || revealedCard.suit === suit;
 
     const newDiscardPile = [...(deck.discardPile || []), revealedCard];
-    const newCardsInDeck = deck.cardsInDeck - 1;
 
     handleDeckUpdate({
       ...deck,
-      cardsInDeck: newCardsInDeck,
+      fullDeck: remainingDeck,
+      cardsInDeck: remainingDeck.length,
       discardPile: newDiscardPile,
     });
 
     const resultMessage = `Declared ${suit}. Revealed ${revealedCard.isJoker ? 'Joker' : `${revealedCard.value} of ${revealedCard.suit}`}.`;
-    
+
     const logEntry = {
       id: Date.now(),
       timestamp: new Date(),
@@ -600,43 +640,32 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
 
   // Deck management functions
   const drawCards = (numCards = 1) => {
-    
-    // Can't draw if deck is empty or hand would exceed max size
-    if (deckState.cardsInDeck <= 0) {
+    // Initialize fullDeck if it doesn't exist
+    let currentFullDeck = deck?.fullDeck || [];
+
+    // If fullDeck is empty but cardsInDeck > 0, generate a fresh deck
+    if (currentFullDeck.length === 0 && deckState.cardsInDeck > 0) {
+      currentFullDeck = generateShuffledDeck();
+    }
+
+    // Can't draw if deck is empty
+    if (currentFullDeck.length <= 0) {
       return;
     }
-    
-    const cardsToDraw = Math.min(numCards, deckState.cardsInDeck);
-    
-    // Generate random cards (simplified - in real game would draw from actual deck)
-    const suits = ['Air', 'Earth', 'Fire', 'Ice'];
-    const newCards = [];
-    
-    for (let i = 0; i < cardsToDraw; i++) {
-      // 2/30 chance for joker, otherwise normal card
-      const isJoker = Math.random() < (2/30);
-      
-      if (isJoker) {
-        newCards.push({
-          isJoker: true,
-          jokerValue: null,
-          jokerSuit: null,
-        });
-      } else {
-        newCards.push({
-          isJoker: false,
-          suit: suits[Math.floor(Math.random() * suits.length)],
-          value: Math.floor(Math.random() * 7) + 1,
-        });
-      }
-    }
-    
+
+    const cardsToDraw = Math.min(numCards, currentFullDeck.length);
+
+    // Draw cards from the top of the deck (pop from array)
+    const drawnCards = currentFullDeck.slice(0, cardsToDraw);
+    const remainingDeck = currentFullDeck.slice(cardsToDraw);
+
     const updatedDeck = {
       ...deck,
-      hand: [...deckState.hand, ...newCards],
-      cardsInDeck: deckState.cardsInDeck - cardsToDraw,
+      fullDeck: remainingDeck,
+      hand: [...deckState.hand, ...drawnCards],
+      cardsInDeck: remainingDeck.length,
     };
-    
+
     handleDeckUpdate(updatedDeck);
   };
 
@@ -662,14 +691,18 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
   };
 
   const resetDeck = () => {
-    // Reset to full deck
+    // Generate a fresh shuffled deck
+    const newFullDeck = generateShuffledDeck();
+
+    // Reset to full deck with the actual card array
     handleDeckUpdate({
       ...deck,
+      fullDeck: newFullDeck,
       cardsInDeck: 30,
       hand: [],
       discardPile: [],
     });
-    
+
     // Clear any selection and combat log
     setSelectedCards([]);
     setPotentialSet(null);
@@ -678,15 +711,21 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
 
   const shuffleDeck = () => {
     // Add discard pile back to deck and shuffle
-    const currentDeckSize = deck.cardsInDeck !== undefined ? deck.cardsInDeck : 30;
-    const discardPileSize = deck.discardPile?.length || 0;
-    const totalCards = currentDeckSize + discardPileSize;
-    
-    if (discardPileSize === 0) return; // Nothing to shuffle
-    
+    const currentFullDeck = deck?.fullDeck || [];
+    const discardPile = deck?.discardPile || [];
+
+    if (discardPile.length === 0) return; // Nothing to shuffle
+
+    // Combine remaining deck cards with discard pile
+    const combinedDeck = [...currentFullDeck, ...discardPile];
+
+    // Fisher-Yates shuffle the combined deck
+    const shuffledDeck = shuffleArray(combinedDeck);
+
     handleDeckUpdate({
       ...deck,
-      cardsInDeck: totalCards,
+      fullDeck: shuffledDeck,
+      cardsInDeck: shuffledDeck.length,
       discardPile: [],
     });
   };
