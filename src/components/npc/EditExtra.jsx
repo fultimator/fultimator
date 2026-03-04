@@ -12,6 +12,7 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Martial } from "../icons";
 import { baseArmors } from "../../libs/equip";
@@ -76,15 +77,17 @@ const Overrides = React.memo(({ npc, setNpc }) => {
     return free;
   }, [npc.species]);
 
-  const extraImmunitiesPicked = useMemo(() => {
-    let count = 0;
-    Object.entries(npc.immunities || {}).forEach(([key, value]) => {
-      if (value && !freeImmunities[key]) {
-        count++;
-      }
-    });
-    return count;
-  }, [npc.immunities, freeImmunities]);
+  const speciesImmunitiesCount = useMemo(() => {
+    return Object.values(freeImmunities).filter(Boolean).length;
+  }, [freeImmunities]);
+
+  const totalAllotted = useMemo(() => {
+    return (npc.extra?.statusImmunity || 0) * 2 + speciesImmunitiesCount;
+  }, [npc.extra?.statusImmunity, speciesImmunitiesCount]);
+
+  const totalPicked = useMemo(() => {
+    return Object.values(npc.immunities || {}).filter(Boolean).length;
+  }, [npc.immunities]);
 
   const onChange = useCallback(
     (e) => {
@@ -111,14 +114,14 @@ const Overrides = React.memo(({ npc, setNpc }) => {
             htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
             formHelperText: {
               sx: {
-                color: extraImmunitiesPicked > (npc.extra?.statusImmunity || 0) * 2 ? "red !important" : "inherit",
+                color: totalPicked > totalAllotted ? "red !important" : "inherit",
               },
             },
           }}
           label={t("Status Effect Immunity")}
           value={npc.extra?.statusImmunity || 0}
           onChange={onChange}
-          helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${extraImmunitiesPicked} / ${(npc.extra?.statusImmunity || 0) * 2}`}
+          helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
         ></TextField>
       </FormControl>
     </Stack>
@@ -177,13 +180,16 @@ const Immunities = React.memo(({ npc, setNpc }) => {
             key={immunity}
             control={
               <Checkbox
-                checked={isFree || immunities[immunity]}
+                checked={immunities[immunity]}
                 onChange={onChange}
                 name={immunity}
-                disabled={isFree}
               />
             }
-            label={`${t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}`}
+            label={
+              <Typography sx={{ color: isFree ? "green" : "inherit", fontWeight: isFree ? "bold" : "inherit" }}>
+                {t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}
+              </Typography>
+            }
           />
         );
       })}
