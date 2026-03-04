@@ -378,8 +378,13 @@ export function calcUsedSkills(npc) {
     calcUsedSkillsFromSpecial(npc) +
     calcUsedSkillsFromSpells(npc) +
     calcUsedSkillsFromEquip(npc) +
-    calcUsedSkillsFromOtherActions(npc)
+    calcUsedSkillsFromOtherActions(npc) +
+    calcUsedSkillsFromStatusImmunity(npc)
   );
+}
+
+export function calcUsedSkillsFromStatusImmunity(npc) {
+  return parseInt(npc.extra?.statusImmunity) || 0;
 }
 
 export function calcUsedSkillsFromOtherActions(npc) {

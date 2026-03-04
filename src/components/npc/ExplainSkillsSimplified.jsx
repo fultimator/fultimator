@@ -35,6 +35,7 @@ import {
   calcUsedSkillsFromSpecial,
   calcUsedSkillsFromOtherActions,
   calcUsedSkillsFromEquip,
+  calcUsedSkillsFromStatusImmunity,
 } from "../../libs/npcs";
 import { useTranslate } from "../../translation/translate";
 import { darken } from "@mui/material/styles";
@@ -171,6 +172,7 @@ export default function ExplainSkillsSimplified({ npc }) {
               [t("Special Rules"), calcUsedSkillsFromSpecial],
               [t("Other Actions"), calcUsedSkillsFromOtherActions],
               [t("Equipment"), calcUsedSkillsFromEquip],
+              [t("Status Effect Immunities"), calcUsedSkillsFromStatusImmunity],
             ].map(
               ([innerLabel, calculator]) =>
                 calculator(npc) > 0 && (

@@ -45,11 +45,85 @@ export default function EditExtra({ npc, setNpc }) {
         <Grid item xs={6}>
           <Immunities npc={npc} setNpc={setNpc} />
         </Grid>
+        <Grid item xs={6}>
+          <Overrides npc={npc} setNpc={setNpc} />
+        </Grid>
       </Grid>
     </>
   );
 }
 
+const Overrides = React.memo(({ npc, setNpc }) => {
+  const { t } = useTranslate();
+
+  const freeImmunities = useMemo(() => {
+    const free = {
+      slow: false,
+      dazed: false,
+      weak: false,
+      shaken: false,
+      enraged: false,
+      poisoned: false,
+    };
+    if (npc.species === "Construct" || npc.species === "Elemental" || npc.species === "Undead") {
+      free.poisoned = true;
+    }
+    if (npc.species === "Plant") {
+      free.dazed = true;
+      free.shaken = true;
+      free.enraged = true;
+    }
+    return free;
+  }, [npc.species]);
+
+  const extraImmunitiesPicked = useMemo(() => {
+    let count = 0;
+    Object.entries(npc.immunities || {}).forEach(([key, value]) => {
+      if (value && !freeImmunities[key]) {
+        count++;
+      }
+    });
+    return count;
+  }, [npc.immunities, freeImmunities]);
+
+  const onChange = useCallback(
+    (e) => {
+      let value = parseInt(e.target.value);
+      if (isNaN(value)) value = 0;
+      if (value < 0) value = 0;
+      if (value > 3) value = 3;
+      setNpc((prevState) => ({
+        ...prevState,
+        extra: { ...prevState.extra, statusImmunity: value },
+      }));
+    },
+    [setNpc]
+  );
+
+  return (
+    <Stack spacing={2} sx={{ mt: 1 }}>
+      <FormLabel id="overrides">{t("Overrides")}</FormLabel>
+      <FormControl variant="standard" fullWidth>
+        <TextField
+          id="statusImmunity"
+          type="number"
+          slotProps={{
+            htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
+            formHelperText: {
+              sx: {
+                color: extraImmunitiesPicked > (npc.extra?.statusImmunity || 0) * 2 ? "red !important" : "inherit",
+              },
+            },
+          }}
+          label={t("Status Effect Immunity")}
+          value={npc.extra?.statusImmunity || 0}
+          onChange={onChange}
+          helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${extraImmunitiesPicked} / ${(npc.extra?.statusImmunity || 0) * 2}`}
+        ></TextField>
+      </FormControl>
+    </Stack>
+  );
+});
 
 const Immunities = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
@@ -63,6 +137,19 @@ const Immunities = React.memo(({ npc, setNpc }) => {
     enraged: false,
     poisoned: false,
   };
+
+  const freeImmunities = useMemo(() => {
+    const free = { ...allImmunities };
+    if (npc.species === "Construct" || npc.species === "Elemental" || npc.species === "Undead") {
+      free.poisoned = true;
+    }
+    if (npc.species === "Plant") {
+      free.dazed = true;
+      free.shaken = true;
+      free.enraged = true;
+    }
+    return free;
+  }, [npc.species]);
 
   const immunities = { ...allImmunities, ...(npc.immunities || {}) };
 
@@ -83,19 +170,23 @@ const Immunities = React.memo(({ npc, setNpc }) => {
   return (
     <FormGroup>
       <FormLabel id="extra-defenses">{t("Immunities")}</FormLabel>
-      {Object.keys(allImmunities).map((immunity) => (
-        <FormControlLabel
-          key={immunity}
-          control={
-            <Checkbox
-              checked={immunities[immunity]}
-              onChange={onChange}
-              name={immunity}
-            />
-          }
-          label={`${t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}`}
-        />
-      ))}
+      {Object.keys(allImmunities).map((immunity) => {
+        const isFree = freeImmunities[immunity];
+        return (
+          <FormControlLabel
+            key={immunity}
+            control={
+              <Checkbox
+                checked={isFree || immunities[immunity]}
+                onChange={onChange}
+                name={immunity}
+                disabled={isFree}
+              />
+            }
+            label={`${t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}`}
+          />
+        );
+      })}
     </FormGroup>
   );
 });
