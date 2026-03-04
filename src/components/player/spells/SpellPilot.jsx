@@ -17,39 +17,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import attributes from "../../../libs/attributes";
-
-const availableFrames = [
-  {
-    name: "pilot_frame_exoskeleton",
-    passengers: 0,
-    distance: 1,
-    limits: {
-      weapon: 2,
-      armor: 1,
-      support: -1,
-    },
-  },
-  {
-    name: "pilot_frame_mecha",
-    passengers: 1,
-    distance: 2,
-    limits: {
-      weapon: 2,
-      armor: 1,
-      support: -1,
-    },
-  },
-  {
-    name: "pilot_frame_steed",
-    passengers: 2,
-    distance: 3,
-    limits: {
-      weapon: 1,
-      armor: 1,
-      support: -1,
-    },
-  }
-];
+import { availableFrames } from "../../../libs/pilotVehicleData";
 
 function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleChange, onVehicleChange }) {
   const { t } = useTranslate();
@@ -88,28 +56,29 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
       m.equipped && getModuleTypeForLimits(m) === moduleType
     ).reduce((count, module) => {
       // Complex support modules take 2 slots
-      if (getModuleTypeForLimits(module) === "support" && module.isComplex) {
-        return count + 2;
-      }
-      return count + 1;
+      return count + ((getModuleTypeForLimits(module) === "support" && module.isComplex) ? 2 : 1);
     }, 0);
   };
 
   const canEquipModule = (vehicle, moduleIndex) => {
     const module = vehicle.modules[moduleIndex];
-    const frameType = getModuleTypeForLimits(module);
     const frameLimits = getFrameLimits(vehicle);
-    const maxEnabledModules = vehicle.maxEnabledModules || (frameLimits.weapon + frameLimits.armor);
+    const maxEnabledModules = vehicle.maxEnabledModules || 3;
 
-    // Calculate total equipped modules
-    const equippedWeapons = getEquippedCount(vehicle, "weapon");
-    const equippedArmor = getEquippedCount(vehicle, "armor");
-    const equippedSupport = getEquippedCount(vehicle, "support");
-    const totalEquippedModules = equippedWeapons + equippedArmor + equippedSupport;
+    // Determine slot cost using isComplex from pilotVehicleData
+    const frameType = getModuleTypeForLimits(module);
+    const slotsNeeded = (frameType === "support" && module.isComplex) ? 2 : 1;
 
-    // If we are trying to equip a new module and we are at or over the max, we can't.
-    if (!module.equipped && totalEquippedModules >= maxEnabledModules) {
-        return false;
+    // Count total slots used
+    const totalUsedSlots = vehicle.modules.reduce((count, m, idx) => {
+      if (!m.equipped || idx === moduleIndex) return count;
+      const mType = getModuleTypeForLimits(m);
+      return count + ((mType === "support" && m.isComplex) ? 2 : 1);
+    }, 0);
+
+    // Block when slots needed would exceed the limit
+    if (!module.equipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
+      return false;
     }
 
     // Check if unlimited slots for this type
@@ -172,14 +141,10 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
       getModuleTypeForLimits(m) === frameType
     ).reduce((count, m) => {
       // Complex support modules take 2 slots
-      if (getModuleTypeForLimits(m) === "support" && m.isComplex) {
-        return count + 2;
-      }
-      return count + 1;
+      return count + ((getModuleTypeForLimits(m) === "support" && m.isComplex) ? 2 : 1);
     }, 0);
 
     // Check if this module would fit
-    const slotsNeeded = (frameType === "support" && module.isComplex) ? 2 : 1;
     return currentlyEquippedSlots + slotsNeeded <= frameLimits[frameType];
   };
 
@@ -360,9 +325,14 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                         const total = equippedWeapons + equippedArmor + equippedSupport;
 
                         // Use maxEnabledModules from vehicle data, or calculate it if not present
-                        const maxDisplay = vehicle.maxEnabledModules || (frame.limits.weapon + frame.limits.armor);
+                        const maxDisplay = vehicle.maxEnabledModules || 3;
+                        const isOverLimit = total > maxDisplay;
 
-                        return `${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(passengers)} | ${t("pilot_distance")}: ${getDistanceText(distance)} | ${t("pilot_max_enabled_modules")}: ${total}/${maxDisplay}`;
+                        return (
+                          <span style={{ color: isOverLimit ? theme.error : "inherit" }}>
+                            {`${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(passengers)} | ${t("pilot_distance")}: ${getDistanceText(distance)} | ${t("pilot_max_enabled_modules")}: ${total}/${maxDisplay}`}
+                          </span>
+                        );
                       })()}
                     </Typography>
                   </div>

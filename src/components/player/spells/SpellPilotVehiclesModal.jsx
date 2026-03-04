@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -19,7 +19,7 @@ import {
   AccordionDetails,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import { Close, Delete, ExpandMore, Add } from "@mui/icons-material";
+import { Close, Delete, ExpandMore, Add, ErrorOutline } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 import { availableFrames } from "../../../libs/pilotVehicleData";
@@ -116,22 +116,27 @@ export default function SpellPilotVehiclesModal({
     const module = vehicle.modules[moduleIndex];
     const maxEnabledModules = vehicle.maxEnabledModules || 3; // Default to 3 if not set
 
-    // Calculate total equipped modules, excluding the current one if it's already equipped
-    const totalEquippedModules = vehicle.modules.filter((m, idx) => 
-      m.equipped && idx !== moduleIndex
-    ).length;
+    // Determine slot cost using isComplex from pilotVehicleData
+    const frameType = getModuleTypeForLimits(module);
+    const slotsNeeded = (frameType === "support" && module.isComplex) ? 2 : 1;
 
-    // If trying to equip a new module and maxEnabledModules limit is reached
-    if (!module.equipped && totalEquippedModules >= maxEnabledModules) {
+    // Count total slots used, excluding this module if it is already equipped.
+    const totalUsedSlots = vehicle.modules.reduce((count, m, idx) => {
+      if (!m.equipped || idx === moduleIndex) return count;
+      const mType = getModuleTypeForLimits(m);
+      return count + ((mType === "support" && m.isComplex) ? 2 : 1);
+    }, 0);
+
+    // Block equip when slots needed would push over the limit
+    if (!module.equipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
       return false;
     }
 
-    const frameType = getModuleTypeForLimits(module);
-    const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton", vehicle);
-    
+    const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+
     if (frameType === "custom") return true;
     if (frameLimits[frameType] === -1) return true;
-    
+
     // For weapons, check hand slot availability
     if (frameType === "weapon") {
       const equippedWeapons = vehicle.modules.filter((m, idx) =>
@@ -188,13 +193,9 @@ export default function SpellPilotVehiclesModal({
       m.equipped && 
       getModuleTypeForLimits(m) === frameType
     ).reduce((count, m) => {
-      if (getModuleTypeForLimits(m) === "support" && m.isComplex) {
-        return count + 2;
-      }
-      return count + 1;
+      return count + ((getModuleTypeForLimits(m) === "support" && m.isComplex) ? 2 : 1);
     }, 0);
     
-    const slotsNeeded = (frameType === "support" && module.isComplex) ? 2 : 1;
     return currentlyEquippedSlots + slotsNeeded <= frameLimits[frameType];
   }, [getFrameLimits, getModuleTypeForLimits]);
 
@@ -203,10 +204,7 @@ export default function SpellPilotVehiclesModal({
     return vehicle.modules.filter(m => 
       m.equipped && getModuleTypeForLimits(m) === moduleType
     ).reduce((count, module) => {
-      if (getModuleTypeForLimits(module) === "support" && module.isComplex) {
-        return count + 2;
-      }
-      return count + 1;
+      return count + ((getModuleTypeForLimits(module) === "support" && module.isComplex) ? 2 : 1);
     }, 0);
   }, [getModuleTypeForLimits]);
 
@@ -219,13 +217,47 @@ export default function SpellPilotVehiclesModal({
     return `(${equipped}/${limit})`;
   }, [getFrameLimits, getEquippedCount]);
 
+  const isSlotUsageOverLimit = useCallback((vehicle, moduleType) => {
+    const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton", vehicle);
+    const equipped = getEquippedCount(vehicle, moduleType);
+    const limit = frameLimits[moduleType];
+    
+    return limit !== -1 && equipped > limit;
+  }, [getFrameLimits, getEquippedCount]);
+
+  const isAnyVehicleIllegal = useMemo(() => {
+    return state.currentVehicles.some((vehicle) => {
+      const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+      
+      // Total slots used must not exceed maxEnabledModules
+      const totalSlots = (vehicle.modules || []).reduce((count, m) => {
+        if (!m.equipped) return count;
+        const mType = getModuleTypeForLimits(m);
+        return count + ((mType === "support" && m.isComplex) ? 2 : 1);
+      }, 0);
+      const maxLimit = vehicle.maxEnabledModules || 3;
+      if (totalSlots > maxLimit) return true;
+
+      // Category slots used must not exceed frame limits
+      const categories = ["armor", "weapon", "support"];
+      for (const cat of categories) {
+        const equipped = getEquippedCount(vehicle, cat);
+        const limit = frameLimits[cat];
+        if (limit !== -1 && equipped > limit) return true;
+      }
+      
+      return false;
+    });
+  }, [state.currentVehicles, getFrameLimits, getModuleTypeForLimits, getEquippedCount]);
+
   const handleSave = useCallback(() => {
+    if (isAnyVehicleIllegal) return;
     onSave(pilot.index, {
       ...pilot,
       vehicles: state.currentVehicles,
       showInPlayerSheet: state.showInPlayerSheet,
     });
-  }, [onSave, pilot, state.currentVehicles, state.showInPlayerSheet]);
+  }, [onSave, pilot, state.currentVehicles, state.showInPlayerSheet, isAnyVehicleIllegal]);
 
 
   return (
@@ -365,20 +397,34 @@ export default function SpellPilotVehiclesModal({
                           })()}
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            label={t("pilot_max_enabled_modules")}
-                            type="number"
-                            inputProps={{ min: 3 }}
-                            value={vehicle.maxEnabledModules || 3}
-                            onChange={(e) =>
-                              handleVehicleChange(
-                                vehicleIndex,
-                                "maxEnabledModules",
-                                parseInt(e.target.value, 10)
-                              )
-                            }
-                          />
+                          {(() => {
+                            const totalSlots = (vehicle.modules || []).reduce((count, m) => {
+                              if (!m.equipped) return count;
+                              const mType = getModuleTypeForLimits(m);
+                              return count + ((mType === "support" && m.isComplex) ? 2 : 1);
+                            }, 0);
+                            const maxLimit = vehicle.maxEnabledModules || 3;
+                            const isOverTotal = totalSlots > maxLimit;
+                            
+                            return (
+                              <TextField
+                                fullWidth
+                                label={t("pilot_max_enabled_modules")}
+                                type="number"
+                                slotProps={{ htmlInput: { min: 3 } }}
+                                value={vehicle.maxEnabledModules || 3}
+                                error={isOverTotal}
+                                helperText={isOverTotal ? `${t("Total slots used")}: ${totalSlots} / ${maxLimit}` : ""}
+                                onChange={(e) =>
+                                  handleVehicleChange(
+                                    vehicleIndex,
+                                    "maxEnabledModules",
+                                    parseInt(e.target.value, 10)
+                                  )
+                                }
+                              />
+                            );
+                          })()}
                         </Grid>
                       </Grid>
                     </Grid>
@@ -397,6 +443,7 @@ export default function SpellPilotVehiclesModal({
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
+                            color={isSlotUsageOverLimit(vehicle, "armor") ? "error" : "primary"}
                             onClick={() => handleAddModule(vehicleIndex, "armor")}
                           >
                             {t("pilot_module_armor")} {getSlotUsageText(vehicle, "armor")}
@@ -407,6 +454,7 @@ export default function SpellPilotVehiclesModal({
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
+                            color={isSlotUsageOverLimit(vehicle, "weapon") ? "error" : "primary"}
                             onClick={() => handleAddModule(vehicleIndex, "weapon")}
                           >
                             {t("pilot_module_weapon")} {getSlotUsageText(vehicle, "weapon")}
@@ -417,6 +465,7 @@ export default function SpellPilotVehiclesModal({
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
+                            color={isSlotUsageOverLimit(vehicle, "support") ? "error" : "primary"}
                             onClick={() => handleAddModule(vehicleIndex, "support")}
                           >
                             {t("pilot_module_support")} {getSlotUsageText(vehicle, "support")}
@@ -464,10 +513,20 @@ export default function SpellPilotVehiclesModal({
         </Grid>
       </DialogContent>
       <DialogActions>
+        {isAnyVehicleIllegal && (
+          <Typography color="error" variant="caption" sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+            <ErrorOutline sx={{ fontSize: 16, mr: 0.5 }} />
+            {t("Illegal module configuration detected")}
+          </Typography>
+        )}
         <Button onClick={onClose} variant="outlined">
           {t("Cancel")}
         </Button>
-        <Button onClick={handleSave} variant="contained">
+        <Button 
+          onClick={handleSave} 
+          variant="contained" 
+          disabled={isAnyVehicleIllegal}
+        >
           {t("Save")}
         </Button>
       </DialogActions>
