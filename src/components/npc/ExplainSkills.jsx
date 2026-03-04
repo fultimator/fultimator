@@ -28,6 +28,7 @@ import {
   calcUsedSkillsFromAbsorbs,
   calcUsedSkillsFromEquip,
   calcUsedSkillsFromOtherActions,
+  calcUsedSkillsFromStatusImmunity,
 } from "../../libs/npcs";
 
 import { useTranslate } from "../../translation/translate";
@@ -197,6 +198,12 @@ export default function ExplainSkills({ npc }) {
             <TableRow>
               <TableCell>{t("Used skills from other actions")}</TableCell>
               <TableCell>{calcUsedSkillsFromOtherActions(npc)}</TableCell>
+            </TableRow>
+          )}
+          {calcUsedSkillsFromStatusImmunity(npc) > 0 && (
+            <TableRow>
+              <TableCell>{t("Used skills from Status Effect Immunity")}</TableCell>
+              <TableCell>{calcUsedSkillsFromStatusImmunity(npc)}</TableCell>
             </TableRow>
           )}
 
