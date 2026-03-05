@@ -18,7 +18,7 @@ import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
 import PrettyArmor from "../equipment/armor/PrettyArmor";
 import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
 import PrettyCustomWeapon from "../equipment/customWeapons/PrettyCustomWeapon";
-import { Casino } from "@mui/icons-material";
+import { Casino, SwapHoriz } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -32,13 +32,14 @@ const calculateCustomWeaponStats = (weapon) => {
   let precision = 0;
 
   // Get customizations for primary or secondary form
-  const customizations = weapon.isSecondaryForm
+  const isSecondary = weapon.activeForm === "secondary";
+  const customizations = isSecondary
     ? weapon.secondCurrentCustomizations || []
     : weapon.customizations || [];
 
   // Apply customization bonuses
   customizations.forEach((customization) => {
-    const category = weapon.isSecondaryForm ? weapon.secondSelectedCategory : weapon.category;
+    const category = isSecondary ? weapon.secondSelectedCategory : weapon.category;
     switch (customization?.name) {
       case "weapon_customization_powerful":
         damage += category === "weapon_category_heavy" ? 7 : 5;
@@ -56,8 +57,11 @@ const calculateCustomWeaponStats = (weapon) => {
   });
 
   // Apply modifiers with safe parsing
-  damage += parseInt(weapon.damageModifier || 0, 10);
-  precision += parseInt(weapon.precModifier || 0, 10);
+  const damageModifier = isSecondary ? weapon.secondDamageModifier : weapon.damageModifier;
+  const precModifier = isSecondary ? weapon.secondPrecModifier : weapon.precModifier;
+
+  damage += parseInt(damageModifier || 0, 10);
+  precision += parseInt(precModifier || 0, 10);
 
   return { damage, precision };
 };
@@ -161,11 +165,19 @@ export default function PlayerEquipment({
     : [];
 
   // Helper function to format custom weapon for display
-  const formatCustomWeaponForDisplay = (customWeapon, isSecondaryForm = false) => {
+  const formatCustomWeaponForDisplay = (customWeapon) => {
+    const isTransforming = customWeapon.customizations?.some(
+      (c) => c.name === "weapon_customization_transforming"
+    );
+    
+    const isSecondaryForm = customWeapon.activeForm === "secondary";
+
     const baseData = {
       ...customWeapon,
       isCustomWeapon: true,
+      isTransforming: isTransforming,
       hands: 2, // Custom weapons are always two-handed
+      originalData: customWeapon // Preserve original reference
     };
 
     if (isSecondaryForm) {
@@ -196,21 +208,8 @@ export default function PlayerEquipment({
   // Combine regular weapons and custom weapons
   const allEquippedWeapons = [
     ...equippedWeapons,
-    // Add custom weapons with proper formatting
-    ...equippedCustomWeapons.flatMap((customWeapon) => {
-      const weapons = [formatCustomWeaponForDisplay(customWeapon)];
-
-      // Add secondary form if it's a transforming weapon
-      const hasTransforming = customWeapon.customizations?.some(
-        (c) => c.name === "weapon_customization_transforming"
-      );
-
-      if (hasTransforming && customWeapon.secondWeaponName) {
-        weapons.push(formatCustomWeaponForDisplay(customWeapon, true));
-      }
-
-      return weapons;
-    })
+    // Add custom weapons with proper formatting (showing only active form)
+    ...equippedCustomWeapons.map((customWeapon) => formatCustomWeaponForDisplay(customWeapon))
   ];
 
   // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
@@ -339,6 +338,26 @@ export default function PlayerEquipment({
     insight: currInsight,
     might: currMight,
     will: currWillpower,
+  };
+
+  const handleSwapForm = (weapon) => {
+    if (!setPlayer || !isEditMode) return;
+    
+    const customWeapon = weapon.originalData;
+    if (!customWeapon) return;
+
+    setPlayer(prevPlayer => {
+      const updatedCustomWeapons = [...(prevPlayer.customWeapons || [])];
+      // Search by reference to original data
+      const weaponIndex = updatedCustomWeapons.findIndex(w => w === customWeapon);
+      if (weaponIndex !== -1) {
+        const cw = updatedCustomWeapons[weaponIndex];
+        const newForm = cw.activeForm === "secondary" ? "primary" : "secondary";
+        updatedCustomWeapons[weaponIndex] = { ...cw, activeForm: newForm };
+        return { ...prevPlayer, customWeapons: updatedCustomWeapons };
+      }
+      return prevPlayer;
+    });
   };
 
   const handleDiceRoll = (weapon) => {
@@ -574,8 +593,8 @@ export default function PlayerEquipment({
                   <Grid item xs={12}>
                     {allEquippedWeapons.map((weapon, index) => (
                       <React.Fragment key={index}>
-                        <Grid container>
-                          <Grid item xs={isEditMode ? 11 : 12}>
+                        <Grid container alignItems="center">
+                          <Grid item xs={isEditMode ? 10 : 12}>
                             {weapon.isCustomWeapon ? (
                               <PrettyCustomWeapon
                                 weaponData={weapon}
@@ -592,14 +611,27 @@ export default function PlayerEquipment({
                             )}
                           </Grid>
                           {isEditMode && (
-                            <Grid item xs={1}>
-                              <Tooltip title={t("Roll")}>
-                                <IconButton
-                                  onClick={() => handleDiceRoll(weapon)}
-                                >
-                                  <Casino />
-                                </IconButton>
-                              </Tooltip>
+                            <Grid item xs={2} container justifyContent="flex-end">
+                              {weapon.isTransforming && (
+                                <Grid item>
+                                  <Tooltip title={t("weapon_customization_swap_form")}>
+                                    <IconButton
+                                      onClick={() => handleSwapForm(weapon)}
+                                    >
+                                      <SwapHoriz />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Grid>
+                              )}
+                              <Grid item>
+                                <Tooltip title={t("Roll")}>
+                                  <IconButton
+                                    onClick={() => handleDiceRoll(weapon)}
+                                  >
+                                    <Casino />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
                           )}
                         </Grid>

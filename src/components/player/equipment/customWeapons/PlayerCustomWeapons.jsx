@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyCustomWeapon from "../../../../routes/equip/customWeapons/PrettyCustomWeapon";
-import { Edit, Error } from "@mui/icons-material";
+import { Edit, Error, SwapHoriz } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
@@ -152,6 +152,13 @@ export default function PlayerCustomWeapons({
     }
   };
 
+  const handleSwapForm = (index) => {
+    const updatedCustomWeapons = [...customWeapons];
+    const cw = updatedCustomWeapons[index];
+    cw.activeForm = cw.activeForm === "secondary" ? "primary" : "secondary";
+    onEquipCustomWeapon(updatedCustomWeapons);
+  };
+
   useEffect(() => {
     // Open the Accordion when a new custom weapon is added
     if (customWeapons.length > 0) {
@@ -193,7 +200,7 @@ export default function PlayerCustomWeapons({
             return (
               <React.Fragment key={index}>
                 {/* Primary Weapon */}
-                <Grid item container xs={12} alignItems="center" spacing={1}>
+                <Grid item container xs={12} alignItems="center" spacing={1} sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
                   <Grid item xs={11}>
                     <PrettyCustomWeapon 
                       weaponData={{
@@ -277,6 +284,26 @@ export default function PlayerCustomWeapons({
                         </Tooltip>
                       )}
                     </Grid>
+                    {hasTransforming && (
+                      <Grid item xs={12}>
+                        <Tooltip title={t("weapon_customization_swap_form")}>
+                          <IconButton
+                            onClick={() => handleSwapForm(index)}
+                            disabled={!isEditMode}
+                            sx={{
+                              mt: 1,
+                              boxShadow: "1px 1px 5px",
+                              backgroundColor: theme.palette.background.paper,
+                              "&:hover": {
+                                backgroundColor: theme.palette.secondary.main,
+                              },
+                            }}
+                          >
+                            <SwapHoriz />
+                          </IconButton>
+                        </Tooltip>
+                      </Grid>
+                    )}
                     <Grid item xs={12} sx={{ mt: 1 }}>
                       <Export
                         name={customWeapon.name}
@@ -289,7 +316,7 @@ export default function PlayerCustomWeapons({
 
                 {/* Secondary Weapon (Transforming Form) */}
                 {hasTransforming && (
-                  <Grid item container xs={12} alignItems="center" spacing={1} sx={{ mt: 1 }}>
+                  <Grid item container xs={12} alignItems="center" spacing={1} sx={{ mt: 1, opacity: customWeapon.activeForm === "secondary" ? 1 : 0.6 }}>
                     <Grid item xs={11}>
                       {(() => {
                         const secondWeaponData = {

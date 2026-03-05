@@ -25,13 +25,21 @@ import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerS
 import { useTheme } from "@mui/material/styles";
 import { FullscreenTwoTone, FullscreenExitTwoTone } from '@mui/icons-material';
 import useDownload from "../../hooks/useDownload";
+import { fixVerticalLabels } from "../../utility/screenshotFix";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
   let params = useParams();
   const ref = doc(firestore, "player-personal", params.playerId);
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [player] = useDocumentData(ref, { idField: "id" });
+  const [playerData] = useDocumentData(ref, { idField: "id" });
+  const [player, setPlayer] = useState(null);
+
+  useEffect(() => {
+    if (playerData) {
+      setPlayer(playerData);
+    }
+  }, [playerData]);
 
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [fullCharacterSheet, setFullCharacterSheet] = useState(true);
@@ -73,35 +81,47 @@ export default function CharacterSheet() {
       fullCharacterSheet ? "character-sheet" : "character-sheet-short"
     );
 
-    // Set a fixed size for the screenshot
-    const originalStyle = {
-      width: element.style.width,
-    };
+    if (!element) return;
 
-    // Calculate the scale factor (2000px for full sheet, 1000px for short)
-    const targetWidth = fullCharacterSheet ? 2000 : 266;
-    const currentWidth = element.offsetWidth;
-    const scale = targetWidth / currentWidth;
+    // Save original styles
+    const originalWidth = element.style.width;
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflow = element.style.overflow;
+
+    // 1400px for full sheet (2 columns), 600px for short sheet (1 column)
+    const captureWidth = fullCharacterSheet ? "1400px" : "600px";
 
     try {
+      // Temporarily apply capture styles
+      element.style.width = captureWidth;
+      element.style.maxHeight = "none";
+      element.style.overflow = "visible";
+
       const canvas = await html2canvas(element, {
         useCORS: true,
         allowTaint: true,
-        logging: true,
+        logging: false,
+        scale: 2,
+        backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.default : "#ffffff",
+        windowWidth: fullCharacterSheet ? 1400 : 600,
+        onclone: (clonedDoc) => {
+          fixVerticalLabels(element, clonedDoc);
+        }
       });
       const imgData = canvas.toDataURL("image/png");
 
-      // Restore original size and transformations
-      element.style.width = originalStyle.width;
-      element.style.height = originalStyle.height;
+      // Restore original styles
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
 
-      // Create a link to download the image
-      const link = document.createElement("a");
-      link.href = imgData;
-      link.download = player.name + "_sheet.png";
-      link.click();
+      await download(imgData, player.name + "_sheet.png");
     } catch (error) {
       console.error("Error capturing screenshot:", error);
+      // Restore original styles even if there's an error
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
     }
   };
 
@@ -158,6 +178,8 @@ export default function CharacterSheet() {
               <Stack direction="column" spacing={2}>
                 <PlayerCard
                   player={player}
+                  setPlayer={setPlayer}
+                  isEditMode={true}
                   isCharacterSheet={true}
                   characterImage={player.info.imgurl}
                 />
@@ -165,7 +187,12 @@ export default function CharacterSheet() {
                 <PlayerTraits player={player} isCharacterSheet={true} />
                 <PlayerBonds player={player} isCharacterSheet={true} />
                 <PlayerRituals player={player} isCharacterSheet={true} />
-                <PlayerEquipment player={player} isCharacterSheet={true} />
+                <PlayerEquipment 
+                  player={player} 
+                  setPlayer={setPlayer}
+                  isEditMode={true}
+                  isCharacterSheet={true} 
+                />
                 <PlayerNotes player={player} isCharacterSheet={true} />
               </Stack>
             </Grid>
@@ -214,13 +241,15 @@ export default function CharacterSheet() {
           container
           sx={{ padding: 1 }}
           justifyContent={"center"}
-          id="character-sheet-short"
         >
           <Grid container item xs={12}>
             <PlayerCardSheet
               player={player}
+              setPlayer={setPlayer}
+              isEditMode={true}
               isCharacterSheet={true}
               characterImage={player.info.imgurl}
+              id="character-sheet-short"
             />
           </Grid>
         </Grid>
