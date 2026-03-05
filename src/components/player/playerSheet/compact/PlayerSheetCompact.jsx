@@ -31,10 +31,12 @@ const AffinityGrid = styled(Grid)(({ theme }) => ({
 
 export default function PlayerCardSheet({
     player,
+    setPlayer,
     isMainTab,
     isEditMode,
     isCharacterSheet,
     characterImage,
+    id,
 }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
@@ -256,8 +258,8 @@ export default function PlayerCardSheet({
     const collapse = true;
     return (
         <>
-            <Card>
-                <div style={{ cursor: "pointer", maxWidth: "566px" }}>
+            <Card id={id} sx={{ maxWidth: "566px", width: "100%", mx: "auto" }}>
+                <div style={{ cursor: "pointer" }}>
                     {(
                         <>
                             <div
@@ -326,18 +328,18 @@ export default function PlayerCardSheet({
 
                               {/* Tab Panels */}
                                 <CustomTabPanel value={value} index={0}>
-                                    <PlayerEquipment player={player} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}/>
+                                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}/>
                                     <PlayerClasses player={player} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={1}>
                                     <PlayerClasses player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={2}>
-                                    <PlayerRituals player={player} isCharacterSheet={true} />
+                                    <PlayerRituals player={player} isCharacterSheet={true} isEditMode={isEditMode} />
                                     <PlayerSpells player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={3}>
-                                    <PlayerEquipment player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={4}>
                                     <PlayerNotes player={player} isCharacterSheet={true} searchQuery={searchQuery} />

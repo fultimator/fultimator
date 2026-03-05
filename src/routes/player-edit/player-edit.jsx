@@ -54,11 +54,11 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { BugReport, Save, Info } from "@mui/icons-material";
-// import { testUsers, moderators } from "../../libs/userGroups";
+import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
-// import { useNavigate } from "react-router-dom";
+import html2canvas from "html2canvas";
+import useDownload from "../../hooks/useDownload";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
@@ -66,6 +66,8 @@ import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
 import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
 import PlayerSymbol from "../../components/player/playerSheet/PlayerSymbol";
 import PlayerDance from "../../components/player/playerSheet/PlayerDance";
+import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
+import { fixVerticalLabels } from "../../utility/screenshotFix";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -104,6 +106,7 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [battleMode, setBattleMode] = useState(false);
+  const [compactView, setCompactView] = useState(false);
 
   const [ritualClockSections, setRitualClockSections] = useState(4);
   const [ritualClockState, setRitualClockState] = useState(
@@ -111,8 +114,104 @@ export default function PlayerEdit() {
   );
 
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const [download, snackbar] = useDownload();
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  // const navigate = useNavigate();
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 100); // adjust threshold as needed
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (playerTemp) {
+      const images = document.querySelectorAll("img");
+      const promises = [];
+
+      images.forEach((image) => {
+        if (!image.complete) {
+          promises.push(
+            new Promise((resolve) => {
+              image.onload = resolve;
+            })
+          );
+        }
+      });
+
+      Promise.all(promises).then(() => {
+        setImagesLoaded(true);
+      });
+
+      // Clean up
+      return () => {
+        images.forEach((image) => {
+          image.onload = null;
+        });
+      };
+    }
+  }, [playerTemp]);
+
+  const takeScreenshot = async () => {
+    if (!imagesLoaded) return;
+
+    const element = document.getElementById(
+      compactView ? "character-sheet-short" : "character-sheet"
+    );
+
+    if (!element) return;
+
+    // Save original styles
+    const originalWidth = element.style.width;
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflow = element.style.overflow;
+
+    // 1400px for full sheet (2 columns), 600px for short sheet (1 column)
+    const captureWidth = compactView ? "600px" : "1400px";
+
+    try {
+      // Temporarily apply capture styles
+      element.style.width = captureWidth;
+      element.style.maxHeight = "none";
+      element.style.overflow = "visible";
+
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        scale: 2,
+        backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.default : "#ffffff",
+        windowWidth: compactView ? 600 : 1400,
+        onclone: (clonedDoc) => {
+          fixVerticalLabels(element, clonedDoc);
+        }
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      // Restore original styles
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+
+      await download(imgData, playerTemp.name + "_sheet.png");
+    } catch (error) {
+      console.error("Error capturing screenshot:", error);
+      // Restore original styles even if there's an error
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+    }
+  };
+
+  useEffect(() => {
+    if (player) {
+      setPlayerTemp({ ...player });
+      setIsUpdated(false);
+    }
+  }, [player]);
 
   // Effect to update temporary Player state and check for unsaved changes
   useEffect(() => {
@@ -350,94 +449,161 @@ export default function PlayerEdit() {
             <Tab value={6}>{t("Notes")}</Tab>
           </TabsList>
         )}
-        <TabPanel value={0}>
-          <PlayerCard
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
-            isCharacterSheet={false}
-          />
-          <Divider sx={{ my: 1 }} />
-          <PlayerNumbers player={playerTemp} isEditMode={isOwner} />
-          <Divider sx={{ my: 1 }} />
-          <Grid container spacing={1} sx={{ py: 1 }}>
-            <Grid item xs={9} sm={10} md={11}>
-              <BattleModeToggle
-                battleMode={battleMode}
-                setBattleMode={setBattleMode}
-              />
+        
+        {/* Compact View Toggle - only show when on Player Sheet tab */}
+        {openTab === 0 && (
+          <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
+            <Grid item xs={isSmallScreen ? 10 : 6}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={takeScreenshot}
+                style={{ width: "100%" }}
+                startIcon={<Download />}
+              >
+                {t("Download Character Sheet")}
+              </Button>
             </Grid>
-            <Grid item xs={3} sm={2} md={1}>
-              <GenericRolls player={playerTemp} isEditMode={isOwner} />
+            <Grid item xs={isSmallScreen ? 2 : 6}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setCompactView(!compactView)}
+                style={{ width: "100%" }}
+                sx={{ display: isSmallScreen ? "none" : "flex" }}
+              >
+                {compactView
+                  ? t("Normal View")
+                  : t("Compact View")}
+              </Button>
+              
+              {/* Mobile icon version */}
+              {isSmallScreen && (
+                <IconButton
+                  onClick={() => setCompactView(!compactView)}
+                  color="primary"
+                  sx={{ display: "flex", mx: "auto" }}
+                >
+                  {compactView ? (
+                    <FullscreenTwoTone />
+                  ) : (
+                    <FullscreenExitTwoTone />
+                  )}
+                </IconButton>
+              )}
             </Grid>
           </Grid>
-          {!battleMode && (
-            <>
-              <PlayerTraits player={playerTemp} isEditMode={isOwner} />
-              <PlayerBonds player={playerTemp} isEditMode={isOwner} />
-              <PlayerQuirk player={playerTemp} isEditMode={isOwner} />
-              <PlayerRituals
-                player={playerTemp}
-                isEditMode={isOwner}
-                clockSections={ritualClockSections}
-                setClockSections={setRitualClockSections}
-                clockState={ritualClockState}
-                setClockState={setRitualClockState}
-              />
-              <PlayerCompanion player={playerTemp} isEditMode={isOwner} />
-              <PlayerNotes
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-            </>
-          )}
-          {isOwner && battleMode ? (
-            <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
-          ) : null}
-          {battleMode && (
-            <>
-              <PlayerEquipment
+        )}
+        
+        <TabPanel value={0}>
+          {compactView ? (
+            <Grid
+              container
+              sx={{ padding: 1 }}
+              justifyContent={"center"}
+            >
+              <Grid container item xs={12}>
+                <PlayerCardSheet
+                  player={playerTemp}
+                  setPlayer={setPlayerTemp}
+                  isEditMode={isOwner}
+                  isCharacterSheet={true}
+                  characterImage={playerTemp.info.imgurl}
+                  id="character-sheet-short"
+                />
+              </Grid>
+            </Grid>
+          ) : (
+            <div id="character-sheet">
+              <PlayerCard
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isOwner}
+                isCharacterSheet={false}
               />
-              <PlayerSkills
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerSpells
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerArcana
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerGadgets
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerMagichant
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerSymbol
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-              <PlayerDance
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
-              />
-            </>
+              <Divider sx={{ my: 1 }} />
+              <PlayerNumbers player={playerTemp} isEditMode={isOwner} />
+              <Divider sx={{ my: 1 }} />
+              <Grid container spacing={1} sx={{ py: 1 }}>
+                <Grid item xs={9} sm={10} md={11}>
+                  <BattleModeToggle
+                    battleMode={battleMode}
+                    setBattleMode={setBattleMode}
+                  />
+                </Grid>
+                <Grid item xs={3} sm={2} md={1}>
+                  <GenericRolls player={playerTemp} isEditMode={isOwner} />
+                </Grid>
+              </Grid>
+              {!battleMode && (
+                <>
+                  <PlayerTraits player={playerTemp} isEditMode={isOwner} />
+                  <PlayerBonds player={playerTemp} isEditMode={isOwner} />
+                  <PlayerQuirk player={playerTemp} isEditMode={isOwner} />
+                  <PlayerRituals
+                    player={playerTemp}
+                    isEditMode={isOwner}
+                    clockSections={ritualClockSections}
+                    setClockSections={setRitualClockSections}
+                    clockState={ritualClockState}
+                    setClockState={setRitualClockState}
+                  />
+                  <PlayerCompanion player={playerTemp} isEditMode={isOwner} />
+                  <PlayerNotes
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                </>
+              )}
+              {isOwner && battleMode ? (
+                <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
+              ) : null}
+              {battleMode && (
+                <>
+                  <PlayerEquipment
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerSkills
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerSpells
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerArcana
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerGadgets
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerMagichant
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerSymbol
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerDance
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                </>
+              )}
+            </div>
           )}
         </TabPanel>
         <TabPanel value={1}>
@@ -579,6 +745,7 @@ export default function PlayerEdit() {
         onSuccess={null}
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
+      {snackbar}
     </Layout>
   );
 }
