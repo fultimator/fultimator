@@ -179,11 +179,38 @@ export default function PlayerCard({
   const equippedAccessory =
     player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
+  // Find all pilot-vehicle spells
+  const pilotSpells = (player.classes || [])
+    .flatMap((c) => c.spells || [])
+    .filter(
+      (spell) =>
+        spell &&
+        spell.spellType === "pilot-vehicle" &&
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+    );
+
+  // Find the enabled vehicle
+  const activeVehicle = pilotSpells
+    .flatMap((s) => s.vehicles || [])
+    .find((v) => v.enabled);
+
+  const equippedModules = activeVehicle?.modules
+    ? activeVehicle.modules.filter((m) => m.equipped)
+    : [];
+
+  const armorModule = equippedModules.find(
+    (m) => m.type === "pilot_module_armor"
+  );
+
   // Rogue - Dodge Skill Bonus
+  const isMartialArmor = armorModule
+    ? armorModule.martial
+    : equippedArmor?.martial || false;
+
   const dodgeBonus =
     equippedShields &&
     equippedShields.length === 0 &&
-    (equippedArmor === null || equippedArmor.martial === false)
+    !isMartialArmor
       ? (player.classes || [])
           .map((cls) => cls.skills || [])
           .flat()
@@ -193,15 +220,27 @@ export default function PlayerCard({
       : 0;
 
   // Calculate DEF and MDEF
+  const baseDef = armorModule
+    ? armorModule.martial
+      ? armorModule.def || 0
+      : currDex + (armorModule.def || 0)
+    : equippedArmor !== null
+    ? equippedArmor.martial
+      ? equippedArmor.def
+      : currDex + equippedArmor.def
+    : currDex;
+
+  const armorDefModifier = armorModule
+    ? 0
+    : equippedArmor !== null
+    ? equippedArmor.defModifier || 0
+    : 0;
+
   const currDef =
-    (equippedArmor !== null
-      ? equippedArmor.martial
-        ? equippedArmor.def
-        : currDex + equippedArmor.def
-      : currDex) +
+    baseDef +
     equippedShields.reduce((total, shield) => total + (shield.def || 0), 0) +
     (player.modifiers?.def || 0) +
-    (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
+    armorDefModifier +
     equippedShields.reduce(
       (total, shield) => total + (shield.defModifier || 0),
       0
@@ -217,11 +256,25 @@ export default function PlayerCard({
     ) +
     dodgeBonus;
 
+  const baseMDef = armorModule
+    ? armorModule.martial
+      ? armorModule.mdef || 0
+      : currInsight + (armorModule.mdef || 0)
+    : equippedArmor !== null
+    ? currInsight + equippedArmor.mdef
+    : currInsight;
+
+  const armorMDefModifier = armorModule
+    ? 0
+    : equippedArmor !== null
+    ? equippedArmor.mDefModifier || 0
+    : 0;
+
   const currMDef =
-    (equippedArmor !== null ? currInsight + equippedArmor.mdef : currInsight) +
+    baseMDef +
     equippedShields.reduce((total, shield) => total + (shield.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
-    (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
+    armorMDefModifier +
     equippedShields.reduce(
       (total, shield) => total + (shield.mDefModifier || 0),
       0
@@ -237,10 +290,22 @@ export default function PlayerCard({
     );
 
   // Initialize INIT to 0
+  const baseInit = armorModule
+    ? 0
+    : equippedArmor !== null
+    ? equippedArmor.init
+    : 0;
+
+  const armorInitModifier = armorModule
+    ? 0
+    : equippedArmor !== null
+    ? equippedArmor.initModifier || 0
+    : 0;
+
   const currInit =
-    (equippedArmor !== null ? equippedArmor.init : 0) +
+    baseInit +
     (player.modifiers?.init || 0) +
-    (equippedArmor !== null ? equippedArmor.initModifier || 0 : 0) +
+    armorInitModifier +
     equippedShields.reduce(
       (total, shield) => total + (shield.initModifier || 0),
       0

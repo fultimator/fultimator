@@ -14,6 +14,7 @@ import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
 import PlayerRituals from "./PlayerRituals";
 import PlayerNotes from "./PlayerNotes";
+import PlayerVehicle from "../PlayerVehicle";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 
 // Styled Components
@@ -192,10 +193,37 @@ export default function PlayerCardSheet({
         12
     );
 
+    // Find all pilot-vehicle spells
+    const pilotSpells = (player.classes || [])
+        .flatMap((c) => c.spells || [])
+        .filter(
+            (spell) =>
+                spell &&
+                spell.spellType === "pilot-vehicle" &&
+                (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        );
+
+    // Find the enabled vehicle
+    const activeVehicle = pilotSpells
+        .flatMap((s) => s.vehicles || [])
+        .find((v) => v.enabled);
+
+    const equippedModules = activeVehicle?.modules
+        ? activeVehicle.modules.filter((m) => m.equipped)
+        : [];
+
+    const armorModule = equippedModules.find(
+        (m) => m.type === "pilot_module_armor"
+    );
+
+    const isMartialArmor = armorModule
+        ? armorModule.martial
+        : equippedArmor?.martial || false;
+
     // Rogue - Dodge Skill Bonus
     const dodgeBonus =
         equippedShield === null &&
-            (equippedArmor === null || equippedArmor.martial === false)
+            !isMartialArmor
             ? player.classes
                 .map((cls) => cls.skills)
                 .flat()
@@ -205,15 +233,27 @@ export default function PlayerCardSheet({
             : 0;
 
     // Calculate DEF and MDEF
-    const currDef =
-        (equippedArmor !== null
+    const baseDef = armorModule
+        ? armorModule.martial
+            ? armorModule.def || 0
+            : currDex + (armorModule.def || 0)
+        : equippedArmor !== null
             ? equippedArmor.martial
                 ? equippedArmor.def
-                : player.attributes.dexterity + equippedArmor.def
-            : player.attributes.dexterity) +
+                : currDex + equippedArmor.def
+            : currDex;
+
+    const armorDefModifier = armorModule
+        ? 0
+        : equippedArmor !== null
+            ? equippedArmor.defModifier || 0
+            : 0;
+
+    const currDef =
+        baseDef +
         (equippedShield !== null ? equippedShield.def : 0) +
         (player.modifiers?.def || 0) +
-        (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
+        armorDefModifier +
         (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
         (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
         equippedWeapons.reduce(
@@ -226,13 +266,25 @@ export default function PlayerCardSheet({
         ) +
         dodgeBonus;
 
+    const baseMDef = armorModule
+        ? armorModule.martial
+            ? armorModule.mdef || 0
+            : currInsight + (armorModule.mdef || 0)
+        : equippedArmor !== null
+            ? currInsight + equippedArmor.mdef
+            : currInsight;
+
+    const armorMDefModifier = armorModule
+        ? 0
+        : equippedArmor !== null
+            ? equippedArmor.mDefModifier || 0
+            : 0;
+
     const currMDef =
-        (equippedArmor !== null
-            ? player.attributes.insight + equippedArmor.mdef
-            : player.attributes.insight) +
+        baseMDef +
         (equippedShield !== null ? equippedShield.mdef : 0) +
         (player.modifiers?.mdef || 0) +
-        (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
+        armorMDefModifier +
         (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
         (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
         equippedWeapons.reduce(
@@ -245,10 +297,22 @@ export default function PlayerCardSheet({
         );
 
     // Initialize INIT to 0
+    const baseInit = armorModule
+        ? 0
+        : equippedArmor !== null
+            ? equippedArmor.init
+            : 0;
+
+    const armorInitModifier = armorModule
+        ? 0
+        : equippedArmor !== null
+            ? equippedArmor.initModifier || 0
+            : 0;
+
     const currInit =
-        (equippedArmor !== null ? equippedArmor.init : 0) +
+        baseInit +
         (player.modifiers?.init || 0) +
-        (equippedArmor !== null ? equippedArmor.initModifier || 0 : 0) +
+        armorInitModifier +
         (equippedShield !== null ? equippedShield.initModifier || 0 : 0) +
         (equippedAccessory !== null ? equippedAccessory.initModifier || 0 : 0);
 
@@ -340,6 +404,7 @@ export default function PlayerCardSheet({
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={3}>
                                     <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
                                 </CustomTabPanel>
                                 <CustomTabPanel value={value} index={4}>
                                     <PlayerNotes player={player} isCharacterSheet={true} searchQuery={searchQuery} />

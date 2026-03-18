@@ -212,9 +212,9 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                   numSections={4}
                   size={60}
                   state={getClockState()}
-                  setState={isEditMode ? handleClockStateChange : undefined}
-                  isCharacterSheet={!isEditMode}
-                  onReset={isEditMode ? handleClockReset : undefined}
+                  setState={(isEditMode || onClockChange) ? handleClockStateChange : undefined}
+                  isCharacterSheet={!isEditMode && !onClockChange}
+                  onReset={(isEditMode || onClockChange) ? handleClockReset : undefined}
                 />
                 <Typography variant="caption" sx={{ mt: 0.5 }}>
                   {clock}/4
@@ -235,7 +235,7 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                     },
                   }}
                 />
-                {isEditMode && (
+                {(isEditMode || onClockChange) && (
                   <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
                     <Button
                       size="small"

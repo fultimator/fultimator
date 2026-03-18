@@ -15,9 +15,11 @@ import {
   Checkbox,
   ToggleButton,
   ToggleButtonGroup,
+  Divider,
 } from "@mui/material";
 import { ExpandMore, Delete } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import ReactMarkdown from "react-markdown";
 import CustomTextarea from "../../common/CustomTextarea";
 import attributes from "../../../libs/attributes";
 import weaponCategories from "../../../libs/weaponCategories";
@@ -30,7 +32,9 @@ const VehicleModule = memo(({
   vehicleIndex, 
   canEquip,
   onModuleChange, 
-  onDeleteModule 
+  onDeleteModule,
+  onCloneModule,
+  vehicle
 }) => {
   const { t } = useTranslate();
 
@@ -68,7 +72,7 @@ const VehicleModule = memo(({
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={5}>
             <Typography variant="h6">
               {isCustomModule
                 ? module.customName || t("pilot_custom")
@@ -80,12 +84,64 @@ const VehicleModule = memo(({
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
               {t(module.type)} 
               {module.equipped && module.type === "pilot_module_weapon" && (
-                <> | {module.equippedSlot === "main" ? t("main_hand") : module.equippedSlot === "off" ? t("off_hand") : t("both_hand")}</>
+                <> | {module.cumbersome ? t("both_hand") : (module.equippedSlot === "main" ? t("main_hand") : t("off_hand"))}</>
               )}
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={2}>
+          <Grid item xs={12} sm={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            {module.equipped && module.type === "pilot_module_weapon" && (
+              module.isShield ? (
+                <ToggleButtonGroup
+                  value={module.equippedSlot || "off"}
+                  exclusive
+                  onChange={(e, newValue) => {
+                    e.stopPropagation();
+                    if (newValue !== null) {
+                      onModuleChange(vehicleIndex, moduleIndex, "equippedSlot", newValue);
+                    }
+                  }}
+                  size="small"
+                >
+                  <ToggleButton 
+                    value="main" 
+                    disabled={!vehicle.modules.some(m => m.equipped && m.isShield && (m.equippedSlot === "off" || !m.equippedSlot) && m !== module)}
+                    sx={{ minWidth: 35 }}
+                  >
+                    {t("m_abbr")}
+                  </ToggleButton>
+                  <ToggleButton value="off" sx={{ minWidth: 35 }}>{t("o_abbr")}</ToggleButton>
+                </ToggleButtonGroup>
+              ) : module.cumbersome ? (
+                <Button variant="contained" size="small" disabled sx={{ minWidth: 35 }}>
+                  {t("mo_abbr")}
+                </Button>
+              ) : (
+                <ToggleButtonGroup
+                  value={module.equippedSlot || "main"}
+                  exclusive
+                  onChange={(e, newValue) => {
+                    e.stopPropagation();
+                    if (newValue !== null) {
+                      onModuleChange(vehicleIndex, moduleIndex, "equippedSlot", newValue);
+                    }
+                  }}
+                  size="small"
+                >
+                  <ToggleButton value="main" sx={{ minWidth: 35 }}>{t("m_abbr")}</ToggleButton>
+                  <ToggleButton 
+                    value="off" 
+                    disabled={vehicle.modules.some(m => m.equipped && m.isShield && m.equippedSlot === "off")}
+                    sx={{ minWidth: 35 }}
+                  >
+                    {t("o_abbr")}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              )
+            )}
+          </Grid>
+
+          <Grid item xs={12} sm={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               onClick={handleDelete}
               variant="outlined"
@@ -143,60 +199,32 @@ const VehicleModule = memo(({
           {/* Equipment Slot Selection for Weapons */}
           {module.equipped && module.type === "pilot_module_weapon" && (
             <Grid item xs={12} sm={2}>
-              {module.isShield ? (
-                <div style={{ textAlign: 'center' }}>
-                  <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-                    {t("Hand")}
-                  </Typography>
-                  <Button 
-                    variant="contained" 
-                    size="small"
-                    disabled
-                    sx={{ minWidth: 60 }}
+              <div style={{ textAlign: 'center' }}>
+                <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                  {t("Hand")}
+                </Typography>
+                <ToggleButtonGroup
+                  value={module.equippedSlot || (module.isShield ? "off" : "main")}
+                  exclusive
+                  onChange={(e, newValue) => {
+                    if (newValue !== null) {
+                      onModuleChange(vehicleIndex, moduleIndex, "equippedSlot", newValue);
+                    }
+                  }}
+                  size="small"
+                >
+                  <ToggleButton value="main">{t("m_abbr")}</ToggleButton>
+                  <ToggleButton 
+                    value="off" 
+                    disabled={!module.isShield && vehicle.modules.some(m => m.equipped && m.isShield && m.equippedSlot === "off")}
                   >
                     {t("o_abbr")}
-                  </Button>
-                  <Typography variant="caption" display="block" sx={{ mt: 0.5, color: "text.secondary" }}>
-                    {t("off_hand_only")}
-                  </Typography>
-                </div>
-              ) : module.cumbersome ? (
-                <div style={{ textAlign: 'center' }}>
-                  <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-                    {t("Hand")}
-                  </Typography>
-                  <Button 
-                    variant="contained" 
-                    size="small"
-                    disabled
-                    sx={{ minWidth: 60 }}
-                  >
-                    {t("mo_abbr")}
-                  </Button>
-                  <Typography variant="caption" display="block" sx={{ mt: 0.5, color: "text.secondary" }}>
-                    {t("both_hand")}
-                  </Typography>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center' }}>
-                  <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-                    {t("hand")}
-                  </Typography>
-                  <ToggleButtonGroup
-                    value={module.equippedSlot || "main"}
-                    exclusive
-                    onChange={(e, newValue) => {
-                      if (newValue !== null) {
-                        onModuleChange(vehicleIndex, moduleIndex, "equippedSlot", newValue);
-                      }
-                    }}
-                    size="small"
-                  >
-                    <ToggleButton value="main">{t("m_abbr")}</ToggleButton>
-                    <ToggleButton value="off">{t("o_abbr")}</ToggleButton>
-                  </ToggleButtonGroup>
-                </div>
-              )}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <Typography variant="caption" display="block" sx={{ mt: 0.5, color: "text.secondary" }}>
+                  {module.equippedSlot === "off" ? t("off_hand") : t("main_hand")}
+                </Typography>
+              </div>
             </Grid>
           )}
 
@@ -211,7 +239,6 @@ const VehicleModule = memo(({
                       onChange={(e) =>
                         onModuleChange(vehicleIndex, moduleIndex, "isShield", e.target.checked)
                       }
-                      disabled={module.name !== "pilot_custom_weapon"}
                     />
                   }
                   label={
@@ -234,7 +261,6 @@ const VehicleModule = memo(({
                       onChange={(e) =>
                         onModuleChange(vehicleIndex, moduleIndex, "cumbersome", e.target.checked)
                       }
-                      disabled={module.name !== "pilot_custom_weapon"}
                     />
                   }
                   label={
@@ -254,34 +280,48 @@ const VehicleModule = memo(({
 
           {/* Support Module Checkboxes */}
           {module.type === "pilot_module_support" && (
-            <Grid item xs={12} sm={2}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={module.isComplex || false}
-                    onChange={(e) =>
-                      onModuleChange(vehicleIndex, moduleIndex, "isComplex", e.target.checked)
-                    }
-                    disabled={module.name !== "pilot_custom_support"}
-                  />
-                }
-                label={
-                  <div>
-                    <Typography component="span">
-                      {t("pilot_complex")}
-                    </Typography>
-                    <Typography variant="body2" display="block" sx={{ color: "text.secondary", fontSize: "0.875rem" }}>
-                      {t("pilot_takes_two_slots")}
-                    </Typography>
-                  </div>
-                }
-              />
-            </Grid>
+            <>
+              <Grid item xs={12} sm={2}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={module.isComplex || false}
+                      onChange={(e) =>
+                        onModuleChange(vehicleIndex, moduleIndex, "isComplex", e.target.checked)
+                      }
+                      disabled={!isCustomModule}
+                    />
+                  }
+                  label={
+                    <div>
+                      <Typography component="span">
+                        {t("pilot_complex")}
+                      </Typography>
+                      <Typography variant="body2" display="block" sx={{ color: "text.secondary", fontSize: "0.875rem" }}>
+                        {t("pilot_takes_two_slots")}
+                      </Typography>
+                    </div>
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={2}>
+                <TextField
+                  fullWidth
+                  label={t("Cost")}
+                  type="number"
+                  value={module.cost || 0}
+                  onChange={(e) =>
+                    onModuleChange(vehicleIndex, moduleIndex, "cost", parseInt(e.target.value) || 0)
+                  }
+                  disabled={!isCustomModule}
+                />
+              </Grid>
+            </>
           )}
 
-          {/* Support Module Description */}
-          {module.type === "pilot_module_support" && module.name === "pilot_custom_support" && (
-            <Grid item xs={12}>
+          {/* Module Description */}
+          <Grid item xs={12}>
+            {isCustomModule ? (
               <CustomTextarea
                 fullWidth
                 label={t("Description")}
@@ -290,8 +330,23 @@ const VehicleModule = memo(({
                   onModuleChange(vehicleIndex, moduleIndex, "description", e.target.value)
                 }
               />
-            </Grid>
-          )}
+            ) : (
+              <div style={{ padding: '8px', border: '1px solid rgba(0, 0, 0, 0.12)', borderRadius: '4px', backgroundColor: 'rgba(0, 0, 0, 0.03)' }}>
+                <Typography variant="caption" sx={{ color: "text.secondary", mb: 1, display: 'block' }}>
+                  {t("Description")}
+                </Typography>
+                <div style={{ fontSize: "0.95em" }}>
+                  <ReactMarkdown
+                    components={{
+                      p: (props) => <p style={{ margin: 0 }} {...props} />,
+                    }}
+                  >
+                    {t(module.description)}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            )}
+          </Grid>
 
           {/* Weapon Stats */}
           {module.type === "pilot_module_weapon" && (
@@ -304,6 +359,7 @@ const VehicleModule = memo(({
                     onChange={(e) =>
                       onModuleChange(vehicleIndex, moduleIndex, "category", e.target.value)
                     }
+                    disabled={!isCustomModule}
                   >
                     {weaponCategories.map((category) => (
                       <MenuItem key={category} value={category}>
@@ -322,6 +378,7 @@ const VehicleModule = memo(({
                     onChange={(e) =>
                       onModuleChange(vehicleIndex, moduleIndex, "att1", e.target.value)
                     }
+                    disabled={!isCustomModule}
                   >
                     {Object.keys(attributes).map((attr) => (
                       <MenuItem key={attr} value={attr}>
@@ -340,6 +397,7 @@ const VehicleModule = memo(({
                     onChange={(e) =>
                       onModuleChange(vehicleIndex, moduleIndex, "att2", e.target.value)
                     }
+                    disabled={!isCustomModule}
                   >
                     {Object.keys(attributes).map((attr) => (
                       <MenuItem key={attr} value={attr}>
@@ -359,6 +417,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "prec", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               
@@ -371,6 +430,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "damage", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               
@@ -382,7 +442,7 @@ const VehicleModule = memo(({
                     onChange={(e) =>
                       onModuleChange(vehicleIndex, moduleIndex, "range", e.target.value)
                     }
-                    disabled={module.name !== "pilot_custom_weapon"}
+                    disabled={!isCustomModule}
                   >
                     <MenuItem value="Melee">{t("Melee")}</MenuItem>
                     <MenuItem value="Ranged">{t("Ranged")}</MenuItem>
@@ -398,7 +458,7 @@ const VehicleModule = memo(({
                     onChange={(e) =>
                       onModuleChange(vehicleIndex, moduleIndex, "damageType", e.target.value)
                     }
-                    disabled={module.name !== "pilot_custom_weapon"}
+                    disabled={!isCustomModule}
                   >
                     <MenuItem value="Physical">{t("Physical")}</MenuItem>
                     <MenuItem value="Air">{t("Air")}</MenuItem>
@@ -422,6 +482,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "cost", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               
@@ -433,6 +494,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "quality", e.target.value)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -444,13 +506,14 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "qualityCost", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
             </>
           )}
 
           {/* Armor Stats */}
-          {module.type === "pilot_module_armor" && module.name === "pilot_custom_armor" && (
+          {module.type === "pilot_module_armor" && (
             <>
               <Grid item xs={12} sm={2}>
                 <FormControlLabel
@@ -460,6 +523,7 @@ const VehicleModule = memo(({
                       onChange={(e) =>
                         onModuleChange(vehicleIndex, moduleIndex, "martial", e.target.checked)
                       }
+                      disabled={!isCustomModule}
                     />
                   }
                   label={t("Martial")}
@@ -474,6 +538,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "def", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               <Grid item xs={12} sm={2}>
@@ -485,6 +550,7 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "mdef", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
               <Grid item xs={12} sm={2}>
@@ -496,9 +562,24 @@ const VehicleModule = memo(({
                   onChange={(e) =>
                     onModuleChange(vehicleIndex, moduleIndex, "cost", parseInt(e.target.value) || 0)
                   }
+                  disabled={!isCustomModule}
                 />
               </Grid>
             </>
+          )}
+
+          {!isCustomModule && onCloneModule && (
+            <Grid item xs={12}>
+              <Divider sx={{ my: 1 }} />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => onCloneModule(vehicleIndex, moduleIndex)}
+                sx={{ mt: 1 }}
+              >
+                {t("Clone to Custom")}
+              </Button>
+            </Grid>
           )}
         </Grid>
       </AccordionDetails>

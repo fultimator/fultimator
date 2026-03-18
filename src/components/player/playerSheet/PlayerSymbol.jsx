@@ -14,26 +14,31 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import SpellSymbolist from "../spells/SpellSymbolist";
+import ReactMarkdown from "react-markdown";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerSymbol({ player }) {
+export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
   const [selectedSymbol, setSelectedSymbol] = useState(null);
+  const [selectedSymbolSpell, setSelectedSymbolSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleOpenModal = (sym) => {
+  const handleOpenModal = (symbolSpell, sym) => {
     setSelectedSymbol(sym);
+    setSelectedSymbolSpell(symbolSpell);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedSymbol(null);
+    setSelectedSymbolSpell(null);
   };
 
   /* All symbol spells from all classes */
@@ -72,7 +77,7 @@ export default function PlayerSymbol({ player }) {
                 marginBottom: "-1px",
                 paddingY: "10px",
                 backgroundColor: primary,
-                color: "#fff",
+                color: custom.white,
                 borderRadius: "0 8px 8px 0",
                 transform: "rotate(180deg)",
                 fontSize: "2em",
@@ -82,86 +87,113 @@ export default function PlayerSymbol({ player }) {
               {t("symbol_symbols")}
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
-              {symbolSpells.map((sym, index) => (
-                <Grid
-                  item
-                  container
-                  xs={12}
-                  md={6}
-                  key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
-                    <Typography
-                      id="spell-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
-                    >
-                      {t("symbol_symbol") + " - " + t(sym.className)}
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
-                    <div
-                      id="spell-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="spell-right-controls"
-                    >
-                      <Tooltip title={t("Info")}>
-                        <IconButton
-                          sx={{ padding: "0px" }}
-                          onClick={() => handleOpenModal(sym)}
+              {symbolSpells.map((symbolSpell, ssIndex) => (
+                <React.Fragment key={ssIndex}>
+                  {/* Individual Symbols */}
+                  {symbolSpell.symbols &&
+                    symbolSpell.symbols.map((sym, sIndex) => (
+                      <Grid
+                        item
+                        container
+                        xs={12}
+                        md={6}
+                        key={`${ssIndex}-${sIndex}`}
+                        sx={{ display: "flex", alignItems: "stretch" }}
+                      >
+                        <Grid item xs={10} sx={{ display: "flex" }}>
+                          <Typography
+                            id="spell-left-name"
+                            variant="h2"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              backgroundColor: primary,
+                              padding: "5px",
+                              paddingLeft: "10px",
+                              color: "#fff",
+                              borderRadius: "8px 0 0 8px",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                          >
+                            {sym.name === "symbol_custom_name"
+                              ? sym.customName
+                              : t(sym.name)}
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          xs={2}
+                          sx={{ display: "flex", alignItems: "stretch" }}
                         >
-                          <Info />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </Grid>
-                </Grid>
+                          <div
+                            id="spell-right-controls"
+                            style={{
+                              padding: "10px",
+                              backgroundColor: ternary,
+                              borderRadius: "0 8px 8px 0",
+                              marginRight: "15px",
+                              display: "flex",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                            className="spell-right-controls"
+                          >
+                            <Tooltip title={t("Info")}>
+                              <IconButton
+                                sx={{ padding: "0px" }}
+                                onClick={() => handleOpenModal(symbolSpell, sym)}
+                              >
+                                <Info />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        </Grid>
+                      </Grid>
+                    ))}
+                </React.Fragment>
               ))}
             </Grid>
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{
-                sx: {
-                  width: "80%",
-                  maxWidth: "lg",
-                },
-              }}
+              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
               <DialogContent>
-                {selectedSymbol !== null && (
-                  <SpellSymbolist
-                    symbol={selectedSymbol}
-                    isEditMode={false}
-                  />
+                {selectedSymbol && (
+                  <>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        mb: 1,
+                      }}
+                    >
+                      {selectedSymbol.name === "symbol_custom_name"
+                        ? selectedSymbol.customName
+                        : t(selectedSymbol.name)}
+                      {" - "}
+                      {selectedSymbolSpell && t(selectedSymbolSpell.className)}
+                    </Typography>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <ReactMarkdown>
+                      {selectedSymbol.name === "symbol_custom_name"
+                        ? selectedSymbol.effect
+                        : t(selectedSymbol.effect)}
+                    </ReactMarkdown>
+                  </>
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>

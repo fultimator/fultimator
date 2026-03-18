@@ -10,14 +10,16 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  LinearProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import Clock from "./Clock";
 
-export default function PlayerDance({ player }) {
+export default function PlayerGift({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -25,36 +27,67 @@ export default function PlayerDance({ player }) {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
-  const [selectedDance, setSelectedDance] = useState(null);
-  const [selectedDanceSpell, setSelectedDanceSpell] = useState(null);
+  const [selectedGift, setSelectedGift] = useState(null);
+  const [selectedGiftSpell, setSelectedGiftSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleOpenModal = (danceSpell, dance) => {
-    setSelectedDance(dance);
-    setSelectedDanceSpell(danceSpell);
+  const handleOpenModal = (giftSpell, gift) => {
+    setSelectedGift(gift);
+    setSelectedGiftSpell(giftSpell);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedDance(null);
-    setSelectedDanceSpell(null);
+    setSelectedGift(null);
+    setSelectedGiftSpell(null);
   };
 
-  /* All dance spells from all classes */
-  const danceSpells = player.classes
+  const handleClockChange = (giftSpell, newClock) => {
+    if (!setPlayer) return;
+    setPlayer((prevPlayer) => {
+      const newClasses = prevPlayer.classes.map((cls) => {
+        if (cls.name === giftSpell.className) {
+          const newSpells = cls.spells.map((spell) => {
+            if (spell.name === giftSpell.name) {
+              return { ...spell, clock: newClock };
+            }
+            return spell;
+          });
+          return { ...cls, spells: newSpells };
+        }
+        return cls;
+      });
+      return { ...prevPlayer, classes: newClasses };
+    });
+  };
+
+  /* All gift spells from all classes */
+  const giftSpells = player.classes
     .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
     .filter(
       (spell) =>
         spell !== undefined &&
-        spell.spellType === "dance" &&
+        spell.spellType === "gift" &&
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
+  const getClockState = (clock) => {
+    const state = [false, false, false, false];
+    for (let i = 0; i < clock && i < 4; i++) {
+      state[i] = true;
+    }
+    return state;
+  };
+
+  const getClockProgress = (clock) => {
+    return (clock / 4) * 100;
+  };
+
   return (
     <>
-      {danceSpells.length > 0 && (
+      {giftSpells.length > 0 && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -84,18 +117,58 @@ export default function PlayerDance({ player }) {
               }}
               align="center"
             >
-              {t("dance_dance")}
+              {t("esper_psychic_gifts")}
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
-              {danceSpells.map((danceSpell, dsIndex) => (
-                <React.Fragment key={dsIndex}>
-                  {danceSpell.dances && danceSpell.dances.map((dance, dIndex) => (
+              {giftSpells.map((giftSpell, gsIndex) => (
+                <React.Fragment key={gsIndex}>
+                  {/* Brainwave Clock Section */}
+                  <Grid item xs={12} sx={{ mb: 2 }}>
+                    <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
+                      {t("esper_brainwave_clock")} - {t(giftSpell.className)}
+                    </Typography>
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid item>
+                        <Clock
+                          numSections={4}
+                          size={60}
+                          state={getClockState(giftSpell.clock || 0)}
+                          setState={(isEditMode || setPlayer) ? (newState) => {
+                            const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
+                            handleClockChange(giftSpell, filledSections);
+                          } : undefined}
+                          isCharacterSheet={!isEditMode && !setPlayer}
+                          onReset={(isEditMode || setPlayer) ? () => handleClockChange(giftSpell, 0) : undefined}
+                        />
+                      </Grid>
+                      <Grid item xs>
+                        <LinearProgress
+                          variant="determinate"
+                          value={getClockProgress(giftSpell.clock || 0)}
+                          sx={{
+                            height: 10,
+                            borderRadius: 5,
+                            backgroundColor: theme.palette.grey[300],
+                            "& .MuiLinearProgress-bar": {
+                              backgroundColor: primary,
+                            },
+                          }}
+                        />
+                        <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
+                          {giftSpell.clock || 0} / 4
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+
+                  {/* Individual Gifts */}
+                  {giftSpell.gifts && giftSpell.gifts.map((gift, gIndex) => (
                     <Grid
                       item
                       container
                       xs={12}
                       md={6}
-                      key={`${dsIndex}-${dIndex}`}
+                      key={`${gsIndex}-${gIndex}`}
                       sx={{ display: "flex", alignItems: "stretch" }}
                     >
                       <Grid item xs={10} sx={{ display: "flex" }}>
@@ -115,7 +188,7 @@ export default function PlayerDance({ player }) {
                             width: "100%",
                           }}
                         >
-                          {dance.name === "dance_custom_name" ? dance.customName : t(dance.name)}
+                          {gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
                         </Typography>
                       </Grid>
                       <Grid
@@ -139,7 +212,7 @@ export default function PlayerDance({ player }) {
                           <Tooltip title={t("Info")}>
                             <IconButton
                               sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(danceSpell, dance)}
+                              onClick={() => handleOpenModal(giftSpell, gift)}
                             >
                               <Info />
                             </IconButton>
@@ -157,21 +230,21 @@ export default function PlayerDance({ player }) {
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
               <DialogContent>
-                {selectedDance && (
+                {selectedGift && (
                   <>
                     <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.customName : t(selectedDance.name)}
+                      {selectedGift.name === "esper_gift_custom_name" ? selectedGift.customName : t(selectedGift.name)}
                       {" - "}
-                      {selectedDanceSpell && t(selectedDanceSpell.className)}
+                      {selectedGiftSpell && t(selectedGiftSpell.className)}
                     </Typography>
-
-                    {selectedDance.duration && (
+                    
+                    {selectedGift.event && (
                       <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1, display: "flex", gap: 1 }}>
-                        {t("dance_duration")}:{" "}
+                        {t("esper_events")}:{" "}
                         <ReactMarkdown components={{ p: "span" }}>
-                          {selectedDance.name === "dance_custom_name"
-                            ? selectedDance.duration
-                            : t(selectedDance.duration)}
+                          {selectedGift.event.startsWith("esper_event_")
+                            ? t(selectedGift.event)
+                            : selectedGift.event}
                         </ReactMarkdown>
                       </Typography>
                     )}
@@ -179,7 +252,7 @@ export default function PlayerDance({ player }) {
                     <Divider sx={{ my: 2 }} />
 
                     <ReactMarkdown>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.effect : t(selectedDance.effect)}
+                      {selectedGift.name === "gift_custom_name" ? selectedGift.effect : t(selectedGift.effect)}
                     </ReactMarkdown>
                   </>
                 )}

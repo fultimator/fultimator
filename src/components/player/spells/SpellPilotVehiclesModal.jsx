@@ -92,6 +92,13 @@ export default function SpellPilotVehiclesModal({
     });
   }, []);
 
+  const handleCloneModule = useCallback((vehicleIndex, moduleIndex) => {
+    dispatch({
+      type: VEHICLE_ACTIONS.CLONE_MODULE,
+      payload: { vehicleIndex, moduleIndex, t },
+    });
+  }, [t]);
+
   const handleShowInPlayerSheetChange = useCallback((e) => {
     dispatch({
       type: VEHICLE_ACTIONS.SET_SHOW_IN_PLAYER_SHEET,
@@ -153,36 +160,32 @@ export default function SpellPilotVehiclesModal({
       // If there's a both-hands weapon, no other weapons can be equipped
       if (hasBothHandsWeapon) return false;
 
-      // For unequipped weapons, check if they can be equipped to any available hand
+      // For unequipped modules
       if (!module.equipped) {
-        // Shields can only go to off hand
+        const mainOccupied = equippedWeapons.some(m => (m.equippedSlot || (m.isShield ? "off" : "main")) === "main");
+        const offOccupied = equippedWeapons.some(m => (m.equippedSlot || (m.isShield ? "off" : "main")) === "off");
+
         if (module.isShield) {
-          const occupiedSlots = equippedWeapons.map(m => 
-            m.isShield ? "off" : (m.equippedSlot || "main")
-          );
-          return !occupiedSlots.includes("off");
+          // Shield can be equipped if off hand is free or if off hand is taken by another shield (so it goes to main)
+          if (!offOccupied) return true;
+          
+          const offHandShield = equippedWeapons.find(m => m.isShield && (m.equippedSlot === "off" || !m.equippedSlot));
+          return !!offHandShield && !mainOccupied;
         }
-        
-        // Regular weapons can go to either main or off hand (whichever is available)
-        const occupiedSlots = equippedWeapons.map(m => 
-          m.isShield ? "off" : (m.equippedSlot || "main")
-        );
-        
-        // Can equip if either main OR off hand is available
-        return !occupiedSlots.includes("main") || !occupiedSlots.includes("off");
+
+        // Regular weapon needs either hand free
+        return !mainOccupied || !offOccupied;
       }
       
-      // For equipped weapons being re-evaluated, check their specific slot
-      const proposedSlot = module.isShield ? "off" : (module.equippedSlot || "main");
+      // For already equipped modules being re-evaluated
+      const proposedSlot = module.equippedSlot || (module.isShield ? "off" : "main");
       
-      // If this weapon uses both hands, check that no other weapons are equipped
       if (proposedSlot === "both") {
         return equippedWeapons.length === 0;
       }
 
-      // Check if the proposed hand slot is available
       const occupiedSlots = equippedWeapons.map(m => 
-        m.isShield ? "off" : (m.equippedSlot || "main")
+        m.equippedSlot || (m.isShield ? "off" : "main")
       );
       
       return !occupiedSlots.includes(proposedSlot);
@@ -484,6 +487,8 @@ export default function SpellPilotVehiclesModal({
                           canEquip={canEquipModule(vehicle, moduleIndex)}
                           onModuleChange={handleModuleChange}
                           onDeleteModule={handleDeleteModule}
+                          onCloneModule={handleCloneModule}
+                          vehicle={vehicle}
                         />
                       </Grid>
                     ))}

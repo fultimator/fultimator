@@ -11,7 +11,7 @@ import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
-export default function PrettyWeapon({ weapon }) {
+export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true, showHeader = true }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -48,164 +48,171 @@ export default function PrettyWeapon({ weapon }) {
     );
   };
 
-  return (
-    <>
-      <Card>
-        <div ref={ref} style={{ cardBackground }}>
-          <Stack>
+  const content = (
+    <div ref={ref} style={{ cardBackground }}>
+      <Stack>
+        {showHeader && (
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              p: 1,
+              background: `${theme.primary}`,
+              color: "#ffffff",
+              "& .MuiTypography-root": {
+                fontSize: { xs: "0.6rem", sm: "1.2rem" },
+                textTransform: "uppercase",
+              },
+            }}
+          >
+            <Grid item xs={3}>
+              <Typography variant="h4" textAlign="left">
+                {t("Weapon")}
+              </Typography>
+            </Grid>
+            <Grid item xs={1}>
+              <Typography variant="h4" textAlign="center">
+                {t("Cost")}
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="h4" textAlign="center">
+                {t("Accuracy")}
+              </Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="h4" textAlign="center">
+                {t("Damage")}
+              </Typography>
+            </Grid>
+          </Grid>
+        )}
+        <Grid container>
+          <Grid container direction="column" item xs>
+            {/* First Row */}
             <Grid
               container
               justifyContent="space-between"
-              alignItems="center"
+              item
               sx={{
-                p: 1,
-                background: `${theme.primary}`,
-                color: "#ffffff",
+                background,
+                borderBottom: `1px solid ${theme.secondary}`,
+                padding: "5px",
                 "& .MuiTypography-root": {
-                  fontSize: { xs: "0.6rem", sm: "1.2rem" },
-                  textTransform: "uppercase",
+                  fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={2} md={3}>
-                <Typography variant="h4" textAlign="left">
-                  {t("Weapon")}
+              <Grid
+                item
+                xs={3}
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
+                  {t(weapon.name)}
                 </Typography>
+                {weapon.martial && <Martial />}
               </Grid>
-              <Grid item xs={2} md={1}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Accuracy")}
-                </Typography>
+              <Grid item xs={1}>
+                <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography variant="h4" textAlign="center">
-                  {t("Damage")}
+                <Typography fontWeight="bold" textAlign="center">
+                  <OpenBracket />
+                  {`${attributes[weapon.att1].shortcaps} + ${
+                    attributes[weapon.att2].shortcaps
+                  }`}
+                  <CloseBracket />
+                  {weapon.prec > 0
+                    ? `+${weapon.prec}`
+                    : weapon.prec < 0
+                    ? `${weapon.prec}`
+                    : ""}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={4}>
+                <Typography fontWeight="bold" textAlign="center">
+                  <OpenBracket />
+                  {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
+                  <CloseBracket />
+                  {types[weapon.type].long}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container>
-              <Grid container direction="column" item xs>
-                {/* First Row */}
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  item
-                  sx={{
-                    background,
-                    borderBottom: `1px solid ${theme.secondary}`,
-                    padding: "5px",
-                    "& .MuiTypography-root": {
-                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                    },
-                  }}
-                >
-                  <Grid
-                    item
-                    xs={3}
-                    sx={{ display: "flex", alignItems: "center" }}
-                  >
-                    <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
-                      {t(weapon.name)}
-                    </Typography>
-                    {weapon.martial && <Martial />}
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography fontWeight="bold" textAlign="center">
-                      <OpenBracket />
-                      {`${attributes[weapon.att1].shortcaps} + ${
-                        attributes[weapon.att2].shortcaps
-                      }`}
-                      <CloseBracket />
-                      {weapon.prec > 0
-                        ? `+${weapon.prec}`
-                        : weapon.prec < 0
-                        ? `${weapon.prec}`
-                        : ""}
-                    </Typography>
-                  </Grid>
 
-                  <Grid item xs={4}>
-                    <Typography fontWeight="bold" textAlign="center">
-                      <OpenBracket />
-                      {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
-                      <CloseBracket />
-                      {types[weapon.type].long}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {/* Second Row */}
-                <Grid
-                  container
-                  justifyContent="flex-end"
-                  sx={{
-                    background: "transparent",
-                    borderBottom: `1px solid ${theme.secondary}`,
-                    padding: "5px",
-                    "& .MuiTypography-root": {
-                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                    },
-                  }}
-                >
-                  <Grid item xs={3}>
-                    <Typography fontWeight="bold">
-                      {t(weapon.category)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Diamond color={theme.primary} />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography textAlign="center">
-                      {weapon.hands === 1 && t("One-handed")}
-                      {weapon.hands === 2 && t("Two-handed")}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Diamond color="{primary}" />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Typography textAlign="center">
-                      {weapon.melee && t("Melee")}
-                      {weapon.ranged && t("Ranged")}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Typography
+            {/* Second Row */}
+            <Grid
+              container
+              justifyContent="flex-end"
               sx={{
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
-                px: 1,
-                py: 1,
+                padding: "5px",
+                "& .MuiTypography-root": {
+                  fontSize: { xs: "0.7rem", sm: "1.0rem" },
+                },
               }}
             >
-              {!weapon.quality && t("No Qualities")}{" "}
-              <StyledMarkdown
-                components={{
-                  strong: (props) => (
-                    <strong style={{ fontWeight: "bold" }} {...props} />
-                  ),
-                  em: (props) => (
-                    <em style={{ fontStyle: "italic" }} {...props} />
-                  ),
-                }}
-              >
-                {weapon.quality}
-              </StyledMarkdown>
-            </Typography>
-          </Stack>
-        </div>
+              <Grid item xs={3}>
+                <Typography fontWeight="bold">
+                  {t(weapon.category)}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Diamond color={theme.primary} />
+              </Grid>
+              <Grid item xs={4}>
+                <Typography textAlign="center">
+                  {weapon.hands === 1 && t("One-handed")}
+                  {weapon.hands === 2 && t("Two-handed")}
+                </Typography>
+              </Grid>
+              <Grid item xs={1}>
+                <Diamond color="{primary}" />
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign="center">
+                  {weapon.melee && t("Melee")}
+                  {weapon.ranged && t("Ranged")}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Typography
+          sx={{
+            background: "transparent",
+            borderBottom: `1px solid ${theme.secondary}`,
+            px: 1,
+            py: 1,
+          }}
+        >
+          {!weapon.quality && t("No Qualities")}{" "}
+          <StyledMarkdown
+            components={{
+              strong: (props) => (
+                <strong style={{ fontWeight: "bold" }} {...props} />
+              ),
+              em: (props) => (
+                <em style={{ fontStyle: "italic" }} {...props} />
+              ),
+            }}
+          >
+            {weapon.quality}
+          </StyledMarkdown>
+        </Typography>
+      </Stack>
+    </div>
+  );
+
+  if (!showCard) return content;
+
+  return (
+    <>
+      <Card sx={{ boxShadow: isCharacterSheet ? 0 : 2 }}>
+        {content}
       </Card>
     </>
   );

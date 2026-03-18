@@ -52,6 +52,7 @@ import SpellInvokerInvocationsModal from "./SpellInvokerInvocationsModal";
 import SpellDeck from "./SpellDeck";
 import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
+import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -969,82 +970,20 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             ...cls,
             spells: cls.spells.map((spell, spellIdx) => {
               if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
-                const updatedVehicles = [...spell.vehicles];
-                const updatedModules = [...updatedVehicles[vehicleIndex].modules];
-                
-                if (field === "equipped") {
-                  const module = updatedModules[moduleIndex];
-                  
-                  if (value) {
-                    // Equipping - determine default slot
-                    if (module.type === "pilot_module_armor") {
-                      module.equippedSlot = "armor";
-                    } else if (module.type === "pilot_module_weapon" || module.type === "pilot_module_shield") {
-                      module.equippedSlot = module.cumbersome ? "both" : "main";
-                    } else if (module.type === "pilot_module_support") {
-                      module.equippedSlot = "support";
-                    }
-                    
-                    // If weapon is cumbersome, disable other weapon modules
-                    if (module.cumbersome && (module.type === "pilot_module_weapon" || module.type === "pilot_module_shield")) {
-                      updatedModules.forEach((otherModule, otherIndex) => {
-                        if (otherIndex !== moduleIndex && 
-                            (otherModule.type === "pilot_module_weapon" || otherModule.type === "pilot_module_shield")) {
-                          otherModule.equipped = false;
-                          otherModule.enabled = false;
-                          otherModule.equippedSlot = null;
-                        }
-                      });
-                    }
-                  } else {
-                    // Unequipping
-                    module.equippedSlot = null;
-                  }
-                  
-                  module.equipped = value;
-                  module.enabled = value;
-                } else if (field === "equippedSlot") {
-                  // Handle equipped slot changes with smart swapping logic
-                  const module = updatedModules[moduleIndex];
-                  module.equippedSlot = value;
-                  
-                  // Smart weapon hand swapping logic
-                  if (module.type === "pilot_module_weapon" && !module.isShield && !module.cumbersome) {
-                    // Find other equipped weapons that are not shields or cumbersome
-                    updatedModules.forEach((otherModule, otherIndex) => {
-                      if (otherIndex !== moduleIndex && 
-                          otherModule.equipped && 
-                          otherModule.type === "pilot_module_weapon" &&
-                          !otherModule.isShield && 
-                          !otherModule.cumbersome) {
-                        
-                        // If we're switching to main hand and other weapon is in main hand
-                        if (value === "main" && otherModule.equippedSlot === "main") {
-                          otherModule.equippedSlot = "off";
-                        }
-                        // If we're switching to off hand and other weapon is in off hand  
-                        else if (value === "off" && otherModule.equippedSlot === "off") {
-                          otherModule.equippedSlot = "main";
-                        }
-                      }
-                    });
-                  }
-                } else {
-                  // Handle other field changes
-                  updatedModules[moduleIndex][field] = value;
-                }
-                
-                updatedVehicles[vehicleIndex].modules = updatedModules;
-                
-                // Update enabled modules list for display
-                const enabledModules = updatedVehicles[vehicleIndex].modules
-                  .filter((m) => m.enabled || m.equipped)
-                  .map((m) => m.name === "pilot_custom_module" ? m.customName : m.name);
-                updatedVehicles[vehicleIndex].enabledModules = enabledModules;
+                // Use the vehicleReducer logic to update the state
+                const tempState = { 
+                  currentVehicles: spell.vehicles,
+                  showInPlayerSheet: spell.showInPlayerSheet
+                };
+                const action = {
+                  type: VEHICLE_ACTIONS.UPDATE_MODULE,
+                  payload: { vehicleIndex, moduleIndex, field, value, t }
+                };
+                const newState = vehicleReducer(tempState, action);
                 
                 return {
                   ...spell,
-                  vehicles: updatedVehicles,
+                  vehicles: newState.currentVehicles
                 };
               }
               return spell;

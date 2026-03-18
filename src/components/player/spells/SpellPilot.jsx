@@ -100,36 +100,32 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
       // If there's a both-hands weapon, no other weapons can be equipped
       if (hasBothHandsWeapon) return false;
 
-      // For unequipped weapons, check if they can be equipped to any available hand
+      // For unequipped modules
       if (!module.equipped) {
-        // Shields can only go to off hand
+        const mainOccupied = equippedWeapons.some(m => (m.equippedSlot || (m.isShield ? "off" : "main")) === "main");
+        const offOccupied = equippedWeapons.some(m => (m.equippedSlot || (m.isShield ? "off" : "main")) === "off");
+
         if (module.isShield) {
-          const occupiedSlots = equippedWeapons.map(m => 
-            m.isShield ? "off" : (m.equippedSlot || "main")
-          );
-          return !occupiedSlots.includes("off");
+          // Shield can be equipped if off hand is free or if off hand is taken by another shield (so it goes to main)
+          if (!offOccupied) return true;
+          
+          const offHandShield = equippedWeapons.find(m => m.isShield && (m.equippedSlot === "off" || !m.equippedSlot));
+          return !!offHandShield && !mainOccupied;
         }
-        
-        // Regular weapons can go to either main or off hand (whichever is available)
-        const occupiedSlots = equippedWeapons.map(m => 
-          m.isShield ? "off" : (m.equippedSlot || "main")
-        );
-        
-        // Can equip if either main OR off hand is available
-        return !occupiedSlots.includes("main") || !occupiedSlots.includes("off");
+
+        // Regular weapon needs either hand free
+        return !mainOccupied || !offOccupied;
       }
       
-      // For equipped weapons being re-evaluated, check their specific slot
-      const proposedSlot = module.isShield ? "off" : (module.equippedSlot || "main");
+      // For already equipped modules being re-evaluated
+      const proposedSlot = module.equippedSlot || (module.isShield ? "off" : "main");
       
-      // If this weapon uses both hands, check that no other weapons are equipped
       if (proposedSlot === "both") {
         return equippedWeapons.length === 0;
       }
 
-      // Check if the proposed hand slot is available
       const occupiedSlots = equippedWeapons.map(m => 
-        m.isShield ? "off" : (m.equippedSlot || "main")
+        m.equippedSlot || (m.isShield ? "off" : "main")
       );
       
       return !occupiedSlots.includes(proposedSlot);
@@ -353,7 +349,7 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                         let slotInfo = "";
                         if (m.type === "pilot_module_weapon") {
                           // Show hand information for weapons
-                          const handText = m.equippedSlot === "main" ? "M" : m.equippedSlot === "off" ? "O" : "M+O";
+                          const handText = m.cumbersome ? "M+O" : (m.equippedSlot === "main" ? "M" : "O");
                           slotInfo = `[${handText}]`;
                         } else if (m.type === "pilot_module_support" && m.isComplex) {
                           slotInfo = "(2 slots)";
@@ -579,15 +575,26 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                                     {module.equipped && module.type === "pilot_module_weapon" && (
                                       <div style={{ marginLeft: 8 }}>
                                         {module.isShield ? (
-                                          // Shields are locked to off-hand
-                                          <Button
-                                            variant="contained"
+                                          // Shields can now be M or O to support Dual Shieldbearer
+                                          <ToggleButtonGroup
+                                            value={module.equippedSlot || "off"}
+                                            exclusive
+                                            onChange={(e, newValue) => {
+                                              if (newValue !== null && onModuleChange) {
+                                                onModuleChange(i, module.originalIndex, "equippedSlot", newValue);
+                                              }
+                                            }}
                                             size="small"
-                                            disabled
-                                            sx={{ minWidth: 40, fontSize: '0.75rem' }}
                                           >
-                                            O
-                                          </Button>
+                                            <ToggleButton 
+                                              value="main" 
+                                              disabled={!vehicle.modules.some(m => m.equipped && m.isShield && (m.equippedSlot === "off" || !m.equippedSlot) && m !== module)}
+                                              sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}
+                                            >
+                                              M
+                                            </ToggleButton>
+                                            <ToggleButton value="off" sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}>O</ToggleButton>
+                                          </ToggleButtonGroup>
                                         ) : module.cumbersome ? (
                                           // Cumbersome weapons use both hands
                                           <Button
@@ -599,7 +606,7 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                                             M+O
                                           </Button>
                                         ) : (
-                                          // Regular weapons can toggle between main/off/both
+                                          // Regular weapons can toggle between main/off
                                           <ToggleButtonGroup
                                             value={module.equippedSlot || "main"}
                                             exclusive
@@ -611,7 +618,13 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
                                             size="small"
                                           >
                                             <ToggleButton value="main" sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}>M</ToggleButton>
-                                            <ToggleButton value="off" sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}>O</ToggleButton>
+                                            <ToggleButton 
+                                              value="off" 
+                                              disabled={vehicle.modules.some(m => m.equipped && m.isShield && m.equippedSlot === "off")}
+                                              sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}
+                                            >
+                                              O
+                                            </ToggleButton>
                                           </ToggleButtonGroup>
                                         )}
                                       </div>
