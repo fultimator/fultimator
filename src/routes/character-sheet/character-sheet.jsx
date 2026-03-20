@@ -4,7 +4,7 @@ import { useTranslate } from "../../translation/translate";
 import { firestore } from "../../firebase";
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { doc } from "@firebase/firestore";
-import { Grid, Button, Typography, Stack, IconButton, useMediaQuery } from "@mui/material";
+import { Grid, Button, Typography, Stack, IconButton, useMediaQuery, Divider } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
@@ -14,6 +14,7 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
 import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
+import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
 import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
@@ -43,6 +44,11 @@ export default function CharacterSheet() {
 
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [fullCharacterSheet, setFullCharacterSheet] = useState(true);
+
+  const [ritualClockSections, setRitualClockSections] = useState(4);
+  const [ritualClockState, setRitualClockState] = useState(
+    new Array(4).fill(false)
+  );
 
   useEffect(() => {
     // Ensure all images are loaded before setting imagesLoaded to true
@@ -186,14 +192,28 @@ export default function CharacterSheet() {
                 <PlayerNumbers player={player} isCharacterSheet={true} />
                 <PlayerTraits player={player} isCharacterSheet={true} />
                 <PlayerBonds player={player} isCharacterSheet={true} />
-                <PlayerRituals player={player} isCharacterSheet={true} />
+                <PlayerRituals
+                  player={player}
+                  isEditMode={true}
+                  isCharacterSheet={true}
+                  clockSections={ritualClockSections}
+                  setClockSections={setRitualClockSections}
+                  clockState={ritualClockState}
+                  setClockState={setRitualClockState}
+                />
                 <PlayerEquipment 
                   player={player} 
                   setPlayer={setPlayer}
                   isEditMode={true}
                   isCharacterSheet={true} 
                 />
-                <PlayerNotes player={player} isCharacterSheet={true} />
+                <PlayerVehicle
+                  player={player}
+                  setPlayer={setPlayer}
+                  isEditMode={true}
+                  isCharacterSheet={true}
+                />
+                <PlayerNotes player={player} setPlayer={setPlayer} isCharacterSheet={true} />
               </Stack>
             </Grid>
           </Grid>
@@ -208,7 +228,7 @@ export default function CharacterSheet() {
           <Grid item xs={12}>
             <PlayerSpellsFull player={player} isCharacterSheet={true} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <PlayerCompanion player={player} isCharacterSheet={true} />
           </Grid>
           <Grid container item xs={12}>

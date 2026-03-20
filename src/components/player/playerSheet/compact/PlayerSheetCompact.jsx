@@ -14,7 +14,9 @@ import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
 import PlayerRituals from "./PlayerRituals";
 import PlayerNotes from "./PlayerNotes";
-import PlayerVehicle from "../PlayerVehicle";
+import PlayerBonds from "../PlayerBonds";
+import PlayerVehicle from "./PlayerVehicle";
+import PlayerCompanion from "./PlayerCompanion";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 
 // Styled Components
@@ -30,6 +32,31 @@ const AffinityGrid = styled(Grid)(({ theme }) => ({
 
 }));
 
+const isMobile = window.innerWidth < 900;
+
+const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+const calculateAttribute = (
+    player,
+    base,
+    decreaseStatuses,
+    increaseStatuses,
+    min,
+    max
+) => {
+    let adjustedValue = base;
+
+    decreaseStatuses.forEach((status) => {
+        if (player.statuses[status]) adjustedValue -= 2;
+    });
+
+    increaseStatuses.forEach((status) => {
+        if (player.statuses[status]) adjustedValue += 2;
+    });
+
+    return clamp(adjustedValue, min, max);
+};
+
 export default function PlayerCardSheet({
     player,
     setPlayer,
@@ -44,7 +71,7 @@ export default function PlayerCardSheet({
     const [value, setValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
 
-  // Handle tab change
+    // Handle tab change
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -80,32 +107,11 @@ export default function PlayerCardSheet({
         <div role="tabpanel" hidden={value !== index}>
             {value === index && (
                 <Box sx={{ p: 0 }}>
-                    <Typography>{children}</Typography>
+                    {children}
                 </Box>
             )}
         </div>
     );
-
-    // const buttonStyle = {
-    //     borderRadius: 0,
-    //     flex: 1,
-    //     padding: 0,
-    //     mt: 0.5,
-    //     bgcolor: theme.mode === 'dark' ? theme.ternary : theme.primary,
-    //     border: `2px solid ${theme.mode === 'dark' ? theme.ternary : theme.primary}`,
-    //     '&:hover': {
-    //         bgcolor: theme.mode === 'dark' ? theme.ternary : theme.primary,
-    //     },
-    // };
-
-    // const homeButtonStyle = {
-    //     ...buttonStyle,
-    //     flex: 0.5,  // Smaller flex value to take less space
-    // };
-
-    const isMobile = window.innerWidth < 900;
-
-    const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
     /* player.armor.isEquipped (should be only one) */
     const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
@@ -126,45 +132,8 @@ export default function PlayerCardSheet({
     const equippedAccessory =
         player.accessories?.find((accessory) => accessory.isEquipped) || null;
 
-    // Function to format item names
-    const formatItemName = (item) =>
-        item.name !== item.base.name
-            ? `${item.name} (${t(item.base.name)})`
-            : t(item.name);
-
-    // Gather all equipped items
-    const equippedItems = [
-        ...equippedWeapons.map(formatItemName),
-        ...equippedCustomWeapons.map(weapon => weapon.name || "Custom Weapon"),
-        equippedArmor ? formatItemName(equippedArmor) : null,
-        equippedShield ? formatItemName(equippedShield) : null,
-        equippedAccessory ? equippedAccessory.name : null,
-    ].filter((item) => item !== null); // Filter out null values
-
-    // Join all equipped items into a single line
-    const equipmentText = equippedItems.join(", ");
-
-    const calculateAttribute = (
-        base,
-        decreaseStatuses,
-        increaseStatuses,
-        min,
-        max
-    ) => {
-        let adjustedValue = base;
-
-        decreaseStatuses.forEach((status) => {
-            if (player.statuses[status]) adjustedValue -= 2;
-        });
-
-        increaseStatuses.forEach((status) => {
-            if (player.statuses[status]) adjustedValue += 2;
-        });
-
-        return clamp(adjustedValue, min, max);
-    };
-
     const currDex = calculateAttribute(
+        player,
         player.attributes.dexterity,
         ["slow", "enraged"],
         ["dexUp"],
@@ -172,6 +141,7 @@ export default function PlayerCardSheet({
         12
     );
     const currInsight = calculateAttribute(
+        player,
         player.attributes.insight,
         ["dazed", "enraged"],
         ["insUp"],
@@ -179,6 +149,7 @@ export default function PlayerCardSheet({
         12
     );
     const currMight = calculateAttribute(
+        player,
         player.attributes.might,
         ["weak", "poisoned"],
         ["migUp"],
@@ -186,6 +157,7 @@ export default function PlayerCardSheet({
         12
     );
     const currWillpower = calculateAttribute(
+        player,
         player.attributes.willpower,
         ["shaken", "poisoned"],
         ["wlpUp"],
@@ -316,105 +288,97 @@ export default function PlayerCardSheet({
         (equippedShield !== null ? equippedShield.initModifier || 0 : 0) +
         (equippedAccessory !== null ? equippedAccessory.initModifier || 0 : 0);
 
-    let crisis =
-        player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
-
     const collapse = true;
     return (
-        <>
-            <Card id={id} sx={{ maxWidth: "566px", width: "100%", mx: "auto" }}>
-                <div style={{ cursor: "pointer" }}>
-                    {(
-                        <>
-                            <div
-                                style={{
-                                    boxShadow: collapse ? "none" : "1px 1px 5px",
-                                }}
-                            >
-                                <Header player={player} characterImage={characterImage} />
-                            </div>
-                            <Stats player={player} currDex={currDex} currInsight={currInsight} currMight={currMight} currWillpower={currWillpower} currDef={currDef} currMDef={currMDef} currInit={currInit} />
+        <Card id={id} sx={{ maxWidth: "566px", width: "100%", mx: "auto" }}>
+            <Box
+                style={{
+                    boxShadow: collapse ? "none" : "1px 1px 5px",
+                }}
+            >
+                <Header player={player} characterImage={characterImage} />
+            </Box>
+            <Stats player={player} currDex={currDex} currInsight={currInsight} currMight={currMight} currWillpower={currWillpower} currDef={currDef} currMDef={currMDef} currInit={currInit} />
 
-                            <Box sx={{ p: 0, borderBottom: 1, borderColor: 'divider' }}>
-                                {/* Tabs */}
-                                <Tabs
-                                    value={value}
-                                    onChange={handleChange}
-                                    aria-label="category filter tab"
-                                    variant="scrollable"
-                                    scrollButtons="auto"
-                                    sx={{
-                                        minHeight: '30px',
-                                        height: '30px',
-                                        '& .MuiTabs-indicator': {
-                                            bgcolor: theme.secondary,
-                                            height: 3,
-                                        },
-                                        '@media (max-width:600px)': {
-                                            minHeight: '30px',
-                                            height: '30px',
-                                        },
-                                    }}
-                                >
-                                    <Tab icon={<HomeOutlinedIcon sx={{ fontSize: '1rem' }} />} sx={homeTabStyle} />
-                                    <Tab label="Classes" sx={tabStyle} />
-                                    <Tab label="Features" sx={tabStyle} />
-                                    <Tab label="Backpack" sx={tabStyle} />
-                                    <Tab label="Notes" sx={tabStyle} />
-                                </Tabs>
+            <Box sx={{ p: 0, borderBottom: 1, borderColor: 'divider' }}>
+                {/* Tabs */}
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="category filter tab"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{
+                        minHeight: '30px',
+                        height: '30px',
+                        '& .MuiTabs-indicator': {
+                            bgcolor: theme.secondary,
+                            height: 3,
+                        },
+                        '@media (max-width:600px)': {
+                            minHeight: '30px',
+                            height: '30px',
+                        },
+                    }}
+                >
+                    <Tab icon={<HomeOutlinedIcon sx={{ fontSize: '1rem' }} />} sx={homeTabStyle} />
+                    <Tab label="Classes" sx={tabStyle} />
+                    <Tab label="Features" sx={tabStyle} />
+                    <Tab label="Backpack" sx={tabStyle} />
+                    <Tab label="Notes" sx={tabStyle} />
+                </Tabs>
 
-                              <Box sx={{ px: 0.5, display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: 0 }}>
-                                <InputBase
-                                  sx={{ ml: 1, flex: 1 }}
-                                  placeholder="Search..."
-                                  inputProps={{ 'aria-label': 'Search' }}
-                                  type="text"
-                                  value={searchQuery}
-                                  onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <IconButton
-                                  type="button"
-                                  sx={{ p: '0' }}
-                                  aria-label={searchQuery ? 'clear' : 'search'}
-                                  onClick={() => {
-                                    if (searchQuery) {
-                                      setSearchQuery('');
-                                    }
-                                  }}
-                                >
-                                  {searchQuery ? (
-                                    <Clear />
-                                  ) : (
-                                    <Search />
-                                  )}
-                                </IconButton>
-                              </Box>
+                <Box sx={{ px: 0.5, display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: 0 }}>
+                    <InputBase
+                        sx={{ ml: 1, flex: 1 }}
+                        placeholder="Search..."
+                        inputProps={{ 'aria-label': 'Search' }}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <IconButton
+                        type="button"
+                        sx={{ p: '0' }}
+                        aria-label={searchQuery ? 'clear' : 'search'}
+                        onClick={() => {
+                            if (searchQuery) {
+                                setSearchQuery('');
+                            }
+                        }}
+                    >
+                        {searchQuery ? (
+                            <Clear />
+                        ) : (
+                            <Search />
+                        )}
+                    </IconButton>
+                </Box>
 
-                              {/* Tab Panels */}
-                                <CustomTabPanel value={value} index={0}>
-                                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}/>
-                                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={1}>
-                                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={2}>
-                                    <PlayerRituals player={player} isCharacterSheet={true} isEditMode={isEditMode} />
-                                    <PlayerSpells player={player} isCharacterSheet={true} searchQuery={searchQuery} />
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={3}>
-                                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
-                                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
-                                </CustomTabPanel>
-                                <CustomTabPanel value={value} index={4}>
-                                    <PlayerNotes player={player} isCharacterSheet={true} searchQuery={searchQuery} />
-                                </CustomTabPanel>
-                            </Box>
-                        </>
-                    )}
-                </div>
-            </Card>
-        </>
+                {/* Tab Panels */}
+                <CustomTabPanel value={value} index={0}>
+                    <PlayerBonds player={player} isCharacterSheet={true} />
+                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
+                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={1}>
+                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={2}>
+                    <PlayerRituals player={player} isCharacterSheet={true} />
+                    <PlayerSpells player={player} setPlayer={setPlayer} isCharacterSheet={true} searchQuery={searchQuery} />
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={3}>
+                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
+                    <PlayerCompanion player={player} isCharacterSheet={true} />
+                </CustomTabPanel>
+                <CustomTabPanel value={value} index={4}>
+                    <PlayerNotes player={player} isCharacterSheet={true} searchQuery={searchQuery} />
+                    <PlayerBonds player={player} isCharacterSheet={true} />
+                </CustomTabPanel>
+            </Box>
+        </Card>
     );
 }
 
@@ -454,33 +418,6 @@ function Header({ player, characterImage }) {
         setOpen(false);
     };
 
-    const StyledMarkdown = ({ children, ...props }) => {
-        return (
-            <div
-                style={{
-                    whiteSpace: "pre-line",
-                    display: "inline",
-                    margin: 0,
-                    padding: 1,
-                }}
-            >
-                <ReactMarkdown
-                    {...props}
-                    components={{
-                        p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-                        ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-                        li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-                        strong: (props) => (
-                            <strong style={{ fontWeight: "bold" }} {...props} />
-                        ),
-                        em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
-                    }}
-                >
-                    {children}
-                </ReactMarkdown>
-            </div>
-        );
-    };
     return (
         <Grid container alignItems="stretch">
             <Grid container>
@@ -585,14 +522,30 @@ function Header({ player, characterImage }) {
                             alignItems: "center",
                         }}
                     >
-
-
-                        <StyledMarkdown
-                            allowedElements={["strong"]}
-                            unwrapDisallowed={true}
+                        <div
+                            style={{
+                                whiteSpace: "pre-line",
+                                display: "inline",
+                                margin: 0,
+                                padding: 1,
+                            }}
                         >
-                            {player.info.description}
-                        </StyledMarkdown>
+                            <ReactMarkdown
+                                components={{
+                                    p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+                                    ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+                                    li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+                                    strong: (props) => (
+                                        <strong style={{ fontWeight: "bold" }} {...props} />
+                                    ),
+                                    em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+                                }}
+                                allowedElements={["strong"]}
+                                unwrapDisallowed={true}
+                            >
+                                {player.info.description}
+                            </ReactMarkdown>
+                        </div>
                     </Box>
                     {/* Row 2 */}
                     {(player.info.identity || player.info.theme || player.info.origin) && (
@@ -657,7 +610,6 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
     const { t } = useTranslate();
     const theme = useTheme();
     const custom = useCustomTheme();
-    const isMobile = window.innerWidth < 900;
     const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
     const getAttributeColor = (base, current) => {
         if (current < base) return theme.palette.error.main;
@@ -751,8 +703,8 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                                     fontFamily: "'Antonio', fantasy, sans-serif",
                                     fontSize: "0.875rem",
                                     color: getAttributeColor(
-                                        player.attributes.willpower,
-                                        currWillpower
+                                        player.attributes.might,
+                                        currMight
                                     ),
                                 }}
                             >

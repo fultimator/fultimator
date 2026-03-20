@@ -70,6 +70,7 @@ import PlayerTherioforms from "../../components/player/playerSheet/PlayerTheriof
 import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
 import PlayerInvoker from "../../components/player/playerSheet/PlayerInvoker";
 import PlayerGourmet from "../../components/player/playerSheet/PlayerGourmet";
+import PlayerDeck from "../../components/player/playerSheet/PlayerDeck.jsx";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -633,6 +634,11 @@ export default function PlayerEdit() {
                     isEditMode={isOwner}
                   />
                   <PlayerInvoker
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
+                  <PlayerDeck
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
                     isEditMode={isOwner}

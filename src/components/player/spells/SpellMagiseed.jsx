@@ -28,6 +28,12 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
   
   const [expandedMagiseeds, setExpandedMagiseeds] = useState(new Set());
+  const [localClock, setLocalClock] = useState(magiseed.growthClock || 0);
+
+  // Sync local clock when prop changes
+  React.useEffect(() => {
+    setLocalClock(magiseed.growthClock || 0);
+  }, [magiseed.growthClock]);
 
   const toggleMagiseedExpansion = (index) => {
     setExpandedMagiseeds(prev => {
@@ -55,7 +61,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
 
   // Get current magiseed in garden
   const currentMagiseed = magiseed.currentMagiseed;
-  const growthClock = magiseed.growthClock || 0;
+  const growthClock = localClock;
 
   // Growth clock progress (0-4 sections)
   const getGrowthClockProgress = () => {
@@ -74,6 +80,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
   // Handle clock state changes from Clock component
   const handleClockStateChange = (newState) => {
     const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
+    setLocalClock(filledSections);
     if (onGrowthClockChange) {
       onGrowthClockChange(filledSections);
     }
@@ -81,8 +88,17 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
 
   // Handle clock reset from right-click
   const handleClockReset = () => {
+    setLocalClock(0);
     if (onGrowthClockChange) {
       onGrowthClockChange(0);
+    }
+  };
+
+  const updateClock = (newValue) => {
+    const clampedValue = Math.max(0, Math.min(4, newValue));
+    setLocalClock(clampedValue);
+    if (onGrowthClockChange) {
+      onGrowthClockChange(clampedValue);
     }
   };
 
@@ -253,9 +269,9 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
                   numSections={4}
                   size={60}
                   state={getClockState()}
-                  setState={isEditMode ? handleClockStateChange : undefined}
-                  isCharacterSheet={!isEditMode}
-                  onReset={isEditMode ? handleClockReset : undefined}
+                  setState={handleClockStateChange}
+                  isCharacterSheet={false}
+                  onReset={handleClockReset}
                 />
                 <Typography variant="caption" sx={{ mt: 0.5 }}>
                   {growthClock}/4
@@ -276,33 +292,31 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
                     },
                   }}
                 />
-                {isEditMode && (
-                  <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onGrowthClockChange && onGrowthClockChange(Math.max(0, growthClock - 1))}
-                      disabled={growthClock === 0}
-                    >
-                      -
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onGrowthClockChange && onGrowthClockChange(Math.min(4, growthClock + 1))}
-                      disabled={growthClock === 4}
-                    >
-                      +
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onGrowthClockChange && onGrowthClockChange(0)}
-                    >
-                      {t("Reset")}
-                    </Button>
-                  </div>
-                )}
+                <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(growthClock - 1)}
+                    disabled={growthClock === 0}
+                  >
+                    -
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(growthClock + 1)}
+                    disabled={growthClock === 4}
+                  >
+                    +
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(0)}
+                  >
+                    {t("Reset")}
+                  </Button>
+                </div>
               </div>
             </div>
           </Grid>
@@ -418,7 +432,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
                             fontSize: "0.85em"
                           }}
                         >
-                          ⚡ {t("magiseed_in_garden")}
+                          {t("magiseed_plant_in_garden")}
                         </Typography>
                       )}
                     </Grid>

@@ -204,32 +204,28 @@ export default function PlayerEquipment({
     };
   };
 
-  // Combined Weapons logic
-  const allEquippedWeaponsToShow = [...equippedWeapons];
-  if (hasDualShieldBearer && (player.shields?.filter(s => s.isEquipped).length >= 2)) {
-    allEquippedWeaponsToShow.push(twinShields);
-  }
-  const allWeaponsEquipped = [...allEquippedWeaponsToShow, ...equippedCustomWeapons.map(cw => formatCustomWeapon(cw))];
-  
-  const weaponsUnequipped = [
-    ...((player.customWeapons?.filter(w => !w.isEquipped) || []).map(cw => formatCustomWeapon(cw))),
-    ...(player.weapons?.filter(w => !w.isEquipped) || [])
-  ];
+  // Format equipped custom weapons for display
+  const formattedCustomWeapons = equippedCustomWeapons.map(cw => formatCustomWeapon(cw));
 
   const equippedArmor = player.armor
     ? player.armor.filter((armor) => armor.isEquipped)
     : [];
-  const armorUnequipped = player.armor?.filter(a => !a.isEquipped) || [];
 
   const equippedShields = player.shields
     ? player.shields.filter((shield) => shield.isEquipped)
     : [];
-  const shieldsUnequipped = player.shields?.filter(s => !s.isEquipped) || [];
 
   const equippedAccessories = player.accessories
     ? player.accessories.filter((accessory) => accessory.isEquipped)
     : [];
-  const accessoriesUnequipped = player.accessories?.filter(ac => !ac.isEquipped) || [];
+
+  // Combine regular weapons and custom weapons
+  const allEquippedWeapons = [...equippedWeapons];
+
+  // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
+  if (hasDualShieldBearer && equippedShields.length >= 2) {
+    allEquippedWeapons.push(twinShields);
+  }
 
   const precMeleeModifier =
     (player.modifiers?.meleePrec || 0) +
@@ -726,41 +722,6 @@ export default function PlayerEquipment({
     return false;
   };
 
-  const CategoryHeader = ({ label, col1, col2 }) => (
-    <Table sx={{ mt: 1 }}>
-      <TableHead>
-        <TableRow
-          sx={{
-            p: 0.5,
-            background: `${theme.primary}`,
-            "& .MuiTypography-root": {
-              fontSize: { xs: "0.75rem", sm: "0.875rem" },
-              textTransform: "uppercase",
-            },
-          }}>
-          <StyledTableCellHeader sx={{ width: 34 }} />
-          <StyledTableCellHeader>
-            <Typography variant="h4" textAlign="left">
-              {label}
-            </Typography>
-          </StyledTableCellHeader>
-          <StyledTableCellHeader>
-            <Typography variant="h4" textAlign="center">
-              {col1}
-            </Typography>
-          </StyledTableCellHeader>
-          {col2 && (
-            <StyledTableCellHeader>
-              <Typography variant="h4" textAlign="center">
-                {col2}
-              </Typography>
-            </StyledTableCellHeader>
-          )}
-          <StyledTableCellHeader sx={{ width: 80 }} />
-        </TableRow>
-      </TableHead>
-    </Table>
-  );
 
   return (
     <>
@@ -782,15 +743,53 @@ export default function PlayerEquipment({
               </StyledTableCellHeader>
             </TableRow>
           </TableHead>
-        </Table>
 
-        {/* Weapons Section */}
-        {!isMainTab && (allWeaponsEquipped.length > 0 || weaponsUnequipped.length > 0) && (
-          <CategoryHeader label={t("Weapon")} col1={t("Accuracy")} col2={t("Damage")} />
+        </Table>
+        {!isMainTab && (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  p: 0.5,
+                  background: `${theme.primary}`,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}>
+                <StyledTableCellHeader />
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="left">
+                    {t("Custom Weapon")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Accuracy")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Damage")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader />
+              </TableRow>
+            </TableHead>
+          </Table>
         )}
         {allWeaponsEquipped.length > 0 && (
           <CollapsibleWeapon 
-            weapons={allWeaponsEquipped} 
+            weapons={allEquippedWeapons} 
+            handleEquipment={handleEquipment} 
+            handleDiceRoll={handleDiceRoll} 
+            isMainTab={isMainTab} 
+            searchQuery={searchQuery} 
+          />
+        )}
+        {formattedCustomWeapons.length > 0 && (
+          <CollapsibleWeapon 
+            weapons={formattedCustomWeapons} 
             handleEquipment={handleEquipment} 
             handleDiceRoll={handleDiceRoll} 
             handleSwapForm={handleSwapForm}
@@ -798,29 +797,61 @@ export default function PlayerEquipment({
             searchQuery={searchQuery} 
           />
         )}
-        {!isMainTab && weaponsUnequipped.length > 0 && (
+        {!isMainTab && (
           <AllWeapon
-            weapons={weaponsUnequipped}
+            weapons={[
+              ...((player.customWeapons?.filter(w => !w.isEquipped) || []).map(cw => formatCustomWeapon(cw)))
+            ]}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
-            handleSwapForm={handleSwapForm}
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
           />
         )}
-
-        {/* Shields Section */}
-        {!isMainTab && (equippedShields.length > 0 || shieldsUnequipped.length > 0) && (
-          <CategoryHeader label={t("Shield")} col1={t("Defense")} col2={t("M. Defense")} />
+        {!isMainTab && (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  p: 0.5,
+                  background: `${theme.primary}`,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}>
+                <StyledTableCellHeader />
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="left">
+                    {t("Weapon")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Accuracy")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Damage")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader />
+              </TableRow>
+            </TableHead>
+          </Table>
         )}
-        {equippedShields.length > 0 && (
-          <CollapsibleArmor 
-            armors={equippedShields} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
+        {!isMainTab && (
+          <AllWeapon
+            weapons={[
+              ...(player.weapons?.filter(w => !w.isEquipped) || []),
+            ]}
+            handleEquipment={handleEquipment}
+            handleDiceRoll={handleDiceRoll}
+            checkIfEquippable={checkIfEquippable}
+            isMainTab={isMainTab}
+            searchQuery={searchQuery}
           />
         )}
         {!isMainTab && shieldsUnequipped.length > 0 && (
@@ -1146,7 +1177,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
   );
 }
 
-function CollapsibleArmor({ armors, handleEquipment, handleDiceRoll, isMainTab, searchQuery }) {
+function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1254,13 +1285,20 @@ function CollapsibleArmor({ armors, handleEquipment, handleDiceRoll, isMainTab, 
                 </StyledTableCell>
                 <StyledTableCell sx={{ textAlign: 'right' }}>
                   <Tooltip title={t("Unequip")} arrow>
-                    <IconButton
-                      onClick={() => handleEquipment(armor)}
-                      aria-label="unequip"
-                      size="small"
-                    >
+                    <IconButton onClick={() => handleEquipment(armor)} aria-label="expand row" size="small">
                       {armor.category === "Armor" && <ArmorIcon />}
                       {armor.category === "Shield" && <ShieldIcon />}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("Roll")} arrow>
+                    <IconButton
+                      onClick={() => {
+                        handleDiceRoll(armor)
+                      }}
+                      aria-label="roll"
+                      size="small"
+                    >
+                      <Casino />
                     </IconButton>
                   </Tooltip>
                 </StyledTableCell>
@@ -1319,7 +1357,7 @@ function CollapsibleArmor({ armors, handleEquipment, handleDiceRoll, isMainTab, 
   );
 }
 
-function CollapsibleAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, searchQuery }) {
+function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQuery }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1624,7 +1662,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
   );
 }
 
-function AllArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
+function AllArmor({ armors, handleEquipment, handleDiceRoll, checkIfEquippable, isMainTab, searchQuery }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1733,15 +1771,34 @@ function AllArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
                   </Typography>
                 </StyledTableCell>
                 <StyledTableCell sx={{ textAlign: 'right' }}>
-                  <Tooltip title={t("Equip")} arrow>
+                  {checkIfEquippable(armor) ? (
+                    <Tooltip title={t("Equip")} arrow>
+                      <IconButton
+                        onClick={() => {
+                          handleEquipment(armor);
+                        }}
+                        aria-label="roll"
+                        size="small"
+                      >
+                        <RadioButtonUnchecked />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={t("Not Equippable")}>
+                      <IconButton>
+                        <Error color="error" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  <Tooltip title={t("Roll")} arrow>
                     <IconButton
                       onClick={() => {
-                        handleEquipment(armor);
+                        handleDiceRoll(armor)
                       }}
                       aria-label="roll"
                       size="small"
                     >
-                      <RadioButtonUnchecked />
+                      <Casino />
                     </IconButton>
                   </Tooltip>
                 </StyledTableCell>

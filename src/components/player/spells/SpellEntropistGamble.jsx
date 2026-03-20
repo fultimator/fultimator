@@ -11,6 +11,7 @@ import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import ReactMarkdown from "react-markdown";
 
 function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
   const { t } = useTranslate();
@@ -18,6 +19,15 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
   const isDarkMode = theme.mode === "dark";
   const iconColor = isDarkMode ? '#ffffff' : '#000000';
   const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+
+  const inlineStyles = {
+    margin: 0,
+    padding: 0,
+  };
+
+  const components = {
+    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+  };
 
   return (
     <>
@@ -248,7 +258,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 fontSize={{ xs: "0.8rem", sm: "1rem" }}
               >
-                {target.effect}
+                <ReactMarkdown components={components}>{target.effect}</ReactMarkdown>
               </Typography>
             </Grid>
 
@@ -277,7 +287,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                             style={{ flexGrow: 1, marginRight: "5px" }}
                             fontSize={{ xs: "0.8rem", sm: "1rem" }}
                           >
-                            {effect.effect}
+                            <ReactMarkdown components={components}>{effect.effect}</ReactMarkdown>
                           </Typography>
                         </Grid>
                         {(i + 1) % 3 === 0 && <Grid item xs={12} />}

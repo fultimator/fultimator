@@ -500,7 +500,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   ...cls.spells,
                   {
                     spellType: spell,
-                    spellName: "New Cooking Spell",
+                    spellName: "Cookbook",
                     cookbookEffects: [],
                     showInPlayerSheet: true,
                   },

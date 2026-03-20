@@ -91,11 +91,11 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
 
   const getWellspringColor = (wellspring) => {
     const colorMap = {
-      Air: "#87CEEB",
+      Air: "#87cfebb9",
       Earth: "#8B4513",
       Fire: "#FF4500",
-      Lightning: "#FFD700",
-      Water: "#4682B4",
+      Lightning: "#ffd900bb",
+      Water: "#4682B4"
     };
     return colorMap[wellspring] || primary;
   };
@@ -162,21 +162,25 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                             key={wellspring.name}
                             label={t(`invoker_${wellspring.name.toLowerCase()}`)}
                             icon={<IconComponent />}
-                            onClick={isInnerWellspring || (!isEditMode && !setPlayer) ? undefined : () => handleWellspringToggle(invokerSpell, wellspring.name)}
+                            onClick={isInnerWellspring || !setPlayer ? undefined : () => handleWellspringToggle(invokerSpell, wellspring.name)}
                             variant={isActive || isInnerWellspring ? "filled" : "outlined"}
                             sx={{
                               backgroundColor: isActive || isInnerWellspring ? wellspringColor : "transparent",
-                              color: isActive || isInnerWellspring ? "white !important" : primary,
+                              color: (isActive || isInnerWellspring) 
+                                ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black !important' : 'white !important') 
+                                : theme.palette.text.primary,
                               borderColor: isInnerWellspring ? "#4CAF50" : wellspringColor,
                               borderWidth: isActive || isInnerWellspring ? "2px" : "1px",
                               fontWeight: isActive || isInnerWellspring ? "bold" : "normal",
-                              cursor: isInnerWellspring || (!isEditMode && !setPlayer) ? "default" : "pointer",
+                              cursor: isInnerWellspring || !setPlayer ? "default" : "pointer",
                               "& .MuiChip-icon": {
-                                color: isActive || isInnerWellspring ? "white" : wellspringColor,
+                                color: (isActive || isInnerWellspring) ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black' : 'white') : wellspringColor,
                               },
                               "&:hover": {
                                 backgroundColor: isInnerWellspring ? wellspringColor : isActive ? wellspringColor : `${wellspringColor}20`,
-                                color: isActive || isInnerWellspring ? "white !important" : primary,
+                                color: (isActive || isInnerWellspring) 
+                                  ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black !important' : 'white !important') 
+                                  : theme.palette.text.primary,
                               },
                               ...(isInnerWellspring && {
                                 boxShadow: `0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)`,
@@ -284,7 +288,11 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                     <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                       <Chip 
                         label={t(`invoker_${selectedInvocation.wellspring.toLowerCase()}`)} 
-                        sx={{ backgroundColor: getWellspringColor(selectedInvocation.wellspring), color: "white", fontWeight: "bold" }} 
+                        sx={{ 
+                          backgroundColor: getWellspringColor(selectedInvocation.wellspring), 
+                          color: (selectedInvocation.wellspring === 'Air' || selectedInvocation.wellspring === 'Lightning') ? "black" : "white", 
+                          fontWeight: "bold" 
+                        }} 
                       />
                       <Chip label={t(selectedInvocation.type)} variant="outlined" />
                     </Box>

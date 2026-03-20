@@ -1,163 +1,84 @@
 import React from "react";
 import { Paper, Typography, Grid } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import SpellDefault from "../spells/SpellDefault";
 import SpellArcanist from "../spells/SpellArcanist";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
+import SpellTinkererAlchemy from "../spells/SpellTinkererAlchemy";
+import SpellTinkererInfusion from "../spells/SpellTinkererInfusion";
+import SpellTinkererMagitech from "../spells/SpellTinkererMagitech";
+import SpellChanter from "../spells/SpellChanter";
+import SpellSymbolist from "../spells/SpellSymbolist";
+import SpellDancer from "../spells/SpellDancer";
+import SpellGift from "../spells/SpellGift";
+import SpellMutant from "../spells/SpellMutant";
+import SpellMagiseed from "../spells/SpellMagiseed";
+import SpellGourmet from "../spells/SpellGourmet";
+import SpellInvoker from "../spells/SpellInvoker";
+import SpellDeck from "../spells/SpellDeck";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   const { t } = useTranslate();
-  const theme = useTheme();
   const custom = useCustomTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
+  const primary = custom.primary;
+  const secondary = custom.secondary;
 
   return (
     <>
-      {player.classes.length > 0 &&
-        player.classes.some((c) =>
-          c.spells.some(
-            (spell) =>
-              (spell.spellType === "default" || spell.spellType === "gamble") &&
-              (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
-          )
-        ) && (
-          <Grid container spacing={2}>
-            {player.classes
-              .filter((c) =>
-                c.spells.some(
-                  (spell) =>
-                    (spell.spellType === "default" ||
-                      spell.spellType === "gamble") &&
-                    (spell.showInPlayerSheet ||
-                      spell.showInPlayerSheet === undefined)
-                )
-              )
-              .map((c, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <Paper
-                    elevation={3}
-                    sx={
-                      isCharacterSheet
-                        ? {
-                            borderRadius: "8px",
-                            border: "2px solid",
-                            borderColor: secondary,
-                            display: "flex",
-                            flexDirection: "column",
-                            marginBottom: "1em",
-                            boxShadow: "none",
-                          }
-                        : {
-                            borderRadius: "8px",
-                            border: "2px solid",
-                            borderColor: secondary,
-                            display: "flex",
-                            flexDirection: "column",
-                            marginBottom: "1em",
-                          }
-                    }
+      {player.classes.length > 0 && (
+        <Grid container spacing={2}>
+          {player.classes
+            .filter((c) => c.spells && c.spells.length > 0)
+            .map((c, classIndex) => (
+              <Grid item xs={12} md={6} key={classIndex}>
+                <Paper
+                  elevation={3}
+                  sx={
+                    isCharacterSheet
+                      ? {
+                          borderRadius: "8px",
+                          border: "2px solid",
+                          borderColor: secondary,
+                          display: "flex",
+                          flexDirection: "column",
+                          marginBottom: "1em",
+                          boxShadow: "none",
+                        }
+                      : {
+                          borderRadius: "8px",
+                          border: "2px solid",
+                          borderColor: secondary,
+                          display: "flex",
+                          flexDirection: "column",
+                          marginBottom: "1em",
+                        }
+                  }
+                >
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      textTransform: "uppercase",
+                      padding: "5px",
+                      backgroundColor: primary,
+                      color: custom.white,
+                      borderRadius: "8px 8px 0 0",
+                      fontSize: "1.5em",
+                    }}
+                    align="center"
                   >
-                    <Typography
-                      variant="h1"
-                      sx={{
-                        textTransform: "uppercase",
-                        padding: "5px", // Adjust padding instead of margins
-                        backgroundColor: primary,
-                        color: custom.white,
-                        borderRadius: "8px 8px 0 0", // Rounded corners only at the top
-                        fontSize: "1.5em",
-                      }}
-                      align="center"
-                    >
-                      {t("Spells") + " - " + t(c.name)}
-                    </Typography>
+                    {t("Spells") + " - " + t(c.name)}
+                  </Typography>
 
-                    {c.spells
-                      .filter(
-                        (spell) =>
-                          spell.spellType === "default" &&
-                          (spell.showInPlayerSheet ||
-                            spell.showInPlayerSheet === undefined)
-                      )
-                      .map((spell, spellIndex) => (
-                        <React.Fragment key={spellIndex}>
-                          {spellIndex === 0 && (
-                            <div
-                              style={{
-                                backgroundColor: primary,
-                                fontFamily: "Antonio",
-                                fontWeight: "normal",
-                                fontSize: "1.1em",
-                                padding: "2px 17px",
-                                color: "white",
-                                textTransform: "uppercase",
-                                display: "flex",
-                                justifyContent: "space-between",
-                              }}
-                            >
-                              <Grid container style={{ flexGrow: 1 }}>
-                                <Grid
-                                  item
-                                  xs
-                                  flexGrow
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "left",
-                                  }}
-                                >
-                                  <Typography
-                                    variant="h3"
-                                    style={{ flexGrow: 1, marginRight: "5px" }}
-                                  >
-                                    {t("Spell")}
-                                  </Typography>
-                                </Grid>
-                                <Grid
-                                  item
-                                  xs={2}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <Typography variant="h3">
-                                    {t("MP")}
-                                  </Typography>
-                                </Grid>
-                                <Grid
-                                  item
-                                  xs={4}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <Typography variant="h3">
-                                    {t("Target")}
-                                  </Typography>
-                                </Grid>
-                                <Grid
-                                  item
-                                  xs={3}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <Typography variant="h3">
-                                    {t("Duration")}
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            </div>
-                          )}
+                  {c.spells
+                    .filter(
+                      (spell) =>
+                        spell.showInPlayerSheet ||
+                        spell.showInPlayerSheet === undefined
+                    )
+                    .map((spell, spellIndex) => (
+                      <React.Fragment key={spellIndex}>
+                        {spell.spellType === "default" && (
                           <SpellDefault
                             key={spellIndex}
                             spellName={spell.name}
@@ -171,102 +92,105 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                             isMagisphere={spell.isMagisphere || false}
                             attr1={spell.attr1}
                             attr2={spell.attr2}
+                            index={spellIndex}
                           />
-                        </React.Fragment>
-                      ))}
-
-                    {c.spells
-                      .filter(
-                        (spell) =>
-                          spell.spellType === "gamble" &&
-                          (spell.showInPlayerSheet ||
-                            spell.showInPlayerSheet === undefined)
-                      )
-                      .map((spell, spellIndex) => (
-                        <SpellEntropistGamble
-                          key={spellIndex}
-                          gamble={spell}
-                          isEditMode={false}
-                        />
-                      ))}
-                  </Paper>
-                </Grid>
-              ))}
-            {player.classes
-              .filter((c) =>
-                c.spells.some(
-                  (spell) =>
-                    (spell.spellType === "arcanist" ||
-                      spell.spellType === "arcanist-rework") &&
-                    (spell.showInPlayerSheet ||
-                      spell.showInPlayerSheet === undefined)
-                )
-              )
-              .map((c, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <Paper
-                    elevation={3}
-                    sx={
-                      isCharacterSheet
-                        ? {
-                            borderRadius: "8px",
-                            border: "2px solid",
-                            borderColor: secondary,
-                            display: "flex",
-                            flexDirection: "column",
-                            marginBottom: "1em",
-                            boxShadow: "none",
-                          }
-                        : {
-                            borderRadius: "8px",
-                            border: "2px solid",
-                            borderColor: secondary,
-                            display: "flex",
-                            flexDirection: "column",
-                            marginBottom: "1em",
-                          }
-                    }
-                  >
-                    <Typography
-                      variant="h1"
-                      sx={{
-                        textTransform: "uppercase",
-                        padding: "5px", // Adjust padding instead of margins
-                        backgroundColor: primary,
-                        color: custom.white,
-                        borderRadius: "8px 8px 0 0", // Rounded corners only at the top
-                        fontSize: "1.5em",
-                      }}
-                      align="center"
-                    >
-                      {t("Arcana") + " - " + t(c.name)}
-                    </Typography>
-
-                    {c.spells
-                      .filter(
-                        (spell) =>
-                          (spell.spellType === "arcanist" ||
-                            spell.spellType === "arcanist-rework") &&
-                          (spell.showInPlayerSheet ||
-                            spell.showInPlayerSheet === undefined)
-                      )
-                      .map((spell, spellIndex) => (
-                        <div
-                          key={spellIndex}
-                          style={{ marginTop: "0.5em", padding: "0.5em" }}
-                        >
-                          <SpellArcanist
-                            arcana={spell}
+                        )}
+                        {spell.spellType === "gamble" && (
+                          <SpellEntropistGamble
+                            key={spellIndex}
+                            gamble={spell}
                             isEditMode={false}
-                            rework={spell.spellType === "arcanist-rework"}
                           />
-                        </div>
-                      ))}
-                  </Paper>
-                </Grid>
-              ))}
-          </Grid>
-        )}
+                        )}
+                        {(spell.spellType === "arcanist" ||
+                          spell.spellType === "arcanist-rework") && (
+                          <div style={{ marginTop: "0.5em", padding: "0.5em" }}>
+                            <SpellArcanist
+                              arcana={spell}
+                              isEditMode={false}
+                              rework={spell.spellType === "arcanist-rework"}
+                            />
+                          </div>
+                        )}
+                        {spell.spellType === "tinkerer-alchemy" && (
+                          <SpellTinkererAlchemy
+                            alchemy={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "tinkerer-infusion" && (
+                          <SpellTinkererInfusion
+                            infusion={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "tinkerer-magitech" && (
+                          <SpellTinkererMagitech
+                            magitech={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "magichant" && (
+                          <SpellChanter
+                            magichant={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "symbol" && (
+                          <SpellSymbolist
+                            symbol={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "dance" && (
+                          <SpellDancer
+                            dance={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "gift" && (
+                          <SpellGift
+                            gift={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "therioform" && (
+                          <SpellMutant
+                            mutant={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "magiseed" && (
+                          <SpellMagiseed
+                            magiseed={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "cooking" && (
+                          <SpellGourmet
+                            spell={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "invocation" && (
+                          <SpellInvoker
+                            invoker={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                        {spell.spellType === "deck" && (
+                          <SpellDeck
+                            deck={spell}
+                            isEditMode={false}
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
+                </Paper>
+              </Grid>
+            ))}
+        </Grid>
+      )}
     </>
   );
 }
