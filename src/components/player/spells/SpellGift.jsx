@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Grid,
@@ -23,10 +23,17 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
+  const [localClock, setLocalClock] = useState(gift.clock || 0);
+
+  // Sync local clock when prop changes
+  useEffect(() => {
+    setLocalClock(gift.clock || 0);
+  }, [gift.clock]);
+
   const showInPlayerSheet =
     gift.showInPlayerSheet || gift.showInPlayerSheet === undefined;
 
-  const clock = gift.clock || 0;
+  const clock = localClock;
 
   const inlineStyles = {
     margin: 0,
@@ -55,6 +62,7 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
   // Handle clock state changes from Clock component
   const handleClockStateChange = (newState) => {
     const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
+    setLocalClock(filledSections);
     if (onClockChange) {
       onClockChange(filledSections);
     }
@@ -62,8 +70,17 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
 
   // Handle clock reset from right-click
   const handleClockReset = () => {
+    setLocalClock(0);
     if (onClockChange) {
       onClockChange(0);
+    }
+  };
+
+  const updateClock = (newValue) => {
+    const clampedValue = Math.max(0, Math.min(4, newValue));
+    setLocalClock(clampedValue);
+    if (onClockChange) {
+      onClockChange(clampedValue);
     }
   };
 
@@ -152,7 +169,7 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "left",
+              justifyPosition: "left",
               minHeight: "40px",
             }}
           >
@@ -212,9 +229,9 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                   numSections={4}
                   size={60}
                   state={getClockState()}
-                  setState={isEditMode ? handleClockStateChange : undefined}
-                  isCharacterSheet={!isEditMode}
-                  onReset={isEditMode ? handleClockReset : undefined}
+                  setState={handleClockStateChange}
+                  isCharacterSheet={false}
+                  onReset={handleClockReset}
                 />
                 <Typography variant="caption" sx={{ mt: 0.5 }}>
                   {clock}/4
@@ -235,33 +252,31 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
                     },
                   }}
                 />
-                {isEditMode && (
-                  <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onClockChange && onClockChange(Math.max(0, clock - 1))}
-                      disabled={clock === 0}
-                    >
-                      -
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onClockChange && onClockChange(Math.min(4, clock + 1))}
-                      disabled={clock === 4}
-                    >
-                      +
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => onClockChange && onClockChange(0)}
-                    >
-                      {t("Reset")}
-                    </Button>
-                  </div>
-                )}
+                <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(clock - 1)}
+                    disabled={clock === 0}
+                  >
+                    -
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(clock + 1)}
+                    disabled={clock === 4}
+                  >
+                    +
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => updateClock(0)}
+                  >
+                    {t("Reset")}
+                  </Button>
+                </div>
               </div>
             </div>
           </Grid>

@@ -9,20 +9,18 @@ export const VEHICLE_ACTIONS = {
   ADD_MODULE: 'ADD_MODULE',
   DELETE_MODULE: 'DELETE_MODULE',
   UPDATE_MODULE: 'UPDATE_MODULE',
+  CLONE_MODULE: 'CLONE_MODULE',
 };
 
 const createDefaultModule = (moduleType) => {
+  const baseModule = availableModules[moduleType][0];
   return { 
-    ...availableModules[moduleType][0], 
+    ...baseModule, 
     enabled: false,
     equipped: false,
     equippedSlot: null,
-    cumbersome: availableModules[moduleType][0].cumbersome || false,
-    att1: "might",
-    att2: "dexterity",
-    prec: 0,
-    damage: 0,
-    cost: 0
+    // Ensure all data fields are present from the base module
+    ...baseModule
   };
 };
 
@@ -38,6 +36,47 @@ const updateEnabledModulesList = (vehicle, t) => {
     ?.filter((m) => m.enabled || m.equipped)
     .map((m) => (m.name === "pilot_custom_armor" || m.name === "pilot_custom_weapon" || m.name === "pilot_custom_support") ? m.customName : t(m.name)) || [];
   return enabledModules;
+};
+
+// Helper to displace a weapon module when another one takes its slot
+const displaceWeaponFromSlot = (vehicle, moduleIndex, slot) => {
+  vehicle.modules.forEach((m, idx) => {
+    if (idx !== moduleIndex && m.equipped && m.type === "pilot_module_weapon") {
+      const currentSlot = m.equippedSlot || (m.isShield ? "off" : "main");
+      if (currentSlot === slot) {
+        // Check if we can move it to the other hand
+        const otherSlot = slot === "main" ? "off" : "main";
+        const otherSlotOccupied = vehicle.modules.some((m2, idx2) => 
+          idx2 !== idx && m2.equipped && m2.type === "pilot_module_weapon" && (m2.equippedSlot || (m2.isShield ? "off" : "main")) === otherSlot
+        );
+
+        if (!otherSlotOccupied && !m.isShield && !m.cumbersome) {
+          m.equippedSlot = otherSlot;
+        } else {
+          // Can't move it, unequip
+          m.equipped = false;
+          m.enabled = false;
+          m.equippedSlot = null;
+        }
+      }
+    }
+  });
+};
+
+// Helper to handle shield hand constraints
+const ensureShieldConstraints = (vehicle) => {
+  const offHandShield = vehicle.modules.find((m) => 
+    m.equipped && m.isShield && (m.equippedSlot === "off" || !m.equippedSlot)
+  );
+  
+  const mainHandShield = vehicle.modules.find((m) => 
+    m.equipped && m.isShield && m.equippedSlot === "main"
+  );
+
+  // Rule: A shield can only be in main hand if another shield is in off hand
+  if (mainHandShield && !offHandShield) {
+    mainHandShield.equippedSlot = "off";
+  }
 };
 
 export const vehicleReducer = (state, action) => {
@@ -127,24 +166,16 @@ export const vehicleReducer = (state, action) => {
         for (const moduleType of Object.values(availableModules)) {
           const selectedModule = moduleType.find((m) => m.name === value);
           if (selectedModule) {
+            const currentModule = vehicle.modules[moduleIndex];
             vehicle.modules[moduleIndex] = {
               ...selectedModule,
-              enabled: vehicle.modules[moduleIndex].enabled || false,
-              equipped: vehicle.modules[moduleIndex].equipped || false,
-              equippedSlot: vehicle.modules[moduleIndex].equippedSlot || null,
-              takesTwoHands: vehicle.modules[moduleIndex].takesTwoHands || false,
-              att1: selectedModule.att1 || "might",
-              att2: selectedModule.att2 || "dexterity",
-              prec: selectedModule.prec || 0,
-              damage: selectedModule.damage || 0,
-              cost: selectedModule.cost || 0,
-              category: selectedModule.category || "",
-              range: selectedModule.range || "Melee",
-              damageType: selectedModule.damageType || "Physical",
+              enabled: currentModule.enabled || false,
+              equipped: currentModule.equipped || false,
+              equippedSlot: currentModule.equippedSlot || null,
               customName:
                 (selectedModule.name === "pilot_custom_armor" || selectedModule.name === "pilot_custom_weapon" || selectedModule.name === "pilot_custom_support")
-                  ? vehicle.modules[moduleIndex].customName
-                  : "",
+                  ? currentModule.customName
+                  : (selectedModule.customName || ""),
             };
             break;
           }
@@ -161,23 +192,32 @@ export const vehicleReducer = (state, action) => {
             module.equippedSlot = "armor";
           } else if (module.type === "pilot_module_weapon") {
             if (module.isShield) {
-              module.equippedSlot = "off";
+              const otherShieldOffHand = vehicle.modules.find((m, idx) => 
+                idx !== moduleIndex && m.equipped && m.isShield && (m.equippedSlot === "off" || !m.equippedSlot)
+              );
+              
+              module.equippedSlot = otherShieldOffHand ? "main" : "off";
+              displaceWeaponFromSlot(vehicle, moduleIndex, module.equippedSlot);
+            } else if (module.cumbersome) {
+              module.equippedSlot = "both";
+              // Cumbersome weapon displaces everything
+              vehicle.modules.forEach((otherModule, otherIndex) => {
+                if (otherIndex !== moduleIndex && otherModule.type === "pilot_module_weapon") {
+                  otherModule.equipped = false;
+                  otherModule.enabled = false;
+                  otherModule.equippedSlot = null;
+                }
+              });
             } else {
-              module.equippedSlot = module.cumbersome ? "both" : "main";
+              // Smart hand selection
+              const mainHandOccupied = vehicle.modules.some((m, idx) => 
+                idx !== moduleIndex && m.equipped && m.type === "pilot_module_weapon" && (m.equippedSlot === "main" || (!m.equippedSlot && !m.isShield))
+              );
+              module.equippedSlot = !mainHandOccupied ? "main" : "off";
+              displaceWeaponFromSlot(vehicle, moduleIndex, module.equippedSlot);
             }
           } else if (module.type === "pilot_module_support") {
             module.equippedSlot = "support";
-          }
-          
-          // If weapon is cumbersome, disable other weapon modules
-          if (module.cumbersome && module.type === "pilot_module_weapon") {
-            vehicle.modules.forEach((otherModule, otherIndex) => {
-              if (otherIndex !== moduleIndex && otherModule.type === "pilot_module_weapon") {
-                otherModule.equipped = false;
-                otherModule.enabled = false;
-                otherModule.equippedSlot = null;
-              }
-            });
           }
         } else {
           module.equippedSlot = null;
@@ -185,61 +225,71 @@ export const vehicleReducer = (state, action) => {
         
         module.equipped = value;
         module.enabled = value;
+        ensureShieldConstraints(vehicle);
         vehicle.enabledModules = updateEnabledModulesList(vehicle, t);
       } else if (field === "equippedSlot") {
         const module = vehicle.modules[moduleIndex];
+        
+        // Shield main-hand validation
+        if (module.isShield && value === "main") {
+          const hasOffHandShield = vehicle.modules.some((m, idx) => 
+            idx !== moduleIndex && m.equipped && m.isShield && m.equippedSlot === "off"
+          );
+          if (!hasOffHandShield) return state;
+        }
+
         module.equippedSlot = value;
         
-        // Smart weapon hand swapping logic
-        if (module.type === "pilot_module_weapon" && !module.isShield && !module.cumbersome) {
+        // Smart hand swapping logic
+        if (module.type === "pilot_module_weapon" && !module.cumbersome) {
           vehicle.modules.forEach((otherModule, otherIndex) => {
-            if (otherIndex !== moduleIndex && 
-                otherModule.equipped && 
-                otherModule.type === "pilot_module_weapon" &&
-                !otherModule.isShield && 
-                !otherModule.cumbersome) {
-              
-              if (value === "main" && otherModule.equippedSlot === "main") {
-                otherModule.equippedSlot = "off";
-              }
-              else if (value === "off" && otherModule.equippedSlot === "off") {
-                otherModule.equippedSlot = "main";
+            if (otherIndex !== moduleIndex && otherModule.equipped && otherModule.type === "pilot_module_weapon" && otherModule.equippedSlot === value) {
+              // Swap logic
+              if (module.isShield && otherModule.isShield) {
+                otherModule.equippedSlot = (value === "main" ? "off" : "main");
+              } else if (!module.isShield && !otherModule.isShield && !otherModule.cumbersome) {
+                otherModule.equippedSlot = (value === "main" ? "off" : "main");
+              } else {
+                // Displace
+                displaceWeaponFromSlot(vehicle, moduleIndex, value);
               }
             }
           });
         }
         
-        if (value === "both") {
-          module.takesTwoHands = true;
-        }
+        ensureShieldConstraints(vehicle);
+        if (value === "both") module.takesTwoHands = true;
       } else if (field === "cumbersome") {
         const module = vehicle.modules[moduleIndex];
         module.cumbersome = value;
         
-        if (value) {
-          if (module.equipped) {
-            module.equippedSlot = "both";
-            vehicle.modules.forEach((otherModule, otherIndex) => {
-              if (otherIndex !== moduleIndex && otherModule.type === "pilot_module_weapon") {
-                otherModule.equipped = false;
-                otherModule.enabled = false;
-                otherModule.equippedSlot = null;
-              }
-            });
-          }
-        } else {
-          if (module.equipped && module.equippedSlot === "both") {
-            module.equippedSlot = "main";
-          }
+        if (value && module.equipped) {
+          module.equippedSlot = "both";
+          vehicle.modules.forEach((otherModule, otherIndex) => {
+            if (otherIndex !== moduleIndex && otherModule.type === "pilot_module_weapon") {
+              otherModule.equipped = false;
+              otherModule.enabled = false;
+              otherModule.equippedSlot = null;
+            }
+          });
+        } else if (!value && module.equipped && module.equippedSlot === "both") {
+          module.equippedSlot = "main";
         }
       } else if (field === "isShield") {
         const module = vehicle.modules[moduleIndex];
         module.isShield = value;
         
-        if (value && module.equipped) {
-          module.equippedSlot = "off";
-        } else if (!value && module.equipped && module.equippedSlot === "off") {
-          module.equippedSlot = "main";
+        if (module.equipped) {
+          if (value) {
+            // Module just became a shield
+            const otherShieldOffHand = vehicle.modules.find((m, idx) => 
+              idx !== moduleIndex && m.equipped && m.isShield && (m.equippedSlot === "off" || !m.equippedSlot)
+            );
+            
+            module.equippedSlot = otherShieldOffHand ? "main" : "off";
+            displaceWeaponFromSlot(vehicle, moduleIndex, module.equippedSlot);
+          }
+          ensureShieldConstraints(vehicle);
         }
       } else {
         vehicle.modules[moduleIndex][field] = value;
@@ -248,6 +298,40 @@ export const vehicleReducer = (state, action) => {
       return {
         ...state,
         currentVehicles: vehiclesWithUpdatedModule,
+      };
+    }
+
+    case VEHICLE_ACTIONS.CLONE_MODULE: {
+      const { vehicleIndex, moduleIndex, t } = action.payload;
+      const vehiclesWithClonedModule = [...state.currentVehicles];
+      const vehicle = vehiclesWithClonedModule[vehicleIndex];
+      const module = vehicle.modules[moduleIndex];
+      
+      const isCurrentlyCustom = (module.name === "pilot_custom_armor" || module.name === "pilot_custom_weapon" || module.name === "pilot_custom_support");
+
+      let customName = (module.type === "pilot_module_armor" || module.type === "pilot_module_weapon" || module.type === "pilot_module_support")
+        ? isCurrentlyCustom
+          ? module.customName
+          : t(module.name)
+        : "";
+
+      let customDescription = isCurrentlyCustom ? module.description : t(module.description);
+
+      let newName = "";
+      if (module.type === "pilot_module_armor") newName = "pilot_custom_armor";
+      else if (module.type === "pilot_module_weapon") newName = "pilot_custom_weapon";
+      else if (module.type === "pilot_module_support") newName = "pilot_custom_support";
+
+      vehicle.modules[moduleIndex] = {
+        ...module,
+        name: newName,
+        customName: customName,
+        description: customDescription,
+      };
+
+      return {
+        ...state,
+        currentVehicles: vehiclesWithClonedModule,
       };
     }
 

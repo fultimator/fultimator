@@ -1,5 +1,18 @@
 const weapons = [
     {
+      category: "Brawling",
+      name: "Unarmed Strike",
+      cost: 0,
+      att1: "dexterity",
+      att2: "might",
+      prec: 0,
+      damage: 0,
+      type: "physical",
+      hands: 1,
+      melee: true,
+      martial: false
+    },
+    {
       category: "Arcane",
       name: "Staff",
       cost: 100,

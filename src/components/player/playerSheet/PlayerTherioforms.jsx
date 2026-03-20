@@ -17,7 +17,7 @@ import { Info } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerDance({ player }) {
+export default function PlayerTherioforms({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -25,36 +25,36 @@ export default function PlayerDance({ player }) {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
-  const [selectedDance, setSelectedDance] = useState(null);
-  const [selectedDanceSpell, setSelectedDanceSpell] = useState(null);
+  const [selectedTherioform, setSelectedTherioform] = useState(null);
+  const [selectedMutantSpell, setSelectedMutantSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleOpenModal = (danceSpell, dance) => {
-    setSelectedDance(dance);
-    setSelectedDanceSpell(danceSpell);
+  const handleOpenModal = (mutantSpell, therioform) => {
+    setSelectedTherioform(therioform);
+    setSelectedMutantSpell(mutantSpell);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedDance(null);
-    setSelectedDanceSpell(null);
+    setSelectedTherioform(null);
+    setSelectedMutantSpell(null);
   };
 
-  /* All dance spells from all classes */
-  const danceSpells = player.classes
+  /* All therioform spells from all classes */
+  const therioformSpells = player.classes
     .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
     .filter(
       (spell) =>
         spell !== undefined &&
-        spell.spellType === "dance" &&
+        spell.spellType === "therioform" &&
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
   return (
     <>
-      {danceSpells.length > 0 && (
+      {therioformSpells.length > 0 && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -84,18 +84,18 @@ export default function PlayerDance({ player }) {
               }}
               align="center"
             >
-              {t("dance_dance")}
+              {t("mutant_therioforms")}
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
-              {danceSpells.map((danceSpell, dsIndex) => (
-                <React.Fragment key={dsIndex}>
-                  {danceSpell.dances && danceSpell.dances.map((dance, dIndex) => (
+              {therioformSpells.map((mutantSpell, msIndex) => (
+                <React.Fragment key={msIndex}>
+                  {mutantSpell.therioforms && mutantSpell.therioforms.map((therioform, tIndex) => (
                     <Grid
                       item
                       container
                       xs={12}
                       md={6}
-                      key={`${dsIndex}-${dIndex}`}
+                      key={`${msIndex}-${tIndex}`}
                       sx={{ display: "flex", alignItems: "stretch" }}
                     >
                       <Grid item xs={10} sx={{ display: "flex" }}>
@@ -115,7 +115,7 @@ export default function PlayerDance({ player }) {
                             width: "100%",
                           }}
                         >
-                          {dance.name === "dance_custom_name" ? dance.customName : t(dance.name)}
+                          {therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name)}
                         </Typography>
                       </Grid>
                       <Grid
@@ -139,7 +139,7 @@ export default function PlayerDance({ player }) {
                           <Tooltip title={t("Info")}>
                             <IconButton
                               sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(danceSpell, dance)}
+                              onClick={() => handleOpenModal(mutantSpell, therioform)}
                             >
                               <Info />
                             </IconButton>
@@ -157,21 +157,21 @@ export default function PlayerDance({ player }) {
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
               <DialogContent>
-                {selectedDance && (
+                {selectedTherioform && (
                   <>
                     <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.customName : t(selectedDance.name)}
+                      {selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.customName : t(selectedTherioform.name)}
                       {" - "}
-                      {selectedDanceSpell && t(selectedDanceSpell.className)}
+                      {selectedMutantSpell && t(selectedMutantSpell.className)}
                     </Typography>
 
-                    {selectedDance.duration && (
+                    {selectedTherioform.genoclepsis && (
                       <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1, display: "flex", gap: 1 }}>
-                        {t("dance_duration")}:{" "}
+                        {t("mutant_genoclepsis_suggestions")}:{" "}
                         <ReactMarkdown components={{ p: "span" }}>
-                          {selectedDance.name === "dance_custom_name"
-                            ? selectedDance.duration
-                            : t(selectedDance.duration)}
+                          {selectedTherioform.name === "mutant_therioform_custom_name"
+                            ? selectedTherioform.genoclepsis
+                            : t(selectedTherioform.genoclepsis)}
                         </ReactMarkdown>
                       </Typography>
                     )}
@@ -179,7 +179,7 @@ export default function PlayerDance({ player }) {
                     <Divider sx={{ my: 2 }} />
 
                     <ReactMarkdown>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.effect : t(selectedDance.effect)}
+                      {selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.description : t(selectedTherioform.description)}
                     </ReactMarkdown>
                   </>
                 )}
