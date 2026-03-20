@@ -4,7 +4,7 @@ import {
   IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
 } from "@mui/material";
 import { OpenBracket, CloseBracket } from "../../../Bracket";
-import { Martial } from "../../../icons";
+import { Martial, MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../../icons";
 import Diamond from "../../../Diamond";
 import ReactMarkdown from "react-markdown";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -14,8 +14,7 @@ import { useTranslate } from "../../../../translation/translate";
 import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { Casino, RadioButtonUnchecked, SwapHoriz, Error } from "@mui/icons-material";
-import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../../icons";
+import { Casino, RadioButtonUnchecked, Error, SwapHoriz } from "@mui/icons-material";
 
 /**
  * Utility function to calculate custom weapon damage and precision stats
@@ -722,7 +721,6 @@ export default function PlayerEquipment({
     return false;
   };
 
-
   return (
     <>
       <Grid container spacing={0} sx={{ padding: 0 }}>
@@ -760,7 +758,7 @@ export default function PlayerEquipment({
                 <StyledTableCellHeader />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
-                    {t("Custom Weapon")}
+                    {t("Weapon")}
                   </Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader>
@@ -778,7 +776,7 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {allWeaponsEquipped.length > 0 && (
+        {allEquippedWeapons.length > 0 && (
           <CollapsibleWeapon 
             weapons={allEquippedWeapons} 
             handleEquipment={handleEquipment} 
@@ -787,20 +785,10 @@ export default function PlayerEquipment({
             searchQuery={searchQuery} 
           />
         )}
-        {formattedCustomWeapons.length > 0 && (
-          <CollapsibleWeapon 
-            weapons={formattedCustomWeapons} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
-            handleSwapForm={handleSwapForm}
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
-          />
-        )}
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...((player.customWeapons?.filter(w => !w.isEquipped) || []).map(cw => formatCustomWeapon(cw)))
+              ...(player.weapons?.filter(w => !w.isEquipped) || []),
             ]}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
@@ -824,7 +812,7 @@ export default function PlayerEquipment({
                 <StyledTableCellHeader />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
-                    {t("Weapon")}
+                    {t("Custom Weapon")}
                   </Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader>
@@ -842,21 +830,68 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
+        {formattedCustomWeapons.length > 0 && (
+          <CollapsibleWeapon 
+            weapons={formattedCustomWeapons} 
+            handleEquipment={handleEquipment} 
+            handleDiceRoll={handleDiceRoll} 
+            handleSwapForm={handleSwapForm}
+            isMainTab={isMainTab} 
+            searchQuery={searchQuery} 
+          />
+        )}
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...(player.weapons?.filter(w => !w.isEquipped) || []),
+              ...((player.customWeapons?.filter(w => !w.isEquipped) || []).map(cw => formatCustomWeapon(cw)))
             ]}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
+            handleSwapForm={handleSwapForm}
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
           />
         )}
-        {!isMainTab && shieldsUnequipped.length > 0 && (
+        {!isMainTab && (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  p: 0.5,
+                  background: `${theme.primary}`,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}>
+                <StyledTableCellHeader />
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="left">
+                    {t("Shield")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Defense")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("M. Defense")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader />
+              </TableRow>
+            </TableHead>
+          </Table>
+        )}
+        {equippedShields.length > 0 && (
+          <CollapsibleArmor armors={equippedShields} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
+        )}
+        {!isMainTab && (
           <AllArmor
-            armors={shieldsUnequipped}
+            armors={player.shields?.filter(s => !s.isEquipped) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -864,23 +899,45 @@ export default function PlayerEquipment({
             searchQuery={searchQuery}
           />
         )}
-
-        {/* Armor Section */}
-        {!isMainTab && (equippedArmor.length > 0 || armorUnequipped.length > 0) && (
-          <CategoryHeader label={t("Armor")} col1={t("Defense")} col2={t("M. Defense")} />
+        {!isMainTab && (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  p: 0.5,
+                  background: `${theme.primary}`,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}>
+                <StyledTableCellHeader />
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="left">
+                    {t("Armor")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Defense")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("M. Defense")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader />
+              </TableRow>
+            </TableHead>
+          </Table>
         )}
         {equippedArmor.length > 0 && (
-          <CollapsibleArmor 
-            armors={equippedArmor} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
-          />
+          <CollapsibleArmor armors={equippedArmor} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
         )}
-        {!isMainTab && armorUnequipped.length > 0 && (
+        {!isMainTab && (
           <AllArmor
-            armors={armorUnequipped}
+            armors={player.armor?.filter(a => !a.isEquipped) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -888,30 +945,46 @@ export default function PlayerEquipment({
             searchQuery={searchQuery}
           />
         )}
-
-        {/* Accessories Section */}
-        {!isMainTab && (equippedAccessories.length > 0 || accessoriesUnequipped.length > 0) && (
-          <CategoryHeader label={t("Accessory")} col1={t("Cost")} />
+        {!isMainTab && (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  p: 0.5,
+                  background: `${theme.primary}`,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}>
+                <StyledTableCellHeader />
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="left">
+                    {t("Accessory")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader>
+                  <Typography variant="h4" textAlign="center">
+                    {t("Cost")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader />
+              </TableRow>
+            </TableHead>
+          </Table>
         )}
         {equippedAccessories.length > 0 && (
-          <CollapsibleAccessory 
-            accessorys={equippedAccessories} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
-          />
+          <CollapsibleAccessory accessorys={equippedAccessories} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
         )}
-        {!isMainTab && accessoriesUnequipped.length > 0 && (
+        {!isMainTab && (
           <AllAccessory
-            accessorys={accessoriesUnequipped}
+            accessorys={player.accessories?.filter(ac => !ac.isEquipped) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
           />
         )}
-
         {!isMainTab && (
           (precMeleeModifier !== 0 ||
             precRangedModifier !== 0 ||
@@ -1078,7 +1151,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                 <StyledTableCell>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
-                    {`${attributes[weapon.att1]?.shortcaps} + ${attributes[weapon.att2]?.shortcaps
+                    {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
                       }`}
                     <CloseBracket />
                     {weapon.prec > 0
@@ -1093,7 +1166,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                     <OpenBracket />
                     {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
                     <CloseBracket />
-                    {types[weapon.type]?.long}
+                    {types[weapon.type].long}
                   </Typography>
                 </StyledTableCell>
                 <StyledTableCell sx={{ textAlign: 'right' }}>
@@ -1290,17 +1363,6 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
                       {armor.category === "Shield" && <ShieldIcon />}
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={t("Roll")} arrow>
-                    <IconButton
-                      onClick={() => {
-                        handleDiceRoll(armor)
-                      }}
-                      aria-label="roll"
-                      size="small"
-                    >
-                      <Casino />
-                    </IconButton>
-                  </Tooltip>
                 </StyledTableCell>
               </TableRow>
               <TableRow>
@@ -1435,7 +1497,7 @@ function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQu
                 </StyledTableCell>
                 <StyledTableCell sx={{ textAlign: 'right' }}>
                   <Tooltip title={t("Unequip")} arrow>
-                    <IconButton onClick={() => handleEquipment(accessory)} aria-label="unequip" size="small">
+                    <IconButton onClick={() => handleEquipment(accessory)} aria-label="expand row" size="small">
                       <AccessoryIcon />
                     </IconButton>
                   </Tooltip>
@@ -1555,7 +1617,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                 <StyledTableCell>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
-                    {`${attributes[weapon.att1]?.shortcaps} + ${attributes[weapon.att2]?.shortcaps
+                    {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
                       }`}
                     <CloseBracket />
                     {weapon.prec > 0
@@ -1570,7 +1632,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                     <OpenBracket />
                     {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
                     <CloseBracket />
-                    {types[weapon.type]?.long}
+                    {types[weapon.type].long}
                   </Typography>
                 </StyledTableCell>
                 <StyledTableCell sx={{ textAlign: 'right' }}>
@@ -1662,7 +1724,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
   );
 }
 
-function AllArmor({ armors, handleEquipment, handleDiceRoll, checkIfEquippable, isMainTab, searchQuery }) {
+function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searchQuery }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1777,7 +1839,7 @@ function AllArmor({ armors, handleEquipment, handleDiceRoll, checkIfEquippable, 
                         onClick={() => {
                           handleEquipment(armor);
                         }}
-                        aria-label="roll"
+                        aria-label="equip"
                         size="small"
                       >
                         <RadioButtonUnchecked />
@@ -1790,17 +1852,6 @@ function AllArmor({ armors, handleEquipment, handleDiceRoll, checkIfEquippable, 
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={t("Roll")} arrow>
-                    <IconButton
-                      onClick={() => {
-                        handleDiceRoll(armor)
-                      }}
-                      aria-label="roll"
-                      size="small"
-                    >
-                      <Casino />
-                    </IconButton>
-                  </Tooltip>
                 </StyledTableCell>
               </TableRow>
               <TableRow>
@@ -1857,7 +1908,7 @@ function AllArmor({ armors, handleEquipment, handleDiceRoll, checkIfEquippable, 
   );
 }
 
-function AllAccessory({ accessorys, handleEquipment, isMainTab, searchQuery }) {
+function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, searchQuery }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
