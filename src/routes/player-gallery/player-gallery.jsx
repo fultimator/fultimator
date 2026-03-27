@@ -201,6 +201,10 @@ function Personal() {
           precModifier: 0,
           defModifier: 0,
           mDefModifier: 0,
+          initModifier: 0,
+          magicModifier: 0,
+          damageMeleeModifier: 0,
+          damageRangedModifier: 0,
           isEquipped: true,
         },
       ],
@@ -670,14 +674,14 @@ function Personal() {
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
-              <Button
+              {/* <Button
                 size="small"
                 variant="outlined"
                 onClick={(e) => setCopyAnchor(e.currentTarget)}
                 startIcon={<FileCopy />}
               >
                 {t("Copy")}
-              </Button>
+              </Button> */}
               <MuiMenu anchorEl={copyAnchor} open={Boolean(copyAnchor)} onClose={() => setCopyAnchor(null)}>
                 <MenuItem disabled={selectedIds.size === 0} onClick={() => { setCopyAnchor(null); copySelectedToLocal(); }}>
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>

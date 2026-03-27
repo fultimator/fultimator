@@ -26,6 +26,7 @@ import ChangeModifiers from "../ChangeModifiers";
 import PrettyArmor from "./PrettyArmor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
+import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 
 export default function PlayerArmorModal({
   open,
@@ -47,30 +48,20 @@ export default function PlayerArmorModal({
   );
   const [init, setInit] = useState(armorPlayer?.init || 0);
   const [rework, setRework] = useState(armorPlayer?.rework || false);
-  const [defModifier, setDefModifier] = useState(armorPlayer?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(
-    armorPlayer?.mDefModifier || 0
-  );
-  const [initModifier, setInitModifier] = useState(
-    armorPlayer?.initModifier || 0
-  );
-  const [magicModifier, setMagicModifier] = useState(
-    armorPlayer?.magicModifier || 0
-  );
-  const [precModifier, setPrecModifier] = useState(
-    armorPlayer?.precModifier || 0
-  );
-  const [damageMeleeModifier, setDamageMeleeModifier] = useState(
-    armorPlayer?.damageMeleeModifier || 0
-  );
-  const [damageRangedModifier, setDamageRangedModifier] = useState(
-    armorPlayer?.damageRangedModifier || 0
-  );
-  const [isEquipped, setIsEquipped] = useState(
-    armorPlayer?.isEquipped || false
-  );
-
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const {
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    initModifier, setInitModifier,
+    magicModifier, setMagicModifier,
+    precModifier, setPrecModifier,
+    damageMeleeModifier, setDamageMeleeModifier,
+    damageRangedModifier, setDamageRangedModifier,
+    isEquipped, setIsEquipped,
+    modifiersExpanded, setModifiersExpanded,
+    expandModifiers,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(armorPlayer);
 
   const fileInputRef = useRef(null);
 
@@ -83,27 +74,7 @@ export default function PlayerArmorModal({
     setSelectedQuality(armorPlayer?.selectedQuality || "");
     setInit(armorPlayer?.init || 0);
     setRework(armorPlayer?.rework || false);
-    setIsEquipped(armorPlayer?.isEquipped || false);
-    setDefModifier(armorPlayer?.defModifier || 0);
-    setMDefModifier(armorPlayer?.mDefModifier || 0);
-    setInitModifier(armorPlayer?.initModifier || 0);
-    setMagicModifier(armorPlayer?.magicModifier || 0);
-    setPrecModifier(armorPlayer?.precModifier || 0);
-    setDamageMeleeModifier(armorPlayer?.damageMeleeModifier || 0);
-    setDamageRangedModifier(armorPlayer?.damageRangedModifier || 0);
-    setModifiersExpanded(
-      (armorPlayer?.defModifier && armorPlayer?.defModifier !== 0) ||
-        (armorPlayer?.mDefModifier && armorPlayer?.mDefModifier !== 0) ||
-        (armorPlayer?.initModifier && armorPlayer?.initModifier !== 0) ||
-        (armorPlayer?.magicModifier && armorPlayer?.magicModifier !== 0) ||
-        (armorPlayer?.precModifier && armorPlayer?.precModifier !== 0) ||
-        (armorPlayer?.damageMeleeModifier &&
-          armorPlayer?.damageMeleeModifier !== 0) ||
-        (armorPlayer?.damageRangedModifier &&
-          armorPlayer?.damageRangedModifier !== 0)
-        ? true
-        : false
-    );
+    // modifier fields are handled by useEquipmentForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armorPlayer]);
 
@@ -150,34 +121,13 @@ export default function PlayerArmorModal({
         if (rework) {
           setRework(rework);
         }
-        if (defModifier) {
-          setDefModifier(defModifier);
-          setModifiersExpanded(true);
-        }
-        if (mDefModifier) {
-          setMDefModifier(mDefModifier);
-          setModifiersExpanded(true);
-        }
-        if (initModifier) {
-          setInitModifier(initModifier);
-          setModifiersExpanded(true);
-        }
-        if (magicModifier) {
-          setMagicModifier(magicModifier);
-          setModifiersExpanded(true);
-        }
-        if (precModifier) {
-          setPrecModifier(precModifier);
-          setModifiersExpanded(true);
-        }
-        if (damageMeleeModifier) {
-          setDamageMeleeModifier(damageMeleeModifier);
-          setModifiersExpanded(true);
-        }
-        if (damageRangedModifier) {
-          setDamageRangedModifier(damageRangedModifier);
-          setModifiersExpanded(true);
-        }
+        if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
+        if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
+        if (initModifier) { setInitModifier(initModifier); expandModifiers(); }
+        if (magicModifier) { setMagicModifier(magicModifier); expandModifiers(); }
+        if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
+        if (damageMeleeModifier) { setDamageMeleeModifier(damageMeleeModifier); expandModifiers(); }
+        if (damageRangedModifier) { setDamageRangedModifier(damageRangedModifier); expandModifiers(); }
       }
     }
     fileInputRef.current.value = null;
@@ -201,14 +151,7 @@ export default function PlayerArmorModal({
     setSelectedQuality("");
     setInit(armor[0].init);
     setRework(false);
-    setDefModifier(0);
-    setMDefModifier(0);
-    setInitModifier(0);
-    setMagicModifier(0);
-    setPrecModifier(0);
-    setDamageMeleeModifier(0);
-    setDamageRangedModifier(0);
-    setModifiersExpanded(false);
+    clearModifiers();
   };
 
   const handleSave = () => {
@@ -221,18 +164,12 @@ export default function PlayerArmorModal({
       selectedQuality,
       init,
       rework,
-      isEquipped: martial !== armorPlayer?.martial ? false : isEquipped,
       cost,
       category: "Armor",
       def: base.def,
       mdef: base.mdef,
-      defModifier: parseInt(defModifier),
-      mDefModifier: parseInt(mDefModifier),
-      initModifier: parseInt(initModifier),
-      magicModifier: parseInt(magicModifier),
-      precModifier: parseInt(precModifier),
-      damageMeleeModifier: parseInt(damageMeleeModifier),
-      damageRangedModifier: parseInt(damageRangedModifier),
+      ...modifiers(),
+      isEquipped: martial !== armorPlayer?.martial ? false : isEquipped,
     };
 
     onAddArmor(updatedArmor);

@@ -32,6 +32,7 @@ import ChangeCategory from "./ChangeCategory";
 import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PrettyWeapon from "./PrettyWeapon";
+import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 
 export default function PlayerWeaponModal({
   open,
@@ -63,14 +64,17 @@ export default function PlayerWeaponModal({
   const [selectedQuality, setSelectedQuality] = useState(
     weapon?.selectedQuality || ""
   );
-  const [precModifier, setPrecModifier] = useState(weapon?.precModifier || 0);
-  const [damageModifier, setDamageModifier] = useState(
-    weapon?.damageModifier || 0
-  );
-  const [defModifier, setDefModifier] = useState(weapon?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(weapon?.mDefModifier || 0);
-  const [isEquipped, setIsEquipped] = useState(weapon?.isEquipped || false);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const {
+    precModifier, setPrecModifier,
+    damageModifier, setDamageModifier,
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    isEquipped, setIsEquipped,
+    modifiersExpanded, setModifiersExpanded,
+    expandModifiers,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(weapon);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -90,19 +94,7 @@ export default function PlayerWeaponModal({
     setQualityCost(weapon?.qualityCost || 0);
     setTotalBonus(weapon?.totalBonus || 0);
     setSelectedQuality(weapon?.selectedQuality || "");
-    setPrecModifier(weapon?.precModifier || 0);
-    setDamageModifier(weapon?.damageModifier || 0);
-    setDefModifier(weapon?.defModifier || 0);
-    setMDefModifier(weapon?.mDefModifier || 0);
-    setIsEquipped(weapon?.isEquipped || false);
-    setModifiersExpanded(
-      (weapon?.precModifier && weapon?.precModifier !== 0) ||
-        (weapon?.damageModifier && weapon?.damageModifier !== 0) ||
-        (weapon?.defModifier && weapon?.defModifier !== 0) ||
-        (weapon?.mDefModifier && weapon?.mDefModifier !== 0)
-        ? true
-        : false
-    );
+    // modifier fields are handled by useEquipmentForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weapon]);
 
@@ -174,22 +166,10 @@ export default function PlayerWeaponModal({
       if (rework) {
         setRework(rework);
       }
-      if (defModifier) {
-        setDefModifier(defModifier);
-        setModifiersExpanded(true);
-      }
-      if (mDefModifier) {
-        setMDefModifier(mDefModifier);
-        setModifiersExpanded(true);
-      }
-      if (precModifier) {
-        setPrecModifier(precModifier);
-        setModifiersExpanded(true);
-      }
-      if (damageModifier) {
-        setDamageModifier(damageModifier);
-        setModifiersExpanded(true);
-      }
+      if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
+      if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
+      if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
+      if (damageModifier) { setDamageModifier(damageModifier); expandModifiers(); }
     }
     fileInputRef.current.value = null;
   };
@@ -300,10 +280,7 @@ export default function PlayerWeaponModal({
       cost,
       damage,
       prec,
-      damageModifier: parseInt(damageModifier),
-      precModifier: parseInt(precModifier),
-      defModifier: parseInt(defModifier),
-      mDefModifier: parseInt(mDefModifier),
+      ...modifiers(),
       isEquipped:
         (weapon?.hands || weapons[0].hands) !== hands ||
         (weapon?.martial || false) !== martial
@@ -339,12 +316,7 @@ export default function PlayerWeaponModal({
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
-    setDamageModifier(0);
-    setPrecModifier(0);
-    setDefModifier(0);
-    setMDefModifier(0);
-    setIsEquipped(false);
-    setModifiersExpanded(false);
+    clearModifiers();
     setTotalBonus(0);
   };
 

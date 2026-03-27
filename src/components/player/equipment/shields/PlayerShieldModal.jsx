@@ -26,6 +26,7 @@ import PrettyArmor from "../armor/PrettyArmor";
 import ChangeModifiers from "../ChangeModifiers";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
+import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 
 export default function PlayerShieldModal({
   open,
@@ -47,21 +48,20 @@ export default function PlayerShieldModal({
   );
   const [init, setInit] = useState(shield?.init || 0);
   const [rework, setRework] = useState(shield?.rework || false);
-  const [defModifier, setDefModifier] = useState(shield?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(shield?.mDefModifier || 0);
-  const [initModifier, setInitModifier] = useState(shield?.initModifier || 0);
-  const [magicModifier, setMagicModifier] = useState(
-    shield?.magicModifier || 0
-  );
-  const [precModifier, setPrecModifier] = useState(shield?.precModifier || 0);
-  const [damageMeleeModifier, setDamageMeleeModifier] = useState(
-    shield?.damageMeleeModifier || 0
-  );
-  const [damageRangedModifier, setDamageRangedModifier] = useState(
-    shield?.damageRangedModifier || 0
-  );
-  const [isEquipped, setIsEquipped] = useState(shield?.isEquipped || false);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const {
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    initModifier, setInitModifier,
+    magicModifier, setMagicModifier,
+    precModifier, setPrecModifier,
+    damageMeleeModifier, setDamageMeleeModifier,
+    damageRangedModifier, setDamageRangedModifier,
+    isEquipped, setIsEquipped,
+    modifiersExpanded, setModifiersExpanded,
+    expandModifiers,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(shield);
 
   const fileInputRef = useRef(null);
 
@@ -74,21 +74,7 @@ export default function PlayerShieldModal({
     setSelectedQuality(shield?.selectedQuality || "");
     setInit(shield?.init || 0);
     setRework(shield?.rework || false);
-    setIsEquipped(shield?.isEquipped || false);
-    setDefModifier(shield?.defModifier || 0);
-    setMDefModifier(shield?.mDefModifier || 0);
-    setInitModifier(shield?.initModifier || 0);
-    setModifiersExpanded(
-      (shield?.defModifier && shield?.defModifier !== 0) ||
-        (shield?.mDefModifier && shield?.mDefModifier !== 0) ||
-        (shield?.initModifier && shield?.initModifier !== 0) ||
-        (shield?.magicModifier && shield?.magicModifier !== 0) ||
-        (shield?.precModifier && shield?.precModifier !== 0) ||
-        (shield?.damageMeleeModifier && shield?.damageMeleeModifier !== 0) ||
-        (shield?.damageRangedModifier && shield?.damageRangedModifier !== 0)
-        ? true
-        : false
-    );
+    // modifier fields are handled by useEquipmentForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shield]);
 
@@ -135,34 +121,13 @@ export default function PlayerShieldModal({
         if (rework) {
           setRework(rework);
         }
-        if (defModifier) {
-          setDefModifier(defModifier);
-          setModifiersExpanded(true);
-        }
-        if (mDefModifier) {
-          setMDefModifier(mDefModifier);
-          setModifiersExpanded(true);
-        }
-        if (initModifier) {
-          setInitModifier(initModifier);
-          setModifiersExpanded(true);
-        }
-        if (magicModifier) {
-          setMagicModifier(magicModifier);
-          setModifiersExpanded(true);
-        }
-        if (precModifier) {
-          setPrecModifier(precModifier);
-          setModifiersExpanded(true);
-        }
-        if (damageMeleeModifier) {
-          setDamageMeleeModifier(damageMeleeModifier);
-          setModifiersExpanded(true);
-        }
-        if (damageRangedModifier) {
-          setDamageRangedModifier(damageRangedModifier);
-          setModifiersExpanded(true);
-        }
+        if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
+        if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
+        if (initModifier) { setInitModifier(initModifier); expandModifiers(); }
+        if (magicModifier) { setMagicModifier(magicModifier); expandModifiers(); }
+        if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
+        if (damageMeleeModifier) { setDamageMeleeModifier(damageMeleeModifier); expandModifiers(); }
+        if (damageRangedModifier) { setDamageRangedModifier(damageRangedModifier); expandModifiers(); }
       }
     }
     fileInputRef.current.value = null;
@@ -186,10 +151,7 @@ export default function PlayerShieldModal({
     setSelectedQuality("");
     setInit(shields[0].init);
     setRework(false);
-    setDefModifier(0);
-    setMDefModifier(0);
-    setInitModifier(0);
-    setModifiersExpanded(false);
+    clearModifiers();
   };
 
   const handleSave = () => {
@@ -202,18 +164,12 @@ export default function PlayerShieldModal({
       selectedQuality,
       init,
       rework,
-      isEquipped: martial !== shield?.martial ? false : isEquipped,
       cost,
       category: "Shield",
       def: base.def,
       mdef: base.mdef,
-      defModifier: parseInt(defModifier),
-      mDefModifier: parseInt(mDefModifier),
-      initModifier: parseInt(initModifier),
-      magicModifier: parseInt(magicModifier),
-      precModifier: parseInt(precModifier),
-      damageMeleeModifier: parseInt(damageMeleeModifier),
-      damageRangedModifier: parseInt(damageRangedModifier),
+      ...modifiers(),
+      isEquipped: martial !== shield?.martial ? false : isEquipped,
     };
 
     onAddShield(updatedShield);

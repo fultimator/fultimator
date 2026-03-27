@@ -34,6 +34,7 @@ import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ChangeModifiers from "../ChangeModifiers";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import { categories, range, accuracyChecks, customizations, types } from "../../../../routes/equip/customWeapons/libs";
+import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 
 export default function PlayerCustomWeaponModal({
   open,
@@ -57,15 +58,17 @@ export default function PlayerCustomWeaponModal({
   const [selectedQuality, setSelectedQuality] = useState(customWeapon?.selectedQuality || "");
   const [quality, setQuality] = useState(customWeapon?.quality || "");
   const [qualityCost, setQualityCost] = useState(customWeapon?.qualityCost || 0);
-  const [isEquipped, setIsEquipped] = useState(customWeapon?.isEquipped || false);
-  
-  // Modifier states
-  const [damageModifier, setDamageModifier] = useState(customWeapon?.damageModifier || 0);
-  const [precModifier, setPrecModifier] = useState(customWeapon?.precModifier || 0);
-  const [defModifier, setDefModifier] = useState(customWeapon?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(customWeapon?.mDefModifier || 0);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
-  
+  const {
+    damageModifier, setDamageModifier,
+    precModifier, setPrecModifier,
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    isEquipped, setIsEquipped,
+    modifiersExpanded, setModifiersExpanded,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(customWeapon);
+
   // Override states
   const [overrideDamageType, setOverrideDamageType] = useState(customWeapon?.overrideDamageType || false);
   const [customDamageType, setCustomDamageType] = useState(customWeapon?.customDamageType || "physical");
@@ -108,11 +111,7 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality(customWeapon.selectedQuality || "");
       setQuality(customWeapon.quality || "");
       setQualityCost(customWeapon.qualityCost || 0);
-      setIsEquipped(customWeapon.isEquipped || false);
-      setDamageModifier(customWeapon.damageModifier || 0);
-      setPrecModifier(customWeapon.precModifier || 0);
-      setDefModifier(customWeapon.defModifier || 0);
-      setMDefModifier(customWeapon.mDefModifier || 0);
+      // primary modifier fields handled by useEquipmentForm
       setOverrideDamageType(customWeapon.overrideDamageType || false);
       setCustomDamageType(customWeapon.customDamageType || "physical");
       
@@ -133,13 +132,8 @@ export default function PlayerCustomWeaponModal({
       setSecondOverrideDamageType(customWeapon.secondOverrideDamageType || false);
       setSecondCustomDamageType(customWeapon.secondCustomDamageType || "physical");
       
-      setModifiersExpanded(
-        (customWeapon?.damageModifier && customWeapon?.damageModifier !== 0) ||
-        (customWeapon?.precModifier && customWeapon?.precModifier !== 0) ||
-        (customWeapon?.defModifier && customWeapon?.defModifier !== 0) ||
-        (customWeapon?.mDefModifier && customWeapon?.mDefModifier !== 0) ||
-        customWeapon?.overrideDamageType
-      );
+      // hook handles expand for numeric modifiers; also expand for overrideDamageType
+      if (customWeapon?.overrideDamageType) setModifiersExpanded(true);
       
       setSecondModifiersExpanded(
         (customWeapon?.secondDamageModifier && customWeapon?.secondDamageModifier !== 0) ||
@@ -160,11 +154,7 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality("");
       setQuality("");
       setQualityCost(0);
-      setIsEquipped(false);
-      setDamageModifier(0);
-      setPrecModifier(0);
-      setDefModifier(0);
-      setMDefModifier(0);
+      clearModifiers();
       setOverrideDamageType(false);
       setCustomDamageType("physical");
       
@@ -185,7 +175,6 @@ export default function PlayerCustomWeaponModal({
       setSecondOverrideDamageType(false);
       setSecondCustomDamageType("physical");
       
-      setModifiersExpanded(false);
       setSecondModifiersExpanded(false);
     }
   }, [customWeapon]);
@@ -274,11 +263,8 @@ export default function PlayerCustomWeaponModal({
       cost: calculateTotalCost(),
       hands: 2, // Custom weapons are always two-handed
       martial: isMartial(),
+      ...modifiers(),
       isEquipped: editCustomWeaponIndex !== null ? isEquipped : false,
-      damageModifier: parseInt(damageModifier) || 0,
-      precModifier: parseInt(precModifier) || 0,
-      defModifier: parseInt(defModifier) || 0,
-      mDefModifier: parseInt(mDefModifier) || 0,
       overrideDamageType,
       customDamageType,
       // Secondary weapon data (for transforming weapons)
