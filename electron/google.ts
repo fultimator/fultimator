@@ -7,19 +7,26 @@ import http from "node:http";
 import { Readable } from "node:stream";
 import { app, BrowserWindow } from "electron";
 
-const clientId = import.meta.env.VITE_CLIENT_ID;
-const clientSecret = import.meta.env.VITE_CLIENT_SECRET;
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET;
 
 // No redirect URI in constructor - we pass it dynamically per-login (local server port)
 const OAuth2 = new google.auth.OAuth2(clientId, clientSecret);
 
 const store = new Store();
 
+function validateCredentials() {
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing required parameter: VITE_GOOGLE_CLIENT_ID or VITE_GOOGLE_CLIENT_SECRET for desktop app. Please check your .env file.");
+  }
+}
+
 // Function to start the login process.
 // Spins up a temporary local HTTP server so the redirect_uri is
 // http://127.0.0.1:<random-port> - Google allows any port on 127.0.0.1
 // for "Desktop app" OAuth clients without registering each port.
 export async function loginGoogle(): Promise<any> {
+  validateCredentials();
   return new Promise((resolve, reject) => {
     const server = http.createServer();
 
