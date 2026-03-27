@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, MemoryRouter, Routes, Route } from "react-router-dom";
+import { IS_ELECTRON } from "./platform";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 
@@ -27,6 +28,7 @@ import {
   ThemeProvider as AppThemeProvider,
   useThemeContext,
 } from "./ThemeContext";
+import { DatabaseProvider } from "./context/DatabaseContext";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingPage from "./components/common/LoadingPage";
 
@@ -64,6 +66,8 @@ const themes = {
   Obscura: { light: lightObscura, dark: darkObscura },
 };
 
+const Router = IS_ELECTRON ? MemoryRouter : BrowserRouter;
+
 const App = () => {
   const { selectedTheme, isDarkMode } = useThemeContext();
   const currentTheme = themes[selectedTheme]
@@ -76,7 +80,7 @@ const App = () => {
     <React.StrictMode>
       <ThemeProvider theme={currentTheme}>
         <CssBaseline />
-        <BrowserRouter>
+        <Router>
           <ErrorBoundary>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -178,7 +182,7 @@ const App = () => {
               />
             </Routes>
           </ErrorBoundary>
-        </BrowserRouter>
+        </Router>
       </ThemeProvider>
     </React.StrictMode>
   );
@@ -186,7 +190,9 @@ const App = () => {
 
 const Root = () => (
   <AppThemeProvider>
-    <App />
+    <DatabaseProvider>
+      <App />
+    </DatabaseProvider>
   </AppThemeProvider>
 );
 

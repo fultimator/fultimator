@@ -16,13 +16,11 @@ import {
 } from "@mui/material";
 import { Download, AddCircle } from "@mui/icons-material";
 import { useRef, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, orderBy, query, where } from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { User } from "firebase/auth";
+import type { User } from "firebase/auth";
+import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
-import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
 import NpcPretty from "../../components/npc/Pretty";
 import PointBar from "../../components/PointBar";
@@ -35,15 +33,14 @@ import { useTranslate } from "../../translation/translate";
 
 export default function Combat() {
   const { t } = useTranslate();
-  const [user, loading, error] = useAuthState(auth);
-  console.debug("user, loading, error", user, loading, error);
+  const { authLoading, cloudUser } = useDatabaseContext();
 
   return (
     <Layout>
       <Typography variant="h4">{t("Combat")}</Typography>
-      {loading && <Skeleton />}
+      {authLoading && <Skeleton />}
 
-      {!loading && !user && (
+      {!authLoading && !cloudUser && (
         <>
           <Typography sx={{ my: 1 }}>
             {t("You must be logged in to use this feature")}
@@ -52,7 +49,7 @@ export default function Combat() {
         </>
       )}
 
-      {user && <AuthCombat user={user} />}
+      {cloudUser && <AuthCombat user={cloudUser} />}
     </Layout>
   );
 }
@@ -63,16 +60,22 @@ interface AuthCombatProps {
 
 function AuthCombat({ user }: AuthCombatProps) {
   const { t } = useTranslate();
-  const personalRef = collection(firestore, "npc-personal");
-  const personalQuery = query(
-    personalRef,
-    where("uid", "==", user.uid),
-    orderBy("lvl", "asc"),
-    orderBy("name", "asc")
-  );
-  const [personalList, loading] = useCollectionData(personalQuery, {
-    idField: "id",
-  });
+  const db = useDatabase("cloud");
+
+  const [personalList, setPersonalList] = useState<TypeNpc[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = db.query(
+      db.collection("npc-personal"),
+      db.orderBy("lvl", "asc"),
+      db.orderBy("name", "asc")
+    );
+    db.getDocs(q)
+      .then((docs) => setPersonalList((docs as TypeNpc[]) ?? []))
+      .catch((e) => console.error("Error loading NPCs:", e))
+      .finally(() => setLoading(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 

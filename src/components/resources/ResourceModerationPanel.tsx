@@ -17,8 +17,7 @@ import {
 } from "@mui/material";
 import { CheckCircle, Cancel, OpenInNew } from "@mui/icons-material";
 import { createClient } from "@supabase/supabase-js";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
+import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
 
 interface PendingSubmission {

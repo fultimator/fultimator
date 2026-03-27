@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { firestore, auth } from "../../firebase";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc, collection, addDoc } from "@firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useDatabase } from "../../hooks/useDatabase";
+import { useDatabaseContext } from "../../context/DatabaseContext";
 import {
   Grid,
   Divider,
@@ -70,9 +68,21 @@ export default function NpcEdit() {
 
   let params = useParams(); // URL parameters hook
   const location = useLocation(); // Location hook for getting URL
-  const ref = doc(firestore, "npc-personal", params.npcId); // Firestore document reference
 
-  const [user] = useAuthState(auth); // Authentication state hook
+  // UUIDs (crypto.randomUUID) come from IDB on both web and desktop.
+  // Firestore auto-IDs are 20-char alphanumeric - never match the UUID pattern.
+  const isLocalNpc = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.npcId);
+
+  const localDb = useDatabase("local");
+  const cloudDb = useDatabase("cloud");
+  const db = isLocalNpc ? localDb : cloudDb;
+
+  const ref = db.doc("npc-personal", params.npcId);
+  const activeSetDoc = (r, data) => db.setDoc(r, data);
+  const activeAddDoc = (r, data) => db.addDoc(r, data);
+  const activeCollection = (_, path) => db.collection(path);
+
+  const { cloudUser: user } = useDatabaseContext();
   const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
 
   const [checkedRules, setCheckedRules] = useState(false);
@@ -103,7 +113,12 @@ export default function NpcEdit() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const [npc] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
+  // Single hook call - both adapters are always instantiated so this is unconditionally stable.
+  const [npc] = db.useDocumentData(ref);
+
+  // Local NPCs are always owned by whoever is running the app.
+  // Cloud NPCs require a matching Firebase UID.
+  const isOwner = isLocalNpc || Boolean(user && npc && user.uid === npc.uid);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
@@ -131,7 +146,7 @@ export default function NpcEdit() {
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
-        setDoc(ref, npcTemp);
+        activeSetDoc(ref, npcTemp);
       }
     },
     [ref, npcTemp]
@@ -229,7 +244,7 @@ export default function NpcEdit() {
   // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
-    setDoc(ref, {
+    activeSetDoc(ref, {
       ...npcTemp,
       published: true,
       searchString: npcTemp.name
@@ -254,7 +269,7 @@ export default function NpcEdit() {
   // Function to update publish language as moderator
   const updatePublishLanguage = async (newLang) => {
     setIsUpdated(false);
-    setDoc(ref, { ...npcTemp, language: newLang });
+    activeSetDoc(ref, { ...npcTemp, language: newLang });
 
     // Send message to webhook when updating publish language as moderator
     if (user && isModerator && user.uid !== npc.uid) {
@@ -272,7 +287,7 @@ export default function NpcEdit() {
   // Function to unpublish NPC
   const unPublish = async () => {
     setIsUpdated(false);
-    setDoc(ref, {
+    activeSetDoc(ref, {
       ...npcTemp,
       published: false,
     });
@@ -297,9 +312,9 @@ export default function NpcEdit() {
     delete data.id;
     data.published = false;
 
-    const ref = collection(firestore, "npc-personal");
+    const ref = db.collection("npc-personal");
 
-    addDoc(ref, data)
+    activeAddDoc(ref, data)
       .then(function (docRef) {
         window.location.href = `/npc-gallery/${docRef.id}`;
       })
@@ -330,7 +345,7 @@ export default function NpcEdit() {
     <NpcProvider npcData={npcTemp}>
       <Layout unsavedChanges={isUpdated}>
         {/* Main Grid Container */}
-        {user && isModerator && user.uid !== npc.uid && (
+        {user && isModerator && !isOwner && (
           <Alert
             severity="warning"
             variant="filled"
@@ -363,18 +378,20 @@ export default function NpcEdit() {
               </IconButton>
             </Tooltip>
 
-            {/* Share URL Button */}
+            {/* Share URL Button - local NPCs have no public URL */}
             <Tooltip title={t("Share URL")}>
-              <IconButton onClick={() => shareNpc(npc.id)}>
-                <Share />
-              </IconButton>
+              <span>
+                <IconButton onClick={() => shareNpc(npc.id)} disabled={isLocalNpc}>
+                  <Share />
+                </IconButton>
+              </span>
             </Tooltip>
 
             {/* Export NPC Data */}
             <Export name={`${npc.name}`} dataType="npc" data={npc} />
 
             {/* Copy and Edit Button, shown only if user is not the creator */}
-            {user && user.uid !== npc.uid && (
+            {!isOwner && (
               <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
                 <IconButton
                   aria-label="duplicate"
@@ -387,24 +404,26 @@ export default function NpcEdit() {
 
             <Divider sx={{ my: 1 }} />
 
-            {/* NPC sharing options */}
-            <EditPublish
-              npc={npcTemp}
-              setNpc={setNpcTemp}
-              user={user}
-              isModerator={isModerator}
-              checkedRules={checkedRules}
-              rulesDialogOpen={rulesDialogOpen}
-              handleDialogOpen={handleDialogOpen}
-              handleDialogClose={handleDialogClose}
-              handleCheckboxChange={handleCheckboxChange}
-              publish={publish}
-              unPublish={unPublish}
-              updatePublishLanguage={updatePublishLanguage}
-              isUpdated={isUpdated}
-            />
+            {/* NPC sharing options - Firestore only, not available for local NPCs */}
+            {!isLocalNpc && (
+              <EditPublish
+                npc={npcTemp}
+                setNpc={setNpcTemp}
+                user={user}
+                isModerator={isModerator}
+                checkedRules={checkedRules}
+                rulesDialogOpen={rulesDialogOpen}
+                handleDialogOpen={handleDialogOpen}
+                handleDialogClose={handleDialogClose}
+                handleCheckboxChange={handleCheckboxChange}
+                publish={publish}
+                unPublish={unPublish}
+                updatePublishLanguage={updatePublishLanguage}
+                isUpdated={isUpdated}
+              />
+            )}
             {/* Tags Section */}
-            {user && user.uid === npc.uid && (
+            {isOwner && (
               <>
                 <Divider sx={{ my: 1 }} />
                 <TagList npc={npcTemp} setNpc={setNpcTemp} />
@@ -417,7 +436,7 @@ export default function NpcEdit() {
         <Divider sx={{ my: 1 }} />
 
         {/* NPC Edit Options for Creator */}
-        {user && user.uid === npc.uid && (
+        {isOwner && (
           <>
             {/* Edit Basic Information */}
             <Paper
@@ -559,7 +578,7 @@ export default function NpcEdit() {
                   aria-label="save"
                   onClick={() => {
                     setIsUpdated(false);
-                    setDoc(ref, npcTemp);
+                    activeSetDoc(ref, npcTemp);
                   }}
                   disabled={!isUpdated}
                   size="medium"
