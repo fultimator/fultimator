@@ -21,8 +21,7 @@ import AddResourceRequestDialog from "../../components/resources/AddResourceRequ
 import ResourceModerationPanel from "../../components/resources/ResourceModerationPanel";
 import { createClient } from "@supabase/supabase-js";
 import { languages } from "../../components/resources/resourceUtils";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
+import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
 
 function Resources() {

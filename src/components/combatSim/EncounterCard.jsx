@@ -16,9 +16,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import UpdateIcon from "@mui/icons-material/Update";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { t } from "../../translation/translate";
 
-const EncounterCard = ({ encounter, onDelete, onClick }) => {
+const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSelected = false, onToggleSelect }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
@@ -31,9 +33,16 @@ const EncounterCard = ({ encounter, onDelete, onClick }) => {
     }).format(date);
   };
 
+  const handleCardClick = () => {
+    if (selectMode) {
+      onToggleSelect(encounter.id);
+    }
+  };
+
   return (
     <Card
       elevation={isDarkMode ? 4 : 2}
+      onClick={handleCardClick}
       sx={{
         height: "100%",
         display: "flex",
@@ -43,12 +52,16 @@ const EncounterCard = ({ encounter, onDelete, onClick }) => {
         backgroundColor: isDarkMode
           ? theme.palette.grey[900]
           : theme.palette.background.paper,
-        border: `1px solid ${
-          isDarkMode ? theme.palette.grey[800] : theme.palette.grey[200]
-        }`,
+        border: isSelected
+          ? `3px solid ${theme.palette.primary.main}`
+          : `1px solid ${isDarkMode ? theme.palette.grey[800] : theme.palette.grey[200]}`,
+        cursor: selectMode ? "pointer" : "default",
+        outline: selectMode && !isSelected ? `1px dashed ${theme.palette.divider}` : "none",
         "&:hover": {
           transform: "translateY(-4px)",
-          border: isDarkMode
+          border: isSelected
+            ? `3px solid ${theme.palette.primary.main}`
+            : isDarkMode
             ? `1px solid ${theme.palette.primary.dark}`
             : `1px solid ${theme.palette.primary.light}`,
           "& .header-box": {
@@ -74,24 +87,31 @@ const EncounterCard = ({ encounter, onDelete, onClick }) => {
           marginTop: "-1px", // Pull the header up to cover the gap
         }}
       >
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{
-            fontWeight: "bold",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            maxWidth: "80%",
-          }}
-        >
-          {encounter.name}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+          {selectMode && (
+            isSelected
+              ? <CheckCircleIcon fontSize="small" />
+              : <RadioButtonUncheckedIcon fontSize="small" sx={{ opacity: 0.7 }} />
+          )}
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontWeight: "bold",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: "80%",
+            }}
+          >
+            {encounter.name}
+          </Typography>
+        </Box>
         <Chip
           label={`${t("combat_sim_round")} ${encounter.round || 1}`}
           size="small"
           color="secondary"
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", flexShrink: 0 }}
         />
       </Box>
 
@@ -121,27 +141,34 @@ const EncounterCard = ({ encounter, onDelete, onClick }) => {
 
       <CardActions sx={{ justifyContent: "space-between", p: 1 }}>
         <Tooltip title={t("combat_sim_continue")}>
-          <Button
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              color:
-                theme.palette.mode === "dark"
-                  ? theme.palette.secondary.main
-                  : theme.palette.primary.main,
-              pl: 1,
-              "&:hover": { color: theme.palette.primary.dark },
-            }}
-            onClick={() => onClick(encounter.id)}
-            startIcon={<PlayArrowIcon />}
-          >
-            {t("combat_sim_continue")}
-          </Button>
+          <span>
+            <Button
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                color:
+                  theme.palette.mode === "dark"
+                    ? theme.palette.secondary.main
+                    : theme.palette.primary.main,
+                pl: 1,
+                "&:hover": { color: theme.palette.primary.dark },
+              }}
+              disabled={selectMode}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick(encounter.id);
+              }}
+              startIcon={<PlayArrowIcon />}
+            >
+              {t("combat_sim_continue")}
+            </Button>
+          </span>
         </Tooltip>
 
         <Tooltip title={t("Delete")}>
           <IconButton
             size="small"
+            disabled={selectMode}
             onClick={(e) => {
               e.stopPropagation();
               onDelete(encounter.id);

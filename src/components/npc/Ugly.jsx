@@ -1,10 +1,8 @@
 import { useState } from "react";
 
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, firestore } from "@platform/db";
 
 import { Button, TextField } from "@mui/material";
-
-import { firestore } from "../../firebase";
 
 export default function NpcUgly({ npc }) {
   const [npcJson, setNpcJson] = useState(JSON.stringify(npc, null, 2));

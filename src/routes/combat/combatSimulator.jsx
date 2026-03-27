@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Layout from "../../components/Layout";
 import {
   Typography,
   Box,
   CircularProgress,
+  Paper,
   useMediaQuery,
   Snackbar,
   Alert,
@@ -21,55 +22,59 @@ import { typesList } from "../../libs/types";
 import { t } from "../../translation/translate";
 import DamageHealDialog from "../../components/combatSim/DamageHealDialog";
 import CombatLog from "../../components/combatSim/CombatLog";
-import { DragHandle } from "@mui/icons-material";
+import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { useNavigate } from "react-router-dom";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, firestore } from "../../firebase";
 import { SignIn } from "../../components/auth";
-import {
-  collection,
-  query,
-  where,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-} from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { useDocumentData } from "react-firebase-hooks/firestore";
+import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
 
 export default function CombatSimulator() {
-  const [user, loading, error] = useAuthState(auth);
-  //console.debug("user, loading, error", user, loading, error);
+  const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
+  const isLocalMode = dbMode === "local";
+  const effectiveUser = cloudUser ?? (isLocalMode ? { uid: activeUid } : null);
   const [isDirty, setIsDirty] = useState(false);
 
   return (
-    <Layout fullWidth={user} unsavedChanges={isDirty}>
-      {loading && (
+    <Layout fullWidth unsavedChanges={isDirty}>
+      {authLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
           <CircularProgress />
         </Box>
       )}
-      {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
+      {!authLoading && !effectiveUser && (
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
-      {user && (
-        <CombatSim user={user} setIsDirty={setIsDirty} isDirty={isDirty} />
+      {!authLoading && effectiveUser && (
+        <CombatSim
+          key={dbMode}
+          user={effectiveUser}
+          setIsDirty={setIsDirty}
+          isDirty={isDirty}
+        />
       )}
     </Layout>
   );
 }
 
 const CombatSim = ({ user, setIsDirty, isDirty }) => {
+  const { dbMode } = useDatabaseContext();
+  const isLocalMode = dbMode === "local";
+  const db = useDatabase();
+
   // ========== Base States ==========
   const { id } = useParams(); // Get the encounter ID from the URL
   const theme = useTheme();
@@ -80,17 +85,28 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [initialized, setInitialized] = useState(false); // Initialized state
   const navigate = useNavigate();
 
-  // ========== Firebase ==========
-  const encounterRef = doc(firestore, "encounters", id);
-  const [encounterData, loadingEncounter] = useDocumentData(encounterRef, {
-    idField: "id",
-  });
+  // ========== DB (active adapter - uid auto-injected in cloud mode) ==========
+  const [encounterData, setEncounterData] = useState(null);
+  const [loadingEncounter, setLoadingEncounter] = useState(true);
 
-  const npcsRef = collection(firestore, "npc-personal");
-  const npcsQuery = query(npcsRef, where("uid", "==", user.uid));
-  const [npcsList, loadingNpcs] = useCollectionData(npcsQuery, {
-    idField: "id",
-  });
+  useEffect(() => {
+    setLoadingEncounter(true);
+    db.getDoc(db.doc("encounters", id))
+      .then((data) => setEncounterData(data ?? null))
+      .catch((e) => console.error("Error loading encounter:", e))
+      .finally(() => setLoadingEncounter(false));
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // NPC list - one-time fetch on mount; no live subscription
+  const [npcsList, setNpcsList] = useState([]);
+  const [loadingNpcs, setLoadingNpcs] = useState(true);
+
+  useEffect(() => {
+    db.getDocs(db.query(db.collection("npc-personal")))
+      .then((docs) => setNpcsList(docs ?? []))
+      .catch((e) => console.error("Error loading NPC list:", e))
+      .finally(() => setLoadingNpcs(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ========== Clock States ==========
   const [clockDialogOpen, setClockDialogOpen] = useState(false);
@@ -155,6 +171,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const prevLogsRef = useRef(null);
   const prevEncounterNameRef = useRef(null);
   const prevEncounterNotesRef = useRef(null);
+  const initializedEncounterIdRef = useRef(null); // Tracks which encounter id has been fully initialized
 
   const [anchorEl, setAnchorEl] = useState(null); // Turns popover anchor
   const [popoverNpcId, setPopoverNpcId] = useState(null); // Popover NPC ID
@@ -189,7 +206,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   };
 
   // ========== User states ==========
-  const isDifferentUser = encounter?.uid !== user?.uid;
+  const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
 
   function addLog(
@@ -253,7 +270,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         setLastAutoSaved(currentTime);
 
         // Save encounter state (only necessary data)
-        setDoc(doc(firestore, "encounters", id), {
+        db.setDoc(db.doc("encounters", id), {
           ...encounter,
           name: encounterName,
           selectedNPCs: selectedNPCs.map((npc) => ({
@@ -419,9 +436,27 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirty, autosaveEnabled]);
 
-  // Fetch encounter and NPCs on initial load
+  // Sync NPC selector list whenever the live collection updates
   useEffect(() => {
-    if (document.hidden) return; // Prevent fetch on tab switch
+    setNpcList(npcsList);
+  }, [npcsList]);
+
+  // Initialize encounter on first load for this id; subsequent encounterData updates
+  // (e.g. from autosave) only update lightweight metadata - no NPC re-fetch.
+  useEffect(() => {
+    if (!encounterData || document.hidden) return;
+
+    const isNewEncounter = initializedEncounterIdRef.current !== id;
+
+    if (!isNewEncounter) {
+      // Autosave or remote update - keep encounter metadata in sync without re-fetching NPCs
+      setEncounter(encounterData);
+      return;
+    }
+
+    // First load for this encounter id
+    initializedEncounterIdRef.current = id;
+
     const fetchEncounter = async () => {
       setEncounter(encounterData);
       setEncounterName(encounterData?.name || "");
@@ -432,7 +467,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         JSON.stringify(encounterData?.selectedNPCs || [])
       );
       prevEncounterNameRef.current = encounterData?.name || "";
-      prevLogsRef.current = [...(encounterData?.logs || [])];    
+      prevLogsRef.current = [...(encounterData?.logs || [])];
       prevRoundRef.current = encounterData?.round;
 
       if (!encounterData?.selectedNPCs?.length) {
@@ -442,24 +477,29 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         return;
       }
 
-      // Fetch all NPCs in one query
+      // Fetch selected NPCs once on encounter load
       const npcIds = encounterData.selectedNPCs.map((npc) => npc.id);
-      const npcQuery = query(
-        collection(firestore, "npc-personal"),
-        where("__name__", "in", npcIds),
-        where("uid", "==", encounterData.uid)
-      );
 
       try {
         console.log("Fetching NPCs...");
-        const querySnapshot = await getDocs(npcQuery);
+        let fetchedNpcs;
+        if (isLocalMode) {
+          // IDB: fetch all local NPCs and filter by ID in JS (no __name__ support)
+          fetchedNpcs = await db.getDocs(db.collection("npc-personal"));
+        } else {
+          // Cloud: fetch by document IDs using Firestore's __name__ field
+          fetchedNpcs = await db.getDocs(
+            db.query(
+              db.collection("npc-personal"),
+              db.where("__name__", "in", npcIds),
+              db.where("uid", "==", encounterData.uid)
+            )
+          );
+        }
         const npcMap = new Map();
 
-        querySnapshot.forEach((doc) => {
-          npcMap.set(doc.id, {
-            ...doc.data(),
-            id: doc.id,
-          });
+        fetchedNpcs.forEach((npc) => {
+          npcMap.set(npc.id, npc);
         });
 
         const loadedNPCs = encounterData.selectedNPCs.map((npcData) => {
@@ -504,7 +544,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           };
         });
 
-        setSelectedNPCs(loadedNPCs);
+        setSelectedNPCs(loadedNPCs.filter((npc) => npc.attributes !== undefined));
         prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(loadedNPCs));
       } catch (error) {
         console.error("Error fetching NPCs:", error);
@@ -515,26 +555,19 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setInitialized(true);
     };
 
-    const fetchNpcs = async () => {
-      setNpcList(npcsList);
-    };
-
     fetchEncounter();
-    fetchNpcs();
-  }, [id, encounterData, npcsList, user.uid]);
+  }, [id, encounterData, user.uid]);
 
   // Fetch single NPC
   const getNpc = async (npcId) => {
     try {
-      const npcDocRef = doc(firestore, "npc-personal", npcId);
-      const npcDocSnap = await getDoc(npcDocRef); // Fetch document
       console.log("Fetching selected NPC...");
-      if (npcDocSnap.exists()) {
-        return npcDocSnap.data(); // Return the NPC data
-      } else {
+      const npc = await db.getDoc(db.doc("npc-personal", npcId));
+      if (!npc) {
         console.error("NPC not found:", npcId);
         return null;
       }
+      return npc;
     } catch (error) {
       console.error("Error fetching NPC:", error);
       return null;
@@ -568,7 +601,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     }));
 
     // Save encounter state (only store necessary identifiers: id and combatId)
-    setDoc(doc(firestore, "encounters", id), {
+    db.setDoc(db.doc("encounters", id), {
       ...encounter,      
       name: encounterName,
       selectedNPCs: combatStatsToSave,

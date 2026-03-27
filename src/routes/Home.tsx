@@ -36,6 +36,7 @@ import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
 import EmailIcon from "@mui/icons-material/Email";
 import powered_by_fu from "./powered_by_fu.png";
 import LanguageIcon from "@mui/icons-material/Language";
+import { IS_ELECTRON } from "../platform";
 
 function Home() {
   const theme = useCustomTheme();
@@ -392,6 +393,7 @@ function Home() {
             </Paper>
           </Grid>
 
+          {!IS_ELECTRON && (
           <Grid item xs={12}>
             <Paper
               elevation={3}
@@ -448,6 +450,7 @@ function Home() {
               </Box>
             </Paper>
           </Grid>
+          )}
 
           <Grid item xs={12}>
             <Divider sx={{ marginBottom: 3 }} />

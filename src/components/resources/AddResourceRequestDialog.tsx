@@ -19,8 +19,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
+import { useAuthState, auth } from "@platform/db";
 import { createClient } from "@supabase/supabase-js";
 
 interface AddResourceRequestDialogProps {

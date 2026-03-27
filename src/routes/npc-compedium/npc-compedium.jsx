@@ -1,18 +1,18 @@
 import {
+  addDoc,
+  deleteDoc,
+  doc,
+  useAuthState,
+  auth,
   query,
   orderBy,
   limit,
   collection,
   where,
-  doc,
-  addDoc,
-  deleteDoc,
   startAfter,
-} from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { firestore } from "../../firebase";
-import { auth } from "../../firebase";
+  useCollectionData as useCollectionDataCloud,
+  firestore as cloudFirestore,
+} from "@platform/cloud";
 
 import {
   IconButton,
@@ -39,13 +39,13 @@ import NpcPretty from "../../components/npc/Pretty";
 import {
   ArrowRight,
   ArrowLeft,
+  Cloud as CloudIcon,
   Search,
   ContentCopy,
   Share,
   Download,
   Report,
 } from "@mui/icons-material";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 
 import allToken from "../icons/All-token.webp";
@@ -72,12 +72,16 @@ export default function NpcCompedium() {
       {loading && <Skeleton />}
 
       {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color="primary" />
+          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
 
       {user && <Personal user={user} />}
@@ -97,7 +101,7 @@ function Personal({ user }) {
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
-  const personalRef = collection(firestore, "npc-personal");
+  const personalRef = collection(cloudFirestore, "npc-personal");
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
@@ -162,7 +166,7 @@ function Personal({ user }) {
   constraints.push(limit(6));
 
   const personalQuery = query(personalRef, ...constraints);
-  const [personalList, loading, err] = useCollectionData(personalQuery);
+  const [personalList, loading, err] = useCollectionDataCloud(personalQuery);
 
   if (err) {
     console.log(err);
