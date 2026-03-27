@@ -12,7 +12,8 @@ import {
   useAuthState,
   useCollectionData,
 } from "@platform/db";
-import { Card, Grid, Stack, Typography, TextField } from "@mui/material";
+import { Card, Grid, Paper, Stack, Typography, TextField } from "@mui/material";
+import { Cloud as CloudIcon } from "@mui/icons-material";
 
 import { auth, firestore } from "@platform/db";
 import PreparedRollsList from "../../components/roller/PreparedRollsList";
@@ -37,10 +38,16 @@ function RollerScoped() {
   if (!user) {
     return (
       <Layout>
-        <Typography sx={{ my: 1 }}>
-          {t("You have to be logged in to access this feature")}
-        </Typography>
-        <SignIn />
+        <Paper
+          elevation={3}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color="primary" />
+          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+            {t("You have to be logged in to access this feature")}
+          </Typography>
+          <SignIn />
+        </Paper>
       </Layout>
     );
   }

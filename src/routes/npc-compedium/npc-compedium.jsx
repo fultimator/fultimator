@@ -39,6 +39,7 @@ import NpcPretty from "../../components/npc/Pretty";
 import {
   ArrowRight,
   ArrowLeft,
+  Cloud as CloudIcon,
   Search,
   ContentCopy,
   Share,
@@ -71,12 +72,16 @@ export default function NpcCompedium() {
       {loading && <Skeleton />}
 
       {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color="primary" />
+          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
 
       {user && <Personal user={user} />}

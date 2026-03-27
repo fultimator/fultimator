@@ -6,6 +6,7 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  Paper,
   Skeleton,
   TextField,
   Typography,
@@ -14,7 +15,7 @@ import {
   Tooltip,
   Stack,
 } from "@mui/material";
-import { Download, AddCircle } from "@mui/icons-material";
+import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
 import { useRef, useState } from "react";
 import type { User } from "firebase/auth";
 import { useDatabaseContext } from "../../context/DatabaseContext";
@@ -33,7 +34,7 @@ import { useTranslate } from "../../translation/translate";
 
 export default function Combat() {
   const { t } = useTranslate();
-  const { authLoading, cloudUser } = useDatabaseContext();
+  const { authLoading, dbMode, cloudUser } = useDatabaseContext();
 
   return (
     <Layout>
@@ -41,12 +42,17 @@ export default function Combat() {
       {authLoading && <Skeleton />}
 
       {!authLoading && !cloudUser && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
 
       {cloudUser && <AuthCombat user={cloudUser} />}
