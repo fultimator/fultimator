@@ -1,7 +1,5 @@
 import { Button } from "@mui/material";
-import { auth, googleAuthProvider } from "../firebase";
-
-import { signInWithPopup } from "@firebase/auth";
+import { auth, googleAuthProvider, signInWithPopup } from "@platform/db";
 
 export function SignIn() {
   const signInWithGoogle = () => {

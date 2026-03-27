@@ -1,18 +1,18 @@
 import {
+  addDoc,
+  deleteDoc,
+  doc,
+  useAuthState,
+  auth,
   query,
   orderBy,
   limit,
   collection,
   where,
-  doc,
-  addDoc,
-  deleteDoc,
   startAfter,
-} from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { firestore } from "../../firebase";
-import { auth } from "../../firebase";
+  useCollectionData as useCollectionDataCloud,
+  firestore as cloudFirestore,
+} from "@platform/cloud";
 
 import {
   IconButton,
@@ -45,7 +45,6 @@ import {
   Download,
   Report,
 } from "@mui/icons-material";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useEffect, useRef, useState } from "react";
 
 import allToken from "../icons/All-token.webp";
@@ -97,7 +96,7 @@ function Personal({ user }) {
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
-  const personalRef = collection(firestore, "npc-personal");
+  const personalRef = collection(cloudFirestore, "npc-personal");
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
@@ -162,7 +161,7 @@ function Personal({ user }) {
   constraints.push(limit(6));
 
   const personalQuery = query(personalRef, ...constraints);
-  const [personalList, loading, err] = useCollectionData(personalQuery);
+  const [personalList, loading, err] = useCollectionDataCloud(personalQuery);
 
   if (err) {
     console.log(err);

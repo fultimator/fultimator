@@ -12,67 +12,94 @@ import {
   Alert,
   Fade,
   CircularProgress,
+  ToggleButtonGroup,
+  ToggleButton,
+  Collapse,
+  // TODO: re-enable when cross-db encounter copy/move is solved (NPC refs tied to source db)
+  // Divider,
+  // ListItemIcon,
+  // ListItemText,
+  // Menu as MuiMenu,
+  // MenuItem,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SettingsIcon from "@mui/icons-material/Settings";
+import StorageIcon from "@mui/icons-material/Storage";
+import CloudIcon from "@mui/icons-material/Cloud";
 import Layout from "../../components/Layout";
 import { useTheme } from "@mui/material/styles";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import SettingsDialog from "../../components/combatSim/SettingsDialog";
-import { SportsMartialArts } from "@mui/icons-material";
+import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts } from "@mui/icons-material";
 import { t } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import EncounterCard from "../../components/combatSim/EncounterCard";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, firestore } from "../../firebase";
 import { SignIn } from "../../components/auth";
-import {
-  collection,
-  query,
-  where,
-  addDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import DriveSync from "../../components/DriveSync";
+import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
 
 const MAX_ENCOUNTERS = 3;
 
 export default function CombatSimulatorEncounters() {
-  const [user, loading, error] = useAuthState(auth);
-  console.debug("user, loading, error", user, loading, error);
+  const { authLoading, dbMode } = useDatabaseContext();
 
   return (
-    <Layout fullWidth={user}>
-      {loading && (
+    <Layout fullWidth>
+      {authLoading && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
           <CircularProgress />
         </Box>
       )}
-      {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
-          </Typography>
-          <SignIn />
-        </>
-      )}
-      {user && <CombatSimEncounters user={user} />}
+      {!authLoading && <CombatSimEncounters key={dbMode} />}
     </Layout>
   );
 }
 
-const CombatSimEncounters = ({ user }) => {
-  const encountersRef = collection(firestore, "encounters");
-  const encountersQuery = query(encountersRef, where("uid", "==", user.uid));
-  const [encountersList, loading] = useCollectionData(encountersQuery, {
-    idField: "id",
-  });
+const CombatSimEncounters = () => {
+  const { dbMode, requestModeSwitch, cloudUser } = useDatabaseContext();
+  const db = useDatabase();
+  // TODO: re-enable when cross-db encounter copy/move is solved (NPC refs tied to source db)
+  // const localDb = useDatabase("local");
+  // const cloudDb = useDatabase("cloud");
+
+  const location = useLocation();
+  const [encountersList, setEncountersList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchEncounters = useCallback(async () => {
+    if (dbMode === "cloud" && !cloudUser) {
+      setEncountersList([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const constraints =
+        dbMode === "cloud" ? [db.where("uid", "==", cloudUser.uid)] : [];
+      const docs = await db.getDocs(db.query(db.collection("encounters"), ...constraints));
+      setEncountersList(docs ?? []);
+    } catch (e) {
+      console.error("Error loading encounters:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [db, dbMode, cloudUser]);
+
+  // Fetch on mount and whenever returning to this page (e.g. after combat sim autosaved)
+  useEffect(() => {
+    fetchEncounters();
+  }, [fetchEncounters, location.key]);
 
   const [encounters, setEncounters] = useState([]);
   const [encounterName, setEncounterName] = useState("");
-  const [settingsOpen, setSettingsOpen] = useState(false); // State for settings dialog
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  // TODO: re-enable when cross-db encounter copy/move is solved
+  // const [copyAnchor, setCopyAnchor] = useState(null);
+  // const [moveAnchor, setMoveAnchor] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -88,10 +115,7 @@ const CombatSimEncounters = ({ user }) => {
 
   // Handler to update individual settings
   const handleSettingChange = useCallback((name, value) => {
-    setLocalSettings((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setLocalSettings((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   useEffect(() => {
@@ -120,7 +144,6 @@ const CombatSimEncounters = ({ user }) => {
   const handleSaveSettings = useCallback(() => {
     // Save local settings to the persisted store
     settingsStore.updateSettings(localSettings);
-
     setSettingsOpen(false);
     showNotification(t("combat_sim_settings_saved_successfully"));
   }, [localSettings, settingsStore, setSettingsOpen]);
@@ -128,7 +151,6 @@ const CombatSimEncounters = ({ user }) => {
   // Close settings dialog without saving changes
   const handleCloseSettings = useCallback(() => {
     setSettingsOpen(false);
-
     // Reset local settings to match store when the user cancels
     setLocalSettings(settingsStore.settings);
   }, [settingsStore.settings]);
@@ -147,8 +169,10 @@ const CombatSimEncounters = ({ user }) => {
     setEncounterName(event.target.value);
   };
 
+  const isAtCloudLimit = dbMode === "cloud" && encounters.length >= MAX_ENCOUNTERS;
+
   const handleSaveEncounter = async () => {
-    if (!encounterName || encounters.length >= MAX_ENCOUNTERS) return;
+    if (!encounterName || isAtCloudLimit) return;
 
     const newEncounter = {
       name: encounterName,
@@ -157,20 +181,17 @@ const CombatSimEncounters = ({ user }) => {
       updatedAt: new Date().toISOString(),
       clocks: [],
       notes: [],
-      uid: user.uid,
       private: true,
+      ...(dbMode === "cloud" && cloudUser ? { uid: cloudUser.uid } : {}),
     };
 
-    // Add doc to firebase
-    const docRef = collection(firestore, "encounters");
     try {
-      const res = await addDoc(docRef, newEncounter);
+      const res = await db.addDoc(db.collection("encounters"), newEncounter);
       console.debug(res);
       showNotification(t("combat_sim_encounter_created"));
     } catch (e) {
       console.error("Error saving encounter:", e);
       showNotification(t("combat_sim_error_creating_encounter"), "error");
-      console.debug(e);
     }
 
     setEncounterName("");
@@ -180,26 +201,19 @@ const CombatSimEncounters = ({ user }) => {
     const confirmDelete = await globalConfirm(
       t("combat_sim_delete_encounter_confirm")
     );
-
     if (!confirmDelete) return;
 
-    const docRef = doc(firestore, "encounters", id);
     try {
-      await deleteDoc(docRef);
+      await db.deleteDoc(db.doc("encounters", id));
       showNotification(t("combat_sim_encounter_deleted"));
     } catch (e) {
       console.error("Error deleting encounter:", e);
       showNotification(t("combat_sim_error_deleting_encounter"), "error");
-      console.debug(e);
     }
   };
 
   const handleNavigateToEncounter = (id) => {
-    navigate(`/combat-sim/${id}`, {
-      state: {
-        from: "/combat-sim",
-      },
-    });
+    navigate(`/combat-sim/${id}`, { state: { from: "/combat-sim", dbMode } });
   };
 
   const handleKeyDown = (event) => {
@@ -207,6 +221,39 @@ const CombatSimEncounters = ({ user }) => {
       handleSaveEncounter();
     }
   };
+
+  const toggleSelectMode = () => {
+    setSelectMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  };
+
+  const toggleSelectEncounter = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const deleteSelectedEncounters = async () => {
+    const confirmDelete = await globalConfirm(
+      `${t("combat_sim_delete_encounter_confirm")} (${selectedIds.size})`
+    );
+    if (!confirmDelete) return;
+    for (const id of selectedIds) {
+      await db.deleteDoc(db.doc("encounters", id));
+    }
+    setSelectedIds(new Set());
+  };
+
+  // TODO: re-enable when cross-db encounter copy/move is solved (NPC refs tied to source db)
+  // const copyEncountersTo = async (targetDb, targetUid) => { ... };
+  // const copySelectedToLocal = async () => { ... };
+  // const copySelectedToCloud = async () => { ... };
+  // const moveSelectedToLocal = async () => { ... };
+  // const moveSelectedToCloud = async () => { ... };
 
   if (loading) {
     return (
@@ -231,7 +278,6 @@ const CombatSimEncounters = ({ user }) => {
         }}
       >
         {/* Header with Settings Button */}
-
         <CustomHeaderAlt
           headerText={t("combat_sim_title")}
           icon={<SportsMartialArts fontSize="large" />}
@@ -259,7 +305,7 @@ const CombatSimEncounters = ({ user }) => {
                 color="primary"
                 fullWidth
                 onClick={handleSaveEncounter}
-                disabled={!encounterName || encounters.length >= MAX_ENCOUNTERS}
+                disabled={!encounterName || isAtCloudLimit}
                 sx={{ height: "100%" }}
               >
                 {t("combat_sim_create_encounter")}
@@ -274,21 +320,82 @@ const CombatSimEncounters = ({ user }) => {
             }}
             mt={2}
           >
-            <Typography variant="h5" color="text.primary">
-              {t("combat_sim_saved_encounters")} ({encounters.length}/
-              {MAX_ENCOUNTERS})
-            </Typography>
-            <Tooltip title={t("combat_sim_settings")}>
-              <IconButton
-                color={isDarkMode ? "white" : "primary"}
-                onClick={() => setSettingsOpen(true)}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <ToggleButtonGroup
+                value={dbMode}
+                exclusive
+                size="small"
+                onChange={(_, val) => val && requestModeSwitch(val)}
               >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
+                <ToggleButton value="local">
+                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Local")}
+                </ToggleButton>
+                <ToggleButton value="cloud">
+                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Cloud")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+              {dbMode === "local" && <DriveSync />}
+              <Typography variant="h5" color="text.primary">
+                {t("combat_sim_saved_encounters")}{" "}
+                {dbMode === "cloud"
+                  ? `(${encounters.length}/${MAX_ENCOUNTERS})`
+                  : `(${encounters.length})`}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select Encounters")}>
+                <Button
+                  variant={selectMode ? "contained" : "outlined"}
+                  size="small"
+                  startIcon={<LibraryAddCheck />}
+                  onClick={toggleSelectMode}
+                >
+                  {t("Select")}
+                </Button>
+              </Tooltip>
+              <Tooltip title={t("combat_sim_settings")}>
+                <IconButton
+                  color={isDarkMode ? "white" : "primary"}
+                  onClick={() => setSettingsOpen(true)}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
+
+          {/* Select mode action bar */}
+          <Collapse in={selectMode}>
+            <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
+              <Typography variant="body2" color="text.secondary">
+                {selectedIds.size} {t("selected")}
+              </Typography>
+              <Box sx={{ flex: 1 }} />
+              {/* TODO: re-enable Copy/Move when cross-db encounter solution is ready */}
+              {/* <Button size="small" variant="outlined" startIcon={<FileCopy />} onClick={(e) => setCopyAnchor(e.currentTarget)}>{t("Copy")}</Button> */}
+              {/* <Button size="small" variant="outlined" startIcon={<DriveFileMove />} onClick={(e) => setMoveAnchor(e.currentTarget)}>{t("Move")}</Button> */}
+              <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
+                <span>
+                  <IconButton onClick={deleteSelectedEncounters} disabled={selectedIds.size === 0} color="error">
+                    <Delete />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          </Collapse>
         </div>
       </Paper>
+
+      {dbMode === "cloud" && !cloudUser && (
+        <Box sx={{ mt: 2 }}>
+          <Typography sx={{ my: 1 }}>
+            {t("You must be logged in to use this feature")}
+          </Typography>
+          <SignIn />
+        </Box>
+      )}
 
       <Grid container spacing={3} sx={{ marginTop: 2 }}>
         {loading ? (
@@ -325,6 +432,9 @@ const CombatSimEncounters = ({ user }) => {
                 encounter={encounter}
                 onDelete={handleDeleteEncounter}
                 onClick={() => handleNavigateToEncounter(encounter.id)}
+                selectMode={selectMode}
+                isSelected={selectedIds.has(encounter.id)}
+                onToggleSelect={toggleSelectEncounter}
               />
             </Grid>
           ))

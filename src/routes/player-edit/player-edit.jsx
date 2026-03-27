@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { firestore, auth } from "../../firebase";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc, setDoc } from "@firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { useDatabase } from "../../hooks/useDatabase";
+import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
@@ -95,19 +93,22 @@ export default function PlayerEdit() {
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
 
   let params = useParams(); // URL parameters hook
-  const ref = doc(firestore, "player-personal", params.playerId); // Firestore document reference
 
-  const [user] = useAuthState(auth); // Authentication state hook
+  // UUIDs (crypto.randomUUID) come from IDB on both web and desktop.
+  // Firestore auto-IDs are 20-char alphanumeric - never match the UUID pattern.
+  const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);
 
-  /*
-  let canAccessTest = false;
+  const localDb = useDatabase("local");
+  const cloudDb = useDatabase("cloud");
+  const db = isLocalPlayer ? localDb : cloudDb;
 
-  if (user && (testUsers.includes(user.uid) || moderators.includes(user.uid))) {
-    canAccessTest = true;
-  }
-  */
+  const ref = db.doc("player-personal", params.playerId);
+  const activeSetDoc = (r, data) => db.setDoc(r, data);
 
-  const [player] = useDocumentData(ref, { idField: "id" }); // Firestore document data hook
+  const { cloudUser: user } = useDatabaseContext();
+
+  // Single hook call - both adapters are always instantiated so this is unconditionally stable.
+  const [player] = db.useDocumentData(ref);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [showScrollTop] = useState(true);
@@ -261,7 +262,9 @@ export default function PlayerEdit() {
     isUpdated
   );
 
-  const isOwner = user?.uid === player?.uid;
+  // Local players are always owned by whoever is running the app.
+  // Cloud players require a matching Firebase UID.
+  const isOwner = isLocalPlayer || Boolean(user && player && user.uid === player.uid);
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -763,7 +766,7 @@ export default function PlayerEdit() {
                 aria-label="save"
                 onClick={() => {
                   setIsUpdated(false);
-                  setDoc(ref, playerTemp);
+                  activeSetDoc(ref, playerTemp);
                 }}
                 disabled={!isUpdated}
                 size="medium"
@@ -780,8 +783,8 @@ export default function PlayerEdit() {
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}
-        userEmail={user.email}
-        userUUID={user.uid}
+        userEmail={user?.email ?? ""}
+        userUUID={user?.uid ?? "local-user"}
         title={"Report a Bug"}
         placeholder="Please describe the bug. Please leave a message in english!"
         onSuccess={null}

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 // Firebase configuration
@@ -16,6 +16,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const firestore = getFirestore(app);
+// Enable IndexedDB offline cache - serves reads from local cache after first load
+let firestore;
+try {
+  firestore = initializeFirestore(app, {
+    cache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  });
+} catch {
+  firestore = getFirestore(app);
+}
+export { firestore };
 export const auth = getAuth(app);
 export const googleAuthProvider = new GoogleAuthProvider();
+// Request Drive access alongside Firebase auth - one sign-in covers both
+googleAuthProvider.addScope("https://www.googleapis.com/auth/drive.file");

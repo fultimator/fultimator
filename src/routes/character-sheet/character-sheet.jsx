@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslate } from "../../translation/translate";
-import { firestore } from "../../firebase";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { doc } from "@firebase/firestore";
+import { firestore, useDocumentData, doc } from "@platform/db";
 import { Grid, Button, Typography, Stack, IconButton, useMediaQuery, Divider } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";

@@ -23,7 +23,7 @@ export default function SelectedNpcsHeader({
   // Calculate the highest initiative for the selected NPCs
   const highestInit = Math.max(
     ...selectedNPCs
-      .filter((npc) => npc.id !== undefined)
+      .filter((npc) => npc.id !== undefined && npc.attributes !== undefined)
       .map((npc) => calcInit(npc))
       .concat([0]) // Add a default value in case the array is empty
   );
