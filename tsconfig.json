@@ -1,21 +1,26 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "jsx": "react-jsx",
-        "jsxImportSource": "react",
-        "moduleResolution": "Node",
-        "allowJs": true,
-        "noEmit": true,
-        "strict": true,
-        "lib": ["DOM", "DOM.Iterable", "ESNext"],
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "noImplicitAny": false,
-        "sourceMap": false
-        
-    },
-    "include": ["src"]
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@platform/*": ["./src/platform/web/*"],
+      "@routes/*": ["./src/routes/*"]
+    }
+  },
+  "include": ["src", "electron"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

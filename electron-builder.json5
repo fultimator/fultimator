@@ -1,0 +1,76 @@
+// @see - https://www.electron.build/configuration/configuration
+{
+  $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  appId: "Fultimator",
+  asar: true,
+  productName: "Fultimator",
+  directories: {
+    output: "release/${version}",
+  },
+  files: ["dist", "dist-electron"],
+  mac: {
+    target: [
+      {
+        target: "dmg",
+        arch: ["x64"],
+      },
+      {
+        target: "dmg",
+        arch: ["arm64"],
+      },
+    ],
+    icon: "public/icons/app.icns",
+    artifactName: "${productName}-Mac-${arch}-${version}-Installer.${ext}",
+  },
+  win: {
+    target: [
+      {
+        target: "nsis",
+        arch: ["x64"],
+      },
+      {
+        target: "portable",
+        arch: ["x64"],
+      },
+    ],
+    icon: "public/icons/app.ico",
+    artifactName: "${productName}-Windows-${version}-Setup.${ext}",
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    deleteAppDataOnUninstall: false,
+  },
+  portable: {
+    artifactName: "${productName}-Windows-${version}-Portable.${ext}",
+  },
+  linux: {
+    target: ["AppImage", "deb", "rpm", "flatpak"],
+    artifactName: "${productName}-Linux-${arch}-${version}.${ext}",
+    icon: "public/icons/app.png",
+    maintainer: "Fultimator <fultimator@gmail.com>",
+    category: "Utility",
+  },
+  deb: {
+    depends: ["libnotify4", "libxtst6", "libnss3"],
+  },
+  rpm: {
+    fpm: ["--rpm-rpmbuild-define=_build_id_links none"],
+  },
+  flatpak: {
+    id: "io.github.fultimator.Fultimator",
+    runtimeVersion: "23.08",
+    finishArgs: [
+      "--share=ipc",
+      "--socket=x11",
+      "--socket=wayland",
+      "--socket=pulseaudio",
+      "--share=network",
+      "--device=dri",
+      "--filesystem=home",
+      "--talk-name=org.freedesktop.Notifications",
+      "--talk-name=org.kde.StatusNotifierWatcher",
+    ],
+  },
+}
