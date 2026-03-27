@@ -15,7 +15,7 @@ import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
 import PlayerRituals from "./PlayerRituals";
 import PlayerNotes from "./PlayerNotes";
-import PlayerBonds from "../PlayerBonds";
+import PlayerBonds from "./PlayerBonds";
 import PlayerVehicle from "./PlayerVehicle";
 import PlayerCompanion from "./PlayerCompanion";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -338,7 +338,7 @@ export default function PlayerCardSheet({
                 <CustomTabPanel value={value} index={0}>
                     <PlayerBonds player={player} isCharacterSheet={true} />
                     <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
-                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
+                    <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
                     <PlayerClasses player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
@@ -353,7 +353,7 @@ export default function PlayerCardSheet({
                     <PlayerCompanion player={player} isCharacterSheet={true} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={4}>
-                    <PlayerNotes player={player} isCharacterSheet={true} searchQuery={searchQuery} />
+                    <PlayerNotes player={player} setPlayer={setPlayer} searchQuery={searchQuery} />
                     <PlayerBonds player={player} isCharacterSheet={true} />
                 </CustomTabPanel>
             </Box>
