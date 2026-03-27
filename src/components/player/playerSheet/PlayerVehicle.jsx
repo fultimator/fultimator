@@ -26,6 +26,7 @@ import { OpenBracket, CloseBracket } from "../../Bracket";
 import Diamond from "../../Diamond";
 import { availableFrames } from "../../../libs/pilotVehicleData";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
+import { calculateAttribute } from "../common/playerCalculations";
 
 export default function PlayerVehicle({
   player,
@@ -95,28 +96,8 @@ export default function PlayerVehicle({
     (m) => m.type === "pilot_module_support"
   );
 
-  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-  const calculateAttribute = (
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-  ) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-  };
-
   const currDex = calculateAttribute(
+    player,
     player.attributes.dexterity,
     ["slow", "enraged"],
     ["dexUp"],
@@ -124,6 +105,7 @@ export default function PlayerVehicle({
     12
   );
   const currInsight = calculateAttribute(
+    player,
     player.attributes.insight,
     ["dazed", "enraged"],
     ["insUp"],
@@ -131,6 +113,7 @@ export default function PlayerVehicle({
     12
   );
   const currMight = calculateAttribute(
+    player,
     player.attributes.might,
     ["weak", "poisoned"],
     ["migUp"],
@@ -138,6 +121,7 @@ export default function PlayerVehicle({
     12
   );
   const currWillpower = calculateAttribute(
+    player,
     player.attributes.willpower,
     ["shaken", "poisoned"],
     ["wlpUp"],

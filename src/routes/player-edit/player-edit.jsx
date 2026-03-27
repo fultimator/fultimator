@@ -111,7 +111,7 @@ export default function PlayerEdit() {
   const [player] = db.useDocumentData(ref);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
-  const [showScrollTop] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [playerTemp, setPlayerTemp] = useState(player);
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -215,13 +215,6 @@ export default function PlayerEdit() {
       element.style.overflow = originalOverflow;
     }
   };
-
-  useEffect(() => {
-    if (player) {
-      setPlayerTemp({ ...player });
-      setIsUpdated(false);
-    }
-  }, [player]);
 
   // Effect to update temporary Player state and check for unsaved changes
   useEffect(() => {

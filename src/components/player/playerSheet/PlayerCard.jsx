@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
@@ -19,6 +20,7 @@ import { DefIcon, MdefIcon, InitIcon } from "../../icons";
 
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { calculateAttribute, newShade } from "../common/playerCalculations";
 
 const AffinityGrid = styled(Grid)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -42,50 +44,10 @@ export default function PlayerCard({
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
-  const isMobile = window.innerWidth < 900;
-
-  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-
-  const newShade = (hexColor, magnitude) => {
-    hexColor = hexColor.replace(`#`, ``);
-    if (hexColor.length === 6) {
-      const decimalColor = parseInt(hexColor, 16);
-      let r = (decimalColor >> 16) + magnitude;
-      r > 255 && (r = 255);
-      r < 0 && (r = 0);
-      let g = (decimalColor & 0x0000ff) + magnitude;
-      g > 255 && (g = 255);
-      g < 0 && (g = 0);
-      let b = ((decimalColor >> 8) & 0x00ff) + magnitude;
-      b > 255 && (b = 255);
-      b < 0 && (b = 0);
-      return `#${(g | (b << 8) | (r << 16)).toString(16)}`;
-    } else {
-      return hexColor;
-    }
-  };
-
-  const calculateAttribute = (
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-  ) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-  };
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const currDex = calculateAttribute(
+    player,
     player.attributes.dexterity,
     ["slow", "enraged"],
     ["dexUp"],
@@ -93,6 +55,7 @@ export default function PlayerCard({
     12
   );
   const currInsight = calculateAttribute(
+    player,
     player.attributes.insight,
     ["dazed", "enraged"],
     ["insUp"],
@@ -100,6 +63,7 @@ export default function PlayerCard({
     12
   );
   const currMight = calculateAttribute(
+    player,
     player.attributes.might,
     ["weak", "poisoned"],
     ["migUp"],
@@ -107,6 +71,7 @@ export default function PlayerCard({
     12
   );
   const currWillpower = calculateAttribute(
+    player,
     player.attributes.willpower,
     ["shaken", "poisoned"],
     ["wlpUp"],

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme } from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees - 90) * (Math.PI / 180);
@@ -16,6 +16,8 @@ const Clock = ({ numSections, size, state, setState, isCharacterSheet, onReset }
   const secondary = theme.palette.secondary.main;
   const hoveredActiveColor = theme.palette.info.main; // Define a new color in the theme
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [isMouseDown, setIsMouseDown] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleClick = (index) => {
@@ -34,7 +36,7 @@ const Clock = ({ numSections, size, state, setState, isCharacterSheet, onReset }
   const handleMouseDown = (index) => {
     if (!isCharacterSheet && !isMobile) {
       setIsMouseDown(true);
-      handleSectionClick(index); // Trigger click logic on mousedown
+      handleClick(index);
     }
   };
 

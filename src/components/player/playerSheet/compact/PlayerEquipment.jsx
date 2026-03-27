@@ -15,49 +15,7 @@ import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { Casino, RadioButtonUnchecked, Error, SwapHoriz } from "@mui/icons-material";
-
-/**
- * Utility function to calculate custom weapon damage and precision stats
- * @param {Object} weapon - The custom weapon object
- * @param {boolean} isSecondary - Whether to calculate for secondary (transforming) form
- * @returns {Object} Object containing calculated damage and precision values
- */
-const calculateCustomWeaponStats = (weapon, isSecondary = false) => {
-  let damage = 5; // Base damage for custom weapons
-  let precision = 0;
-
-  // Get customizations for primary or secondary form
-  const customizations = isSecondary
-    ? weapon.secondCurrentCustomizations || []
-    : weapon.customizations || [];
-
-  // Apply customization bonuses
-  customizations.forEach((customization) => {
-    const category = isSecondary ? weapon.secondSelectedCategory : weapon.category;
-    switch (customization?.name) {
-      case "weapon_customization_powerful":
-        damage += category === "weapon_category_heavy" ? 7 : 5;
-        break;
-      case "weapon_customization_accurate":
-        precision += 2;
-        break;
-      case "weapon_customization_elemental":
-        damage += 2;
-        break;
-      default:
-        break;
-    }
-  });
-
-  // Apply modifiers with safe parsing
-  const damageModifier = isSecondary ? weapon.secondDamageModifier : weapon.damageModifier;
-  const precModifier = isSecondary ? weapon.secondPrecModifier : weapon.precModifier;
-
-  damage += parseInt(damageModifier || 0, 10);
-  precision += parseInt(precModifier || 0, 10);
-
-  return { damage, precision };
-};
+import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -276,28 +234,8 @@ export default function PlayerEquipment({
       0
     );
 
-  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-  const calculateAttribute = (
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-  ) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-  };
-
   const currDex = calculateAttribute(
+    player,
     player.attributes.dexterity,
     ["slow", "enraged"],
     ["dexUp"],
@@ -305,6 +243,7 @@ export default function PlayerEquipment({
     12
   );
   const currInsight = calculateAttribute(
+    player,
     player.attributes.insight,
     ["dazed", "enraged"],
     ["insUp"],
@@ -312,6 +251,7 @@ export default function PlayerEquipment({
     12
   );
   const currMight = calculateAttribute(
+    player,
     player.attributes.might,
     ["weak", "poisoned"],
     ["migUp"],
@@ -319,6 +259,7 @@ export default function PlayerEquipment({
     12
   );
   const currWillpower = calculateAttribute(
+    player,
     player.attributes.willpower,
     ["shaken", "poisoned"],
     ["wlpUp"],

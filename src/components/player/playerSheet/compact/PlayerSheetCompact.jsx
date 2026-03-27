@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Paper, Grid, Typography, Divider, Card, Box, Dialog, ButtonGroup, Button, Tabs, Tab, TextField, TableHead, TableRow, InputBase, IconButton, TableCell } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import avatar_image from "../../../avatar.jpg";
 import Diamond from "../../../Diamond";
@@ -18,6 +19,7 @@ import PlayerBonds from "../PlayerBonds";
 import PlayerVehicle from "./PlayerVehicle";
 import PlayerCompanion from "./PlayerCompanion";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import { calculateAttribute } from "../../common/playerCalculations";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -32,31 +34,6 @@ const AffinityGrid = styled(Grid)(({ theme }) => ({
 
 }));
 
-const isMobile = window.innerWidth < 900;
-
-const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-
-const calculateAttribute = (
-    player,
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-        if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-        if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-};
-
 export default function PlayerCardSheet({
     player,
     setPlayer,
@@ -68,6 +45,8 @@ export default function PlayerCardSheet({
 }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
+    const muiTheme = useTheme();
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
     const [value, setValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -610,6 +589,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
     const { t } = useTranslate();
     const theme = useTheme();
     const custom = useCustomTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
     const getAttributeColor = (base, current) => {
         if (current < base) return theme.palette.error.main;

@@ -25,6 +25,7 @@ import attributes from "../../../libs/attributes";
 import { OpenBracket, CloseBracket } from "../../Bracket";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { calculateAttribute } from "../common/playerCalculations";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -66,28 +67,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
       ? equippedAccessories[0].magicModifier || 0
       : 0);
 
-  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-  const calculateAttribute = (
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-  ) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-  };
-
   const currDex = calculateAttribute(
+    player,
     player.attributes.dexterity,
     ["slow", "enraged"],
     ["dexUp"],
@@ -95,6 +76,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     12
   );
   const currInsight = calculateAttribute(
+    player,
     player.attributes.insight,
     ["dazed", "enraged"],
     ["insUp"],
@@ -102,6 +84,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     12
   );
   const currMight = calculateAttribute(
+    player,
     player.attributes.might,
     ["weak", "poisoned"],
     ["migUp"],
@@ -109,6 +92,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     12
   );
   const currWillpower = calculateAttribute(
+    player,
     player.attributes.willpower,
     ["shaken", "poisoned"],
     ["wlpUp"],

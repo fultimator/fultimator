@@ -791,11 +791,11 @@ function Personal() {
               sx={{ marginBottom: 1 }}
             />
             <div style={{ marginTop: "3px" }} onClick={(e) => e.stopPropagation()}>
-                  <Tooltip title={t("Copy")}>
+                  {/* <Tooltip title={t("Copy")}>
                     <IconButton onClick={copyPlayer(player)}>
                       <ContentCopy />
                     </IconButton>
-                  </Tooltip>
+                  </Tooltip> */}
                   <PlayerTransferButton
                     player={player}
                     copyPlayerToLocal={copyPlayerToLocal}

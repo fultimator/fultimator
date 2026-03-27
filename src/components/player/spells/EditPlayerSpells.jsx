@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSpellModals } from "../common/hooks/useSpellModals";
 import { useTheme } from "@mui/material/styles";
 import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -62,40 +63,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSpell, setSelectedSpell] = useState(null);
 
-  const [openSpellDefaultModal, setOpenSpellDefaultModal] = useState(false);
-  const [openSpellArcanistModal, setOpenSpellArcanistModal] = useState(false);
-  const [openAlchemyRankModal, setOpenAlchemyRankModal] = useState(false);
-  const [openAlchemyTargetModal, setOpenAlchemyTargetModal] = useState(false);
-  const [openAlchemyEffectsModal, setOpenAlchemyEffectsModal] = useState(false);
-  const [openInfusionModal, setOpenInfusionModal] = useState(false);
-  const [openMagitechRankModal, setOpenMagitechRankModal] = useState(false);
-  const [openGambleModal, setOpenGambleModal] = useState(false);
-  const [openChantModal, setOpenChantModal] = useState(false);
-  const [openChantKeyModal, setOpenChantKeyModal] = useState(false);
-  const [openChantToneModal, setOpenChantToneModal] = useState(false);
-  const [openSymbolModal, setOpenSymbolModal] = useState(false);
-  const [openSymbolSymbolsModal, setOpenSymbolSymbolsModal] = useState(false);
-  const [openDancerModal, setOpenDancerModal] = useState(false);
-  const [openDancerDancesModal, setOpenDancerDancesModal] = useState(false);
-  const [openGiftModal, setOpenGiftModal] = useState(false);
-  const [openGiftGiftsModal, setOpenGiftGiftsModal] = useState(false);
-  const [openMutantModal, setOpenMutantModal] = useState(false);
-  const [openMutantTherioformsModal, setOpenMutantTherioformsModal] = useState(false);
-  const [openPilotModal, setOpenPilotModal] = useState(false);
-  const [openPilotVehiclesModal, setOpenPilotVehiclesModal] = useState(false);
-  const [openMagiseedModal, setOpenMagiseedModal] = useState(false);
-  const [openMagiseedMagiseedsModal, setOpenMagiseedMagiseedsModal] = useState(false);
-  const [openGourmetModal, setOpenGourmetModal] = useState(false);
-  const [openGourmetCookingModal, setOpenGourmetCookingModal] = useState(false);
-  const [openInvokerModal, setOpenInvokerModal] = useState(false);
-  const [openInvokerInvocationsModal, setOpenInvokerInvocationsModal] = useState(false);
-  const [openDeckModal, setOpenDeckModal] = useState(false);
-
-  const [spellBeingEdited, setSpellBeingEdited] = useState(null);
-  const [editingSpellClass, setEditingSpellClass] = useState(null);
-  const [editingSpellIndex, setEditingSpellIndex] = useState(null);
-
-  const [openCompendiumModal, setOpenCompendiumModal] = useState(false);
+  const {
+    isOpen,
+    openModal,
+    closeModal,
+    spellBeingEdited,
+    editingSpellClass,
+    editingSpellIndex,
+  } = useSpellModals();
 
   const handleClassChange = (event, newValue) => {
     setSelectedClass(
@@ -636,190 +611,33 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedSpell(null);
   };
 
-  const handleEditDefaultSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenSpellDefaultModal(true);
-  };
-
-  const handleEditArcanistSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenSpellArcanistModal(true);
-  };
-
-  const handleEditAlchemyRank = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenAlchemyRankModal(true);
-  };
-
-  const handleEditAlchemyTarget = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenAlchemyTargetModal(true);
-  };
-
-  const handleEditAlchemyEffects = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenAlchemyEffectsModal(true);
-  };
-
-  const handleEditInfusionSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenInfusionModal(true);
-  };
-
-  const handleEditMagitechRank = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenMagitechRankModal(true);
-  };
-
-  const handleEditGambleSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenGambleModal(true);
-  };
-
-  const handleEditChantSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenChantModal(true);
-  };
-
-  const handleEditChantKey = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenChantKeyModal(true);
-  };
-
-  const handleEditChantTone = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenChantToneModal(true);
-  };
-
-  const handleEditSymbol = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenSymbolModal(true);
-  };
-
-  const handleEditSymbolSymbols = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenSymbolSymbolsModal(true);
-  };
-
-  const handleEditDanceSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenDancerModal(true);
-  };
-
-  const handleEditDancerDances = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenDancerDancesModal(true);
-  };
-  const handleEditGiftSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenGiftModal(true);
-  };
-  const handleEditGiftGifts = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenGiftGiftsModal(true);
-  };
-  const handleEditMutantSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenMutantModal(true);
-  };
-  const handleEditMutantTherioforms = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenMutantTherioformsModal(true);
-  };
-
-  const handleEditPilotSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenPilotModal(true);
-  };
-
-  const handleEditPilotVehicles = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenPilotVehiclesModal(true);
-  };
-
-  const handleEditMagiseedSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenMagiseedModal(true);
-  };
-
-  const handleEditGourmetSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenGourmetModal(true);
-  };
-
-  const handleEditGourmetCooking = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenGourmetCookingModal(true);
-  };
-
-  const handleEditInvokerSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenInvokerModal(true);
-  };
-
-  const handleEditInvokerInvocations = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenInvokerInvocationsModal(true);
-  };
-
-  const handleEditDeckSpell = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenDeckModal(true);
-  };
+  const handleEditDefaultSpell = (spell, spellClass, spellIndex) => openModal("spellDefault", spell, spellClass, spellIndex);
+  const handleEditArcanistSpell = (spell, spellClass, spellIndex) => openModal("spellArcanist", spell, spellClass, spellIndex);
+  const handleEditAlchemyRank = (spell, spellClass, spellIndex) => openModal("alchemyRank", spell, spellClass, spellIndex);
+  const handleEditAlchemyTarget = (spell, spellClass, spellIndex) => openModal("alchemyTarget", spell, spellClass, spellIndex);
+  const handleEditAlchemyEffects = (spell, spellClass, spellIndex) => openModal("alchemyEffects", spell, spellClass, spellIndex);
+  const handleEditInfusionSpell = (spell, spellClass, spellIndex) => openModal("infusion", spell, spellClass, spellIndex);
+  const handleEditMagitechRank = (spell, spellClass, spellIndex) => openModal("magitechRank", spell, spellClass, spellIndex);
+  const handleEditGambleSpell = (spell, spellClass, spellIndex) => openModal("gamble", spell, spellClass, spellIndex);
+  const handleEditChantSpell = (spell, spellClass, spellIndex) => openModal("chant", spell, spellClass, spellIndex);
+  const handleEditChantKey = (spell, spellClass, spellIndex) => openModal("chantKey", spell, spellClass, spellIndex);
+  const handleEditChantTone = (spell, spellClass, spellIndex) => openModal("chantTone", spell, spellClass, spellIndex);
+  const handleEditSymbol = (spell, spellClass, spellIndex) => openModal("symbol", spell, spellClass, spellIndex);
+  const handleEditSymbolSymbols = (spell, spellClass, spellIndex) => openModal("symbolSymbols", spell, spellClass, spellIndex);
+  const handleEditDanceSpell = (spell, spellClass, spellIndex) => openModal("dancer", spell, spellClass, spellIndex);
+  const handleEditDancerDances = (spell, spellClass, spellIndex) => openModal("dancerDances", spell, spellClass, spellIndex);
+  const handleEditGiftSpell = (spell, spellClass, spellIndex) => openModal("gift", spell, spellClass, spellIndex);
+  const handleEditGiftGifts = (spell, spellClass, spellIndex) => openModal("giftGifts", spell, spellClass, spellIndex);
+  const handleEditMutantSpell = (spell, spellClass, spellIndex) => openModal("mutant", spell, spellClass, spellIndex);
+  const handleEditMutantTherioforms = (spell, spellClass, spellIndex) => openModal("mutantTherioforms", spell, spellClass, spellIndex);
+  const handleEditPilotSpell = (spell, spellClass, spellIndex) => openModal("pilot", spell, spellClass, spellIndex);
+  const handleEditPilotVehicles = (spell, spellClass, spellIndex) => openModal("pilotVehicles", spell, spellClass, spellIndex);
+  const handleEditMagiseedSpell = (spell, spellClass, spellIndex) => openModal("magiseed", spell, spellClass, spellIndex);
+  const handleEditGourmetSpell = (spell, spellClass, spellIndex) => openModal("gourmet", spell, spellClass, spellIndex);
+  const handleEditGourmetCooking = (spell, spellClass, spellIndex) => openModal("gourmetCooking", spell, spellClass, spellIndex);
+  const handleEditInvokerSpell = (spell, spellClass, spellIndex) => openModal("invoker", spell, spellClass, spellIndex);
+  const handleEditInvokerInvocations = (spell, spellClass, spellIndex) => openModal("invokerInvocations", spell, spellClass, spellIndex);
+  const handleEditDeckSpell = (spell, spellClass, spellIndex) => openModal("deck", spell, spellClass, spellIndex);
 
   const handleDeckUpdate = (spellClass, spellIndex, updatedDeck) => {
     setPlayer(prev => ({
@@ -885,12 +703,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }));
   };
 
-  const handleEditMagiseedMagiseeds = (spell, spellClass, spellIndex) => {
-    setSpellBeingEdited(spell);
-    setEditingSpellClass(spellClass);
-    setEditingSpellIndex(spellIndex);
-    setOpenMagiseedMagiseedsModal(true);
-  };
+  const handleEditMagiseedMagiseeds = (spell, spellClass, spellIndex) => openModal("magiseedMagiseeds", spell, spellClass, spellIndex);
 
   const handleMagiseedChange = (spellClass, spellIndex, newMagiseed) => {
     setPlayer((prev) => ({
@@ -1071,38 +884,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     closeModals();
   };
 
-  const closeModals = () => {
-    setOpenSpellDefaultModal(false);
-    setOpenSpellArcanistModal(false);
-    setOpenAlchemyRankModal(false);
-    setOpenAlchemyTargetModal(false);
-    setOpenAlchemyEffectsModal(false);
-    setOpenInfusionModal(false);
-    setOpenGambleModal(false);
-    setSpellBeingEdited(null);
-    setOpenMagitechRankModal(false);
-    setOpenChantModal(false);
-    setOpenChantKeyModal(false);
-    setOpenChantToneModal(false);
-    setOpenSymbolModal(false);
-    setOpenSymbolSymbolsModal(false);
-    setOpenDancerModal(false);
-    setOpenDancerDancesModal(false);
-    setOpenGiftModal(false);
-    setOpenGiftGiftsModal(false);
-    setOpenMutantModal(false);
-    setOpenMutantTherioformsModal(false);
-    setOpenPilotModal(false);
-    setOpenPilotVehiclesModal(false);
-    setOpenMagiseedModal(false);
-    setOpenMagiseedMagiseedsModal(false);
-    setOpenGourmetModal(false);
-    setOpenGourmetCookingModal(false);
-    setOpenInvokerModal(false);
-    setOpenInvokerInvocationsModal(false);
-    setOpenDeckModal(false);
-    setEditingSpellClass(null);
-  };
+  const closeModals = () => closeModal();
 
   return (
     <>
@@ -1186,7 +968,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     variant="outlined"
                     sx={{ width: "100%", height: "100%" }}
                     disabled={!selectedClass}
-                    onClick={() => setOpenCompendiumModal(true)}
+                    onClick={() => openModal("compendium")}
                   >
                     {t("Add from Compendium")}
                   </Button>
@@ -1661,286 +1443,175 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         })}
       <SpellDefaultModal
         isEditMode={isEditMode}
-        open={openSpellDefaultModal}
-        onClose={() => {
-          setOpenSpellDefaultModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("spellDefault")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellArcanistModal
-        open={openSpellArcanistModal}
-        onClose={() => {
-          setOpenSpellArcanistModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("spellArcanist")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
         isRework={spellBeingEdited?.spellType === "arcanist-rework"}
       />
       <SpellTinkererAlchemyRankModal
-        open={openAlchemyRankModal}
-        onClose={() => {
-          setOpenAlchemyRankModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("alchemyRank")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellTinkererAlchemyTargetModal
-        open={openAlchemyTargetModal}
-        onClose={() => {
-          setOpenAlchemyTargetModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("alchemyTarget")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellTinkererAlchemyEffectsModal
-        open={openAlchemyEffectsModal}
-        onClose={() => {
-          setOpenAlchemyEffectsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("alchemyEffects")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellTinkererInfusionModal
-        open={openInfusionModal}
-        onClose={() => {
-          setOpenInfusionModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("infusion")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         infusion={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellTinkererMagitechRankModal
-        open={openMagitechRankModal}
-        onClose={() => {
-          setOpenMagitechRankModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("magitechRank")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         magitech={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellEntropistGambleModal
-        open={openGambleModal}
-        onClose={() => {
-          setOpenGambleModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("gamble")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         gamble={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellChanterModal
-        open={openChantModal}
-        onClose={() => {
-          setOpenChantModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("chant")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
-
       <SpellChanterKeysModal
-        open={openChantKeyModal}
-        onClose={() => {
-          setOpenChantKeyModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("chantKey")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellChanterTonesModal
-        open={openChantToneModal}
-        onClose={() => {
-          setOpenChantToneModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("chantTone")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellSymbolistModal
-        open={openSymbolModal}
-        onClose={() => {
-          setOpenSymbolModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("symbol")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellSymbolistSymbolsModal
-        open={openSymbolSymbolsModal}
-        onClose={() => {
-          setOpenSymbolSymbolsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("symbolSymbols")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellDancerModal
-        open={openDancerModal}
-        onClose={() => {
-          setOpenDancerModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("dancer")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
         dance={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellDancerDancesModal
-        open={openDancerDancesModal}
-        onClose={() => {
-          setOpenDancerDancesModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("dancerDances")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         dance={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellGiftModal
-        open={openGiftModal}
-        onClose={() => {
-          setOpenGiftModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("gift")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         gift={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellGiftGiftsModal
-        open={openGiftGiftsModal}
-        onClose={() => {
-          setOpenGiftGiftsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("giftGifts")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         gift={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellMutantModal
-        open={openMutantModal}
-        onClose={() => {
-          setOpenMutantModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("mutant")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellMutantTherioformsModal
-        open={openMutantTherioformsModal}
-        onClose={() => {
-          setOpenMutantTherioformsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("mutantTherioforms")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellPilotModal
-        open={openPilotModal}
-        onClose={() => {
-          setOpenPilotModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("pilot")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellPilotVehiclesModal
-        open={openPilotVehiclesModal}
-        onClose={() => {
-          setOpenPilotVehiclesModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("pilotVehicles")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellMagiseedModal
-        open={openMagiseedModal}
-        onClose={() => {
-          setOpenMagiseedModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("magiseed")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellMagiseedMagiseedsModal
-        open={openMagiseedMagiseedsModal}
-        onClose={() => {
-          setOpenMagiseedMagiseedsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("magiseedMagiseeds")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
         magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellGourmetModal
-        open={openGourmetModal}
-        onClose={() => {
-          setOpenGourmetModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("gourmet")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
         player={player}
         onPlayerUpdate={setPlayer}
       />
       <SpellGourmetCookingModal
-        open={openGourmetCookingModal}
-        onClose={() => {
-          setOpenGourmetCookingModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("gourmetCooking")}
+        onClose={closeModal}
         onSave={(cookbookEffects, inventory, spellData) => {
-          const updatedSpell = { 
-            ...spellBeingEdited, 
+          const updatedSpell = {
+            ...spellBeingEdited,
             cookbookEffects,
             ingredientInventory: inventory || [],
-            ...spellData
+            ...spellData,
           };
           handleSaveEditedSpell(editingSpellIndex, updatedSpell);
         }}
@@ -1951,47 +1622,29 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         spell={spellBeingEdited}
       />
       <SpellInvokerModal
-        open={openInvokerModal}
-        onClose={() => {
-          setOpenInvokerModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("invoker")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellInvokerInvocationsModal
-        open={openInvokerInvocationsModal}
-        onClose={() => {
-          setOpenInvokerInvocationsModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("invokerInvocations")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         invoker={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellDeckModal
-        open={openDeckModal}
-        onClose={() => {
-          setOpenDeckModal(false);
-          setEditingSpellClass(null);
-          setSpellBeingEdited(null);
-        }}
+        open={isOpen("deck")}
+        onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) =>
-          handleDeleteSpell(spellIndex, editingSpellClass)
-        }
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
         deck={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellCompendiumModal
-        open={openCompendiumModal}
-        onClose={() => setOpenCompendiumModal(false)}
+        open={isOpen("compendium")}
+        onClose={closeModal}
         typeName={selectedClass}
         onSave={(spell) => addSpellFromCompendium(spell)}
       />

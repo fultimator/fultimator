@@ -1,6 +1,7 @@
 import React from "react";
 import { Paper, Grid, Typography, Divider, Card } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
@@ -19,7 +20,7 @@ export default function PlayerCardShort({
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
 
-  const isMobile = window.innerWidth < 900;
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   /* player.armor.isEquipped (should be only one) */
   const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
