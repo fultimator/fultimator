@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import { Paper, Typography, Box, Table, TableBody, TableCell, TableContainer, TableRow, Collapse, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -27,23 +27,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
-  // Separate sessionStorage key per tab (compact sheet is usually one tab)
-  const storageKey = useMemo(
-    () => `playerSpellsOpenRows_${player?.id ?? "default"}`,
-    [player?.id]
-  );
-
-  const getInitialOpenRows = () => {
-    const saved = sessionStorage.getItem(storageKey);
-    if (saved) return JSON.parse(saved);
-    return {};
-  };
-
-  const [openRows, setOpenRows] = useState(getInitialOpenRows);
-
-  useEffect(() => {
-    sessionStorage.setItem(storageKey, JSON.stringify(openRows));
-  }, [openRows, storageKey]);
+  const [openRows, setOpenRows] = useState({});
 
   const toggleRow = (key) =>
     setOpenRows((prev) => ({ ...prev, [key]: !prev[key] }));
