@@ -5,14 +5,14 @@ import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/system";
+import { useCustomTheme } from "../hooks/useCustomTheme";
 import { useTranslate } from "../translation/translate";
 import AddIcon from "@mui/icons-material/Add";
 
 const TagList = ({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
+  const theme = useCustomTheme();
+  const secondary = theme.secondary;
 
   const [inputValue, setInputValue] = useState("");
   const maxTags = 5; // Maximum tag count
@@ -92,6 +92,10 @@ const TagList = ({ npc, setNpc }) => {
           fontFamily: "Antonio",
           textTransform: "uppercase",
           fontSize: "1.3rem",
+          color: theme.white,
+          background: theme.primary,
+          padding: "2px 10px",
+          borderRadius: "4px",
         }}
       >
         {t("Personal Tags")}
