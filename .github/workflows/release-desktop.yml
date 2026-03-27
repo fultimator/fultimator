@@ -27,6 +27,21 @@ jobs:
 
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Package with electron-builder
         run: npx electron-builder --mac --${{ matrix.arch }} --publish never
@@ -52,6 +67,20 @@ jobs:
 
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Package with electron-builder
         run: npx electron-builder --win --publish never
@@ -80,6 +109,20 @@ jobs:
 
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Package with electron-builder
         run: npx electron-builder --linux AppImage deb rpm --publish never
@@ -108,16 +151,32 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --fix-missing flatpak flatpak-builder
-          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
 
       - run: npm ci
 
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Package with electron-builder
         run: npx electron-builder --linux flatpak --publish never
+        env:
+          DEBUG: electron-builder
 
       - name: Upload Flatpak to release
         uses: softprops/action-gh-release@v2
