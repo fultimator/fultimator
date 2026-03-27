@@ -1,7 +1,7 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  appId: "Fultimator",
+  appId: "io.github.fultimator.Fultimator",
   asar: true,
   productName: "Fultimator",
   directories: {
@@ -59,7 +59,6 @@
     fpm: ["--rpm-rpmbuild-define=_build_id_links none"],
   },
   flatpak: {
-    id: "io.github.fultimator.Fultimator",
     runtimeVersion: "23.08",
     finishArgs: [
       "--share=ipc",

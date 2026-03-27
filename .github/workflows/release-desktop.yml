@@ -13,7 +13,7 @@ jobs:
         include:
           - os: macos-13
             arch: x64
-          - os: macos-latest
+          - os: macos-14
             arch: arm64
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +106,8 @@ jobs:
 
       - name: Install Flatpak build tools
         run: |
-          sudo apt-get install -y flatpak flatpak-builder
+          sudo apt-get update
+          sudo apt-get install -y --fix-missing flatpak flatpak-builder
           sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           sudo flatpak install -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
 
