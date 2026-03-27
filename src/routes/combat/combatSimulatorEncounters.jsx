@@ -297,6 +297,7 @@ const CombatSimEncounters = () => {
                 onKeyDown={handleKeyDown}
                 onChange={handleEncounterNameChange}
                 inputProps={{ maxLength: 200 }}
+                disabled={dbMode === "cloud" && !cloudUser}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -389,12 +390,16 @@ const CombatSimEncounters = () => {
       </Paper>
 
       {dbMode === "cloud" && !cloudUser && (
-        <Box sx={{ mt: 2 }}>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
+        <Paper
+          elevation={3}
+          sx={{ p: 2, mt: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color="primary" />
+          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </Box>
+        </Paper>
       )}
 
       <Grid container spacing={3} sx={{ marginTop: 2 }}>

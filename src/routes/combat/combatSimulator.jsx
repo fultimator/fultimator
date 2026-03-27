@@ -5,6 +5,7 @@ import {
   Typography,
   Box,
   CircularProgress,
+  Paper,
   useMediaQuery,
   Snackbar,
   Alert,
@@ -21,7 +22,7 @@ import { typesList } from "../../libs/types";
 import { t } from "../../translation/translate";
 import DamageHealDialog from "../../components/combatSim/DamageHealDialog";
 import CombatLog from "../../components/combatSim/CombatLog";
-import { DragHandle } from "@mui/icons-material";
+import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { useNavigate } from "react-router-dom";
@@ -45,12 +46,17 @@ export default function CombatSimulator() {
         </Box>
       )}
       {!authLoading && !effectiveUser && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
       {!authLoading && effectiveUser && (
         <CombatSim

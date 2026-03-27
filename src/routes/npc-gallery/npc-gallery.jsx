@@ -615,9 +615,27 @@ function Personal() {
 
           {/* ── Actions + Status (single row) ───────────────────────────────── */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-            <Button variant="contained" startIcon={<HistoryEdu />} onClick={addNpc}>
+            <Button variant="contained" startIcon={<HistoryEdu />} onClick={addNpc} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create NPC")}
             </Button>
+            {SUPPORTS_LOCAL_DB && (
+              <ToggleButtonGroup
+                value={dbMode}
+                exclusive
+                onChange={(_, val) => { if (val !== null) requestModeSwitch(val); }}
+                size="small"
+              >
+                <ToggleButton value="local">
+                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Local")}
+                </ToggleButton>
+                <ToggleButton value="cloud">
+                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Cloud")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
+            {dbMode === "local" && <DriveSync />}
             <Box sx={{ flex: 1 }} />
             <Box sx={{ "& button": { width: "auto !important" } }}>
               <ExportAllNPCs npcs={filteredList?.length > 0 ? filteredList : []} />
@@ -659,24 +677,6 @@ function Personal() {
               </IconButton>
             </Tooltip>
             <Divider orientation="vertical" flexItem />
-            {SUPPORTS_LOCAL_DB && (
-              <ToggleButtonGroup
-                value={dbMode}
-                exclusive
-                onChange={(_, val) => { if (val !== null) requestModeSwitch(val); }}
-                size="small"
-              >
-                <ToggleButton value="local">
-                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Local")}
-                </ToggleButton>
-                <ToggleButton value="cloud">
-                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Cloud")}
-                </ToggleButton>
-              </ToggleButtonGroup>
-            )}
-            {dbMode === "local" && <DriveSync />}
             <Typography variant="body1" fontWeight={600}>
               {t("filtered_npc_count") + " " + filteredList?.length}
             </Typography>
@@ -712,7 +712,7 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Copy Selected to Local")} (${selectedIds.size})`} />
                 </MenuItem>
-                <MenuItem disabled={selectedIds.size === 0} onClick={() => { setCopyAnchor(null); copySelectedToCloud(); }}>
+                <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setCopyAnchor(null); copySelectedToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`} />
                 </MenuItem>
@@ -721,7 +721,7 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Copy All to Local")} />
                 </MenuItem>
-                <MenuItem onClick={() => { setCopyAnchor(null); copyAllToCloud(); }}>
+                <MenuItem disabled={!cloudUser} onClick={() => { setCopyAnchor(null); copyAllToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Copy All to Cloud")} />
                 </MenuItem>
@@ -742,7 +742,7 @@ function Personal() {
                   </MenuItem>
                 )}
                 {dbMode !== "cloud" && (
-                  <MenuItem disabled={selectedIds.size === 0} onClick={() => { setMoveAnchor(null); moveSelectedToCloud(); }}>
+                  <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setMoveAnchor(null); moveSelectedToCloud(); }}>
                     <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                     <ListItemText primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`} />
                   </MenuItem>
@@ -755,7 +755,7 @@ function Personal() {
                   </MenuItem>
                 )}
                 {dbMode !== "cloud" && (
-                  <MenuItem onClick={() => { setMoveAnchor(null); moveAllToCloud(); }}>
+                  <MenuItem disabled={!cloudUser} onClick={() => { setMoveAnchor(null); moveAllToCloud(); }}>
                     <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                     <ListItemText primary={t("Move All to Cloud")} />
                   </MenuItem>
@@ -797,8 +797,8 @@ function Personal() {
           <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
           <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
             {dbMode === "cloud"
-              ? t("Sign in to load your Cloud gallery")
-              : t("Have a Cloud account? Sign in to access your NPCs from any device.")}
+              ? t("You have to be logged in to access this feature")
+              : t("Have a Google account? Sign in to sync your data between devices.")}
           </Typography>
           <SignIn />
         </Paper>
@@ -891,7 +891,7 @@ function Personal() {
         </div>
       )}
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
-        {loading && <CircularProgress />}
+        {loading && (dbMode !== "cloud" || cloudUser) && <CircularProgress />}
       </div>
 
       <Snackbar
@@ -924,6 +924,7 @@ function Personal() {
 
 function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbMode, selectMode, isSelected, onToggleSelect, onRegisterDownload, copyNpcToLocal, copyNpcToCloud, moveNpcToLocal, moveNpcToCloud }) {
   const { t } = useTranslate();
+  const { cloudUser } = useDatabaseContext();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
   const [transferAnchor, setTransferAnchor] = useState(null);
@@ -978,7 +979,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbM
           <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Copy to Local")} />
         </MenuItem>
-        <MenuItem onClick={() => { setTransferAnchor(null); copyNpcToCloud(npc)(); }}>
+        <MenuItem disabled={!cloudUser} onClick={() => { setTransferAnchor(null); copyNpcToCloud(npc)(); }}>
           <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Copy to Cloud")} />
         </MenuItem>
@@ -990,7 +991,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbM
           </MenuItem>
         )}
         {dbMode !== "cloud" && (
-          <MenuItem onClick={() => { setTransferAnchor(null); moveNpcToCloud(npc)(); }}>
+          <MenuItem disabled={!cloudUser} onClick={() => { setTransferAnchor(null); moveNpcToCloud(npc)(); }}>
             <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
             <ListItemText primary={t("Move to Cloud")} />
           </MenuItem>

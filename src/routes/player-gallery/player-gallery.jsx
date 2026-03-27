@@ -31,7 +31,9 @@ import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import {
   ContentCopy,
+  ContentPaste,
   Delete,
+  Download,
   DriveFileMove,
   FileCopy,
   LibraryAddCheck,
@@ -52,6 +54,8 @@ import { SUPPORTS_LOCAL_DB } from "../../platform";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import JSZip from "jszip";
+import useDownload from "../../hooks/useDownload";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -78,6 +82,7 @@ function Personal() {
   const db = useDatabase();
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
+  const [download] = useDownload();
 
   const [personalList, loading, err] = db.useCollectionData(
     db.query(db.collection("player-personal"))
@@ -239,6 +244,28 @@ function Personal() {
     } catch (error) {
       console.error("Error uploading PC from JSON:", error);
     }
+  };
+
+  const handlePastePlayer = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const jsonData = JSON.parse(text);
+      await handleFileUpload(jsonData);
+    } catch (err) {
+      console.error("Failed to parse clipboard content:", err);
+      alert(t("Could not parse clipboard content as JSON."));
+    }
+  };
+
+  const exportSelectedAsJson = async () => {
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    const zip = new JSZip();
+    selected.forEach((player) => {
+      const jsonData = JSON.stringify(player, null, 2);
+      zip.file(`${(player.name || "player").replace(/\s/g, "_").toLowerCase()}.json`, jsonData);
+    });
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    download(URL.createObjectURL(zipBlob), "players.zip");
   };
 
   const [snackMsg, setSnackMsg] = useState(null);
@@ -569,13 +596,36 @@ function Personal() {
 
           {/* ── Actions + Status (single row) ───────────────────────────────── */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-            <Button variant="contained" startIcon={<HistoryEdu />} onClick={addPlayer}>
+            <Button variant="contained" startIcon={<HistoryEdu />} onClick={addPlayer} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create Player")}
             </Button>
+            {SUPPORTS_LOCAL_DB && (
+              <ToggleButtonGroup
+                value={dbMode}
+                exclusive
+                onChange={(_, val) => { if (val !== null) requestModeSwitch(val); }}
+                size="small"
+              >
+                <ToggleButton value="local">
+                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Local")}
+                </ToggleButton>
+                <ToggleButton value="cloud">
+                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Cloud")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
+            {dbMode === "local" && <DriveSync />}
             <Box sx={{ flex: 1 }} />
             <Button variant="outlined" size="small" onClick={() => fileInputRef.current.click()}>
               {t("Add PC from JSON")}
             </Button>
+            <Tooltip title={t("Add PC from Clipboard")}>
+              <IconButton size="small" onClick={handlePastePlayer}>
+                <ContentPaste />
+              </IconButton>
+            </Tooltip>
             <input
               ref={fileInputRef}
               type="file"
@@ -598,24 +648,6 @@ function Personal() {
               style={{ display: "none" }}
             />
             <Divider orientation="vertical" flexItem />
-            {SUPPORTS_LOCAL_DB && (
-              <ToggleButtonGroup
-                value={dbMode}
-                exclusive
-                onChange={(_, val) => { if (val !== null) requestModeSwitch(val); }}
-                size="small"
-              >
-                <ToggleButton value="local">
-                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Local")}
-                </ToggleButton>
-                <ToggleButton value="cloud">
-                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Cloud")}
-                </ToggleButton>
-              </ToggleButtonGroup>
-            )}
-            {dbMode === "local" && <DriveSync />}
             <Typography variant="body1" fontWeight={600}>
               {filteredList?.length ?? 0} {t("Players")}
             </Typography>
@@ -651,7 +683,7 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Copy Selected to Local")} (${selectedIds.size})`} />
                 </MenuItem>
-                <MenuItem disabled={selectedIds.size === 0} onClick={() => { setCopyAnchor(null); copySelectedToCloud(); }}>
+                <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setCopyAnchor(null); copySelectedToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`} />
                 </MenuItem>
@@ -660,7 +692,7 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Copy All to Local")} />
                 </MenuItem>
-                <MenuItem onClick={() => { setCopyAnchor(null); copyAllToCloud(); }}>
+                <MenuItem disabled={!cloudUser} onClick={() => { setCopyAnchor(null); copyAllToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Copy All to Cloud")} />
                 </MenuItem>
@@ -678,7 +710,7 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Move Selected to Local")} (${selectedIds.size})`} />
                 </MenuItem>
-                <MenuItem disabled={selectedIds.size === 0} onClick={() => { setMoveAnchor(null); moveSelectedToCloud(); }}>
+                <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setMoveAnchor(null); moveSelectedToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`} />
                 </MenuItem>
@@ -687,11 +719,18 @@ function Personal() {
                   <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Move All to Local")} />
                 </MenuItem>
-                <MenuItem onClick={() => { setMoveAnchor(null); moveAllToCloud(); }}>
+                <MenuItem disabled={!cloudUser} onClick={() => { setMoveAnchor(null); moveAllToCloud(); }}>
                   <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
                   <ListItemText primary={t("Move All to Cloud")} />
                 </MenuItem>
               </MuiMenu>
+              <Tooltip title={`${t("Export Selected as JSON")} (${selectedIds.size})`}>
+                <span>
+                  <IconButton onClick={exportSelectedAsJson} disabled={selectedIds.size === 0}>
+                    <Download />
+                  </IconButton>
+                </span>
+              </Tooltip>
               <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
                 <span>
                   <IconButton onClick={deleteSelected} disabled={selectedIds.size === 0} color="error">
@@ -714,14 +753,14 @@ function Personal() {
           <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
           <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
             {dbMode === "cloud"
-              ? t("Sign in to load your Cloud gallery")
-              : t("Have a Cloud account? Sign in to access your players from any device.")}
+              ? t("You have to be logged in to access this feature")
+              : t("Have a Google account? Sign in to sync your data between devices")}
           </Typography>
           <SignIn />
         </Paper>
       )}
 
-      {loading && (
+      {loading && (dbMode !== "cloud" || cloudUser) && (
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
           <CircularProgress />
         </div>
@@ -831,6 +870,7 @@ function Personal() {
 }
 
 function PlayerTransferButton({ player, copyPlayerToLocal, copyPlayerToCloud, movePlayerToLocal, movePlayerToCloud, t }) {
+  const { cloudUser } = useDatabaseContext();
   const [anchor, setAnchor] = useState(null);
   return (
     <>
@@ -844,7 +884,7 @@ function PlayerTransferButton({ player, copyPlayerToLocal, copyPlayerToCloud, mo
           <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Copy to Local")} />
         </MenuItem>
-        <MenuItem onClick={() => { setAnchor(null); copyPlayerToCloud(player)(); }}>
+        <MenuItem disabled={!cloudUser} onClick={() => { setAnchor(null); copyPlayerToCloud(player)(); }}>
           <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Copy to Cloud")} />
         </MenuItem>
@@ -853,7 +893,7 @@ function PlayerTransferButton({ player, copyPlayerToLocal, copyPlayerToCloud, mo
           <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Move to Local")} />
         </MenuItem>
-        <MenuItem onClick={() => { setAnchor(null); movePlayerToCloud(player)(); }}>
+        <MenuItem disabled={!cloudUser} onClick={() => { setAnchor(null); movePlayerToCloud(player)(); }}>
           <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={t("Move to Cloud")} />
         </MenuItem>
