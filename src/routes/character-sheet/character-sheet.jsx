@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslate } from "../../translation/translate";
-import { firestore, useDocumentData, doc } from "@platform/db";
+import { useDatabase } from "../../hooks/useDatabase";
 import { Grid, Button, Typography, Stack, IconButton, useMediaQuery, Divider } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
@@ -29,9 +29,13 @@ import { fixVerticalLabels } from "../../utility/screenshotFix";
 export default function CharacterSheet() {
   const { t } = useTranslate();
   let params = useParams();
-  const ref = doc(firestore, "player-personal", params.playerId);
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [playerData] = useDocumentData(ref, { idField: "id" });
+  const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);
+  const localDb = useDatabase("local");
+  const cloudDb = useDatabase("cloud");
+  const db = isLocalPlayer ? localDb : cloudDb;
+  const ref = db.doc("player-personal", params.playerId);
+  const [playerData] = db.useDocumentData(ref);
   const [player, setPlayer] = useState(null);
 
   useEffect(() => {
