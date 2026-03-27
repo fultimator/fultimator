@@ -14,8 +14,13 @@
 # production
 /build
 /dist
+/dist-electron
+/release
 /.firebase
 Instructions.txt
+
+# temp
+output.txt
 # misc
 .DS_Store
 .env
