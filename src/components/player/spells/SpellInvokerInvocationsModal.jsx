@@ -18,7 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 
-const invocationsByWellspring = {
+export const invocationsByWellspring = {
   Air: [
     { name: "invoker_aero_blast", type: "Blast", effect: "invoker_aero_blast_desc" },
     { name: "invoker_aero_hex", type: "Hex", effect: "invoker_aero_hex_desc" },

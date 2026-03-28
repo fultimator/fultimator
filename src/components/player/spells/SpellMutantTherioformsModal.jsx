@@ -18,7 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close, Delete } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 
-const availableTherioforms = [
+export const availableTherioforms = [
   {
     name: "mutant_therioform_amphibia",
     genoclepsis: "mutant_therioform_amphibia_geno",

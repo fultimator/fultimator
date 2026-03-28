@@ -16,7 +16,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close, Delete } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 
-const availableDances = [
+export const availableDances = [
   {
     name: "dance_angel",
     effect: "dance_angel_desc",

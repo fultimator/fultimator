@@ -56,6 +56,9 @@ const RollerScoped = React.lazy(() => import("./routes/roller/roller-scoped"));
 const Resources = React.lazy(() =>
   import("./routes/resources/resources")
 );
+const CompendiumViewer = React.lazy(() =>
+  import("./routes/compendium-viewer/compendium-viewer")
+);
 
 const themes = {
   Fabula: { light: lightFabula, dark: darkFabula },
@@ -177,6 +180,14 @@ const App = () => {
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <Resources />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/compendium-viewer"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <CompendiumViewer />
                   </Suspense>
                 }
               />

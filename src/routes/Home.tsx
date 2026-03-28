@@ -23,6 +23,7 @@ import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
+import compendium_viewer from "./compendia_viewer.webp"; // placeholder, replace with dedicated asset
 import character_designer from "./character_designer.webp";
 import PublicIcon from "@mui/icons-material/Public";
 import FeedbackIcon from "@mui/icons-material/Feedback";
@@ -77,6 +78,11 @@ function Home() {
       image: dice_roller,
       link: "/roller",
       hoverKey: "dice_roller",
+    },
+    {
+      image: compendium_viewer,
+      link: "/compendium-viewer",
+      hoverKey: "compendium_viewer",
     },
   ];
 

@@ -16,7 +16,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close, Delete } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 
-const availableSymbols = [
+export const availableSymbols = [
   {
     name: "symbol_binding",
     effect: "symbol_binding_desc",

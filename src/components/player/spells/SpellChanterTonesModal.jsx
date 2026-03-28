@@ -16,7 +16,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close, Delete } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 
-const availableTones = [
+export const availableTones = [
   {
     name: "magichant_tone_calm",
     effect: "magichant_tone_calm_desc",

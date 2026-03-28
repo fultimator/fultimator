@@ -18,7 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Close, Delete } from "@mui/icons-material";
 import CustomTextarea from "../../common/CustomTextarea";
 
-const availableGifts = [
+export const availableGifts = [
   {
     name: "esper_gift_atmokinesis",
     event: "esper_event_you_deal_damage",
