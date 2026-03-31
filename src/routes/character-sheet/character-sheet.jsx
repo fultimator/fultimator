@@ -30,6 +30,8 @@ import { fixVerticalLabels } from "../../utility/screenshotFix";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const [download] = useDownload();
   let params = useParams();
   const ref = doc(firestore, "player-personal", params.playerId);
   const isMobile = useMediaQuery('(max-width:600px)');
