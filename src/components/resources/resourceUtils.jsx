@@ -8,6 +8,7 @@ import ExtensionIcon from "@mui/icons-material/Extension";
 import StarIcon from "@mui/icons-material/Star";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+import { useTranslate } from "../../translation/translate";
 
 export const getTypeIcon = (type) => {
   switch (type) {
@@ -64,29 +65,30 @@ export const getTypeColor = ({type, isDarkMode = false}) => {
 };
 
 export const getTypeLabel = (type) => {
+  const { t } = useTranslate();
   switch (type) {
     case "pdf":
-      return "PDF Download";
+      return t("resources_pdf_download");
     case "physical":
-      return "Physical Book";
+      return t("resources_physical_book");
     case "both":
-      return "Book & PDF";
+      return t("resources_book_pdf");
     case "free":
-      return "Free Resource";
+      return t("resources_free_resource");
     case "website":
-      return "Website";
+      return t("resources_website");
     case "coming_soon":
-      return "Coming Soon";
+      return t("resources_coming_soon");
     case "tools":
-      return "Tool";
+      return t("resources_tools");
     case "content":
-      return "Content";
+      return t("resources_content");
     case "crowdfunding":
-      return "Crowdfunding";
+      return t("resources_crowdfunding");
     case "social_media":
-      return "Social Media";
+      return t("resources_social_media");
     default:
-      return "Resource";
+      return t("resources_resource");
   }
 };
 

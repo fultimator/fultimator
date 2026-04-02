@@ -36,15 +36,15 @@ export default function StatisticsFooter({ allResources = {}, uniqueLanguages = 
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <MenuBookIcon fontSize="small" />
-          {allResources.official.length} {t("Official Resources")}
+          {allResources.official.length} {t("resources_official_tab")}
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <ExtensionIcon fontSize="small" />
-          {allResources.homebrew.length} {t("Community Resources")}
+          {allResources.homebrew.length} {t("resources_community_tab")}
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <LanguageIcon fontSize="small" />
-          {uniqueLanguages.length} {t("Languages")}
+          {uniqueLanguages.length} {t("resources_footer_languages")}
         </Box>
       </Typography>
       <Typography
@@ -52,7 +52,7 @@ export default function StatisticsFooter({ allResources = {}, uniqueLanguages = 
         color="textSecondary"
         sx={{ mt: 1, display: "block" }}
       >
-        {t("Resources are regularly updated. Check back for new content!")}
+        {t("resources_footer_note")}
       </Typography>
     </Paper>
   );

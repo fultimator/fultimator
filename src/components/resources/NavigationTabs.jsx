@@ -40,7 +40,7 @@ export default function NavigationTabs({
           label={
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <MenuBookIcon />
-              {!isMobile && t("Official Resources")}
+              {!isMobile && t("resources_official_tab")}
             </Box>
           }
           sx={{
@@ -55,7 +55,7 @@ export default function NavigationTabs({
           label={
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ExtensionIcon />
-              {!isMobile && t("Community Content")}
+              {!isMobile && t("resources_community_tab")}
             </Box>
           }
           sx={{

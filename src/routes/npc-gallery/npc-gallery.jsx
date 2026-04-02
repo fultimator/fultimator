@@ -438,6 +438,24 @@ function Personal() {
     notify(t("Copied to Clipboard!"));
   };
 
+  const exportSelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const ext = fmt === "plain" ? "txt" : "md";
+    const zip = new JSZip();
+    selected.forEach((npc) => {
+      const text = buildItemText("npc", npc, fmt);
+      zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
+    });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selected_npcs_${fmt}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportAnchor(null);
+  };
+
   const downloadSelectedAsImages = () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     selected.forEach((npc, i) => {
@@ -795,13 +813,22 @@ function Personal() {
                 </MenuItem>
                 <Divider />
                 <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("markdown")}>
-                  <ListItemText primary={t("Copy as Markdown")} />
+                  <ListItemText primary={t("Copy Markdown to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("markdown")}>
+                  <ListItemText primary={t("Export as Markdown (.zip)")} />
                 </MenuItem>
                 <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("plain")}>
-                  <ListItemText primary={t("Copy as Plaintext")} />
+                  <ListItemText primary={t("Copy Plaintext to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("plain")}>
+                  <ListItemText primary={t("Export as Plaintext (.zip)")} />
                 </MenuItem>
                 <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("obsidian")}>
-                  <ListItemText primary={t("Copy as Obsidian (fu-vault)")} />
+                  <ListItemText primary={t("Copy Obsidian (BlueCorvid) to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("obsidian")}>
+                  <ListItemText primary={t("Export as Obsidian (.zip)")} />
                 </MenuItem>
               </MuiMenu>
               <Tooltip title={`${t("Download Selected as Images")} (${selectedIds.size})`}>

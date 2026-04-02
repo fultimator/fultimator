@@ -49,7 +49,7 @@ export default function FilterSection({
           <TextField
             fullWidth
             variant="outlined"
-            placeholder={t("Search resources...")}
+            placeholder={t("resources_search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
@@ -68,14 +68,14 @@ export default function FilterSection({
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <FormControl fullWidth>
-            <InputLabel>{t("Filter by Type")}</InputLabel>
+            <InputLabel>{t("resources_filter_by_type")}</InputLabel>
             <Select
               value={typeFilter}
-              label={t("Filter by Type")}
+              label={t("resources_filter_by_type")}
               onChange={(e) => setTypeFilter(e.target.value)}
               sx={{ borderRadius: "12px" }}
             >
-              <MenuItem value="all">{t("All Types")}</MenuItem>
+              <MenuItem value="all">{t("resources_filter_by_type_all")}</MenuItem>
               {uniqueTypes.map((type) => (
                 <MenuItem key={type} value={type}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -91,14 +91,14 @@ export default function FilterSection({
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <FormControl fullWidth>
-            <InputLabel>{t("Filter by Language")}</InputLabel>
+            <InputLabel>{t("resources_filter_by_language")}</InputLabel>
             <Select
               value={languageFilter}
-              label={t("Filter by Language")}
+              label={t("resources_filter_by_language")}
               onChange={(e) => setLanguageFilter(e.target.value)}
               sx={{ borderRadius: "12px" }}
             >
-              <MenuItem value="all">{t("All Languages")}</MenuItem>
+              <MenuItem value="all">{t("resources_filter_by_language_all")}</MenuItem>
               {uniqueLanguages.map((language) => (
                 <MenuItem key={language} value={language}>
                   {languages[language]?.lang}

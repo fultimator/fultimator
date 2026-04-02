@@ -19,10 +19,10 @@ export default function OfficialResources({ groupedOfficialResources }) {
           }}
         >
           <Typography variant="h6" color="textSecondary" sx={{ mb: 1 }}>
-            {t("No resources found")}
+            {t("resources_no_results")}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            {t("Try adjusting your search or filter criteria")}
+            {t("resources_try_adjusting")}
           </Typography>
         </Paper>
       ) : (
@@ -53,7 +53,7 @@ export default function OfficialResources({ groupedOfficialResources }) {
               </span>
               {langData.language}
               <Chip
-                label={`${langData.resources.length} ${t("resources")}`}
+                label={`${langData.resources.length} ${t("resources_length_suffix")}`}
                 size="small"
                 sx={{ ml: 2, fontWeight: 600 }}
               />

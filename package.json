@@ -10,7 +10,7 @@
     "start": "npm run dev:web",
     "build": "npm run build:web",
     "dev:web": "vite",
-    "dev:electron": "vite --config vite.electron.config.ts --host",
+    "dev:electron": "vite --config vite.electron.config.ts",
     "build:web": "node DownloadTranslations.js && vite build",
     "build:electron": "tsc && vite build --config vite.electron.config.ts && electron-builder",
     "build:electron:nopublish": "tsc && vite build --config vite.electron.config.ts && electron-builder --publish never",

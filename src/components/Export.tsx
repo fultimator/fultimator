@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
 import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
@@ -24,7 +24,7 @@ function Export({ name = "", dataType, data = {} }: Props) {
   const [exportAnchor, setExportAnchor] = useState(null);
   const isExportMenuOpen = Boolean(exportAnchor);
 
-  function handleOpenExportMenu(event) {
+  function handleOpenExportMenu(event: React.MouseEvent<HTMLButtonElement>) {
     setExportAnchor(event.currentTarget);
   }
 
@@ -62,6 +62,20 @@ function Export({ name = "", dataType, data = {} }: Props) {
     handleSnackbarOpen();
   }
 
+  function handleDownloadText(fmt: string) {
+    const text = buildItemText(dataType, data, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (name || "export").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    handleCloseExportMenu();
+  }
+
   return (
     <>
       <Tooltip title={t("Export")}>
@@ -91,9 +105,14 @@ function Export({ name = "", dataType, data = {} }: Props) {
           {t("copy_json_clipboard")}
         </MenuItem>
         <MenuItem onClick={() => handleCopyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>
+        <MenuItem onClick={() => handleDownloadText("markdown")}>{t("Export as Markdown (.md)")}</MenuItem>
         <MenuItem onClick={() => handleCopyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>
+        <MenuItem onClick={() => handleDownloadText("plain")}>{t("Export as Plaintext (.txt)")}</MenuItem>
         {dataType === "npc" && (
           <MenuItem onClick={() => handleCopyText("obsidian")}>{t("Copy Obsidian (BlueCorvid) to Clipboard")}</MenuItem>
+        )}
+        {dataType === "npc" && (
+          <MenuItem onClick={() => handleDownloadText("obsidian")}>{t("Export as Obsidian (.md)")}</MenuItem>
         )}
       </Menu>
       <Snackbar
