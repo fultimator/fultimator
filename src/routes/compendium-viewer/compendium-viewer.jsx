@@ -16,12 +16,7 @@ import {
   TableRow,
   Paper,
   Grid,
-  Card,
-  Stack,
   Chip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Drawer,
   Fab,
   IconButton,
@@ -31,27 +26,54 @@ import {
   useMediaQuery,
   ThemeProvider,
   Snackbar,
+  Autocomplete,
+  Menu,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import DownloadIcon from "@mui/icons-material/Download";
-import ReactMarkdown from "react-markdown";
-import { styled } from "@mui/system";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import StarIcon from "@mui/icons-material/Star";
+import SettingsIcon from "@mui/icons-material/Settings";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import LinkIcon from "@mui/icons-material/Link";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  ListItemIcon,
+  Alert,
+  CircularProgress,
+  Tabs,
+  Tab,
+} from "@mui/material";
 
 import Layout from "../../components/Layout";
 import Export from "../../components/Export";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import AddToCompendiumButton from "../../components/compendium/AddToCompendiumButton";
+import CompendiumItemCreateDialog from "../../components/compendium/CompendiumItemCreateDialog";
+import QuickCreateModal from "../../components/compendium/QuickCreateModal";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
-import { Martial } from "../../components/icons";
-import { OpenBracket, CloseBracket } from "../../components/Bracket";
-import Diamond from "../../components/Diamond";
+import { IS_ELECTRON } from "../../platform";
+import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard } from "../../components/compendium/ItemCards";
 
 import weapons from "../../libs/weapons";
+import heroics from "../../libs/heroics";
+import qualities from "../../libs/qualities";
 import { baseArmors, baseShields } from "../../libs/equip";
 import { npcSpells } from "../../libs/npcSpells";
 import { npcAttacks } from "../../libs/npcAttacks";
@@ -68,28 +90,28 @@ import { availableTones } from "../../components/player/spells/SpellChanterTones
 import { availableSymbols } from "../../components/player/spells/SpellSymbolistSymbolsModal";
 import { invocationsByWellspring } from "../../components/player/spells/SpellInvokerInvocationsModal";
 
-// ---------------------------------------------------------------------------
-// Spell type description keys (per-character types have no static list)
-// ---------------------------------------------------------------------------
+export const CLASS_BOOK_OPTIONS = [
+  { label: "Core", value: "core" },
+  { label: "Rework", value: "rework" },
+  { label: "Bonus", value: "bonus" },
+  { label: "High Fantasy", value: "high" },
+  { label: "Techno Fantasy", value: "techno" },
+  { label: "Natural Fantasy", value: "natural" },
+];
 
-const SPELL_TYPE_DESC_KEYS = {
-  dance:             ["dance_details_1"],
-  symbol:            ["symbol_details_1"],
-  magichant:         ["magichant_details_1", "magichant_details_2", "magichant_details_3", "magichant_details_4"],
-  cooking:           ["Cooking_desc"],
-  invocation:        ["Invocation_desc"],
-  "pilot-vehicle":   ["pilot_details_1"],
-  magiseed:          ["magiseed_details_1"],
-  gift:              [],
-  therioform:        [],
-  deck:              [],
-  arcanist:          [],
-  "arcanist-rework": [],
-  "tinkerer-alchemy":  [],
-  "tinkerer-infusion": [],
-  "tinkerer-magitech": [],
-  gamble:            [],
-};
+export const QUALITY_FILTER_OPTIONS = [
+  { label: "Weapons", value: "weapon" },
+  { label: "Custom Weapons", value: "customWeapon" },
+  { label: "Armor", value: "armor" },
+  { label: "Shields", value: "shield" },
+  { label: "Accessories", value: "accessory" },
+];
+
+export const QUALITY_CATEGORY_OPTIONS = [
+  { label: "Defensive", value: "Defensive" },
+  { label: "Offensive", value: "Offensive" },
+  { label: "Enhancement", value: "Enhancement" },
+];
 
 // ---------------------------------------------------------------------------
 // Data preparation
@@ -103,17 +125,51 @@ const shields = baseShields
   .filter((s) => s.name !== "No Shield")
   .map((s) => ({ ...s, category: "Shield" }));
 
-const ITEM_TYPES = [
-  { key: "weapons", label: "Weapons" },
-  { key: "armor", label: "Armor" },
-  { key: "shields", label: "Shields" },
-  { key: "spells", label: "NPC Spells" },
-  { key: "attacks", label: "NPC Attacks" },
-  { key: "classes", label: "Classes" },
-  { key: "player-spells", label: "Spells" },
+export const ITEM_TYPES = [
+  { key: "weapons",      label: "Weapons",        context: "player" },
+  { key: "armor",        label: "Armor",          context: "player" },
+  { key: "shields",      label: "Shields",        context: "player" },
+  { key: "spells",       label: "NPC Spells",     context: "npc" },
+  { key: "attacks",      label: "NPC Attacks",    context: "npc" },
+  { key: "special",      label: "Special Rules",  context: "npc" },
+  { key: "actions",      label: "Other Actions",  context: "npc" },
+  { key: "classes",      label: "Classes",        context: "player" },
+  { key: "player-spells", label: "Spells",        context: "both" },
+  { key: "qualities",    label: "Qualities",      context: "player" },
+  { key: "heroics",      label: "Heroic Skills",  context: "player" },
 ];
 
-function getItems(type) {
+// Item types available when browsing a pack (no classes / non-standard types)
+export const PACK_ITEM_TYPES = [
+  { key: "weapons",      label: "Weapons",        context: "player" },
+  { key: "armor",        label: "Armor",          context: "player" },
+  { key: "shields",      label: "Shields",        context: "player" },
+  { key: "spells",       label: "NPC Spells",     context: "npc" },
+  { key: "attacks",      label: "NPC Attacks",    context: "npc" },
+  { key: "special",      label: "Special Rules",  context: "npc" },
+  { key: "actions",      label: "Other Actions",  context: "npc" },
+  { key: "player-spells", label: "Spells",        context: "both" },
+  { key: "qualities",    label: "Qualities",      context: "player" },
+  { key: "classes",      label: "Classes",        context: "player" },
+  { key: "heroics",      label: "Heroic Skills",  context: "player" },
+];
+
+// viewer key → CompendiumItemType
+export const VIEWER_TO_PACK_TYPE = {
+  weapons:        "weapon",
+  armor:          "armor",
+  shields:        "shield",
+  spells:         "npc-spell",
+  attacks:        "npc-attack",
+  special:        "npc-special",
+  actions:        "npc-action",
+  "player-spells": "player-spell",
+  qualities:      "quality",
+  classes:        "class",
+  heroics:        "heroic",
+};
+
+export function getItems(type) {
   switch (type) {
     case "weapons":
       return weapons;
@@ -129,34 +185,35 @@ function getItems(type) {
       return classList;
     case "player-spells":
       return spellList;
+    case "qualities":
+      return qualities;
+    case "heroics":
+      return heroics;
+    case "special":
+    case "actions":
+      return []; // pack-only, no official data
     default:
       return [];
   }
 }
 
-function getItemSearchText(item) {
+export function getItemSearchText(item) {
   const skillNames = item.skills
     ? item.skills.map((s) => s.skillName).join(" ")
     : "";
-  return [item.name, item.category, item.type, item.range, item.book, skillNames]
+  return [item.name, item.category, item.type, item.range, item.book, skillNames, item.quality]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 }
 
-function makeId(name, idx) {
+export function makeId(name, idx) {
   return `compendium-item-${name.replace(/[^a-zA-Z0-9]/g, "-")}-${idx}`;
 }
 
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
-
-// ---------------------------------------------------------------------------
-// Styled markdown (defined once outside components to avoid re-creation)
-// ---------------------------------------------------------------------------
-
-const StyledMarkdown = styled(ReactMarkdown)({ whiteSpace: "pre-line" });
 
 // ---------------------------------------------------------------------------
 // Sidebar table columns per type
@@ -166,10 +223,14 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
   if (type === "armor") return `${item.cost}z`;
   if (type === "shields") return `${item.cost}z`;
+  if (type === "qualities") return `${item.cost}z`;
   if (type === "spells") return `${item.mp} MP`;
   if (type === "player-spells") return item.mp != null ? `${item.mp} MP` : item.wellspring ?? "";
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
+  if (type === "heroics") return item.book ?? "";
+  if (type === "special") return item.spCost != null ? `${item.spCost} SP` : "";
+  if (type === "actions") return item.spCost != null ? `${item.spCost} SP` : "";
   return "";
 }
 
@@ -178,6 +239,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "player-spells") return t("MP");
   if (type === "attacks") return t("Range");
   if (type === "classes") return t("Book");
+  if (type === "heroics") return t("Book");
   return t("Cost");
 }
 
@@ -194,6 +256,7 @@ const SidebarRow = React.memo(function SidebarRow({
   primaryColor,
 }) {
   const { t } = useTranslate();
+  const customTheme = useCustomTheme();
   const handleClick = useCallback(() => onItemClick(item, idx), [onItemClick, item, idx]);
 
   return (
@@ -212,13 +275,16 @@ const SidebarRow = React.memo(function SidebarRow({
         <Typography
           variant="body2"
           fontWeight={isSelected ? "bold" : "normal"}
-          color={isSelected ? primaryColor : "text.primary"}
+          color={isSelected ? (customTheme.mode === "dark" ? "primary.light" : primaryColor) : "text.primary"}
         >
           {t(item.name)}
         </Typography>
       </TableCell>
       <TableCell align="right">
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          variant="body2"
+          color={isSelected ? (customTheme.mode === "dark" ? "primary.light" : primaryColor) : "text.secondary"}
+        >
           {SidebarSecondaryValue(selectedType, item, t)}
         </Typography>
       </TableCell>
@@ -226,7 +292,7 @@ const SidebarRow = React.memo(function SidebarRow({
   );
 });
 
-const CompendiumSidebar = React.memo(function CompendiumSidebar({
+export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   selectedType,
   onTypeChange,
   searchQuery,
@@ -236,9 +302,30 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
   selectedIdx,
   selectedSpellClass,
   onSpellClassChange,
+  selectedQualityFilters,
+  onQualityFiltersChange,
+  selectedQualityCategories,
+  onQualityCategoriesChange,
+  selectedBook,
+  onBookChange,
+  selectedHeroicClasses,
+  onHeroicClassesChange,
+  // pack props
+  packs,
+  selectedCompendium,
+  onCompendiumChange,
+  onNewPack,
+  onImportPack,
+  onManagePack,
+  activePack,
+  onToggleLock,
+  onOpenCreateDialog,
+  onOpenQuickCreate,
 }) {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
+  const isPackMode = selectedCompendium !== "official";
+  const activeTypes = isPackMode ? PACK_ITEM_TYPES : ITEM_TYPES;
 
   return (
     <Box
@@ -251,6 +338,18 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
         overflow: "hidden",
       }}
     >
+      {/* Quick Create button */}
+      <Button
+        variant="contained"
+        size="small"
+        startIcon={<AutoFixHighIcon fontSize="small" />}
+        onClick={onOpenQuickCreate}
+        fullWidth
+        sx={{ textTransform: "none" }}
+      >
+        {t("Quick Create")}
+      </Button>
+
       <Paper
         variant="outlined"
         sx={{
@@ -261,22 +360,114 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
           background: customTheme.mode === "dark" ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.01)",
         }}
       >
-        <FormControl fullWidth size="small">
-          <InputLabel>{t("Item Type")}</InputLabel>
-          <Select
-            value={selectedType}
-            onChange={(e) => onTypeChange(e.target.value)}
-            label={t("Item Type")}
-          >
-            {ITEM_TYPES.map((type) => (
-              <MenuItem key={type.key} value={type.key}>
-                {t(type.label)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {/* Compendium selector */}
+        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>{t("Compendium")}</InputLabel>
+            <Select
+              value={selectedCompendium}
+              onChange={(e) => onCompendiumChange(e.target.value)}
+              label={t("Compendium")}
+            >
+              <MenuItem value="official">{t("Official Data")}</MenuItem>
+              {[...packs]
+                .sort((a, b) => {
+                  if (a.isPersonal !== b.isPersonal) return a.isPersonal ? -1 : 1;
+                  return a.name.localeCompare(b.name);
+                })
+                .map((pack) => (
+                  <MenuItem key={pack.id} value={pack.id}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      {pack.isPersonal && <StarIcon sx={{ fontSize: 14, color: "warning.main" }} />}
+                      {pack.locked && <LockIcon sx={{ fontSize: 14, color: "error.main" }} />}
+                      {pack.name}
+                    </Box>
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+          <Tooltip title={t("New Pack")}>
+            <IconButton size="small" onClick={onNewPack}>
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Import Pack")}>
+            <IconButton size="small" onClick={onImportPack}>
+              <FileUploadIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          {isPackMode && (
+            <Tooltip title={activePack?.locked ? t("Unlock Pack") : t("Lock Pack")}>
+              <IconButton
+                size="small"
+                onClick={() => onToggleLock(selectedCompendium)}
+                color={activePack?.locked ? "error" : "default"}
+              >
+                {activePack?.locked
+                  ? <LockIcon fontSize="small" />
+                  : <LockOpenIcon fontSize="small" />
+                }
+              </IconButton>
+            </Tooltip>
+          )}
+          {isPackMode && (
+            <Tooltip title={t("Manage Pack")}>
+              <IconButton size="small" onClick={onManagePack}>
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
 
-        {selectedType === "player-spells" && (
+        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>{t("Item Type")}</InputLabel>
+            <Select
+              value={activeTypes.some((x) => x.key === selectedType) ? selectedType : activeTypes[0].key}
+              onChange={(e) => onTypeChange(e.target.value)}
+              label={t("Item Type")}
+            >
+              {activeTypes.map((type) => (
+                <MenuItem key={type.key} value={type.key}>
+                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 1 }}>
+                    <span>{t(type.label)}</span>
+                    {type.context && type.context !== "both" && (
+                      <Chip
+                        label={type.context === "npc" ? "NPC" : "Player"}
+                        size="small"
+                        sx={{
+                          height: 16,
+                          fontSize: "0.6rem",
+                          fontWeight: "bold",
+                          backgroundColor: type.context === "npc" ? "rgba(211,47,47,0.15)" : "rgba(25,118,210,0.15)",
+                          color: type.context === "npc"
+                            ? customTheme.mode === "dark" ? "white" : "error.dark"
+                            : customTheme.mode === "dark" ? "white" : "primary.dark",
+                          pointerEvents: "none",
+                        }}
+                      />
+                    )}
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {isPackMode && (
+            <Tooltip title={activePack?.locked ? t("Unlock pack to create items") : t("Create New Item")}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={onOpenCreateDialog}
+                  disabled={!!activePack?.locked}
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+        </Box>
+
+        {selectedType === "player-spells" && !isPackMode && (
           <FormControl fullWidth size="small">
             <InputLabel>{t("Class")}</InputLabel>
             <Select
@@ -296,6 +487,34 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
           </FormControl>
         )}
 
+        {(selectedType === "classes" || selectedType === "heroics") && (
+          <Autocomplete
+            multiple
+            size="small"
+            fullWidth
+            options={CLASS_BOOK_OPTIONS}
+            getOptionLabel={(option) => t(option.label)}
+            value={CLASS_BOOK_OPTIONS.filter((o) => selectedBook.includes(o.value))}
+            onChange={(e, newValue) => onBookChange(newValue.map((v) => v.value))}
+            renderInput={(params) => (
+              <TextField {...params} label={t("Book")} placeholder={t("Filters")} />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return (
+                  <Chip
+                    key={key}
+                    label={t(option.label)}
+                    size="small"
+                    {...tagProps}
+                  />
+                );
+              })
+            }
+          />
+        )}
+
         <TextField
           size="small"
           fullWidth
@@ -311,9 +530,99 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
           }}
         />
 
-        <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5 }}>
+        {selectedType === "heroics" && (
+          <Autocomplete
+            multiple
+            size="small"
+            fullWidth
+            options={classList.map((c) => c.name)}
+            value={selectedHeroicClasses}
+            onChange={(e, newValue) => onHeroicClassesChange(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label={t("Applicable To")} placeholder={t("All classes")} />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return <Chip key={key} label={t(option)} size="small" {...tagProps} />;
+              })
+            }
+          />
+        )}
+
+        {selectedType === "qualities" && (
+          <>
+            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+              <Autocomplete
+                multiple
+                size="small"
+                fullWidth
+                options={QUALITY_CATEGORY_OPTIONS}
+                getOptionLabel={(option) => t(option.label)}
+                value={QUALITY_CATEGORY_OPTIONS.filter((o) => selectedQualityCategories.includes(o.value))}
+                onChange={(e, newValue) => onQualityCategoriesChange(newValue.map((v) => v.value))}
+                renderInput={(params) => (
+                  <TextField {...params} label={t("Category")} placeholder={t("Filters")} />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        label={t(option.label)}
+                        size="small"
+                        {...tagProps}
+                      />
+                    );
+                  })
+                }
+              />
+              {/* <Tooltip title={t("Clear Filters")}>
+                <IconButton size="small" onClick={() => onQualityCategoriesChange([])}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip> */}
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+              <Autocomplete
+                multiple
+                size="small"
+                fullWidth
+                options={QUALITY_FILTER_OPTIONS}
+                getOptionLabel={(option) => t(option.label)}
+                value={QUALITY_FILTER_OPTIONS.filter((o) => selectedQualityFilters.includes(o.value))}
+                onChange={(e, newValue) => onQualityFiltersChange(newValue.map((v) => v.value))}
+                renderInput={(params) => (
+                  <TextField {...params} label={t("Applicable To")} placeholder={t("Filters")} />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...tagProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        label={t(option.label)}
+                        size="small"
+                        {...tagProps}
+                      />
+                    );
+                  })
+                }
+              />
+              {/* <Tooltip title={t("Clear Filters")}>
+                <IconButton size="small" onClick={() => onQualityFiltersChange([])}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip> */}
+            </Box>
+          </>
+        )}
+
+        {/* <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5 }}>
           {filteredItems.length} {t("items")}
-        </Typography>
+        </Typography> */}
       </Paper>
 
       <TableContainer
@@ -360,819 +669,10 @@ const CompendiumSidebar = React.memo(function CompendiumSidebar({
 });
 
 // ---------------------------------------------------------------------------
-// WeaponCard
+// Per-character spell-type item builder
 // ---------------------------------------------------------------------------
 
-const WeaponCard = React.memo(function WeaponCard({ weapon, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const attr1 = attributes[weapon.att1];
-  const attr2 = attributes[weapon.att2];
-  const dmgType = types[weapon.type];
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            "& .MuiTypography-root": {
-              fontSize: "0.9rem",
-              textTransform: "uppercase",
-            },
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography variant="h4">{t("Weapon")}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
-              {t("Cost")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Accuracy")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Damage")}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 1 – name + stats */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            background,
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
-            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
-              {t(weapon.name)}
-            </Typography>
-            {weapon.martial && <Martial />}
-          </Grid>
-          <Grid item xs={2}>
-            <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
-              <OpenBracket />
-              {attr1?.shortcaps} + {attr2?.shortcaps}
-              <CloseBracket />
-              {weapon.prec > 0 ? `+${weapon.prec}` : ""}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
-              <OpenBracket />
-              {t("HR +")} {weapon.damage}
-              <CloseBracket />
-              {dmgType?.long}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 2 – category / hands / range */}
-        <Grid
-          container
-          justifyContent="space-between"
-          sx={{
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(weapon.category)}</Typography>
-          </Grid>
-          <Grid item xs={1}>
-            <Diamond color={customTheme.primary} />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">
-              {weapon.hands === 1 ? t("One-handed") : t("Two-handed")}
-            </Typography>
-          </Grid>
-          <Grid item xs={1}>
-            <Diamond color={customTheme.primary} />
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">
-              {weapon.melee ? t("Melee") : t("Ranged")}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 3 – quality */}
-        <Box sx={{ px: 1, py: 0.75 }}>
-          <Typography variant="body2">
-            {!weapon.quality ? (
-              t("No Qualities")
-            ) : (
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed
-              >
-                {weapon.quality}
-              </StyledMarkdown>
-            )}
-          </Typography>
-        </Box>
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// ArmorCard  (handles both Armor and Shield)
-// ---------------------------------------------------------------------------
-
-function getArmorDefDisplay(armor, t) {
-  if (armor.category === "Shield") {
-    const bonus = armor.defbonus !== undefined ? armor.defbonus : armor.def;
-    return `+${bonus}`;
-  }
-  if (armor.martial) return `${armor.def}`;
-  const bonus = armor.defbonus !== undefined ? armor.defbonus : 0;
-  return bonus === 0 ? t("DEX die") : `${t("DEX die")} +${bonus}`;
-}
-
-function getArmorMDefDisplay(armor, t) {
-  if (armor.category === "Shield") {
-    const bonus = armor.mdefbonus !== undefined ? armor.mdefbonus : armor.mdef;
-    return `+${bonus}`;
-  }
-  const bonus = armor.mdefbonus !== undefined ? armor.mdefbonus : 0;
-  return bonus === 0 ? t("INS die") : `${t("INS die")} +${bonus}`;
-}
-
-const ArmorCard = React.memo(function ArmorCard({ armor, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            "& .MuiTypography-root": {
-              fontSize: "0.9rem",
-              textTransform: "uppercase",
-            },
-          }}
-        >
-          <Grid item xs={3}>
-            <Typography variant="h4">{t(armor.category)}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
-              {t("Cost")}
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
-              {t("Defense")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("M. Defense")}
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
-              {t("Init.")}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 1 – name + stats */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            background,
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
-            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
-              {t(armor.name)}
-            </Typography>
-            {armor.martial && <Martial />}
-          </Grid>
-          <Grid item xs={2}>
-            <Typography textAlign="center">{`${armor.cost}z`}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography fontWeight="bold" textAlign="center">
-              {getArmorDefDisplay(armor, t)}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
-              {getArmorMDefDisplay(armor, t)}
-            </Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography fontWeight="bold" textAlign="center">
-              {armor.init === 0 ? "—" : armor.init}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* quality row (optional) */}
-        {armor.quality && (
-          <Box sx={{ px: 1, py: 0.75 }}>
-            <Typography variant="body2">
-              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                {armor.quality}
-              </StyledMarkdown>
-            </Typography>
-          </Box>
-        )}
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// SpellCard
-// ---------------------------------------------------------------------------
-
-const SpellCard = React.memo(function SpellCard({ spell, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const attr1 = attributes[spell.attr1];
-  const attr2 = attributes[spell.attr2];
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Grid
-          container
-          alignItems="center"
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            "& .MuiTypography-root": {
-              fontSize: "0.9rem",
-              textTransform: "uppercase",
-            },
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography variant="h4">{t("Spell")}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
-              {t("MP")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Duration")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Target")}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 1 – name + cost + duration + target */}
-        <Grid
-          container
-          alignItems="center"
-          sx={{
-            background,
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(spell.name)}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography textAlign="center">{spell.mp}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">{spell.duration}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">{spell.target}</Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 2 – accuracy (if applicable) */}
-        {attr1 && attr2 && (
-          <Grid
-            container
-            alignItems="center"
-            sx={{
-              borderBottom: `1px solid ${customTheme.secondary}`,
-              px: 1,
-              py: "4px",
-            }}
-          >
-            <Grid item xs={12}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="right"
-                fontWeight="bold"
-              >
-                {attr1.shortcaps} + {attr2.shortcaps}
-              </Typography>
-            </Grid>
-          </Grid>
-        )}
-
-        {/* Effect */}
-        <Box sx={{ px: 1, py: 0.75 }}>
-          <Typography variant="body2">{spell.effect}</Typography>
-        </Box>
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// PlayerSpellCard
-// ---------------------------------------------------------------------------
-
-const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const attr1 = attributes[spell.attr1];
-  const attr2 = attributes[spell.attr2];
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Grid
-          container
-          alignItems="center"
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            "& .MuiTypography-root": {
-              fontSize: "0.9rem",
-              textTransform: "uppercase",
-            },
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography variant="h4">{t("Spell")}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">{t("MP")}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">{t("Duration")}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">{t("Target")}</Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 1 – name + mp + duration + target */}
-        <Grid
-          container
-          alignItems="center"
-          sx={{
-            background,
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(spell.name)}</Typography>
-            <Typography variant="caption" color="text.secondary">{spell.class}</Typography>
-          </Grid>
-          <Grid item xs={2}>
-            <Typography textAlign="center">{spell.mp}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">{t(spell.duration)}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">{t(spell.targetDesc)}</Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 2 – accuracy (if applicable) */}
-        {attr1 && attr2 && (
-          <Grid
-            container
-            alignItems="center"
-            sx={{
-              borderBottom: `1px solid ${customTheme.secondary}`,
-              px: 1,
-              py: "4px",
-            }}
-          >
-            <Grid item xs={12}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="right"
-                fontWeight="bold"
-              >
-                <OpenBracket />{attr1.shortcaps} + {attr2.shortcaps}<CloseBracket />
-              </Typography>
-            </Grid>
-          </Grid>
-        )}
-
-        {/* Description */}
-        <Box sx={{ px: 1, py: 0.75 }}>
-          <Typography variant="body2">
-            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-              {t(spell.description)}
-            </StyledMarkdown>
-          </Typography>
-        </Box>
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// NonStaticSpellCard
-// ---------------------------------------------------------------------------
-
-const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const md = (text) => (
-    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>{text || ""}</StyledMarkdown>
-  );
-
-  const renderBody = () => {
-    switch (item.spellType) {
-      case "gift":
-        return (
-          <>
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 0.5 }}>
-              {md(t(item.event))}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
-          </>
-        );
-      case "dance":
-        return (
-          <>
-            {item.duration && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                <strong>{t("Duration")}:</strong> {t(item.duration)}
-              </Typography>
-            )}
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
-          </>
-        );
-      case "therioform":
-        return (
-          <>
-            {item.genoclepsis && (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 0.5 }}>
-                {md(t(item.genoclepsis))}
-              </Typography>
-            )}
-            <Typography variant="body2" color="text.secondary">{md(t(item.description))}</Typography>
-          </>
-        );
-      case "magichant":
-      case "symbol":
-        return <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>;
-      case "invocation":
-        return (
-          <>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-              {item.wellspring && (
-                <Chip label={item.wellspring} size="small" variant="outlined"
-                  sx={{ fontSize: "0.65rem", height: 18 }} />
-              )}
-              {item.type && (
-                <Chip label={item.type} size="small" variant="outlined"
-                  sx={{ fontSize: "0.65rem", height: 18 }} />
-              )}
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
-          </>
-        );
-      case "magiseed":
-        return (
-          <>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{md(t(item.description))}</Typography>
-            {Array.from({ length: item.rangeEnd - item.rangeStart + 1 }, (_, j) => {
-              const tier = item.rangeStart + j;
-              const effect = item.effects?.[tier];
-              return effect ? (
-                <Box key={tier} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                  <Typography variant="caption" fontWeight="bold" color={customTheme.primary}
-                    sx={{ minWidth: 22, flexShrink: 0, pt: "1px" }}>
-                    T{tier}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">{md(t(effect))}</Typography>
-                </Box>
-              ) : null;
-            })}
-          </>
-        );
-      case "arcanist":
-      case "arcanist-rework":
-        return (
-          <Stack divider={<Divider />}>
-            {item.domainDesc && (
-              <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t("Domain")}</Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.domainDesc))}</Typography>
-              </Box>
-            )}
-            {item.mergeDesc && (
-              <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>{t("Merge")}</Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.mergeDesc))}</Typography>
-              </Box>
-            )}
-            {item.dismissDesc && (
-              <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>{t("Dismiss")}</Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.dismissDesc))}</Typography>
-              </Box>
-            )}
-          </Stack>
-        );
-      case "tinkerer-alchemy":
-        return (
-          <>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>
-              {item.category}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">{md(item.effect)}</Typography>
-          </>
-        );
-      case "tinkerer-infusion":
-        return (
-          <>
-            {item.infusionRank && (
-              <Typography variant="caption" color="text.secondary">Rank {item.infusionRank}</Typography>
-            )}
-            <Typography variant="body2" color="text.secondary">{md(item.effect ?? item.description ?? "")}</Typography>
-          </>
-        );
-      case "pilot-vehicle":
-        return (
-          <>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: "bold", mb: 0.25, display: "block" }}>
-              {item.category}
-            </Typography>
-            {item.passengers != null && (
-              <Typography variant="caption" color="text.secondary">
-                Passengers: {item.passengers} · Distance: {item.distance}
-              </Typography>
-            )}
-            {item.def != null && (
-              <Typography variant="caption" color="text.secondary">
-                DEF {item.def} · MDEF {item.mdef}{item.martial ? " · Martial" : ""}
-              </Typography>
-            )}
-            {(item.damage != null || item.range) && (
-              <Typography variant="caption" color="text.secondary">
-                {[item.category, `HR+${item.damage}`, item.range, item.prec !== 0 ? `+${item.prec} acc` : null, item.cumbersome ? "Cumbersome" : null].filter(Boolean).join(" · ")}
-              </Typography>
-            )}
-            {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(t(item.description))}</Typography>}
-          </>
-        );
-      case "cooking":
-        return <Typography variant="body2" color="text.secondary">{md(item.effect ?? "")}</Typography>;
-      default:
-        return null;
-    }
-  };
-
-  const typeLabel = {
-    gift: "Gift",
-    dance: "Dance",
-    therioform: "Therioform",
-    magichant: "Tone",
-    symbol: "Symbol",
-    invocation: "Invocation",
-    magiseed: "Magiseed",
-    arcanist: "Arcanum",
-    "arcanist-rework": "Arcanum",
-    "tinkerer-alchemy": "Alchemy",
-    "tinkerer-infusion": "Infusion",
-    "pilot-vehicle": "Pilot Vehicle",
-    cooking: "Delicacy",
-  }[item.spellType] ?? item.spellType;
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        <Box
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="body2" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>
-            {t(typeLabel)}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            background,
-            borderBottom: `1px solid ${customTheme.secondary}`,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Typography fontWeight="bold">{t(item.name)}</Typography>
-        </Box>
-        <Box sx={{ px: 1, py: 0.75 }}>
-          {renderBody()}
-        </Box>
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// AttackCard
-// ---------------------------------------------------------------------------
-
-const AttackCard = React.memo(function AttackCard({ attack, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const attr1 = attributes[attack.attr1];
-  const attr2 = attributes[attack.attr2];
-  const dmgType = types[attack.type];
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            p: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            "& .MuiTypography-root": {
-              fontSize: "0.9rem",
-              textTransform: "uppercase",
-            },
-          }}
-        >
-          <Grid item xs={3}>
-            <Typography variant="h4">{t(attack.category)}</Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Accuracy")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Damage")}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
-              {t("Range")}
-            </Typography>
-          </Grid>
-        </Grid>
-
-        {/* Row 1 – stats */}
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{
-            background,
-            px: 1,
-            py: "5px",
-          }}
-        >
-          <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
-            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
-              {t(attack.name)}
-            </Typography>
-            {attack.martial && <Martial />}
-          </Grid>
-          <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
-              {attr1 && attr2 ? (
-                <>
-                  <OpenBracket />
-                  {attr1.shortcaps} + {attr2.shortcaps}
-                  <CloseBracket />
-                  {attack.flathit > 0 ? `+${attack.flathit}` : ""}
-                </>
-              ) : (
-                "—"
-              )}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
-              <OpenBracket />
-              HR + {attack.flatdmg}
-              <CloseBracket />
-              {dmgType?.long}
-            </Typography>
-          </Grid>
-          <Grid item xs={3}>
-            <Typography textAlign="center">{t(attack.range)}</Typography>
-          </Grid>
-        </Grid>
-      </Stack>
-    </Card>
-  );
-});
-
-// ---------------------------------------------------------------------------
-// Per-character spell-type item renderer
-// ---------------------------------------------------------------------------
-
-function getNonStaticSpellItems(sc) {
+export function getNonStaticSpellItems(sc) {
   switch (sc) {
     case "gift":
       return availableGifts
@@ -1240,605 +740,35 @@ function getNonStaticSpellItems(sc) {
   }
 }
 
-function renderSpellTypeContent(sc, t, customTheme) {
-  const border = { borderTop: `1px solid ${customTheme.secondary}` };
-  const itemSx = { ...border, px: 2, py: 0.75 };
-  const sectionHeaderSx = {
-    ...border, px: 2, py: 0.5,
-    backgroundColor: `${customTheme.primary}11`,
-  };
-  const captionHeader = (label) => (
-    <Typography variant="caption" fontWeight="bold" color="text.secondary"
-      sx={{ textTransform: "uppercase", letterSpacing: "0.05em" }}>
-      {label}
-    </Typography>
-  );
-  const md = (text) => (
-    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>{text}</StyledMarkdown>
-  );
-
-  switch (sc) {
-
-    case "gift":
-      return availableGifts
-        .filter(g => !g.name.includes("_custom_"))
-        .map((g, i) => (
-          <Box key={i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75, mb: 0.25, flexWrap: "wrap" }}>
-              <Typography variant="body2" fontWeight="bold">{t(g.name)}</Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                {md(t(g.event))}
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(g.effect))}</Typography>
-          </Box>
-        ));
-
-    case "dance":
-      return availableDances
-        .filter(d => !d.name.includes("_custom_"))
-        .map((d, i) => (
-          <Box key={i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25 }}>
-              <Typography variant="body2" fontWeight="bold">{t(d.name)}</Typography>
-              {d.duration && (
-                <Typography variant="caption" color="text.secondary">· {t(d.duration)}</Typography>
-              )}
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(d.effect))}</Typography>
-          </Box>
-        ));
-
-    case "therioform":
-      return availableTherioforms
-        .filter(tf => !tf.name.includes("_custom_"))
-        .map((tf, i) => (
-          <Box key={i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75, mb: 0.25, flexWrap: "wrap" }}>
-              <Typography variant="body2" fontWeight="bold">{t(tf.name)}</Typography>
-              {tf.genoclepsis && (
-                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                  {md(t(tf.genoclepsis))}
-                </Typography>
-              )}
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(tf.description))}</Typography>
-          </Box>
-        ));
-
-    case "magichant":
-      return availableTones
-        .filter(tone => !tone.name.includes("_custom_"))
-        .map((tone, i) => (
-          <Box key={i} sx={itemSx}>
-            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(tone.name)}</Typography>
-            <Typography variant="body2" color="text.secondary">{md(t(tone.effect))}</Typography>
-          </Box>
-        ));
-
-    case "symbol":
-      return availableSymbols
-        .filter(s => !s.name.includes("_custom_"))
-        .map((s, i) => (
-          <Box key={i} sx={itemSx}>
-            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(s.name)}</Typography>
-            <Typography variant="body2" color="text.secondary">{md(t(s.effect))}</Typography>
-          </Box>
-        ));
-
-    case "invocation":
-      return Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) => [
-        <Box key={wellspring + "_h"} sx={sectionHeaderSx}>{captionHeader(wellspring)}</Box>,
-        ...invocations.map((inv, i) => (
-          <Box key={wellspring + i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25 }}>
-              <Typography variant="body2" fontWeight="bold">{t(inv.name)}</Typography>
-              <Chip label={inv.type} size="small" variant="outlined"
-                sx={{ fontSize: "0.6rem", height: 16 }} />
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(inv.effect))}</Typography>
-          </Box>
-        )),
-      ]);
-
-    case "magiseed":
-      return magiseeds.map((ms, i) => (
-        <Box key={i} sx={itemSx}>
-          <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(ms.name)}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{md(t(ms.description))}</Typography>
-          {Array.from({ length: ms.rangeEnd - ms.rangeStart + 1 }, (_, j) => {
-            const tier = ms.rangeStart + j;
-            const effect = ms.effects[tier];
-            return effect ? (
-              <Box key={tier} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                <Typography variant="caption" fontWeight="bold" color={`${customTheme.primary}`}
-                  sx={{ minWidth: 22, flexShrink: 0, pt: "1px" }}>
-                  T{tier}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(effect))}</Typography>
-              </Box>
-            ) : null;
-          })}
-        </Box>
-      ));
-
-    case "cooking": {
-      const effects = getDelicacyEffects(t);
-      return effects.map((eff, i) => (
-        <Box key={i} sx={itemSx}>
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Typography variant="caption" fontWeight="bold" color="text.secondary"
-              sx={{ minWidth: 22, flexShrink: 0, pt: "1px" }}>
-              {eff.id}.
-            </Typography>
-            <Typography variant="body2" color="text.secondary">{md(eff.effect)}</Typography>
-          </Box>
-        </Box>
-      ));
-    }
-
-    case "tinkerer-alchemy": {
-      return [
-        <Box key="targets_h" sx={sectionHeaderSx}>{captionHeader(t("Targets"))}</Box>,
-        ...tinkererAlchemy.targets.map((target, i) => (
-          <Box key={"t" + i} sx={itemSx}>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Typography variant="caption" fontWeight="bold" color="text.secondary"
-                sx={{ minWidth: 36, flexShrink: 0, pt: "1px" }}>
-                {target.rangeFrom === target.rangeTo
-                  ? target.rangeFrom
-                  : `${target.rangeFrom}–${target.rangeTo}`}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">{md(target.effect)}</Typography>
-            </Box>
-          </Box>
-        )),
-        <Box key="effects_h" sx={sectionHeaderSx}>{captionHeader(t("Effects"))}</Box>,
-        ...tinkererAlchemy.effects.map((eff, i) => (
-          <Box key={"e" + i} sx={itemSx}>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Typography variant="caption" fontWeight="bold" color="text.secondary"
-                sx={{ minWidth: 24, flexShrink: 0, pt: "1px" }}>
-                {eff.dieValue}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">{md(eff.effect)}</Typography>
-            </Box>
-          </Box>
-        )),
-      ];
-    }
-
-    case "tinkerer-infusion": {
-      const byRank = {};
-      tinkererInfusion.effects.forEach(eff => {
-        const r = eff.infusionRank;
-        if (!byRank[r]) byRank[r] = [];
-        byRank[r].push(eff);
-      });
-      return Object.entries(byRank).flatMap(([rank, effs]) => [
-        <Box key={"rank_" + rank} sx={sectionHeaderSx}>
-          {captionHeader(`${t("Rank")} ${rank}`)}
-        </Box>,
-        ...effs.map((eff, i) => (
-          <Box key={"r" + rank + "_" + i} sx={itemSx}>
-            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{eff.name}</Typography>
-            <Typography variant="body2" color="text.secondary">{md(eff.effect)}</Typography>
-          </Box>
-        )),
-      ]);
-    }
-
-    case "tinkerer-magitech": {
-      const magitechRanks = [
-        { rankLabel: t("Basic"),    name: t("Magitech Override"), descKeys: ["MagitechOverride_desc"] },
-        { rankLabel: t("Advanced"), name: t("Magicannon"),        descKeys: ["Magicannon_desc1", "Magicannon_desc2"] },
-        { rankLabel: t("Superior"), name: t("Magispheres"),       descKeys: ["Magispheres_desc1", "Magispheres_desc2", "Magispheres_desc3"] },
-      ];
-      return magitechRanks.flatMap((rank, ri) => [
-        <Box key={"mtr_" + ri} sx={sectionHeaderSx}>
-          {captionHeader(`${rank.rankLabel} — ${rank.name}`)}
-        </Box>,
-        <Box key={"mtc_" + ri} sx={itemSx}>
-          {rank.descKeys.map((key, ki) => (
-            <Typography key={ki} variant="body2" color="text.secondary" sx={{ mb: ki < rank.descKeys.length - 1 ? 0.5 : 0 }}>
-              {md(t(key))}
-            </Typography>
-          ))}
-        </Box>,
-      ]);
-    }
-
-    case "arcanist":
-    case "arcanist-rework": {
-      return arcanumList.flatMap((arc, i) => [
-        <Box key={"arc_h_" + i} sx={sectionHeaderSx}>
-          {captionHeader(arc.name)}
-        </Box>,
-        <Box key={"arc_domain_" + i} sx={itemSx}>
-          <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t("Domain")}</Typography>
-          <Typography variant="body2" color="text.secondary">{md(t(arc.domainDesc))}</Typography>
-        </Box>,
-        <Box key={"arc_merge_" + i} sx={itemSx}>
-          <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>{t("Merge")}</Typography>
-          <Typography variant="body2" color="text.secondary">{md(t(arc.mergeDesc))}</Typography>
-        </Box>,
-        <Box key={"arc_dismiss_" + i} sx={itemSx}>
-          <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>{t("Dismiss")}</Typography>
-          <Typography variant="body2" color="text.secondary">{md(t(arc.dismissDesc))}</Typography>
-        </Box>,
-      ]);
-    }
-
-    case "pilot-vehicle": {
-      return [
-        <Box key="frames_h" sx={sectionHeaderSx}>{captionHeader(t("Frames"))}</Box>,
-        ...availableFrames.map((frame, i) => (
-          <Box key={"fr" + i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25, flexWrap: "wrap" }}>
-              <Typography variant="body2" fontWeight="bold">{t(frame.name)}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t("Passengers")}: {frame.passengers} · {t("Distance")}: {frame.distance}
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(frame.description))}</Typography>
-          </Box>
-        )),
-
-        <Box key="armor_h" sx={sectionHeaderSx}>{captionHeader(t("Armor Modules"))}</Box>,
-        ...availableModules.armor
-          .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map((m, i) => (
-            <Box key={"am" + i} sx={itemSx}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
-                <Typography variant="body2" fontWeight="bold">{t(m.name)}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  DEF {m.def} · MDEF {m.mdef}{m.martial ? " · Martial" : ""}
-                </Typography>
-              </Box>
-            </Box>
-          )),
-
-        <Box key="weapon_h" sx={sectionHeaderSx}>{captionHeader(t("Weapon Modules"))}</Box>,
-        ...availableModules.weapon.map((m, i) => (
-          <Box key={"wm" + i} sx={itemSx}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
-              <Typography variant="body2" fontWeight="bold">{t(m.name)}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {m.category} · HR+{m.damage} · {m.range}
-                {m.prec !== 0 ? ` · +${m.prec} acc` : ""}
-                {m.cumbersome ? " · Cumbersome" : ""}
-              </Typography>
-            </Box>
-          </Box>
-        )),
-
-        <Box key="support_h" sx={sectionHeaderSx}>{captionHeader(t("Support Modules"))}</Box>,
-        ...availableModules.support
-          .filter(m => m.name !== "pilot_custom_support")
-          .map((m, i) => (
-            <Box key={"sm" + i} sx={itemSx}>
-              <Typography variant="body2" fontWeight="bold" sx={{ mb: m.description ? 0.25 : 0 }}>
-                {t(m.name)}
-              </Typography>
-              {m.description && (
-                <Typography variant="body2" color="text.secondary">{md(t(m.description))}</Typography>
-              )}
-            </Box>
-          )),
-      ];
-    }
-
-    default:
-      return null;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// ClassCard
-// ---------------------------------------------------------------------------
-
-const ClassCard = React.memo(function ClassCard({ cls, id }) {
-  const { t } = useTranslate();
-  const customTheme = useCustomTheme();
-
-  const background =
-    customTheme.mode === "dark"
-      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
-
-  const benefits = cls.benefits;
-  const benefitLines = [];
-  if (benefits) {
-    if (benefits.hpplus > 0)
-      benefitLines.push(
-        t("Permanently increase your maximum Hit Points by") + ` ${benefits.hpplus}.`
-      );
-    if (benefits.mpplus > 0)
-      benefitLines.push(
-        t("Permanently increase your maximum Mind Points by") + ` ${benefits.mpplus}.`
-      );
-    if (benefits.ipplus > 0)
-      benefitLines.push(
-        t("Permanently increase your maximum Inventory Points by") + ` ${benefits.ipplus}.`
-      );
-    if (benefits.martials?.armor)
-      benefitLines.push(t("Gain the ability to equip martial armor."));
-    if (benefits.martials?.melee)
-      benefitLines.push(t("Gain the ability to equip martial melee weapons."));
-    if (benefits.martials?.ranged)
-      benefitLines.push(t("Gain the ability to equip martial ranged weapons."));
-    if (benefits.martials?.shields)
-      benefitLines.push(t("Gain the ability to equip martial shields."));
-    if (benefits.rituals?.ritualism)
-      benefitLines.push(
-        t("You may perform Rituals whose effects fall within the Ritualism discipline.")
-      );
-  }
-
-  return (
-    <Card id={id} elevation={1}>
-      <Stack>
-        {/* Header */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1,
-            background: customTheme.primary,
-            color: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 1,
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{ textTransform: "uppercase", fontSize: "1.1rem", fontWeight: "bold" }}
-          >
-            {t(cls.name)}
-          </Typography>
-          {cls.book && (
-            <Chip
-              label={cls.book}
-              size="small"
-              sx={{
-                textTransform: "capitalize",
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "#ffffff",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                flexShrink: 0,
-              }}
-            />
-          )}
-        </Box>
-
-        {/* Free Benefits */}
-        {benefitLines.length > 0 && (
-          <Box sx={{ background, px: 2, py: 1, borderBottom: `1px solid ${customTheme.secondary}` }}>
-            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5, textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-              {t("Free Benefits")}
-            </Typography>
-            <Stack spacing={0.25}>
-              {benefitLines.map((line, i) => (
-                <Typography key={i} variant="body2">• {line}</Typography>
-              ))}
-            </Stack>
-          </Box>
-        )}
-
-        {/* Skills */}
-        {/* Spells accordion */}
-        {(() => {
-          const classSpells = spellList.filter((s) => s.class === cls.name);
-          const hasCustomSpells =
-            cls.benefits?.spellClasses?.length > 0 && classSpells.length === 0;
-          if (!cls.benefits?.spellClasses?.length && classSpells.length === 0)
-            return null;
-          return (
-            <Accordion disableGutters elevation={0} square
-              sx={{ borderTop: `1px solid ${customTheme.secondary}`, "&:before": { display: "none" } }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 40, "& .MuiAccordionSummary-content": { my: 0.5 } }}>
-                <Typography variant="body2" fontWeight="bold">
-                  {t("Spells")}
-                  {classSpells.length > 0 && (
-                    <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                      ({classSpells.length})
-                    </Typography>
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ p: 0 }}>
-                {hasCustomSpells ? (
-                  /* Per-character spell types */
-                  cls.benefits.spellClasses.map((sc) => {
-                    const descKeys = SPELL_TYPE_DESC_KEYS[sc] ?? [];
-                    const content = renderSpellTypeContent(sc, t, customTheme);
-                    const hasContent = Array.isArray(content) ? content.length > 0 : content !== null;
-                    return (
-                      <Box key={sc} sx={{ borderTop: `1px solid ${customTheme.secondary}` }}>
-                        {/* Header: chip + optional desc keys */}
-                        <Box sx={{ px: 2, py: 1 }}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: descKeys.length ? 0.75 : 0 }}>
-                            <Chip
-                              label={sc}
-                              size="small"
-                              sx={{
-                                fontSize: "0.65rem",
-                                textTransform: "capitalize",
-                                backgroundColor: `${customTheme.primary}22`,
-                                color: customTheme.primary,
-                                fontWeight: "bold",
-                              }}
-                            />
-                            {!descKeys.length && !hasContent && (
-                              <Typography variant="caption" color="text.secondary" fontStyle="italic">
-                                {t("Defined per character")}
-                              </Typography>
-                            )}
-                          </Box>
-                          {descKeys.map((key) => (
-                            <Typography key={key} variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                                {t(key)}
-                              </StyledMarkdown>
-                            </Typography>
-                          ))}
-                        </Box>
-                        {/* Individual items */}
-                        {content}
-                      </Box>
-                    );
-                  })
-                ) : (
-                  /* Static spell list (default / gamble types) */
-                  classSpells.map((spell, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        borderTop: `1px solid ${customTheme.secondary}`,
-                        px: 2,
-                        py: 0.75,
-                      }}
-                    >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25 }}>
-                        <Typography variant="body2" fontWeight="bold">
-                          {t(spell.name)}
-                        </Typography>
-                        <Chip
-                          label={spell.isOffensive ? t("Offensive") : t("Support")}
-                          size="small"
-                          color={spell.isOffensive ? "error" : "success"}
-                          variant="outlined"
-                          sx={{ fontSize: "0.6rem", height: 16 }}
-                        />
-                        <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
-                          {spell.mp} MP
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          {spell.targetDesc}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">·</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {spell.duration}
-                        </Typography>
-                        {spell.attr1 && spell.attr2 && (
-                          <>
-                            <Typography variant="caption" color="text.secondary">·</Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {attributes[spell.attr1]?.shortcaps} + {attributes[spell.attr2]?.shortcaps}
-                            </Typography>
-                          </>
-                        )}
-                      </Box>
-                      {spell.spellType === "gamble" ? (
-                        <>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                              {t("GambleSpell_desc")}
-                            </StyledMarkdown>
-                          </Typography>
-                          {spell.targets?.map((target, j) => (
-                            <Box key={j} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                              <Typography variant="caption" fontWeight="bold" color="text.secondary"
-                                sx={{ minWidth: 32, flexShrink: 0, pt: "1px" }}>
-                                {target.rangeFrom === target.rangeTo
-                                  ? target.rangeFrom
-                                  : `${target.rangeFrom}–${target.rangeTo}`}
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                                  {target.effect}
-                                </StyledMarkdown>
-                              </Typography>
-                            </Box>
-                          ))}
-                        </>
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                            {t(spell.description)}
-                          </StyledMarkdown>
-                        </Typography>
-                      )}
-                    </Box>
-                  ))
-                )}
-              </AccordionDetails>
-            </Accordion>
-          );
-        })()}
-        <Divider />
-
-        {cls.skills?.map((skill, i) => (
-          <Box
-            key={i}
-            sx={{
-              borderBottom: i < cls.skills.length - 1
-                ? `1px solid ${customTheme.secondary}`
-                : undefined,
-            }}
-          >
-            {/* Skill header row */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                px: 2,
-                pt: 0.75,
-                pb: 0.25,
-              }}
-            >
-              <Typography variant="body2" fontWeight="bold">
-                {t(skill.skillName)}
-              </Typography>
-              <Chip
-                label={`Max ${skill.maxLvl}`}
-                size="small"
-                variant="outlined"
-                sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
-              />
-            </Box>
-            {/* Skill description */}
-            <Box sx={{ px: 2, pb: 0.75 }}>
-              <Typography variant="body2" color="text.secondary">
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                  {t(skill.description)}
-                </StyledMarkdown>
-              </Typography>
-            </Box>
-          </Box>
-        ))}
-      </Stack>
-    </Card>
-  );
-});
-
 // ---------------------------------------------------------------------------
 // Card dispatcher
 // ---------------------------------------------------------------------------
 
-const ItemCard = React.memo(function ItemCard({ type, item, id }) {
+export const ItemCard = React.memo(function ItemCard({ type, item, id, onHeaderClick }) {
   switch (type) {
     case "weapons":
-      return <WeaponCard weapon={item} id={id} />;
+      return <WeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />;
     case "armor":
     case "shields":
-      return <ArmorCard armor={item} id={id} />;
+      return <ArmorCard armor={item} id={id} onHeaderClick={onHeaderClick} />;
     case "spells":
-      return <SpellCard spell={item} id={id} />;
+      return <SpellCard spell={item} id={id} onHeaderClick={onHeaderClick} />;
     case "player-spells":
       return item.spellType && item.spellType !== "default" && item.spellType !== "gamble"
-        ? <NonStaticSpellCard item={item} id={id} />
-        : <PlayerSpellCard spell={item} id={id} />;
+        ? <NonStaticSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        : <PlayerSpellCard spell={item} id={id} onHeaderClick={onHeaderClick} />;
     case "attacks":
-      return <AttackCard attack={item} id={id} />;
+      return <AttackCard attack={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "qualities":
+      return <QualityCard quality={item} id={id} onHeaderClick={onHeaderClick} />;
     case "classes":
-      return <ClassCard cls={item} id={id} />;
+      return <ClassCard cls={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "heroics":
+      return <HeroicCard heroic={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "special":
+      return <SpecialRuleCard item={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "actions":
+      return <ActionCard item={item} id={id} onHeaderClick={onHeaderClick} />;
     default:
       return null;
   }
@@ -1862,8 +792,58 @@ function CompendiumViewer() {
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
 
+  // Pack state
+  const { packs, loading: packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule, importFromFile, importFromManifestUrl } = useCompendiumPacks();
+  const [newPackDialogOpen, setNewPackDialogOpen] = useState(false);
+  const [newPackName, setNewPackName] = useState("");
+  const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
+  const [quickCreateOpen, setQuickCreateOpen] = useState(false);
+  const [editClassItem, setEditClassItem] = useState(null); // { item, packItemId }
+  const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [editingPackName, setEditingPackName] = useState("");
+  const [editingDescription, setEditingDescription] = useState("");
+  const [editingAuthor, setEditingAuthor] = useState("");
+
+  // Export meta lives inside the Manage Pack dialog (not a separate dialog)
+  const [exportMeta, setExportMeta] = useState({ version: "1.0.0", homepageUrl: "", manifestUrl: "", downloadUrl: "" });
+  const [exporting, setExporting] = useState(false);
+
+  // Import dialog state
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importTab, setImportTab] = useState(0); // 0 = file, 1 = URL
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  // Navigation is deferred to after the Dialog exit transition so MUI's focus
+  // trap is fully released before we change the URL (avoids backdrop freeze).
+  const [pendingNavPackId, setPendingNavPackId] = useState(null);
+
+  // Always ensure the personal pack exists so it shows in the dropdown
+  useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
+
+  const selectedCompendium = searchParams.get("compendium") ?? "official";
+  const activePack = selectedCompendium !== "official"
+    ? packs.find((p) => p.id === selectedCompendium) ?? null
+    : null;
+
   const selectedType = searchParams.get("type") ?? "weapons";
   const selectedSpellClass = searchParams.get("class") ?? "";
+  const selectedBook = useMemo(() => {
+    const books = searchParams.get("book");
+    return books ? books.split(",") : [];
+  }, [searchParams]);
+  const selectedQualityFilters = useMemo(() => {
+    const filters = searchParams.get("qualityFilters");
+    return filters ? filters.split(",") : [];
+  }, [searchParams]);
+  const selectedQualityCategories = useMemo(() => {
+    const categories = searchParams.get("qualityCategories");
+    return categories ? categories.split(",") : [];
+  }, [searchParams]);
+  const selectedHeroicClasses = useMemo(() => {
+    const classes = searchParams.get("heroicClasses");
+    return classes ? classes.split(",") : [];
+  }, [searchParams]);
 
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
@@ -1881,8 +861,81 @@ function CompendiumViewer() {
   }, [selectedType, selectedSpellClass]);
 
   const filteredItems = useMemo(() => {
+    // ── Pack mode ────────────────────────────────────────────────────────────
+    if (activePack) {
+      const packType = VIEWER_TO_PACK_TYPE[selectedType];
+      let items = activePack.items
+        .filter((i) => !packType || i.type === packType)
+        // Embed the pack item id so Remove can find it later
+        .map((i) => ({ ...i.data, _packItemId: i.id }));
+
+      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
+        items = items.filter((item) =>
+          item.filter && selectedQualityFilters.some(f => item.filter.includes(f))
+        );
+      }
+
+      if (selectedType === "qualities" && selectedQualityCategories.length > 0) {
+        items = items.filter((item) =>
+          item.category && selectedQualityCategories.includes(item.category)
+        );
+      }
+
+      if (selectedType === "classes" && selectedBook.length > 0) {
+        items = items.filter((item) => selectedBook.includes(item.book));
+      }
+
+      if (selectedType === "heroics" && selectedBook.length > 0) {
+        items = items.filter((item) => selectedBook.includes(item.book));
+      }
+
+      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
+        items = items.filter((item) =>
+          item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
+        );
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        items = items.filter((item) => getItemSearchText(item).includes(q));
+      }
+      return items;
+    }
+
+    // ── Official mode ─────────────────────────────────────────────────────
     if (selectedType !== "player-spells") {
-      const items = getItems(selectedType);
+      let items = getItems(selectedType);
+
+      if (selectedType === "classes") {
+        // Filter out blank classes and homebrew from official data
+        items = items.filter(c => c.name !== "Blank Class" && c.book !== "homebrew");
+        if (selectedBook.length > 0) {
+          items = items.filter((item) => selectedBook.includes(item.book));
+        }
+      }
+
+      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
+        items = items.filter((item) =>
+          item.filter && selectedQualityFilters.some(f => item.filter.includes(f))
+        );
+      }
+
+      if (selectedType === "qualities" && selectedQualityCategories.length > 0) {
+        items = items.filter((item) =>
+          item.category && selectedQualityCategories.includes(item.category)
+        );
+      }
+
+      if (selectedType === "heroics" && selectedBook.length > 0) {
+        items = items.filter((item) => selectedBook.includes(item.book));
+      }
+
+      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
+        items = items.filter((item) =>
+          item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
+        );
+      }
+
       if (!searchQuery.trim()) return items;
       const q = searchQuery.toLowerCase();
       return items.filter((item) => getItemSearchText(item).includes(q));
@@ -1922,7 +975,7 @@ function CompendiumViewer() {
         .toLowerCase()
         .includes(q)
     );
-  }, [selectedType, searchQuery, activeSpellCls, selectedSpellClass]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedSpellClass, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses]);
 
   // Stable IDs per item (index in the filtered list)
   const itemIds = useMemo(
@@ -1934,9 +987,15 @@ function CompendiumViewer() {
   const [downloadSelectedImage] = useDownloadImage(selectedItem?.name ?? "", selectedCardRef);
 
   const handleShareUrl = useCallback(async () => {
-    await navigator.clipboard.writeText(window.location.href);
+    let url = window.location.href;
+    if (IS_ELECTRON) {
+      const baseUrl = "https://fultimator.com/compendium-viewer";
+      const params = searchParams.toString();
+      url = params ? `${baseUrl}?${params}` : baseUrl;
+    }
+    await navigator.clipboard.writeText(url);
     setShareSnackOpen(true);
-  }, []);
+  }, [searchParams]);
 
   // Restore selection from URL params on mount / when filteredItems change
   useEffect(() => {
@@ -1957,9 +1016,10 @@ function CompendiumViewer() {
   const handleTypeChange = useCallback((type) => {
     setSearchQuery("");
     setSelectedIdx(null);
-    setSearchParams({ type });
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    setSearchParams({ ...base, type });
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [setSearchParams]);
+  }, [selectedCompendium, setSearchParams]);
 
   const handleSpellClassChange = useCallback((cls) => {
     setSearchQuery("");
@@ -1968,10 +1028,119 @@ function CompendiumViewer() {
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [selectedType, setSearchParams]);
 
+  const handleBookChange = useCallback((books) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    setSearchParams({ ...base, type: selectedType, ...(books.length > 0 ? { book: books.join(",") } : {}) });
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, setSearchParams]);
+
+  const handleQualityFiltersChange = useCallback((filters) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const categories = searchParams.get("qualityCategories");
+    const newParams = { ...base, type: selectedType };
+    if (filters.length > 0) newParams.qualityFilters = filters.join(",");
+    if (categories) newParams.qualityCategories = categories;
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
+
+  const handleQualityCategoriesChange = useCallback((categories) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const filters = searchParams.get("qualityFilters");
+    const newParams = { ...base, type: selectedType };
+    if (categories.length > 0) newParams.qualityCategories = categories.join(",");
+    if (filters) newParams.qualityFilters = filters;
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
+
+  const handleHeroicClassesChange = useCallback((classes) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const newParams = { ...base, type: selectedType };
+    if (classes.length > 0) newParams.heroicClasses = classes.join(",");
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, setSearchParams]);
+
+  const handleCompendiumChange = useCallback((compendium) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const defaultType = compendium !== "official" ? "weapons" : "weapons";
+    const base = compendium !== "official" ? { compendium } : {};
+    setSearchParams({ ...base, type: defaultType });
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [setSearchParams]);
+
+  const handleNewPack = useCallback(async () => {
+    if (!newPackName.trim()) return;
+    const id = await createPack(newPackName.trim());
+    setNewPackName("");
+    setPendingNavPackId(id); // navigate in onExited
+    setNewPackDialogOpen(false);
+  }, [newPackName, createPack]);
+
+  const handleRemoveFromPack = useCallback(async (item) => {
+    if (!activePack) return;
+    await removeItem(activePack.id, item._packItemId);
+    setSelectedIdx(null);
+  }, [activePack, removeItem]);
+
+  const handleExport = useCallback(async () => {
+    if (!activePack) return;
+    setExporting(true);
+    try {
+      await exportAsModule(activePack.id, exportMeta);
+    } finally {
+      setExporting(false);
+      setManageDialogOpen(false);
+    }
+  }, [activePack, exportAsModule, exportMeta]);
+
+  const handleImportFile = useCallback(async (file) => {
+    if (importing) return; // guard against re-entry via the hidden <input>
+    setImporting(true);
+    setImportError("");
+    try {
+      const id = await importFromFile(file);
+      setImportUrl("");
+      setPendingNavPackId(id); // navigate in onExited, not here
+      setImportDialogOpen(false);
+    } catch (err) {
+      setImportError(err.message ?? "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  }, [importing, importFromFile]);
+
+  const handleImportUrl = useCallback(async () => {
+    if (!importUrl.trim() || importing) return;
+    setImporting(true);
+    setImportError("");
+    try {
+      const id = await importFromManifestUrl(importUrl.trim());
+      setImportUrl("");
+      setPendingNavPackId(id); // navigate in onExited, not here
+      setImportDialogOpen(false);
+    } catch (err) {
+      setImportError(err.message ?? "Import failed");
+    } finally {
+      setImporting(false);
+    }
+  }, [importing, importUrl, importFromManifestUrl]);
+
   const handleItemClick = useCallback(
     (item, idx) => {
       setSelectedIdx(idx);
-      setSearchParams({ type: selectedType, ...(selectedSpellClass ? { class: selectedSpellClass } : {}), item: toSlug(item.name) });
+      const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+      setSearchParams({ ...base, type: selectedType, ...(selectedSpellClass ? { class: selectedSpellClass } : {}), item: toSlug(item.name) });
       const id = itemIds[idx];
       const scrollToItem = () => {
         const el = document.getElementById(id);
@@ -1984,7 +1153,7 @@ function CompendiumViewer() {
         requestAnimationFrame(scrollToItem);
       }
     },
-    [itemIds, isDesktop, selectedType, selectedSpellClass, setSearchParams]
+    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, setSearchParams]
   );
 
   const sidebarContent = (
@@ -1992,12 +1161,48 @@ function CompendiumViewer() {
       selectedType={selectedType}
       onTypeChange={handleTypeChange}
       searchQuery={searchQuery}
-      onSearchChange={(q) => { setSearchQuery(q); setSelectedIdx(null); setSearchParams({ type: selectedType, ...(selectedSpellClass ? { class: selectedSpellClass } : {}) }); }}
+      onSearchChange={(q) => {
+        setSearchQuery(q);
+        setSelectedIdx(null);
+        const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+        setSearchParams({
+          ...base,
+          type: selectedType,
+          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
+          ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
+          ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
+        });
+      }}
       filteredItems={filteredItems}
       onItemClick={handleItemClick}
       selectedIdx={selectedIdx}
       selectedSpellClass={selectedSpellClass}
       onSpellClassChange={handleSpellClassChange}
+      selectedQualityFilters={selectedQualityFilters}
+      onQualityFiltersChange={handleQualityFiltersChange}
+      selectedQualityCategories={selectedQualityCategories}
+      onQualityCategoriesChange={handleQualityCategoriesChange}
+      selectedBook={selectedBook}
+      onBookChange={handleBookChange}
+      selectedHeroicClasses={selectedHeroicClasses}
+      onHeroicClassesChange={handleHeroicClassesChange}
+      packs={packs}
+      selectedCompendium={selectedCompendium}
+      onCompendiumChange={handleCompendiumChange}
+      onNewPack={() => setNewPackDialogOpen(true)}
+      onImportPack={() => { setImportError(""); setImportTab(0); setImportUrl(""); setImportDialogOpen(true); }}
+      onManagePack={() => {
+        setEditingPackName(activePack?.name ?? "");
+        setEditingDescription(activePack?.description ?? "");
+        setEditingAuthor(activePack?.author ?? "");
+        setExportMeta({ version: "1.0.0", homepageUrl: "", manifestUrl: "", downloadUrl: "" });
+        setManageDialogOpen(true);
+      }}
+      activePack={activePack}
+      onToggleLock={toggleLock}
+      onOpenCreateDialog={() => setCreateItemDialogOpen(true)}
+      onOpenQuickCreate={() => setQuickCreateOpen(true)}
     />
   );
 
@@ -2145,6 +1350,7 @@ function CompendiumViewer() {
                         type={selectedType}
                         item={item}
                         id={itemIds[idx]}
+                        onHeaderClick={() => handleItemClick(item, idx)}
                       />
                     </Box>
                     {idx === selectedIdx && (
@@ -2160,6 +1366,31 @@ function CompendiumViewer() {
                           </IconButton>
                         </Tooltip>
                         <Export name={item.name} dataType={selectedType} data={item} />
+                        {/* Add to compendium / Clone to Custom */}
+                        {VIEWER_TO_PACK_TYPE[selectedType] && (
+                          <AddToCompendiumButton
+                            itemType={VIEWER_TO_PACK_TYPE[selectedType]}
+                            data={item}
+                            excludePackId={selectedCompendium !== "official" ? selectedCompendium : undefined}
+                            tooltipOverride={selectedType === "classes" && selectedCompendium === "official" ? t("Clone to Custom") : undefined}
+                          />
+                        )}
+                        {/* Edit class — pack mode only */}
+                        {selectedCompendium !== "official" && selectedType === "classes" && item._packItemId && !activePack?.locked && (
+                          <Tooltip title={t("Edit Class")}>
+                            <IconButton size="small" onClick={() => setEditClassItem({ item, packItemId: item._packItemId })}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {/* Remove from pack — pack mode, only when unlocked */}
+                        {selectedCompendium !== "official" && item._packItemId && !activePack?.locked && (
+                          <Tooltip title={t("Remove from pack")}>
+                            <IconButton size="small" color="error" onClick={() => handleRemoveFromPack(item)}>
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Box>
                     )}
                   </Grid>
@@ -2176,6 +1407,326 @@ function CompendiumViewer() {
         onClose={() => setShareSnackOpen(false)}
         message={t("Copied to Clipboard!")}
       />
+
+      {/* Quick Create modal */}
+      <QuickCreateModal
+        open={quickCreateOpen}
+        onClose={() => setQuickCreateOpen(false)}
+      />
+
+      {/* Create item dialog */}
+      {activePack && (
+        <CompendiumItemCreateDialog
+          open={createItemDialogOpen}
+          onClose={() => setCreateItemDialogOpen(false)}
+          itemType={VIEWER_TO_PACK_TYPE[selectedType]}
+          packId={activePack.id}
+        />
+      )}
+
+      {/* Edit class dialog */}
+      {activePack && editClassItem && (
+        <CompendiumItemCreateDialog
+          open={Boolean(editClassItem)}
+          onClose={() => setEditClassItem(null)}
+          itemType="class"
+          packId={activePack.id}
+          editData={editClassItem.item}
+          editItemId={editClassItem.packItemId}
+        />
+      )}
+
+      {/* New Pack dialog */}
+      <Dialog
+        open={newPackDialogOpen}
+        onClose={() => setNewPackDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        TransitionProps={{
+          onExited: () => {
+            if (pendingNavPackId) {
+              handleCompendiumChange(pendingNavPackId);
+              setPendingNavPackId(null);
+            }
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            background: customTheme.primary,
+            color: "#ffffff",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            fontSize: "0.95rem",
+            py: 1.25,
+          }}
+        >
+          {t("New Compendium Pack")}
+        </DialogTitle>
+        <DialogContent sx={{ pt: "16px !important" }}>
+          <TextField
+            label={t("Name")}
+            value={newPackName}
+            onChange={(e) => setNewPackName(e.target.value)}
+            autoFocus
+            fullWidth
+            size="small"
+            onKeyDown={(e) => e.key === "Enter" && handleNewPack()}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setNewPackDialogOpen(false); setNewPackName(""); }}>
+            {t("Cancel")}
+          </Button>
+          <Button variant="contained" onClick={handleNewPack} disabled={!newPackName.trim()}>
+            {t("Create")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Manage Pack dialog — rename, description, author, module meta, export */}
+      <Dialog
+        open={manageDialogOpen}
+        onClose={() => !exporting && setManageDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionProps={{
+          onExited: () => {
+            if (pendingNavPackId) {
+              handleCompendiumChange(pendingNavPackId);
+              setPendingNavPackId(null);
+            }
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            background: customTheme.primary,
+            color: "#ffffff",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            fontSize: "0.95rem",
+            py: 1.25,
+          }}
+        >
+          {activePack?.name}
+        </DialogTitle>
+        <DialogContent sx={{ pt: "16px !important", display: "flex", flexDirection: "column", gap: 2 }}>
+          {activePack && !activePack.isPersonal && (
+            <TextField
+              label={t("Pack name")}
+              value={editingPackName}
+              onChange={(e) => setEditingPackName(e.target.value)}
+              fullWidth
+              size="small"
+            />
+          )}
+          <TextField
+            label={t("Description")}
+            value={editingDescription}
+            onChange={(e) => setEditingDescription(e.target.value)}
+            fullWidth
+            size="small"
+            multiline
+            rows={2}
+          />
+          <TextField
+            label={t("Author")}
+            value={editingAuthor}
+            onChange={(e) => setEditingAuthor(e.target.value)}
+            fullWidth
+            size="small"
+          />
+
+          <Divider>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+              {t("Module Export")}
+            </Typography>
+          </Divider>
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <TextField
+              label={t("Version")}
+              value={exportMeta.version}
+              onChange={(e) => setExportMeta((m) => ({ ...m, version: e.target.value }))}
+              size="small"
+              sx={{ width: 120 }}
+              placeholder="1.0.0"
+            />
+            <TextField
+              label={t("Homepage URL")}
+              value={exportMeta.homepageUrl}
+              onChange={(e) => setExportMeta((m) => ({ ...m, homepageUrl: e.target.value }))}
+              fullWidth
+              size="small"
+              placeholder="https://..."
+            />
+          </Box>
+          <TextField
+            label={t("Manifest URL")}
+            value={exportMeta.manifestUrl}
+            onChange={(e) => setExportMeta((m) => ({ ...m, manifestUrl: e.target.value }))}
+            fullWidth
+            size="small"
+            placeholder="https://.../manifest.json"
+          />
+          <TextField
+            label={t("Download URL")}
+            value={exportMeta.downloadUrl}
+            onChange={(e) => setExportMeta((m) => ({ ...m, downloadUrl: e.target.value }))}
+            fullWidth
+            size="small"
+            placeholder="https://.../pack.fcp"
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "space-between" }}>
+          {activePack && !activePack.isPersonal && (
+            <Button
+              color="error"
+              disabled={exporting}
+              onClick={async () => {
+                await deletePack(activePack.id);
+                setPendingNavPackId("official"); // navigate in onExited
+                setManageDialogOpen(false);
+              }}
+            >
+              {t("Delete Pack")}
+            </Button>
+          )}
+          <Box sx={{ display: "flex", gap: 1, ml: "auto" }}>
+            <Button
+              startIcon={exporting ? <CircularProgress size={16} color="inherit" /> : <IosShareIcon />}
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              {t("Export")}
+            </Button>
+            <Button onClick={() => setManageDialogOpen(false)} disabled={exporting}>
+              {t("Cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              disabled={exporting || (!activePack?.isPersonal && !editingPackName.trim())}
+              onClick={async () => {
+                if (!activePack) return;
+                const changes = {
+                  ...(!activePack.isPersonal ? { name: editingPackName.trim() } : {}),
+                  description: editingDescription.trim() || undefined,
+                  author: editingAuthor.trim() || undefined,
+                };
+                await updatePack(activePack.id, changes);
+                setManageDialogOpen(false);
+              }}
+            >
+              {t("Save")}
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Pack dialog */}
+      <Dialog
+        open={importDialogOpen}
+        onClose={() => !importing && setImportDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        TransitionProps={{
+          onExited: () => {
+            // Navigate only after focus trap + backdrop are fully unmounted
+            if (pendingNavPackId) {
+              handleCompendiumChange(pendingNavPackId);
+              setPendingNavPackId(null);
+            }
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            background: customTheme.primary,
+            color: "#ffffff",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+            fontSize: "0.95rem",
+            py: 1.25,
+          }}
+        >
+          {t("Import Pack")}
+        </DialogTitle>
+        <DialogContent sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: 2 }}>
+          <Tabs value={importTab} onChange={(_, v) => { setImportTab(v); setImportError(""); }}>
+            <Tab label={t("Upload .fcp file")} />
+            <Tab label={t("From URL")} icon={<LinkIcon fontSize="small" />} iconPosition="end" />
+          </Tabs>
+
+          {importTab === 0 && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {t("Select a .fcp file exported from Fultimator.")}
+              </Typography>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<FileUploadIcon />}
+                disabled={importing}
+              >
+                {t("Choose file")}
+                <input
+                  type="file"
+                  accept=".fcp,.zip"
+                  hidden
+                  disabled={importing}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImportFile(file);
+                    e.target.value = "";
+                  }}
+                />
+              </Button>
+              {importing && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={16} />
+                  <Typography variant="body2">{t("Importing…")}</Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+
+          {importTab === 1 && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {t("Paste a manifest.json URL to download and import the pack.")}
+              </Typography>
+              <TextField
+                label={t("Manifest URL")}
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                fullWidth
+                size="small"
+                placeholder="https://.../manifest.json"
+                disabled={importing}
+                onKeyDown={(e) => e.key === "Enter" && handleImportUrl()}
+              />
+            </Box>
+          )}
+
+          {importError && <Alert severity="error">{importError}</Alert>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImportDialogOpen(false)} disabled={importing}>
+            {t("Cancel")}
+          </Button>
+          {importTab === 1 && (
+            <Button
+              variant="contained"
+              onClick={handleImportUrl}
+              disabled={importing || !importUrl.trim()}
+              startIcon={importing ? <CircularProgress size={16} color="inherit" /> : <FileUploadIcon />}
+            >
+              {t("Import")}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }

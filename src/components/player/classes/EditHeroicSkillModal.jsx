@@ -60,6 +60,14 @@ export default function EditHeroicSkillModal({
           margin="normal"
           inputProps={{ maxLength: 50 }}
         />
+        <TextField
+          label={t("Quote")}
+          value={heroic.quote || ""}
+          onChange={(e) => setHeroic({ ...heroic, quote: e.target.value })}
+          fullWidth
+          margin="normal"
+          inputProps={{ maxLength: 200 }}
+        />
         <CustomTextarea
           label={t("Description")}
           fullWidth

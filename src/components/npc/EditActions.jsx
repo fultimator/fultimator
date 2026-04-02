@@ -6,13 +6,16 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
+import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 
 export default function EditActions({ npc, setNpc }) {
   const { t } = useTranslate();
+  const [modalOpen, setModalOpen] = useState(false);
   const onChangeActions = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -47,7 +50,7 @@ export default function EditActions({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" addItem={addActions} headerText={t("Other Actions")} icon={Add} />
+      <CustomHeader type="top" addItem={addActions} headerText={t("Other Actions")} icon={Add} openCompendium={() => setModalOpen(true)} />
       {npc.actions?.map((actions, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -105,6 +108,20 @@ export default function EditActions({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <CompendiumViewerModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        context="npc"
+        initialType="actions"
+        onAddItem={(item) => {
+          setNpc((prev) => {
+            const newState = { ...prev };
+            if (!newState.actions) newState.actions = [];
+            newState.actions.push({ name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 });
+            return newState;
+          });
+        }}
+      />
     </>
   );
 }

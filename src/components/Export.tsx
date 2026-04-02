@@ -3,6 +3,7 @@ import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
 import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
 import { useTranslate } from "../translation/translate";
+import { buildItemText } from "../libs/buildItemText";
 
 type Props = {
   name?: string;
@@ -54,6 +55,13 @@ function Export({ name = "", dataType, data = {} }: Props) {
     handleCloseExportMenu();
   }
 
+  async function handleCopyText(fmt: string) {
+    const text = buildItemText(dataType, data, fmt);
+    await navigator.clipboard.writeText(text);
+    handleCloseExportMenu();
+    handleSnackbarOpen();
+  }
+
   return (
     <>
       <Tooltip title={t("Export")}>
@@ -82,6 +90,11 @@ function Export({ name = "", dataType, data = {} }: Props) {
         >
           {t("copy_json_clipboard")}
         </MenuItem>
+        <MenuItem onClick={() => handleCopyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>
+        <MenuItem onClick={() => handleCopyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>
+        {dataType === "npc" && (
+          <MenuItem onClick={() => handleCopyText("obsidian")}>{t("Copy Obsidian (BlueCorvid) to Clipboard")}</MenuItem>
+        )}
       </Menu>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

@@ -75,15 +75,16 @@ function Home() {
       hoverKey: "items_rituals_projects",
     },
     {
-      image: dice_roller,
-      link: "/roller",
-      hoverKey: "dice_roller",
-    },
-    {
       image: compendium_viewer,
       link: "/compendium-viewer",
       hoverKey: "compendium_viewer",
     },
+    {
+      image: dice_roller,
+      link: "/roller",
+      hoverKey: "dice_roller",
+    },
+
   ];
 
   return (

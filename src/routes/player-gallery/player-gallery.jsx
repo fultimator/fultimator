@@ -50,7 +50,7 @@ import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGal
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
 import { validateCharacter } from "../../utility/validateJson";
-import { SUPPORTS_LOCAL_DB } from "../../platform";
+import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -544,7 +544,10 @@ function Personal() {
   };
 
   const sharePlayer = async (id) => {
-    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    if (IS_ELECTRON) {
+      baseUrl = "https://fultimator.com";
+    }
     const fullUrl = `${baseUrl}/pc-gallery/${id}`;
     await navigator.clipboard.writeText(fullUrl);
     setOpen(true);

@@ -28,6 +28,8 @@ import { fixVerticalLabels } from "../../utility/screenshotFix";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const [download] = useDownload();
   let params = useParams();
   const isMobile = useMediaQuery('(max-width:600px)');
   const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);

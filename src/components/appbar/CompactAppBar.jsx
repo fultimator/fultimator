@@ -10,7 +10,7 @@ import { ArrowBack, Search } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import { useNpc } from "../npc/NpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
-import EditCompendiumModal from "../npc/EditCompendiumModal";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { t } from "../../translation/translate";
 
 const NpcEditAppBar = ({
@@ -66,12 +66,12 @@ const NpcEditAppBar = ({
           </Grid>
         </Grid>
       </Container>
-      <EditCompendiumModal
-        typeName="spells"
+      <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
-        onSave={(selectedItem) => {
-          console.log("Selected Item from Compendium Modal:", selectedItem);
+        context="npc"
+        onAddItem={(item, type) => {
+          console.log("Selected Item from Compendium Modal:", item, type);
         }}
       />
     </MuiAppBar>
@@ -120,13 +120,12 @@ const PcEditAppBar = ({
           </Grid>
         </Grid>
       </Container>
-      <EditCompendiumModal
-        typeName="spells"
+      <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
-        onSave={(selectedItem) => {
-          console.log("Selected Item from Compendium Modal:", selectedItem);
-          // Add snackbar when item successfully added
+        context="player"
+        onAddItem={(item, type) => {
+          console.log("Selected Item from Compendium Modal:", item, type);
         }}
       />
     </MuiAppBar>

@@ -91,6 +91,7 @@ export interface Skills {
 
 export interface HeroicSkills {
     name: string,
+    quote: string,
     description: string
 }
 

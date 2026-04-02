@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useTheme } from "@mui/material/styles";
 import { Paper, Grid, Button, Divider } from "@mui/material";
 import { UploadFile } from "@mui/icons-material";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import { useTranslate } from "../../../translation/translate";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import CustomHeader from "../../common/CustomHeader";
@@ -15,6 +16,7 @@ import PlayerCustomWeaponModal from "./customWeapons/PlayerCustomWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
+import EquipmentCompendiumModal from "./EquipmentCompendiumModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 
@@ -42,6 +44,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [openNewAccessory, setOpenNewAccessory] = React.useState(false);
   const [editAccessoryIndex, setEditAccessoryIndex] = React.useState(null);
   const [accessory, setAccessory] = React.useState(null);
+
+  const [openEquipmentCompendium, setOpenEquipmentCompendium] = React.useState(false);
 
   // FILE UPLOAD
   const fileInputRef = useRef(null);
@@ -163,6 +167,61 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const handleAddAccessory = (newAccessory) => {
     const updatedAccessories = [...(player.accessories || []), newAccessory];
     setPlayer({ ...player, accessories: updatedAccessories });
+  };
+
+  const handleImportFromCompendium = (equipType, itemData) => {
+    if (equipType === "weapon") {
+      handleAddWeapon({
+        base: itemData,
+        name: itemData.name,
+        category: itemData.category || "",
+        melee: itemData.melee || false,
+        ranged: !itemData.melee,
+        type: itemData.type,
+        hands: itemData.hands,
+        att1: itemData.att1,
+        att2: itemData.att2,
+        martial: itemData.martial || false,
+        damageBonus: false,
+        damageReworkBonus: false,
+        precBonus: false,
+        rework: false,
+        quality: "",
+        qualityCost: 0,
+        totalBonus: 0,
+        selectedQuality: "",
+        cost: itemData.cost || 0,
+        damage: itemData.damage || 0,
+        prec: itemData.prec || 0,
+        isEquipped: false,
+      });
+    } else if (equipType === "armor") {
+      handleAddArmor({
+        base: itemData,
+        name: itemData.name,
+        quality: "",
+        martial: itemData.martial || false,
+        qualityCost: 0,
+        selectedQuality: "",
+        init: itemData.init || 0,
+        rework: false,
+        cost: itemData.cost || 0,
+        isEquipped: false,
+      });
+    } else if (equipType === "shield") {
+      handleAddShield({
+        base: itemData,
+        name: itemData.name,
+        quality: "",
+        martial: itemData.martial || false,
+        qualityCost: 0,
+        selectedQuality: "",
+        init: itemData.init || 0,
+        rework: false,
+        cost: itemData.cost || 0,
+        isEquipped: false,
+      });
+    }
   };
 
   // DELETE
@@ -430,7 +489,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Accessory")}
                   </Button>
                 </Grid>
-                <Grid item xs={12} container justifyContent="center">
+                <Grid item xs={6} sm="auto" container justifyContent="center">
                   <Button
                     variant="outlined"
                     onClick={handleUploadJSON}
@@ -438,6 +497,16 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     size="small"
                   >
                     {t("Upload JSON")}
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm="auto" container justifyContent="center">
+                  <Button
+                    variant="outlined"
+                    onClick={() => setOpenEquipmentCompendium(true)}
+                    startIcon={<LibraryAddIcon />}
+                    size="small"
+                  >
+                    {t("Import from Pack")}
                   </Button>
                 </Grid>
               </Grid>
@@ -544,6 +613,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         accessory={accessory}
         onAddAccessory={handleSaveAccessory}
         onDeleteAccessory={handleDeleteAccessory}
+      />
+
+      <EquipmentCompendiumModal
+        open={openEquipmentCompendium}
+        onClose={() => setOpenEquipmentCompendium(false)}
+        onSave={handleImportFromCompendium}
       />
     </>
   );

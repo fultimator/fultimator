@@ -56,6 +56,7 @@ import JSZip from "jszip";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { buildItemText } from "../../libs/buildItemText";
 import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
 import ExportAllNPCs from "../../components/common/ExportAllNPCs";
@@ -63,7 +64,7 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
-import { SUPPORTS_LOCAL_DB } from "../../platform";
+import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -331,6 +332,7 @@ function Personal() {
 
   const [copyAnchor, setCopyAnchor] = useState(null);
   const [moveAnchor, setMoveAnchor] = useState(null);
+  const [exportAnchor, setExportAnchor] = useState(null);
 
   // ── Bulk cross-DB copy / move ────────────────────────────────────────────────
 
@@ -427,6 +429,15 @@ function Personal() {
     URL.revokeObjectURL(url);
   };
 
+  const copySelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const separator = fmt === "obsidian" ? "\n\n" : "\n\n---\n\n";
+    const text = selected.map((npc) => buildItemText("npc", npc, fmt)).join(separator);
+    await navigator.clipboard.writeText(text);
+    setExportAnchor(null);
+    notify(t("Copied to Clipboard!"));
+  };
+
   const downloadSelectedAsImages = () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     selected.forEach((npc, i) => {
@@ -447,7 +458,10 @@ function Personal() {
   };
 
   const shareNpc = async (id) => {
-    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    if (IS_ELECTRON) {
+      baseUrl = "https://fultimator.com";
+    }
     await navigator.clipboard.writeText(`${baseUrl}/npc-gallery/${id}`);
     notify(t("Copied to Clipboard!"));
   };
@@ -770,11 +784,26 @@ function Personal() {
               </Tooltip>
               <Tooltip title={`${t("export_selected_npcs_button")} (${selectedIds.size})`}>
                 <span>
-                  <IconButton onClick={exportSelectedAsJSON} disabled={selectedIds.size === 0}>
+                  <IconButton onClick={(e) => setExportAnchor(e.currentTarget)} disabled={selectedIds.size === 0}>
                     <Download />
                   </IconButton>
                 </span>
               </Tooltip>
+              <MuiMenu anchorEl={exportAnchor} open={Boolean(exportAnchor)} onClose={() => setExportAnchor(null)}>
+                <MenuItem disabled={selectedIds.size === 0} onClick={exportSelectedAsJSON}>
+                  <ListItemText primary={t("export_json_file")} />
+                </MenuItem>
+                <Divider />
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("markdown")}>
+                  <ListItemText primary={t("Copy as Markdown")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("plain")}>
+                  <ListItemText primary={t("Copy as Plaintext")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("obsidian")}>
+                  <ListItemText primary={t("Copy as Obsidian (fu-vault)")} />
+                </MenuItem>
+              </MuiMenu>
               <Tooltip title={`${t("Download Selected as Images")} (${selectedIds.size})`}>
                 <span>
                   <IconButton onClick={downloadSelectedAsImages} disabled={selectedIds.size === 0}>
