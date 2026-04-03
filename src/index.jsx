@@ -57,7 +57,7 @@ const Resources = React.lazy(() =>
   import("./routes/resources/resources")
 );
 const CompendiumViewer = React.lazy(() =>
-  import("./routes/compendium-viewer/compendium-viewer")
+  import("./routes/compendium/compendium")
 );
 
 const themes = {
@@ -184,7 +184,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/compendium-viewer"
+                path="/compendium"
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <CompendiumViewer />

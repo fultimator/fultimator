@@ -989,7 +989,7 @@ function CompendiumViewer() {
   const handleShareUrl = useCallback(async () => {
     let url = window.location.href;
     if (IS_ELECTRON) {
-      const baseUrl = "https://fultimator.com/compendium-viewer";
+      const baseUrl = "https://fultimator.com/compendium";
       const params = searchParams.toString();
       url = params ? `${baseUrl}?${params}` : baseUrl;
     }

@@ -76,7 +76,7 @@ function Home() {
     },
     {
       image: compendium_viewer,
-      link: "/compendium-viewer",
+      link: "/compendium",
       hoverKey: "compendium_viewer",
     },
     {

@@ -39,7 +39,7 @@ import {
   getItemSearchText,
   makeId,
   getNonStaticSpellItems,
-} from "../../routes/compendium-viewer/compendium-viewer";
+} from "../../routes/compendium/compendium";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
 import QuickCreateModal from "./QuickCreateModal";
