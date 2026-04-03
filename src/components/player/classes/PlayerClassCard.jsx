@@ -24,6 +24,7 @@ import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
 import { firestore, query, orderBy, collection, where, getDocs } from "@platform/db";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function PlayerClassCard({
   allClasses,
@@ -66,6 +67,8 @@ export default function PlayerClassCard({
   const [description, setDescription] = useState("");
   const [specialSkill, setSpecialSkill] = useState("");
   const [warnings, setWarnings] = useState([]);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const [heroic, setHeroic] = useState({
     name: classItem.heroic ? classItem.heroic.name : "",
@@ -379,7 +382,7 @@ export default function PlayerClassCard({
           <>
             <Grid item xs={12}>
               <CustomHeader2
-                headerText={`${t(classItem.name)} ${t("Free Benefits")}`}
+                headerText={`${t(classItem.name)} ${t("Free Benefits")} `}
                 buttonText={t("Edit Benefits")}
                 onButtonClick={() => setOpenEditBenefitsModal(true)}
                 isEditMode={isEditMode}
@@ -620,14 +623,7 @@ export default function PlayerClassCard({
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => {
-                  const confirmed = window.confirm(
-                    t("Are you sure you want to remove the class?")
-                  );
-                  if (confirmed) {
-                    onRemove();
-                  }
-                }}
+                onClick={() => setDeleteDialogOpen(true)}
                 sx={{ marginTop: "30px", fontSize: "0.9em" }}
               >
                 {t("Remove Class")}
@@ -714,6 +710,21 @@ export default function PlayerClassCard({
         onSave={handleSaveCompanion}
         companionList={companionList}
         setSelectedCompanion={setSelectedCompanion}
+      />
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={onRemove}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to remove this class?")}
+        itemPreview={
+          <Box>
+            <Typography variant="h4">{t(classItem.name)}</Typography>
+            <Typography variant="body2">
+              {t("Level")} {classItem.lvl}
+            </Typography>
+          </Box>
+        }
       />
     </Paper>
   );

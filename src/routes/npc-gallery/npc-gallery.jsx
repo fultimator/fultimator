@@ -8,11 +8,6 @@ import {
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   IconButton,
   ListItemIcon,
@@ -39,8 +34,6 @@ import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 import {
-  ContentCopy,
-  ContentPaste,
   Delete,
   Download,
   DriveFileMove,
@@ -51,6 +44,7 @@ import {
   PhotoLibrary,
   Share,
   UploadFile,
+  ContentPaste,
 } from "@mui/icons-material";
 import JSZip from "jszip";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -68,6 +62,7 @@ import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -105,6 +100,11 @@ function Personal() {
   const db = useDatabase();
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
+
+  // Deletion confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [npcToDelete, setNpcToDelete] = useState(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   const [personalList, loading, err] = db.useCollectionData(
     db.query(
@@ -218,7 +218,11 @@ function Personal() {
     }
   };
 
-  const deleteNpc = (npc) => () => setDeleteTarget(npc);
+  const deleteNpc = (npc) => () => {
+    setNpcToDelete(npc);
+    setIsBulkDelete(false);
+    setDeleteDialogOpen(true);
+  };
 
   // ── Cross-DB copy ────────────────────────────────────────────────────────────
 
@@ -292,16 +296,6 @@ function Personal() {
   const [snackMsg, setSnackMsg] = useState(null);
   const notify = (msg) => setSnackMsg(msg);
 
-  const [deleteTarget, setDeleteTarget] = useState(null);
-
-  const handleDeleteConfirm = () => {
-    const npc = deleteTarget;
-    setDeleteTarget(null);
-    db.deleteDoc(db.doc("npc-personal", npc.id))
-      .then(() => notify(t("NPC deleted")))
-      .catch(() => notify(t("Failed to delete NPC")));
-  };
-
   // ── Select mode ─────────────────────────────────────────────────────────────
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -323,11 +317,8 @@ function Personal() {
   };
 
   const deleteSelected = async () => {
-    if (!window.confirm(`Delete ${selectedIds.size} NPC(s)?`)) return;
-    for (const id of selectedIds) {
-      await db.deleteDoc(db.doc("npc-personal", id));
-    }
-    setSelectedIds(new Set());
+    setIsBulkDelete(true);
+    setDeleteDialogOpen(true);
   };
 
   const [copyAnchor, setCopyAnchor] = useState(null);
@@ -958,22 +949,39 @@ function Personal() {
         message={snackMsg}
       />
 
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t("Delete NPC")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("Are you sure you want to delete")} <strong>{deleteTarget?.name}</strong>?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)} variant="contained" color="secondary">
-            {t("Cancel")}
-          </Button>
-          <Button onClick={handleDeleteConfirm} variant="contained" color="error">
-            {t("Delete")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          if (isBulkDelete) {
+            for (const id of selectedIds) {
+              await db.deleteDoc(db.doc("npc-personal", id));
+            }
+            setSelectedIds(new Set());
+            notify(t("NPCs deleted"));
+          } else if (npcToDelete) {
+            await db.deleteDoc(db.doc("npc-personal", npcToDelete.id));
+            setNpcToDelete(null);
+            notify(t("NPC deleted"));
+          }
+        }}
+        title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
+        message={
+          isBulkDelete
+            ? t("Are you sure you want to delete {count} NPC(s)?").replace("{count}", String(selectedIds.size))
+            : t("Are you sure you want to delete this NPC?")
+        }
+        itemPreview={
+          !isBulkDelete && npcToDelete && (
+            <Box>
+              <Typography variant="h4">{npcToDelete.name}</Typography>
+              <Typography variant="body2">
+                {t("Level")} {npcToDelete.lvl} - {t(npcToDelete.species)}
+              </Typography>
+            </Box>
+          )
+        }
+      />
     </>
   );
 }

@@ -12,6 +12,7 @@ import {
   Grid,
   Typography,
   Divider,
+  Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import weapons from "../../../../libs/weapons";
@@ -33,6 +34,7 @@ import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PrettyWeapon from "./PrettyWeapon";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerWeaponModal({
   open,
@@ -76,6 +78,8 @@ export default function PlayerWeaponModal({
     clearModifiers,
   } = useEquipmentForm(weapon);
   const fileInputRef = useRef(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
@@ -291,13 +295,7 @@ export default function PlayerWeaponModal({
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(t("delete_equipment_confirm"));
-    if (confirmDelete) {
-      if (editWeaponIndex !== null) {
-        onDeleteWeapon(editWeaponIndex);
-      }
-      onClose();
-    }
+    setDeleteDialogOpen(true);
   };
 
   const handleClearFields = () => {
@@ -331,6 +329,7 @@ export default function PlayerWeaponModal({
   }, [damageReworkBonus, cost, qualityCost, rework]);
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -581,7 +580,7 @@ export default function PlayerWeaponModal({
       <DialogActions>
         {editWeaponIndex !== null && (
           <Button
-            onClick={() => handleDelete(editWeaponIndex)}
+            onClick={handleDelete}
             color="error"
             variant="contained"
           >
@@ -600,5 +599,26 @@ export default function PlayerWeaponModal({
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        if (editWeaponIndex !== null) {
+          onDeleteWeapon(editWeaponIndex);
+        }
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this weapon?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="body2">
+            {t(category)} - {cost} {t("zenit")}
+          </Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -74,6 +75,12 @@ function Personal() {
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+
+  // Deletion confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [playerToDelete, setPlayerToDelete] = useState(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
+
   const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
@@ -359,12 +366,8 @@ function Personal() {
   };
 
   const deleteSelected = async () => {
-    if (!window.confirm(`Delete ${selectedIds.size} player(s)?`)) return;
-    for (const id of selectedIds) {
-      await db.deleteDoc(db.doc("player-personal", id));
-    }
-    setSelectedIds(new Set());
-    fetchData();
+    setIsBulkDelete(true);
+    setDeleteDialogOpen(true);
   };
 
   const copySelectedToLocal = async () => {
@@ -529,9 +532,9 @@ function Personal() {
 
   const deletePlayer = function (player) {
     return function () {
-      if (window.confirm("Are you sure you want to delete?")) {
-        db.deleteDoc(db.doc("player-personal", player.id));
-      }
+      setPlayerToDelete(player);
+      setIsBulkDelete(false);
+      setDeleteDialogOpen(true);
     };
   };
 
@@ -849,6 +852,37 @@ function Personal() {
         </Grid>
       </Grid>
       <Box sx={{ height: "10vh" }} />
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          if (isBulkDelete) {
+            for (const id of selectedIds) {
+              await db.deleteDoc(db.doc("player-personal", id));
+            }
+            setSelectedIds(new Set());
+          } else if (playerToDelete) {
+            await db.deleteDoc(db.doc("player-personal", playerToDelete.id));
+            setPlayerToDelete(null);
+          }
+        }}
+        title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
+        message={
+          isBulkDelete
+            ? t("Are you sure you want to delete {count} player(s)?").replace("{count}", String(selectedIds.size))
+            : t("Are you sure you want to delete this player?")
+        }
+        itemPreview={
+          !isBulkDelete && playerToDelete && (
+            <Box>
+              <Typography variant="h4">{playerToDelete.name}</Typography>
+              <Typography variant="body2">
+                {t("Level")} {playerToDelete.lvl} - {playerToDelete.info?.identity}
+              </Typography>
+            </Box>
+          )
+        }
+      />
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

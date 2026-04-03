@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import qualities from "../../../../routes/equip/Accessories/qualities";
@@ -24,6 +25,7 @@ import PrettyAccessory from "./PrettyAccessory";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerAccessoryModal({
   open,
@@ -57,6 +59,8 @@ export default function PlayerAccessoryModal({
   } = useEquipmentForm(accessory);
 
   const fileInputRef = useRef(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setName(accessory?.name || "");
@@ -129,18 +133,12 @@ export default function PlayerAccessoryModal({
     onAddAccessory(updatedAccessory);
   };
 
-  const handleDelete = async (accIndex) => {
-    const confirmed = window.confirm(t("Are you sure you want to delete this accessory?"));
-
-    if (confirmed) {
-      if (accIndex !== null) {
-        onDeleteAccessory(accIndex); // Call the delete function if confirmed
-      }
-      onClose(); // Close the dialog or perform any necessary cleanup
-    }
+  const handleDelete = async () => {
+    setDeleteDialogOpen(true);
   };
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -309,7 +307,7 @@ export default function PlayerAccessoryModal({
       </DialogContent>
       <DialogActions>
         {editAccIndex !== null && (
-          <Button onClick={() => handleDelete(editAccIndex)} color="error" variant="contained" >
+          <Button onClick={handleDelete} color="error" variant="contained" >
             {t("Delete")}
           </Button>
         )}
@@ -322,5 +320,26 @@ export default function PlayerAccessoryModal({
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        if (editAccIndex !== null) {
+          onDeleteAccessory(editAccIndex);
+        }
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this accessory?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="body2">
+            {cost} {t("zenit")}
+          </Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

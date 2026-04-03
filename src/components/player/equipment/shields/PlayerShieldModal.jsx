@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import shields from "../../../../libs/shields";
@@ -27,6 +28,7 @@ import ChangeModifiers from "../ChangeModifiers";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerShieldModal({
   open,
@@ -64,6 +66,8 @@ export default function PlayerShieldModal({
   } = useEquipmentForm(shield);
 
   const fileInputRef = useRef(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setBase(shield?.base || shields[0]);
@@ -175,19 +179,12 @@ export default function PlayerShieldModal({
     onAddShield(updatedShield);
   };
 
-  const handleDelete = async (shieldIndex) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this shield?"
-    );
-    if (confirmDelete) {
-      if (shieldIndex !== null) {
-        onDeleteShield(shieldIndex);
-      }
-      onClose();
-    }
+  const handleDelete = async () => {
+    setDeleteDialogOpen(true);
   };
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -385,7 +382,7 @@ export default function PlayerShieldModal({
       <DialogActions>
         {editShieldIndex !== null && (
           <Button
-            onClick={() => handleDelete(editShieldIndex)}
+            onClick={handleDelete}
             color="error"
             variant="contained"
           >
@@ -397,5 +394,26 @@ export default function PlayerShieldModal({
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        if (editShieldIndex !== null) {
+          onDeleteShield(editShieldIndex);
+        }
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this shield?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="body2">
+            {t("Shield")} - {cost} {t("zenit")}
+          </Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

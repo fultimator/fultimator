@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import armor from "../../../../libs/armor";
@@ -27,6 +28,7 @@ import PrettyArmor from "./PrettyArmor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerArmorModal({
   open,
@@ -64,6 +66,8 @@ export default function PlayerArmorModal({
   } = useEquipmentForm(armorPlayer);
 
   const fileInputRef = useRef(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setBase(armorPlayer?.base || armor[0]);
@@ -175,19 +179,12 @@ export default function PlayerArmorModal({
     onAddArmor(updatedArmor);
   };
 
-  const handleDelete = async (armorIndex) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this armor?"
-    );
-    if (confirmDelete) {
-      if (armorIndex !== null) {
-        onDeleteArmor(armorIndex);
-      }
-      onClose();
-    }
+  const handleDelete = async () => {
+    setDeleteDialogOpen(true);
   };
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -385,7 +382,7 @@ export default function PlayerArmorModal({
       <DialogActions>
         {editArmorIndex !== null && (
           <Button
-            onClick={() => handleDelete(editArmorIndex)}
+            onClick={handleDelete}
             color="error"
             variant="contained"
           >
@@ -397,5 +394,26 @@ export default function PlayerArmorModal({
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        if (editArmorIndex !== null) {
+          onDeleteArmor(editArmorIndex);
+        }
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this armor?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="body2">
+            {t("Armor")} - {cost} {t("zenit")}
+          </Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

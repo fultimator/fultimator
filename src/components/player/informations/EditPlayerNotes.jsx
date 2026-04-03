@@ -13,12 +13,14 @@ import {
   DialogContentText,
   DialogTitle,
   Typography,
+  Box,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
 import { Add } from "@mui/icons-material";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -29,6 +31,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   const [selectedNoteIndex, setSelectedNoteIndex] = useState(null);
   const [clockName, setClockName] = useState("");
   const [clockSections, setClockSections] = useState(4);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [noteToDeleteIndex, setNoteToDeleteIndex] = useState(null);
 
   const handleNoteNameChange = (key) => (e) => {
     setPlayer((prevState) => {
@@ -47,16 +52,8 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   };
 
   const removeItem = (key) => async () => {
-    const confirmDelete = window.confirm(
-      t("Are you sure you want to delete this note?")
-    );
-    if (confirmDelete) {
-      setPlayer((prevState) => {
-        const newState = { ...prevState };
-        newState.notes.splice(key, 1);
-        return newState;
-      });
-    }
+    setNoteToDeleteIndex(key);
+    setDeleteDialogOpen(true);
   };
 
   const handleAddClock = (index) => {
@@ -286,6 +283,31 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
           </Button>
         </DialogActions>
       </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          if (noteToDeleteIndex !== null) {
+            setPlayer((prevState) => {
+              const newState = { ...prevState };
+              newState.notes.splice(noteToDeleteIndex, 1);
+              return newState;
+            });
+          }
+          setNoteToDeleteIndex(null);
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to delete this note?")}
+        itemPreview={
+          noteToDeleteIndex !== null && (
+            <Box>
+              <Typography variant="h4">
+                {player.notes[noteToDeleteIndex].name || t("Untitled Note")}
+              </Typography>
+            </Box>
+          )
+        }
+      />
     </Paper>
   );
 }
