@@ -6,7 +6,6 @@ import {
   Grid,
   Divider,
   Fab,
-  Fade,
   Tooltip,
   IconButton,
   Paper,
@@ -84,11 +83,6 @@ export default function NpcEdit() {
 
   const { cloudUser: user } = useDatabaseContext();
   const [showScrollTop, setShowScrollTop] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 300);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
@@ -157,28 +151,13 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
-  // Effect for scroll, focus, and blur events, and keyboard shortcuts
+  // Effect for scroll and keyboard shortcuts
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
-
-    const handleFocus = () => {
-      setShowScrollTop(false);
-    };
-
-    const handleBlur = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
-
+    const handleScroll = () => setShowScrollTop(window.scrollY > 200);
     window.addEventListener("scroll", handleScroll);
-    document.body.addEventListener("focus", handleFocus, true);
-    document.body.addEventListener("blur", handleBlur, true);
     document.addEventListener("keydown", handleCtrlS);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      document.body.removeEventListener("focus", handleFocus, true);
-      document.body.removeEventListener("blur", handleBlur, true);
       document.removeEventListener("keydown", handleCtrlS);
     };
   }, [handleCtrlS]);
@@ -573,36 +552,29 @@ export default function NpcEdit() {
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* Save Button, shown if there are unsaved changes */}
         {isUpdated && (
-          <Grid
-            style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}
-          >
-            <Fade in={showScrollTop} timeout={300}>
-              <Tooltip title="Save" placement="bottom">
-                <Fab
-                  color="primary"
-                  aria-label="save"
-                  onClick={() => {
-                    setIsUpdated(false);
-                    activeSetDoc(ref, npcTemp);
-                  }}
-                  disabled={!isUpdated}
-                  size="medium"
-                  style={{ marginLeft: "5px" }}
-                >
-                  <Save />
-                </Fab>
-              </Tooltip>
-            </Fade>
-          </Grid>
+          <Tooltip title="Save" placement="left">
+            <Fab
+              color="primary"
+              aria-label="save"
+              size="medium"
+              sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
+              onClick={() => {
+                setIsUpdated(false);
+                activeSetDoc(ref, npcTemp);
+              }}
+            >
+              <Save />
+            </Fab>
+          </Tooltip>
         )}
 
         {showScrollTop && (
-          <Tooltip title={t("Scroll to top")}>
+          <Tooltip title={t("Scroll to top")} placement="left">
             <Fab
-              size="small"
+              size="medium"
               color="primary"
               onClick={handleMoveToTop}
-              sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+              sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
             >
               <KeyboardArrowUp />
             </Fab>

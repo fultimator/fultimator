@@ -18,6 +18,7 @@ import PlayerNotes from "./PlayerNotes";
 import PlayerBonds from "./PlayerBonds";
 import PlayerVehicle from "./PlayerVehicle";
 import PlayerCompanion from "./PlayerCompanion";
+import CompactLoadout from "./CompactLoadout";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { calculateAttribute } from "../../common/playerCalculations";
 import { isItemEquipped } from "../../equipment/slots/equipmentSlots";
@@ -339,7 +340,7 @@ export default function PlayerCardSheet({
                 {/* Tab Panels */}
                 <CustomTabPanel value={value} index={0}>
                     <PlayerBonds player={player} isCharacterSheet={true} />
-                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
+                    <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} withEquipment isMainTab={true} searchQuery={searchQuery} />
                     <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
@@ -350,6 +351,7 @@ export default function PlayerCardSheet({
                     <PlayerSpells player={player} setPlayer={setPlayer} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={3}>
+                    <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} isMainTab={false} searchQuery={searchQuery} />
                     <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
                     <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
                     <PlayerCompanion player={player} isCharacterSheet={true} />

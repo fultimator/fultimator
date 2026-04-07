@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/DatabaseContext";
@@ -13,7 +13,6 @@ import {
   ListItemText,
   Box,
   Grid,
-  Fade,
   Tooltip,
   Typography,
   Fab,
@@ -270,6 +269,24 @@ export default function PlayerEdit() {
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
   const isOwner = isLocalPlayer || Boolean(user && player && user.uid === player.uid);
+
+  const handleCtrlS = useCallback(
+    (e) => {
+      if (e.ctrlKey && e.key === "s") {
+        e.preventDefault();
+        if (isOwner) {
+          setIsUpdated(false);
+          activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
+        }
+      }
+    },
+    [ref, playerTemp, isOwner]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleCtrlS);
+    return () => document.removeEventListener("keydown", handleCtrlS);
+  }, [handleCtrlS]);
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -773,27 +790,20 @@ export default function PlayerEdit() {
       </Tabs>
       {/* Save Button, shown if there are unsaved changes */}
       {isUpdated && isOwner && (
-        <Grid style={{ position: "fixed", bottom: 20, right: 10, zIndex: 100 }}>
-          <Fade in={showScrollTop} timeout={300}>
-            <Tooltip title="Save" placement="bottom">
-              <Fab
-                color="primary"
-                aria-label="save"
-                onClick={() => {
-                  setIsUpdated(false);
-                  activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
-                }}
-                disabled={!isUpdated}
-                size="medium"
-                style={{
-                  marginLeft: "5px",
-                }}
-              >
-                <Save />
-              </Fab>
-            </Tooltip>
-          </Fade>
-        </Grid>
+        <Tooltip title="Save" placement="left">
+          <Fab
+            color="primary"
+            aria-label="save"
+            onClick={() => {
+              setIsUpdated(false);
+              activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
+            }}
+            size="medium"
+            sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
+          >
+            <Save />
+          </Fab>
+        </Tooltip>
       )}
       <HelpFeedbackDialog
         open={isBugDialogOpen}
@@ -806,12 +816,12 @@ export default function PlayerEdit() {
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
       {showScrollTop && (
-        <Tooltip title={t("Scroll to top")}>
+        <Tooltip title={t("Scroll to top")} placement="left">
           <Fab
-            size="small"
+            size="medium"
             color="primary"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+            sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
           >
             <KeyboardArrowUp />
           </Fab>

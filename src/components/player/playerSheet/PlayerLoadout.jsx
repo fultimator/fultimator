@@ -17,6 +17,8 @@ import { useTranslate } from '../../../translation/translate';
 import { useCustomTheme } from '../../../hooks/useCustomTheme';
 import attributes from '../../../libs/attributes';
 import { resolveEffectiveSlot, getActiveVehicle, syncSlots, isItemEquipped } from '../equipment/slots/equipmentSlots';
+import { availableFrames } from '../../../libs/pilotVehicleData';
+import { getModuleTypeForLimits } from '../spells/vehicleReducer';
 import { calculateAttribute, calculateCustomWeaponStats } from '../common/playerCalculations';
 import SlotPickerDialog from '../equipment/slots/SlotPickerDialog';
 import SpellPilotVehiclesModal from '../spells/SpellPilotVehiclesModal';
@@ -68,7 +70,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
   const isEmpty = !resolved;
 
   const itemName = (() => {
-    if (isVehicle) return resolved.module.customName || resolved.module.name;
+    if (isVehicle) return resolved.module.customName || t(resolved.module.name);
     const item = resolved?.item;
     if (!item) return null;
     if ('accuracyCheck' in item && item.activeForm === 'secondary') {
@@ -211,9 +213,9 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
             <Typography variant="caption" color="text.secondary" fontWeight={700}>{label}</Typography>
             <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
           </Box>
-          <Typography variant="body2" fontWeight={600} noWrap>{module.customName || module.name}</Typography>
+          <Typography variant="body2" fontWeight={600} noWrap>{module.customName || t(module.name)}</Typography>
           {module.description && (
-            <Typography variant="caption" color="text.secondary" noWrap>{module.description.slice(0, 50)}</Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>{(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 50)}</Typography>
           )}
         </>
       ) : (
@@ -354,6 +356,18 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
 
   const activeVehicle = getActiveVehicle(player);
   const vs = player?.vehicleSlots;
+
+  const vehicleModuleUsage = activeVehicle ? (() => {
+    const frame = availableFrames.find(f => f.name === activeVehicle.frame) ?? { limits: { weapon: 2, armor: 1, support: -1 } };
+    const counts = { weapon: 0, armor: 0, support: 0 };
+    for (const m of activeVehicle.modules ?? []) {
+      if (!m.equipped) continue;
+      const type = getModuleTypeForLimits(m);
+      if (type === 'custom') continue;
+      counts[type] += (type === 'support' && m.isComplex) ? 2 : 1;
+    }
+    return { counts, limits: frame.limits };
+  })() : null;
 
   // Return all equipped modules for a loadout slot's type, including their original index.
   const getEquippedModulesForSlot = (slot) => {
@@ -687,13 +701,34 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {activeVehicle && (
           <>
             <Divider sx={{ my: 1.5 }}>
-              <Chip
-                icon={<PrecisionManufacturingIcon />}
-                label={activeVehicle.customName || t('Vehicle')}
-                size="small"
-                color="success"
-                variant="outlined"
-              />
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Chip
+                  icon={<PrecisionManufacturingIcon />}
+                  label={activeVehicle.customName || t('Vehicle')}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
+                {vehicleModuleUsage && [
+                  { key: 'weapon', label: t('Weapon') },
+                  { key: 'armor', label: t('Armor') },
+                  { key: 'support', label: t('Support') },
+                ].map(({ key, label }) => {
+                  const used = vehicleModuleUsage.counts[key];
+                  const max = vehicleModuleUsage.limits[key];
+                  const over = max !== -1 && used > max;
+                  return (
+                    <Chip
+                      key={key}
+                      label={`${label}: ${used}/${max === -1 ? '∞' : max}`}
+                      size="small"
+                      color={over ? 'error' : 'success'}
+                      variant={over ? 'filled' : 'outlined'}
+                      sx={{ fontSize: '0.7rem', height: 22 }}
+                    />
+                  );
+                })}
+              </Box>
             </Divider>
             <Grid container spacing={1}>
               {vehicleAccessoryModule && (
@@ -908,7 +943,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                       </ListItemIcon>
                       <ListItemText
                         primary={m.customName || t(m.name)}
-                        secondary={m.isComplex ? `${t('Complex')} - ${m.description?.slice(0, 40) || ''}` : m.description?.slice(0, 50) || ''}
+                        secondary={m.isComplex ? `${t('Complex')} - ${(m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 40)}` : (m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 50)}
                         primaryTypographyProps={{ variant: 'body2', fontWeight: m.enabled ? 700 : 400 }}
                         secondaryTypographyProps={{ variant: 'caption' }}
                       />
