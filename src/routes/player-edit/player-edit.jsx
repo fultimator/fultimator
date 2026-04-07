@@ -223,7 +223,7 @@ export default function PlayerEdit() {
     if (player) {
       // Perform a deep copy of the player object
       const updatedPlayerTemp = JSON.parse(JSON.stringify(player));
-      setPlayerTemp(updatedPlayerTemp);
+      setPlayerTemp(applyPostLoadTransforms(updatedPlayerTemp));
       setIsUpdated(false);
     }
   }, [player]);

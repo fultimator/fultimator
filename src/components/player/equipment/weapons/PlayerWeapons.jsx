@@ -152,7 +152,7 @@ export default function PlayerWeapons({
                       {checkIfEquippable(weapon) ? (
                         <Tooltip title={tooltipTitle}>
                           <Badge
-                            badgeContent={equippedSlot === 'mainHand' ? 'M' : equippedSlot === 'offHand' ? 'O' : null}
+                            badgeContent={equippedSlot === 'mainHand' ? (isTwoHand ? 'M+O' : 'M') : equippedSlot === 'offHand' ? 'O' : null}
                             color="primary"
                             invisible={!weapon.isEquipped || !equippedSlot}
                             sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
