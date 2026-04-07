@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Box, List } from "@mui/material";
+import { Box, List, Typography, Divider } from "@mui/material";
+import PcListItem from "./selectedNpcs/PcListItem";
 import {
   DndContext,
   closestCenter,
@@ -39,6 +40,13 @@ export default function SelectedNpcs({
   onSortEnd = null, // Function to handle sorting end (function)
   onClockClick, // Function to handle clock button click (function)
   onNotesClick, // Function to handle notes button click (function)
+  // PC props
+  selectedPCs = [],
+  handleRemovePC,
+  handlePcClick,
+  handleHpMpClickPC,
+  handleUpdatePcTurns,
+  selectedPcID,
 }) {
   const [anchorMenu, setAnchorMenu] = useState(null); // Anchor element for the menu
   const [selectedNpcMenu, setSelectedNpcMenu] = useState(null); // ID of the selected NPC for the menu
@@ -116,7 +124,7 @@ export default function SelectedNpcs({
           flexGrow: 1,
           overflowY: "auto",
           paddingTop: 1,
-          ...(selectedNPCs.length === 0 && {
+          ...(selectedNPCs.length === 0 && selectedPCs.length === 0 && {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -125,48 +133,80 @@ export default function SelectedNpcs({
           }),
         }}
       >
-        {selectedNPCs.length === 0 ? (
+        {selectedNPCs.length === 0 && selectedPCs.length === 0 ? (
           <EmptyList isMobile={isMobile} showIcon={true} />
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={selectedNPCs.map((npc) => npc.combatId)}
-              strategy={verticalListSortingStrategy}
+          <>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              <List>
-                {selectedNPCs.map((npc, index) => (
-                  <NpcListItem
-                    key={npc.combatId}
-                    npc={npc}
-                    index={index}
-                    selectedNpcID={selectedNpcID}
-                    handleListItemClick={handleListItemClick}
-                    handlePopoverOpen={handlePopoverOpen}
-                    handlePopoverClose={handlePopoverClose}
-                    handleUpdateNpcTurns={handleUpdateNpcTurns}
-                    handleMenuOpen={handleMenuOpen}
-                    handleMenuClose={handleMenuClose}
-                    handleMoveUp={handleMoveUp}
-                    handleMoveDown={handleMoveDown}
-                    handleRemoveNPC={handleRemoveNPC}
-                    anchorEl={anchorEl}
-                    anchorMenu={anchorMenu}
-                    popoverNpcId={popoverNpcId}
-                    selectedNpcMenu={selectedNpcMenu}
-                    isMobile={isMobile}
-                    getTurnCount={getTurnCount}
-                    handleHpMpClick={handleHpMpClick}
-                    selectedNPCs={selectedNPCs}
-                    useDragAndDrop={useDragAndDrop}
-                  />
-                ))}
-              </List>
-            </SortableContext>
-          </DndContext>
+              <SortableContext
+                items={selectedNPCs.map((npc) => npc.combatId)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List>
+                  {selectedNPCs.map((npc, index) => (
+                    <NpcListItem
+                      key={npc.combatId}
+                      npc={npc}
+                      index={index}
+                      selectedNpcID={selectedNpcID}
+                      handleListItemClick={handleListItemClick}
+                      handlePopoverOpen={handlePopoverOpen}
+                      handlePopoverClose={handlePopoverClose}
+                      handleUpdateNpcTurns={handleUpdateNpcTurns}
+                      handleMenuOpen={handleMenuOpen}
+                      handleMenuClose={handleMenuClose}
+                      handleMoveUp={handleMoveUp}
+                      handleMoveDown={handleMoveDown}
+                      handleRemoveNPC={handleRemoveNPC}
+                      anchorEl={anchorEl}
+                      anchorMenu={anchorMenu}
+                      popoverNpcId={popoverNpcId}
+                      selectedNpcMenu={selectedNpcMenu}
+                      isMobile={isMobile}
+                      getTurnCount={getTurnCount}
+                      handleHpMpClick={handleHpMpClick}
+                      selectedNPCs={selectedNPCs}
+                      useDragAndDrop={useDragAndDrop}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+
+            {/* PC Section */}
+            {selectedPCs.length > 0 && (
+              <>
+                {selectedNPCs.length > 0 && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, my: 1 }}>
+                    <Divider sx={{ flex: 1 }} />
+                    <Typography variant="caption" color="text.secondary">
+                      PCs
+                    </Typography>
+                    <Divider sx={{ flex: 1 }} />
+                  </Box>
+                )}
+                <List>
+                  {selectedPCs.map((pc, index) => (
+                    <PcListItem
+                      key={pc.combatId}
+                      pc={pc}
+                      index={index}
+                      selectedPcID={selectedPcID}
+                      handleListItemClick={handlePcClick}
+                      handleRemovePC={handleRemovePC}
+                      handleHpMpClick={handleHpMpClickPC}
+                      handleUpdatePcTurns={handleUpdatePcTurns}
+                      isMobile={isMobile}
+                    />
+                  ))}
+                </List>
+              </>
+            )}
+          </>
         )}
       </Box>
     </>

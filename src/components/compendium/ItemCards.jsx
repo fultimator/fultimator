@@ -193,14 +193,16 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
         </Grid>
 
         {/* Row 3 – quality */}
-        <Box sx={{ px: 1, py: 0.75 }}>
+        <Box>
           <Typography variant="body2">
             {!weapon.quality ? (
-              t("No Qualities")
+              // t("No Qualities")
+              ""
             ) : (
               <StyledMarkdown
                 allowedElements={["strong", "em"]}
                 unwrapDisallowed
+                 sx={{ px: 1, py: 0.75 }}
               >
                 {weapon.quality}
               </StyledMarkdown>
