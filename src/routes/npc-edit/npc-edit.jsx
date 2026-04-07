@@ -19,7 +19,7 @@ import {
   Download,
   Save,
   Share,
-  ArrowUpward,
+  KeyboardArrowUp,
   ContentCopy,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
@@ -83,7 +83,12 @@ export default function NpcEdit() {
   const activeCollection = (_, path) => db.collection(path);
 
   const { cloudUser: user } = useDatabaseContext();
-  const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
@@ -591,19 +596,18 @@ export default function NpcEdit() {
           </Grid>
         )}
 
-        {/* Move to Top Button */}
-        <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
-          <Fade in={showScrollTop} timeout={300}>
+        {showScrollTop && (
+          <Tooltip title={t("Scroll to top")}>
             <Fab
+              size="small"
               color="primary"
-              aria-label="move-to-top"
               onClick={handleMoveToTop}
-              size="medium"
+              sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
             >
-              <ArrowUpward />
+              <KeyboardArrowUp />
             </Fab>
-          </Fade>
-        </Grid>
+          </Tooltip>
+        )}
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openShareSnackbar}

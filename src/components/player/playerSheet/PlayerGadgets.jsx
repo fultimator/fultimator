@@ -247,37 +247,35 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       setPlayer({ ...player });
     }
   
-    // Check if player already has a Magicannon
-    const weapons = player.weapons || [];
+    const inv = player.equipment?.[0] || {};
+    const weapons = inv.weapons || [];
     const hasMagicannon = weapons.some(weapon => weapon.magicannon === true);
   
+    let updatedInv = { ...inv };
+
     if (hasMagicannon) {
       // Delete the existing Magicannon
-      setPlayer(prevPlayer => ({
-        ...prevPlayer,
-        weapons: prevPlayer.weapons ? prevPlayer.weapons.filter(weapon => !weapon.magicannon) : []
-      }));
+      updatedInv.weapons = weapons.filter(weapon => !weapon.magicannon);
     }
   
     if (equipMagicannon) {
       // Unequip any currently equipped weapons or shields
-      setPlayer(prevPlayer => ({
-        ...prevPlayer,
-        weapons: prevPlayer.weapons ? prevPlayer.weapons.map(weapon => ({
-          ...weapon,
-          isEquipped: false
-        })) : [],
-        shields: prevPlayer.shields ? prevPlayer.shields.map(shield => ({
-          ...shield,
-          isEquipped: false
-        })) : []
+      updatedInv.weapons = (updatedInv.weapons || []).map(weapon => ({
+        ...weapon,
+        isEquipped: false
+      }));
+      updatedInv.shields = (updatedInv.shields || []).map(shield => ({
+        ...shield,
+        isEquipped: false
       }));
     }
   
     // Add Magicannon weapon to the player weapons
-    setPlayer(prevPlayer => ({
-      ...prevPlayer,
-      weapons: [...(prevPlayer.weapons || []), magicannonItem]
+    updatedInv.weapons = [...(updatedInv.weapons || []), magicannonItem];
+  
+    setPlayer(syncSlots({
+      ...player,
+      equipment: [updatedInv, ...(player.equipment?.slice(1) ?? [])]
     }));
   
     // Close modal

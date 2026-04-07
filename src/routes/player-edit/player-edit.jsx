@@ -84,6 +84,9 @@ import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
 import PlayerDance from "../../components/player/playerSheet/PlayerDance";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 import { fixVerticalLabels } from "../../utility/screenshotFix";
+import { isItemEquipped } from '../../components/player/equipment/slots/equipmentSlots';
+import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
+import PlayerLoadout from '../../components/player/playerSheet/PlayerLoadout';
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -129,7 +132,7 @@ export default function PlayerEdit() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 100); // adjust threshold as needed
+      setShowScrollTop(window.scrollY > 300);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -227,12 +230,21 @@ export default function PlayerEdit() {
   }, [player]);
 
   useEffect(() => {
-    if (!deepEqual(playerTemp, player)) {
+    if (!deepEqual(playerTemp ? applyPreSaveTransforms(playerTemp) : playerTemp, player)) {
       setIsUpdated(true);
     } else {
       setIsUpdated(false);
     }
   }, [playerTemp, player]);
+
+  // After loading player into playerTemp, run post-load transforms (migration + rehydration).
+  useEffect(() => {
+    if (!playerTemp) return;
+    const transformed = applyPostLoadTransforms(playerTemp);
+    if (!deepEqual(transformed, playerTemp)) {
+      setPlayerTemp(transformed);
+    }
+  }, [playerTemp?.id]); // run only when a new player is loaded, not on every change
 
   // Warn user when leaving the page with unsaved changes
   useEffect(() => {
@@ -351,21 +363,26 @@ export default function PlayerEdit() {
             skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
         )
       );
+      
+      const inv = playerTemp.equipment?.[0];
       const equippedShields =
-        playerTemp.shields?.filter((shield) => shield.isEquipped) || [];
+        inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
 
       if (!hasDualShieldBearer && equippedShields.length > 1) {
         // Unequip all shields but the first one
         setPlayerTemp((prevPlayer) => {
-          const newShields = prevPlayer.shields.map((shield, index) => ({
+          const inv = prevPlayer.equipment?.[0];
+          if (!inv) return prevPlayer;
+          const newShields = inv.shields.map((shield, index) => ({
             ...shield,
             isEquipped:
-              index === prevPlayer.shields.findIndex((s) => s.isEquipped),
+              index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
           }));
 
+          const updatedInv = { ...inv, shields: newShields };
           return {
             ...prevPlayer,
-            shields: newShields,
+            equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
           };
         });
       }
@@ -566,6 +583,11 @@ export default function PlayerEdit() {
               ) : null}
               {battleMode && (
                 <>
+                  <PlayerLoadout
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isOwner}
+                  />
                   <PlayerEquipment
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
@@ -759,7 +781,7 @@ export default function PlayerEdit() {
                 aria-label="save"
                 onClick={() => {
                   setIsUpdated(false);
-                  activeSetDoc(ref, playerTemp);
+                  activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
                 }}
                 disabled={!isUpdated}
                 size="medium"
@@ -783,6 +805,18 @@ export default function PlayerEdit() {
         onSuccess={null}
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
       {snackbar}
     </Layout>
   );

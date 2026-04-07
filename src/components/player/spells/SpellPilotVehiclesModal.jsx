@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Box,
   Grid,
   FormControl,
   InputLabel,
@@ -313,14 +314,31 @@ export default function SpellPilotVehiclesModal({
                     </Grid>
 
                     <Grid item xs={12} sm={4}>
-                      <Button
-                        onClick={() => handleDeleteVehicle(vehicleIndex)}
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Delete />}
-                      >
-                        {t("pilot_vehicles_remove")}
-                      </Button>
+                      <Box display="flex" gap={1}>
+                        <Button
+                          onClick={() => handleDeleteVehicle(vehicleIndex)}
+                          variant="outlined"
+                          color="error"
+                          startIcon={<Delete />}
+                          sx={{ flexShrink: 0 }}
+                        >
+                          {t("pilot_vehicles_remove")}
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            handleVehicleChange(
+                              vehicleIndex,
+                              "enabled",
+                              !vehicle.enabled
+                            )
+                          }
+                          variant={vehicle.enabled ? "contained" : "outlined"}
+                          color={vehicle.enabled ? "success" : "primary"}
+                          sx={{ flexGrow: 1 }}
+                        >
+                          {vehicle.enabled ? "Active" : "Enable"}
+                        </Button>
+                      </Box>
                     </Grid>
 
                     <Grid item xs={12}>

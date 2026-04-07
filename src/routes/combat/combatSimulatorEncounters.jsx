@@ -21,6 +21,7 @@ import {
   // ListItemText,
   // Menu as MuiMenu,
   // MenuItem,
+  Fab,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -30,7 +31,7 @@ import Layout from "../../components/Layout";
 import { useTheme } from "@mui/material/styles";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import SettingsDialog from "../../components/combatSim/SettingsDialog";
-import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts } from "@mui/icons-material";
+import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts, KeyboardArrowUp } from "@mui/icons-material";
 import { t } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import EncounterCard from "../../components/combatSim/EncounterCard";
@@ -91,6 +92,13 @@ const CombatSimEncounters = () => {
   useEffect(() => {
     fetchEncounters();
   }, [fetchEncounters, location.key]);
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const [encounters, setEncounters] = useState([]);
   const [encounterName, setEncounterName] = useState("");
@@ -474,6 +482,18 @@ const CombatSimEncounters = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </Box>
   );
 };

@@ -31,6 +31,7 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -45,6 +46,7 @@ import {
   Share,
   Download,
   Report,
+  KeyboardArrowUp,
 } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 
@@ -98,6 +100,13 @@ function Personal({ user }) {
     name: "",
     author: "",
   });
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
@@ -625,6 +634,18 @@ function Personal({ user }) {
         onClose={handleClose}
         message={t("Copied to Clipboard!")}
       />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }

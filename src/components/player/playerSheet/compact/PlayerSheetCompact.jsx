@@ -20,6 +20,7 @@ import PlayerVehicle from "./PlayerVehicle";
 import PlayerCompanion from "./PlayerCompanion";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { calculateAttribute } from "../../common/playerCalculations";
+import { isItemEquipped } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -93,23 +94,24 @@ export default function PlayerCardSheet({
     );
 
     /* player.armor.isEquipped (should be only one) */
-    const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
+    const inv = player.equipment?.[0];
+    const equippedArmor = inv?.armor?.find((armor) => isItemEquipped(player, armor)) || null;
 
     /* player.shields.isEquipped (should be only one) */
     const equippedShield =
-        player.shields?.find((shield) => shield.isEquipped) || null;
+        inv?.shields?.find((shield) => isItemEquipped(player, shield)) || null;
 
     /* player.weapons.isEquipped (can be more than one) */
     const equippedWeapons =
-        player.weapons?.filter((weapon) => weapon.isEquipped) || [];
+        inv?.weapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
 
     /* player.customWeapons.isEquipped (can be more than one) */
     const equippedCustomWeapons =
-        player.customWeapons?.filter((weapon) => weapon.isEquipped) || [];
+        inv?.customWeapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
 
     /* player.accessories.isEquipped (should be only one) */
     const equippedAccessory =
-        player.accessories?.find((accessory) => accessory.isEquipped) || null;
+        inv?.accessories?.find((accessory) => isItemEquipped(player, accessory)) || null;
 
     const currDex = calculateAttribute(
         player,

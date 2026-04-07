@@ -134,11 +134,11 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
               justifyContent="space-between"
               alignItems="center"
               sx={{
-                p: 1,
+                p: 0.5,
                 background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
-                  fontSize: "1.2rem",
+                  fontSize: { xs: "0.6rem", sm: "1.0rem" },
                   textTransform: "uppercase",
                 },
               }}
@@ -169,13 +169,13 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
               <Grid
                 item
                 sx={{
-                  flex: "0 0 70px",
-                  minWidth: "70px",
-                  minHeight: "70px",
+                  flex: "0 0 60px",
+                  minWidth: "60px",
+                  minHeight: "60px",
                   background2,
                 }}
               >
-                <EditableImage size={70} />
+                <EditableImage size={60} />
               </Grid>
 
               <Grid container direction="column" item xs>
@@ -187,7 +187,10 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
-                    padding: "5px",
+                    padding: "2px 5px",
+                    "& .MuiTypography-root": {
+                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
+                    },
                   }}
                 >
                   <Grid
@@ -236,7 +239,10 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                   sx={{
                     background: "transparent",
                     borderBottom: `1px solid ${theme.secondary}`,
-                    padding: "5px",
+                    padding: "2px 5px",
+                    "& .MuiTypography-root": {
+                      fontSize: { xs: "0.7rem", sm: "1.0rem" },
+                    },
                   }}
                 >
                   <Grid item xs={3}>
@@ -272,7 +278,7 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
               sx={{
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
-                padding: "5px",
+                padding: "2px 5px",
               }}
             >
               <Grid item xs={12} sx={{ textAlign: "center" }}>

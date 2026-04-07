@@ -19,6 +19,7 @@ import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
 import EquipmentCompendiumModal from "./EquipmentCompendiumModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
+import { syncSlots, deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -47,6 +48,23 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const [openEquipmentCompendium, setOpenEquipmentCompendium] = React.useState(false);
 
+  const inv = player.equipment?.[0] || {};
+
+  // Helper: update one source array inside equipment[0] and return a new player.
+  const patchInv = (p, source, updater) => {
+    const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
+    const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
+    return { ...p, equipment };
+  };
+
+  // For add/edit/delete operations: preserve existing equippedSlots (only clear slots
+  // whose items no longer exist), then refresh vehicleSlots. Do NOT re-derive
+  // equippedSlots from isEquipped flags — that would unequip items when saving edits.
+  const preserveSlots = (p) => {
+    const validated = validateSlots(p);
+    return { ...validated, vehicleSlots: deriveVehicleSlots(validated) };
+  };
+
   // FILE UPLOAD
   const fileInputRef = useRef(null);
 
@@ -55,10 +73,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       switch (data.dataType) {
         case "weapon":
           if (data.customizations) {
-            // This is a custom weapon
             handleAddCustomWeapon(data);
           } else {
-            // This is a regular weapon
             handleAddWeapon(data);
           }
           break;
@@ -145,28 +161,28 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   // ADD NEW
   const handleAddWeapon = (newWeapon) => {
-    const updatedWeapons = [...(player.weapons || []), newWeapon];
-    setPlayer({ ...player, weapons: updatedWeapons });
+    const updated = patchInv(player, 'weapons', arr => [...arr, newWeapon]);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleAddCustomWeapon = (newCustomWeapon) => {
-    const updatedCustomWeapons = [...(player.customWeapons || []), newCustomWeapon];
-    setPlayer({ ...player, customWeapons: updatedCustomWeapons });
+    const updated = patchInv(player, 'customWeapons', arr => [...arr, newCustomWeapon]);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleAddArmor = (newArmor) => {
-    const updatedArmors = [...(player.armor || []), newArmor];
-    setPlayer({ ...player, armor: updatedArmors });
+    const updated = patchInv(player, 'armor', arr => [...arr, newArmor]);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleAddShield = (newShields) => {
-    const updatedShields = [...(player.shields || []), newShields];
-    setPlayer({ ...player, shields: updatedShields });
+    const updated = patchInv(player, 'shields', arr => [...arr, newShields]);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleAddAccessory = (newAccessory) => {
-    const updatedAccessories = [...(player.accessories || []), newAccessory];
-    setPlayer({ ...player, accessories: updatedAccessories });
+    const updated = patchInv(player, 'accessories', arr => [...arr, newAccessory]);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleImportFromCompendium = (equipType, itemData) => {
@@ -226,59 +242,57 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   // DELETE
   const handleDeleteWeapon = (index) => {
-    const updatedWeapons = (player.weapons || []).filter((_, i) => i !== index);
-    setPlayer({ ...player, weapons: updatedWeapons });
+    const updated = patchInv(player, 'weapons', arr => arr.filter((_, i) => i !== index));
+    setPlayer(preserveSlots(updated));
   };
 
   const handleDeleteCustomWeapon = (index) => {
-    const updatedCustomWeapons = (player.customWeapons || []).filter((_, i) => i !== index);
-    setPlayer({ ...player, customWeapons: updatedCustomWeapons });
+    const updated = patchInv(player, 'customWeapons', arr => arr.filter((_, i) => i !== index));
+    setPlayer(preserveSlots(updated));
   };
 
   const handleDeleteArmor = (index) => {
-    const updatedArmors = (player.armor || []).filter((_, i) => i !== index);
-    setPlayer({ ...player, armor: updatedArmors });
+    const updated = patchInv(player, 'armor', arr => arr.filter((_, i) => i !== index));
+    setPlayer(preserveSlots(updated));
   };
 
   const handleDeleteShield = (index) => {
-    const updatedShields = (player.shields || []).filter((_, i) => i !== index);
-    setPlayer({ ...player, shields: updatedShields });
+    const updated = patchInv(player, 'shields', arr => arr.filter((_, i) => i !== index));
+    setPlayer(preserveSlots(updated));
   };
 
   const handleDeleteAccessory = (index) => {
-    const updatedAccessories = (player.accessories || []).filter(
-      (_, i) => i !== index
-    );
-    setPlayer({ ...player, accessories: updatedAccessories });
+    const updated = patchInv(player, 'accessories', arr => arr.filter((_, i) => i !== index));
+    setPlayer(preserveSlots(updated));
   };
 
   // EDIT
   const handleEditWeapon = (index) => {
-    setWeapon(player.weapons[index]);
+    setWeapon(inv.weapons[index]);
     setEditWeaponIndex(index);
     setOpenNewWeapon(true);
   };
 
   const handleEditCustomWeapon = (index) => {
-    setCustomWeapon(player.customWeapons[index]);
+    setCustomWeapon(inv.customWeapons[index]);
     setEditCustomWeaponIndex(index);
     setOpenNewCustomWeapon(true);
   };
 
   const handleEditArmor = (index) => {
-    setArmor(player.armor[index]);
+    setArmor(inv.armor[index]);
     setEditArmorIndex(index);
     setOpenNewArmor(true);
   };
 
   const handleEditShield = (index) => {
-    setShields(player.shields[index]);
+    setShields(inv.shields[index]);
     setEditShieldIndex(index);
     setOpenNewShields(true);
   };
 
   const handleEditAccessory = (index) => {
-    setAccessory(player.accessories[index]);
+    setAccessory(inv.accessories[index]);
     setEditAccessoryIndex(index);
     setOpenNewAccessory(true);
   };
@@ -286,10 +300,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   // SAVE
   const handleSaveWeapon = (updatedWeapon) => {
     if (editWeaponIndex !== null) {
-      const updatedWeapons = (player.weapons || []).map((weapon, i) =>
-        i === editWeaponIndex ? updatedWeapon : weapon
-      );
-      setPlayer({ ...player, weapons: updatedWeapons });
+      const updated = patchInv(player, 'weapons', arr => arr.map((weapon, i) => i === editWeaponIndex ? updatedWeapon : weapon));
+      setPlayer(preserveSlots(updated));
     } else {
       handleAddWeapon(updatedWeapon);
     }
@@ -298,10 +310,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const handleSaveCustomWeapon = (updatedCustomWeapon) => {
     if (editCustomWeaponIndex !== null) {
-      const updatedCustomWeapons = (player.customWeapons || []).map((customWeapon, i) =>
-        i === editCustomWeaponIndex ? updatedCustomWeapon : customWeapon
-      );
-      setPlayer({ ...player, customWeapons: updatedCustomWeapons });
+      const updated = patchInv(player, 'customWeapons', arr => arr.map((customWeapon, i) => i === editCustomWeaponIndex ? updatedCustomWeapon : customWeapon));
+      setPlayer(preserveSlots(updated));
     } else {
       handleAddCustomWeapon(updatedCustomWeapon);
     }
@@ -310,10 +320,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const handleSaveArmor = (updatedArmor) => {
     if (editArmorIndex !== null) {
-      const updatedArmors = (player.armor || []).map((armor, i) =>
-        i === editArmorIndex ? updatedArmor : armor
-      );
-      setPlayer({ ...player, armor: updatedArmors });
+      const updated = patchInv(player, 'armor', arr => arr.map((armor, i) => i === editArmorIndex ? updatedArmor : armor));
+      setPlayer(preserveSlots(updated));
     } else {
       handleAddArmor(updatedArmor);
     }
@@ -322,10 +330,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const handleSaveShield = (updatedShield) => {
     if (editShieldIndex !== null) {
-      const updatedShields = (player.shields || []).map((shield, i) =>
-        i === editShieldIndex ? updatedShield : shield
-      );
-      setPlayer({ ...player, shields: updatedShields });
+      const updated = patchInv(player, 'shields', arr => arr.map((shield, i) => i === editShieldIndex ? updatedShield : shield));
+      setPlayer(preserveSlots(updated));
     } else {
       handleAddShield(updatedShield);
     }
@@ -334,11 +340,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const handleSaveAccessory = (updatedAccessory) => {
     if (editAccessoryIndex !== null) {
-      const updatedAccessories = (player.accessories || []).map(
-        (accessory, i) =>
-          i === editAccessoryIndex ? updatedAccessory : accessory
-      );
-      setPlayer({ ...player, accessories: updatedAccessories });
+      const updated = patchInv(player, 'accessories', arr => arr.map((accessory, i) => i === editAccessoryIndex ? updatedAccessory : accessory));
+      setPlayer(preserveSlots(updated));
     } else {
       handleAddAccessory(updatedAccessory);
     }
@@ -346,70 +349,129 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   };
 
   // TOGGLE EQUIPPED
-  const handleEquipWeapon = (updatedWeapons) => {
-    // PlayerWeapons passes the full updated weapons array
-    let updatedCustomWeapons = player.customWeapons || [];
-    
-    // Check if any weapon is being equipped for the first time
-    const previousWeapons = player.weapons || [];
-    const newlyEquippedWeapon = updatedWeapons.find((weapon, index) => {
-      const previousWeapon = previousWeapons[index];
-      return weapon.isEquipped && (!previousWeapon || !previousWeapon.isEquipped);
-    });
-    
-    // If a weapon is being equipped (not just unequipped), unequip all custom weapons
-    if (newlyEquippedWeapon) {
-      updatedCustomWeapons = updatedCustomWeapons.map(cw => ({ ...cw, isEquipped: false }));
+
+  // Equip an item to a specific slot, displacing the current occupant.
+  const equipToSlot = (source, itemName, slot, isTwoHand) => {
+    let updated = player;
+
+    // Clear current occupant of the target slot
+    const currentRef = updated.equippedSlots?.[slot];
+    if (currentRef) {
+      updated = patchInv(updated, currentRef.source, arr =>
+        arr.map(it => it.name === currentRef.name ? { ...it, isEquipped: false } : it)
+      );
     }
-    
-    setPlayer({ 
-      ...player, 
-      weapons: updatedWeapons,
-      customWeapons: updatedCustomWeapons 
+
+    // 2H in mainHand also clears offHand
+    if (isTwoHand && slot === 'mainHand') {
+      const offRef = updated.equippedSlots?.offHand;
+      if (offRef) {
+        updated = patchInv(updated, offRef.source, arr =>
+          arr.map(it => it.name === offRef.name ? { ...it, isEquipped: false } : it)
+        );
+      }
+    }
+
+    // Equip the item
+    updated = patchInv(updated, source, arr =>
+      arr.map(it => it.name === itemName ? { ...it, isEquipped: true } : it)
+    );
+
+    const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
+    setPlayer({
+      ...updated,
+      equippedSlots: {
+        ...prevSlots,
+        [slot]: { source, name: itemName },
+        ...(isTwoHand && slot === 'mainHand' ? { offHand: null } : {}),
+      },
+      vehicleSlots: deriveVehicleSlots(updated),
     });
   };
 
-  const handleEquipCustomWeapon = (updatedCustomWeapons, updatedWeapons, updatedShields) => {
-    // Custom weapons are always two-handed, so when equipping one, unequip all other weapons
-    const updatedPlayer = { ...player, customWeapons: updatedCustomWeapons };
-    
-    // If we need to update other equipment types
-    if (updatedWeapons) {
-      updatedPlayer.weapons = updatedWeapons;
+  // Unequip an item by clearing whichever slot it currently occupies.
+  const unequipItem = (source, itemName) => {
+    const slots = player.equippedSlots ?? {};
+    const slotKey = Object.keys(slots).find(k => {
+      const ref = slots[k];
+      return ref?.source === source && ref?.name === itemName;
+    });
+
+    let updated = patchInv(player, source, arr =>
+      arr.map(it => it.name === itemName ? { ...it, isEquipped: false } : it)
+    );
+
+    if (slotKey) {
+      const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
+      setPlayer({
+        ...updated,
+        equippedSlots: { ...prevSlots, [slotKey]: null },
+        vehicleSlots: deriveVehicleSlots(updated),
+      });
+    } else {
+      setPlayer(preserveSlots(updated));
     }
-    if (updatedShields) {
-      updatedPlayer.shields = updatedShields;
-    }
-    
-    setPlayer(updatedPlayer);
+  };
+
+  const handleEquipWeapon = (index, slot) => {
+    const weapon = (inv.weapons ?? [])[index];
+    if (!weapon) return;
+    equipToSlot('weapons', weapon.name, slot, weapon.hands === 2 || weapon.isTwoHand);
+  };
+
+  const handleUnequipWeapon = (index) => {
+    const weapon = (inv.weapons ?? [])[index];
+    if (!weapon) return;
+    unequipItem('weapons', weapon.name);
+  };
+
+  const handleEquipCustomWeapon = (index) => {
+    const cw = (inv.customWeapons ?? [])[index];
+    if (!cw) return;
+    equipToSlot('customWeapons', cw.name, 'mainHand', true);
+  };
+
+  const handleUnequipCustomWeapon = (index) => {
+    const cw = (inv.customWeapons ?? [])[index];
+    if (!cw) return;
+    unequipItem('customWeapons', cw.name);
+  };
+
+  const handleUpdateCustomWeapons = (updatedCustomWeapons) => {
+    const updated = patchInv(player, 'customWeapons', () => updatedCustomWeapons);
+    setPlayer(preserveSlots(updated));
   };
 
   const handleEquipArmor = (armorIndex) => {
-    // Toggle equipped armor (armor.isEquipped)
-    const updatedArmors = (player.armor || []).map((armor, i) =>
-      i === armorIndex ? { ...armor, isEquipped: !armor.isEquipped } : armor
-    );
-    setPlayer({ ...player, armor: updatedArmors });
+    const armor = (inv.armor ?? [])[armorIndex];
+    if (!armor) return;
+    if (armor.isEquipped) {
+      unequipItem('armor', armor.name);
+    } else {
+      equipToSlot('armor', armor.name, 'armor', false);
+    }
   };
 
-  const handleEquipShield = (shieldsIndex) => {
-    // Toggle equipped shields (shields.isEquipped)
-    const updatedShields = (player.shields || []).map((shields, i) =>
-      i === shieldsIndex
-        ? { ...shields, isEquipped: !shields.isEquipped }
-        : shields
-    );
-    setPlayer({ ...player, shields: updatedShields });
+  const handleEquipShield = (index, slot) => {
+    const shield = (inv.shields ?? [])[index];
+    if (!shield) return;
+    equipToSlot('shields', shield.name, slot, false);
+  };
+
+  const handleUnequipShield = (index) => {
+    const shield = (inv.shields ?? [])[index];
+    if (!shield) return;
+    unequipItem('shields', shield.name);
   };
 
   const handleEquipAccessory = (accessoryIndex) => {
-    // Toggle equipped accessory (accessory.isEquipped)
-    const updatedAccessories = (player.accessories || []).map((accessory, i) =>
-      i === accessoryIndex
-        ? { ...accessory, isEquipped: !accessory.isEquipped }
-        : accessory
-    );
-    setPlayer({ ...player, accessories: updatedAccessories });
+    const accessory = (inv.accessories ?? [])[accessoryIndex];
+    if (!accessory) return;
+    if (accessory.isEquipped) {
+      unequipItem('accessories', accessory.name);
+    } else {
+      equipToSlot('accessories', accessory.name, 'accessory', false);
+    }
   };
 
   return (
@@ -459,7 +521,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewArmor}
                     startIcon={<ArmorIcon />}
-                    disabled={player.armor && player.armor.length >= 10}
+                    disabled={inv.armor && inv.armor.length >= 10}
                     size="small"
                   >
                     {t("Add Armor")}
@@ -470,7 +532,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     variant="contained"
                     onClick={handleOpenNewShield}
                     startIcon={<ShieldIcon />}
-                    disabled={player.shields && player.shields.length >= 10}
+                    disabled={inv.shields && inv.shields.length >= 10}
                     size="small"
                   >
                     {t("Add Shield")}
@@ -482,7 +544,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     onClick={handleOpenNewAccessory}
                     startIcon={<AccessoryIcon />}
                     disabled={
-                      player.accessories && player.accessories.length >= 10
+                      inv.accessories && inv.accessories.length >= 10
                     }
                     size="small"
                   >
@@ -525,25 +587,28 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
       <PlayerWeapons
         player={player}
-        weapons={player.weapons || []}
+        weapons={inv.weapons || []}
         onEditWeapon={handleEditWeapon}
         onDeleteWeapon={handleDeleteWeapon}
         onEquipWeapon={handleEquipWeapon}
+        onUnequipWeapon={handleUnequipWeapon}
         isEditMode={isEditMode}
       />
 
       <PlayerCustomWeapons
         player={player}
-        customWeapons={player.customWeapons || []}
+        customWeapons={inv.customWeapons || []}
         onEditCustomWeapon={handleEditCustomWeapon}
         onDeleteCustomWeapon={handleDeleteCustomWeapon}
         onEquipCustomWeapon={handleEquipCustomWeapon}
+        onUnequipCustomWeapon={handleUnequipCustomWeapon}
+        onUpdateCustomWeapons={handleUpdateCustomWeapons}
         isEditMode={isEditMode}
       />
 
       <PlayerArmor
         player={player}
-        armor={player.armor || []}
+        armor={inv.armor || []}
         onEditArmor={handleEditArmor}
         onDeleteArmor={handleDeleteArmor}
         onEquipArmor={handleEquipArmor}
@@ -552,16 +617,17 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
       <PlayerShields
         player={player}
-        shields={player.shields || []}
+        shields={inv.shields || []}
         onEditShield={handleEditShield}
         onDeleteShield={handleDeleteShield}
         onEquipShield={handleEquipShield}
+        onUnequipShield={handleUnequipShield}
         isEditMode={isEditMode}
       />
 
       <PlayerAccessories
         player={player}
-        accessories={player.accessories || []}
+        accessories={inv.accessories || []}
         onEditAccessory={handleEditAccessory}
         onDeleteAccessory={handleDeleteAccessory}
         onEquipAccessory={handleEquipAccessory}

@@ -1,3 +1,5 @@
+export type PackType = "compendium" | "supplement";
+
 export type CompendiumItemType =
   | "npc-attack"
   | "npc-spell"
@@ -23,6 +25,9 @@ export interface CompendiumPack {
   name: string;
   description?: string;
   author?: string;
+  type?: PackType;
+  version?: string;                    // from manifest on import; editable in-app
+  active?: boolean;                    // absent or true = visible in viewer; false = hidden
   isPersonal: boolean;                 // cannot be deleted
   locked?: boolean;                    // when true, destructive actions are hidden
   createdAt: number;

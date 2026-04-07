@@ -423,7 +423,7 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
         </Grid>
 
         {/* Row 2 – accuracy (if applicable) */}
-        {attr1 && attr2 && (
+        {/* {attr1 && attr2 && (
           <Grid
             container
             alignItems="center"
@@ -444,7 +444,7 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
               </Typography>
             </Grid>
           </Grid>
-        )}
+        )} */}
 
         {/* Effect */}
         {/* <Box sx={{ px: 1, py: 0.75 }}>
@@ -541,7 +541,7 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
         </Grid>
 
         {/* Row 2 – accuracy (if applicable) */}
-        {attr1 && attr2 && (
+        {/* {attr1 && attr2 && (
           <Grid
             container
             alignItems="center"
@@ -562,7 +562,7 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
               </Typography>
             </Grid>
           </Grid>
-        )}
+        )} */}
 
         {/* Description */}
         <Box sx={{ px: 1, py: 0.75 }}>

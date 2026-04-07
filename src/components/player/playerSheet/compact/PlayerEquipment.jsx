@@ -16,6 +16,7 @@ import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { Casino, RadioButtonUnchecked, Error, SwapHoriz } from "@mui/icons-material";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
+import { isItemEquipped } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -100,13 +101,14 @@ export default function PlayerEquipment({
   };
 
   // Retrieve equipped weapons, armor, shields, and accessories
-  const equippedWeapons = player.weapons
-    ? player.weapons.filter((weapon) => weapon.isEquipped)
+  const inv = player.equipment?.[0];
+  const equippedWeapons = inv?.weapons
+    ? inv.weapons.filter((weapon) => isItemEquipped(player, weapon))
     : [];
 
   // Retrieve equipped custom weapons and format them for display
-  const equippedCustomWeapons = player.customWeapons
-    ? player.customWeapons.filter((weapon) => weapon.isEquipped)
+  const equippedCustomWeapons = inv?.customWeapons
+    ? inv.customWeapons.filter((weapon) => isItemEquipped(player, weapon))
     : [];
 
   // Function to format custom weapons for display
@@ -164,16 +166,16 @@ export default function PlayerEquipment({
   // Format equipped custom weapons for display
   const formattedCustomWeapons = equippedCustomWeapons.map(cw => formatCustomWeapon(cw));
 
-  const equippedArmor = player.armor
-    ? player.armor.filter((armor) => armor.isEquipped)
+  const equippedArmor = inv?.armor
+    ? inv.armor.filter((armor) => isItemEquipped(player, armor))
     : [];
 
-  const equippedShields = player.shields
-    ? player.shields.filter((shield) => shield.isEquipped)
+  const equippedShields = inv?.shields
+    ? inv.shields.filter((shield) => isItemEquipped(player, shield))
     : [];
 
-  const equippedAccessories = player.accessories
-    ? player.accessories.filter((accessory) => accessory.isEquipped)
+  const equippedAccessories = inv?.accessories
+    ? inv.accessories.filter((accessory) => isItemEquipped(player, accessory))
     : [];
 
   // Combine regular weapons and custom weapons
@@ -288,7 +290,7 @@ export default function PlayerEquipment({
       handleEquipArmor(item);
     } else if (item.category === 'Shield') {
       handleEquipShield(item);
-    } else if (item.category === 'Accessory' || (!item.category && player.accessories.some(a => a === item))) {
+    } else if (item.category === 'Accessory' || (!item.category && inv.accessories?.some(a => a === item))) {
       handleEquipAccessory(item);
     }
   };
@@ -378,9 +380,11 @@ export default function PlayerEquipment({
     let oneHandedCount = 0;
     let twoHandedCount = 0;
 
+    const inv = player.equipment?.[0];
+
     // Count regular weapons
-    if (player.weapons) {
-      player.weapons.forEach((weapon) => {
+    if (inv?.weapons) {
+      inv.weapons.forEach((weapon) => {
         if (weapon.isEquipped) {
           if (weapon.hands === 1) {
             oneHandedCount++;
@@ -392,8 +396,8 @@ export default function PlayerEquipment({
     }
 
     // Count custom weapons (all are two-handed)
-    if (player.customWeapons) {
-      player.customWeapons.forEach((weapon) => {
+    if (inv?.customWeapons) {
+      inv.customWeapons.forEach((weapon) => {
         if (weapon.isEquipped) {
           twoHandedCount++;
         }
@@ -405,8 +409,9 @@ export default function PlayerEquipment({
 
   const countEquippedShields = () => {
     let count = 0;
-    if (player.shields && player.shields.length > 0) {
-      player.shields.forEach((shield) => {
+    const inv = player.equipment?.[0];
+    if (inv?.shields && inv.shields.length > 0) {
+      inv.shields.forEach((shield) => {
         if (shield.isEquipped) {
           count++;
         }
@@ -729,7 +734,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...(player.weapons?.filter(w => !w.isEquipped) || []),
+              ...(inv?.weapons?.filter(w => !isItemEquipped(player, w)) || []),
             ]}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
@@ -784,7 +789,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...((player.customWeapons?.filter(w => !w.isEquipped) || []).map(cw => formatCustomWeapon(cw)))
+              ...((inv?.customWeapons?.filter(w => !isItemEquipped(player, w)) || []).map(cw => formatCustomWeapon(cw)))
             ]}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
@@ -832,7 +837,7 @@ export default function PlayerEquipment({
         )}
         {!isMainTab && (
           <AllArmor
-            armors={player.shields?.filter(s => !s.isEquipped) || []}
+            armors={inv?.shields?.filter(s => !isItemEquipped(player, s)) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -878,7 +883,7 @@ export default function PlayerEquipment({
         )}
         {!isMainTab && (
           <AllArmor
-            armors={player.armor?.filter(a => !a.isEquipped) || []}
+            armors={inv?.armor?.filter(a => !isItemEquipped(player, a)) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -919,7 +924,7 @@ export default function PlayerEquipment({
         )}
         {!isMainTab && (
           <AllAccessory
-            accessorys={player.accessories?.filter(ac => !ac.isEquipped) || []}
+            accessorys={inv?.accessories?.filter(ac => !isItemEquipped(player, ac)) || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             isMainTab={isMainTab}

@@ -239,9 +239,9 @@ export default function PlayerCustomWeaponModal({
   const calculateTotalCost = () => {
     const baseCost = 300; // Custom weapons have base cost of 300
     const customizationCost = hasTransforming ? 100 : 0;
+    const qualityCostValue = parseInt(qualityCost) || 0;
 
-    return baseCost + customizationCost;
-
+    return baseCost + customizationCost + qualityCostValue;
   };
 
   const isMartial = () => {
@@ -431,14 +431,29 @@ export default function PlayerCustomWeaponModal({
           {/* Left side - Configuration */}
           <Grid item xs={12} md={6}>
             <Grid container spacing={2}>
-              {/* Weapon Name */}
+              {/* Weapon Name and Equipped Status */}
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label={t("weapon_name")}
-                  value={weaponName}
-                  onChange={(e) => setWeaponName(e.target.value)}
-                />
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={8}>
+                    <TextField
+                      fullWidth
+                      label={t("weapon_name")}
+                      value={weaponName}
+                      onChange={(e) => setWeaponName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={isEquipped}
+                          onChange={(e) => setIsEquipped(e.target.checked)}
+                        />
+                      }
+                      label={t("Equipped")}
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
 
               {/* Category */}

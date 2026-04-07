@@ -26,6 +26,7 @@ import { OpenBracket, CloseBracket } from "../../Bracket";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
+import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -47,16 +48,18 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
   const [dialogSeverity, setDialogSeverity] = useState("");
 
-  const equippedArmor = player.armor
-    ? player.armor.filter((armor) => armor.isEquipped)
+  const inv = player.equipment?.[0];
+
+  const equippedArmor = inv?.armor
+    ? inv.armor.filter((armor) => isItemEquipped(player, armor))
     : [];
 
-  const equippedShields = player.shields
-    ? player.shields.filter((shield) => shield.isEquipped)
+  const equippedShields = inv?.shields
+    ? inv.shields.filter((shield) => isItemEquipped(player, shield))
     : [];
 
-  const equippedAccessories = player.accessories
-    ? player.accessories.filter((accessory) => accessory.isEquipped)
+  const equippedAccessories = inv?.accessories
+    ? inv.accessories.filter((accessory) => isItemEquipped(player, accessory))
     : [];
 
   const magicModifier =

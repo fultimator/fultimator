@@ -1,6 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import MigrationDialog from "../../components/common/MigrationDialog";
+import { playerNeedsMigration, applyPreSaveTransforms, applyPostLoadTransforms } from "../../components/player/playerTransforms";
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -27,6 +30,7 @@ import {
   Collapse,
   ToggleButtonGroup,
   ToggleButton,
+  Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -50,6 +54,7 @@ import { useTranslate } from "../../translation/translate";
 import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { validateCharacter } from "../../utility/validateJson";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
@@ -84,6 +89,13 @@ function Personal() {
   const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const { dbMode, requestModeSwitch, cloudUser, activeUid } = useDatabaseContext();
   const db = useDatabase();
@@ -342,6 +354,18 @@ function Personal() {
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Cloud"));
     } catch { notify(t("Failed to move to Cloud")); }
+  };
+
+  // ── Migration ────────────────────────────────────────────────────────────────
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+  const stalePlayers = (personalList ?? []).filter(playerNeedsMigration);
+
+  const handleMigrateAllPlayers = async (actors) => {
+    for (const player of actors) {
+      const ref = db.doc("player-personal", player.id);
+      const migrated = applyPostLoadTransforms(player);
+      await db.setDoc(ref, applyPreSaveTransforms(migrated));
+    }
   };
 
   // ── Select mode ──────────────────────────────────────────────────────────────
@@ -661,6 +685,19 @@ function Personal() {
             <Typography variant="body1" fontWeight={600}>
               {filteredList?.length ?? 0} {t("Players")}
             </Typography>
+            {stalePlayers.length > 0 && (
+              <Tooltip title={t("Some players need a data migration")}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  startIcon={<SystemUpdateAltIcon />}
+                  onClick={() => setMigrationDialogOpen(true)}
+                >
+                  {t("Migrate")} ({stalePlayers.length})
+                </Button>
+              </Tooltip>
+            )}
             <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select Players")}>
               <Button
                 variant={selectMode ? "contained" : "outlined"}
@@ -852,6 +889,14 @@ function Personal() {
         </Grid>
       </Grid>
       <Box sx={{ height: "10vh" }} />
+      <MigrationDialog
+        open={migrationDialogOpen}
+        onClose={() => setMigrationDialogOpen(false)}
+        actors={stalePlayers}
+        actorType="player"
+        onMigrateAll={handleMigrateAllPlayers}
+      />
+
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -906,6 +951,18 @@ function Personal() {
         autoHideDuration={2000}
         message={snackMsg}
       />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUpIcon />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }

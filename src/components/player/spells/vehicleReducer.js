@@ -116,8 +116,15 @@ export const vehicleReducer = (state, action) => {
       };
 
     case VEHICLE_ACTIONS.UPDATE_VEHICLE: {
-      const updatedVehicles = [...state.currentVehicles];
-      updatedVehicles[action.payload.vehicleIndex][action.payload.field] = action.payload.value;
+      const updatedVehicles = state.currentVehicles.map((vehicle, index) => {
+        if (index === action.payload.vehicleIndex) {
+          return { ...vehicle, [action.payload.field]: action.payload.value };
+        }
+        if (action.payload.field === 'enabled' && action.payload.value === true) {
+          return { ...vehicle, enabled: false };
+        }
+        return vehicle;
+      });
       return {
         ...state,
         currentVehicles: updatedVehicles,

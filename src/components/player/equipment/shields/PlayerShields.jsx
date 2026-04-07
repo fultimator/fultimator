@@ -5,6 +5,11 @@ import {
   AccordionDetails,
   IconButton,
   Tooltip,
+  Menu,
+  MenuItem,
+  ListItemText,
+  Badge,
+  Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyArmor from "../armor/PrettyArmor";
@@ -14,20 +19,23 @@ import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
 import { useTheme } from "@mui/material/styles";
 import { ShieldIcon } from "../../../icons";
+import { isTwoHandedEquipped } from "../slots/equipmentSlots";
 
 export default function PlayerShields({
   player,
   shields,
   onEditShield,
   onEquipShield,
+  onUnequipShield,
   isEditMode,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
 
   const [expanded, setExpanded] = useState(false);
+  const [slotMenuAnchor, setSlotMenuAnchor] = useState(null);
+  const [slotMenuIndex, setSlotMenuIndex] = useState(null);
 
-  // Check if the player has a "Dual Shieldbearer" Skill in player.classes[].skills[].specialSkill
   const hasDualShieldBearer = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
@@ -36,102 +44,50 @@ export default function PlayerShields({
   );
 
   const checkIfEquippable = (shield) => {
-    // if shield is not martial then is always equippable
-    // true = equippable, false = not equippable
-
     const { classes } = player;
-
-    // If the shield is not martial, it is always equippable
-    if (!shield.martial) {
-      return true;
-    }
-
-    // Iterate through each class to check if the shield is equippable based on their benefits
+    if (!shield.martial) return true;
     for (const playerClass of classes) {
       const { benefits } = playerClass;
-
-      // Check if the class benefits allow equipping martial armor
       if (benefits.martials) {
         if (shield.martial && benefits.martials.shields) {
-          // The shield is equippable based on the current class
           return true;
         }
       }
     }
-
-    // The shield is not equippable based on any of the player's classes
     return false;
   };
 
-  const countEquippedShields = () => {
-    let count = 0;
-    shields.forEach((shield) => {
-      if (shield.isEquipped) {
-        count++;
-      }
-    });
-    return count;
+  const getShieldSlot = (shield) => {
+    const slots = player.equippedSlots;
+    if (!slots) return null;
+    if (slots.mainHand?.source === 'shields' && slots.mainHand?.name === shield.name) return 'mainHand';
+    if (slots.offHand?.source === 'shields' && slots.offHand?.name === shield.name) return 'offHand';
+    return null;
   };
 
-  const countEquippedWeapons = () => {
-    let oneHandedCount = 0;
-    let twoHandedCount = 0;
-
-    if (player.weapons && player.weapons.length > 0) {
-      player.weapons.forEach((weapon) => {
-        if (weapon.isEquipped) {
-          if (weapon.hands === 1) {
-            oneHandedCount++;
-          } else if (weapon.hands === 2) {
-            twoHandedCount++;
-          }
-        }
-      });
+  const handleEquipClick = (event, index) => {
+    const shield = shields[index];
+    if (shield.isEquipped) {
+      onUnequipShield(index);
+      return;
     }
-
-    return { oneHandedCount, twoHandedCount };
-  };
-
-  const canEquipShield = () => {
-    const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
-    if (twoHandedCount === 1) {
-      return false;
-    } else if (
-      hasDualShieldBearer &&
-      oneHandedCount === 0 &&
-      twoHandedCount === 0 &&
-      countEquippedShields() <= 1
-    ) {
-      return true;
-    } else if (
-      oneHandedCount <= 1 &&
-      twoHandedCount === 0 &&
-      countEquippedShields() === 0
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const handleEquipShields = (index, checked) => {
-    const shieldSelected = shields[index];
-    if (canEquipShield(shieldSelected) || !checked) {
-      const updatedShield = { ...shields };
-      updatedShield[index].isEquipped = checked;
-      onEquipShield(updatedShield);
+    // 2H or custom weapon in main hand locks both hands
+    if (isTwoHandedEquipped(player)) return;
+    if (hasDualShieldBearer) {
+      setSlotMenuAnchor(event.currentTarget);
+      setSlotMenuIndex(index);
     } else {
-      if (window.electron) {
-        window.electron.alert(
-          t("You cannot equip this shield as no hands are free.")
-        );
-      } else {
-        alert(t("You cannot equip this shield as no hands are free."));
-      }
+      onEquipShield(index, 'offHand');
     }
+  };
+
+  const handleSlotSelect = (slot) => {
+    onEquipShield(slotMenuIndex, slot);
+    setSlotMenuAnchor(null);
+    setSlotMenuIndex(null);
   };
 
   useEffect(() => {
-    // Open the Accordion when a new weapon is added
     if (shields.length > 0) {
       setExpanded(true);
     }
@@ -140,6 +96,10 @@ export default function PlayerShields({
   const handleAccordionChange = () => {
     setExpanded(!expanded);
   };
+
+  const slotLabels = { mainHand: t('Main Hand'), offHand: t('Off Hand') };
+  const mainHandOccupant = player.equippedSlots?.mainHand?.name;
+  const offHandOccupant = player.equippedSlots?.offHand?.name;
 
   return (
     <Accordion
@@ -158,98 +118,122 @@ export default function PlayerShields({
         handleAccordionChange={handleAccordionChange}
         headerText={t("Shield")}
         showIconButton={false}
-        icon = {<ShieldIcon />}
+        icon={<ShieldIcon />}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={3}>
-          {/* map the weapons and display them with a PrettyWeapon component if they exist */}
-          {shields.map((shield, index) => (
-            <React.Fragment key={index}>
-              <Grid item container xs={12} alignItems="center" spacing={1}>
-                {/* Updated grid item */}
-                <Grid item xs={11}>
-                  <PrettyArmor armor={shield} />
-                </Grid>
-                <Grid
-                  item
-                  container
-                  xs={1}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {/* Updated grid item */}
-                  {isEditMode && (
-                    <Grid item xs={12}>
-                      <IconButton onClick={() => onEditShield(index)}>
-                        <Edit />
-                      </IconButton>
-                    </Grid>
-                  )}
-                  <Grid item xs={12}>
-                    {checkIfEquippable(shield) ? (
-                      <Tooltip
-                        title={
-                          shield.isEquipped
-                            ? t("Unequip Shield")
-                            : t("Equip Shield")
-                        }
-                      >
-                        <IconButton
-                          onClick={() =>
-                            handleEquipShields(index, !shield.isEquipped)
-                          }
-                          disabled={!isEditMode}
-                          sx={{
-                            mt: 1,
-                            boxShadow: "1px 1px 5px",
-                            backgroundColor: shield.isEquipped
-                              ? theme.palette.ternary.main
-                              : theme.palette.background.paper,
-                            "&:hover": {
-                              backgroundColor: shield.isEquipped
-                                ? theme.palette.quaternary.main // Darker for equipped state
-                                : theme.palette.secondary.main, // Highlight when not equipped
-                            },
-                            transition: "background-color 0.3s",
-                          }}
-                        >
-                          <Equip
-                            color={
-                              shield.isEquipped
-                                ? theme.palette.mode === "dark"
-                                  ? theme.palette.white.main // White in dark mode
-                                  : theme.palette.primary.main // Primary in light mode
-                                : theme.palette.background.default
-                            }
-                            strokeColor={
-                              shield.isEquipped && theme.palette.mode === "dark"
-                                ? theme.palette.white.main // White stroke in dark mode
-                                : theme.palette.secondary.main // Default primary stroke
-                            }
-                          />
-                        </IconButton>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title={t("Not Equippable")}>
-                        <IconButton>
-                          <Error color="error" />
+        <Grid container justifyContent="flex-end" spacing={2}>
+          {shields.map((shield, index) => {
+            const equippedSlot = getShieldSlot(shield);
+            const twoHandedBlocked = !shield.isEquipped && isTwoHandedEquipped(player);
+            const tooltipTitle = twoHandedBlocked
+              ? t('Both hands are occupied by a two-handed weapon')
+              : shield.isEquipped
+              ? `${t('Unequip Shield')}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ''}`
+              : hasDualShieldBearer
+                ? t('Equip Shield')
+                : `${t('Equip Shield')} (${slotLabels.offHand})`;
+
+            return (
+              <React.Fragment key={index}>
+                <Grid item xs={12} sx={{ mb: 1 }}>
+                  <Box>
+                    <PrettyArmor armor={shield} />
+                  </Box>
+
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                    {isEditMode && (
+                      <Tooltip title={t("Edit")}>
+                        <IconButton onClick={() => onEditShield(index)} size="small">
+                          <Edit fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                  </Grid>
-                  <Grid item xs={12} sx={{ mt: 1 }}>
-                    <Export
-                      name={shield.name}
-                      dataType="shield"
-                      data={shield}
-                    />
-                  </Grid>
+                    
+                    <Box sx={{ ml: 0.5 }}>
+                      {checkIfEquippable(shield) ? (
+                        <Tooltip title={tooltipTitle}>
+                          <Badge
+                            badgeContent={equippedSlot === 'mainHand' ? 'M' : equippedSlot === 'offHand' ? 'O' : null}
+                            color="primary"
+                            invisible={!shield.isEquipped || !equippedSlot}
+                            sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                          >
+                            <IconButton
+                              onClick={(e) => handleEquipClick(e, index)}
+                              disabled={!isEditMode}
+                              size="small"
+                              sx={{
+                                backgroundColor: shield.isEquipped
+                                  ? theme.palette.ternary.main
+                                  : theme.palette.background.paper,
+                                "&:hover": {
+                                  backgroundColor: shield.isEquipped
+                                    ? theme.palette.quaternary.main
+                                    : theme.palette.secondary.main,
+                                },
+                                transition: "background-color 0.3s",
+                                p: 0.5,
+                                border: `1px solid ${theme.palette.divider}`
+                              }}
+                            >
+                              <Equip
+                                color={
+                                  shield.isEquipped
+                                    ? theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.primary.main
+                                    : theme.palette.text.secondary
+                                }
+                                strokeColor={
+                                  shield.isEquipped && theme.palette.mode === "dark"
+                                    ? theme.palette.white.main
+                                    : theme.palette.secondary.main
+                                }
+                              />
+                            </IconButton>
+                          </Badge>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={t("Not Equippable")}>
+                          <IconButton size="small">
+                            <Error color="error" fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
+                    <Box sx={{ ml: 0.5 }}>
+                      <Export
+                        name={shield.name}
+                        dataType="shield"
+                        data={shield}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
                 </Grid>
-              </Grid>
-            </React.Fragment>
-          ))}
+              </React.Fragment>
+            );
+          })}
         </Grid>
       </AccordionDetails>
+      <Menu
+        anchorEl={slotMenuAnchor}
+        open={Boolean(slotMenuAnchor)}
+        onClose={() => setSlotMenuAnchor(null)}
+      >
+        <MenuItem onClick={() => handleSlotSelect('mainHand')}>
+          <ListItemText
+            primary={t('Main Hand')}
+            secondary={mainHandOccupant ?? undefined}
+          />
+        </MenuItem>
+        <MenuItem onClick={() => handleSlotSelect('offHand')}>
+          <ListItemText
+            primary={t('Off Hand')}
+            secondary={offHandOccupant ?? undefined}
+          />
+        </MenuItem>
+      </Menu>
     </Accordion>
   );
 }

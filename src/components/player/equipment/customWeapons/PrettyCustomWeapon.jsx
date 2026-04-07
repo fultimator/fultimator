@@ -138,11 +138,11 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
             justifyContent="space-between"
             alignItems="center"
             sx={{
-              p: 1,
+              p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
               "& .MuiTypography-root": {
-                fontSize: isCharacterSheet ? "1rem" : "1.2rem",
+                fontSize: isCharacterSheet ? "0.9rem" : "1.0rem",
                 textTransform: "uppercase",
               },
             }}
@@ -181,7 +181,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
               sx={{
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
-                padding: "5px",
+                padding: "2px 5px",
               }}
             >
               <Grid
@@ -243,7 +243,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
               sx={{
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
-                padding: "5px",
+                padding: "2px 5px",
               }}
             >
               <Grid item xs={3}>

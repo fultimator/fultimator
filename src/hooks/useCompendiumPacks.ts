@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getDb, notifyListeners, subscribeToStore } from "../platform/idb";
-import type { CompendiumPack, CompendiumItem, CompendiumItemType } from "../types/CompendiumPack";
+import type { CompendiumPack, CompendiumItem, CompendiumItemType, PackType } from "../types/CompendiumPack";
 import { validateManifest } from "../utils/validateCompendiumPack";
 
 const STORE = "compendium-packs";
@@ -93,6 +93,13 @@ export function useCompendiumPacks() {
     },
     []
   );
+
+  const setPackActive = useCallback(async (id: string, active: boolean): Promise<void> => {
+    const all = await getAllPacks();
+    const pack = all.find((p) => p.id === id);
+    if (!pack) return;
+    await savePack({ ...pack, active, updatedAt: Date.now() });
+  }, []);
 
   const toggleLock = useCallback(async (id: string): Promise<void> => {
     const all = await getAllPacks();
@@ -234,6 +241,7 @@ export function useCompendiumPacks() {
         id: pack.id,
         name: pack.name,
         version: meta.version ?? "1.0.0",
+        type: (pack.type ?? "compendium") as PackType,
         author: pack.author ?? "",
         description: pack.description ?? "",
         homepageUrl: meta.homepageUrl ?? "",
@@ -310,11 +318,16 @@ export function useCompendiumPacks() {
       items.push({ id: crypto.randomUUID(), type, data, addedAt: now });
     }
 
+    const rawType = manifest.type;
+    const packType: PackType = rawType === "supplement" ? "supplement" : "compendium";
+
     const pack: CompendiumPack = {
       id: packId,
       name: (manifest.name as string).trim(),
       description: typeof manifest.description === "string" ? manifest.description.trim() || undefined : undefined,
       author: typeof manifest.author === "string" ? manifest.author.trim() || undefined : undefined,
+      type: packType,
+      version: typeof manifest.version === "string" ? manifest.version.trim() || undefined : undefined,
       isPersonal: false,
       createdAt: typeof manifest.createdAt === "number" ? manifest.createdAt : now,
       updatedAt: now,
@@ -376,6 +389,7 @@ export function useCompendiumPacks() {
     createPack,
     updatePack,
     deletePack,
+    setPackActive,
     toggleLock,
     addItem,
     updateItem,

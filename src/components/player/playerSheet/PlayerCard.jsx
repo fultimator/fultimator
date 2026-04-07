@@ -21,6 +21,7 @@ import { DefIcon, MdefIcon, InitIcon } from "../../icons";
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
+import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 
 const AffinityGrid = styled(Grid)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -134,15 +135,16 @@ export default function PlayerCard({
   );
 
   // Retrieve equipped armor, shields, weapons, accessories, and custom weapons
-  const equippedArmor = player.armor?.find((armor) => armor.isEquipped) || null;
+  const inv = player.equipment?.[0];
+  const equippedArmor = inv?.armor?.find((armor) => isItemEquipped(player, armor)) || null;
   const equippedShields =
-    player.shields?.filter((shield) => shield.isEquipped) || [];
+    inv?.shields?.filter((shield) => isItemEquipped(player, shield)) || [];
   const equippedWeapons =
-    player.weapons?.filter((weapon) => weapon.isEquipped) || [];
+    inv?.weapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
   const equippedCustomWeapons =
-    player.customWeapons?.filter((weapon) => weapon.isEquipped) || [];
+    inv?.customWeapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
   const equippedAccessory =
-    player.accessories?.find((accessory) => accessory.isEquipped) || null;
+    inv?.accessories?.find((accessory) => isItemEquipped(player, accessory)) || null;
 
   // Find all pilot-vehicle spells
   const pilotSpells = (player.classes || [])

@@ -31,6 +31,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
@@ -42,10 +43,8 @@ import StarIcon from "@mui/icons-material/Star";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import LinkIcon from "@mui/icons-material/Link";
 import {
   Button,
   Dialog,
@@ -60,6 +59,7 @@ import {
 } from "@mui/material";
 
 import Layout from "../../components/Layout";
+import { ManageModulesModal } from "../../components/manage-modules";
 import Export from "../../components/Export";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import AddToCompendiumButton from "../../components/compendium/AddToCompendiumButton";
@@ -315,7 +315,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   selectedCompendium,
   onCompendiumChange,
   onNewPack,
-  onImportPack,
   onManagePack,
   activePack,
   onToggleLock,
@@ -384,16 +383,18 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                     </Box>
                   </MenuItem>
                 ))}
+              <Divider />
+              <MenuItem value="__manage_modules__">
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <SettingsIcon fontSize="small" />
+                  {t("Manage Modules")}
+                </Box>
+              </MenuItem>
             </Select>
           </FormControl>
           <Tooltip title={t("New Pack")}>
             <IconButton size="small" onClick={onNewPack}>
               <AddIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t("Import Pack")}>
-            <IconButton size="small" onClick={onImportPack}>
-              <FileUploadIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           {isPackMode && (
@@ -793,7 +794,7 @@ function CompendiumViewer() {
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
 
   // Pack state
-  const { packs, loading: packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule, importFromFile, importFromManifestUrl } = useCompendiumPacks();
+  const { packs, loading: packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule } = useCompendiumPacks();
   const [newPackDialogOpen, setNewPackDialogOpen] = useState(false);
   const [newPackName, setNewPackName] = useState("");
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
@@ -808,22 +809,20 @@ function CompendiumViewer() {
   const [exportMeta, setExportMeta] = useState({ version: "1.0.0", homepageUrl: "", manifestUrl: "", downloadUrl: "" });
   const [exporting, setExporting] = useState(false);
 
-  // Import dialog state
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [importTab, setImportTab] = useState(0); // 0 = file, 1 = URL
-  const [importUrl, setImportUrl] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [importError, setImportError] = useState("");
-  // Navigation is deferred to after the Dialog exit transition so MUI's focus
-  // trap is fully released before we change the URL (avoids backdrop freeze).
+  const [manageModulesOpen, setManageModulesOpen] = useState(false);
   const [pendingNavPackId, setPendingNavPackId] = useState(null);
 
   // Always ensure the personal pack exists so it shows in the dropdown
   useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
 
-  const selectedCompendium = searchParams.get("compendium") ?? "official";
+  const activePacks = useMemo(() => packs.filter((p) => p.active !== false), [packs]);
+  const rawSelectedCompendium = searchParams.get("compendium") ?? "official";
+  // If the selected pack was deactivated, fall back to official
+  const selectedCompendium = rawSelectedCompendium === "official" || activePacks.some((p) => p.id === rawSelectedCompendium)
+    ? rawSelectedCompendium
+    : "official";
   const activePack = selectedCompendium !== "official"
-    ? packs.find((p) => p.id === selectedCompendium) ?? null
+    ? activePacks.find((p) => p.id === selectedCompendium) ?? null
     : null;
 
   const selectedType = searchParams.get("type") ?? "weapons";
@@ -847,11 +846,20 @@ function CompendiumViewer() {
 
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Lock page scroll while this route is mounted
   React.useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    const onScroll = () => setShowScrollTop(el.scrollTop > 300);
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
   // Compute filtered items
@@ -1071,6 +1079,10 @@ function CompendiumViewer() {
   }, [selectedCompendium, selectedType, setSearchParams]);
 
   const handleCompendiumChange = useCallback((compendium) => {
+    if (compendium === "__manage_modules__") {
+      setManageModulesOpen(true);
+      return;
+    }
     setSearchQuery("");
     setSelectedIdx(null);
     const defaultType = compendium !== "official" ? "weapons" : "weapons";
@@ -1104,37 +1116,6 @@ function CompendiumViewer() {
     }
   }, [activePack, exportAsModule, exportMeta]);
 
-  const handleImportFile = useCallback(async (file) => {
-    if (importing) return; // guard against re-entry via the hidden <input>
-    setImporting(true);
-    setImportError("");
-    try {
-      const id = await importFromFile(file);
-      setImportUrl("");
-      setPendingNavPackId(id); // navigate in onExited, not here
-      setImportDialogOpen(false);
-    } catch (err) {
-      setImportError(err.message ?? "Import failed");
-    } finally {
-      setImporting(false);
-    }
-  }, [importing, importFromFile]);
-
-  const handleImportUrl = useCallback(async () => {
-    if (!importUrl.trim() || importing) return;
-    setImporting(true);
-    setImportError("");
-    try {
-      const id = await importFromManifestUrl(importUrl.trim());
-      setImportUrl("");
-      setPendingNavPackId(id); // navigate in onExited, not here
-      setImportDialogOpen(false);
-    } catch (err) {
-      setImportError(err.message ?? "Import failed");
-    } finally {
-      setImporting(false);
-    }
-  }, [importing, importUrl, importFromManifestUrl]);
 
   const handleItemClick = useCallback(
     (item, idx) => {
@@ -1187,11 +1168,10 @@ function CompendiumViewer() {
       onBookChange={handleBookChange}
       selectedHeroicClasses={selectedHeroicClasses}
       onHeroicClassesChange={handleHeroicClassesChange}
-      packs={packs}
+      packs={activePacks}
       selectedCompendium={selectedCompendium}
       onCompendiumChange={handleCompendiumChange}
       onNewPack={() => setNewPackDialogOpen(true)}
-      onImportPack={() => { setImportError(""); setImportTab(0); setImportUrl(""); setImportDialogOpen(true); }}
       onManagePack={() => {
         setEditingPackName(activePack?.name ?? "");
         setEditingDescription(activePack?.description ?? "");
@@ -1309,6 +1289,20 @@ function CompendiumViewer() {
                   }}
                 >
                   <MenuIcon />
+                </Fab>
+              </Tooltip>
+            )}
+
+            {/* Scroll-to-top FAB */}
+            {showScrollTop && (
+              <Tooltip title={t("Scroll to top")}>
+                <Fab
+                  size="small"
+                  color="primary"
+                  onClick={() => { if (mainRef.current) mainRef.current.scrollTop = 0; }}
+                  sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+                >
+                  <KeyboardArrowUpIcon />
                 </Fab>
               </Tooltip>
             )}
@@ -1442,14 +1436,6 @@ function CompendiumViewer() {
         onClose={() => setNewPackDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
-        }}
       >
         <DialogTitle
           sx={{
@@ -1490,14 +1476,6 @@ function CompendiumViewer() {
         onClose={() => !exporting && setManageDialogOpen(false)}
         maxWidth="sm"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
-        }}
       >
         <DialogTitle
           sx={{
@@ -1624,109 +1602,14 @@ function CompendiumViewer() {
         </DialogActions>
       </Dialog>
 
-      {/* Import Pack dialog */}
-      <Dialog
-        open={importDialogOpen}
-        onClose={() => !importing && setImportDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        TransitionProps={{
-          onExited: () => {
-            // Navigate only after focus trap + backdrop are fully unmounted
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+      <ManageModulesModal
+        open={manageModulesOpen}
+        onClose={() => setManageModulesOpen(false)}
+        onImportSuccess={(id) => {
+          setManageModulesOpen(false);
+          handleCompendiumChange(id);
         }}
-      >
-        <DialogTitle
-          sx={{
-            background: customTheme.primary,
-            color: "#ffffff",
-            fontWeight: "bold",
-            textTransform: "uppercase",
-            fontSize: "0.95rem",
-            py: 1.25,
-          }}
-        >
-          {t("Import Pack")}
-        </DialogTitle>
-        <DialogContent sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: 2 }}>
-          <Tabs value={importTab} onChange={(_, v) => { setImportTab(v); setImportError(""); }}>
-            <Tab label={t("Upload .fcp file")} />
-            <Tab label={t("From URL")} icon={<LinkIcon fontSize="small" />} iconPosition="end" />
-          </Tabs>
-
-          {importTab === 0 && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t("Select a .fcp file exported from Fultimator.")}
-              </Typography>
-              <Button
-                variant="outlined"
-                component="label"
-                startIcon={<FileUploadIcon />}
-                disabled={importing}
-              >
-                {t("Choose file")}
-                <input
-                  type="file"
-                  accept=".fcp,.zip"
-                  hidden
-                  disabled={importing}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImportFile(file);
-                    e.target.value = "";
-                  }}
-                />
-              </Button>
-              {importing && (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <CircularProgress size={16} />
-                  <Typography variant="body2">{t("Importing…")}</Typography>
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {importTab === 1 && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t("Paste a manifest.json URL to download and import the pack.")}
-              </Typography>
-              <TextField
-                label={t("Manifest URL")}
-                value={importUrl}
-                onChange={(e) => setImportUrl(e.target.value)}
-                fullWidth
-                size="small"
-                placeholder="https://.../manifest.json"
-                disabled={importing}
-                onKeyDown={(e) => e.key === "Enter" && handleImportUrl()}
-              />
-            </Box>
-          )}
-
-          {importError && <Alert severity="error">{importError}</Alert>}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setImportDialogOpen(false)} disabled={importing}>
-            {t("Cancel")}
-          </Button>
-          {importTab === 1 && (
-            <Button
-              variant="contained"
-              onClick={handleImportUrl}
-              disabled={importing || !importUrl.trim()}
-              startIcon={importing ? <CircularProgress size={16} color="inherit" /> : <FileUploadIcon />}
-            >
-              {t("Import")}
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
+      />
     </ThemeProvider>
   );
 }

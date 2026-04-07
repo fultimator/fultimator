@@ -29,6 +29,7 @@ import {
   Autocomplete,
   ToggleButtonGroup,
   ToggleButton,
+  Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -55,7 +56,7 @@ import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
 import ExportAllNPCs from "../../components/common/ExportAllNPCs";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, KeyboardArrowUp } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
@@ -63,6 +64,9 @@ import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import MigrationDialog from "../../components/common/MigrationDialog";
+import { npcNeedsMigration, applyNpcPreSaveTransforms, applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -95,6 +99,13 @@ function Personal() {
   const [filteredParams, setFilteredParams] = useState(location.search || "");
 
   const fileInputRef = useRef(null);
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const { dbMode, requestModeSwitch, cloudUser } = useDatabaseContext();
   const db = useDatabase();
@@ -295,6 +306,18 @@ function Personal() {
 
   const [snackMsg, setSnackMsg] = useState(null);
   const notify = (msg) => setSnackMsg(msg);
+
+  // ── Migration ────────────────────────────────────────────────────────────────
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+  const staleNpcs = (personalList ?? []).filter(npcNeedsMigration);
+
+  const handleMigrateAllNpcs = async (actors) => {
+    for (const npc of actors) {
+      const ref = db.doc("npc-personal", npc.id);
+      const migrated = applyNpcPostLoadTransforms(npc);
+      await db.setDoc(ref, applyNpcPreSaveTransforms(migrated));
+    }
+  };
 
   // ── Select mode ─────────────────────────────────────────────────────────────
   const [selectMode, setSelectMode] = useState(false);
@@ -703,6 +726,19 @@ function Personal() {
             <Typography variant="body1" fontWeight={600}>
               {t("filtered_npc_count") + " " + filteredList?.length}
             </Typography>
+            {staleNpcs.length > 0 && (
+              <Tooltip title={t("Some NPCs need a data migration")}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  startIcon={<SystemUpdateAltIcon />}
+                  onClick={() => setMigrationDialogOpen(true)}
+                >
+                  {t("Migrate")} ({staleNpcs.length})
+                </Button>
+              </Tooltip>
+            )}
             <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select NPCs")}>
               <Button
                 variant={selectMode ? "contained" : "outlined"}
@@ -949,6 +985,14 @@ function Personal() {
         message={snackMsg}
       />
 
+      <MigrationDialog
+        open={migrationDialogOpen}
+        onClose={() => setMigrationDialogOpen(false)}
+        actors={staleNpcs}
+        actorType="npc"
+        onMigrateAll={handleMigrateAllNpcs}
+      />
+
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -982,6 +1026,18 @@ function Personal() {
           )
         }
       />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }

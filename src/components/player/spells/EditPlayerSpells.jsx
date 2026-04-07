@@ -54,6 +54,7 @@ import SpellDeck from "./SpellDeck";
 import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
+import { syncSlots, deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -775,69 +776,81 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   };
 
   const handlePilotModuleChange = (spellClass, spellIndex, vehicleIndex, moduleIndex, field, value) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((cls) => {
-        if (cls.name === spellClass) {
-          return {
-            ...cls,
-            spells: cls.spells.map((spell, spellIdx) => {
-              if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
-                // Use the vehicleReducer logic to update the state
-                const tempState = { 
-                  currentVehicles: spell.vehicles,
-                  showInPlayerSheet: spell.showInPlayerSheet
-                };
-                const action = {
-                  type: VEHICLE_ACTIONS.UPDATE_MODULE,
-                  payload: { vehicleIndex, moduleIndex, field, value, t }
-                };
-                const newState = vehicleReducer(tempState, action);
-                
-                return {
-                  ...spell,
-                  vehicles: newState.currentVehicles
-                };
-              }
-              return spell;
-            }),
-          };
-        }
-        return cls;
-      }),
-    }));
+    setPlayer((prev) => {
+      const updatedPlayer = {
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name === spellClass) {
+            return {
+              ...cls,
+              spells: cls.spells.map((spell, spellIdx) => {
+                if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
+                  // Use the vehicleReducer logic to update the state
+                  const tempState = { 
+                    currentVehicles: spell.vehicles,
+                    showInPlayerSheet: spell.showInPlayerSheet
+                  };
+                  const action = {
+                    type: VEHICLE_ACTIONS.UPDATE_MODULE,
+                    payload: { vehicleIndex, moduleIndex, field, value, t }
+                  };
+                  const newState = vehicleReducer(tempState, action);
+                  
+                  return {
+                    ...spell,
+                    vehicles: newState.currentVehicles
+                  };
+                }
+                return spell;
+              }),
+            };
+          }
+          return cls;
+        }),
+      };
+      // Re-derive vehicleSlots from the updated vehicle state
+      return { ...updatedPlayer, vehicleSlots: deriveVehicleSlots(updatedPlayer) };
+    });
   };
 
   const handlePilotVehicleChange = (spellClass, spellIndex, vehicleIndex, field, value) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((cls) => {
-        if (cls.name === spellClass) {
-          return {
-            ...cls,
-            spells: cls.spells.map((spell, spellIdx) => {
-              if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
-                const updatedVehicles = [...spell.vehicles];
-                
-                if (field === "enabled") {
-                  // Only one vehicle can be enabled at a time
-                  updatedVehicles.forEach((vehicle, idx) => {
-                    vehicle.enabled = idx === vehicleIndex ? value : false;
-                  });
+    setPlayer((prev) => {
+      const updatedPlayer = {
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name === spellClass) {
+            return {
+              ...cls,
+              spells: cls.spells.map((spell, spellIdx) => {
+                if (spellIdx === spellIndex && spell.spellType === "pilot-vehicle") {
+                  const updatedVehicles = [...spell.vehicles];
+                  
+                  if (field === "enabled") {
+                    // Only one vehicle can be enabled at a time
+                    updatedVehicles.forEach((vehicle, idx) => {
+                      vehicle.enabled = idx === vehicleIndex ? value : false;
+                    });
+                  } else {
+                    updatedVehicles[vehicleIndex] = {
+                      ...updatedVehicles[vehicleIndex],
+                      [field]: value,
+                    };
+                  }
+                  
+                  return {
+                    ...spell,
+                    vehicles: updatedVehicles,
+                  };
                 }
-                
-                return {
-                  ...spell,
-                  vehicles: updatedVehicles,
-                };
-              }
-              return spell;
-            }),
-          };
-        }
-        return cls;
-      }),
-    }));
+                return spell;
+              }),
+            };
+          }
+          return cls;
+        }),
+      };
+      return { ...updatedPlayer, vehicleSlots: deriveVehicleSlots(updatedPlayer) };
+    });
   };
 
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {

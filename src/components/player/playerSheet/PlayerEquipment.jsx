@@ -13,6 +13,7 @@ import {
   Divider,
   Card,
   Stack,
+  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -24,6 +25,7 @@ import { Casino, SwapHoriz } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
+import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 
 export default function PlayerEquipment({
   player,
@@ -102,25 +104,26 @@ export default function PlayerEquipment({
   };
 
   // Retrieve equipped weapons, armor, shields, and accessories
-  const equippedWeapons = player.weapons
-    ? player.weapons.filter((weapon) => weapon.isEquipped)
+  const inv = player.equipment?.[0];
+  const equippedWeapons = inv?.weapons
+    ? inv.weapons.filter((weapon) => isItemEquipped(player, weapon))
     : [];
 
   // Retrieve equipped custom weapons
-  const equippedCustomWeapons = player.customWeapons
-    ? player.customWeapons.filter((weapon) => weapon.isEquipped)
+  const equippedCustomWeapons = inv?.customWeapons
+    ? inv.customWeapons.filter((weapon) => isItemEquipped(player, weapon))
     : [];
 
-  const equippedArmor = player.armor
-    ? player.armor.filter((armor) => armor.isEquipped)
+  const equippedArmor = inv?.armor
+    ? inv.armor.filter((armor) => isItemEquipped(player, armor))
     : [];
 
-  const equippedShields = player.shields
-    ? player.shields.filter((shield) => shield.isEquipped)
+  const equippedShields = inv?.shields
+    ? inv.shields.filter((shield) => isItemEquipped(player, shield))
     : [];
 
-  const equippedAccessories = player.accessories
-    ? player.accessories.filter((accessory) => accessory.isEquipped)
+  const equippedAccessories = inv?.accessories
+    ? inv.accessories.filter((accessory) => isItemEquipped(player, accessory))
     : [];
 
   // Find all pilot-vehicle spells
@@ -561,8 +564,8 @@ export default function PlayerEquipment({
                     <Stack>
                       {allEquippedWeapons.map((weapon, index) => (
                         <React.Fragment key={index}>
-                          <Grid container alignItems="center">
-                            <Grid item xs={isEditMode ? 10 : 12}>
+                          <Grid item xs={12} sx={{ mb: index < allEquippedWeapons.length - 1 ? 1 : 0 }}>
+                            <Box>
                               {weapon.isCustomWeapon ? (
                                 <PrettyCustomWeapon
                                   weaponData={weapon}
@@ -581,27 +584,27 @@ export default function PlayerEquipment({
                                   showHeader={index === 0}
                                 />
                               )}
-                            </Grid>
-                            {isEditMode && (
-                              <Grid item xs={2} container direction="column" alignItems="center" justifyContent="center">
-                                {weapon.isTransforming && (
-                                  <Tooltip title={t("weapon_customization_swap_form")}>
-                                    <IconButton
-                                      onClick={() => handleSwapForm(weapon)}
-                                    >
-                                      <SwapHoriz />
-                                    </IconButton>
-                                  </Tooltip>
-                                )}
-                                <Tooltip title={t("Roll")}>
+                            </Box>
+                            <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                              {weapon.isTransforming && isEditMode && (
+                                <Tooltip title={t("weapon_customization_swap_form")}>
                                   <IconButton
-                                    onClick={() => handleDiceRoll(weapon)}
+                                    onClick={() => handleSwapForm(weapon)}
+                                    size="small"
                                   >
-                                    <Casino />
+                                    <SwapHoriz fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </Grid>
-                            )}
+                              )}
+                              <Tooltip title={t("Roll")}>
+                                <IconButton
+                                  onClick={() => handleDiceRoll(weapon)}
+                                  size="small"
+                                >
+                                  <Casino fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
                           </Grid>
                           {index < allEquippedWeapons.length - 1 && <Divider />}
                         </React.Fragment>
