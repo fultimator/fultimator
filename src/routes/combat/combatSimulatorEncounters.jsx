@@ -197,6 +197,7 @@ const CombatSimEncounters = () => {
       const res = await db.addDoc(db.collection("encounters"), newEncounter);
       console.debug(res);
       showNotification(t("combat_sim_encounter_created"));
+      fetchEncounters();
     } catch (e) {
       console.error("Error saving encounter:", e);
       showNotification(t("combat_sim_error_creating_encounter"), "error");
