@@ -16,6 +16,7 @@ import {
   IconButton,
   Box,
   Typography,
+  ListSubheader,
 } from "@mui/material";
 import { Close, Delete as DeleteIcon } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../icons";
@@ -25,6 +26,7 @@ import { useCustomTheme } from "../../hooks/useCustomTheme";
 import types from "../../libs/types";
 import classList from "../../libs/classes";
 import spellClassesList from "../../libs/spellClasses";
+import specialSkillsList from "../../libs/skills";
 import {
   Chip,
   Box as MuiBox,
@@ -34,6 +36,8 @@ import {
 import PlayerWeaponModal from "../player/equipment/weapons/PlayerWeaponModal";
 import PlayerArmorModal from "../player/equipment/armor/PlayerArmorModal";
 import PlayerShieldModal from "../player/equipment/shields/PlayerShieldModal";
+import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
 
 // Shared attribute options
 const ATTRS = [
@@ -858,6 +862,12 @@ const BLANK_BENEFITS = {
   spellClasses: [],
 };
 
+const GROUPED_SPECIAL_SKILLS = specialSkillsList.reduce((acc, skill) => {
+  if (!acc[skill.class]) acc[skill.class] = [];
+  acc[skill.class].push(skill);
+  return acc;
+}, {});
+
 export function ClassForm({ open, packId, onClose, editData, editItemId, onItemCreated }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
@@ -1089,6 +1099,26 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       inputProps={{ maxLength: 1500 }}
                     />
                   </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("Special Skill Effect")}</InputLabel>
+                      <Select
+                        value={skill.specialSkill ?? ""}
+                        onChange={(e) => updateSkillField(i, "specialSkill", e.target.value)}
+                        label={t("Special Skill Effect")}
+                      >
+                        <MenuItem value=""><em>{t("None")}</em></MenuItem>
+                        {Object.keys(GROUPED_SPECIAL_SKILLS)
+                          .sort((a, b) => t(a).localeCompare(t(b)))
+                          .flatMap((cls) => [
+                            <ListSubheader key={cls}>{t(cls)}</ListSubheader>,
+                            ...GROUPED_SPECIAL_SKILLS[cls].map((s) => (
+                              <MenuItem key={s.name} value={s.name}>{t(s.name)}</MenuItem>
+                            )),
+                          ])}
+                      </Select>
+                    </FormControl>
+                  </Grid>
                 </Grid>
               </Box>
             </Grid>
@@ -1160,6 +1190,32 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         shield={null}
         onAddShield={async (data) => { await addItem(packId, "shield", data); onClose(); }}
         onDeleteShield={() => {}}
+      />
+    );
+  }
+
+  if (itemType === "custom-weapon") {
+    return (
+      <PlayerCustomWeaponModal
+        open={open}
+        onClose={onClose}
+        editCustomWeaponIndex={null}
+        customWeapon={null}
+        onAddCustomWeapon={async (data) => { await addItem(packId, "custom-weapon", data); onClose(); }}
+        onDeleteCustomWeapon={() => {}}
+      />
+    );
+  }
+
+  if (itemType === "accessory") {
+    return (
+      <PlayerAccessoryModal
+        open={open}
+        onClose={onClose}
+        editAccIndex={null}
+        accessory={null}
+        onAddAccessory={async (data) => { await addItem(packId, "accessory", data); onClose(); }}
+        onDeleteAccessory={() => {}}
       />
     );
   }

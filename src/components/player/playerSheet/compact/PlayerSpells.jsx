@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Paper, Typography, Box, Table, TableBody, TableCell, TableContainer, TableRow, Collapse, IconButton, Tooltip } from "@mui/material";
+import { Paper, Typography, Box, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Collapse, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
@@ -105,6 +105,15 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
         )
       ) && (
         <Table size="small">
+          <TableHead>
+            <TableRow>
+              <StyledTableCellHeader sx={{ width: 36 }} />
+              <StyledTableCellHeader />
+              <StyledTableCellHeader sx={{ width: 80 }} />
+              <StyledTableCellHeader sx={{ width: 90 }} />
+              <StyledTableCellHeader sx={{ width: 100 }} />
+            </TableRow>
+          </TableHead>
           <TableBody>
             {player.classes
               .map((c, classIndex) => {
@@ -121,7 +130,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
                 return (
                   <React.Fragment key={classKey}>
                     <TableRow sx={{ background: theme.primary }}>
-                      <StyledTableCellHeader colSpan={3} sx={{ px: 1, py: 0.5 }}>
+                      <StyledTableCellHeader colSpan={5} sx={{ px: 1, py: 0.5 }}>
                         <Typography variant="h4" sx={{ textTransform: "uppercase", color: "white" }}>
                           {t("Spells") + " - " + t(c.name)}
                         </Typography>
@@ -135,25 +144,28 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
                       return (
                         <React.Fragment key={spellKey}>
                           <TableRow>
-                            <StyledTableCell sx={{ width: '1%' }}>
-                              <Tooltip title={t("Spell")}>
-                                <MoreVert sx={{ color: theme.secondary, ml: 1 }} />
-                              </Tooltip>
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: '1%' }}>
+                            <StyledTableCell sx={{ width: 36 }}>
                               <IconButton onClick={() => toggleRow(spellKey)} size="small">
                                 {openRows[spellKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                               </IconButton>
                             </StyledTableCell>
                             <StyledTableCell onClick={() => toggleRow(spellKey)} sx={{ cursor: "pointer" }}>
-                              <Typography variant="body2" fontWeight="bold">
-                                {highlightMatch(spellName, searchQuery)}
-                              </Typography>
+                              <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                  {highlightMatch(spellName, searchQuery)}
+                                </Typography>
+                                <Tooltip title={t("Spell")}>
+                                  <MoreVert sx={{ color: theme.secondary }} />
+                                </Tooltip>
+                              </Box>
                             </StyledTableCell>
+                            <StyledTableCell sx={{ width: 80 }} />
+                            <StyledTableCell sx={{ width: 90 }} />
+                            <StyledTableCell sx={{ width: 100 }} />
                           </TableRow>
                           
                           <TableRow>
-                            <StyledTableCell colSpan={3} sx={{ p: 0 }}>
+                            <StyledTableCell colSpan={5} sx={{ p: 0 }}>
                               <Collapse in={openRows[spellKey]} timeout="auto" unmountOnExit>
                                 <Box sx={{ p: 1 }}>
                                   {spell.spellType === "default" && (

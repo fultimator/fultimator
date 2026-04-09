@@ -43,15 +43,16 @@ import {
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
 import QuickCreateModal from "./QuickCreateModal";
+import { ManageModulesModal } from "../manage-modules";
 import classList, { spellList } from "../../libs/classes";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 
 const NPC_TYPES    = ["spells", "attacks", "special", "actions"];
-const PLAYER_TYPES = ["weapons", "armor", "shields", "player-spells", "qualities", "classes", "heroics"];
+const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
 
 const SIDEBAR_WIDTH = 300;
 
-const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context }) => {
+const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
@@ -87,6 +88,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [newPackName, setNewPackName] = useState("");
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
+  const [manageModulesOpen, setManageModulesOpen] = useState(false);
   const [editClassItem, setEditClassItem] = useState(null);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
@@ -108,7 +110,10 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
-      setSelectedType(initialType);
+      const resolvedType = restrictToTypes?.length
+        ? (restrictToTypes.includes(initialType) ? initialType : restrictToTypes[0])
+        : initialType;
+      setSelectedType(resolvedType);
       setSearchQuery("");
       setSelectedIdx(null);
       setSelectedCompendium("official");
@@ -233,15 +238,25 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     [filteredItems]
   );
 
+  // Scroll selected item into view in the main panel
+  useEffect(() => {
+    if (selectedIdx === null || !mainRef.current) return;
+    const id = itemIds[selectedIdx];
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [selectedIdx, itemIds]);
+
   const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
 
   // Handlers
   const handleTypeChange = useCallback((type) => {
+    if (restrictToTypes && !restrictToTypes.includes(type)) return;
     setSelectedType(type);
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
+  }, [restrictToTypes]);
 
   const handleItemClick = useCallback((item, idx) => {
     setSelectedIdx(idx);
@@ -284,6 +299,10 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   }, []);
 
   const handleCompendiumChange = useCallback((compendium) => {
+    if (compendium === "__manage_modules__") {
+      setManageModulesOpen(true);
+      return;
+    }
     setSelectedCompendium(compendium);
     setSearchQuery("");
     setSelectedIdx(null);
@@ -400,6 +419,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       onToggleLock={toggleLock}
       onOpenCreateDialog={() => setCreateItemDialogOpen(true)}
       onOpenQuickCreate={() => setQuickCreateOpen(true)}
+      restrictToTypes={restrictToTypes}
     />
   );
 
@@ -462,6 +482,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
             open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
             PaperProps={{ sx: { width: "85vw", maxWidth: 340 } }}
+            sx={{ zIndex: 1400 }}
           >
             <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
               <IconButton size="small" onClick={() => setDrawerOpen(false)}>
@@ -543,43 +564,61 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         </Box>
       </DialogContent>
 
-      <Divider />
-      <DialogActions
-        sx={{
-          justifyContent: "space-between",
-          px: 2,
-          py: 1,
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          gap: { xs: 1, sm: 0 },
-        }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          <strong>{t("Disclaimer")}:</strong>{" "}
-          {t("For personal use only; do not share exported data on official channels.")}
-        </Typography>
-        <Tooltip
-          title={contextMismatch
-            ? t(context === "npc" ? "This item type is for player sheets only." : "This item type is for NPC sheets only.")
-            : ""}
-          disableHoverListener={!contextMismatch}
-        >
-          <span>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={selectedItem === null || !!contextMismatch}
-              onClick={handleAddItem}
-              sx={{ flexShrink: 0 }}
+      {!viewOnly && (
+        <>
+          <Divider />
+          <DialogActions
+            sx={{
+              justifyContent: "space-between",
+              px: 2,
+              py: 1,
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: { xs: 1, sm: 0 },
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              <strong>{t("Disclaimer")}:</strong>{" "}
+              {t("For personal use only; do not share exported data on official channels.")}
+            </Typography>
+            <Tooltip
+              title={contextMismatch
+                ? t(context === "npc" ? "This item type is for player sheets only." : "This item type is for NPC sheets only.")
+                : ""}
+              disableHoverListener={!contextMismatch}
             >
-              {t("Add Item")}
-            </Button>
-          </span>
-        </Tooltip>
-      </DialogActions>
+              <span>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={selectedItem === null || !!contextMismatch}
+                  onClick={handleAddItem}
+                  sx={{ flexShrink: 0 }}
+                >
+                  {t("Add Item")}
+                </Button>
+              </span>
+            </Tooltip>
+          </DialogActions>
+        </>
+      )}
+
+      {/* Manage Modules modal */}
+      <ManageModulesModal
+        open={manageModulesOpen}
+        onClose={() => setManageModulesOpen(false)}
+        onImportSuccess={(id) => {
+          setManageModulesOpen(false);
+          handleCompendiumChange(id);
+        }}
+      />
 
       {/* Quick Create modal */}
-      <QuickCreateModal open={quickCreateOpen} onClose={() => setQuickCreateOpen(false)} />
+      <QuickCreateModal
+        open={quickCreateOpen}
+        onClose={() => setQuickCreateOpen(false)}
+        lockedToViewerType={restrictToTypes?.length ? selectedType : undefined}
+      />
 
       {/* Create item dialog */}
       {activePack && (

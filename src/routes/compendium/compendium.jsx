@@ -69,7 +69,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
-import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard } from "../../components/compendium/ItemCards";
+import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard } from "../../components/compendium/ItemCards";
 
 import weapons from "../../libs/weapons";
 import heroics from "../../libs/heroics";
@@ -126,47 +126,53 @@ const shields = baseShields
   .map((s) => ({ ...s, category: "Shield" }));
 
 export const ITEM_TYPES = [
-  { key: "weapons",      label: "Weapons",        context: "player" },
-  { key: "armor",        label: "Armor",          context: "player" },
-  { key: "shields",      label: "Shields",        context: "player" },
-  { key: "spells",       label: "NPC Spells",     context: "npc" },
-  { key: "attacks",      label: "NPC Attacks",    context: "npc" },
-  { key: "special",      label: "Special Rules",  context: "npc" },
-  { key: "actions",      label: "Other Actions",  context: "npc" },
-  { key: "classes",      label: "Classes",        context: "player" },
-  { key: "player-spells", label: "Spells",        context: "both" },
-  { key: "qualities",    label: "Qualities",      context: "player" },
-  { key: "heroics",      label: "Heroic Skills",  context: "player" },
+  { key: "weapons",        label: "Weapons",        context: "player" },
+  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
+  { key: "shields",        label: "Shields",        context: "player" },
+  { key: "armor",          label: "Armor",          context: "player" },
+  { key: "accessories",    label: "Accessories",    context: "player" },
+  { key: "spells",         label: "NPC Spells",     context: "npc" },
+  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
+  { key: "special",        label: "Special Rules",  context: "npc" },
+  { key: "actions",        label: "Other Actions",  context: "npc" },
+  { key: "classes",        label: "Classes",        context: "player" },
+  { key: "player-spells",  label: "Spells",         context: "both" },
+  { key: "qualities",      label: "Qualities",      context: "player" },
+  { key: "heroics",        label: "Heroic Skills",  context: "player" },
 ];
 
 // Item types available when browsing a pack (no classes / non-standard types)
 export const PACK_ITEM_TYPES = [
-  { key: "weapons",      label: "Weapons",        context: "player" },
-  { key: "armor",        label: "Armor",          context: "player" },
-  { key: "shields",      label: "Shields",        context: "player" },
-  { key: "spells",       label: "NPC Spells",     context: "npc" },
-  { key: "attacks",      label: "NPC Attacks",    context: "npc" },
-  { key: "special",      label: "Special Rules",  context: "npc" },
-  { key: "actions",      label: "Other Actions",  context: "npc" },
-  { key: "player-spells", label: "Spells",        context: "both" },
-  { key: "qualities",    label: "Qualities",      context: "player" },
-  { key: "classes",      label: "Classes",        context: "player" },
-  { key: "heroics",      label: "Heroic Skills",  context: "player" },
+  { key: "weapons",        label: "Weapons",        context: "player" },
+  { key: "armor",          label: "Armor",          context: "player" },
+  { key: "shields",        label: "Shields",        context: "player" },
+  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
+  { key: "accessories",    label: "Accessories",    context: "player" },
+  { key: "spells",         label: "NPC Spells",     context: "npc" },
+  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
+  { key: "special",        label: "Special Rules",  context: "npc" },
+  { key: "actions",        label: "Other Actions",  context: "npc" },
+  { key: "player-spells",  label: "Spells",         context: "both" },
+  { key: "qualities",      label: "Qualities",      context: "player" },
+  { key: "classes",        label: "Classes",        context: "player" },
+  { key: "heroics",        label: "Heroic Skills",  context: "player" },
 ];
 
 // viewer key → CompendiumItemType
 export const VIEWER_TO_PACK_TYPE = {
-  weapons:        "weapon",
-  armor:          "armor",
-  shields:        "shield",
-  spells:         "npc-spell",
-  attacks:        "npc-attack",
-  special:        "npc-special",
-  actions:        "npc-action",
-  "player-spells": "player-spell",
-  qualities:      "quality",
-  classes:        "class",
-  heroics:        "heroic",
+  weapons:          "weapon",
+  armor:            "armor",
+  shields:          "shield",
+  "custom-weapons": "custom-weapon",
+  accessories:      "accessory",
+  spells:           "npc-spell",
+  attacks:          "npc-attack",
+  special:          "npc-special",
+  actions:          "npc-action",
+  "player-spells":  "player-spell",
+  qualities:        "quality",
+  classes:          "class",
+  heroics:          "heroic",
 };
 
 export function getItems(type) {
@@ -191,6 +197,8 @@ export function getItems(type) {
       return heroics;
     case "special":
     case "actions":
+    case "custom-weapons":
+    case "accessories":
       return []; // pack-only, no official data
     default:
       return [];
@@ -221,8 +229,10 @@ function toSlug(name) {
 
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
+  if (type === "custom-weapons") return `${item.cost || 300}z`;
   if (type === "armor") return `${item.cost}z`;
   if (type === "shields") return `${item.cost}z`;
+  if (type === "accessories") return `${item.cost}z`;
   if (type === "qualities") return `${item.cost}z`;
   if (type === "spells") return `${item.mp} MP`;
   if (type === "player-spells") return item.mp != null ? `${item.mp} MP` : item.wellspring ?? "";
@@ -320,11 +330,15 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onToggleLock,
   onOpenCreateDialog,
   onOpenQuickCreate,
+  restrictToTypes,
 }) {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const isPackMode = selectedCompendium !== "official";
-  const activeTypes = isPackMode ? PACK_ITEM_TYPES : ITEM_TYPES;
+  const baseTypes = isPackMode ? PACK_ITEM_TYPES : ITEM_TYPES;
+  const activeTypes = restrictToTypes
+    ? baseTypes.filter((x) => restrictToTypes.includes(x.key))
+    : baseTypes;
 
   return (
     <Box
@@ -370,6 +384,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             >
               <MenuItem value="official">{t("Official Data")}</MenuItem>
               {[...packs]
+                .filter((p) => p.active !== false)
                 .sort((a, b) => {
                   if (a.isPersonal !== b.isPersonal) return a.isPersonal ? -1 : 1;
                   return a.name.localeCompare(b.name);
@@ -420,53 +435,55 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           )}
         </Box>
 
-        <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-          <FormControl fullWidth size="small">
-            <InputLabel>{t("Item Type")}</InputLabel>
-            <Select
-              value={activeTypes.some((x) => x.key === selectedType) ? selectedType : activeTypes[0].key}
-              onChange={(e) => onTypeChange(e.target.value)}
-              label={t("Item Type")}
-            >
-              {activeTypes.map((type) => (
-                <MenuItem key={type.key} value={type.key}>
-                  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 1 }}>
-                    <span>{t(type.label)}</span>
-                    {type.context && type.context !== "both" && (
-                      <Chip
-                        label={type.context === "npc" ? "NPC" : "Player"}
-                        size="small"
-                        sx={{
-                          height: 16,
-                          fontSize: "0.6rem",
-                          fontWeight: "bold",
-                          backgroundColor: type.context === "npc" ? "rgba(211,47,47,0.15)" : "rgba(25,118,210,0.15)",
-                          color: type.context === "npc"
-                            ? customTheme.mode === "dark" ? "white" : "error.dark"
-                            : customTheme.mode === "dark" ? "white" : "primary.dark",
-                          pointerEvents: "none",
-                        }}
-                      />
-                    )}
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {isPackMode && (
-            <Tooltip title={activePack?.locked ? t("Unlock pack to create items") : t("Create New Item")}>
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={onOpenCreateDialog}
-                  disabled={!!activePack?.locked}
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
-          )}
-        </Box>
+        {(!restrictToTypes || restrictToTypes.length > 1) && (
+          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Item Type")}</InputLabel>
+              <Select
+                value={activeTypes.some((x) => x.key === selectedType) ? selectedType : activeTypes[0].key}
+                onChange={(e) => onTypeChange(e.target.value)}
+                label={t("Item Type")}
+              >
+                {activeTypes.map((type) => (
+                  <MenuItem key={type.key} value={type.key}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 1 }}>
+                      <span>{t(type.label)}</span>
+                      {type.context && type.context !== "both" && (
+                        <Chip
+                          label={type.context === "npc" ? "NPC" : "Player"}
+                          size="small"
+                          sx={{
+                            height: 16,
+                            fontSize: "0.6rem",
+                            fontWeight: "bold",
+                            backgroundColor: type.context === "npc" ? "rgba(211,47,47,0.15)" : "rgba(25,118,210,0.15)",
+                            color: type.context === "npc"
+                              ? customTheme.mode === "dark" ? "white" : "error.dark"
+                              : customTheme.mode === "dark" ? "white" : "primary.dark",
+                            pointerEvents: "none",
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {isPackMode && (
+              <Tooltip title={activePack?.locked ? t("Unlock pack to create items") : t("Create New Item")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onOpenCreateDialog}
+                    disabled={!!activePack?.locked}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </Box>
+        )}
 
         {selectedType === "player-spells" && !isPackMode && (
           <FormControl fullWidth size="small">
@@ -766,6 +783,10 @@ export const ItemCard = React.memo(function ItemCard({ type, item, id, onHeaderC
       return <ClassCard cls={item} id={id} onHeaderClick={onHeaderClick} />;
     case "heroics":
       return <HeroicCard heroic={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "custom-weapons":
+      return <CustomWeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "accessories":
+      return <AccessoryCard accessory={item} id={id} onHeaderClick={onHeaderClick} />;
     case "special":
       return <SpecialRuleCard item={item} id={id} onHeaderClick={onHeaderClick} />;
     case "actions":

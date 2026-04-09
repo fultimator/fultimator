@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {
   Grid, Typography, Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Collapse,
-  IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
+  IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip,
+  Badge, Menu, MenuItem
 } from "@mui/material";
 import { OpenBracket, CloseBracket } from "../../../Bracket";
 import { Martial, MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../../icons";
@@ -14,9 +15,10 @@ import { useTranslate } from "../../../../translation/translate";
 import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { Casino, RadioButtonUnchecked, Error, SwapHoriz } from "@mui/icons-material";
+import { Casino, RadioButtonUnchecked, Error, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
-import { isItemEquipped } from "../../equipment/slots/equipmentSlots";
+import { isItemEquipped, validateSlots, deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -26,7 +28,17 @@ export default function PlayerEquipment({
   setPlayer,
   isMainTab,
   isEditMode,
-  searchQuery = ''
+  searchQuery = '',
+  onAddWeapon,
+  onEditWeapon,
+  onAddCustomWeapon,
+  onEditCustomWeapon,
+  onAddArmor,
+  onEditArmor,
+  onAddShield,
+  onEditShield,
+  onAddAccessory,
+  onEditAccessory,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -34,6 +46,7 @@ export default function PlayerEquipment({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
+  const [compendiumType, setCompendiumType] = useState(null);
 
   // Guardian - Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
@@ -276,64 +289,163 @@ export default function PlayerEquipment({
     will: currWillpower,
   };
 
-  const handleEquipment = (item) => {
-    if (!setPlayer || !isEditMode) return;
+  // --- Equip helpers (mirrors EditPlayerEquipment) ---
+  const patchInv = (p, source, updater) => {
+    const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
+    const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
+    return { ...p, equipment };
+  };
 
-    // Handle custom weapons
-    if (item.isCustomWeapon) {
-      handleEquipCustomWeapon(item);
+  const preserveSlots = (p) => {
+    const validated = validateSlots(p);
+    return { ...validated, vehicleSlots: deriveVehicleSlots(validated) };
+  };
+
+  const equipToSlot = (source, itemName, slot, isTwoHand) => {
+    let updated = player;
+    const currentRef = updated.equippedSlots?.[slot];
+    if (currentRef) {
+      updated = patchInv(updated, currentRef.source, arr =>
+        arr.map(it => it.name === currentRef.name ? { ...it, isEquipped: false } : it)
+      );
     }
-    // Determine the equipment type and handle accordingly
-    else if (item.category === 'Weapon' || item.melee || item.ranged) {
-      handleEquipWeapon(item);
-    } else if (item.category === 'Armor') {
-      handleEquipArmor(item);
-    } else if (item.category === 'Shield') {
-      handleEquipShield(item);
-    } else if (item.category === 'Accessory' || (!item.category && inv.accessories?.some(a => a === item))) {
-      handleEquipAccessory(item);
+    if (isTwoHand && slot === 'mainHand') {
+      const offRef = updated.equippedSlots?.offHand;
+      if (offRef) {
+        updated = patchInv(updated, offRef.source, arr =>
+          arr.map(it => it.name === offRef.name ? { ...it, isEquipped: false } : it)
+        );
+      }
+    }
+    updated = patchInv(updated, source, arr =>
+      arr.map(it => it.name === itemName ? { ...it, isEquipped: true } : it)
+    );
+    const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
+    setPlayer({
+      ...updated,
+      equippedSlots: {
+        ...prevSlots,
+        [slot]: { source, name: itemName },
+        ...(isTwoHand && slot === 'mainHand' ? { offHand: null } : {}),
+      },
+      vehicleSlots: deriveVehicleSlots(updated),
+    });
+  };
+
+  const unequipItem = (source, itemName) => {
+    const slots = player.equippedSlots ?? {};
+    const slotKey = Object.keys(slots).find(k => {
+      const ref = slots[k];
+      return ref?.source === source && ref?.name === itemName;
+    });
+    let updated = patchInv(player, source, arr =>
+      arr.map(it => it.name === itemName ? { ...it, isEquipped: false } : it)
+    );
+    if (slotKey) {
+      const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
+      setPlayer({
+        ...updated,
+        equippedSlots: { ...prevSlots, [slotKey]: null },
+        vehicleSlots: deriveVehicleSlots(updated),
+      });
+    } else {
+      setPlayer(preserveSlots(updated));
     }
   };
 
-  const handleEquipCustomWeapon = (item) => {
-    const customWeapon = item.originalData;
-    setPlayer(prevPlayer => {
-      const updatedCustomWeapons = [...(prevPlayer.customWeapons || [])];
-      const weaponIndex = updatedCustomWeapons.findIndex(w => w === customWeapon);
-      if (weaponIndex !== -1) {
-        const isEquipping = !customWeapon.isEquipped;
-        updatedCustomWeapons[weaponIndex] = { ...customWeapon, isEquipped: isEquipping };
+  // Slot menu state for 1H weapons and shields
+  const [slotMenuAnchor, setSlotMenuAnchor] = useState(null);
+  const [slotMenuWeapon, setSlotMenuWeapon] = useState(null);
+  const [shieldMenuAnchor, setShieldMenuAnchor] = useState(null);
+  const [shieldMenuName, setShieldMenuName] = useState(null);
 
-        // If equipping, unequip regular weapons and shields
-        if (isEquipping) {
-          const updatedWeapons = (prevPlayer.weapons || []).map(weapon => ({
-            ...weapon,
-            isEquipped: false
-          }));
-          const updatedShields = (prevPlayer.shields || []).map(shield => ({
-            ...shield,
-            isEquipped: false
-          }));
-          
-          // Also unequip other custom weapons
-          updatedCustomWeapons.forEach((cw, i) => {
-            if (i !== weaponIndex) {
-              cw.isEquipped = false;
-            }
-          });
+  const handleWeaponSlotSelect = (slot) => {
+    if (slotMenuWeapon) equipToSlot('weapons', slotMenuWeapon, slot, false);
+    setSlotMenuAnchor(null);
+    setSlotMenuWeapon(null);
+  };
 
-          return {
-            ...prevPlayer,
-            customWeapons: updatedCustomWeapons,
-            weapons: updatedWeapons,
-            shields: updatedShields
-          };
-        }
+  const handleShieldSlotSelect = (slot) => {
+    if (shieldMenuName) equipToSlot('shields', shieldMenuName, slot, false);
+    setShieldMenuAnchor(null);
+    setShieldMenuName(null);
+  };
 
-        return { ...prevPlayer, customWeapons: updatedCustomWeapons };
+  const handleEquipment = (item, event) => {
+    if (!setPlayer || !isEditMode) return;
+
+    if (item.isCustomWeapon) {
+      const cw = item.originalData;
+      if (cw.isEquipped) {
+        unequipItem('customWeapons', cw.name);
+      } else {
+        equipToSlot('customWeapons', cw.name, 'mainHand', true);
       }
-      return prevPlayer;
-    });
+      return;
+    }
+
+    const invItem = (() => {
+      const eq0 = player.equipment?.[0];
+      if (item.category === 'Shield') return eq0?.shields?.find(s => s === item || s.name === item.name);
+      if (item.category === 'Armor') return eq0?.armor?.find(a => a === item || a.name === item.name);
+      if (!item.category || item.melee !== undefined || item.ranged !== undefined) return eq0?.weapons?.find(w => w === item || w.name === item.name);
+      return eq0?.accessories?.find(a => a === item || a.name === item.name);
+    })();
+
+    if (!invItem && item.category !== 'Accessory') {
+      // fallback for accessories that don't have category
+      const eq0 = player.equipment?.[0];
+      const acc = eq0?.accessories?.find(a => a === item || a.name === item.name);
+      if (acc) {
+        if (acc.isEquipped) {
+          unequipItem('accessories', acc.name);
+        } else {
+          equipToSlot('accessories', acc.name, 'accessory', false);
+        }
+      }
+      return;
+    }
+
+    if (!invItem) return;
+
+    if (item.category === 'Armor') {
+      if (invItem.isEquipped) {
+        unequipItem('armor', invItem.name);
+      } else {
+        equipToSlot('armor', invItem.name, 'armor', false);
+      }
+    } else if (item.category === 'Shield') {
+      if (invItem.isEquipped) {
+        unequipItem('shields', invItem.name);
+      } else if (hasDualShieldBearer && event) {
+        setShieldMenuAnchor({ top: event.clientY, left: event.clientX });
+        setShieldMenuName(invItem.name);
+      } else {
+        equipToSlot('shields', invItem.name, 'offHand', false);
+      }
+    } else if (item.category === 'Accessory' || (!item.melee && !item.ranged && !item.hands)) {
+      if (invItem.isEquipped) {
+        unequipItem('accessories', invItem.name);
+      } else {
+        equipToSlot('accessories', invItem.name, 'accessory', false);
+      }
+    } else {
+      // Regular weapon
+      const isTwoHand = invItem.hands === 2 || invItem.isTwoHand;
+      if (invItem.isEquipped) {
+        unequipItem('weapons', invItem.name);
+      } else if (isTwoHand) {
+        equipToSlot('weapons', invItem.name, 'mainHand', true);
+      } else if (event) {
+        setSlotMenuAnchor({ top: event.clientY, left: event.clientX });
+        setSlotMenuWeapon(invItem.name);
+      } else {
+        // fallback: pick first free slot
+        const slots = player.equippedSlots ?? {};
+        const slot = !slots.mainHand ? 'mainHand' : !slots.offHand ? 'offHand' : null;
+        if (slot) equipToSlot('weapons', invItem.name, slot, false);
+      }
+    }
   };
 
   const handleSwapForm = (item) => {
@@ -348,147 +460,6 @@ export default function PlayerEquipment({
         const newForm = cw.activeForm === "secondary" ? "primary" : "secondary";
         updatedCustomWeapons[weaponIndex] = { ...cw, activeForm: newForm };
         return { ...prevPlayer, customWeapons: updatedCustomWeapons };
-      }
-      return prevPlayer;
-    });
-  };
-
-  const canEquipWeapon = (weapon) => {
-    const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
-    const shieldsCount = countEquippedShields();
-
-    if (weapon.hands === 2) {
-      // Two-handed weapon can be equipped only if both hands are free
-      return oneHandedCount === 0 && twoHandedCount === 0 && shieldsCount === 0;
-    } else if (weapon.hands === 1) {
-      // One-handed weapon can be equipped if there is at least one hand free
-      // Player can't equip 2 one-handed weapons and a shield
-      if (twoHandedCount > 0) {
-        return false;
-      }
-      return (
-        oneHandedCount < 2 &&
-        shieldsCount < 2 &&
-        !(oneHandedCount === 1 && shieldsCount === 1)
-      );
-    }
-
-    return false;
-  };
-
-  const countEquippedWeapons = () => {
-    let oneHandedCount = 0;
-    let twoHandedCount = 0;
-
-    const inv = player.equipment?.[0];
-
-    // Count regular weapons
-    if (inv?.weapons) {
-      inv.weapons.forEach((weapon) => {
-        if (weapon.isEquipped) {
-          if (weapon.hands === 1) {
-            oneHandedCount++;
-          } else if (weapon.hands === 2) {
-            twoHandedCount++;
-          }
-        }
-      });
-    }
-
-    // Count custom weapons (all are two-handed)
-    if (inv?.customWeapons) {
-      inv.customWeapons.forEach((weapon) => {
-        if (weapon.isEquipped) {
-          twoHandedCount++;
-        }
-      });
-    }
-
-    return { oneHandedCount, twoHandedCount };
-  };
-
-  const countEquippedShields = () => {
-    let count = 0;
-    const inv = player.equipment?.[0];
-    if (inv?.shields && inv.shields.length > 0) {
-      inv.shields.forEach((shield) => {
-        if (shield.isEquipped) {
-          count++;
-        }
-      });
-    }
-    return count;
-  };
-
-  const handleEquipWeapon = (weapon) => {
-    if (canEquipWeapon(weapon) || weapon.isEquipped) {
-      setPlayer(prevPlayer => {
-        const updatedWeapons = [...(prevPlayer.weapons || [])];
-        const weaponIndex = updatedWeapons.findIndex(w => w === weapon);
-        if (weaponIndex !== -1) {
-          updatedWeapons[weaponIndex] = { ...weapon, isEquipped: !weapon.isEquipped };
-          return { ...prevPlayer, weapons: updatedWeapons };
-        }
-        return prevPlayer;
-      });
-    } else {
-      const message = t("You cannot equip this weapon as no hands are free.");
-      if (window.electron) {
-        window.electron.alert(message);
-      } else {
-        alert(message);
-      }
-    }
-  };
-
-  const handleEquipArmor = (armor) => {
-    setPlayer(prevPlayer => {
-      const updatedArmor = [...(prevPlayer.armor || [])];
-      const armorIndex = updatedArmor.findIndex(a => a === armor);
-      if (armorIndex !== -1) {
-        // Unequip all other armor first
-        const newArmor = updatedArmor.map(a => ({ ...a, isEquipped: false }));
-        // Equip the selected armor
-        newArmor[armorIndex] = { ...armor, isEquipped: !armor.isEquipped };
-        return { ...prevPlayer, armor: newArmor };
-      }
-      return prevPlayer;
-    });
-  };
-
-  const handleEquipShield = (shield) => {
-    const shieldsCount = countEquippedShields();
-    const { twoHandedCount } = countEquippedWeapons();
-
-    if (shield.isEquipped || (shieldsCount < (hasDualShieldBearer ? 2 : 1) && twoHandedCount === 0)) {
-      setPlayer(prevPlayer => {
-        const updatedShields = [...(prevPlayer.shields || [])];
-        const shieldIndex = updatedShields.findIndex(s => s === shield);
-        if (shieldIndex !== -1) {
-          updatedShields[shieldIndex] = { ...shield, isEquipped: !shield.isEquipped };
-          return { ...prevPlayer, shields: updatedShields };
-        }
-        return prevPlayer;
-      });
-    } else {
-      const message = hasDualShieldBearer
-        ? t("You can only equip up to 2 shields.")
-        : t("You can only equip 1 shield or your hands are occupied.");
-      if (window.electron) {
-        window.electron.alert(message);
-      } else {
-        alert(message);
-      }
-    }
-  };
-
-  const handleEquipAccessory = (accessory) => {
-    setPlayer(prevPlayer => {
-      const updatedAccessories = [...(prevPlayer.accessories || [])];
-      const accessoryIndex = updatedAccessories.findIndex(a => a === accessory);
-      if (accessoryIndex !== -1) {
-        updatedAccessories[accessoryIndex] = { ...accessory, isEquipped: !accessory.isEquipped };
-        return { ...prevPlayer, accessories: updatedAccessories };
       }
       return prevPlayer;
     });
@@ -639,6 +610,30 @@ export default function PlayerEquipment({
     setDialogOpen(false);
   };
 
+  // Edit helpers — resolve item to inventory index and call parent callback
+  const handleEditWeaponItem = (weapon) => {
+    if (weapon.isCustomWeapon) {
+      const idx = inv?.customWeapons?.indexOf(weapon.originalData) ?? -1;
+      if (idx >= 0 && onEditCustomWeapon) onEditCustomWeapon(idx);
+    } else {
+      const idx = inv?.weapons?.indexOf(weapon) ?? -1;
+      if (idx >= 0 && onEditWeapon) onEditWeapon(idx);
+    }
+  };
+  const handleEditArmorOrShieldItem = (item) => {
+    if (item.category === "Shield") {
+      const idx = inv?.shields?.indexOf(item) ?? -1;
+      if (idx >= 0 && onEditShield) onEditShield(idx);
+    } else {
+      const idx = inv?.armor?.indexOf(item) ?? -1;
+      if (idx >= 0 && onEditArmor) onEditArmor(idx);
+    }
+  };
+  const handleEditAccessoryItem = (accessory) => {
+    const idx = inv?.accessories?.indexOf(accessory) ?? -1;
+    if (idx >= 0 && onEditAccessory) onEditAccessory(idx);
+  };
+
   const checkIfEquippable = (item) => {
     const { classes } = player;
 
@@ -667,6 +662,43 @@ export default function PlayerEquipment({
     return false;
   };
 
+  const handleImportFromCompendium = (item, type) => {
+    if (!setPlayer) return;
+    const patchInv = (p, source, updater) => {
+      const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
+      const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
+      return { ...p, equipment };
+    };
+    if (type === "weapons") {
+      setPlayer(prev => patchInv(prev, 'weapons', arr => [...arr, {
+        base: item, name: item.name, category: item.category || "",
+        melee: item.melee || false, ranged: !item.melee, type: item.type,
+        hands: item.hands, att1: item.att1, att2: item.att2,
+        martial: item.martial || false, damageBonus: false,
+        damageReworkBonus: false, precBonus: false, rework: false,
+        quality: "", qualityCost: 0, totalBonus: 0, selectedQuality: "",
+        cost: item.cost || 0, damage: item.damage || 0, prec: item.prec || 0,
+        isEquipped: false,
+      }]));
+    } else if (type === "armor") {
+      setPlayer(prev => patchInv(prev, 'armor', arr => [...arr, {
+        base: item, name: item.name, quality: "",
+        martial: item.martial || false, qualityCost: 0, selectedQuality: "",
+        init: item.init || 0, rework: false, cost: item.cost || 0, isEquipped: false,
+      }]));
+    } else if (type === "shields") {
+      setPlayer(prev => patchInv(prev, 'shields', arr => [...arr, {
+        base: item, name: item.name, quality: "",
+        martial: item.martial || false, qualityCost: 0, selectedQuality: "",
+        init: item.init || 0, rework: false, cost: item.cost || 0, isEquipped: false,
+      }]));
+    } else if (type === "custom-weapons") {
+      setPlayer(prev => patchInv(prev, 'customWeapons', arr => [...arr, { ...item, isEquipped: false }]));
+    } else if (type === "accessories") {
+      setPlayer(prev => patchInv(prev, 'accessories', arr => [...arr, { ...item, isEquipped: false }]));
+    }
+  };
+
   return (
     <>
       <Grid container spacing={0} sx={{ padding: 0 }}>
@@ -681,7 +713,7 @@ export default function PlayerEquipment({
                 },
               }}
             >
-              <StyledTableCellHeader sx={{ width: 34 }} />
+              <StyledTableCellHeader sx={{ width: 36 }} />
               <StyledTableCellHeader>
                 <Typography variant="h4">{t("Equipment")}</Typography>
               </StyledTableCellHeader>
@@ -701,34 +733,44 @@ export default function PlayerEquipment({
                     textTransform: "uppercase",
                   },
                 }}>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
                     {t("Weapon")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 80 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Accuracy")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 90 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Damage")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                  {isEditMode && onAddWeapon && (
+                    <Tooltip title={t("Add Weapon")}><IconButton size="small" onClick={onAddWeapon} sx={{ color: '#fff', p: 0 }}><Add fontSize="small" /></IconButton></Tooltip>
+                  )}
+                  {isEditMode && (
+                    <Tooltip title={t("Search Weapons")}><IconButton size="small" onClick={() => setCompendiumType("weapons")} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
+                  )}
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
           </Table>
         )}
         {allEquippedWeapons.length > 0 && (
-          <CollapsibleWeapon 
-            weapons={allEquippedWeapons} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
+          <CollapsibleWeapon
+            weapons={allEquippedWeapons}
+            handleEquipment={handleEquipment}
+            handleDiceRoll={handleDiceRoll}
+            isMainTab={isMainTab}
+            searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditWeaponItem}
+            equippedSlots={player.equippedSlots}
           />
         )}
         {!isMainTab && (
@@ -741,6 +783,8 @@ export default function PlayerEquipment({
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditWeaponItem}
           />
         )}
         {!isMainTab && (
@@ -755,35 +799,45 @@ export default function PlayerEquipment({
                     textTransform: "uppercase",
                   },
                 }}>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
                     {t("Custom Weapon")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 80 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Accuracy")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 90 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Damage")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                  {isEditMode && onAddCustomWeapon && (
+                    <Tooltip title={t("Add Custom Weapon")}><IconButton size="small" onClick={onAddCustomWeapon} sx={{ color: '#fff', p: 0 }}><Add fontSize="small" /></IconButton></Tooltip>
+                  )}
+                  {isEditMode && (
+                    <Tooltip title={t("Search Custom Weapons")}><IconButton size="small" onClick={() => setCompendiumType("custom-weapons")} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
+                  )}
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
           </Table>
         )}
         {formattedCustomWeapons.length > 0 && (
-          <CollapsibleWeapon 
-            weapons={formattedCustomWeapons} 
-            handleEquipment={handleEquipment} 
-            handleDiceRoll={handleDiceRoll} 
+          <CollapsibleWeapon
+            weapons={formattedCustomWeapons}
+            handleEquipment={handleEquipment}
+            handleDiceRoll={handleDiceRoll}
             handleSwapForm={handleSwapForm}
-            isMainTab={isMainTab} 
-            searchQuery={searchQuery} 
+            isMainTab={isMainTab}
+            searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditWeaponItem}
+            equippedSlots={player.equippedSlots}
           />
         )}
         {!isMainTab && (
@@ -797,6 +851,8 @@ export default function PlayerEquipment({
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditWeaponItem}
           />
         )}
         {!isMainTab && (
@@ -811,29 +867,36 @@ export default function PlayerEquipment({
                     textTransform: "uppercase",
                   },
                 }}>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
                     {t("Shield")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 80 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Defense")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 90 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("M. Defense")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                  {isEditMode && onAddShield && (
+                    <Tooltip title={t("Add Shield")}><IconButton size="small" onClick={onAddShield} sx={{ color: '#fff', p: 0 }}><Add fontSize="small" /></IconButton></Tooltip>
+                  )}
+                  {isEditMode && (
+                    <Tooltip title={t("Search Shields")}><IconButton size="small" onClick={() => setCompendiumType("shields")} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
+                  )}
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
           </Table>
         )}
         {equippedShields.length > 0 && (
-          <CollapsibleArmor armors={equippedShields} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
+          <CollapsibleArmor armors={equippedShields} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditArmorOrShieldItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllArmor
@@ -843,6 +906,8 @@ export default function PlayerEquipment({
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditArmorOrShieldItem}
           />
         )}
         {!isMainTab && (
@@ -857,29 +922,36 @@ export default function PlayerEquipment({
                     textTransform: "uppercase",
                   },
                 }}>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
                     {t("Armor")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 80 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Defense")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 90 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("M. Defense")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                  {isEditMode && onAddArmor && (
+                    <Tooltip title={t("Add Armor")}><IconButton size="small" onClick={onAddArmor} sx={{ color: '#fff', p: 0 }}><Add fontSize="small" /></IconButton></Tooltip>
+                  )}
+                  {isEditMode && (
+                    <Tooltip title={t("Search Armor")}><IconButton size="small" onClick={() => setCompendiumType("armor")} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
+                  )}
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
           </Table>
         )}
         {equippedArmor.length > 0 && (
-          <CollapsibleArmor armors={equippedArmor} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
+          <CollapsibleArmor armors={equippedArmor} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditArmorOrShieldItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllArmor
@@ -889,6 +961,8 @@ export default function PlayerEquipment({
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditArmorOrShieldItem}
           />
         )}
         {!isMainTab && (
@@ -903,24 +977,32 @@ export default function PlayerEquipment({
                     textTransform: "uppercase",
                   },
                 }}>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4" textAlign="left">
                     {t("Accessory")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: 80 }}>
                   <Typography variant="h4" textAlign="center">
                     {t("Cost")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader />
+                <StyledTableCellHeader sx={{ width: 90 }} />
+                <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                  {isEditMode && onAddAccessory && (
+                    <Tooltip title={t("Add Accessory")}><IconButton size="small" onClick={onAddAccessory} sx={{ color: '#fff', p: 0 }}><Add fontSize="small" /></IconButton></Tooltip>
+                  )}
+                  {isEditMode && (
+                    <Tooltip title={t("Search Accessories")}><IconButton size="small" onClick={() => setCompendiumType("accessories")} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
+                  )}
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
           </Table>
         )}
         {equippedAccessories.length > 0 && (
-          <CollapsibleAccessory accessorys={equippedAccessories} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} />
+          <CollapsibleAccessory accessorys={equippedAccessories} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditAccessoryItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllAccessory
@@ -929,6 +1011,8 @@ export default function PlayerEquipment({
             handleDiceRoll={handleDiceRoll}
             isMainTab={isMainTab}
             searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditAccessoryItem}
           />
         )}
         {!isMainTab && (
@@ -964,6 +1048,34 @@ export default function PlayerEquipment({
           )
         )}
       </Grid>
+      {/* Slot selection menu for 1H weapons */}
+      <Menu
+        open={Boolean(slotMenuAnchor)}
+        onClose={() => { setSlotMenuAnchor(null); setSlotMenuWeapon(null); }}
+        anchorReference="anchorPosition"
+        anchorPosition={slotMenuAnchor ?? undefined}
+      >
+        <MenuItem onClick={() => handleWeaponSlotSelect('mainHand')}>{t("Main Hand")}</MenuItem>
+        <MenuItem onClick={() => handleWeaponSlotSelect('offHand')}>{t("Off Hand")}</MenuItem>
+      </Menu>
+      {/* Slot selection menu for shields (dual shieldbearer) */}
+      <Menu
+        open={Boolean(shieldMenuAnchor)}
+        onClose={() => { setShieldMenuAnchor(null); setShieldMenuName(null); }}
+        anchorReference="anchorPosition"
+        anchorPosition={shieldMenuAnchor ?? undefined}
+      >
+        <MenuItem onClick={() => handleShieldSlotSelect('mainHand')}>{t("Main Hand")}</MenuItem>
+        <MenuItem onClick={() => handleShieldSlotSelect('offHand')}>{t("Off Hand")}</MenuItem>
+      </Menu>
+      <CompendiumViewerModal
+        open={compendiumType !== null}
+        onClose={() => setCompendiumType(null)}
+        onAddItem={handleImportFromCompendium}
+        initialType={compendiumType ?? "weapons"}
+        restrictToTypes={compendiumType ? [compendiumType] : undefined}
+        context="player"
+      />
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
@@ -1022,10 +1134,22 @@ function highlightMatch(text, query) {
   );
 }
 
-function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, isMainTab, searchQuery }) {
+function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, isMainTab, searchQuery, isEditMode, onEdit, equippedSlots }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
+
+  const getWeaponBadge = (weapon) => {
+    const slots = equippedSlots ?? {};
+    const source = weapon.isCustomWeapon ? 'customWeapons' : 'weapons';
+    const name = weapon.isCustomWeapon ? weapon.originalData?.name : weapon.name;
+    if (slots.mainHand?.source === source && slots.mainHand?.name === name) {
+      const isTwoHand = weapon.hands === 2 || weapon.isTwoHand || weapon.isCustomWeapon;
+      return isTwoHand ? 'M+O' : 'M';
+    }
+    if (slots.offHand?.source === source && slots.offHand?.name === name) return 'O';
+    return null;
+  };
 
   const toggleRow = (index) => {
     setOpen((prev) => ({
@@ -1073,15 +1197,13 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
           {weapons.map((weapon, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1094,7 +1216,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                     {weapon.martial && <Martial />}
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
                     {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
@@ -1107,7 +1229,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                         : ""}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 90 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
                     {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
@@ -1115,21 +1237,35 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                     {types[weapon.type].long}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 100, textAlign: 'right', overflow: 'visible', pr: 1 }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(weapon)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <Tooltip title={t("Unequip")} arrow>
-                    <IconButton onClick={() => handleEquipment(weapon)} aria-label="expand row" size="small">
-                      <MeleeIcon />
-                    </IconButton>
+                    <Badge
+                      badgeContent={getWeaponBadge(weapon)}
+                      color="primary"
+                      invisible={!getWeaponBadge(weapon)}
+                      sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                    >
+                      <IconButton onClick={(e) => handleEquipment(weapon, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
+                        <MeleeIcon />
+                      </IconButton>
+                    </Badge>
                   </Tooltip>
                   {weapon.isTransforming && (
                     <Tooltip title={t("weapon_customization_swap_form")} arrow>
-                      <IconButton onClick={() => handleSwapForm(weapon)} size="small">
+                      <IconButton onClick={() => handleSwapForm(weapon)} size="small" sx={{ p: 0.25 }}>
                         <SwapHoriz />
                       </IconButton>
                     </Tooltip>
                   )}
                   <Tooltip title={t("Roll")} arrow>
-                    <IconButton onClick={() => handleDiceRoll(weapon)} aria-label="expand row" size="small">
+                    <IconButton onClick={() => handleDiceRoll(weapon)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
                       <Casino />
                     </IconButton>
                   </Tooltip>
@@ -1196,10 +1332,20 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
   );
 }
 
-function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
+function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery, isEditMode, onEdit, equippedSlots }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
+
+  const getArmorBadge = (armor) => {
+    if (armor.category === 'Shield') {
+      const slots = equippedSlots ?? {};
+      if (slots.mainHand?.source === 'shields' && slots.mainHand?.name === armor.name) return 'M';
+      if (slots.offHand?.source === 'shields' && slots.offHand?.name === armor.name) return 'O';
+      return null;
+    }
+    return 'E';
+  };
 
   const toggleRow = (index) => {
     setOpen((prev) => ({
@@ -1247,15 +1393,13 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
           {armors.map((armor, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1268,7 +1412,7 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
                     {armor.martial && <Martial />}
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("DEF")}:</Box>
                     <Box component="span">
@@ -1287,7 +1431,7 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
                     </Box>
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 90 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("M.DEF")}:</Box>
                     <Box component="span">
@@ -1302,12 +1446,26 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
                     </Box>
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 100, textAlign: 'right', overflow: 'visible', pr: 1 }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(armor)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <Tooltip title={t("Unequip")} arrow>
-                    <IconButton onClick={() => handleEquipment(armor)} aria-label="expand row" size="small">
-                      {armor.category === "Armor" && <ArmorIcon />}
-                      {armor.category === "Shield" && <ShieldIcon />}
-                    </IconButton>
+                    <Badge
+                      badgeContent={getArmorBadge(armor)}
+                      color="primary"
+                      invisible={!getArmorBadge(armor)}
+                      sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                    >
+                      <IconButton onClick={(e) => handleEquipment(armor, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
+                        {armor.category === "Armor" && <ArmorIcon />}
+                        {armor.category === "Shield" && <ShieldIcon />}
+                      </IconButton>
+                    </Badge>
                   </Tooltip>
                 </StyledTableCell>
               </TableRow>
@@ -1365,7 +1523,7 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery }) {
   );
 }
 
-function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQuery }) {
+function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQuery, isEditMode, onEdit, equippedSlots }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1416,15 +1574,13 @@ function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQu
           {accessorys.map((accessory, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1436,16 +1592,26 @@ function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQu
                     </Typography>
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     {`${accessory.cost}z`}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 90 }} />
+                <StyledTableCell sx={{ width: 100, textAlign: 'right', overflow: 'visible', pr: 1 }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(accessory)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <Tooltip title={t("Unequip")} arrow>
-                    <IconButton onClick={() => handleEquipment(accessory)} aria-label="expand row" size="small">
-                      <AccessoryIcon />
-                    </IconButton>
+                    <Badge badgeContent="E" color="primary" sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}>
+                      <IconButton onClick={(e) => handleEquipment(accessory, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
+                        <AccessoryIcon />
+                      </IconButton>
+                    </Badge>
                   </Tooltip>
                 </StyledTableCell>
               </TableRow>
@@ -1489,7 +1655,7 @@ function CollapsibleAccessory({ accessorys, handleEquipment, isMainTab, searchQu
   );
 }
 
-function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, checkIfEquippable, isMainTab, searchQuery }) {
+function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, checkIfEquippable, isMainTab, searchQuery, isEditMode, onEdit }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1539,15 +1705,13 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
           {weapons.map((weapon, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1560,7 +1724,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                     {weapon.martial && <Martial />}
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
                     {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
@@ -1573,7 +1737,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                         : ""}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 90 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <OpenBracket />
                     {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
@@ -1581,29 +1745,36 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                     {types[weapon.type].long}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 100, textAlign: 'right' }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(weapon)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   {checkIfEquippable(weapon) ? (
                     <Tooltip title={t("Equip")} arrow>
-                      <IconButton onClick={() => handleEquipment(weapon)} aria-label="expand row" size="small">
+                      <IconButton onClick={(e) => handleEquipment(weapon, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
                         <RadioButtonUnchecked />
                       </IconButton>
                     </Tooltip>
                   ) : (
                     <Tooltip title={t("Not Equippable")}>
-                      <IconButton>
+                      <IconButton sx={{ p: 0.25 }}>
                         <Error color="error" />
                       </IconButton>
                     </Tooltip>
                   )}
                   {weapon.isTransforming && (
                     <Tooltip title={t("weapon_customization_swap_form")} arrow>
-                      <IconButton onClick={() => handleSwapForm(weapon)} size="small">
+                      <IconButton onClick={() => handleSwapForm(weapon)} size="small" sx={{ p: 0.25 }}>
                         <SwapHoriz />
                       </IconButton>
                     </Tooltip>
                   )}
                   <Tooltip title={t("Roll")} arrow>
-                    <IconButton onClick={() => handleDiceRoll(weapon)} aria-label="expand row" size="small">
+                    <IconButton onClick={() => handleDiceRoll(weapon)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
                       <Casino />
                     </IconButton>
                   </Tooltip>
@@ -1670,7 +1841,7 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
   );
 }
 
-function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searchQuery }) {
+function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searchQuery, isEditMode, onEdit }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1723,15 +1894,13 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
           {armors.map((armor, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1744,7 +1913,7 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                     {armor.martial && <Martial />}
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("DEF")}:</Box>
                     <Box component="span">
@@ -1763,7 +1932,7 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                     </Box>
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 90 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("M.DEF")}:</Box>
                     <Box component="span">
@@ -1778,22 +1947,28 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                     </Box>
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 100, textAlign: 'right' }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(armor)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   {checkIfEquippable(armor) ? (
                     <Tooltip title={t("Equip")} arrow>
                       <IconButton
-                        onClick={() => {
-                          handleEquipment(armor);
-                        }}
+                        onClick={(e) => handleEquipment(armor, e)}
                         aria-label="equip"
                         size="small"
+                        sx={{ p: 0.25 }}
                       >
                         <RadioButtonUnchecked />
                       </IconButton>
                     </Tooltip>
                   ) : (
                     <Tooltip title={t("Not Equippable")}>
-                      <IconButton>
+                      <IconButton sx={{ p: 0.25 }}>
                         <Error color="error" />
                       </IconButton>
                     </Tooltip>
@@ -1854,7 +2029,7 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
   );
 }
 
-function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, searchQuery }) {
+function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, searchQuery, isEditMode, onEdit }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1905,15 +2080,13 @@ function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, 
           {accessorys.map((accessory, index) => (
             <React.Fragment key={index}>
               <TableRow>
-                <StyledTableCell sx={{ width: '1%', whiteSpace: 'nowrap', padding: 0 }}>
+                <StyledTableCell sx={{ width: 36, whiteSpace: 'nowrap', padding: 0 }}>
                   <IconButton onClick={() => toggleRow(index)} size="small">
                     {open[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
                 <StyledTableCell
                   sx={{
-                    width: { xs: '100px', md: '128px' },
-                    maxWidth: { xs: '100px', md: '128px' },
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
@@ -1925,14 +2098,22 @@ function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, 
                     </Typography>
                   </Box>
                 </StyledTableCell>
-                <StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }}>
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     {`${accessory.cost}z`}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ textAlign: 'right' }}>
+                <StyledTableCell sx={{ width: 90 }} />
+                <StyledTableCell sx={{ width: 100, textAlign: 'right' }}>
+                  {isEditMode && onEdit && (
+                    <Tooltip title={t("Edit")} arrow>
+                      <IconButton onClick={() => onEdit(accessory)} size="small" sx={{ p: 0.25 }}>
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <Tooltip title={t("Equip")} arrow>
-                    <IconButton onClick={() => handleEquipment(accessory)} aria-label="expand row" size="small">
+                    <IconButton onClick={(e) => handleEquipment(accessory, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
                       <RadioButtonUnchecked />
                     </IconButton>
                   </Tooltip>

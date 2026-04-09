@@ -9,7 +9,12 @@ import {
   Box,
   Paper,
   Tooltip,
+  TextField,
+  IconButton,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
@@ -38,6 +43,7 @@ export default function PlayerCard({
   isEditMode,
   isCharacterSheet,
   characterImage,
+  updateMaxStats,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -443,17 +449,43 @@ export default function PlayerCard({
             background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%);`,
             borderRight: "4px solid white",
             px: 2,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          <Typography
-            color="#fff"
-            fontFamily="Antonio"
-            fontSize="1.5rem"
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
-            {player.name}
-          </Typography>
+          {isEditMode ? (
+            <TextField
+              value={player.name}
+              onChange={(e) =>
+                setPlayer((p) => ({ ...p, name: e.target.value }))
+              }
+              inputProps={{ maxLength: 50 }}
+              variant="standard"
+              size="small"
+              sx={{
+                "& .MuiInputBase-input": {
+                  color: "#fff",
+                  fontFamily: "Antonio",
+                  fontSize: "1.5rem",
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                },
+                "& .MuiInput-underline:before": { borderBottomColor: "rgba(255,255,255,0.5)" },
+                "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
+                "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
+              }}
+            />
+          ) : (
+            <Typography
+              color="#fff"
+              fontFamily="Antonio"
+              fontSize="1.5rem"
+              fontWeight="medium"
+              sx={{ textTransform: "uppercase" }}
+            >
+              {player.name}
+            </Typography>
+          )}
         </Grid>
         <Grid
           item
@@ -463,21 +495,54 @@ export default function PlayerCard({
             borderLeft: `2px solid ${primary} `,
             borderBottom: `2px solid ${primary} `,
             borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          <Typography
-            fontFamily="Antonio"
-            fontSize="1.25rem"
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
-            {player.info.pronouns && (
-              <>
-                {player.info.pronouns} <Diamond color={primary} />{" "}
-              </>
-            )}
-            {t("Lvl")} {player.lvl}
-          </Typography>
+          {isEditMode ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              {player.info.pronouns && (
+                <Typography fontFamily="Antonio" fontSize="1rem" sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                  {player.info.pronouns} <Diamond color={primary} />
+                </Typography>
+              )}
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) }));
+                  if (updateMaxStats) updateMaxStats();
+                }}
+              >
+                <Remove fontSize="small" />
+              </IconButton>
+              <Typography fontFamily="Antonio" fontSize="1.25rem" fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
+                {t("Lvl")} {player.lvl}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) }));
+                  if (updateMaxStats) updateMaxStats();
+                }}
+              >
+                <Add fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Typography
+              fontFamily="Antonio"
+              fontSize="1.25rem"
+              fontWeight="medium"
+              sx={{ textTransform: "uppercase" }}
+            >
+              {player.info.pronouns && (
+                <>
+                  {player.info.pronouns} <Diamond color={primary} />{" "}
+                </>
+              )}
+              {t("Lvl")} {player.lvl}
+            </Typography>
+          )}
         </Grid>
       </Grid>
       <Grid container spacing={2} alignItems="flex-start">
@@ -748,94 +813,52 @@ export default function PlayerCard({
                 marginTop: 0.4,
               }}
             >
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <Typography
-                  component="span"
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio', fantasy, sans-serif",
-                    fontSize: "1rem",
-                    color: getAttributeColor(
-                      player.attributes.dexterity,
-                      currDex
-                    ),
-                  }}
-                >
-                  d{currDex}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <Typography
-                  component="span"
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio', fantasy, sans-serif",
-                    fontSize: "1rem",
-                    color: getAttributeColor(
-                      player.attributes.insight,
-                      currInsight
-                    ),
-                  }}
-                >
-                  d{currInsight}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <Typography
-                  component="span"
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio', fantasy, sans-serif",
-                    fontSize: "1rem",
-                    color: getAttributeColor(
-                      player.attributes.might,
-                      currMight
-                    ),
-                  }}
-                >
-                  d{currMight}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <Typography
-                  component="span"
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio', fantasy, sans-serif",
-                    fontSize: "1rem",
-                    color: getAttributeColor(
-                      player.attributes.willpower,
-                      currWillpower
-                    ),
-                  }}
-                >
-                  d{currWillpower}
-                </Typography>
-              </Grid>
+              {[
+                { key: "dexterity", curr: currDex },
+                { key: "insight", curr: currInsight },
+                { key: "might", curr: currMight },
+                { key: "willpower", curr: currWillpower },
+              ].map(({ key, curr }) => (
+                <Grid item xs={12} sx={{ marginY: 1 }} key={key}>
+                  {isEditMode ? (
+                    <Select
+                      value={player.attributes[key]}
+                      onChange={(e) => {
+                        setPlayer((p) => ({
+                          ...p,
+                          attributes: { ...p.attributes, [key]: e.target.value },
+                        }));
+                        if (updateMaxStats) updateMaxStats();
+                      }}
+                      variant="standard"
+                      size="small"
+                      sx={{
+                        fontFamily: "'Antonio', fantasy, sans-serif",
+                        fontSize: "1rem",
+                        minWidth: 52,
+                      }}
+                    >
+                      {[6, 8, 10, 12].map((v) => (
+                        <MenuItem key={v} value={v} sx={{ fontFamily: "'Antonio', fantasy, sans-serif" }}>
+                          d{v}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  ) : (
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      style={{
+                        fontFamily: "'Antonio', fantasy, sans-serif",
+                        fontSize: "1rem",
+                        color: getAttributeColor(player.attributes[key], curr),
+                      }}
+                    >
+                      d{curr}
+                    </Typography>
+                  )}
+                </Grid>
+              ))}
             </Grid>
             <Grid
               item

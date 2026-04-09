@@ -52,7 +52,7 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download } from "@mui/icons-material";
+import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download, Lock, LockOpen } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
@@ -125,6 +125,7 @@ export default function PlayerEdit() {
     new Array(4).fill(false)
   );
 
+  const [isSheetEditMode, setIsSheetEditMode] = useState(true);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [download, snackbar] = useDownload();
   const [imagesLoaded, setImagesLoaded] = useState(false);
@@ -269,6 +270,7 @@ export default function PlayerEdit() {
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
   const isOwner = isLocalPlayer || Boolean(user && player && user.uid === player.uid);
+  const isEditMode = isOwner && isSheetEditMode;
 
   const handleCtrlS = useCallback(
     (e) => {
@@ -419,24 +421,6 @@ export default function PlayerEdit() {
       <Tabs value={openTab} onChange={handleTabChange}>
         {isSmallScreen ? (
           <>
-            <Box
-              sx={{
-                position: "fixed",
-                bottom: 16,
-                left: 14,
-                zIndex: 1200,
-                textAlign: "center",
-              }}
-            >
-              <Fab onClick={toggleDrawer(true)} color="primary">
-                <Stack direction="column" alignItems="center" spacing={0.5}>
-                  <MenuBookIcon />
-                  <Typography variant="caption" sx={{ fontSize: "10px" }}>
-                    {t("Menu")}
-                  </Typography>
-                </Stack>
-              </Fab>
-            </Box>
             <Drawer
               anchor="bottom"
               open={drawerOpen}
@@ -478,17 +462,30 @@ export default function PlayerEdit() {
           </>
         ) : (
           <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
-            <Tab value={0}>{t("Player Sheet")}</Tab>
-            <Divider orientation="vertical" flexItem />
-            <Tab value={1}>{t("Informations")}</Tab>
-            <Tab value={2}>{t("Stats")}</Tab>
-            <Tab value={3}>{t("Classes")}</Tab>
-            <Tab value={4}>{t("Spells")}</Tab>
-            <Tab value={5}>{t("Equipment")}</Tab>
-            <Tab value={6}>{t("Notes")}</Tab>
+            {/* spacer mirrors the toggle button to keep tabs visually centered */}
+            <Box sx={{ width: 32, flexShrink: 0 }} />
+            <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Tab value={0}>{t("Player Sheet")}</Tab>
+              <Divider orientation="vertical" flexItem />
+              <Tab value={1}>{t("Informations")}</Tab>
+              <Tab value={2}>{t("Stats")}</Tab>
+              <Tab value={3}>{t("Classes")}</Tab>
+              <Tab value={4}>{t("Spells")}</Tab>
+              <Tab value={5}>{t("Equipment")}</Tab>
+              <Tab value={6}>{t("Notes")}</Tab>
+            </Box>
+            {isOwner ? (
+              <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
+                <IconButton size="small" onClick={() => setIsSheetEditMode((v) => !v)} sx={{ color: "inherit", flexShrink: 0 }}>
+                  {isSheetEditMode ? <LockOpen /> : <Lock />}
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Box sx={{ width: 32, flexShrink: 0 }} />
+            )}
           </TabsList>
         )}
-        
+
         {/* Compact View Toggle - only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
@@ -545,10 +542,14 @@ export default function PlayerEdit() {
                 <PlayerCardSheet
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
-                  isEditMode={isOwner}
+                  isEditMode={isEditMode}
                   isCharacterSheet={true}
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
+                  updateMaxStats={updateMaxStats}
+                  onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
+                  onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
+                  onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
                 />
               </Grid>
             </Grid>
@@ -557,11 +558,12 @@ export default function PlayerEdit() {
               <PlayerCard
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
-                isEditMode={isOwner}
+                isEditMode={isEditMode}
                 isCharacterSheet={false}
+                updateMaxStats={updateMaxStats}
               />
               <Divider sx={{ my: 1 }} />
-              <PlayerNumbers player={playerTemp} isEditMode={isOwner} />
+              <PlayerNumbers player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
               <Grid container spacing={1} sx={{ py: 1 }}>
                 <Grid item xs={9} sm={10} md={11}>
@@ -571,27 +573,27 @@ export default function PlayerEdit() {
                   />
                 </Grid>
                 <Grid item xs={3} sm={2} md={1}>
-                  <GenericRolls player={playerTemp} isEditMode={isOwner} />
+                  <GenericRolls player={playerTemp} isEditMode={isEditMode} />
                 </Grid>
               </Grid>
               {!battleMode && (
                 <>
-                  <PlayerTraits player={playerTemp} isEditMode={isOwner} />
-                  <PlayerBonds player={playerTemp} isEditMode={isOwner} />
-                  <PlayerQuirk player={playerTemp} isEditMode={isOwner} />
+                  <PlayerTraits player={playerTemp} isEditMode={isEditMode} />
+                  <PlayerBonds player={playerTemp} isEditMode={isEditMode} />
+                  <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
                   <PlayerRituals
                     player={playerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                     clockSections={ritualClockSections}
                     setClockSections={setRitualClockSections}
                     clockState={ritualClockState}
                     setClockState={setRitualClockState}
                   />
-                  <PlayerCompanion player={playerTemp} isEditMode={isOwner} />
+                  <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
                   <PlayerNotes
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                 </>
               )}
@@ -603,62 +605,62 @@ export default function PlayerEdit() {
                   <PlayerLoadout
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerEquipment
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerVehicle
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerSkills
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerSpells
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerArcana
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerGadgets
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerMagichant
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerMagiseed
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerSymbol
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerDance
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerGift
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerTherioforms
                     player={playerTemp}
@@ -666,17 +668,17 @@ export default function PlayerEdit() {
                   <PlayerGourmet
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerInvoker
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                   <PlayerDeck
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
-                    isEditMode={isOwner}
+                    isEditMode={isEditMode}
                   />
                 </>
               )}
@@ -688,32 +690,32 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerBonds
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerQuirk
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={2}>
           <EditPlayerAttributes
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
             updateMaxStats={updateMaxStats}
           />
           <Divider sx={{ my: 1 }} />
@@ -721,32 +723,32 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerAffinities
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerStatuses
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerImmunities
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditManualStats
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={3}>
@@ -754,28 +756,28 @@ export default function PlayerEdit() {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={4}>
           <EditPlayerSpells
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={5}>
           <EditPlayerEquipment
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={6}>
           <EditPlayerNotes
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isOwner}
+            isEditMode={isEditMode}
           />
         </TabPanel>
         <Button
@@ -788,23 +790,83 @@ export default function PlayerEdit() {
         </Button>
         <Box sx={{ height: "15vh" }} />
       </Tabs>
-      {/* Save Button, shown if there are unsaved changes */}
-      {isUpdated && isOwner && (
-        <Tooltip title="Save" placement="left">
-          <Fab
-            color="primary"
-            aria-label="save"
-            onClick={() => {
-              setIsUpdated(false);
-              activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
-            }}
-            size="medium"
-            sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
-          >
-            <Save />
+
+      {/* Floating Action Buttons */}
+      {isSmallScreen && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            left: 16,
+            zIndex: 1200,
+            textAlign: "center",
+          }}
+        >
+          <Fab onClick={toggleDrawer(true)} color="primary" size="medium">
+            <Stack direction="column" alignItems="center" spacing={0.5}>
+              <MenuBookIcon fontSize="medium" />
+              <Typography variant="caption" sx={{ fontSize: "10px" }}>
+                {t("Menu")}
+              </Typography>
+            </Stack>
           </Fab>
-        </Tooltip>
+        </Box>
       )}
+
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          zIndex: 1200,
+          display: "flex",
+          flexDirection: "column-reverse",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        {/* Save Button, shown if there are unsaved changes */}
+        {isUpdated && isOwner && (
+          <Tooltip title="Save" placement="left">
+            <Fab
+              color="primary"
+              aria-label="save"
+              onClick={() => {
+                setIsUpdated(false);
+                activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
+              }}
+              size="medium"
+            >
+              <Save fontSize="medium" />
+            </Fab>
+          </Tooltip>
+        )}
+
+        {showScrollTop && (
+          <Tooltip title={t("Scroll to top")} placement="left">
+            <Fab
+              size="medium"
+              color="primary"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            >
+              <KeyboardArrowUp fontSize="medium" />
+            </Fab>
+          </Tooltip>
+        )}
+
+        {isSmallScreen && isOwner && openTab === 0 && (
+          <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
+            <Fab
+              size="medium"
+              onClick={() => setIsSheetEditMode((v) => !v)}
+              color="primary"
+            >
+              {isSheetEditMode ? <LockOpen fontSize="medium" /> : <Lock fontSize="medium" />}
+            </Fab>
+          </Tooltip>
+        )}
+      </Box>
+
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}
@@ -815,18 +877,6 @@ export default function PlayerEdit() {
         onSuccess={null}
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
-      {showScrollTop && (
-        <Tooltip title={t("Scroll to top")} placement="left">
-          <Fab
-            size="medium"
-            color="primary"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
-          >
-            <KeyboardArrowUp />
-          </Fab>
-        </Tooltip>
-      )}
       {snackbar}
     </Layout>
   );
@@ -878,8 +928,7 @@ const TabsList = styled(BaseTabsList)(
     margin-bottom: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    align-content: space-between;
+    padding: 0 4px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
   `
 );

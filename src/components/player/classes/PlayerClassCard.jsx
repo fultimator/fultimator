@@ -25,6 +25,7 @@ import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
 import { firestore, query, orderBy, collection, where, getDocs } from "@platform/db";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 export default function PlayerClassCard({
   allClasses,
@@ -59,6 +60,7 @@ export default function PlayerClassCard({
     useState(false);
   const [openEditHeroicSkillModal, setOpenEditHeroicSkillModal] =
     useState(false);
+  const [heroicCompendiumOpen, setHeroicCompendiumOpen] = useState(false);
   const [openSelectCompanionModal, setOpenSelectCompanionModal] =
     useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
@@ -537,6 +539,7 @@ export default function PlayerClassCard({
                 onIncrease={() => {}}
                 onDecrease={() => {}}
                 onEdit={() => handleEditHeroicSkill()}
+                onOpenCompendium={isEditMode ? () => setHeroicCompendiumOpen(true) : undefined}
                 isEditMode={isEditMode}
                 isHeroicSkill={true}
               />
@@ -694,6 +697,17 @@ export default function PlayerClassCard({
         onSpellClassChange={handleSpellClassChange}
         spellClassesList={spellClasses}
         selectedSpellClasses={benefits.spellClasses}
+      />
+      {/* Heroic Skill Compendium Picker */}
+      <CompendiumViewerModal
+        open={heroicCompendiumOpen}
+        onClose={() => setHeroicCompendiumOpen(false)}
+        onAddItem={(item) => {
+          editHeroic({ name: item.name, description: item.description });
+        }}
+        initialType="heroics"
+        restrictToTypes={["heroics"]}
+        context="player"
       />
       {/* Edit Heroic Skill Modal */}
       <EditHeroicSkillModal

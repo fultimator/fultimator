@@ -22,7 +22,9 @@ export default function PlayerArmor({
   armor,
   onEditArmor,
   onEquipArmor,
+  onAddItem,
   isEditMode,
+  onOpenCompendium,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -86,6 +88,8 @@ export default function PlayerArmor({
         headerText={t("Armor")}
         showIconButton={false}
         icon={<ArmorIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>

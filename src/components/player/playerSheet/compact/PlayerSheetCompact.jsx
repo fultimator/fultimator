@@ -1,12 +1,41 @@
 import React, { Fragment, useState } from "react";
-import { Paper, Grid, Typography, Divider, Card, Box, Dialog, ButtonGroup, Button, Tabs, Tab, TextField, TableHead, TableRow, InputBase, IconButton, TableCell } from "@mui/material";
+import { Paper, Grid, Typography, Divider, Card, Box, Dialog, DialogTitle, DialogContent, ButtonGroup, Button, Tabs, Tab, TextField, TableHead, TableRow, InputBase, IconButton, TableCell, Select, MenuItem, Tooltip, Menu } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import avatar_image from "../../../avatar.jpg";
 import Diamond from "../../../Diamond";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { ArrowDropDown, Search, Clear } from "@mui/icons-material";
+import { ArrowDropDown, Search, Clear, Add, Remove, Lock, LockOpen } from "@mui/icons-material";
+import PlayerWeaponModal from "../../equipment/weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "../../equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerArmorModal from "../../equipment/armor/PlayerArmorModal";
+import PlayerShieldModal from "../../equipment/shields/PlayerShieldModal";
+import PlayerAccessoryModal from "../../equipment/accessories/PlayerAccessoryModal";
+import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../../icons";
+import { deriveVehicleSlots, validateSlots, syncSlots, isItemEquipped } from "../../equipment/slots/equipmentSlots";
+import AddSkillModal from "../../classes/AddSkillModal";
+import PlayerClassCard from "../../classes/PlayerClassCard";
+import classList from "../../../../libs/classes";
+import { useSpellModals } from "../../common/hooks/useSpellModals";
+import SpellDefaultModal from "../../spells/SpellDefaultModal";
+import SpellArcanistModal from "../../spells/SpellArcanistModal";
+import SpellEntropistGambleModal from "../../spells/SpellEntropistGambleModal";
+import SpellChanterModal from "../../spells/SpellChanterModal";
+import SpellSymbolistModal from "../../spells/SpellSymbolistModal";
+import SpellDancerModal from "../../spells/SpellDancerModal";
+import SpellGiftModal from "../../spells/SpellGiftModal";
+import SpellMutantModal from "../../spells/SpellMutantModal";
+import SpellPilotModal from "../../spells/SpellPilotModal";
+import SpellPilotVehiclesModal from "../../spells/SpellPilotVehiclesModal";
+import SpellMagiseedModal from "../../spells/SpellMagiseedModal";
+import SpellGourmetModal from "../../spells/SpellGourmetModal";
+import SpellInvokerModal from "../../spells/SpellInvokerModal";
+import SpellTinkererAlchemyRankModal from "../../spells/SpellTinkererAlchemyRankModal";
+import SpellTinkererInfusionModal from "../../spells/SpellTinkererInfusionModal";
+import SpellTinkererMagitechRankModal from "../../spells/SpellTinkererMagitechRankModal";
+import SpellDeckModal from "../../spells/SpellDeckModal";
+import PlayerNoteModal from "../../informations/PlayerNoteModal";
 import ReactMarkdown from "react-markdown";
 import { fontSize, styled, width } from "@mui/system";
 import { TypeAffinity } from "../../../types";
@@ -21,7 +50,6 @@ import PlayerCompanion from "./PlayerCompanion";
 import CompactLoadout from "./CompactLoadout";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { calculateAttribute } from "../../common/playerCalculations";
-import { isItemEquipped } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -44,6 +72,10 @@ export default function PlayerCardSheet({
     isCharacterSheet,
     characterImage,
     id,
+    updateMaxStats,
+    onToggleEditMode,
+    onAddClass,
+    onAddFeature,
 }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
@@ -51,6 +83,283 @@ export default function PlayerCardSheet({
     const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
     const [value, setValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // ── Equipment modal state ──────────────────────────────────────────────
+    const [openNewWeapon, setOpenNewWeapon] = useState(false);
+    const [editWeaponIndex, setEditWeaponIndex] = useState(null);
+    const [weapon, setWeapon] = useState(null);
+
+    const [openNewCustomWeapon, setOpenNewCustomWeapon] = useState(false);
+    const [editCustomWeaponIndex, setEditCustomWeaponIndex] = useState(null);
+    const [customWeapon, setCustomWeapon] = useState(null);
+
+    const [openNewArmor, setOpenNewArmor] = useState(false);
+    const [editArmorIndex, setEditArmorIndex] = useState(null);
+    const [armor, setArmor] = useState(null);
+
+    const [openNewShields, setOpenNewShields] = useState(false);
+    const [editShieldIndex, setEditShieldIndex] = useState(null);
+    const [shields, setShields] = useState(null);
+
+    const [openNewAccessory, setOpenNewAccessory] = useState(false);
+    const [editAccessoryIndex, setEditAccessoryIndex] = useState(null);
+    const [accessory, setAccessory] = useState(null);
+
+    const [openNoteModal, setOpenNoteModal] = useState(false);
+    const [editNoteIndex, setEditNoteIndex] = useState(null);
+    const [noteBeingEdited, setNoteBeingEdited] = useState(null);
+
+    const [equipMenuAnchor, setEquipMenuAnchor] = useState(null);
+
+    // ── Equipment helpers (mirrors EditPlayerEquipment) ────────────────────
+    const patchInv = (p, source, updater) => {
+        const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
+        const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
+        return { ...p, equipment };
+    };
+
+    const preserveSlots = (p) => {
+        const validated = validateSlots(p);
+        return { ...validated, vehicleSlots: deriveVehicleSlots(validated) };
+    };
+
+    // Add
+    const handleAddWeapon = (w) => setPlayer(preserveSlots(patchInv(player, 'weapons', arr => [...arr, w])));
+    const handleAddCustomWeapon = (cw) => setPlayer(preserveSlots(patchInv(player, 'customWeapons', arr => [...arr, cw])));
+    const handleAddArmor = (a) => setPlayer(preserveSlots(patchInv(player, 'armor', arr => [...arr, a])));
+    const handleAddShield = (s) => setPlayer(preserveSlots(patchInv(player, 'shields', arr => [...arr, s])));
+    const handleAddAccessory = (ac) => setPlayer(preserveSlots(patchInv(player, 'accessories', arr => [...arr, ac])));
+
+    // Delete
+    const handleDeleteWeapon = (i) => setPlayer(preserveSlots(patchInv(player, 'weapons', arr => arr.filter((_, idx) => idx !== i))));
+    const handleDeleteCustomWeapon = (i) => setPlayer(preserveSlots(patchInv(player, 'customWeapons', arr => arr.filter((_, idx) => idx !== i))));
+    const handleDeleteArmor = (i) => setPlayer(preserveSlots(patchInv(player, 'armor', arr => arr.filter((_, idx) => idx !== i))));
+    const handleDeleteShield = (i) => setPlayer(preserveSlots(patchInv(player, 'shields', arr => arr.filter((_, idx) => idx !== i))));
+    const handleDeleteAccessory = (i) => setPlayer(preserveSlots(patchInv(player, 'accessories', arr => arr.filter((_, idx) => idx !== i))));
+
+    // Save (add or edit)
+    const handleSaveWeapon = (w) => {
+        if (editWeaponIndex !== null) setPlayer(preserveSlots(patchInv(player, 'weapons', arr => arr.map((x, i) => i === editWeaponIndex ? w : x))));
+        else handleAddWeapon(w);
+        setOpenNewWeapon(false);
+    };
+    const handleSaveCustomWeapon = (cw) => {
+        if (editCustomWeaponIndex !== null) setPlayer(preserveSlots(patchInv(player, 'customWeapons', arr => arr.map((x, i) => i === editCustomWeaponIndex ? cw : x))));
+        else handleAddCustomWeapon(cw);
+        setOpenNewCustomWeapon(false);
+    };
+    const handleSaveArmor = (a) => {
+        if (editArmorIndex !== null) setPlayer(preserveSlots(patchInv(player, 'armor', arr => arr.map((x, i) => i === editArmorIndex ? a : x))));
+        else handleAddArmor(a);
+        setOpenNewArmor(false);
+    };
+    const handleSaveShield = (s) => {
+        if (editShieldIndex !== null) setPlayer(preserveSlots(patchInv(player, 'shields', arr => arr.map((x, i) => i === editShieldIndex ? s : x))));
+        else handleAddShield(s);
+        setOpenNewShields(false);
+    };
+    const handleSaveAccessory = (ac) => {
+        if (editAccessoryIndex !== null) setPlayer(preserveSlots(patchInv(player, 'accessories', arr => arr.map((x, i) => i === editAccessoryIndex ? ac : x))));
+        else handleAddAccessory(ac);
+        setOpenNewAccessory(false);
+    };
+
+    // Note handlers
+    const handleSaveNote = (note) => {
+        if (editNoteIndex !== null) {
+            setPlayer(prev => ({
+                ...prev,
+                notes: prev.notes.map((n, i) => i === editNoteIndex ? note : n)
+            }));
+        } else {
+            setPlayer(prev => ({
+                ...prev,
+                notes: [...(prev.notes || []), note]
+            }));
+        }
+        setOpenNoteModal(false);
+    };
+
+    const handleDeleteNote = (index) => {
+        setPlayer(prev => ({
+            ...prev,
+            notes: prev.notes.filter((_, i) => i !== index)
+        }));
+        setOpenNoteModal(false);
+    };
+
+    // Open add modals
+    const openAddWeapon = () => { setWeapon(null); setEditWeaponIndex(null); setOpenNewWeapon(true); setEquipMenuAnchor(null); };
+    const openAddCustomWeapon = () => { setCustomWeapon(null); setEditCustomWeaponIndex(null); setOpenNewCustomWeapon(true); setEquipMenuAnchor(null); };
+    const openAddArmor = () => { setArmor(null); setEditArmorIndex(null); setOpenNewArmor(true); setEquipMenuAnchor(null); };
+    const openAddShield = () => { setShields(null); setEditShieldIndex(null); setOpenNewShields(true); setEquipMenuAnchor(null); };
+    const openAddAccessory = () => { setAccessory(null); setEditAccessoryIndex(null); setOpenNewAccessory(true); setEquipMenuAnchor(null); };
+
+    // Notes
+    const handleAddNote = () => {
+        setNoteBeingEdited(null);
+        setEditNoteIndex(null);
+        setOpenNoteModal(true);
+    };
+
+    const handleOpenEditNote = (index) => {
+        setNoteBeingEdited(player.notes[index]);
+        setEditNoteIndex(index);
+        setOpenNoteModal(true);
+    };
+
+    // ── Class management ──────────────────────────────────────────────────────
+    const [editClassIndex, setEditClassIndex] = useState(null);
+    const [openClassCard, setOpenClassCard] = useState(false);
+
+    const handleAddBlankClass = (name) => {
+        const exists = player.classes.some(c => c.name.toLowerCase() === name.toLowerCase());
+        if (exists) { alert(t("This class type already exists for the character")); return; }
+        setPlayer(prev => ({ ...prev, classes: [...prev.classes, { name, lvl: 1, benefits: { hpplus: 0, mpplus: 0, ipplus: 0, rituals: {}, martials: {}, custom: [] }, skills: [], heroic: { name: "", description: "" }, spells: [], isHomebrew: true }] }));
+        if (updateMaxStats) updateMaxStats();
+    };
+
+    const handleAddClassFromCompendium = (item) => {
+        const name = item.name;
+        const exists = player.classes.some(c => c.name.toLowerCase() === name.toLowerCase());
+        if (exists) { alert(t("This class type already exists for the character")); return; }
+        const src = classList.find(c => c.name === name);
+        const newClass = src ? {
+            name,
+            lvl: 1,
+            benefits: src.benefits,
+            skills: [...src.skills].sort((a, b) => a.skillName < b.skillName ? -1 : 1),
+            heroic: { name: "", description: "" },
+            spells: [],
+            isHomebrew: false,
+        } : { name, lvl: 1, benefits: { hpplus: 0, mpplus: 0, ipplus: 0, rituals: {}, martials: {}, custom: [] }, skills: [], heroic: { name: "", description: "" }, spells: [], isHomebrew: false };
+        setPlayer(prev => ({ ...prev, classes: [...prev.classes, newClass] }));
+        if (updateMaxStats) updateMaxStats();
+    };
+
+    const handleOpenEditClass = (idx) => { setEditClassIndex(idx); setOpenClassCard(true); };
+
+    // Class edit callbacks (passed to PlayerClassCard)
+    const handleClassLevelChange = (classIdx, newLevel) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, lvl: newLevel } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassSaveBenefits = (classIdx, benefits) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, benefits } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassAddSkill = (className, skillName, maxLevel, description, specialSkill) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map(c => c.name === className ? { ...c, skills: [...c.skills, { skillName, currentLvl: 1, maxLvl: maxLevel, description, specialSkill }] } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassEditSkill = (className, skillIndex, skillName, maxLevel, description, specialSkill) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map(c => c.name === className ? { ...c, skills: c.skills.map((s, i) => i === skillIndex ? { ...s, skillName, maxLvl: parseInt(maxLevel), currentLvl: Math.min(s.currentLvl, parseInt(maxLevel)), description, specialSkill } : s) } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassDeleteSkill = (classIdx, skillIndex) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, skills: c.skills.filter((_, si) => si !== skillIndex) } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassIncreaseSkill = (classIdx, skillIndex) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, skills: c.skills.map((s, si) => si === skillIndex && s.currentLvl < s.maxLvl ? { ...s, currentLvl: s.currentLvl + 1 } : s) } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassDecreaseSkill = (classIdx, skillIndex) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, skills: c.skills.map((s, si) => si === skillIndex && s.currentLvl > 0 ? { ...s, currentLvl: s.currentLvl - 1 } : s) } : c) }));
+        if (updateMaxStats) updateMaxStats();
+    };
+    const handleClassEditName = (classIdx, newName) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, name: newName } : c) }));
+    };
+    const handleClassEditHeroic = (classIdx, newHeroic) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, heroic: newHeroic } : c) }));
+    };
+    const handleClassRemove = () => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.filter((_, i) => i !== editClassIndex) }));
+        if (updateMaxStats) updateMaxStats();
+        setOpenClassCard(false);
+    };
+    const handleClassEditCompanion = (classIdx, companion) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, companion } : c) }));
+    };
+
+    // ── Skill modal (standalone, from compact classes view) ──────────────────
+    const [openSkillModal, setOpenSkillModal] = useState(false);
+    const [editSkillClassIdx, setEditSkillClassIdx] = useState(null);
+    const [editSkillIdx, setEditSkillIdx] = useState(null);
+    const [skillName, setSkillName] = useState("");
+    const [skillMaxLevel, setSkillMaxLevel] = useState(1);
+    const [skillDescription, setSkillDescription] = useState("");
+    const [skillSpecial, setSkillSpecial] = useState("");
+
+    const openAddSkillForClass = (classIdx) => {
+        setEditSkillClassIdx(classIdx);
+        setEditSkillIdx(null);
+        setSkillName(""); setSkillMaxLevel(1); setSkillDescription(""); setSkillSpecial("");
+        setOpenSkillModal(true);
+    };
+    const openEditSkillForClass = (classIdx, skillIdx) => {
+        const skill = player.classes[classIdx]?.skills[skillIdx];
+        if (!skill) return;
+        setEditSkillClassIdx(classIdx);
+        setEditSkillIdx(skillIdx);
+        setSkillName(skill.skillName); setSkillMaxLevel(skill.maxLvl); setSkillDescription(skill.description); setSkillSpecial(skill.specialSkill || "");
+        setOpenSkillModal(true);
+    };
+    const handleSkillModalSave = () => {
+        const cls = player.classes[editSkillClassIdx];
+        if (!cls) return;
+        if (editSkillIdx !== null) {
+            handleClassEditSkill(cls.name, editSkillIdx, skillName, skillMaxLevel, skillDescription, skillSpecial);
+        } else {
+            handleClassAddSkill(cls.name, skillName, skillMaxLevel, skillDescription, skillSpecial);
+        }
+        setOpenSkillModal(false);
+    };
+    const handleSkillModalDelete = () => {
+        handleClassDeleteSkill(editSkillClassIdx, editSkillIdx);
+        setOpenSkillModal(false);
+    };
+
+    // ── Spell modals ─────────────────────────────────────────────────────────
+    const { isOpen: isSpellOpen, openModal: openSpellModal, closeModal: closeSpellModal, spellBeingEdited, editingSpellClass, editingSpellIndex } = useSpellModals();
+
+    const handleEditSpell = (classIdx, spellIdx, spell) => {
+        const cls = player.classes[classIdx];
+        if (!cls) return;
+        const spellType = spell.spellType;
+        let modalName = "default";
+        if (spellType === "arcanist" || spellType === "arcanist-rework") modalName = "arcanist";
+        else if (spellType === "gamble") modalName = "gamble";
+        else if (spellType === "magichant") modalName = "chanter";
+        else if (spellType === "symbol") modalName = "symbolist";
+        else if (spellType === "dance") modalName = "dancer";
+        else if (spellType === "gift") modalName = "gift";
+        else if (spellType === "therioform") modalName = "mutant";
+        else if (spellType === "pilot-vehicle") modalName = "pilot";
+        else if (spellType === "magiseed") modalName = "magiseed";
+        else if (spellType === "cooking") modalName = "gourmet";
+        else if (spellType === "invocation") modalName = "invoker";
+        else if (spellType?.startsWith("tinkerer-alchemy")) modalName = "tinkerer-alchemy";
+        else if (spellType?.startsWith("tinkerer-infusion")) modalName = "tinkerer-infusion";
+        else if (spellType?.startsWith("tinkerer-magitech")) modalName = "tinkerer-magitech";
+        else if (spellType === "deck") modalName = "deck";
+        openSpellModal(modalName, spell, cls.name, spellIdx);
+    };
+
+    const saveSpell = (updatedSpell) => {
+        setPlayer(prev => ({ ...prev, classes: prev.classes.map(c => c.name === editingSpellClass ? { ...c, spells: c.spells.map((s, i) => i === editingSpellIndex ? updatedSpell : s) } : c) }));
+        closeSpellModal();
+    };
+    const saveVehicleSpell = (spellIndex, updatedSpell) => {
+        setPlayer(prev => {
+            const withSpell = { ...prev, classes: prev.classes.map(c => c.name === editingSpellClass ? { ...c, spells: c.spells.map((s, i) => i === spellIndex ? updatedSpell : s) } : c) };
+            const validated = validateSlots(withSpell);
+            return syncSlots({ ...validated, vehicleSlots: deriveVehicleSlots(validated) });
+        });
+        closeSpellModal();
+    };
+
 
     // Handle tab change
     const handleChange = (event, newValue) => {
@@ -278,9 +587,9 @@ export default function PlayerCardSheet({
                     boxShadow: collapse ? "none" : "1px 1px 5px",
                 }}
             >
-                <Header player={player} characterImage={characterImage} />
+                <Header player={player} characterImage={characterImage} isEditMode={isEditMode} setPlayer={setPlayer} updateMaxStats={updateMaxStats} />
             </Box>
-            <Stats player={player} currDex={currDex} currInsight={currInsight} currMight={currMight} currWillpower={currWillpower} currDef={currDef} currMDef={currMDef} currInit={currInit} />
+            <Stats player={player} currDex={currDex} currInsight={currInsight} currMight={currMight} currWillpower={currWillpower} currDef={currDef} currMDef={currMDef} currInit={currInit} isEditMode={isEditMode} setPlayer={setPlayer} updateMaxStats={updateMaxStats} />
 
             <Box sx={{ p: 0, borderBottom: 1, borderColor: 'divider' }}>
                 {/* Tabs */}
@@ -304,10 +613,10 @@ export default function PlayerCardSheet({
                     }}
                 >
                     <Tab icon={<HomeOutlinedIcon sx={{ fontSize: '1rem' }} />} sx={homeTabStyle} />
-                    <Tab label="Classes" sx={tabStyle} />
-                    <Tab label="Features" sx={tabStyle} />
-                    <Tab label="Backpack" sx={tabStyle} />
-                    <Tab label="Notes" sx={tabStyle} />
+                    <Tab label={t("Classes")} sx={tabStyle} />
+                    <Tab label={t("Features")} sx={tabStyle} />
+                    <Tab label={t("Backpack")} sx={tabStyle} />
+                    <Tab label={t("Notes")} sx={tabStyle} />
                 </Tabs>
 
                 <Box sx={{ px: 0.5, display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: 0 }}>
@@ -335,16 +644,45 @@ export default function PlayerCardSheet({
                             <Search />
                         )}
                     </IconButton>
+                    {onToggleEditMode && (
+                        <Tooltip title={isEditMode ? "Switch to Preview Mode" : "Switch to Edit Mode"}>
+                            <IconButton size="small" sx={{ p: '0' }} onClick={onToggleEditMode}>
+                                {isEditMode ? <LockOpen fontSize="small" /> : <Lock fontSize="small" />}
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </Box>
 
                 {/* Tab Panels */}
                 <CustomTabPanel value={value} index={0}>
                     <PlayerBonds player={player} isCharacterSheet={true} />
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} withEquipment isMainTab={true} searchQuery={searchQuery} />
-                    <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery} />
+                    <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}
+                        isEditMode={isEditMode}
+                        onAddBlankClass={isEditMode ? handleAddBlankClass : undefined}
+                        onAddFromCompendium={isEditMode ? handleAddClassFromCompendium : undefined}
+                        onEditClass={isEditMode ? handleOpenEditClass : undefined}
+                        onAddSkill={isEditMode ? openAddSkillForClass : undefined}
+                        onEditSkill={isEditMode ? openEditSkillForClass : undefined}
+                        onEditSpell={isEditMode ? handleEditSpell : undefined}
+                        onLevelChange={isEditMode ? handleClassLevelChange : undefined}
+                        onIncreaseSkillLevel={isEditMode ? handleClassIncreaseSkill : undefined}
+                        onDecreaseSkillLevel={isEditMode ? handleClassDecreaseSkill : undefined}
+                    />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
-                    <PlayerClasses player={player} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                    <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery}
+                        isEditMode={isEditMode}
+                        onAddBlankClass={isEditMode ? handleAddBlankClass : undefined}
+                        onAddFromCompendium={isEditMode ? handleAddClassFromCompendium : undefined}
+                        onEditClass={isEditMode ? handleOpenEditClass : undefined}
+                        onAddSkill={isEditMode ? openAddSkillForClass : undefined}
+                        onEditSkill={isEditMode ? openEditSkillForClass : undefined}
+                        onEditSpell={isEditMode ? handleEditSpell : undefined}
+                        onLevelChange={isEditMode ? handleClassLevelChange : undefined}
+                        onIncreaseSkillLevel={isEditMode ? handleClassIncreaseSkill : undefined}
+                        onDecreaseSkillLevel={isEditMode ? handleClassDecreaseSkill : undefined}
+                    />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
                     <PlayerRituals player={player} isCharacterSheet={true} />
@@ -352,20 +690,179 @@ export default function PlayerCardSheet({
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={3}>
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} isMainTab={false} searchQuery={searchQuery} />
-                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} />
+                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery}
+                        onAddWeapon={isEditMode ? openAddWeapon : undefined}
+                        onEditWeapon={isEditMode ? (idx) => { const w = inv?.weapons?.[idx]; if (w) { setWeapon(w); setEditWeaponIndex(idx); setOpenNewWeapon(true); } } : undefined}
+                        onAddCustomWeapon={isEditMode ? openAddCustomWeapon : undefined}
+                        onEditCustomWeapon={isEditMode ? (idx) => { const w = inv?.customWeapons?.[idx]; if (w) { setCustomWeapon(w); setEditCustomWeaponIndex(idx); setOpenNewCustomWeapon(true); } } : undefined}
+                        onAddArmor={isEditMode ? openAddArmor : undefined}
+                        onEditArmor={isEditMode ? (idx) => { const a = inv?.armor?.[idx]; if (a) { setArmor(a); setEditArmorIndex(idx); setOpenNewArmor(true); } } : undefined}
+                        onAddShield={isEditMode ? openAddShield : undefined}
+                        onEditShield={isEditMode ? (idx) => { const s = inv?.shields?.[idx]; if (s) { setShields(s); setEditShieldIndex(idx); setOpenNewShields(true); } } : undefined}
+                        onAddAccessory={isEditMode ? openAddAccessory : undefined}
+                        onEditAccessory={isEditMode ? (idx) => { const ac = inv?.accessories?.[idx]; if (ac) { setAccessory(ac); setEditAccessoryIndex(idx); setOpenNewAccessory(true); } } : undefined}
+                    />
                     <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
                     <PlayerCompanion player={player} isCharacterSheet={true} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={4}>
-                    <PlayerNotes player={player} setPlayer={setPlayer} searchQuery={searchQuery} />
+                    <PlayerNotes player={player} setPlayer={setPlayer} searchQuery={searchQuery}
+                        isEditMode={isEditMode}
+                        onAddNote={isEditMode ? handleAddNote : undefined}
+                        onEditNote={isEditMode ? handleOpenEditNote : undefined}
+                    />
                     <PlayerBonds player={player} isCharacterSheet={true} />
                 </CustomTabPanel>
             </Box>
+
+            {/* Class edit card dialog */}
+            {openClassCard && editClassIndex !== null && player.classes[editClassIndex] && (
+                <Dialog open={openClassCard} onClose={() => setOpenClassCard(false)} maxWidth="md" fullWidth>
+                    <DialogTitle sx={{ background: theme.primary, color: '#fff', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.9rem', py: 1 }}>
+                        {t("Edit Class")}
+                    </DialogTitle>
+                    <DialogContent sx={{ p: 1 }}>
+                        <PlayerClassCard
+                            allClasses={player.classes}
+                            classItem={player.classes[editClassIndex]}
+                            onRemove={handleClassRemove}
+                            onLevelChange={(newLevel) => handleClassLevelChange(editClassIndex, newLevel)}
+                            onSaveBenefits={(benefits) => handleClassSaveBenefits(editClassIndex, benefits)}
+                            onAddSkill={handleClassAddSkill}
+                            onEditSkill={handleClassEditSkill}
+                            onDeleteSkill={(skillIdx) => handleClassDeleteSkill(editClassIndex, skillIdx)}
+                            onIncreaseSkillLevel={(skillIdx) => handleClassIncreaseSkill(editClassIndex, skillIdx)}
+                            onDecreaseSkillLevel={(skillIdx) => handleClassDecreaseSkill(editClassIndex, skillIdx)}
+                            editCompanion={(companion) => handleClassEditCompanion(editClassIndex, companion)}
+                            isEditMode={true}
+                            editClassName={(newName) => handleClassEditName(editClassIndex, newName)}
+                            editHeroic={(newHeroic) => handleClassEditHeroic(editClassIndex, newHeroic)}
+                        />
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {/* Standalone skill modal */}
+            <AddSkillModal
+                open={openSkillModal}
+                onClose={() => setOpenSkillModal(false)}
+                editSkillIndex={editSkillIdx}
+                skillName={skillName}
+                setSkillName={setSkillName}
+                maxLevel={skillMaxLevel}
+                setMaxLevel={setSkillMaxLevel}
+                description={skillDescription}
+                setDescription={setSkillDescription}
+                specialSkill={skillSpecial}
+                setSpecialSkill={setSkillSpecial}
+                onAddSkill={handleSkillModalSave}
+                onDeleteSkill={handleSkillModalDelete}
+            />
+
+            {/* Spell modals */}
+            {spellBeingEdited && (
+                <>
+                    <SpellDefaultModal open={isSpellOpen("default")} onClose={closeSpellModal} spell={spellBeingEdited} onSave={saveSpell} />
+                    <SpellArcanistModal open={isSpellOpen("arcanist")} onClose={closeSpellModal} spell={spellBeingEdited} isRework={spellBeingEdited?.spellType === "arcanist-rework"} onSave={saveSpell} />
+                    <SpellEntropistGambleModal open={isSpellOpen("gamble")} onClose={closeSpellModal} gamble={spellBeingEdited} onSave={saveSpell} />
+                    <SpellChanterModal open={isSpellOpen("chanter")} onClose={closeSpellModal} magichant={spellBeingEdited} onSave={saveSpell} />
+                    <SpellSymbolistModal open={isSpellOpen("symbolist")} onClose={closeSpellModal} symbol={spellBeingEdited} onSave={saveSpell} />
+                    <SpellDancerModal open={isSpellOpen("dancer")} onClose={closeSpellModal} dance={spellBeingEdited} onSave={saveSpell} />
+                    <SpellGiftModal open={isSpellOpen("gift")} onClose={closeSpellModal} gift={spellBeingEdited} onSave={saveSpell} />
+                    <SpellMutantModal open={isSpellOpen("mutant")} onClose={closeSpellModal} mutant={spellBeingEdited} onSave={saveSpell} />
+                    <SpellPilotModal open={isSpellOpen("pilot")} onClose={closeSpellModal} pilot={spellBeingEdited} onSave={saveSpell} />
+                    <SpellPilotVehiclesModal open={isSpellOpen("pilot-vehicles")} onClose={closeSpellModal} pilot={spellBeingEdited} onSave={(idx, updated) => saveVehicleSpell(idx, updated)} />
+                    <SpellMagiseedModal open={isSpellOpen("magiseed")} onClose={closeSpellModal} magiseed={spellBeingEdited} onSave={saveSpell} />
+                    <SpellGourmetModal open={isSpellOpen("gourmet")} onClose={closeSpellModal} spell={spellBeingEdited} player={player} onPlayerUpdate={setPlayer} onSave={saveSpell} />
+                    <SpellInvokerModal open={isSpellOpen("invoker")} onClose={closeSpellModal} spell={spellBeingEdited} onSave={saveSpell} />
+                    <SpellTinkererAlchemyRankModal open={isSpellOpen("tinkerer-alchemy")} onClose={closeSpellModal} alchemy={spellBeingEdited} onSave={saveSpell} />
+                    <SpellTinkererInfusionModal open={isSpellOpen("tinkerer-infusion")} onClose={closeSpellModal} infusion={spellBeingEdited} onSave={saveSpell} />
+                    <SpellTinkererMagitechRankModal open={isSpellOpen("tinkerer-magitech")} onClose={closeSpellModal} magitech={spellBeingEdited} onSave={saveSpell} />
+                    <SpellDeckModal open={isSpellOpen("deck")} onClose={closeSpellModal} deck={spellBeingEdited} onSave={saveSpell} />
+                </>
+            )}
+
+            {/* Equipment type picker menu */}
+            <Menu
+                anchorEl={equipMenuAnchor}
+                open={Boolean(equipMenuAnchor)}
+                onClose={() => setEquipMenuAnchor(null)}
+            >
+                <MenuItem onClick={openAddWeapon} sx={{ gap: 1 }}>
+                    <MeleeIcon size="1.2em" /> {t("Add Weapon")}
+                </MenuItem>
+                <MenuItem onClick={openAddCustomWeapon} sx={{ gap: 1 }}>
+                    <MeleeIcon size="1.2em" /> {t("Add Custom Weapon")}
+                </MenuItem>
+                <MenuItem onClick={openAddArmor} sx={{ gap: 1 }} disabled={inv?.armor && inv.armor.length >= 10}>
+                    <ArmorIcon size="1.2em" /> {t("Add Armor")}
+                </MenuItem>
+                <MenuItem onClick={openAddShield} sx={{ gap: 1 }} disabled={inv?.shields && inv.shields.length >= 10}>
+                    <ShieldIcon size="1.2em" /> {t("Add Shield")}
+                </MenuItem>
+                <MenuItem onClick={openAddAccessory} sx={{ gap: 1 }} disabled={inv?.accessories && inv.accessories.length >= 10}>
+                    <AccessoryIcon size="1.2em" /> {t("Add Accessory")}
+                </MenuItem>
+            </Menu>
+
+            {/* Equipment modals */}
+            <PlayerWeaponModal
+                open={openNewWeapon}
+                onClose={() => { setOpenNewWeapon(false); setWeapon(null); setEditWeaponIndex(null); }}
+                editWeaponIndex={editWeaponIndex}
+                weapon={weapon}
+                setWeapon={setWeapon}
+                onAddWeapon={handleSaveWeapon}
+                onDeleteWeapon={handleDeleteWeapon}
+            />
+            <PlayerCustomWeaponModal
+                open={openNewCustomWeapon}
+                onClose={() => { setOpenNewCustomWeapon(false); setCustomWeapon(null); setEditCustomWeaponIndex(null); }}
+                editCustomWeaponIndex={editCustomWeaponIndex}
+                customWeapon={customWeapon}
+                setCustomWeapon={setCustomWeapon}
+                onAddCustomWeapon={handleSaveCustomWeapon}
+                onDeleteCustomWeapon={handleDeleteCustomWeapon}
+            />
+            <PlayerArmorModal
+                open={openNewArmor}
+                onClose={() => { setOpenNewArmor(false); setArmor(null); setEditArmorIndex(null); }}
+                editArmorIndex={editArmorIndex}
+                armorPlayer={armor}
+                setArmorPlayer={setArmor}
+                onAddArmor={handleSaveArmor}
+                onDeleteArmor={handleDeleteArmor}
+            />
+            <PlayerShieldModal
+                open={openNewShields}
+                onClose={() => { setOpenNewShields(false); setShields(null); setEditShieldIndex(null); }}
+                editShieldIndex={editShieldIndex}
+                shield={shields}
+                setShield={setShields}
+                onAddShield={handleSaveShield}
+                onDeleteShield={handleDeleteShield}
+            />
+            <PlayerAccessoryModal
+                open={openNewAccessory}
+                onClose={() => { setOpenNewAccessory(false); setAccessory(null); setEditAccessoryIndex(null); }}
+                editAccIndex={editAccessoryIndex}
+                accessory={accessory}
+                onAddAccessory={handleSaveAccessory}
+                onDeleteAccessory={handleDeleteAccessory}
+            />
+            <PlayerNoteModal
+                open={openNoteModal}
+                onClose={() => { setOpenNoteModal(false); setNoteBeingEdited(null); setEditNoteIndex(null); }}
+                editNoteIndex={editNoteIndex}
+                note={noteBeingEdited}
+                onSaveNote={handleSaveNote}
+                onDeleteNote={handleDeleteNote}
+            />
         </Card>
     );
 }
 
-function Header({ player, characterImage }) {
+function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
 
@@ -411,17 +908,41 @@ function Header({ player, characterImage }) {
                         background,
                         borderRight,
                         px: 2,
+                        display: "flex",
+                        alignItems: "center",
                     }}
                 >
-                    <Typography
-                        color="white.main"
-                        fontFamily="Antonio"
-                        fontSize="1.5rem"
-                        fontWeight="medium"
-                        sx={{ textTransform: "uppercase" }}
-                    >
-                        {player.name}
-                    </Typography>
+                    {isEditMode ? (
+                        <TextField
+                            value={player.name}
+                            onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
+                            inputProps={{ maxLength: 50 }}
+                            variant="standard"
+                            size="small"
+                            sx={{
+                                "& .MuiInputBase-input": {
+                                    color: "#fff",
+                                    fontFamily: "Antonio",
+                                    fontSize: "1.5rem",
+                                    fontWeight: "medium",
+                                    textTransform: "uppercase",
+                                },
+                                "& .MuiInput-underline:before": { borderBottomColor: "rgba(255,255,255,0.5)" },
+                                "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
+                                "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
+                            }}
+                        />
+                    ) : (
+                        <Typography
+                            color="white.main"
+                            fontFamily="Antonio"
+                            fontSize="1.5rem"
+                            fontWeight="medium"
+                            sx={{ textTransform: "uppercase" }}
+                        >
+                            {player.name}
+                        </Typography>
+                    )}
                 </Grid>
                 <Grid
                     item
@@ -431,16 +952,37 @@ function Header({ player, characterImage }) {
                         borderLeft: borderLeft,
                         borderBottom: borderBottom,
                         borderImage: borderImage,
+                        display: "flex",
+                        alignItems: "center",
                     }}
                 >
-                    <Typography
-                        fontFamily="Antonio"
-                        fontSize="1.25rem"
-                        fontWeight="medium"
-                        sx={{ textTransform: "uppercase" }}
-                    >
-                        {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}
-                    </Typography>
+                    {isEditMode ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
+                            {player.info.pronouns && (
+                                <Typography fontFamily="Antonio" fontSize="1rem" sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                                    {player.info.pronouns} <Diamond />
+                                </Typography>
+                            )}
+                            <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); if (updateMaxStats) updateMaxStats(); }}>
+                                <Remove fontSize="small" />
+                            </IconButton>
+                            <Typography fontFamily="Antonio" fontSize="1.1rem" fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.25 }}>
+                                {t("Lvl")} {player.lvl}
+                            </Typography>
+                            <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); if (updateMaxStats) updateMaxStats(); }}>
+                                <Add fontSize="small" />
+                            </IconButton>
+                        </Box>
+                    ) : (
+                        <Typography
+                            fontFamily="Antonio"
+                            fontSize="1.25rem"
+                            fontWeight="medium"
+                            sx={{ textTransform: "uppercase" }}
+                        >
+                            {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}
+                        </Typography>
+                    )}
                 </Grid>
             </Grid>
             <Box sx={{ display: "flex", width: 1 }}>
@@ -589,7 +1131,7 @@ function RenderTraits({ player }) {
     );
 }
 
-function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef, currMDef, currInit }) {
+function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef, currMDef, currInit, isEditMode, setPlayer, updateMaxStats }) {
     const { t } = useTranslate();
     const theme = useTheme();
     const custom = useCustomTheme();
@@ -599,6 +1141,18 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
         if (current < base) return theme.palette.error.main;
         if (current > base) return theme.palette.success.main;
         return theme.palette.text.primary;
+    };
+
+    const attrSelectSx = {
+        fontFamily: "'Antonio', fantasy, sans-serif",
+        fontSize: "0.875rem",
+        "& .MuiSelect-select": { py: 0, px: 0.5 },
+        "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+    };
+
+    const handleAttrChange = (key) => (e) => {
+        setPlayer((p) => ({ ...p, attributes: { ...p.attributes, [key]: e.target.value } }));
+        if (updateMaxStats) updateMaxStats();
     };
 
     return (
@@ -623,101 +1177,56 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                     }}
                 >
                     <Grid container alignItems="stretch" justifyContent="space-between">
-                        <Grid
-                            item
-                            xs
-                            sx={{
-                                bgcolor: custom.mode === 'dark' ? '#1E2122' : '#efecf5',
-                                borderRight: custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
-                                py: 0.4,
-                            }}
-                        >
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontFamily: "'Antonio', fantasy, sans-serif",
-                                    fontSize: "0.875rem",
-                                    color: getAttributeColor(
-                                        player.attributes.dexterity,
-                                        currDex
-                                    ),
+                        {[
+                            { key: "dexterity", label: t("DEX"), curr: currDex, bg: { dark: '#1E2122', light: '#efecf5' }, border: true },
+                            { key: "insight",   label: t("INS"), curr: currInsight, bg: { dark: '#1E2122', light: '#f3f0f7' }, border: true },
+                            { key: "might",     label: t("MIG"), curr: currMight,   bg: { dark: '#1D1F20', light: '#f6f4f9' }, border: true },
+                            { key: "willpower", label: t("WLP"), curr: currWillpower, bg: { dark: '#1B1D1E', light: '#f9f8fb' }, border: false },
+                        ].map(({ key, label, curr, bg, border }) => (
+                            <Grid
+                                key={key}
+                                item
+                                xs
+                                sx={{
+                                    bgcolor: custom.mode === 'dark' ? bg.dark : bg.light,
+                                    borderRight: border ? (custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff') : undefined,
+                                    py: 0.4,
                                 }}
                             >
-                                {t("DEX")}{" "}d{currDex}
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs
-                            sx={{
-                                bgcolor: custom.mode === 'dark' ? '#1E2122' : '#f3f0f7',
-                                borderRight: custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
-                                py: 0.4,
-                            }}
-                        >
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontFamily: "'Antonio', fantasy, sans-serif",
-                                    fontSize: "0.875rem",
-                                    color: getAttributeColor(
-                                        player.attributes.insight,
-                                        currInsight
-                                    ),
-                                }}
-                            >
-                                {t("INS")}{" "}d{currInsight}
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs
-                            sx={{
-                                bgcolor: custom.mode === 'dark' ? '#1D1F20' : '#f6f4f9',
-                                borderRight: custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
-                                py: 0.4,
-                            }}
-                        >
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontFamily: "'Antonio', fantasy, sans-serif",
-                                    fontSize: "0.875rem",
-                                    color: getAttributeColor(
-                                        player.attributes.might,
-                                        currMight
-                                    ),
-                                }}
-                            >
-                                {t("MIG")}{" "}d{currMight}
-                            </Typography>
-                        </Grid>
-                        <Grid
-                            item
-                            xs
-                            sx={{
-                                bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#f9f8fb',
-                                py: 0.4,
-                            }}
-                        >
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                style={{
-                                    fontFamily: "'Antonio', fantasy, sans-serif",
-                                    fontSize: "0.9rem",
-                                    color: getAttributeColor(
-                                        player.attributes.willpower,
-                                        currWillpower
-                                    ),
-                                }}
-                            >
-                                {t("WLP")}{" "}d{currWillpower}
-                            </Typography>
-                        </Grid>
+                                {isEditMode ? (
+                                    <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0 }}>
+                                        <Typography component="span" style={{ fontFamily: "'Antonio', fantasy, sans-serif", fontSize: "0.875rem" }}>
+                                            {label}{" "}
+                                        </Typography>
+                                        <Select
+                                            value={player.attributes[key]}
+                                            onChange={handleAttrChange(key)}
+                                            variant="outlined"
+                                            size="small"
+                                            sx={{ ...attrSelectSx, color: getAttributeColor(player.attributes[key], curr) }}
+                                        >
+                                            {[6, 8, 10, 12].map((v) => (
+                                                <MenuItem key={v} value={v} sx={{ fontFamily: "'Antonio', fantasy, sans-serif", fontSize: "0.875rem" }}>
+                                                    d{v}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </Box>
+                                ) : (
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        style={{
+                                            fontFamily: "'Antonio', fantasy, sans-serif",
+                                            fontSize: key === "willpower" ? "0.9rem" : "0.875rem",
+                                            color: getAttributeColor(player.attributes[key], curr),
+                                        }}
+                                    >
+                                        {label}{" "}d{curr}
+                                    </Typography>
+                                )}
+                            </Grid>
+                        ))}
                     </Grid>
                 </Grid>
                 <Grid

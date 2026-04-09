@@ -15,6 +15,7 @@ import Diamond from "../Diamond";
 import attributes from "../../libs/attributes";
 import types from "../../libs/types";
 import { spellList, tinkererAlchemy, tinkererInfusion, arcanumList } from "../../libs/classes";
+import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
 import { magiseeds } from "../../libs/floralistMagiseedData";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
@@ -196,7 +197,6 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
         <Box>
           <Typography variant="body2">
             {!weapon.quality ? (
-              // t("No Qualities")
               ""
             ) : (
               <StyledMarkdown
@@ -1748,6 +1748,217 @@ export const ActionCard = React.memo(function ActionCard({ item, id, onHeaderCli
             <StyledMarkdown allowedElements={["p", "strong", "em", "ul", "ol", "li", "br"]} unwrapDisallowed>
               {item.effect}
             </StyledMarkdown>
+          </Box>
+        )}
+      </Stack>
+    </Card>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// HeroicCard
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// CustomWeaponCard
+// ---------------------------------------------------------------------------
+
+export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, id, onHeaderClick }) {
+  const { t } = useTranslate();
+  const customTheme = useCustomTheme();
+
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  const { precision, damage } = calculateCustomWeaponStats(weapon, false);
+  const [att1Key, att2Key] = weapon.accuracyCheck || ["dex", "ins"];
+  const attr1 = attributes[att1Key];
+  const attr2 = attributes[att2Key];
+  const dmgType = types[weapon.type];
+  const isRanged = weapon.range === "weapon_range_ranged";
+
+  return (
+    <Card id={id} elevation={1}>
+      <Stack>
+        {/* Header */}
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          onClick={onHeaderClick}
+          sx={{
+            p: 1,
+            background: customTheme.primary,
+            color: "#ffffff",
+            cursor: onHeaderClick ? "pointer" : "default",
+            "& .MuiTypography-root": { fontSize: "0.9rem", textTransform: "uppercase" },
+          }}
+        >
+          <Grid item xs={4}>
+            <Typography variant="h4">{t("Custom Weapon")}</Typography>
+          </Grid>
+          <Grid item xs={2}>
+            <Typography variant="h4" textAlign="center">{t("Cost")}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h4" textAlign="center">{t("Accuracy")}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h4" textAlign="center">{t("Damage")}</Typography>
+          </Grid>
+        </Grid>
+
+        {/* Row 1 – name + stats */}
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{
+            background,
+            borderBottom: `1px solid ${customTheme.secondary}`,
+            px: 1,
+            py: "5px",
+          }}
+        >
+          <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>{weapon.name}</Typography>
+            {weapon.martial && <Martial />}
+          </Grid>
+          <Grid item xs={2}>
+            <Typography textAlign="center">{`${weapon.cost || 300}z`}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography fontWeight="bold" textAlign="center">
+              <OpenBracket />
+              {attr1?.shortcaps} + {attr2?.shortcaps}
+              <CloseBracket />
+              {precision > 0 ? `+${precision}` : ""}
+            </Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography fontWeight="bold" textAlign="center">
+              <OpenBracket />
+              {t("HR +")} {damage}
+              <CloseBracket />
+              {dmgType?.long}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        {/* Row 2 – category / hands / range */}
+        <Grid
+          container
+          justifyContent="space-between"
+          sx={{
+            borderBottom: `1px solid ${customTheme.secondary}`,
+            px: 1,
+            py: "5px",
+          }}
+        >
+          <Grid item xs={4}>
+            <Typography fontWeight="bold">{t(weapon.category)}</Typography>
+          </Grid>
+          <Grid item xs={1}>
+            <Diamond color={customTheme.primary} />
+          </Grid>
+          <Grid item xs={3}>
+            <Typography textAlign="center">
+              {weapon.hands === 1 ? t("One-handed") : t("Two-handed")}
+            </Typography>
+          </Grid>
+          <Grid item xs={1}>
+            <Diamond color={customTheme.primary} />
+          </Grid>
+          <Grid item xs={3}>
+            <Typography textAlign="center">
+              {isRanged ? t("Ranged") : t("Melee")}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        {/* Row 3 – quality */}
+        {weapon.quality && (
+          <Box sx={{ px: 1, py: 0.75 }}>
+            <Typography variant="body2">
+              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                {weapon.quality}
+              </StyledMarkdown>
+            </Typography>
+          </Box>
+        )}
+      </Stack>
+    </Card>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// AccessoryCard
+// ---------------------------------------------------------------------------
+
+export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, onHeaderClick }) {
+  const { t } = useTranslate();
+  const customTheme = useCustomTheme();
+
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Card id={id} elevation={1}>
+      <Stack>
+        {/* Header */}
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          onClick={onHeaderClick}
+          sx={{
+            p: 1,
+            background: customTheme.primary,
+            color: "#ffffff",
+            cursor: onHeaderClick ? "pointer" : "default",
+            "& .MuiTypography-root": { fontSize: "0.9rem", textTransform: "uppercase" },
+          }}
+        >
+          <Grid item xs={9}>
+            <Typography variant="h4">{t("Accessory")}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h4" textAlign="center">{t("Cost")}</Typography>
+          </Grid>
+        </Grid>
+
+        {/* Row 1 – name + cost */}
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{
+            background,
+            borderBottom: `1px solid ${customTheme.secondary}`,
+            px: 1,
+            py: "5px",
+          }}
+        >
+          <Grid item xs={9}>
+            <Typography fontWeight="bold">{accessory.name}</Typography>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
+          </Grid>
+        </Grid>
+
+        {/* quality row */}
+        {accessory.quality && (
+          <Box sx={{ px: 1, py: 0.75 }}>
+            <Typography variant="body2">
+              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                {accessory.quality}
+              </StyledMarkdown>
+            </Typography>
           </Box>
         )}
       </Stack>

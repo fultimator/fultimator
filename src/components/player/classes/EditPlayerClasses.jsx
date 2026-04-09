@@ -14,12 +14,14 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
 import PlayerClassCard from "./PlayerClassCard";
 import useUploadJSON from "../../../hooks/useUploadJSON";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 export default function EditPlayerClasses({
   player,
@@ -32,6 +34,7 @@ export default function EditPlayerClasses({
   const [warnings, setWarnings] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -135,20 +138,18 @@ export default function EditPlayerClasses({
       classes: Array.isArray(player.classes) ? player.classes : [],
     };
 
-    const sortedSkills = selectedClass.skills.sort((a, b) => {
-      if (a.skillName < b.skillName) {
-        return -1;
-      }
-      if (a.skillName > b.skillName) {
-        return 1;
-      }
-      return 0;
-    });
+    const sortedSkills = selectedClass
+      ? selectedClass.skills.slice().sort((a, b) => {
+          if (a.skillName < b.skillName) return -1;
+          if (a.skillName > b.skillName) return 1;
+          return 0;
+        })
+      : [];
 
     updatedPlayer.classes.push({
       name: name,
       lvl: 1,
-      benefits: selectedClass.benefits,
+      benefits: selectedClass?.benefits ?? {},
       skills: sortedSkills,
       heroic: {
         name: "",
@@ -384,6 +385,42 @@ export default function EditPlayerClasses({
     setPlayer(updatedPlayer);
   };
 
+  const handleAddFromCompendium = (item, type) => {
+    if (type !== "classes") return;
+
+    const classExists = player.classes.some(
+      (cls) => cls.name.toLowerCase() === item.name.toLowerCase()
+    );
+    if (classExists) {
+      alert(t("This class type already exists for the character"));
+      return;
+    }
+
+    const sortedSkills = (item.skills || []).slice().sort((a, b) => {
+      if (a.skillName < b.skillName) return -1;
+      if (a.skillName > b.skillName) return 1;
+      return 0;
+    });
+
+    const updatedPlayer = {
+      ...player,
+      classes: Array.isArray(player.classes) ? [...player.classes] : [],
+    };
+
+    updatedPlayer.classes.push({
+      name: item.name,
+      lvl: 1,
+      benefits: item.benefits,
+      skills: sortedSkills,
+      heroic: item.heroic || { name: "", description: "" },
+      spells: item.spells || [],
+      isHomebrew: item.isHomebrew || false,
+    });
+
+    setPlayer(updatedPlayer);
+    updateMaxStats();
+  };
+
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -410,7 +447,11 @@ export default function EditPlayerClasses({
                 <CustomHeader
                   type="top"
                   headerText={t("Classes")}
-                  showIconButton={false}
+                  showIconButton={true}
+                  icon={AddIcon}
+                  customTooltip={t("Add Blank Class")}
+                  addItem={() => setDialogOpen(true)}
+                  openCompendium={() => setCompendiumOpen(true)}
                 />
               </Grid>
               {warnings.map((warning, index) => (
@@ -420,7 +461,7 @@ export default function EditPlayerClasses({
                   </Alert>
                 </Grid>
               ))}
-              <Grid item xs={12} sm={4}>
+              {/* <Grid item xs={12} sm={4}>
                 <Autocomplete
                   id="book-select"
                   options={Object.values(classList)
@@ -508,7 +549,7 @@ export default function EditPlayerClasses({
                 >
                   {t("Upload JSON")}
                 </Button>
-              </Grid>
+              </Grid> */}
             </Grid>
             <input
               ref={fileInputRef}
@@ -570,6 +611,15 @@ export default function EditPlayerClasses({
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
         ))}
+
+      <CompendiumViewerModal
+        open={compendiumOpen}
+        onClose={() => setCompendiumOpen(false)}
+        onAddItem={handleAddFromCompendium}
+        initialType="classes"
+        restrictToTypes={["classes"]}
+        context="player"
+      />
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle variant="h3">{t("Enter Class Name")}</DialogTitle>

@@ -177,7 +177,7 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
                 py: 0.5,
               }}
             >
-              {!armor.quality && t("No Qualities")}{" "}
+              {!armor.quality}{" "}
               <StyledMarkdown
                 components={{
                   strong: (props) => (

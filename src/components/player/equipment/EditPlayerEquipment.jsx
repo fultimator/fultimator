@@ -16,7 +16,7 @@ import PlayerCustomWeaponModal from "./customWeapons/PlayerCustomWeaponModal";
 import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
-import EquipmentCompendiumModal from "./EquipmentCompendiumModal";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 import { syncSlots, deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
@@ -47,6 +47,11 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [accessory, setAccessory] = React.useState(null);
 
   const [openEquipmentCompendium, setOpenEquipmentCompendium] = React.useState(false);
+  const [openWeaponCompendium, setOpenWeaponCompendium] = React.useState(false);
+  const [openArmorCompendium, setOpenArmorCompendium] = React.useState(false);
+  const [openShieldCompendium, setOpenShieldCompendium] = React.useState(false);
+  const [openCustomWeaponCompendium, setOpenCustomWeaponCompendium] = React.useState(false);
+  const [openAccessoryCompendium, setOpenAccessoryCompendium] = React.useState(false);
 
   const inv = player.equipment?.[0] || {};
 
@@ -237,6 +242,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         cost: itemData.cost || 0,
         isEquipped: false,
       });
+    } else if (equipType === "custom-weapon") {
+      handleAddCustomWeapon({ ...itemData, isEquipped: false });
+    } else if (equipType === "accessory") {
+      handleAddAccessory({ ...itemData, isEquipped: false });
     }
   };
 
@@ -592,7 +601,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onDeleteWeapon={handleDeleteWeapon}
         onEquipWeapon={handleEquipWeapon}
         onUnequipWeapon={handleUnequipWeapon}
+        onAddItem={handleOpenNewWeapon}
         isEditMode={isEditMode}
+        onOpenCompendium={isEditMode ? () => setOpenWeaponCompendium(true) : undefined}
       />
 
       <PlayerCustomWeapons
@@ -603,6 +614,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEquipCustomWeapon={handleEquipCustomWeapon}
         onUnequipCustomWeapon={handleUnequipCustomWeapon}
         onUpdateCustomWeapons={handleUpdateCustomWeapons}
+        onAddItem={handleOpenNewCustomWeapon}
+        onOpenCompendium={isEditMode ? () => setOpenCustomWeaponCompendium(true) : undefined}
         isEditMode={isEditMode}
       />
 
@@ -612,7 +625,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditArmor={handleEditArmor}
         onDeleteArmor={handleDeleteArmor}
         onEquipArmor={handleEquipArmor}
+        onAddItem={handleOpenNewArmor}
         isEditMode={isEditMode}
+        onOpenCompendium={isEditMode ? () => setOpenArmorCompendium(true) : undefined}
       />
 
       <PlayerShields
@@ -622,7 +637,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onDeleteShield={handleDeleteShield}
         onEquipShield={handleEquipShield}
         onUnequipShield={handleUnequipShield}
+        onAddItem={handleOpenNewShield}
         isEditMode={isEditMode}
+        onOpenCompendium={isEditMode ? () => setOpenShieldCompendium(true) : undefined}
       />
 
       <PlayerAccessories
@@ -631,6 +648,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onEditAccessory={handleEditAccessory}
         onDeleteAccessory={handleDeleteAccessory}
         onEquipAccessory={handleEquipAccessory}
+        onAddItem={handleOpenNewAccessory}
+        onOpenCompendium={isEditMode ? () => setOpenAccessoryCompendium(true) : undefined}
         isEditMode={isEditMode}
       />
 
@@ -681,10 +700,62 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onDeleteAccessory={handleDeleteAccessory}
       />
 
-      <EquipmentCompendiumModal
+      <CompendiumViewerModal
         open={openEquipmentCompendium}
         onClose={() => setOpenEquipmentCompendium(false)}
-        onSave={handleImportFromCompendium}
+        onAddItem={(item, type) => {
+          const typeMap = {
+            "weapons": "weapon",
+            "custom-weapons": "custom-weapon",
+            "armor": "armor",
+            "shields": "shield",
+            "accessories": "accessory",
+          };
+          handleImportFromCompendium(typeMap[type], item);
+        }}
+        initialType="weapons"
+        restrictToTypes={["weapons", "custom-weapons", "armor", "shields", "accessories"]}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={openWeaponCompendium}
+        onClose={() => setOpenWeaponCompendium(false)}
+        onAddItem={(item) => { handleImportFromCompendium("weapon", item); }}
+        initialType="weapons"
+        restrictToTypes={["weapons"]}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={openArmorCompendium}
+        onClose={() => setOpenArmorCompendium(false)}
+        onAddItem={(item) => { handleImportFromCompendium("armor", item); }}
+        initialType="armor"
+        restrictToTypes={["armor"]}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={openShieldCompendium}
+        onClose={() => setOpenShieldCompendium(false)}
+        onAddItem={(item) => { handleImportFromCompendium("shield", item); }}
+        initialType="shields"
+        restrictToTypes={["shields"]}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={openCustomWeaponCompendium}
+        onClose={() => setOpenCustomWeaponCompendium(false)}
+        onAddItem={(item) => { handleImportFromCompendium("custom-weapon", item); }}
+        initialType="custom-weapons"
+        restrictToTypes={["custom-weapons"]}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={openAccessoryCompendium}
+        onClose={() => setOpenAccessoryCompendium(false)}
+        onAddItem={(item) => { handleImportFromCompendium("accessory", item); }}
+        initialType="accessories"
+        restrictToTypes={["accessories"]}
+        context="player"
       />
     </>
   );

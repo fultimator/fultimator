@@ -69,10 +69,7 @@ const NpcEditAppBar = ({
       <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
-        context="npc"
-        onAddItem={(item, type) => {
-          console.log("Selected Item from Compendium Modal:", item, type);
-        }}
+        viewOnly
       />
     </MuiAppBar>
   );
@@ -90,6 +87,7 @@ const PcEditAppBar = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  const openCompendiumModal = () => setModalOpen(true);
   const closeCompendiumModal = () => setModalOpen(false);
 
   return (
@@ -110,6 +108,13 @@ const PcEditAppBar = ({
           </Grid>
           <Grid item xs={3} textAlign="right">
             <Grid container alignItems="center" justifyContent="flex-end">
+              {showGoBackButton && (
+                <Tooltip title="Open Compendium">
+                  <IconButton color="inherit" onClick={openCompendiumModal}>
+                    <Search />
+                  </IconButton>
+                </Tooltip>
+              )}
               <MenuOption
                 selectedTheme={selectedTheme}
                 onSelectTheme={handleSelectTheme}
@@ -123,10 +128,7 @@ const PcEditAppBar = ({
       <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
-        context="player"
-        onAddItem={(item, type) => {
-          console.log("Selected Item from Compendium Modal:", item, type);
-        }}
+        viewOnly
       />
     </MuiAppBar>
   );

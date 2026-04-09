@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Paper, Typography, Grid } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -7,10 +7,25 @@ import CustomHeader3 from "../../common/CustomHeader3";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
-export default function PlayerClasses({ player, isCharacterSheet }) {
+export default function PlayerClasses({ player, setPlayer = null, isEditMode = false, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
+
+  const [heroicPickerClassIdx, setHeroicPickerClassIdx] = useState(null);
+
+  const handleAddHeroic = (item) => {
+    if (heroicPickerClassIdx === null || !setPlayer) return;
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls, i) =>
+        i === heroicPickerClassIdx
+          ? { ...cls, heroic: { name: item.name, description: item.description } }
+          : cls
+      ),
+    }));
+  };
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -208,8 +223,9 @@ export default function PlayerClasses({ player, isCharacterSheet }) {
                       headerText={c.heroic.name}
                       currentLvl={0}
                       maxLvl={0}
-                      isEditMode={false}
+                      isEditMode={isEditMode && !!setPlayer}
                       isHeroicSkill={true}
+                      onOpenCompendium={isEditMode && setPlayer ? () => setHeroicPickerClassIdx(index) : undefined}
                     />
                     <Typography
                       variant="body1"
@@ -233,6 +249,14 @@ export default function PlayerClasses({ player, isCharacterSheet }) {
           ))}
         </>
       )}
+      <CompendiumViewerModal
+        open={heroicPickerClassIdx !== null}
+        onClose={() => setHeroicPickerClassIdx(null)}
+        onAddItem={handleAddHeroic}
+        initialType="heroics"
+        restrictToTypes={["heroics"]}
+        context="player"
+      />
     </>
   );
 }

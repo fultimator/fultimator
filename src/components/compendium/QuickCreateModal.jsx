@@ -25,6 +25,7 @@ import {
   AccordionDetails,
   Tooltip,
   Menu,
+  ListSubheader,
 } from "@mui/material";
 import { Close, AutoFixHigh, Delete as DeleteIcon } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -38,13 +39,14 @@ import { useEquipmentForm } from "../player/common/hooks/useEquipmentForm";
 import types from "../../libs/types";
 import classList from "../../libs/classes";
 import spellClassesList from "../../libs/spellClasses";
+import specialSkillsList from "../../libs/skills";
 import weapons from "../../libs/weapons";
 import weaponCategories from "../../libs/weaponCategories";
 import armor from "../../libs/armor";
 import shields from "../../libs/shields";
 import weaponQualities from "../../routes/equip/weapons/qualities";
 import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
-import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard } from "./ItemCards";
+import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard, CustomWeaponCard, AccessoryCard } from "./ItemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
@@ -67,6 +69,16 @@ import ChangeBonus from "../../routes/equip/weapons/ChangeBonus";
 import ApplyRework from "../../routes/equip/common/ApplyRework";
 import ChangeCategory from "../player/equipment/weapons/ChangeCategory";
 import ChangeModifiers from "../player/equipment/ChangeModifiers";
+
+// ── Custom weapon / accessory sub-components ──────────────────────────────────
+import ChangeCWCategory from "../../routes/equip/customWeapons/ChangeCategory";
+import ChangeRange from "../../routes/equip/customWeapons/ChangeRange";
+import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
+import ChangeCWType from "../../routes/equip/customWeapons/ChangeType";
+import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
+import SelectAccessoryQuality from "../../routes/equip/Accessories/SelectQuality";
+import accessoryQualities from "../../routes/equip/Accessories/qualities";
+import { categories as cwCategories, range as cwRange, accuracyChecks as cwAccuracyChecks, types as cwTypes } from "../../routes/equip/customWeapons/libs.jsx";
 
 // ── Shared constants ──────────────────────────────────────────────────────────
 
@@ -93,6 +105,12 @@ const FILTER_OPTIONS = [
 ];
 
 const HEROIC_BOOK_OPTIONS = ["core", "rework", "bonus", "high", "techno", "natural"];
+
+const GROUPED_SPECIAL_SKILLS = specialSkillsList.reduce((acc, skill) => {
+  if (!acc[skill.class]) acc[skill.class] = [];
+  acc[skill.class].push(skill);
+  return acc;
+}, {});
 const CLASS_BOOK_SUGGESTIONS = ["core", "rework", "bonus", "high", "techno", "natural", "homebrew"];
 const CLASS_NAME_OPTIONS  = classList.map((c) => c.name);
 
@@ -1228,6 +1246,26 @@ function ClassPanel() {
                       onChange={(e) => updateSkillField(i, "description", e.target.value)}
                       fullWidth size="small" multiline rows={2} inputProps={{ maxLength: 1500 }} />
                   </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("Special Skill Effect")}</InputLabel>
+                      <Select
+                        value={skill.specialSkill}
+                        onChange={(e) => updateSkillField(i, "specialSkill", e.target.value)}
+                        label={t("Special Skill Effect")}
+                      >
+                        <MenuItem value=""><em>{t("None")}</em></MenuItem>
+                        {Object.keys(GROUPED_SPECIAL_SKILLS)
+                          .sort((a, b) => t(a).localeCompare(t(b)))
+                          .flatMap((cls) => [
+                            <ListSubheader key={cls}>{t(cls)}</ListSubheader>,
+                            ...GROUPED_SPECIAL_SKILLS[cls].map((s) => (
+                              <MenuItem key={s.name} value={s.name}>{t(s.name)}</MenuItem>
+                            )),
+                          ])}
+                      </Select>
+                    </FormControl>
+                  </Grid>
                 </Grid>
               </Box>
             </Grid>
@@ -1622,6 +1660,231 @@ function ShieldPanel() {
   );
 }
 
+// ── Custom Weapon panel ───────────────────────────────────────────────────────
+
+function CustomWeaponPanel() {
+  const { t } = useTranslate();
+  const [name,                  setName]                  = useState("");
+  const [category,              setCategory]              = useState(cwCategories[0]);
+  const [range,                 setRange]                 = useState(cwRange[0]);
+  const [accuracyCheck,         setAccuracyCheck]         = useState(cwAccuracyChecks[0]);
+  const [type,                  setType]                  = useState(cwTypes[0]);
+  const [customizations,        setCustomizations]        = useState([]);
+  const [selectedCustomization, setSelectedCustomization] = useState("");
+  const [quality,               setQuality]               = useState("");
+  const [qualityCost,           setQualityCost]           = useState(0);
+  const [selectedQuality,       setSelectedQuality]       = useState("");
+  const {
+    damageModifier, setDamageModifier,
+    precModifier, setPrecModifier,
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    modifiersExpanded, setModifiersExpanded,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(null);
+
+  const weaponObj = {
+    name,
+    category,
+    range,
+    accuracyCheck: [accuracyCheck.att1, accuracyCheck.att2],
+    type,
+    customizations,
+    quality,
+    qualityCost,
+    selectedQuality,
+    damageModifier: parseInt(damageModifier),
+    precModifier: parseInt(precModifier),
+    defModifier: parseInt(defModifier),
+    mDefModifier: parseInt(mDefModifier),
+    ...modifiers(),
+  };
+
+  const handleClear = () => {
+    setName(""); setCategory(cwCategories[0]); setRange(cwRange[0]);
+    setAccuracyCheck(cwAccuracyChecks[0]); setType(cwTypes[0]);
+    setCustomizations([]); setSelectedCustomization("");
+    setQuality(""); setQualityCost(0); setSelectedQuality("");
+    clearModifiers();
+  };
+
+  const handleCategoryChange = (e) => {
+    const newCat = e.target.value;
+    setCategory(newCat);
+    if (newCat === "weapon_category_arcane" || newCat === "weapon_category_dagger") {
+      setCustomizations((prev) => prev.filter((c) => c.name !== "weapon_customization_powerful"));
+    }
+  };
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <ChangeCWCategory value={category} onChange={handleCategoryChange} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <ChangeRange value={range} onChange={(e) => setRange(e.target.value)} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <ChangeAccuracyCheck value={accuracyCheck} onChange={(val) => setAccuracyCheck(val)} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <ChangeCWType value={type} onChange={(e) => setType(e.target.value)} />
+          </Grid>
+          <Grid item xs={12}>
+            <ChangeCustomizations
+              selectedCustomization={selectedCustomization}
+              setSelectedCustomization={setSelectedCustomization}
+              onCustomizationAdd={(c) => setCustomizations((prev) => [...prev, c])}
+              onCustomizationRemove={(name) => setCustomizations((prev) => prev.filter((c) => c.name !== name))}
+              currentCustomizations={customizations}
+              selectedCategory={category}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <SelectWeaponQuality quality={selectedQuality} setQuality={(e) => {
+              const q = weaponQualities.find((el) => el.name === e.target.value);
+              setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
+            }} />
+          </Grid>
+          <Grid item xs={12}>
+            <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
+              qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
+          </Grid>
+          <Accordion sx={{ width: "100%", marginLeft: "10px" }}
+            expanded={modifiersExpanded} onChange={() => setModifiersExpanded(!modifiersExpanded)}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>{t("Modifiers")}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                {[
+                  { label: "Damage Modifier",   value: damageModifier, set: setDamageModifier },
+                  { label: "Precision Modifier", value: precModifier,   set: setPrecModifier },
+                  { label: "DEF Modifier",       value: defModifier,    set: setDefModifier },
+                  { label: "MDEF Modifier",      value: mDefModifier,   set: setMDefModifier },
+                ].map(({ label, value, set }) => (
+                  <Grid item xs={6} key={label}>
+                    <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
+                  </Grid>
+                ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<CustomWeaponCard weapon={weaponObj} />}
+      addButton={<AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />}
+      data={weaponObj}
+      itemName={weaponObj.name || ""}
+    />
+  );
+}
+
+// ── Accessory panel ───────────────────────────────────────────────────────────
+
+function AccessoryPanel() {
+  const { t } = useTranslate();
+  const [name,            setName]            = useState("");
+  const [quality,         setQuality]         = useState("");
+  const [qualityCost,     setQualityCost]     = useState(0);
+  const [selectedQuality, setSelectedQuality] = useState("");
+  const {
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    initModifier, setInitModifier,
+    magicModifier, setMagicModifier,
+    precModifier, setPrecModifier,
+    damageMeleeModifier, setDamageMeleeModifier,
+    damageRangedModifier, setDamageRangedModifier,
+    modifiersExpanded, setModifiersExpanded,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(null);
+
+  const cost = parseInt(qualityCost);
+
+  const accessoryObj = {
+    name,
+    cost,
+    quality,
+    qualityCost,
+    selectedQuality,
+    defModifier: parseInt(defModifier),
+    mDefModifier: parseInt(mDefModifier),
+    initModifier: parseInt(initModifier),
+    magicModifier: parseInt(magicModifier),
+    precModifier: parseInt(precModifier),
+    damageMeleeModifier: parseInt(damageMeleeModifier),
+    damageRangedModifier: parseInt(damageRangedModifier),
+  };
+
+  const handleClear = () => {
+    setName(""); setQuality(""); setQualityCost(0); setSelectedQuality("");
+    clearModifiers();
+  };
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={6}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <SelectAccessoryQuality quality={selectedQuality} setQuality={(e) => {
+              const q = accessoryQualities.find((el) => el.name === e.target.value);
+              setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
+            }} />
+          </Grid>
+          <Grid item xs={12}>
+            <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
+              qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
+          </Grid>
+          <Accordion sx={{ width: "100%", marginLeft: "10px" }}
+            expanded={modifiersExpanded} onChange={() => setModifiersExpanded(!modifiersExpanded)}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>{t("Modifiers")}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={2}>
+                {[
+                  { label: "DEF Modifier",             value: defModifier,          set: setDefModifier },
+                  { label: "MDEF Modifier",            value: mDefModifier,         set: setMDefModifier },
+                  { label: "INIT Modifier",            value: initModifier,         set: setInitModifier },
+                  { label: "Magic Modifier",           value: magicModifier,        set: setMagicModifier },
+                  { label: "Precision Modifier",       value: precModifier,         set: setPrecModifier },
+                  { label: "Damage (Melee) Modifier",  value: damageMeleeModifier,  set: setDamageMeleeModifier },
+                  { label: "Damage (Ranged) Modifier", value: damageRangedModifier, set: setDamageRangedModifier },
+                ].map(({ label, value, set }) => (
+                  <Grid item xs={6} md={4} key={label}>
+                    <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
+                  </Grid>
+                ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<AccessoryCard accessory={accessoryObj} />}
+      addButton={<AddToCompendiumButton itemType="accessory" data={accessoryObj} />}
+      data={accessoryObj}
+      itemName={accessoryObj.name || ""}
+    />
+  );
+}
+
 // ── Tab definitions ───────────────────────────────────────────────────────────
 
 const TABS = [
@@ -1631,16 +1894,43 @@ const TABS = [
   { key: "quality",      label: "Quality",      Panel: QualityPanel     },
   { key: "heroic",       label: "Heroic Skill", Panel: HeroicPanel      },
   { key: "class",        label: "Class",        Panel: ClassPanel       },
-  { key: "weapon",       label: "Weapon",       Panel: WeaponPanel      },
-  { key: "armor",        label: "Armor",        Panel: ArmorPanel       },
-  { key: "shield",       label: "Shield",       Panel: ShieldPanel      },
+  { key: "weapon",        label: "Weapon",        Panel: WeaponPanel        },
+  { key: "custom-weapon", label: "Custom Weapon", Panel: CustomWeaponPanel  },
+  { key: "armor",         label: "Armor",         Panel: ArmorPanel         },
+  { key: "shield",        label: "Shield",        Panel: ShieldPanel        },
+  { key: "accessory",     label: "Accessory",     Panel: AccessoryPanel     },
 ];
+
+// ── Viewer type → Quick Create tab key ───────────────────────────────────────
+
+const VIEWER_TYPE_TO_TAB_KEY = {
+  "attacks":       "npc-attack",
+  "spells":        "npc-spell",
+  "player-spells": "player-spell",
+  "qualities":     "quality",
+  "heroics":       "heroic",
+  "classes":       "class",
+  "weapons":       "weapon",
+  "custom-weapons": "custom-weapon",
+  "armor":         "armor",
+  "shields":       "shield",
+  "accessories":   "accessory",
+};
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function QuickCreateModal({ open, onClose }) {
+export default function QuickCreateModal({ open, onClose, lockedToViewerType }) {
   const { t } = useTranslate();
-  const [tab, setTab] = useState(0);
+
+  const lockedTabKey = lockedToViewerType ? VIEWER_TYPE_TO_TAB_KEY[lockedToViewerType] : null;
+  const lockedTabIdx = lockedTabKey != null ? TABS.findIndex((t) => t.key === lockedTabKey) : -1;
+  const initialTab   = lockedTabIdx >= 0 ? lockedTabIdx : 0;
+
+  const [tab, setTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (open && lockedTabIdx >= 0) setTab(lockedTabIdx);
+  }, [open, lockedTabIdx]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
@@ -1657,7 +1947,13 @@ export default function QuickCreateModal({ open, onClose }) {
 
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto">
-          {TABS.map((item) => <Tab key={item.key} label={t(item.label)} />)}
+          {TABS.map((item, idx) => (
+            <Tab
+              key={item.key}
+              label={t(item.label)}
+              disabled={lockedTabIdx >= 0 && idx !== lockedTabIdx}
+            />
+          ))}
         </Tabs>
       </Box>
 

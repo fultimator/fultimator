@@ -24,6 +24,8 @@ export default function PlayerCustomWeapons({
   onEquipCustomWeapon,
   onUnequipCustomWeapon,
   onUpdateCustomWeapons,
+  onAddItem,
+  onOpenCompendium,
   isEditMode,
 }) {
   const { t } = useTranslate();
@@ -113,6 +115,8 @@ export default function PlayerCustomWeapons({
         headerText={t("Custom Weapons")}
         showIconButton={false}
         icon={<MeleeIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>

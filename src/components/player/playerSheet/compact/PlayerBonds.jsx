@@ -42,13 +42,15 @@ export default function PlayerBonds({ player }) {
               },
             }}
           >
+            <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader>
               <Typography variant="h4">{t("Bonds")}</Typography>
             </StyledTableCellHeader>
-            <StyledTableCellHeader>
+            <StyledTableCellHeader sx={{ width: 80 }} />
+            <StyledTableCellHeader sx={{ width: 90 }}>
               <Typography variant="h4">{t("Sentiments")}</Typography>
             </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: 36, textAlign: "center" }}>
+            <StyledTableCellHeader sx={{ width: 100, textAlign: "center" }}>
               <Typography variant="h4">★</Typography>
             </StyledTableCellHeader>
           </TableRow>
@@ -93,6 +95,7 @@ export default function PlayerBonds({ player }) {
 
             return (
               <TableRow key={index}>
+                <StyledTableCell sx={{ width: 36 }} />
                 <StyledTableCell>
                   <Typography
                     variant="body2"
@@ -102,8 +105,9 @@ export default function PlayerBonds({ player }) {
                     {bond.name}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell>{sentimentNodes}</StyledTableCell>
-                <StyledTableCell sx={{ textAlign: "center" }}>
+                <StyledTableCell sx={{ width: 80 }} />
+                <StyledTableCell sx={{ width: 90 }}>{sentimentNodes}</StyledTableCell>
+                <StyledTableCell sx={{ width: 100, textAlign: "center" }}>
                   {strength > 0 && (
                     <Typography variant="body2" fontWeight="bold">
                       ★{strength}

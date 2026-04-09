@@ -104,7 +104,7 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
                 py: 0.5,
               }}
             >
-              {!accessory.quality && t("No Qualities")}{" "}
+              {!accessory.quality}{" "}
               <StyledMarkdown
                 components={{
                   strong: (props) => (

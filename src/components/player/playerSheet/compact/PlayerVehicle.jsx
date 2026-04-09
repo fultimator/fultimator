@@ -42,7 +42,7 @@ export default function PlayerVehicle({ player }) {
               },
             }}
           >
-            <StyledTableCellHeader sx={{ width: 24 }} />
+            <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader>
               <Typography variant="h4" sx={{ color: 'white' }}>{t("pilot_vehicle")}</Typography>
             </StyledTableCellHeader>

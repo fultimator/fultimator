@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Typography,
@@ -30,20 +30,22 @@ import Clock from "../Clock";
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
 
-export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
+export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEditMode = false, onAddNote, onEditNote }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const [openNotes, setOpenNotes] = useState({});
 
-  const visibleNotes = (player.notes || []).filter(
-    (note) =>
-      note.showInPlayerSheet !== false &&
-      (!searchQuery ||
-        note.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.description?.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const visibleNotes = (player.notes || [])
+    .map((note, index) => ({ ...note, originalIndex: index }))
+    .filter(
+      (note) =>
+        note.showInPlayerSheet !== false &&
+        (!searchQuery ||
+          note.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
-  if (visibleNotes.length === 0) return null;
+  if (visibleNotes.length === 0 && !(isEditMode && onAddNote)) return null;
 
   const toggleNote = (idx) =>
     setOpenNotes((prev) => ({ ...prev, [idx]: !prev[idx] }));
@@ -103,18 +105,29 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
               },
             }}
           >
-            <StyledTableCellHeader sx={{ width: 34 }} />
-            <StyledTableCellHeader colSpan={4}>
+            <StyledTableCellHeader sx={{ width: 36 }}>
+              {isEditMode && onAddNote && (
+                <Tooltip title={t("Add Note")}>
+                  <IconButton size="small" onClick={onAddNote} sx={{ color: '#fff', p: 0 }}>
+                    <Add fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </StyledTableCellHeader>
+            <StyledTableCellHeader>
               <Typography variant="h4">{t("Notes")}</Typography>
             </StyledTableCellHeader>
+            <StyledTableCellHeader sx={{ width: 80 }} />
+            <StyledTableCellHeader sx={{ width: 90 }} />
+            <StyledTableCellHeader sx={{ width: 100 }} />
           </TableRow>
         </TableHead>
         <TableBody>
           {visibleNotes.map((note, noteIndex) => (
-            <>
+            <React.Fragment key={noteIndex}>
               {/* Note title row */}
               <TableRow key={`note-${noteIndex}`}>
-                <StyledTableCell sx={{ width: 34 }}>
+                <StyledTableCell sx={{ width: 36 }}>
                   {note.description ? (
                     <IconButton
                       size="small"
@@ -135,15 +148,25 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
                     </Tooltip>
                   )}
                 </StyledTableCell>
-                <StyledTableCell colSpan={4}>
+                <StyledTableCell onClick={() => note.description && toggleNote(noteIndex)} sx={{ cursor: note.description ? "pointer" : "default" }}>
                   <Typography
                     variant="body2"
                     fontWeight="bold"
-                    sx={{ textTransform: "uppercase", cursor: note.description ? "pointer" : "default" }}
-                    onClick={() => note.description && toggleNote(noteIndex)}
+                    sx={{ textTransform: "uppercase" }}
                   >
                     {note.name}
                   </Typography>
+                </StyledTableCell>
+                <StyledTableCell sx={{ width: 80 }} />
+                <StyledTableCell sx={{ width: 90 }} />
+                <StyledTableCell sx={{ width: 100, textAlign: 'right' }}>
+                  {isEditMode && (
+                    <Tooltip title={t("Edit Note")}>
+                      <IconButton size="small" onClick={() => onEditNote && onEditNote(note.originalIndex)}>
+                        <StickyNote2Outlined fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </StyledTableCell>
               </TableRow>
 
@@ -174,50 +197,44 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
                     key={`clock-${noteIndex}-${clockIndex}`}
                     sx={{ bgcolor: "action.hover" }}
                   >
-                    {/* Mini non-interactable clock */}
-                    <StyledTableCell sx={{ width: 44, textAlign: "center", pl: 1 }}>
+                    <StyledTableCell sx={{ width: 36 }}>
                       <Clock
                         numSections={total}
-                        size={36}
+                        size={28}
                         state={clock.state}
                         setState={() => {}}
                         isCharacterSheet={true}
                       />
                     </StyledTableCell>
 
-                    {/* Clock name */}
                     <StyledTableCell>
                       <Typography variant="body2" sx={{ fontSize: "0.75rem" }}>
                         {clock.name}
                       </Typography>
                     </StyledTableCell>
 
-                    {/* Decrement */}
-                    <StyledTableCell sx={{ width: 28, p: 0 }}>
-                      <IconButton
-                        size="small"
-                        disabled={!canDecrement}
-                        onClick={() => decrement(noteIndex, clockIndex, clock)}
-                        sx={{ p: "2px" }}
-                      >
-                        <Remove fontSize="small" />
-                      </IconButton>
-                    </StyledTableCell>
-
-                    {/* Count */}
-                    <StyledTableCell sx={{ width: 36, textAlign: "center", p: 0 }}>
+                    <StyledTableCell sx={{ width: 80, textAlign: "center" }}>
                       <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
                         {filled}/{total}
                       </Typography>
                     </StyledTableCell>
 
-                    {/* Increment + Reset */}
-                    <StyledTableCell sx={{ width: 56, p: 0 }}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <StyledTableCell sx={{ width: 90 }} />
+
+                    <StyledTableCell sx={{ width: 100, textAlign: 'right' }}>
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: 'flex-end' }}>
+                        <IconButton
+                          size="small"
+                          disabled={!canDecrement}
+                          onClick={() => decrement(note.originalIndex, clockIndex, clock)}
+                          sx={{ p: "2px" }}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
                         <IconButton
                           size="small"
                           disabled={!canIncrement}
-                          onClick={() => increment(noteIndex, clockIndex, clock)}
+                          onClick={() => increment(note.originalIndex, clockIndex, clock)}
                           sx={{ p: "2px" }}
                         >
                           <Add fontSize="small" />
@@ -225,7 +242,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
                         <Tooltip title={t("Reset")} arrow>
                           <IconButton
                             size="small"
-                            onClick={() => reset(noteIndex, clockIndex, clock)}
+                            onClick={() => reset(note.originalIndex, clockIndex, clock)}
                             sx={{ p: "2px" }}
                           >
                             <RestartAlt fontSize="small" />
@@ -236,7 +253,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "" }) {
                   </TableRow>
                 );
               })}
-            </>
+            </React.Fragment>
           ))}
         </TableBody>
       </Table>

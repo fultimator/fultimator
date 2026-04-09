@@ -22,6 +22,8 @@ export default function PlayerAccessories({
   accessories,
   onEditAccessory,
   onEquipAccessory,
+  onAddItem,
+  onOpenCompendium,
   isEditMode,
 }) {
   const { t } = useTranslate();
@@ -86,6 +88,8 @@ export default function PlayerAccessories({
         headerText={t("Accessories")}
         showIconButton={false}
         icon={<AccessoryIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>

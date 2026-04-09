@@ -18,6 +18,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Clock from "./Clock";
@@ -36,7 +37,10 @@ export default function PlayerRituals({
   compact = false,
 }) {
   const { t } = useTranslate();
-  const theme = useCustomTheme();
+  const theme = useTheme();
+  const custom = useCustomTheme();
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.secondary.main;
 
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
@@ -137,8 +141,8 @@ export default function PlayerRituals({
         marginRight: "10px",
         marginTop: "-1px",
         marginBottom: "-1px",
-        backgroundColor: theme.primary,
-        color: "white",
+        backgroundColor: primary,
+        color: custom.white,
         borderRadius: "0 8px 8px 0",
         transform: "rotate(180deg)",
         fontSize: "2em",
@@ -256,14 +260,14 @@ export default function PlayerRituals({
             <TableHead>
               <TableRow
                 sx={{
-                  background: theme.primary,
+                  background: primary,
                   "& .MuiTypography-root": {
                     fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     textTransform: "uppercase",
                   },
                 }}
               >
-                <StyledTableCellHeader sx={{ width: 24 }} />
+                <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
                   <Typography variant="h4">{t("Rituals")}</Typography>
                 </StyledTableCellHeader>
@@ -286,7 +290,7 @@ export default function PlayerRituals({
         sx={{
           borderRadius: "8px",
           border: "2px solid",
-          borderColor: theme.secondary,
+          borderColor: secondary,
           display: "flex",
           flexDirection: isCharacterSheet ? "column" : undefined,
           boxShadow: isCharacterSheet ? "none" : undefined,
@@ -298,8 +302,8 @@ export default function PlayerRituals({
             sx={{
               textTransform: "uppercase",
               padding: "5px",
-              backgroundColor: theme.primary,
-              color: theme.white,
+              backgroundColor: primary,
+              color: custom.white,
               borderRadius: "8px 8px 0 0",
               fontSize: "1.5em",
             }}
@@ -363,7 +367,9 @@ function RitualsCalculator({
   calcClock,
 }) {
   const { t } = useTranslate();
-  const theme = useCustomTheme();
+  const theme = useTheme();
+  const custom = useCustomTheme();
+  const secondary = theme.palette.secondary.main;
 
   const labelFontSize = compact
     ? { xs: "0.75em" }
@@ -381,7 +387,7 @@ function RitualsCalculator({
         p: compact ? "8px" : "14px",
         borderRadius: "8px",
         border: "2px solid",
-        borderColor: theme.secondary,
+        borderColor: secondary,
       }}
     >
       <Grid container>

@@ -27,7 +27,9 @@ export default function PlayerShields({
   onEditShield,
   onEquipShield,
   onUnequipShield,
+  onAddItem,
   isEditMode,
+  onOpenCompendium,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -119,6 +121,8 @@ export default function PlayerShields({
         headerText={t("Shield")}
         showIconButton={false}
         icon={<ShieldIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>

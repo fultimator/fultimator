@@ -44,6 +44,7 @@ export default function PlayerCompanion({ player }) {
       <Table size="small">
         <TableHead>
           <TableRow sx={{ background: theme.primary }}>
+            <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader sx={{ px: 1, py: 0.5 }}>
               <Typography variant="h4" sx={{ fontSize: "0.85rem", textTransform: "uppercase" }}>
                 {t("Faithful Companion")} (SL: {faithfulCompanionSkills[0].currentLvl})
@@ -53,6 +54,7 @@ export default function PlayerCompanion({ player }) {
         </TableHead>
         <TableBody>
           <TableRow>
+            <StyledTableCell sx={{ width: 36 }} />
             <TableCell sx={{ p: 0.5 }}>
               <Pretty npc={companion} collapse={true} />
             </TableCell>

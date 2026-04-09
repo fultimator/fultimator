@@ -204,7 +204,7 @@ function PrettySingle({ weapon, showActions }) {
                 py: 1,
               }}
             >
-              {!weapon.quality && t("No Qualities")}{" "}
+              {!weapon.quality}{" "}
               <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                 {weapon.quality}
               </StyledMarkdown>

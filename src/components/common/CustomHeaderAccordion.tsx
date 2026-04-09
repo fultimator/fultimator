@@ -1,19 +1,32 @@
-import {
+import React from "react";
+  import {
     AccordionSummary,
     Typography,
     IconButton,
     Icon,
     Box,
+    Tooltip,
   } from "@mui/material";
   import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+  import AddIcon from "@mui/icons-material/Add";
+  import SearchIcon from "@mui/icons-material/Search";
   import { useCustomTheme } from "../../hooks/useCustomTheme";
-  
+
   const CustomHeaderAccordion = ({
     isExpanded = true,
     //handleAccordionChange,
     headerText = "",
     showIconButton = false,
     icon = null,
+    addItem = null,
+    openCompendium = null,
+  }: {
+    isExpanded?: boolean;
+    headerText?: string;
+    showIconButton?: boolean;
+    icon?: React.ReactNode;
+    addItem?: (() => void) | null;
+    openCompendium?: (() => void) | null;
   }) => {
     const theme = useCustomTheme();
     return (
@@ -26,7 +39,7 @@ import {
           borderRadius: isExpanded ? "6px 6px 0 0" : "6px",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1 }}>
           {icon && (
             <Icon
               sx={{
@@ -51,10 +64,38 @@ import {
             {headerText}
           </Typography>
         </Box>
-        {showIconButton && (
-          <IconButton aria-label="icon button" sx={{ color: "#ffffff" }}>
-            <ArrowDownwardIcon />
-          </IconButton>
+        {openCompendium && (
+          <Tooltip title={`Search ${headerText}`}>
+            <IconButton
+              size="small"
+              onClick={(e) => { e.stopPropagation(); openCompendium(); }}
+              sx={{
+                color: "#ffffff",
+                "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.3)" },
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        {(addItem || openCompendium) && (
+          <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
+            {addItem && (
+              <Tooltip title={`Add ${headerText}`}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); addItem(); }}
+                  sx={{
+                    color: "#ffffff",
+                    "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.3)" },
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+          </Box>
         )}
       </AccordionSummary>
     );

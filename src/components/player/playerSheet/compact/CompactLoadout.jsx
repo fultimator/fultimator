@@ -437,7 +437,7 @@ export default function CompactLoadout({
 
           const inner = (
             <Box sx={{ display: 'flex', alignItems: 'center', px: 1, py: 0.25, borderBottom: '1px solid', borderColor: 'divider', minWidth: 0 }}>
-              <Typography component="span" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' }, fontWeight: 700, textTransform: 'uppercase', color: locked ? 'text.disabled' : 'text.secondary', whiteSpace: 'nowrap', flexShrink: 0, mr: 0.5 }}>
+              <Typography component="span" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' }, fontWeight: 700, textTransform: 'uppercase', color: locked ? 'text.disabled' : 'text.secondary', whiteSpace: 'nowrap', flexShrink: 0, mr: 0.5, width: { xs: '65px', sm: '75px' } }}>
                 {slotLabel(t, slot)}
               </Typography>
               {locked && <LockIcon sx={{ fontSize: '0.65rem', color: 'text.disabled', flexShrink: 0, mr: 0.5 }} />}
@@ -510,7 +510,7 @@ export default function CompactLoadout({
               const inner = (
                 <Box sx={{ display: 'flex', alignItems: 'center', px: 1, py: 0.25, borderBottom: '1px solid', borderColor: 'divider', minWidth: 0 }}>
                   <PrecisionManufacturingIcon sx={{ fontSize: '0.65rem', color: 'success.main', flexShrink: 0, mr: 0.5 }} />
-                  <Typography component="span" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' }, fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', whiteSpace: 'nowrap', flexShrink: 0, mr: 0.5 }}>
+                  <Typography component="span" sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem' }, fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', whiteSpace: 'nowrap', flexShrink: 0, mr: 0.5, width: { xs: '65px', sm: '75px' } }}>
                     {`${t('Support')} ${i + 1}`}
                   </Typography>
                   <Typography component="span" noWrap sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: isEmpty ? 400 : 600, color: isEmpty ? 'text.disabled' : 'success.main', fontStyle: isEmpty ? 'italic' : 'normal', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>

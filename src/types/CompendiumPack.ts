@@ -8,6 +8,8 @@ export type CompendiumItemType =
   | "weapon"
   | "armor"
   | "shield"
+  | "custom-weapon"
+  | "accessory"
   | "player-spell"
   | "quality"
   | "class"

@@ -118,7 +118,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
       damage,
       precision,
       damageType,
-      qualities: weaponData.quality || t("No Qualities"), // Use actual quality data
+      qualities: weaponData.quality, // Use actual quality data
       martial: isMartial,
       // Include defensive modifiers for display
       defModifier: parseInt(weaponData.defModifier || 0),

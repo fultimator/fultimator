@@ -27,7 +27,9 @@ export default function PlayerWeapons({
   onEditWeapon,
   onEquipWeapon,
   onUnequipWeapon,
+  onAddItem,
   isEditMode,
+  onOpenCompendium,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -115,6 +117,8 @@ export default function PlayerWeapons({
         headerText={t("Weapon")}
         showIconButton={false}
         icon={<MeleeIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
