@@ -64,6 +64,73 @@ function migrateEquippedSlots(player: TypePlayer): TypePlayer {
 }
 
 /**
+ * Migration for players with equipment arrays at the root level.
+ * Moves root-level weapons, armor, etc. into equipment[0].
+ */
+function migrateLegacyEquipment(player: any): any {
+  const legacySources = ['weapons', 'shields', 'armor', 'accessories', 'customWeapons'];
+  const hasLegacyData = legacySources.some(key => Array.isArray(player[key]));
+
+  if (!hasLegacyData) return player;
+
+  const eq0 = {
+    ...(player.equipment?.[0] ?? {}),
+  };
+
+  legacySources.forEach(key => {
+    if (Array.isArray(player[key])) {
+      eq0[key] = [...(eq0[key] ?? []), ...player[key]];
+      delete player[key];
+    }
+  });
+
+  return {
+    ...player,
+    equipment: [eq0, ...(player.equipment?.slice(1) ?? [])],
+  };
+}
+
+/**
+ * Ensures all skills use 'currentLvl' instead of the deprecated 'currentSL'.
+ */
+function normalizeSkillLevels(player: TypePlayer): TypePlayer {
+  if (!player.classes) return player;
+  const updatedClasses = player.classes.map(cls => ({
+    ...cls,
+    skills: cls.skills?.map((sk: any) => {
+      if (sk.currentSL !== undefined) {
+        const { currentSL, ...rest } = sk;
+        return { ...rest, currentLvl: currentSL };
+      }
+      return sk;
+    }) ?? []
+  }));
+  return { ...player, classes: updatedClasses };
+}
+
+/**
+ * Ensures 'notes' is always a valid array of PlayerNotes objects.
+ * Converts legacy string arrays to objects if needed.
+ */
+function normalizeNotes(player: TypePlayer): TypePlayer {
+  if (!player.notes) return { ...player, notes: [] };
+  if (!Array.isArray(player.notes)) return { ...player, notes: [] };
+
+  const normalized = player.notes.map((n: any) => {
+    if (typeof n === 'string') return { name: '', description: n };
+    if (typeof n === 'object' && n !== null) {
+      return {
+        name: n.name ?? '',
+        description: n.description ?? ''
+      };
+    }
+    return { name: '', description: '' };
+  });
+
+  return { ...player, notes: normalized };
+}
+
+/**
  * Restore the isEquipped convenience flags on inventory items from equippedSlots.
  * These are stripped before saving and must be re-added so that runtime code
  * that still reads item.isEquipped directly continues to work.
@@ -72,7 +139,68 @@ function restoreRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
   return rehydrateIsEquipped(player);
 }
 
+/**
+ * Ensures all required properties for TypePlayer are present.
+ */
+function normalizeRequiredFields(player: any): any {
+  return {
+    ...player,
+    rituals: player.rituals ?? {
+      ritualism: false,
+      arcanism: false,
+      chimerism: false,
+      elementalism: false,
+      entropism: false,
+      spiritism: false
+    },
+    martials: player.martials ?? {
+      armor: false,
+      shields: false,
+      melee: false,
+      ranged: false
+    },
+    items: player.items ?? [],
+    consumables: player.consumables ?? [],
+    affinities: player.affinities ?? {},
+    modifiers: player.modifiers ?? {
+      hp: 0,
+      mp: 0,
+      ip: 0,
+      def: 0,
+      mdef: 0,
+      init: 0,
+      meleePrec: 0,
+      rangedPrec: 0,
+      magicPrec: 0
+    },
+    statuses: player.statuses ?? {
+      slow: false,
+      dazed: false,
+      enraged: false,
+      weak: false,
+      shaken: false,
+      poisoned: false,
+      dexUp: false,
+      insUp: false,
+      migUp: false,
+      wlpUp: false
+    },
+    immunities: player.immunities ?? {
+      slow: false,
+      dazed: false,
+      enraged: false,
+      weak: false,
+      shaken: false,
+      poisoned: false
+    }
+  };
+}
+
 const POST_LOAD_TRANSFORMS: PlayerTransform[] = [
+  normalizeRequiredFields,
+  migrateLegacyEquipment,
+  normalizeSkillLevels,
+  normalizeNotes,
   migrateEquippedSlots,
   restoreRuntimeEquippedFlags,
 ];
@@ -95,6 +223,15 @@ export function applyPostLoadTransforms(player: TypePlayer): TypePlayer {
  *    will remove them on the next save)
  */
 export function playerNeedsMigration(player: TypePlayer): boolean {
+  // Root-level equipment arrays need nesting into equipment[0]
+  const legacySources = ['weapons', 'shields', 'armor', 'accessories', 'customWeapons'] as const;
+  if (legacySources.some(k => Array.isArray((player as any)[k]))) return true;
+
+  // Any skill still using deprecated currentSL
+  if ((player as any).classes?.some((cls: any) =>
+    cls.skills?.some((sk: any) => sk.currentSL !== undefined)
+  )) return true;
+
   const inv = player.equipment?.[0];
 
   if (!player.equippedSlots) {
@@ -105,8 +242,7 @@ export function playerNeedsMigration(player: TypePlayer): boolean {
 
   // Has equippedSlots but isEquipped flags weren't stripped before the last save.
   if (!inv) return false;
-  const sources = ['weapons', 'shields', 'armor', 'accessories', 'customWeapons'] as const;
-  return sources.some(k =>
+  return legacySources.some(k =>
     ((inv as any)[k] ?? []).some((item: any) => 'isEquipped' in item)
   );
 }

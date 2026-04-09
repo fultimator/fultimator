@@ -324,8 +324,8 @@ function buildPcText(player, md) {
       classLines.push(`${b(cls.name)} (Lv. ${cls.lvl})`);
       if (cls.skills?.length) {
         for (const skill of cls.skills) {
-          if (skill.currentSL > 0) {
-            classLines.push(`  • ${skill.name} (Lv. ${skill.currentSL}/${skill.maxSL}): ${skill.description ?? ""}`);
+          if (skill.currentLvl > 0) {
+            classLines.push(`  • ${skill.name} (Lv. ${skill.currentLvl}/${skill.maxLvl}): ${skill.description ?? ""}`);
           }
         }
       }

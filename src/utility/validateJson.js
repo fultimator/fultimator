@@ -22,10 +22,10 @@ export const validateCharacter = (character) => {
       "stats",
       "statuses",
       "classes",
-      "weapons",
-      "armor",
+      "equipment",
       "notes",
       "modifiers",
+      "immunities",
     ];
     for (const prop of basicProperties) {
       if (!character.hasOwnProperty(prop)) {
@@ -165,8 +165,8 @@ export const validateCharacter = (character) => {
     }
   }
 
-  // Validate 'classes', 'weapons', 'armor', 'notes' arrays
-  const arrayProps = ["classes", "weapons", "armor", "notes"];
+  // Validate 'classes', 'equipment', 'notes' arrays
+  const arrayProps = ["classes", "equipment", "notes"];
   for (const prop of arrayProps) {
     if (!Array.isArray(character[prop])) {
       errors.push(`Missing or invalid: ${prop}`);

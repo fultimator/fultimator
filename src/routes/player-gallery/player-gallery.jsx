@@ -252,17 +252,23 @@ function Personal() {
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (!validateCharacter(jsonData)) {
+      // Apply post-load transforms to normalize legacy formats (equipment nesting, skill names, etc.)
+      let data = applyPostLoadTransforms(jsonData);
+
+      if (!validateCharacter(data)) {
         console.error("Invalid character data.");
         alert(t("Invalid character JSON data."));
         return;
       }
 
-      delete jsonData.id;
-      jsonData.uid = activeUid;
-      jsonData.published = false;
+      delete data.id;
+      data.uid = activeUid;
+      data.published = false;
 
-      const res = await db.addDoc(db.collection("player-personal"), jsonData);
+      // Apply pre-save transforms to strip runtime-only flags before initial save
+      data = applyPreSaveTransforms(data);
+
+      const res = await db.addDoc(db.collection("player-personal"), data);
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading PC from JSON:", error);

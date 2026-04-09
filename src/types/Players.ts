@@ -85,8 +85,20 @@ export interface Benefits {
 export interface Skills {
     name: string,
     description: string,
-    currentSL: number,
-    maxSL: number
+    currentLvl: number,
+    maxLvl: number
+}
+
+export interface PlayerModifiers {
+    hp: number,
+    mp: number,
+    ip: number,
+    def: number,
+    mdef: number,
+    init: number,
+    meleePrec: number,
+    rangedPrec: number,
+    magicPrec: number
 }
 
 export interface HeroicSkills {
@@ -286,6 +298,7 @@ export interface TypePlayer {
     items: PlayerItems[],
     consumables: PlayerConsumables[],
     notes: PlayerNotes[],
+    modifiers: PlayerModifiers,
     equippedSlots?: EquippedSlots,
     vehicleSlots?:  VehicleSlots,
 }
