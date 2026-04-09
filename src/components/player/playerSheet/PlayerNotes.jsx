@@ -142,7 +142,6 @@ export default function PlayerNotes({
                               onClick={() => resetClockState(noteIndex, clockIndex)}
                               sx={{
                                 mt: 1,
-                                bgcolor: "background.default",
                                 "&:hover": { bgcolor: "action.selected" },
                               }}
                             >

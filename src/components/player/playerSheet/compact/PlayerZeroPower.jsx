@@ -24,6 +24,7 @@ import {
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import Clock from "../Clock";
+import ReactMarkdown from "react-markdown";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
@@ -185,16 +186,18 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
             <TableRow>
               <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                 <Collapse in={open} timeout="auto" unmountOnExit>
-                  <Box sx={{ px: 2, py: 1, bgcolor: "background.default" }}>
+                  <Box sx={{ px: 2, py: 1 }}>
                     {triggerName && (
                       <Typography variant="body2" sx={{ mb: 0.5 }}>
                         <strong>{t("Trigger")}: </strong>
                         {triggerName}
                         {triggerDesc && (
-                          <>
-                            {" — "}
-                            <em>{triggerDesc}</em>
-                          </>
+                          <Typography
+                            variant="body2"
+                            component="div"
+                          >
+                            <ReactMarkdown>{triggerDesc}</ReactMarkdown>
+                          </Typography>
                         )}
                       </Typography>
                     )}
@@ -203,10 +206,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
                         <strong>{t("Effect")}: </strong>
                         {effectName}
                         {effectDesc && (
-                          <>
-                            {" — "}
-                            <em>{effectDesc}</em>
-                          </>
+                          <Typography
+                            variant="body2"
+                            component="div"
+                          >
+                            <ReactMarkdown>{effectDesc}</ReactMarkdown>
+                          </Typography>
                         )}
                       </Typography>
                     )}

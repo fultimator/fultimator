@@ -175,7 +175,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                 <TableRow key={`desc-${noteIndex}`}>
                   <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                     <Collapse in={!!openNotes[noteIndex]} timeout="auto" unmountOnExit>
-                      <Box sx={{ px: 2, py: 1, bgcolor: "background.default" }}>
+                      <Box sx={{ px: 2, py: 1 }}>
                         <NotesMarkdown sx={{ fontSize: "0.85rem" }}>
                           {note.description}
                         </NotesMarkdown>

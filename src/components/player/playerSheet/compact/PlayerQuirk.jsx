@@ -82,7 +82,7 @@ export default function PlayerQuirk({ player }) {
             <TableRow>
               <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                 <Collapse in={open} timeout="auto" unmountOnExit>
-                  <Box sx={{ px: 2, py: 1, bgcolor: "background.default" }}>
+                  <Box sx={{ px: 2, py: 1 }}>
                     {quirk.description && (
                       <NotesMarkdown sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
                         {quirk.description}
