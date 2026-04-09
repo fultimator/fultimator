@@ -1152,6 +1152,143 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
  * @param {object} [props.editData]   — existing item data (for editing)
  * @param {string} [props.editItemId] — existing item id in the pack (for editing)
  */
+const OPTIONAL_SUBTYPES = [
+  { value: "quirk",        label: "Quirk"        },
+  { value: "zero-trigger", label: "Zero Trigger" },
+  { value: "zero-effect",  label: "Zero Effect"  },
+  { value: "zero-power",   label: "Zero Power"   },
+  { value: "other",        label: "Other"        },
+];
+
+function OptionalForm({ packId, onClose }) {
+  const { t } = useTranslate();
+  const { addItem, packs } = useCompendiumPacks();
+  const customTheme = useCustomTheme();
+
+  const [subtype,       setSubtype]       = useState("quirk");
+  const [name,          setName]          = useState("");
+  const [description,   setDescription]   = useState("");
+  const [effect,        setEffect]        = useState("");
+  const [clockSections, setClockSections] = useState(6);
+  const [showClock,     setShowClock]     = useState(false);
+  const [zeroTrigger,   setZeroTrigger]   = useState(null);
+  const [zeroEffect,    setZeroEffect]    = useState(null);
+  const [saving,        setSaving]        = useState(false);
+
+  const allOptionals = packs.flatMap((p) =>
+    (p.active !== false ? p.items : []).filter((i) => i.type === "optional").map((i) => i.data)
+  );
+  const zeroTriggerOptions = allOptionals.filter((i) => i.subtype === "zero-trigger");
+  const zeroEffectOptions  = allOptionals.filter((i) => i.subtype === "zero-effect");
+
+  const buildData = () => {
+    if (subtype === "quirk") return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() };
+    if (subtype === "zero-trigger" || subtype === "zero-effect") return { subtype, name: name.trim(), description: description.trim() };
+    if (subtype === "zero-power") return { subtype, name: name.trim(), zeroTrigger: zeroTrigger?.name ?? "", zeroEffect: zeroEffect?.name ?? "", clock: { sections: Number(clockSections) } };
+    return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim(), ...(showClock ? { clock: { sections: Number(clockSections) } } : {}) };
+  };
+
+  const handleSave = async () => {
+    if (!name.trim()) return;
+    setSaving(true);
+    await addItem(packId, "optional", buildData());
+    setSaving(false);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle sx={{ background: customTheme.primary, color: "#fff", fontWeight: "bold", textTransform: "uppercase", fontSize: "0.95rem", py: 1.25 }}>
+        {t("New Optional Item")}
+        <IconButton size="small" onClick={onClose} sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}>
+          <Close fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ pt: "16px !important" }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus inputProps={{ maxLength: 80 }} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Subtype")}</InputLabel>
+              <Select value={subtype} label={t("Subtype")} onChange={(e) => setSubtype(e.target.value)}>
+                {OPTIONAL_SUBTYPES.map((s) => <MenuItem key={s.value} value={s.value}>{t(s.label)}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {(subtype === "quirk" || subtype === "other") && <>
+            <Grid item xs={12}>
+              <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={2} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} fullWidth size="small" multiline rows={3} />
+            </Grid>
+          </>}
+
+          {(subtype === "zero-trigger" || subtype === "zero-effect") && (
+            <Grid item xs={12}>
+              <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={4} />
+            </Grid>
+          )}
+
+          {subtype === "zero-power" && <>
+            <Grid item xs={12} sm={6}>
+              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={zeroTriggerOptions}
+                getOptionLabel={(o) => o.name ?? ""}
+                value={zeroTrigger}
+                onChange={(_, v) => setZeroTrigger(v)}
+                renderInput={(params) => <TextField {...params} label={t("Zero Trigger")} size="small" helperText={zeroTriggerOptions.length === 0 ? t("No zero-trigger items in active packs") : ""} />}
+                size="small"
+                isOptionEqualToValue={(a, b) => a.name === b.name}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={zeroEffectOptions}
+                getOptionLabel={(o) => o.name ?? ""}
+                value={zeroEffect}
+                onChange={(_, v) => setZeroEffect(v)}
+                renderInput={(params) => <TextField {...params} label={t("Zero Effect")} size="small" helperText={zeroEffectOptions.length === 0 ? t("No zero-effect items in active packs") : ""} />}
+                size="small"
+                isOptionEqualToValue={(a, b) => a.name === b.name}
+              />
+            </Grid>
+          </>}
+
+          {subtype === "other" && (
+            <>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t("Clock")}</InputLabel>
+                  <Select value={showClock ? "yes" : "no"} label={t("Clock")} onChange={(e) => setShowClock(e.target.value === "yes")}>
+                    <MenuItem value="no">{t("No Clock")}</MenuItem>
+                    <MenuItem value="yes">{t("With Clock")}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              {showClock && (
+                <Grid item xs={12} sm={6}>
+                  <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+                </Grid>
+              )}
+            </>
+          )}
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={!name.trim() || saving}>{t("Save")}</Button>
+      </DialogActions>
+    </>
+  );
+}
+
 export default function CompendiumItemCreateDialog({ open, onClose, itemType, packId, editData, editItemId }) {
   const { addItem } = useCompendiumPacks();
 
@@ -1234,6 +1371,7 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
       {itemType === "player-spell" && <PlayerSpellForm packId={packId} onClose={onClose} />}
       {itemType === "quality" && <QualityForm packId={packId} onClose={onClose} />}
       {itemType === "heroic" && <HeroicForm packId={packId} onClose={onClose} />}
+      {itemType === "optional" && <OptionalForm packId={packId} onClose={onClose} />}
     </Dialog>
   );
 }

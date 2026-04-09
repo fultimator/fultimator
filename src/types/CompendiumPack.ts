@@ -13,7 +13,8 @@ export type CompendiumItemType =
   | "player-spell"
   | "quality"
   | "class"
-  | "heroic";
+  | "heroic"
+  | "optional";
 
 export interface CompendiumItem {
   id: string;                          // crypto.randomUUID() — stable across edits

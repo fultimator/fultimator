@@ -3,6 +3,7 @@ import {
   Box, Card, Stack, Grid, Typography, Chip,
   Accordion, AccordionSummary, AccordionDetails, Divider,
 } from "@mui/material";
+import Clock from "../player/playerSheet/Clock";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -2061,6 +2062,221 @@ export const HeroicCard = React.memo(function HeroicCard({ heroic, id, onHeaderC
             {t(heroic.description)}
           </StyledMarkdown>
         </Box>
+      </Stack>
+    </Card>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// OptionalCard (dispatcher → QuirkCard | ZeroPowerCard | GenericOptionalCard)
+// ---------------------------------------------------------------------------
+
+function QuirkCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {item.description && (
+        <Box sx={{ px: 2, py: "5px", borderBottom: `1px solid ${customTheme.secondary}` }}>
+          <Typography variant="body2" fontStyle="italic" color="text.secondary">
+            {item.description}
+          </Typography>
+        </Box>
+      )}
+      {item.effect && (
+        <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+            {item.effect}
+          </StyledMarkdown>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+function ZeroTriggerCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {item.description && (
+        <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+            {item.description}
+          </StyledMarkdown>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+function ZeroEffectCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {item.description && (
+        <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+            {item.description}
+          </StyledMarkdown>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+function ZeroPowerCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  const sections = item.clock?.sections ?? 6;
+  const triggerName = typeof item.zeroTrigger === "string" ? item.zeroTrigger : item.zeroTrigger?.name ?? "";
+  const triggerDesc = typeof item.zeroTrigger === "object" ? item.zeroTrigger?.description ?? "" : "";
+  const effectName  = typeof item.zeroEffect  === "string" ? item.zeroEffect  : item.zeroEffect?.name  ?? "";
+  const effectDesc  = typeof item.zeroEffect  === "object" ? item.zeroEffect?.description  ?? "" : "";
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {/* <Box sx={{ px: 2, py: 1, display: "flex", justifyContent: "center" }}>
+        <Clock numSections={sections} size={40} />
+      </Box> */}
+      {triggerName && (
+        <Box sx={{ px: 2, py: "5px", borderBottom: `1px solid ${customTheme.secondary}` }}>
+          <Typography variant="body2">
+            <strong>{t("Trigger")}:</strong> {triggerName}
+          </Typography>
+          {triggerDesc && <Typography variant="body2">
+            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+              {triggerDesc}
+            </StyledMarkdown>
+            </Typography>}
+        </Box>
+      )}
+      {effectName && (
+        <Box sx={{ px: 2, py: "5px" }}>
+          <Typography variant="body2">
+            <strong>{t("Effect")}:</strong> {effectName}
+          </Typography>
+          {effectDesc && <Typography variant="body2">
+            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+              {effectDesc}
+            </StyledMarkdown>
+            </Typography>}
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+function GenericOptionalCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {item.description && (
+        <Box sx={{ px: 2, py: "5px", borderBottom: `1px solid ${customTheme.secondary}` }}>
+          <Typography variant="body2" fontStyle="italic" color="text.secondary">
+            {item.description}
+          </Typography>
+        </Box>
+      )}
+      {/* {item.clock?.sections && (
+        <Box sx={{ px: 2, py: 1, display: "flex", justifyContent: "center" }}>
+          <Clock numSections={item.clock.sections} size={40} />
+        </Box>
+      )} */}
+      {item.effect && (
+        <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+            {item.effect}
+          </StyledMarkdown>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+export const OptionalCard = React.memo(function OptionalCard({ optional, id, onHeaderClick }) {
+  const { t } = useTranslate();
+  const customTheme = useCustomTheme();
+
+  const subtypeLabel = {
+    "quirk":        t("Quirk"),
+    "zero-trigger": t("Zero Trigger"),
+    "zero-effect":  t("Zero Effect"),
+    "zero-power":   t("Zero Power"),
+    "other":        t("Optional Rule"),
+  }[optional.subtype] ?? t("Optional Rule");
+
+  return (
+    <Card id={id} elevation={1}>
+      <Stack>
+        <Box
+          onClick={onHeaderClick}
+          sx={{
+            px: 2, py: 1,
+            background: customTheme.primary,
+            color: "#ffffff",
+            cursor: onHeaderClick ? "pointer" : "default",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
+          <Typography
+            variant="h4"
+            color="inherit"
+            sx={{ textTransform: "uppercase", fontSize: "1.1rem", fontWeight: "bold" }}
+          >
+            {subtypeLabel}
+          </Typography>
+        </Box>
+        {optional.subtype === "quirk" && (
+          <QuirkCard item={optional} customTheme={customTheme} t={t} />
+        )}
+        {optional.subtype === "zero-trigger" && (
+          <ZeroTriggerCard item={optional} customTheme={customTheme} t={t} />
+        )}
+        {optional.subtype === "zero-effect" && (
+          <ZeroEffectCard item={optional} customTheme={customTheme} t={t} />
+        )}
+        {optional.subtype === "zero-power" && (
+          <ZeroPowerCard item={optional} customTheme={customTheme} t={t} />
+        )}
+        {(optional.subtype === "other" || !optional.subtype) && (
+          <GenericOptionalCard item={optional} customTheme={customTheme} t={t} />
+        )}
       </Stack>
     </Card>
   );

@@ -69,7 +69,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
-import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard } from "../../components/compendium/ItemCards";
+import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
 
 import weapons from "../../libs/weapons";
 import heroics from "../../libs/heroics";
@@ -139,6 +139,7 @@ export const ITEM_TYPES = [
   { key: "player-spells",  label: "Spells",         context: "both" },
   { key: "qualities",      label: "Qualities",      context: "player" },
   { key: "heroics",        label: "Heroic Skills",  context: "player" },
+  { key: "optionals",      label: "Optionals",      context: "player" },
 ];
 
 // Item types available when browsing a pack (no classes / non-standard types)
@@ -156,6 +157,7 @@ export const PACK_ITEM_TYPES = [
   { key: "qualities",      label: "Qualities",      context: "player" },
   { key: "classes",        label: "Classes",        context: "player" },
   { key: "heroics",        label: "Heroic Skills",  context: "player" },
+  { key: "optionals",      label: "Optionals",      context: "player" },
 ];
 
 // viewer key → CompendiumItemType
@@ -173,6 +175,7 @@ export const VIEWER_TO_PACK_TYPE = {
   qualities:        "quality",
   classes:          "class",
   heroics:          "heroic",
+  optionals:        "optional",
 };
 
 export function getItems(type) {
@@ -199,6 +202,7 @@ export function getItems(type) {
     case "actions":
     case "custom-weapons":
     case "accessories":
+    case "optionals":
       return []; // pack-only, no official data
     default:
       return [];
@@ -239,6 +243,7 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
   if (type === "heroics") return item.book ?? "";
+  if (type === "optionals") return item.subtype ?? "";
   if (type === "special") return item.spCost != null ? `${item.spCost} SP` : "";
   if (type === "actions") return item.spCost != null ? `${item.spCost} SP` : "";
   return "";
@@ -250,6 +255,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "attacks") return t("Range");
   if (type === "classes") return t("Book");
   if (type === "heroics") return t("Book");
+  if (type === "optionals") return t("Subtype");
   return t("Cost");
 }
 
@@ -320,6 +326,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onBookChange,
   selectedHeroicClasses,
   onHeroicClassesChange,
+  selectedOptionalSubtypes,
+  onOptionalSubtypesChange,
   // pack props
   packs,
   selectedCompendium,
@@ -568,6 +576,28 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           />
         )}
 
+        {selectedType === "optionals" && (
+          <Autocomplete
+            multiple
+            size="small"
+            fullWidth
+            options={["quirk", "zero-trigger", "zero-effect", "zero-power", "other"]}
+            getOptionLabel={(o) => t({ "quirk": "Quirk", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[o] ?? o)}
+            value={selectedOptionalSubtypes}
+            onChange={(e, newValue) => onOptionalSubtypesChange(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label={t("Subtype")} placeholder={t("All subtypes")} />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                const label = { "quirk": "Quirk", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[option] ?? option;
+                return <Chip key={key} label={t(label)} size="small" {...tagProps} />;
+              })
+            }
+          />
+        )}
+
         {selectedType === "qualities" && (
           <>
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
@@ -791,6 +821,8 @@ export const ItemCard = React.memo(function ItemCard({ type, item, id, onHeaderC
       return <SpecialRuleCard item={item} id={id} onHeaderClick={onHeaderClick} />;
     case "actions":
       return <ActionCard item={item} id={id} onHeaderClick={onHeaderClick} />;
+    case "optionals":
+      return <OptionalCard optional={item} id={id} onHeaderClick={onHeaderClick} />;
     default:
       return null;
   }
@@ -864,6 +896,10 @@ function CompendiumViewer() {
     const classes = searchParams.get("heroicClasses");
     return classes ? classes.split(",") : [];
   }, [searchParams]);
+  const selectedOptionalSubtypes = useMemo(() => {
+    const subtypes = searchParams.get("optionalSubtypes");
+    return subtypes ? subtypes.split(",") : [];
+  }, [searchParams]);
 
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
@@ -924,6 +960,10 @@ function CompendiumViewer() {
         );
       }
 
+      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
+        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+      }
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         items = items.filter((item) => getItemSearchText(item).includes(q));
@@ -963,6 +1003,10 @@ function CompendiumViewer() {
         items = items.filter((item) =>
           item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
         );
+      }
+
+      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
+        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
       }
 
       if (!searchQuery.trim()) return items;
@@ -1099,6 +1143,16 @@ function CompendiumViewer() {
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [selectedCompendium, selectedType, setSearchParams]);
 
+  const handleOptionalSubtypesChange = useCallback((subtypes) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const newParams = { ...base, type: selectedType };
+    if (subtypes.length > 0) newParams.optionalSubtypes = subtypes.join(",");
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, setSearchParams]);
+
   const handleCompendiumChange = useCallback((compendium) => {
     if (compendium === "__manage_modules__") {
       setManageModulesOpen(true);
@@ -1174,6 +1228,7 @@ function CompendiumViewer() {
           ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
           ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
           ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
+          ...(selectedOptionalSubtypes.length > 0 ? { optionalSubtypes: selectedOptionalSubtypes.join(",") } : {}),
         });
       }}
       filteredItems={filteredItems}
@@ -1189,6 +1244,8 @@ function CompendiumViewer() {
       onBookChange={handleBookChange}
       selectedHeroicClasses={selectedHeroicClasses}
       onHeroicClassesChange={handleHeroicClassesChange}
+      selectedOptionalSubtypes={selectedOptionalSubtypes}
+      onOptionalSubtypesChange={handleOptionalSubtypesChange}
       packs={activePacks}
       selectedCompendium={selectedCompendium}
       onCompendiumChange={handleCompendiumChange}

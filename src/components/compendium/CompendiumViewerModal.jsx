@@ -52,7 +52,7 @@ const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessor
 
 const SIDEBAR_WIDTH = 300;
 
-const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false }) => {
+const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false, initialOptionalSubtypes = [] }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
@@ -69,6 +69,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
   const [selectedQualityCategories, setSelectedQualityCategories] = useState([]);
   const [selectedHeroicClasses, setSelectedHeroicClasses] = useState([]);
+  const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(initialOptionalSubtypes);
 
   // Pack state
   const {
@@ -116,14 +117,14 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       setSelectedType(resolvedType);
       setSearchQuery("");
       setSelectedIdx(null);
-      setSelectedCompendium("official");
       setSelectedSpellClass("");
       setSelectedBook([]);
       setSelectedQualityFilters([]);
       setSelectedQualityCategories([]);
       setSelectedHeroicClasses([]);
+      setSelectedOptionalSubtypes(initialOptionalSubtypes);
     }
-  }, [open, initialType]);
+  }, [open, initialType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activePack = selectedCompendium !== "official"
     ? packs.find((p) => p.id === selectedCompendium) ?? null
@@ -160,6 +161,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
         );
       }
+      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
+        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+      }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         items = items.filter((item) => getItemSearchText(item).includes(q));
@@ -193,6 +197,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         items = items.filter((item) =>
           item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
         );
+      }
+      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
+        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
       }
       if (!searchQuery.trim()) return items;
       const q = searchQuery.toLowerCase();
@@ -231,7 +238,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         .toLowerCase()
         .includes(q)
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes]);
 
   const itemIds = useMemo(
     () => filteredItems.map((item, idx) => makeId(item.name, idx)),
@@ -293,6 +300,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
 
   const handleHeroicClassesChange = useCallback((classes) => {
     setSelectedHeroicClasses(classes);
+    setSearchQuery("");
+    setSelectedIdx(null);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, []);
+
+  const handleOptionalSubtypesChange = useCallback((subtypes) => {
+    setSelectedOptionalSubtypes(subtypes);
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
@@ -398,6 +412,8 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       onBookChange={handleBookChange}
       selectedHeroicClasses={selectedHeroicClasses}
       onHeroicClassesChange={handleHeroicClassesChange}
+      selectedOptionalSubtypes={selectedOptionalSubtypes}
+      onOptionalSubtypesChange={handleOptionalSubtypesChange}
       packs={packs}
       selectedCompendium={selectedCompendium}
       onCompendiumChange={handleCompendiumChange}

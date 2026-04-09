@@ -10,7 +10,7 @@ function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   };
 }
 
-const Clock = ({ numSections, size, state, setState, isCharacterSheet, onReset }) => {
+const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onReset }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;

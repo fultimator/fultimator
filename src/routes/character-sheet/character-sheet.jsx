@@ -10,6 +10,8 @@ import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
+import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
+import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
@@ -205,7 +207,17 @@ export default function CharacterSheet() {
                   clockState={ritualClockState}
                   setClockState={setRitualClockState}
                 />
-                <PlayerEquipment 
+                <PlayerZeroPower
+                  player={player}
+                  setPlayer={setPlayer}
+                  isEditMode={true}
+                />
+                <PlayerOthers
+                  player={player}
+                  setPlayer={setPlayer}
+                  isEditMode={true}
+                />
+                <PlayerEquipment
                   player={player} 
                   setPlayer={setPlayer}
                   isEditMode={true}

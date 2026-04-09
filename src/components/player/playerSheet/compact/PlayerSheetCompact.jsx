@@ -43,6 +43,9 @@ import PlayerEquipment from "./PlayerEquipment";
 import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
 import PlayerRituals from "./PlayerRituals";
+import PlayerQuirk from "./PlayerQuirk";
+import PlayerZeroPower from "./PlayerZeroPower";
+import PlayerOthers from "./PlayerOthers";
 import PlayerNotes from "./PlayerNotes";
 import PlayerBonds from "./PlayerBonds";
 import PlayerVehicle from "./PlayerVehicle";
@@ -685,6 +688,9 @@ export default function PlayerCardSheet({
                     />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
+                    <PlayerQuirk player={player} isCharacterSheet={true} />
+                    <PlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+                    <PlayerOthers player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
                     <PlayerRituals player={player} isCharacterSheet={true} />
                     <PlayerSpells player={player} setPlayer={setPlayer} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>

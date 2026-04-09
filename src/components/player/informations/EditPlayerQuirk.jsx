@@ -1,13 +1,17 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { Grid, TextField, useTheme, Paper } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+
+const QUIRK_SUBTYPES = ["quirk"];
 
 export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const onChangeQuirk = useCallback(
     (key) => (value) => {
@@ -16,6 +20,20 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
         quirk: {
           ...prevState.quirk,
           [key]: value,
+        },
+      }));
+    },
+    [setPlayer]
+  );
+
+  const handleAddFromCompendium = useCallback(
+    (item) => {
+      setPlayer((prev) => ({
+        ...prev,
+        quirk: {
+          name: item.name ?? "",
+          description: item.description ?? "",
+          effect: item.effect ?? "",
         },
       }));
     },
@@ -38,6 +56,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
             type="top"
             headerText={t("Quirk")}
             showIconButton={false}
+            openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
           />
         </Grid>
         <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
@@ -77,6 +96,17 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
+
+      {isEditMode && (
+        <CompendiumViewerModal
+          open={compendiumOpen}
+          onClose={() => setCompendiumOpen(false)}
+          onAddItem={handleAddFromCompendium}
+          initialType="optionals"
+          restrictToTypes={["optionals"]}
+          initialOptionalSubtypes={QUIRK_SUBTYPES}
+        />
+      )}
     </Paper>
   );
 }

@@ -35,6 +35,7 @@ import { OffensiveSpellIcon } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useEquipmentForm } from "../player/common/hooks/useEquipmentForm";
 import types from "../../libs/types";
 import classList from "../../libs/classes";
@@ -46,7 +47,7 @@ import armor from "../../libs/armor";
 import shields from "../../libs/shields";
 import weaponQualities from "../../routes/equip/weapons/qualities";
 import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
-import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard, CustomWeaponCard, AccessoryCard } from "./ItemCards";
+import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "./ItemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
@@ -254,8 +255,7 @@ function NpcAttackPanel() {
               fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)}
-              fullWidth size="small" multiline rows={2} placeholder={t("Optional special effect description")} />
+            <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Optional special effect description")} />
           </Grid>
         </Grid>
       }
@@ -362,8 +362,7 @@ function NpcSpellPanel() {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)}
-              fullWidth size="small" multiline rows={3} placeholder={t("Spell effect description")} />
+            <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Spell effect description")} />
           </Grid>
         </Grid>
       }
@@ -932,8 +931,7 @@ function PlayerSpellPanel() {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)}
-                  fullWidth size="small" multiline rows={3} />
+                <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
               </Grid>
             </>
           )}
@@ -999,8 +997,7 @@ function QualityPanel() {
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
-                <TextField label={t("Quality Effect")} value={quality} onChange={(e) => setQuality(e.target.value)}
-                  fullWidth size="small" multiline rows={3} />
+                <CustomTextarea label={t("Quality Effect")} value={quality} onChange={(e) => setQuality(e.target.value)} helperText="" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField label={t("Cost")} value={cost} onChange={(e) => setCost(e.target.value)}
@@ -1077,8 +1074,7 @@ function HeroicPanel() {
               fullWidth size="small" inputProps={{ maxLength: 200 }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)}
-              fullWidth size="small" multiline rows={4} inputProps={{ maxLength: 1500 }} />
+            <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" maxLength={1500} />
           </Grid>
         </Grid>
       }
@@ -1242,9 +1238,9 @@ function ClassPanel() {
                       fullWidth size="small" inputProps={{ min: 1, max: 10 }} />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField label={t("Description")} value={skill.description}
+                    <CustomTextarea label={t("Description")} value={skill.description}
                       onChange={(e) => updateSkillField(i, "description", e.target.value)}
-                      fullWidth size="small" multiline rows={2} inputProps={{ maxLength: 1500 }} />
+                      helperText="" maxLength={1500} />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl fullWidth size="small">
@@ -1885,6 +1881,143 @@ function AccessoryPanel() {
   );
 }
 
+// ── Optional panel ────────────────────────────────────────────────────────────
+
+const OPTIONAL_SUBTYPES = [
+  { value: "quirk",        label: "Quirk"        },
+  { value: "zero-trigger", label: "Zero Trigger" },
+  { value: "zero-effect",  label: "Zero Effect"  },
+  { value: "zero-power",   label: "Zero Power"   },
+  { value: "other",        label: "Other"        },
+];
+
+function OptionalPanel() {
+  const { t } = useTranslate();
+  const { packs } = useCompendiumPacks();
+  const [subtype,       setSubtype]       = useState("quirk");
+  const [name,          setName]          = useState("");
+  const [description,   setDescription]   = useState("");
+  const [effect,        setEffect]        = useState("");
+  const [clockSections, setClockSections] = useState(6);
+  const [showClock,     setShowClock]     = useState(false);
+  const [zeroTrigger,   setZeroTrigger]   = useState(null);
+  const [zeroEffect,    setZeroEffect]    = useState(null);
+
+  // Collect zero-trigger / zero-effect items from all active packs
+  const allOptionals = packs.flatMap((p) =>
+    (p.active !== false ? p.items : []).filter((i) => i.type === "optional").map((i) => i.data)
+  );
+  const zeroTriggerOptions = allOptionals.filter((i) => i.subtype === "zero-trigger");
+  const zeroEffectOptions  = allOptionals.filter((i) => i.subtype === "zero-effect");
+
+  const data =
+    subtype === "quirk"
+      ? { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() }
+    : subtype === "zero-trigger" || subtype === "zero-effect"
+      ? { subtype, name: name.trim(), description: description.trim() }
+    : subtype === "zero-power"
+      ? {
+          subtype, name: name.trim(),
+          zeroTrigger: zeroTrigger ? { name: zeroTrigger.name ?? "", description: zeroTrigger.description ?? "" } : "",
+          zeroEffect:  zeroEffect  ? { name: zeroEffect.name  ?? "", description: zeroEffect.description  ?? "" } : "",
+          clock: { sections: Number(clockSections) },
+        }
+    : /* other */ {
+        subtype, name: name.trim(), description: description.trim(), effect: effect.trim(),
+        ...(showClock ? { clock: { sections: Number(clockSections) } } : {}),
+      };
+
+  return (
+    <PanelLayout
+      data={data}
+      itemName={data.name || ""}
+      formContent={
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Subtype")}</InputLabel>
+              <Select value={subtype} label={t("Subtype")} onChange={(e) => setSubtype(e.target.value)}>
+                {OPTIONAL_SUBTYPES.map((s) => <MenuItem key={s.value} value={s.value}>{t(s.label)}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {(subtype === "quirk") && <>
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
+            </Grid>
+          </>}
+
+          {(subtype === "zero-trigger" || subtype === "zero-effect") && (
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
+            </Grid>
+          )}
+
+          {subtype === "zero-power" && <>
+            <Grid item xs={12} sm={6}>
+              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={zeroTriggerOptions}
+                getOptionLabel={(o) => o.name ?? ""}
+                value={zeroTrigger}
+                onChange={(_, v) => setZeroTrigger(v)}
+                renderInput={(params) => <TextField {...params} label={t("Zero Trigger")} size="small" helperText={zeroTriggerOptions.length === 0 ? t("No zero-trigger items in active packs") : ""} />}
+                size="small"
+                isOptionEqualToValue={(a, b) => a.name === b.name}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                options={zeroEffectOptions}
+                getOptionLabel={(o) => o.name ?? ""}
+                value={zeroEffect}
+                onChange={(_, v) => setZeroEffect(v)}
+                renderInput={(params) => <TextField {...params} label={t("Zero Effect")} size="small" helperText={zeroEffectOptions.length === 0 ? t("No zero-effect items in active packs") : ""} />}
+                size="small"
+                isOptionEqualToValue={(a, b) => a.name === b.name}
+              />
+            </Grid>
+          </>}
+
+          {subtype === "other" && <>
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small">
+                <InputLabel>{t("Clock")}</InputLabel>
+                <Select value={showClock ? "yes" : "no"} label={t("Clock")} onChange={(e) => setShowClock(e.target.value === "yes")}>
+                  <MenuItem value="no">{t("No Clock")}</MenuItem>
+                  <MenuItem value="yes">{t("With Clock")}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            {showClock && (
+              <Grid item xs={12} sm={6}>
+                <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+              </Grid>
+            )}
+          </>}
+        </Grid>
+      }
+      previewContent={data.name ? <OptionalCard optional={data} /> : <Box sx={{ p: 2 }}><Typography color="text.secondary">{t("Fill in the form to see a preview")}</Typography></Box>}
+      addButton={<AddToCompendiumButton itemType="optional" data={data} />}
+    />
+  );
+}
+
 // ── Tab definitions ───────────────────────────────────────────────────────────
 
 const TABS = [
@@ -1899,6 +2032,7 @@ const TABS = [
   { key: "armor",         label: "Armor",         Panel: ArmorPanel         },
   { key: "shield",        label: "Shield",        Panel: ShieldPanel        },
   { key: "accessory",     label: "Accessory",     Panel: AccessoryPanel     },
+  { key: "optional",      label: "Optional",      Panel: OptionalPanel      },
 ];
 
 // ── Viewer type → Quick Create tab key ───────────────────────────────────────
@@ -1915,6 +2049,7 @@ const VIEWER_TYPE_TO_TAB_KEY = {
   "armor":         "armor",
   "shields":       "shield",
   "accessories":   "accessory",
+  "optionals":     "optional",
 };
 
 // ── Main component ────────────────────────────────────────────────────────────

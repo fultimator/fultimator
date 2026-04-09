@@ -29,6 +29,8 @@ import EditPlayerTraits from "../../components/player/informations/EditPlayerTra
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
 import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
 import EditPlayerQuirk from "../../components/player/informations/EditPlayerQuirk";
+import EditPlayerZeroPower from "../../components/player/informations/EditPlayerZeroPower";
+import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
 import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
 import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
@@ -59,6 +61,8 @@ import html2canvas from "html2canvas";
 import useDownload from "../../hooks/useDownload";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
+import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
+import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
 import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
@@ -589,6 +593,16 @@ export default function PlayerEdit() {
                     clockState={ritualClockState}
                     setClockState={setRitualClockState}
                   />
+                  <PlayerZeroPower
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isEditMode}
+                  />
+                  <PlayerOthers
+                    player={playerTemp}
+                    setPlayer={setPlayerTemp}
+                    isEditMode={isEditMode}
+                  />
                   <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
                   <PlayerNotes
                     player={playerTemp}
@@ -706,6 +720,18 @@ export default function PlayerEdit() {
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerQuirk
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isEditMode}
+          />
+          <Divider sx={{ my: 1 }} />
+          <EditPlayerZeroPower
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isEditMode}
+          />
+          <Divider sx={{ my: 1 }} />
+          <EditPlayerOther
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
