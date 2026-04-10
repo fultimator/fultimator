@@ -49,6 +49,7 @@ import {
   KeyboardArrowUp,
 } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import allToken from "../icons/All-token.webp";
 import beastToken from "../icons/Beast-token.webp";
@@ -93,6 +94,7 @@ export default function NpcCompedium() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
+  const navigate = useNavigate();
 
   const [openReportDialog, setOpenReportDialog] = useState(false);
   const [selectedReportNpc, setSelectedReportNpc] = useState({
@@ -205,11 +207,11 @@ function Personal({ user }) {
       delete data.id;
       data.published = false;
 
-      const ref = collection(firestore, "npc-personal");
+      const ref = collection(cloudFirestore, "npc-personal");
 
       addDoc(ref, data)
         .then(function (docRef) {
-          window.location.href = `/npc-gallery/${docRef.id}`;
+          navigate(`/npc-gallery/${docRef.id}`);
         })
         .catch(function (error) {
           console.error("Error adding document: ", error);
@@ -219,7 +221,7 @@ function Personal({ user }) {
 
   const deleteNpc = function (npc) {
     return function () {
-      deleteDoc(doc(firestore, "npc-personal", npc.id));
+      deleteDoc(doc(cloudFirestore, "npc-personal", npc.id));
     };
   };
 
