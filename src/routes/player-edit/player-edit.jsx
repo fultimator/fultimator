@@ -233,13 +233,22 @@ export default function PlayerEdit() {
     }
   }, [player]);
 
+  // Normalize the DB snapshot so that migration-only changes (equippedSlots,
+  // slot indexes, default fields) don't register as unsaved user edits.
+  const playerBaseline = useMemo(() => {
+    if (!player) return null;
+    return applyPreSaveTransforms(
+      applyPostLoadTransforms(JSON.parse(JSON.stringify(player)))
+    );
+  }, [player]);
+
   useEffect(() => {
-    if (!deepEqual(playerTemp ? applyPreSaveTransforms(playerTemp) : playerTemp, player)) {
+    if (!deepEqual(playerTemp ? applyPreSaveTransforms(playerTemp) : playerTemp, playerBaseline)) {
       setIsUpdated(true);
     } else {
       setIsUpdated(false);
     }
-  }, [playerTemp, player]);
+  }, [playerTemp, playerBaseline]);
 
   // After loading player into playerTemp, run post-load transforms (migration + rehydration).
   useEffect(() => {
@@ -583,7 +592,7 @@ export default function PlayerEdit() {
               {!battleMode && (
                 <>
                   <PlayerTraits player={playerTemp} isEditMode={isEditMode} />
-                  <PlayerBonds player={playerTemp} isEditMode={isEditMode} />
+                  <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
                   <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
                   <PlayerRituals
                     player={playerTemp}
@@ -614,6 +623,7 @@ export default function PlayerEdit() {
               {isOwner && battleMode ? (
                 <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
               ) : null}
+              <Divider sx={{ my: 1 }} />
               {battleMode && (
                 <>
                   <PlayerLoadout

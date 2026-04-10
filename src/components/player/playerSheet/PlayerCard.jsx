@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import {
   Grid,
   Typography,
@@ -7,19 +7,26 @@ import {
   Checkbox,
   Card,
   Box,
-  Paper,
   Tooltip,
   TextField,
   IconButton,
   Select,
   MenuItem,
+  Autocomplete,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Remove, Casino, SwapHoriz, Edit } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
 import Diamond from "../../Diamond";
+import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { DefIcon, MdefIcon, InitIcon } from "../../icons";
 
@@ -27,20 +34,220 @@ import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
+import CardLoadout from "./CardLoadout";
 
-const AffinityGrid = styled(Grid)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  borderTop: `1px solid ${theme.palette.divider}`,
-  borderLeft: `1px solid ${theme.palette.divider}`,
-  borderImage: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.background.paper}) 1`,
-  marginLeft: theme.spacing(0.25),
-  marginTop: theme.spacing(1),
+// Styled Components
+
+const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }) => ({
+  height: 18,
+  [theme.breakpoints.down("sm")]: {
+    height: 14,
+  },
+  borderRadius: 0,
+  backgroundColor: "transparent",
+  "& .MuiLinearProgress-bar": {
+    background: `linear-gradient(to right, ${color1}, ${color2})`,
+    borderRadius: 0,
+    transition: "width 1s ease-in-out",
+  },
 }));
+
+const StatBarWrapper = styled(Box)(({ theme }) => ({
+  position: "relative",
+  "& .stat-label": {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    pointerEvents: "none",
+    fontFamily: "'Antonio', fantasy, sans-serif",
+    fontWeight: "bold",
+    fontSize: "0.72rem",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "0.6rem",
+    },
+    letterSpacing: "0.04em",
+    color: "#fff",
+    textShadow: "0 1px 3px rgba(0,0,0,0.6)",
+  },
+}));
+
+const AffinityStrip = styled(Box)(({ theme }) => ({
+  display: "grid",
+  gridTemplateColumns: "repeat(9, 1fr)",
+  [theme.breakpoints.down("sm")]: {
+    gridTemplateColumns: "repeat(3, 1fr)",
+  },
+  borderTop: `1px solid ${theme.palette.divider}`,
+}));
+
+const AffinityCell = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  padding: "4px 2px",
+  borderRight: `1px solid ${theme.palette.divider}`,
+  [theme.breakpoints.down("sm")]: {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    "&:nth-of-type(3n)": { borderRight: "none" },
+    "&:nth-last-of-type(-n+3)": { borderBottom: "none" },
+  },
+  "&:last-child": { borderRight: "none" },
+}));
+
+const CombatStatCard = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.default,
+  border: `0.5px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  padding: "4px 6px",
+  textAlign: "center",
+  flex: 1,
+}));
+
+const StyledMarkdown = styled(ReactMarkdown)({
+  whiteSpace: "pre-line",
+  "& p": {
+    margin: "4px 0",
+  },
+  "& p:first-of-type": {
+    marginTop: 0,
+  },
+  "& p:last-of-type": {
+    marginBottom: 0,
+  },
+});
+
+
+const DescriptionWrapper = styled(Box, {
+  shouldForwardProp: (p) => p !== "isExpanded" && p !== "showFade",
+})(({ theme, isExpanded, showFade }) => ({
+  position: "relative",
+  maxHeight: isExpanded ? "none" : "80px",
+  overflow: "hidden",
+  transition: "max-height 0.3s ease-in-out",
+  cursor: "pointer",
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    height: !isExpanded && showFade ? "30px" : 0,
+    background: `linear-gradient(to bottom, transparent, ${theme.palette.background.paper})`,
+    pointerEvents: "none",
+    transition: "height 0.3s ease-in-out",
+  },
+}));
+
+// Sub-components 
+
+function StatChangeDialog({ open, handleClose, stat, value, max, onApply, t }) {
+  const [amount, setValue] = useState("");
+  const [isHealing, setIsHealing] = useState(true);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const val = parseInt(amount, 10) || 0;
+    onApply(isHealing ? val : -val);
+    setValue("");
+    handleClose();
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle variant="h4" sx={{ fontWeight: "bold", textAlign: "center", borderBottom: "1px solid #ddd", pb: 1 }}>
+          {t("Update")} {stat}
+        </DialogTitle>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 2, minWidth: 250 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {stat}: {value} / {max}
+          </Typography>
+          <ToggleButtonGroup
+            value={isHealing ? "heal" : "damage"}
+            exclusive
+            onChange={(_, v) => v !== null && setIsHealing(v === "heal")}
+            sx={{ mb: 2 }}
+          >
+            <ToggleButton value="heal" color="success" sx={{ px: 3 }}>{t("Heal")}</ToggleButton>
+            <ToggleButton value="damage" color="error" sx={{ px: 3 }}>{t("Damage")}</ToggleButton>
+          </ToggleButtonGroup>
+          <TextField
+            fullWidth
+            type="number"
+            label={t("Amount")}
+            value={amount}
+            onChange={(e) => setValue(e.target.value)}
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button onClick={handleClose} color="secondary" variant="contained">{t("Cancel")}</Button>
+          <Button type="submit" variant="contained" color="primary">{t("Apply")}</Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+}
+
+function StatBar({ label, value, max, color1, color2, trackColor, onClick, isOwner }) {
+  return (
+    <StatBarWrapper sx={{ background: trackColor, cursor: isOwner ? "pointer" : "default" }} onClick={isOwner ? onClick : undefined}>
+      <GradientLinearProgress
+        variant="determinate"
+        value={Math.min((value / max) * 100, 100)}
+        color1={color1}
+        color2={color2}
+        sx={{ padding: { xs: "0.4rem 0", sm: "0.5rem 0" } }}
+      />
+      <span className="stat-label">
+        {label} {value}/{max}
+      </span>
+    </StatBarWrapper>
+  );
+}
+
+function CombatStat({ icon, label, value, theme }) {
+  return (
+    <CombatStatCard sx={{ px: { xs: "2px", sm: "6px" }, py: "4px" }}>
+      <Typography
+        sx={{
+          fontFamily: "'Antonio', fantasy, sans-serif",
+          fontWeight: "bold",
+          fontSize: { xs: "0.55rem", sm: "0.62rem" },
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: theme.palette.text.secondary,
+          lineHeight: 1.2,
+        }}
+      >
+        {label}
+      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px" }}>
+        {React.cloneElement(icon, { size: "14px" })}
+        <Typography
+          sx={{
+            fontFamily: "'Antonio', fantasy, sans-serif",
+            fontSize: { xs: "0.9rem", sm: "1.1rem" },
+            fontWeight: "bold",
+            lineHeight: 1.3,
+          }}
+        >
+          {value}
+        </Typography>
+      </Box>
+    </CombatStatCard>
+  );
+}
+
+// Main Component
 
 export default function PlayerCard({
   player,
   setPlayer,
   isEditMode,
+  isOwner,
   isCharacterSheet,
   characterImage,
   updateMaxStats,
@@ -50,41 +257,67 @@ export default function PlayerCard({
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isDark = theme.palette.mode === "dark";
 
-  const currDex = calculateAttribute(
-    player,
-    player.attributes.dexterity,
-    ["slow", "enraged"],
-    ["dexUp"],
-    6,
-    12
-  );
-  const currInsight = calculateAttribute(
-    player,
-    player.attributes.insight,
-    ["dazed", "enraged"],
-    ["insUp"],
-    6,
-    12
-  );
-  const currMight = calculateAttribute(
-    player,
-    player.attributes.might,
-    ["weak", "poisoned"],
-    ["migUp"],
-    6,
-    12
-  );
-  const currWillpower = calculateAttribute(
-    player,
-    player.attributes.willpower,
-    ["shaken", "poisoned"],
-    ["wlpUp"],
-    6,
-    12
-  );
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [showFade, setShowFade] = useState(false);
+  const descRef = useRef(null);
+
+  const [statDialog, setStatChangeDialog] = useState(null); // { key, label, value, max }
+
+  useLayoutEffect(() => {
+    if (descRef.current) {
+      setShowFade(descRef.current.scrollHeight > 80);
+    }
+  }, [player.info.description]);
+
+  const themes = [
+    t("Ambition"),
+    t("Anger"),
+    t("Belonging"),
+    t("Doubt"),
+    t("Duty"),
+    t("Guilt"),
+    t("Hope"),
+    t("Justice"),
+    t("Mercy"),
+    t("Vengeance"),
+  ];
+
+  const handleThemeChange = (event, newValue) => {
+    const updatedValue = newValue === null ? "" : newValue;
+    setPlayer((prevState) => ({
+      ...prevState,
+      info: { ...prevState.info, theme: updatedValue },
+    }));
+  };
+
+  const handleThemeInputChange = (event, newInputValue) => {
+    setPlayer((prevState) => ({
+      ...prevState,
+      info: { ...prevState.info, theme: newInputValue },
+    }));
+  };
+
+  const handleStatApply = (amount) => {
+    if (!statDialog) return;
+    const key = statDialog.key;
+    setPlayer((prev) => {
+      const current = Math.max(
+        0,
+        Math.min(prev.stats[key].current + amount, prev.stats[key].max)
+      );
+      return {
+        ...prev,
+        stats: { ...prev.stats, [key]: { ...prev.stats[key], current } },
+      };
+    });
+  };
+
+  const currDex = calculateAttribute(player, player.attributes.dexterity, ["slow", "enraged"], ["dexUp"], 6, 12);
+  const currInsight = calculateAttribute(player, player.attributes.insight, ["dazed", "enraged"], ["insUp"], 6, 12);
+  const currMight = calculateAttribute(player, player.attributes.might, ["weak", "poisoned"], ["migUp"], 6, 12);
+  const currWillpower = calculateAttribute(player, player.attributes.willpower, ["shaken", "poisoned"], ["wlpUp"], 6, 12);
 
   const getAttributeColor = (base, current) => {
     if (current < base) return theme.palette.error.main;
@@ -92,363 +325,138 @@ export default function PlayerCard({
     return theme.palette.text.primary;
   };
 
-  const GradientLinearProgress = styled(LinearProgress)(
-    ({ theme, color1, color2 }) => ({
-      height: 15,
-      borderRadius: 0,
-      backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.default : theme.palette.grey[200],
-      position: "relative",
-      overflow: "hidden",
-      "& .MuiLinearProgress-bar": {
-        background: `linear-gradient(to right, ${color1}, ${color2})`,
-        borderRadius: 0,
-      },
-    })
-  );
-
-  const ProgressBarWithLabel = styled(Box)(({ theme }) => ({
-    position: "absolute",
-    left: "50%",
-    top: "50%",
-    transform: "translate(-50%, -50%)",
-    color: theme.palette.mode === "dark" ? "#fff" : theme.palette.text.secondary ,
-    fontFamily: "'Antonio', fantasy, sans-serif",
-    fontSize: "0.7rem",
-    pointerEvents: "none",
-    whiteSpace: "nowrap",
-  }));
-
-  const renderStatBar = (label, value, max, color1, color2) => (
-    <Box sx={{ display: "flex", alignItems: "center", marginBottom: 0 }}>
-      <Box sx={{ flexGrow: 1, position: "relative" }}>
-        <GradientLinearProgress
-          variant="determinate"
-          value={(value / max) * 100}
-          color1={color1}
-          color2={color2}
-          sx={{
-            "& .MuiLinearProgress-bar": {
-              transition: "width 1s ease-in-out",
-            },
-            padding: "0.6rem",
-          }}
-        />
-        <ProgressBarWithLabel sx={{ fontWeight: "bold", fontSize: "0.8rem" }}>
-          {label} {`${value}/${max}`}
-        </ProgressBarWithLabel>
-      </Box>
-    </Box>
-  );
-
-  // Retrieve equipped armor, shields, weapons, accessories, and custom weapons
+  // Equipment resolution
   const inv = player.equipment?.[0];
-  const equippedArmor = inv?.armor?.find((armor) => isItemEquipped(player, armor)) || null;
-  const equippedShields =
-    inv?.shields?.filter((shield) => isItemEquipped(player, shield)) || [];
-  const equippedWeapons =
-    inv?.weapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
-  const equippedCustomWeapons =
-    inv?.customWeapons?.filter((weapon) => isItemEquipped(player, weapon)) || [];
-  const equippedAccessory =
-    inv?.accessories?.find((accessory) => isItemEquipped(player, accessory)) || null;
+  const equippedArmor = inv?.armor?.find((a) => isItemEquipped(player, a)) || null;
+  const equippedShields = inv?.shields?.filter((s) => isItemEquipped(player, s)) || [];
+  const equippedWeapons = inv?.weapons?.filter((w) => isItemEquipped(player, w)) || [];
+  const equippedCustomWeapons = inv?.customWeapons?.filter((w) => isItemEquipped(player, w)) || [];
+  const equippedAccessory = inv?.accessories?.find((a) => isItemEquipped(player, a)) || null;
 
-  // Find all pilot-vehicle spells
+  // Vehicle/module resolution
   const pilotSpells = (player.classes || [])
     .flatMap((c) => c.spells || [])
-    .filter(
-      (spell) =>
-        spell &&
-        spell.spellType === "pilot-vehicle" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
-    );
+    .filter((s) => s?.spellType === "pilot-vehicle" && s.showInPlayerSheet !== false);
 
-  // Find the enabled vehicle
-  const activeVehicle = pilotSpells
-    .flatMap((s) => s.vehicles || [])
-    .find((v) => v.enabled);
+  const activeVehicle = pilotSpells.flatMap((s) => s.vehicles || []).find((v) => v.enabled);
+  const equippedModules = activeVehicle?.modules?.filter((m) => m.equipped) || [];
+  const armorModule = equippedModules.find((m) => m.type === "pilot_module_armor");
 
-  const equippedModules = activeVehicle?.modules
-    ? activeVehicle.modules.filter((m) => m.equipped)
-    : [];
-
-  const armorModule = equippedModules.find(
-    (m) => m.type === "pilot_module_armor"
-  );
-
-  // Rogue - Dodge Skill Bonus
-  const isMartialArmor = armorModule
-    ? armorModule.martial
-    : equippedArmor?.martial || false;
-
+  // Derived combat values
+  const isMartialArmor = armorModule ? armorModule.martial : equippedArmor?.martial || false;
   const dodgeBonus =
-    equippedShields &&
-    equippedShields.length === 0 &&
-    !isMartialArmor
-      ? (player.classes || [])
-          .map((cls) => cls.skills || [])
-          .flat()
-          .filter((skill) => skill.specialSkill === "Dodge")
-          .map((skill) => skill.currentLvl || 0)
-          .reduce((a, b) => a + b, 0)
+    equippedShields.length === 0 && !isMartialArmor
+      ? (player.classes || []).flatMap((c) => c.skills || [])
+        .filter((s) => s.specialSkill === "Dodge")
+        .reduce((sum, s) => sum + (s.currentLvl || 0), 0)
       : 0;
 
-  // Calculate DEF and MDEF
   const baseDef = armorModule
-    ? armorModule.martial
-      ? armorModule.def || 0
-      : currDex + (armorModule.def || 0)
-    : equippedArmor !== null
-    ? equippedArmor.martial
-      ? equippedArmor.def
-      : currDex + equippedArmor.def
-    : currDex;
-
-  const armorDefModifier = armorModule
-    ? 0
-    : equippedArmor !== null
-    ? equippedArmor.defModifier || 0
-    : 0;
+    ? armorModule.martial ? armorModule.def || 0 : currDex + (armorModule.def || 0)
+    : equippedArmor ? equippedArmor.martial ? equippedArmor.def : currDex + equippedArmor.def : currDex;
 
   const currDef =
     baseDef +
-    equippedShields.reduce((total, shield) => total + (shield.def || 0), 0) +
+    equippedShields.reduce((t, s) => t + (s.def || 0), 0) +
     (player.modifiers?.def || 0) +
-    armorDefModifier +
-    equippedShields.reduce(
-      (total, shield) => total + (shield.defModifier || 0),
-      0
-    ) +
-    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
-    equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.defModifier || 0),
-      0
-    ) +
-    equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
-      0
-    ) +
+    (armorModule ? 0 : equippedArmor?.defModifier || 0) +
+    equippedShields.reduce((t, s) => t + (s.defModifier || 0), 0) +
+    (equippedAccessory?.defModifier || 0) +
+    equippedWeapons.reduce((t, w) => t + (w.defModifier || 0), 0) +
+    equippedCustomWeapons.reduce((t, w) => t + (parseInt(w.defModifier || 0, 10) || 0), 0) +
     dodgeBonus;
 
   const baseMDef = armorModule
-    ? armorModule.martial
-      ? armorModule.mdef || 0
-      : currInsight + (armorModule.mdef || 0)
-    : equippedArmor !== null
-    ? currInsight + equippedArmor.mdef
-    : currInsight;
-
-  const armorMDefModifier = armorModule
-    ? 0
-    : equippedArmor !== null
-    ? equippedArmor.mDefModifier || 0
-    : 0;
+    ? armorModule.martial ? armorModule.mdef || 0 : currInsight + (armorModule.mdef || 0)
+    : equippedArmor ? currInsight + equippedArmor.mdef : currInsight;
 
   const currMDef =
     baseMDef +
-    equippedShields.reduce((total, shield) => total + (shield.mdef || 0), 0) +
+    equippedShields.reduce((t, s) => t + (s.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
-    armorMDefModifier +
-    equippedShields.reduce(
-      (total, shield) => total + (shield.mDefModifier || 0),
-      0
-    ) +
-    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
-    equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.mDefModifier || 0),
-      0
-    ) +
-    equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
-      0
-    );
+    (armorModule ? 0 : equippedArmor?.mDefModifier || 0) +
+    equippedShields.reduce((t, s) => t + (s.mDefModifier || 0), 0) +
+    (equippedAccessory?.mDefModifier || 0) +
+    equippedWeapons.reduce((t, w) => t + (w.mDefModifier || 0), 0) +
+    equippedCustomWeapons.reduce((t, w) => t + (parseInt(w.mDefModifier || 0, 10) || 0), 0);
 
-  // Initialize INIT to 0
-  const baseInit = armorModule
-    ? 0
-    : equippedArmor !== null
-    ? equippedArmor.init
-    : 0;
-
-  const armorInitModifier = armorModule
-    ? 0
-    : equippedArmor !== null
-    ? equippedArmor.initModifier || 0
-    : 0;
-
+  const baseInit = armorModule ? 0 : equippedArmor?.init || 0;
   const currInit =
     baseInit +
     (player.modifiers?.init || 0) +
-    armorInitModifier +
-    equippedShields.reduce(
-      (total, shield) => total + (shield.initModifier || 0),
-      0
-    ) +
-    (equippedAccessory !== null ? equippedAccessory.initModifier || 0 : 0);
+    (armorModule ? 0 : equippedArmor?.initModifier || 0) +
+    equippedShields.reduce((t, s) => t + (s.initModifier || 0), 0) +
+    (equippedAccessory?.initModifier || 0);
 
-  let crisis =
-    player.stats.hp.current <= player.stats.hp.max / 2 ? true : false;
-  const crisisText = crisis ? (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="flex-end"
-      style={{
-        position: "absolute",
-        bottom: 0,
-        width: "100%",
-        background: "rgba(0, 0, 0, 0.6)",
-        color: "white", // Text color changed to white
-        padding: "6px",
-        fontFamily: "Antonio",
-        textShadow: "0 0 3px red", // Red shadow around the text
-      }}
-    >
-      !! {t("CRISIS")} !!
-    </Grid>
-  ) : null;
-
-  // Function to render DEF, MDEF, and INIT as numbers
-  const renderAdditionalStats = () => (
-    <>
-      <Grid item xs={4} sm={4}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            fontSize: "1.5rem", // Move this style to the parent div
-          }}
-        >
-          <Typography
-            variant="body2"
-            style={{
-              fontFamily: "Antonio",
-              fontWeight: "bold",
-              fontSize: "0.7rem",
-              marginBottom: "-4px",
-            }}
-          >
-            {t("DEF")}
-          </Typography>
-          <span style={{ marginLeft: "-4px" }}>
-            <DefIcon
-              size={"24px"}
-              color={theme.palette.mode === "dark" ? "white" : "black"}
-            />
-            <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-              {" "}
-              {currDef}
-            </span>
-          </span>
-        </div>
-      </Grid>
-      <Grid item xs={4} sm={4}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            fontSize: "1.5rem", // Move this style to the parent div
-          }}
-        >
-          <Typography
-            variant="body2"
-            style={{
-              fontFamily: "Antonio",
-              fontWeight: "bold",
-              fontSize: "0.7rem",
-              marginBottom: "-4px",
-            }}
-          >
-            {t("M.DEF")}
-          </Typography>
-          <span style={{ marginLeft: "-4px" }}>
-            <MdefIcon
-              size={"24px"}
-              color={theme.palette.mode === "dark" ? "white" : "black"}
-            />
-            <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-              {" "}
-              {currMDef}
-            </span>
-          </span>
-        </div>
-      </Grid>
-      <Grid item xs={4} sm={4}>
-        <Tooltip title={isEditMode && t("DEX") + " + " + t("INS")}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              fontSize: "1.5rem", // Move this style to the parent div
-            }}
-          >
-            <Typography
-              variant="body2"
-              style={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                marginBottom: "-4px",
-              }}
-            >
-              {t("INIT")}
-            </Typography>
-            <span style={{ marginLeft: "-4px" }}>
-              <InitIcon
-                size={"24px"}
-                color={theme.palette.mode === "dark" ? "white" : "black"}
-              />
-              <span style={{ fontFamily: "'Antonio', sans-serif" }}>
-                {" "}
-                {(currInit > 0 ? "+" : "") + currInit}
-              </span>
-            </span>
-          </div>
-        </Tooltip>
-      </Grid>
-    </>
-  );
+  const inCrisis = player.stats.hp.current <= player.stats.hp.max / 2;
 
   const onStatusChange = (status) => (event) => {
-    setPlayer((prevPlayer) => ({
-      ...prevPlayer,
-      statuses: {
-        ...prevPlayer.statuses,
-        [status]: event.target.checked,
-      },
+    setPlayer((prev) => ({
+      ...prev,
+      statuses: { ...prev.statuses, [status]: event.target.checked },
     }));
   };
 
-  const isImmune = (status) => player.immunities && player.immunities[status] === true;
+  const isImmune = (status) => player.immunities?.[status] === true;
+
+  const STATUSES_LEFT = [
+    { key: "slow", label: t("Slow") },
+    { key: "dazed", label: t("Dazed") },
+    { key: "weak", label: t("Weak") },
+    { key: "shaken", label: t("Shaken") },
+  ];
+
+  const ATTRIBUTES = [
+    { key: "dexterity", label: t("DEX"), curr: currDex },
+    { key: "insight", label: t("INS"), curr: currInsight },
+    { key: "might", label: t("MIG"), curr: currMight },
+    { key: "willpower", label: t("WLP"), curr: currWillpower },
+  ];
+
+  const avatarSrc = isCharacterSheet
+    ? characterImage || avatar_image
+    : player.info.imgurl || avatar_image;
+
+  // Shared status checkbox style
+  const statusLabel = (label) => (
+    <Typography
+      variant="body2"
+      sx={{
+        fontFamily: "'Antonio', fantasy, sans-serif",
+        fontSize: { xs: "0.68rem", sm: "0.8rem" },
+      }}
+    >
+      {label}
+    </Typography>
+  );
+
+  const statusCheckbox = (key) => (
+    <Checkbox
+      sx={{ margin: 0, padding: 0, "& .MuiSvgIcon-root": { fontSize: { xs: "1rem", sm: "1.2rem" } } }}
+      checked={player.statuses[key]}
+      onChange={onStatusChange(key)}
+      disabled={!(isEditMode || isOwner) || isImmune(key)}
+    />
+  );
 
   return (
     <Card
-      elevation={3}
-      sx={
-        isCharacterSheet
-          ? {
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              boxShadow: "none",
-            }
-          : {
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }
-      }
+      elevation={isCharacterSheet ? 0 : 3}
+      sx={{
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: secondary,
+        overflow: "hidden",
+      }}
     >
-      <Grid container>
-        <Grid
-          item
-          xs
+      {/* Header */}
+      <Box sx={{ display: "flex", alignItems: "stretch" }}>
+        <Box
           sx={{
-            background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%);`,
-            borderRight: "4px solid white",
-            px: 2,
+            flex: 1,
+            background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%)`,
+            px: { xs: 1, sm: 2 },
+            py: 1,
             display: "flex",
             alignItems: "center",
           }}
@@ -456,9 +464,7 @@ export default function PlayerCard({
           {isEditMode ? (
             <TextField
               value={player.name}
-              onChange={(e) =>
-                setPlayer((p) => ({ ...p, name: e.target.value }))
-              }
+              onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
               inputProps={{ maxLength: 50 }}
               variant="standard"
               size="small"
@@ -466,7 +472,7 @@ export default function PlayerCard({
                 "& .MuiInputBase-input": {
                   color: "#fff",
                   fontFamily: "Antonio",
-                  fontSize: "1.5rem",
+                  fontSize: { xs: "1.2rem", sm: "1.5rem" },
                   fontWeight: "medium",
                   textTransform: "uppercase",
                 },
@@ -479,22 +485,21 @@ export default function PlayerCard({
             <Typography
               color="#fff"
               fontFamily="Antonio"
-              fontSize="1.5rem"
+              fontSize={{ xs: "1.2rem", sm: "1.5rem" }}
               fontWeight="medium"
               sx={{ textTransform: "uppercase" }}
             >
               {player.name}
             </Typography>
           )}
-        </Grid>
-        <Grid
-          item
+        </Box>
+
+        <Box
           sx={{
-            px: 2,
+            px: { xs: 1, sm: 2 },
             py: 0.5,
-            borderLeft: `2px solid ${primary} `,
-            borderBottom: `2px solid ${primary} `,
-            borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
+            borderLeft: "2px solid #fff",
+            borderBottom: `2px solid ${primary}`,
             display: "flex",
             alignItems: "center",
           }}
@@ -502,612 +507,345 @@ export default function PlayerCard({
           {isEditMode ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {player.info.pronouns && (
-                <Typography fontFamily="Antonio" fontSize="1rem" sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                <Typography fontFamily="Antonio" fontSize={{ xs: "0.8rem", sm: "1rem" }} sx={{ textTransform: "uppercase", mr: 0.5 }}>
                   {player.info.pronouns} <Diamond color={primary} />
                 </Typography>
               )}
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) }));
-                  if (updateMaxStats) updateMaxStats();
-                }}
-              >
+              <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); updateMaxStats?.(); }}>
                 <Remove fontSize="small" />
               </IconButton>
-              <Typography fontFamily="Antonio" fontSize="1.25rem" fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
+              <Typography fontFamily="Antonio" fontSize={{ xs: "1rem", sm: "1.25rem" }} fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
                 {t("Lvl")} {player.lvl}
               </Typography>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) }));
-                  if (updateMaxStats) updateMaxStats();
-                }}
-              >
+              <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); updateMaxStats?.(); }}>
                 <Add fontSize="small" />
               </IconButton>
             </Box>
           ) : (
-            <Typography
-              fontFamily="Antonio"
-              fontSize="1.25rem"
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
-              {player.info.pronouns && (
-                <>
-                  {player.info.pronouns} <Diamond color={primary} />{" "}
-                </>
-              )}
+            <Typography fontFamily="Antonio" fontSize={{ xs: "1rem", sm: "1.25rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
+              {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
               {t("Lvl")} {player.lvl}
             </Typography>
           )}
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} alignItems="flex-start">
-        <Grid item xs={4} sm={4}>
-          <div style={{ position: "relative" }}>
-            <img
-              src={
-                isCharacterSheet
-                  ? characterImage
-                    ? characterImage
-                    : avatar_image
-                  : player.info.imgurl
-                  ? player.info.imgurl
-                  : avatar_image
-              }
-              alt="Player Avatar"
-              style={{
-                width: "100%",
-                aspectRatio: "1",
-                objectFit: "cover",
-                marginBottom: "-6px",
-              }}
-            />
-            {crisisText}
-          </div>
-          {renderStatBar(
-            t("HP"),
-            player.stats.hp.current,
-            player.stats.hp.max,
-            theme.palette.mode === 'dark' ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80),
-            theme.palette.error.main
-          )}
-          {renderStatBar(
-            t("MP"),
-            player.stats.mp.current,
-            player.stats.mp.max,
-            theme.palette.mode === 'dark' ? newShade(theme.palette.info.main, 10) :newShade(theme.palette.info.main, 80),
-            theme.palette.info.main
-          )}
-          {renderStatBar(
-            t("IP"),
-            player.stats.ip.current,
-            player.stats.ip.max,
-            theme.palette.mode === 'dark' ? newShade(theme.palette.success.main, 10) :newShade(theme.palette.success.main, 80),
-            theme.palette.success.main
-          )}
-        </Grid>
-        <Grid item xs={8} sx={{ marginTop: "5px", marginX: "-5px" }}>
-          <Paper
-            elevation={3}
-            sx={
-              isCharacterSheet
-                ? {
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                    marginRight: "0px",
-                    boxShadow: "none",
-                    flexDirection: "column",
-                  }
-                : {
-                    borderRadius: "8px",
-                    border: "1px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                    marginRight: "5px",
-                    boxShadow: "none",
-                  }
-            }
-          >
-            {isCharacterSheet ? (
-              <Typography
-                variant="h1"
-                sx={{
-                  textTransform: "uppercase",
-                  padding: "5px", // Adjust padding instead of margins
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
-                  fontSize: "1em",
-                }}
-                align="center"
-              >
-                {t("Traits")}
-              </Typography>
-            ) : (
-              <Typography
-                variant="h4"
-                sx={{
-                  writingMode: "vertical-lr",
-                  textTransform: "uppercase",
-                  marginLeft: "-1px",
-                  marginRight: "10px",
-                  marginTop: "-1px",
-                  marginBottom: "-1px",
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "0 8px 8px 0",
-                  transform: "rotate(180deg)",
-                  fontSize: "1.2rem",
-                }}
-                align="center"
-              >
-                {t("Traits")}
-              </Typography>
-            )}
+        </Box>
+      </Box>
 
-            <Grid container spacing={1} sx={{ padding: "0.3rem" }}>
-              <Grid item xs={12} md={12}>
-                <Typography variant="h4">
-                  <span
-                    style={{
-                      fontWeight: "bolder",
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {t("Identity") + ": "}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {player.info.identity && player.info.identity.length > 40
-                      ? player.info.identity.slice(0, 40) + "..."
+      {/* Body  */}
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr" }, alignItems: "stretch" }}>
+        {/* Left column */}
+        <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden", height: "100%", justifyContent: "space-between" }}>          {/* Avatar */}
+          <Box sx={{ position: "relative" }}>
+            <img
+              src={avatarSrc}
+              alt="Player Avatar"
+              style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }}
+            />
+            {inCrisis && (
+              <Box sx={{ position: "absolute", bottom: 0, width: "100%", background: "rgba(0,0,0,0.65)", color: "#fff", textAlign: "center", py: "3px", fontFamily: "Antonio", fontSize: "0.7rem", letterSpacing: "0.1em", textShadow: "0 0 4px red" }}>
+                !! {t("CRISIS")} !!
+              </Box>
+            )}
+          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <StatBar 
+              label={t("HP")} 
+              value={player.stats.hp.current} 
+              max={player.stats.hp.max} 
+              color1={isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80)} 
+              color2={theme.palette.error.main} 
+              trackColor="rgba(35,35,35,0.88)" 
+              isOwner={isOwner}
+              onClick={() => setStatChangeDialog({ key: "hp", label: t("HP"), value: player.stats.hp.current, max: player.stats.hp.max })}
+            />
+            <StatBar 
+              label={t("MP")} 
+              value={player.stats.mp.current} 
+              max={player.stats.mp.max} 
+              color1={isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80)} 
+              color2={theme.palette.info.main} 
+              trackColor="rgba(35,35,35,0.88)" 
+              isOwner={isOwner}
+              onClick={() => setStatChangeDialog({ key: "mp", label: t("MP"), value: player.stats.mp.current, max: player.stats.mp.max })}
+            />
+            <StatBar 
+              label={t("IP")} 
+              value={player.stats.ip.current} 
+              max={player.stats.ip.max} 
+              color1={isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80)} 
+              color2={theme.palette.success.main} 
+              trackColor="rgba(35,35,35,0.88)" 
+              isOwner={isOwner}
+              onClick={() => setStatChangeDialog({ key: "ip", label: t("IP"), value: player.stats.ip.current, max: player.stats.ip.max })}
+            />
+          </Box>
+          {/* Mobile loadout in left column */}
+          {/* <Box sx={{
+            display: isCharacterSheet ? "flex" : { xs: "flex", md: "none" }, mt: "auto",
+            pt: 1,
+            borderTop: `0.5px solid ${theme.palette.divider}`,
+            width: "100%",
+            minWidth: 0,
+            overflow: "hidden",
+            "& *": {
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+              whiteSpace: "normal !important",
+              minWidth: "0 !important",
+            },
+          }}
+          >
+            <CardLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+          </Box> */}
+        </Box>
+
+        {/* Right column */}
+        <Box sx={{ display: "flex", flexDirection: "column", p: { xs: 0.5, sm: 1 }, gap: 1, minWidth: 0 }}>
+
+          {/* Description */}
+          {player.info.description && (
+            <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden", minWidth: 0 }}>
+              <Box sx={{ background: primary, px: 1, py: "2px" }}>
+                <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  {t("Description")}
+                </Typography>
+              </Box>
+              <DescriptionWrapper
+                isExpanded={isDescExpanded}
+                showFade={showFade}
+                onClick={() => setIsDescExpanded(!isDescExpanded)}
+                sx={{ px: 1, minWidth: 0 }}
+              >
+                <div ref={descRef}>
+                  <StyledMarkdown>
+                    {player.info.description}
+                  </StyledMarkdown>
+                </div>
+              </DescriptionWrapper>
+            </Box>
+          )}
+
+          {/* Traits */}
+          <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
+            <Box sx={{ background: primary, px: 1, py: "2px" }}>
+              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                {t("Traits")}
+              </Typography>
+            </Box>
+            <Box sx={{ px: 1, py: "5px", display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "2px 8px" }}>
+              <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
+                {isEditMode ? (
+                  <TextField
+                    fullWidth
+                    label={t("Identity")}
+                    variant="standard"
+                    value={player.info.identity}
+                    onChange={(e) => setPlayer(p => ({ ...p, info: { ...p.info, identity: e.target.value } }))}
+                    inputProps={{ maxLength: 300, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                  />
+                ) : (
+                  <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <strong>{t("Identity")}: </strong>
+                    {player.info.identity && player.info.identity.length > (isCharacterSheet ? 100 : 50)
+                      ? player.info.identity.slice(0, (isCharacterSheet ? 100 : 50)) + "…"
                       : player.info.identity}
-                  </span>
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h4">
-                  <span
-                    style={{
-                      fontWeight: "bolder",
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {t("Theme") + ": "}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {t(player.info.theme) && t(player.info.theme).length > 20
-                      ? t(player.info.theme).slice(0, 20) + "..."
-                      : t(player.info.theme)}
-                  </span>
-                </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h4">
-                  <span
-                    style={{
-                      fontWeight: "bolder",
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {t("Origin") + ": "}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: isMobile ? "0.8rem" : "1rem",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {player.info.origin && player.info.origin.length > 20
-                      ? player.info.origin.slice(0, 20) + "..."
-                      : player.info.origin}
-                  </span>
-                </Typography>
-              </Grid>
-            </Grid>
-          </Paper>
-          <Grid container spacing={1}>
-            <Grid
-              item
-              xs={1}
-              sx={{
-                marginRight: 2,
-                marginTop: 0.4,
-              }}
-            >
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio'",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {t("DEX")}:{" "}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1.2,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio'",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {t("INS")}:{" "}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1.2,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio'",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {t("MIG")}:{" "}
-                </Typography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1.3,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  style={{
-                    fontFamily: "'Antonio'",
-                    fontWeight: "bold",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {t("WLP")}:{" "}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              xs={2}
-              sx={{
-                marginRight: 1,
-                marginTop: 0.4,
-              }}
-            >
-              {[
-                { key: "dexterity", curr: currDex },
-                { key: "insight", curr: currInsight },
-                { key: "might", curr: currMight },
-                { key: "willpower", curr: currWillpower },
-              ].map(({ key, curr }) => (
-                <Grid item xs={12} sx={{ marginY: 1 }} key={key}>
-                  {isEditMode ? (
-                    <Select
-                      value={player.attributes[key]}
-                      onChange={(e) => {
-                        setPlayer((p) => ({
-                          ...p,
-                          attributes: { ...p.attributes, [key]: e.target.value },
-                        }));
-                        if (updateMaxStats) updateMaxStats();
-                      }}
+                  </Typography>
+                )}
+              </Box>
+              {isEditMode ? (
+                <Autocomplete
+                  options={themes}
+                  value={player.info.theme}
+                  onChange={handleThemeChange}
+                  onInputChange={handleThemeInputChange}
+                  freeSolo
+                  sx={{ width: "100%" }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t("Theme")}
                       variant="standard"
-                      size="small"
-                      sx={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "1rem",
-                        minWidth: 52,
-                      }}
-                    >
-                      {[6, 8, 10, 12].map((v) => (
-                        <MenuItem key={v} value={v} sx={{ fontFamily: "'Antonio', fantasy, sans-serif" }}>
-                          d{v}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "1rem",
-                        color: getAttributeColor(player.attributes[key], curr),
-                      }}
-                    >
-                      d{curr}
-                    </Typography>
+                      inputProps={{ ...params.inputProps, maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                    />
                   )}
-                </Grid>
-              ))}
-            </Grid>
-            <Grid
-              item
-              xs={2}
-              sx={{
-                marginRight: 3.5,
-              }}
-            >
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.slow}
-                      onChange={onStatusChange("slow")}
-                      disabled={!isEditMode || isImmune("slow")} 
+                />
+              ) : (
+                <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <strong>{t("Theme")}: </strong>
+                  {t(player.info.theme)?.length > 18 ? t(player.info.theme).slice(0, 18) + "…" : t(player.info.theme)}
+                </Typography>
+              )}
+              {isEditMode ? (
+                <TextField
+                  fullWidth
+                  label={t("Origin")}
+                  variant="standard"
+                  value={player.info.origin}
+                  onChange={(e) => setPlayer(p => ({ ...p, info: { ...p.info, origin: e.target.value } }))}
+                  inputProps={{ maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                />
+              ) : (
+                <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <strong>{t("Origin")}: </strong>
+                  {player.info.origin?.length > 18 ? player.info.origin.slice(0, 18) + "…" : player.info.origin}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+
+          {/* Attributes + Statuses
+              Grid: [label] [dice] [status-left] [status-right]
+              4 rows (one per attribute). All cells share the same row height
+              automatically, so edit-mode Selects and preview Typography stay
+              perfectly aligned without any manual margin hacks. */}
+          {/* Attributes grid */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: isCharacterSheet
+                ? "auto auto auto auto"
+                : { xs: "auto auto auto auto", md: "auto auto auto auto 1fr" },
+              gridTemplateRows: "repeat(4, auto)",
+              alignItems: "center",
+              rowGap: "2px",
+              columnGap: { xs: "2px", sm: "6px" },
+            }}
+          >
+            {/* Right column desktop loadout */}
+            <Box sx={{ gridColumn: 5, gridRow: "1 / -1", display: isCharacterSheet ? "none" : { xs: "none", md: "flex" } }}>
+              <CardLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+            </Box>
+
+
+            {ATTRIBUTES.map(({ key, label, curr }, i) => {
+              // Which status goes in the left slot for this row
+              const leftStatus = STATUSES_LEFT[i]; // slow/dazed/weak/shaken
+
+              // Right slot: Enraged on row 0, Poisoned on row 2, empty otherwise
+              const rightStatus =
+                i === 0 ? { key: "enraged", label: t("Enraged") } :
+                  i === 2 ? { key: "poisoned", label: t("Poisoned") } :
+                    null;
+
+              return (
+                <React.Fragment key={key}>
+                  {/* Col 1 — attribute label */}
+                  <Typography
+                    sx={{
+                      fontFamily: "'Antonio'",
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.85rem", sm: "1rem" },
+                      lineHeight: 1,
+                      whiteSpace: "nowrap",
+                      py: "6px",
+                    }}
+                  >
+                    {label}:
+                  </Typography>
+
+                  {/* Col 2 — dice value or Select */}
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {isEditMode ? (
+                      <Select
+                        value={player.attributes[key]}
+                        onChange={(e) => {
+                          setPlayer((p) => ({ ...p, attributes: { ...p.attributes, [key]: e.target.value } }));
+                          updateMaxStats?.();
+                        }}
+                        variant="standard"
+                        size="small"
+                        sx={{
+                          fontFamily: "'Antonio', fantasy, sans-serif",
+                          fontSize: { xs: "0.85rem", sm: "1rem" },
+                          minWidth: { xs: 35, sm: 52 },
+                        }}
+                      >
+                        {[6, 8, 10, 12].map((v) => (
+                          <MenuItem key={v} value={v} sx={{ fontFamily: "'Antonio', fantasy, sans-serif" }}>d{v}</MenuItem>
+                        ))}
+                      </Select>
+                    ) : (
+                      <Typography
+                        sx={{
+                          fontFamily: "'Antonio', fantasy, sans-serif",
+                          fontSize: { xs: "0.85rem", sm: "1rem" },
+                          fontWeight: "bold",
+                          color: getAttributeColor(player.attributes[key], curr),
+                          lineHeight: 1,
+                        }}
+                      >
+                        d{curr}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Col 3 — left status (Slow / Dazed / Weak / Shaken) */}
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <FormControlLabel
+                      control={statusCheckbox(leftStatus.key)}
+                      label={statusLabel(leftStatus.label)}
+                      sx={{ margin: 0 }}
                     />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Slow")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.dazed}
-                      onChange={onStatusChange("dazed")}
-                      disabled={!isEditMode || isImmune("dazed")} 
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Dazed")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.weak}
-                      onChange={onStatusChange("weak")}
-                      disabled={!isEditMode || isImmune("weak")} 
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Weak")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.shaken}
-                      onChange={onStatusChange("shaken")}
-                      disabled={!isEditMode || isImmune("shaken")} 
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Shaken")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              xs={2}
-              sx={{
-                marginRight: 2.5,
-              }}
-            >
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  sx={{
-                    marginY: 1.8,
-                  }}
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.enraged}
-                      onChange={onStatusChange("enraged")}
-                      disabled={!isEditMode || isImmune("enraged")} 
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Enraged")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  marginY: 1,
-                }}
-              >
-                <FormControlLabel
-                  sx={{
-                    marginY: 1.8,
-                  }}
-                  control={
-                    <Checkbox
-                      sx={{
-                        margin: 0,
-                        padding: 0,
-                      }}
-                      checked={player.statuses.poisoned}
-                      onChange={onStatusChange("poisoned")}
-                      disabled={!isEditMode || isImmune("poisoned")} 
-                    />
-                  }
-                  label={
-                    <Typography
-                      variant="body2"
-                      style={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {t("Poisoned")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-            </Grid>
-            <Grid container sx={{ marginBottom: 0 }}>
-              {renderAdditionalStats()}
-            </Grid>
-          </Grid>
-          <AffinityGrid container>
-            {[
-              "physical",
-              "wind",
-              "bolt",
-              "dark",
-              "earth",
-              "fire",
-              "ice",
-              "light",
-              "poison",
-            ].map((type) => (
-              <Grid
-                item
-                xs
-                key={type}
-                sx={{
-                  py: 0.4,
-                  borderRight: `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <TypeAffinity
-                  type={type}
-                  affinity={player.affinities?.[type] || ""}
-                />
-              </Grid>
-            ))}
-          </AffinityGrid>
-        </Grid>
-      </Grid>
-    </Card>
-  );
-}
+                  </Box>
+
+                  {/* Col 4 — right status (Enraged row 0, Poisoned row 2, blank otherwise) */}
+                  <Box sx={{ display: "flex", alignItems: "center", alignSelf: rightStatus ? "end" : "center", transform: rightStatus ? "translateY(60%)" : "none" }}>
+                    {rightStatus && (
+                      <FormControlLabel
+                        control={statusCheckbox(rightStatus.key)}
+                        label={statusLabel(rightStatus.label)}
+                        sx={{ margin: 0 }}
+                      />
+                    )}
+                  </Box>
+                </React.Fragment>
+              );
+            })}
+          </Box>
+
+          {/* DEF / MDEF / INIT */}
+          <Box sx={{ display: "flex", gap: { xs: 0.5, sm: 1 }, flexWrap: "wrap" }}>
+            <CombatStat
+              theme={theme}
+              label={t("DEF")}
+              icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />}
+              value={currDef}
+            />
+            <CombatStat
+              theme={theme}
+              label={t("M.DEF")}
+              icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />}
+              value={currMDef}
+            />
+            <Tooltip title={isEditMode ? `${t("DEX")} + ${t("INS")}` : ""}>
+              <CombatStat
+                theme={theme}
+                label={t("INIT")}
+                icon={<InitIcon size="18px" color={isDark ? "white" : "black"} />}
+                value={(currInit > 0 ? "+" : "") + currInit}
+              />
+            </Tooltip>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* ── Affinity Strip ── */}
+      <AffinityStrip>
+        {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
+          <AffinityCell key={type}>
+            <TypeAffinity type={type} affinity={player.affinities?.[type] || ""} />
+          </AffinityCell>
+        ))}
+      </AffinityStrip>
+
+      <StatChangeDialog
+        open={!!statDialog}
+        handleClose={() => setStatChangeDialog(null)}
+        stat={statDialog?.label}
+        value={statDialog?.value}
+        max={statDialog?.max}
+        onApply={handleStatApply}
+        t={t}
+      />
+      </Card>
+      );
+      }

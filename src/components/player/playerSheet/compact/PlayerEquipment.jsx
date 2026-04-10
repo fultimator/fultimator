@@ -15,7 +15,8 @@ import { useTranslate } from "../../../../translation/translate";
 import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { Casino, RadioButtonUnchecked, Error, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import { Casino, RadioButtonUnchecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
 import { isItemEquipped, validateSlots, deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
@@ -47,6 +48,7 @@ export default function PlayerEquipment({
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
   const [compendiumType, setCompendiumType] = useState(null);
+  const [martialWarning, setMartialWarning] = useState(null); // { item, event }
 
   // Guardian - Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
@@ -301,31 +303,42 @@ export default function PlayerEquipment({
     return { ...validated, vehicleSlots: deriveVehicleSlots(validated) };
   };
 
-  const equipToSlot = (source, itemName, slot, isTwoHand) => {
-    let updated = player;
-    const currentRef = updated.equippedSlots?.[slot];
-    if (currentRef) {
-      updated = patchInv(updated, currentRef.source, arr =>
-        arr.map(it => it.name === currentRef.name ? { ...it, isEquipped: false } : it)
-      );
-    }
-    if (isTwoHand && slot === 'mainHand') {
-      const offRef = updated.equippedSlots?.offHand;
-      if (offRef) {
-        updated = patchInv(updated, offRef.source, arr =>
-          arr.map(it => it.name === offRef.name ? { ...it, isEquipped: false } : it)
-        );
+  const equipToSlot = (source, itemName, itemIndex, slot, isTwoHand) => {
+    // Block off-hand equip when main hand holds a two-handed or custom weapon
+    if (slot === 'offHand') {
+      const mainRef = player.equippedSlots?.mainHand;
+      if (mainRef) {
+        if (mainRef.source === 'customWeapons') return;
+        const inv0 = player.equipment?.[0];
+        const mainWeapon = inv0?.weapons?.find(w => w.name === mainRef.name);
+        if (mainWeapon?.hands === 2 || mainWeapon?.isTwoHand) return;
       }
     }
+    const unequipRef = (p, ref) => {
+      if (!ref) return p;
+      return patchInv(p, ref.source, arr =>
+        arr.map((it, idx) => {
+          const match = ref.index !== undefined ? idx === ref.index : it.name === ref.name;
+          return match ? { ...it, isEquipped: false } : it;
+        })
+      );
+    };
+    let updated = unequipRef(player, player.equippedSlots?.[slot]);
+    if (isTwoHand && slot === 'mainHand') {
+      updated = unequipRef(updated, updated.equippedSlots?.offHand);
+    }
     updated = patchInv(updated, source, arr =>
-      arr.map(it => it.name === itemName ? { ...it, isEquipped: true } : it)
+      arr.map((it, idx) => {
+        const match = itemIndex !== undefined ? idx === itemIndex : it.name === itemName;
+        return match ? { ...it, isEquipped: true } : it;
+      })
     );
     const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
     setPlayer({
       ...updated,
       equippedSlots: {
         ...prevSlots,
-        [slot]: { source, name: itemName },
+        [slot]: { source, name: itemName, index: itemIndex },
         ...(isTwoHand && slot === 'mainHand' ? { offHand: null } : {}),
       },
       vehicleSlots: deriveVehicleSlots(updated),
@@ -338,8 +351,12 @@ export default function PlayerEquipment({
       const ref = slots[k];
       return ref?.source === source && ref?.name === itemName;
     });
+    const slotRef = slotKey ? slots[slotKey] : null;
     let updated = patchInv(player, source, arr =>
-      arr.map(it => it.name === itemName ? { ...it, isEquipped: false } : it)
+      arr.map((it, idx) => {
+        const match = slotRef?.index !== undefined ? idx === slotRef.index : it.name === itemName;
+        return match ? { ...it, isEquipped: false } : it;
+      })
     );
     if (slotKey) {
       const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
@@ -353,115 +370,128 @@ export default function PlayerEquipment({
     }
   };
 
-  // Slot menu state for 1H weapons and shields
+  // Slot menu state for 1H weapons and shields — stores { name, index }
   const [slotMenuAnchor, setSlotMenuAnchor] = useState(null);
   const [slotMenuWeapon, setSlotMenuWeapon] = useState(null);
   const [shieldMenuAnchor, setShieldMenuAnchor] = useState(null);
-  const [shieldMenuName, setShieldMenuName] = useState(null);
+  const [shieldMenuItem, setShieldMenuItem] = useState(null);
 
   const handleWeaponSlotSelect = (slot) => {
-    if (slotMenuWeapon) equipToSlot('weapons', slotMenuWeapon, slot, false);
+    if (slotMenuWeapon) equipToSlot('weapons', slotMenuWeapon.name, slotMenuWeapon.index, slot, false);
     setSlotMenuAnchor(null);
     setSlotMenuWeapon(null);
   };
 
   const handleShieldSlotSelect = (slot) => {
-    if (shieldMenuName) equipToSlot('shields', shieldMenuName, slot, false);
+    if (shieldMenuItem) equipToSlot('shields', shieldMenuItem.name, shieldMenuItem.index, slot, false);
     setShieldMenuAnchor(null);
-    setShieldMenuName(null);
+    setShieldMenuItem(null);
   };
 
   const handleEquipment = (item, event) => {
     if (!setPlayer || !isEditMode) return;
 
+    const eq0 = player.equipment?.[0];
+
     if (item.isCustomWeapon) {
       const cw = item.originalData;
+      const cwIndex = eq0?.customWeapons?.findIndex(w => w === cw) ?? -1;
       if (cw.isEquipped) {
         unequipItem('customWeapons', cw.name);
       } else {
-        equipToSlot('customWeapons', cw.name, 'mainHand', true);
+        equipToSlot('customWeapons', cw.name, cwIndex >= 0 ? cwIndex : undefined, 'mainHand', true);
       }
       return;
     }
 
-    const invItem = (() => {
-      const eq0 = player.equipment?.[0];
-      if (item.category === 'Shield') return eq0?.shields?.find(s => s === item || s.name === item.name);
-      if (item.category === 'Armor') return eq0?.armor?.find(a => a === item || a.name === item.name);
-      if (!item.category || item.melee !== undefined || item.ranged !== undefined) return eq0?.weapons?.find(w => w === item || w.name === item.name);
-      return eq0?.accessories?.find(a => a === item || a.name === item.name);
-    })();
+    const findWithIndex = (arr, pred) => {
+      const idx = arr ? arr.findIndex(pred) : -1;
+      return idx >= 0 ? { item: arr[idx], index: idx } : { item: null, index: undefined };
+    };
 
-    if (!invItem && item.category !== 'Accessory') {
-      // fallback for accessories that don't have category
-      const eq0 = player.equipment?.[0];
-      const acc = eq0?.accessories?.find(a => a === item || a.name === item.name);
-      if (acc) {
-        if (acc.isEquipped) {
-          unequipItem('accessories', acc.name);
-        } else {
-          equipToSlot('accessories', acc.name, 'accessory', false);
-        }
-      }
-      return;
-    }
+    // Locate by identity/name in each source array — do NOT rely on item.category
+    // because compendium-imported items may be missing it.
+    const pred = it => it === item || it.name === item.name;
+    const shieldResult    = findWithIndex(eq0?.shields,     pred);
+    const armorResult     = findWithIndex(eq0?.armor,       pred);
+    const weaponResult    = findWithIndex(eq0?.weapons,     pred);
+    const accessoryResult = findWithIndex(eq0?.accessories, pred);
 
-    if (!invItem) return;
-
-    if (item.category === 'Armor') {
-      if (invItem.isEquipped) {
-        unequipItem('armor', invItem.name);
-      } else {
-        equipToSlot('armor', invItem.name, 'armor', false);
-      }
-    } else if (item.category === 'Shield') {
+    if (shieldResult.item) {
+      const { item: invItem, index: invItemIndex } = shieldResult;
       if (invItem.isEquipped) {
         unequipItem('shields', invItem.name);
       } else if (hasDualShieldBearer && event) {
         setShieldMenuAnchor({ top: event.clientY, left: event.clientX });
-        setShieldMenuName(invItem.name);
+        setShieldMenuItem({ name: invItem.name, index: invItemIndex });
       } else {
-        equipToSlot('shields', invItem.name, 'offHand', false);
+        equipToSlot('shields', invItem.name, invItemIndex, 'offHand', false);
       }
-    } else if (item.category === 'Accessory' || (!item.melee && !item.ranged && !item.hands)) {
+    } else if (armorResult.item) {
+      const { item: invItem, index: invItemIndex } = armorResult;
       if (invItem.isEquipped) {
-        unequipItem('accessories', invItem.name);
+        unequipItem('armor', invItem.name);
       } else {
-        equipToSlot('accessories', invItem.name, 'accessory', false);
+        equipToSlot('armor', invItem.name, invItemIndex, 'armor', false);
       }
-    } else {
-      // Regular weapon
+    } else if (weaponResult.item) {
+      const { item: invItem, index: invItemIndex } = weaponResult;
       const isTwoHand = invItem.hands === 2 || invItem.isTwoHand;
       if (invItem.isEquipped) {
         unequipItem('weapons', invItem.name);
       } else if (isTwoHand) {
-        equipToSlot('weapons', invItem.name, 'mainHand', true);
+        equipToSlot('weapons', invItem.name, invItemIndex, 'mainHand', true);
       } else if (event) {
         setSlotMenuAnchor({ top: event.clientY, left: event.clientX });
-        setSlotMenuWeapon(invItem.name);
+        setSlotMenuWeapon({ name: invItem.name, index: invItemIndex });
       } else {
-        // fallback: pick first free slot
         const slots = player.equippedSlots ?? {};
         const slot = !slots.mainHand ? 'mainHand' : !slots.offHand ? 'offHand' : null;
-        if (slot) equipToSlot('weapons', invItem.name, slot, false);
+        if (slot) equipToSlot('weapons', invItem.name, invItemIndex, slot, false);
+      }
+    } else if (accessoryResult.item) {
+      const { item: invItem, index: invItemIndex } = accessoryResult;
+      if (invItem.isEquipped) {
+        unequipItem('accessories', invItem.name);
+      } else {
+        equipToSlot('accessories', invItem.name, invItemIndex, 'accessory', false);
       }
     }
   };
 
+  /**
+   * Wrapper around handleEquipment that shows a warning dialog when the player
+   * is not proficient with a martial item before equipping it.
+   * Pass this instead of handleEquipment to AllWeapon/AllArmor.
+   */
+  const handleEquipmentGuarded = (item, event) => {
+    // Only intercept equip actions, not unequip (isEquipped check)
+    const isCurrentlyEquipped = item.isEquipped ?? false;
+    if (!isCurrentlyEquipped && !checkIfEquippable(item)) {
+      setMartialWarning({ item, event });
+      return;
+    }
+    handleEquipment(item, event);
+  };
+
   const handleSwapForm = (item) => {
     if (!setPlayer || !isEditMode) return;
-    
+
     const customWeapon = item.originalData;
+    if (!customWeapon) return;
+
     setPlayer(prevPlayer => {
-      const updatedCustomWeapons = [...(prevPlayer.customWeapons || [])];
-      const weaponIndex = updatedCustomWeapons.findIndex(w => w === customWeapon);
-      if (weaponIndex !== -1) {
-        const cw = updatedCustomWeapons[weaponIndex];
-        const newForm = cw.activeForm === "secondary" ? "primary" : "secondary";
-        updatedCustomWeapons[weaponIndex] = { ...cw, activeForm: newForm };
-        return { ...prevPlayer, customWeapons: updatedCustomWeapons };
-      }
-      return prevPlayer;
+      const customWeapons = prevPlayer.equipment?.[0]?.customWeapons ?? [];
+      const weaponIndex = customWeapons.findIndex(w => w === customWeapon);
+      if (weaponIndex === -1) return prevPlayer;
+      const updated = customWeapons.map((cw, i) =>
+        i === weaponIndex ? { ...cw, activeForm: cw.activeForm === 'secondary' ? 'primary' : 'secondary' } : cw
+      );
+      const equipment = [
+        { ...prevPlayer.equipment[0], customWeapons: updated },
+        ...(prevPlayer.equipment?.slice(1) ?? []),
+      ];
+      return { ...prevPlayer, equipment };
     });
   };
 
@@ -683,13 +713,17 @@ export default function PlayerEquipment({
     } else if (type === "armor") {
       setPlayer(prev => patchInv(prev, 'armor', arr => [...arr, {
         base: item, name: item.name, quality: "",
+        category: "Armor",
         martial: item.martial || false, qualityCost: 0, selectedQuality: "",
+        def: item.def || item.defbonus || 0, mdef: item.mdef || item.mdefbonus || 0,
         init: item.init || 0, rework: false, cost: item.cost || 0, isEquipped: false,
       }]));
     } else if (type === "shields") {
       setPlayer(prev => patchInv(prev, 'shields', arr => [...arr, {
         base: item, name: item.name, quality: "",
+        category: "Shield",
         martial: item.martial || false, qualityCost: 0, selectedQuality: "",
+        def: item.def || item.defbonus || 0, mdef: item.mdef || item.mdefbonus || 0,
         init: item.init || 0, rework: false, cost: item.cost || 0, isEquipped: false,
       }]));
     } else if (type === "custom-weapons") {
@@ -778,7 +812,7 @@ export default function PlayerEquipment({
             weapons={[
               ...(inv?.weapons?.filter(w => !isItemEquipped(player, w)) || []),
             ]}
-            handleEquipment={handleEquipment}
+            handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
@@ -845,7 +879,7 @@ export default function PlayerEquipment({
             weapons={[
               ...((inv?.customWeapons?.filter(w => !isItemEquipped(player, w)) || []).map(cw => formatCustomWeapon(cw)))
             ]}
-            handleEquipment={handleEquipment}
+            handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             handleSwapForm={handleSwapForm}
             checkIfEquippable={checkIfEquippable}
@@ -901,7 +935,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllArmor
             armors={inv?.shields?.filter(s => !isItemEquipped(player, s)) || []}
-            handleEquipment={handleEquipment}
+            handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
@@ -956,7 +990,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllArmor
             armors={inv?.armor?.filter(a => !isItemEquipped(player, a)) || []}
-            handleEquipment={handleEquipment}
+            handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
             isMainTab={isMainTab}
@@ -1061,7 +1095,7 @@ export default function PlayerEquipment({
       {/* Slot selection menu for shields (dual shieldbearer) */}
       <Menu
         open={Boolean(shieldMenuAnchor)}
-        onClose={() => { setShieldMenuAnchor(null); setShieldMenuName(null); }}
+        onClose={() => { setShieldMenuAnchor(null); setShieldMenuItem(null); }}
         anchorReference="anchorPosition"
         anchorPosition={shieldMenuAnchor ?? undefined}
       >
@@ -1076,6 +1110,37 @@ export default function PlayerEquipment({
         restrictToTypes={compendiumType ? [compendiumType] : undefined}
         context="player"
       />
+      {/* Martial proficiency warning */}
+      {martialWarning && (
+        <Dialog open onClose={() => setMartialWarning(null)} maxWidth="xs" fullWidth>
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+            <WarningAmberIcon fontSize="small" />
+            {t('Not Proficient')}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2">
+              <strong>{martialWarning.item?.name}</strong> {t('is a martial item and your character is not proficient with it.')}
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+              {t('Equipping it without proficiency may be against the rules. Equip anyway?')}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setMartialWarning(null)} size="small">{t('Cancel')}</Button>
+            <Button
+              color="warning"
+              variant="contained"
+              size="small"
+              onClick={() => {
+                handleEquipment(martialWarning.item, martialWarning.event);
+                setMartialWarning(null);
+              }}
+            >
+              {t('Equip Anyway')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
@@ -1237,7 +1302,7 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
                     {types[weapon.type].long}
                   </Typography>
                 </StyledTableCell>
-                <StyledTableCell sx={{ width: 100, textAlign: 'right', overflow: 'visible', pr: 1 }}>
+                <StyledTableCell sx={{ width: 100, textAlign: 'right', overflow: 'visible' }}>
                   {isEditMode && onEdit && (
                     <Tooltip title={t("Edit")} arrow>
                       <IconButton onClick={() => onEdit(weapon)} size="small" sx={{ p: 0.25 }}>
@@ -1332,13 +1397,20 @@ function CollapsibleWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwa
   );
 }
 
+// Resolve defense values with fallbacks for old compendium imports that used
+// base.defbonus / base.mdefbonus instead of base.def / base.mdef.
+const resolveArmorDef  = (armor) => armor.def  || 0;
+const resolveArmorMdef = (armor) => armor.mdef || 0;
+// Resolve category from the item or its base, falling back to "Armor".
+const resolveArmorCategory = (armor) => armor.category || armor.base?.category || "Armor";
+
 function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery, isEditMode, onEdit, equippedSlots }) {
   const [open, setOpen] = useState({});
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
   const getArmorBadge = (armor) => {
-    if (armor.category === 'Shield') {
+    if (resolveArmorCategory(armor) === 'Shield') {
       const slots = equippedSlots ?? {};
       if (slots.mainHand?.source === 'shields' && slots.mainHand?.name === armor.name) return 'M';
       if (slots.offHand?.source === 'shields' && slots.offHand?.name === armor.name) return 'O';
@@ -1416,17 +1488,16 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery, isE
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("DEF")}:</Box>
                     <Box component="span">
-                      {armor.category === "Shield"
-                        ? "+" + parseInt(armor.def + (armor.defModifier || 0))
+                      {resolveArmorCategory(armor) === "Shield"
+                        ? "+" + parseInt(resolveArmorDef(armor) + (armor.defModifier || 0))
                         : ""}
-                      {armor.category === "Armor" && armor.martial
-                        ? armor.def + (armor.defModifier || 0)
+                      {resolveArmorCategory(armor) === "Armor" && armor.martial
+                        ? resolveArmorDef(armor) + (armor.defModifier || 0)
                         : ""}
-                      {armor.category === "Armor" && !armor.martial
-                        ? armor.def + (armor.defModifier || 0) === 0
+                      {resolveArmorCategory(armor) === "Armor" && !armor.martial
+                        ? resolveArmorDef(armor) + (armor.defModifier || 0) === 0
                           ? t("DEX die")
-                          : `${t("DEX die")} + ${armor.def + (armor.defModifier || 0)
-                          }`
+                          : `${t("DEX die")} + ${resolveArmorDef(armor) + (armor.defModifier || 0)}`
                         : ""}
                     </Box>
                   </Typography>
@@ -1435,13 +1506,13 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery, isE
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("M.DEF")}:</Box>
                     <Box component="span">
-                      {armor.category === "Shield"
-                        ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0))
+                      {resolveArmorCategory(armor) === "Shield"
+                        ? "+" + parseInt(resolveArmorMdef(armor) + (armor.mDefModifier || 0))
                         : ""}
-                      {armor.category === "Armor"
-                        ? armor.mdef + (armor.mDefModifier || 0) === 0
+                      {resolveArmorCategory(armor) === "Armor"
+                        ? resolveArmorMdef(armor) + (armor.mDefModifier || 0) === 0
                           ? t("INS die")
-                          : `${t("INS die")} + ${armor.mdef + (armor.mDefModifier || 0)}`
+                          : `${t("INS die")} + ${resolveArmorMdef(armor) + (armor.mDefModifier || 0)}`
                         : ""}
                     </Box>
                   </Typography>
@@ -1462,8 +1533,8 @@ function CollapsibleArmor({ armors, handleEquipment, isMainTab, searchQuery, isE
                       sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
                     >
                       <IconButton onClick={(e) => handleEquipment(armor, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
-                        {armor.category === "Armor" && <ArmorIcon />}
-                        {armor.category === "Shield" && <ShieldIcon />}
+                        {resolveArmorCategory(armor) === "Armor" && <ArmorIcon />}
+                        {resolveArmorCategory(armor) === "Shield" && <ShieldIcon />}
                       </IconButton>
                     </Badge>
                   </Tooltip>
@@ -1753,19 +1824,11 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                       </IconButton>
                     </Tooltip>
                   )}
-                  {checkIfEquippable(weapon) ? (
-                    <Tooltip title={t("Equip")} arrow>
-                      <IconButton onClick={(e) => handleEquipment(weapon, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
-                        <RadioButtonUnchecked />
-                      </IconButton>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={t("Not Equippable")}>
-                      <IconButton sx={{ p: 0.25 }}>
-                        <Error color="error" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                  <Tooltip title={checkIfEquippable(weapon) ? t("Equip") : t("Not proficient — martial item")} arrow>
+                    <IconButton onClick={(e) => handleEquipment(weapon, e)} aria-label="equip" size="small" sx={{ p: 0.25 }}>
+                      {checkIfEquippable(weapon) ? <RadioButtonUnchecked /> : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
+                    </IconButton>
+                  </Tooltip>
                   {weapon.isTransforming && (
                     <Tooltip title={t("weapon_customization_swap_form")} arrow>
                       <IconButton onClick={() => handleSwapForm(weapon)} size="small" sx={{ p: 0.25 }}>
@@ -1917,17 +1980,16 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("DEF")}:</Box>
                     <Box component="span">
-                      {armor.category === "Shield"
-                        ? "+" + parseInt(armor.def + (armor.defModifier || 0))
+                      {resolveArmorCategory(armor) === "Shield"
+                        ? "+" + parseInt(resolveArmorDef(armor) + (armor.defModifier || 0))
                         : ""}
-                      {armor.category === "Armor" && armor.martial
-                        ? armor.def + (armor.defModifier || 0)
+                      {resolveArmorCategory(armor) === "Armor" && armor.martial
+                        ? resolveArmorDef(armor) + (armor.defModifier || 0)
                         : ""}
-                      {armor.category === "Armor" && !armor.martial
-                        ? armor.def + (armor.defModifier || 0) === 0
+                      {resolveArmorCategory(armor) === "Armor" && !armor.martial
+                        ? resolveArmorDef(armor) + (armor.defModifier || 0) === 0
                           ? t("DEX die")
-                          : `${t("DEX die")} + ${armor.def + (armor.defModifier || 0)
-                          }`
+                          : `${t("DEX die")} + ${resolveArmorDef(armor) + (armor.defModifier || 0)}`
                         : ""}
                     </Box>
                   </Typography>
@@ -1936,13 +1998,13 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                   <Typography variant="body2" fontWeight="bold" textAlign="center">
                     <Box component="span" sx={{ mr: '4px' }}>{t("M.DEF")}:</Box>
                     <Box component="span">
-                      {armor.category === "Shield"
-                        ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0))
+                      {resolveArmorCategory(armor) === "Shield"
+                        ? "+" + parseInt(resolveArmorMdef(armor) + (armor.mDefModifier || 0))
                         : ""}
-                      {armor.category === "Armor"
-                        ? armor.mdef + (armor.mDefModifier || 0) === 0
+                      {resolveArmorCategory(armor) === "Armor"
+                        ? resolveArmorMdef(armor) + (armor.mDefModifier || 0) === 0
                           ? t("INS die")
-                          : `${t("INS die")} + ${armor.mdef + (armor.mDefModifier || 0)}`
+                          : `${t("INS die")} + ${resolveArmorMdef(armor) + (armor.mDefModifier || 0)}`
                         : ""}
                     </Box>
                   </Typography>
@@ -1955,24 +2017,16 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                       </IconButton>
                     </Tooltip>
                   )}
-                  {checkIfEquippable(armor) ? (
-                    <Tooltip title={t("Equip")} arrow>
-                      <IconButton
-                        onClick={(e) => handleEquipment(armor, e)}
-                        aria-label="equip"
-                        size="small"
-                        sx={{ p: 0.25 }}
-                      >
-                        <RadioButtonUnchecked />
-                      </IconButton>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={t("Not Equippable")}>
-                      <IconButton sx={{ p: 0.25 }}>
-                        <Error color="error" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                  <Tooltip title={checkIfEquippable(armor) ? t("Equip") : t("Not proficient — martial item")} arrow>
+                    <IconButton
+                      onClick={(e) => handleEquipment(armor, e)}
+                      aria-label="equip"
+                      size="small"
+                      sx={{ p: 0.25 }}
+                    >
+                      {checkIfEquippable(armor) ? <RadioButtonUnchecked /> : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
+                    </IconButton>
+                  </Tooltip>
                 </StyledTableCell>
               </TableRow>
               <TableRow>

@@ -153,51 +153,62 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
   const inv = player.equipment?.[0];
   if (!inv) return slots;
 
+  // Helper to build a SlotRef with index
+  const ref = (source: SlotRef['source'], name: string, index: number): SlotRef =>
+    ({ source, name, index });
+
   // Custom weapons are always two-handed (occupy both hands, but not armor/accessory)
-  const equippedCustom = (inv.customWeapons ?? []).filter(w => w.isEquipped);
-  if (equippedCustom.length > 0) {
-    slots.mainHand = { source: 'customWeapons', name: equippedCustom[0].name };
+  const customWeapons = inv.customWeapons ?? [];
+  const firstEquippedCustomIdx = customWeapons.findIndex(w => w.isEquipped);
+  if (firstEquippedCustomIdx >= 0) {
+    const cw = customWeapons[firstEquippedCustomIdx];
+    slots.mainHand = ref('customWeapons', cw.name, firstEquippedCustomIdx);
     // offHand is locked (two-handed), skip regular weapon/shield logic
   } else {
     // Regular weapons
-    const equippedWeapons = (inv.weapons ?? []).filter(w => w.isEquipped);
-    for (const w of equippedWeapons) {
-      const is2H = w.hands === 2 || w.isTwoHand;
+    const weapons = inv.weapons ?? [];
+    for (let i = 0; i < weapons.length; i++) {
+      const w = weapons[i];
+      if (!w.isEquipped) continue;
+      const is2H = (w as any).hands === 2 || (w as any).isTwoHand;
       if (is2H) {
-        slots.mainHand = { source: 'weapons', name: w.name };
-        // Two-handed locks off hand
+        slots.mainHand = ref('weapons', w.name, i);
         break;
       } else {
         if (!slots.mainHand) {
-          slots.mainHand = { source: 'weapons', name: w.name };
+          slots.mainHand = ref('weapons', w.name, i);
         } else if (!slots.offHand) {
-          slots.offHand = { source: 'weapons', name: w.name };
+          slots.offHand = ref('weapons', w.name, i);
           break;
         }
       }
     }
 
     // Shields
-    const equippedShields = (inv.shields ?? []).filter(s => s.isEquipped);
-    for (const s of equippedShields) {
+    const shields = inv.shields ?? [];
+    for (let i = 0; i < shields.length; i++) {
+      const s = shields[i];
+      if (!s.isEquipped) continue;
       if (!slots.offHand) {
-        slots.offHand = { source: 'shields', name: s.name };
+        slots.offHand = ref('shields', s.name, i);
       } else if (hasDualShieldBearer && !slots.mainHand) {
-        slots.mainHand = { source: 'shields', name: s.name };
+        slots.mainHand = ref('shields', s.name, i);
       }
     }
   }
 
   // Armor (only one allowed)
-  const equippedArmor = (inv.armor ?? []).find(a => a.isEquipped);
-  if (equippedArmor) {
-    slots.armor = { source: 'armor', name: equippedArmor.name };
+  const armorArr = inv.armor ?? [];
+  const armorIdx = armorArr.findIndex(a => a.isEquipped);
+  if (armorIdx >= 0) {
+    slots.armor = ref('armor', armorArr[armorIdx].name, armorIdx);
   }
 
   // Accessory (only one allowed)
-  const equippedAccessory = (inv.accessories ?? []).find(a => a.isEquipped);
-  if (equippedAccessory) {
-    slots.accessory = { source: 'accessories', name: equippedAccessory.name };
+  const accessoriesArr = inv.accessories ?? [];
+  const accIdx = accessoriesArr.findIndex(a => a.isEquipped);
+  if (accIdx >= 0) {
+    slots.accessory = ref('accessories', accessoriesArr[accIdx].name, accIdx);
   }
 
   return slots;
@@ -223,12 +234,26 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
 export function isItemEquipped(player: TypePlayer, item: AnyEquipmentItem): boolean {
   const slots = player.equippedSlots;
   if (!slots) return (item as any).isEquipped ?? false;
+
   const name = (item as any).name as string;
+  const inv  = player.equipment?.[0];
+
+  const matchesRef = (ref: SlotRef | null | undefined): boolean => {
+    if (!ref || ref.name !== name) return false;
+    if (ref.index !== undefined) {
+      // Index-aware match: only the item at that exact position qualifies
+      const arr = (inv as any)?.[ref.source] as AnyEquipmentItem[] | undefined;
+      return arr?.[ref.index] === item;
+    }
+    // Legacy: name-only (backward compat for refs without an index)
+    return true;
+  };
+
   return !!(
-    slots.mainHand?.name  === name ||
-    slots.offHand?.name   === name ||
-    slots.armor?.name     === name ||
-    slots.accessory?.name === name
+    matchesRef(slots.mainHand) ||
+    matchesRef(slots.offHand)  ||
+    matchesRef(slots.armor)    ||
+    matchesRef(slots.accessory)
   );
 }
 
@@ -361,21 +386,21 @@ export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
   const inv = player.equipment?.[0];
   if (!inv) return player;
 
-  const inSlot = (source: string, name: string): boolean =>
-    !!(
-      (slots.mainHand?.source  === source && slots.mainHand?.name  === name) ||
-      (slots.offHand?.source   === source && slots.offHand?.name   === name) ||
-      (slots.armor?.source     === source && slots.armor?.name     === name) ||
-      (slots.accessory?.source === source && slots.accessory?.name === name)
-    );
+  const inSlot = (source: string, name: string, index: number): boolean => {
+    const check = (ref: SlotRef | null | undefined): boolean => {
+      if (!ref || ref.source !== source || ref.name !== name) return false;
+      return ref.index === undefined || ref.index === index;
+    };
+    return !!(check(slots.mainHand) || check(slots.offHand) || check(slots.armor) || check(slots.accessory));
+  };
 
   const eq0 = {
     ...inv,
-    weapons:       (inv.weapons       ?? []).map(w => ({ ...w, isEquipped: inSlot('weapons',       w.name) })),
-    customWeapons: (inv.customWeapons  ?? []).map(w => ({ ...w, isEquipped: inSlot('customWeapons', w.name) })),
-    shields:       (inv.shields        ?? []).map(s => ({ ...s, isEquipped: inSlot('shields',       s.name) })),
-    armor:         (inv.armor          ?? []).map(a => ({ ...a, isEquipped: inSlot('armor',         a.name) })),
-    accessories:   (inv.accessories    ?? []).map(a => ({ ...a, isEquipped: inSlot('accessories',   a.name) })),
+    weapons:       (inv.weapons       ?? []).map((w, i) => ({ ...w, isEquipped: inSlot('weapons',       w.name, i) })),
+    customWeapons: (inv.customWeapons  ?? []).map((w, i) => ({ ...w, isEquipped: inSlot('customWeapons', w.name, i) })),
+    shields:       (inv.shields        ?? []).map((s, i) => ({ ...s, isEquipped: inSlot('shields',       s.name, i) })),
+    armor:         (inv.armor          ?? []).map((a, i) => ({ ...a, isEquipped: inSlot('armor',         a.name, i) })),
+    accessories:   (inv.accessories    ?? []).map((a, i) => ({ ...a, isEquipped: inSlot('accessories',   a.name, i) })),
   };
 
   const equipment = player.equipment ? [eq0, ...player.equipment.slice(1)] : [eq0];

@@ -5,9 +5,17 @@ import { Martial } from "../../../icons";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
+const resolveDef      = (a) => a.def      || 0;
+const resolveMdef     = (a) => a.mdef     || 0;
+const resolveCategory = (a) => a.category || a.base?.category || 'Armor';
+
 export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, showHeader = true }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+
+  const def      = resolveDef(armor);
+  const mdef     = resolveMdef(armor);
+  const category = resolveCategory(armor);
 
   const background =
     theme.mode === "dark"
@@ -62,7 +70,7 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
           >
             <Grid item xs={3}>
               <Typography variant="h4" textAlign="left">
-                {t(armor.category)}
+                {t(category)}
               </Typography>
             </Grid>
             <Grid item xs={1}>
@@ -120,47 +128,38 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
               </Grid>
               <Grid item xs={2}>
                 <Typography fontWeight="bold" textAlign="center">
-                  {armor.category === "Shield"
-                    ? "+" + parseInt(armor.def + (armor.defModifier || 0))
+                  {category === "Shield"
+                    ? "+" + parseInt(def + (armor.defModifier || 0))
                     : ""}
-                  {armor.category === "Armor" && armor.martial
-                    ? armor.def + (armor.defModifier || 0)
+                  {category === "Armor" && armor.martial
+                    ? def + (armor.defModifier || 0)
                     : ""}
-                  {armor.category === "Armor" && !armor.martial
-                    ? armor.def + (armor.defModifier || 0) === 0
+                  {category === "Armor" && !armor.martial
+                    ? def + (armor.defModifier || 0) === 0
                       ? t("DEX die")
-                      : `${t("DEX die")} + ${
-                          armor.def + (armor.defModifier || 0)
-                        }`
+                      : `${t("DEX die")} + ${def + (armor.defModifier || 0)}`
                     : ""}
                 </Typography>
               </Grid>
               <Grid item xs={2}>
                 <Typography fontWeight="bold" textAlign="center">
-                  {armor.category === "Shield"
-                    ? "+" + parseInt(armor.mdef + (armor.mDefModifier || 0))
+                  {category === "Shield"
+                    ? "+" + parseInt(mdef + (armor.mDefModifier || 0))
                     : ""}
-                  {armor.category === "Armor"
-                    ? armor.martial
-                      ? armor.mdef + (armor.mDefModifier || 0)
-                      : armor.mdef + (armor.mDefModifier || 0) === 0
-                        ? t("INS die")
-                        : `${t("INS die")} + ${
-                            armor.mdef + (armor.mDefModifier || 0)
-                          }`
+                  {category === "Armor"
+                    ? mdef + (armor.mDefModifier || 0) === 0
+                      ? t("INS die")
+                      : `${t("INS die")} + ${mdef + (armor.mDefModifier || 0)}`
                     : ""}
                 </Typography>
               </Grid>
               {!armor.rework && (
                 <Grid item xs={2}>
                   <Typography fontWeight="bold" textAlign="center">
-                    {armor.category === "Armor" ||
-                    armor.category === "Shield"
+                    {category === "Armor" || category === "Shield"
                       ? armor.init + (armor.initModifier || 0) === 0
                         ? "-"
-                        : (armor.init + (armor.initModifier || 0) > 0
-                            ? "+"
-                            : "") +
+                        : (armor.init + (armor.initModifier || 0) > 0 ? "+" : "") +
                           parseInt(armor.init + (armor.initModifier || 0))
                       : ""}
                   </Typography>

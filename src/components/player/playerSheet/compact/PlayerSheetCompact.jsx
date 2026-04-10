@@ -658,7 +658,7 @@ export default function PlayerCardSheet({
 
                 {/* Tab Panels */}
                 <CustomTabPanel value={value} index={0}>
-                    <PlayerBonds player={player} isCharacterSheet={true} />
+                    <PlayerBonds player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} withEquipment isMainTab={true} searchQuery={searchQuery} />
                     <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}
                         isEditMode={isEditMode}
@@ -717,7 +717,7 @@ export default function PlayerCardSheet({
                         onAddNote={isEditMode ? handleAddNote : undefined}
                         onEditNote={isEditMode ? handleOpenEditNote : undefined}
                     />
-                    <PlayerBonds player={player} isCharacterSheet={true} />
+                    <PlayerBonds player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
                 </CustomTabPanel>
             </Box>
 

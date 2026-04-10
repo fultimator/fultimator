@@ -3,7 +3,7 @@ import {
   Paper, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Collapse, IconButton, Grid, Box,
   Chip, Tooltip, ClickAwayListener, Alert,
-  Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
+  Button, TextField,
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, MoreVert, Star, AutoFixHigh, Add, Remove, Edit, Search } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -47,7 +47,6 @@ const StyledMarkdown = ({ children, ...props }) => (
   </div>
 );
 
-// Benefit Chip
 const BenefitChip = ({ label, value, tooltipText }) => {
   const [open, setOpen] = useState(false);
   if (value === 0) return null;
@@ -74,7 +73,6 @@ const BenefitChip = ({ label, value, tooltipText }) => {
   );
 };
 
-// Benefit Chips
 const BenefitChips = ({ benefits, t }) => {
   const chipConfigs = [
     { key: "hpplus", label: t("HP"), tooltip: t("Permanently increase your maximum Hit Points by") },
@@ -134,22 +132,22 @@ function getSpellName(spell, t) {
   const name = spell.name || spell.spellName;
   if (name && name !== t("Unnamed Spell")) return name;
   switch (spell.spellType) {
-    case "magiseed":       return t("magiseed_garden");
-    case "cooking":        return t("Gourmet");
-    case "invocation":     return t("Invoker");
-    case "deck":           return t("ace_deck_management");
+    case "magiseed": return t("magiseed_garden");
+    case "cooking": return t("Gourmet");
+    case "invocation": return t("Invoker");
+    case "deck": return t("ace_deck_management");
     case "tinkerer-alchemy": return t("Alchemy");
     case "tinkerer-infusion": return t("Infusion");
     case "tinkerer-magitech": return t("Magitech");
-    case "magichant":      return t("Magichant");
-    case "symbol":         return t("Symbol");
-    case "dance":          return t("Dance");
-    case "gift":           return t("Gift");
-    case "therioform":     return t("Therioform");
-    case "pilot-vehicle":  return t("Pilot Vehicle");
-    case "arcanist":       return t("Arcanist");
+    case "magichant": return t("Magichant");
+    case "symbol": return t("Symbol");
+    case "dance": return t("Dance");
+    case "gift": return t("Gift");
+    case "therioform": return t("Therioform");
+    case "pilot-vehicle": return t("Pilot Vehicle");
+    case "arcanist": return t("Arcanist");
     case "arcanist-rework": return t("Arcanist-Rework");
-    default:               return t("Unnamed Spell");
+    default: return t("Unnamed Spell");
   }
 }
 
@@ -229,7 +227,6 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
   }
 }
 
-// Main Component
 export default function PlayerClasses({
   player,
   setPlayer = null,
@@ -249,7 +246,6 @@ export default function PlayerClasses({
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
-  // Separate sessionStorage key per tab
   const storageKey = useMemo(
     () => `playerClassesOpenRows_${player?.id ?? "default"}_${isMainTab ? "main" : "secondary"}`,
     [player?.id, isMainTab]
@@ -258,17 +254,13 @@ export default function PlayerClasses({
   const getInitialOpenRows = () => {
     const saved = sessionStorage.getItem(storageKey);
     if (saved) return JSON.parse(saved);
-
-    // Default open all rows if not isMainTab
     if (!isMainTab && player?.classes?.length) {
       const initialOpen = {};
       player.classes.forEach((cls, classIdx) => {
-        const classKey = `class-${classIdx}`;
-        initialOpen[classKey] = true;
+        initialOpen[`class-${classIdx}`] = true;
       });
       return initialOpen;
     }
-
     return {};
   };
 
@@ -286,7 +278,6 @@ export default function PlayerClasses({
   const [newBlankClassName, setNewBlankClassName] = useState("");
   const [classCompendiumOpen, setClassCompendiumOpen] = useState(false);
 
-  // Warnings
   const warnings = useMemo(() => {
     const w = [];
     if (!player.classes || player.classes.length < 2) w.push("Character must have at least 2 classes.");
@@ -296,17 +287,6 @@ export default function PlayerClasses({
     if (total !== player.lvl) w.push("Sum of class levels isn't equal to character level.");
     return w;
   }, [player.classes, player.lvl]);
-
-  const handleConfirmBlankClass = () => {
-    if (!newBlankClassName.trim() || !onAddBlankClass) return;
-    onAddBlankClass(newBlankClassName.trim());
-    setNewBlankClassName("");
-    setBlankClassDialogOpen(false);
-  };
-
-  const handleImportFromCompendium = (item) => {
-    if (onAddFromCompendium) onAddFromCompendium(item);
-  };
 
   const handleAddHeroic = (item) => {
     if (heroicPickerClassIdx === null || !setPlayer) return;
@@ -324,368 +304,277 @@ export default function PlayerClasses({
 
   return (
     <>
-    {warnings.length > 0 && (
-      <Box sx={{ mb: 0.5 }}>
-        {warnings.map((w, i) => (
-          <Alert key={i} severity="warning" sx={{ py: 0, mb: 0.25, fontSize: "0.75rem" }}>{t(w)}</Alert>
-        ))}
-      </Box>
-    )}
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow
-            sx={{
-              background: theme.primary,
-              "& .MuiTypography-root": {
-                fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                textTransform: "uppercase",
-              },
-            }}
-          >
-            <StyledTableCellHeader sx={{ width: 36 }} />
-            <StyledTableCellHeader>
-              <Typography variant="h4">{t("Class Name")}</Typography>
-            </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: 80 }} />
-            <StyledTableCellHeader sx={{ width: 90 }}>
-              <Typography variant="h4" textAlign="center">{t("Level")}</Typography>
-            </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
-              {isEditMode && (
-                <>
-                  {onAddBlankClass && (
-                    <Tooltip title={t("Add Blank Class")}>
+      {warnings.length > 0 && (
+        <Box sx={{ mb: 0.5 }}>
+          {warnings.map((w, i) => (
+            <Alert key={i} severity="warning" sx={{ py: 0, mb: 0.25, fontSize: "0.75rem" }}>{t(w)}</Alert>
+          ))}
+        </Box>
+      )}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow
+              sx={{
+                background: theme.primary,
+                "& .MuiTypography-root": {
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  textTransform: "uppercase",
+                },
+              }}
+            >
+              <StyledTableCellHeader sx={{ width: 36 }} />
+              <StyledTableCellHeader>
+                <Typography variant="h4">{t("Class Name")}</Typography>
+              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: 80 }} />
+              <StyledTableCellHeader sx={{ width: 90 }}>
+                <Typography variant="h4" textAlign="center">{t("Level")}</Typography>
+              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: 100, textAlign: "right" }}>
+                {isEditMode && (
+                  <>
+                    {onAddBlankClass && (
                       <IconButton size="small" onClick={() => setBlankClassDialogOpen(true)} sx={{ color: '#fff', p: 0 }}>
                         <Add fontSize="small" />
                       </IconButton>
-                    </Tooltip>
-                  )}
-                  {onAddFromCompendium && (
-                    <Tooltip title={t("Search Classes")}>
+                    )}
+                    {onAddFromCompendium && (
                       <IconButton size="small" onClick={() => setClassCompendiumOpen(true)} sx={{ color: '#fff', p: 0 }}>
                         <Search fontSize="small" />
                       </IconButton>
-                    </Tooltip>
-                  )}
-                </>
-              )}
-            </StyledTableCellHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {player.classes
-            .filter((cls) => {
-              if (!searchQuery) return true;
-              const query = searchQuery.toLowerCase();
-              const classNameMatches = t(cls.name).toLowerCase().includes(query);
-              const skillMatches = cls.skills?.some(skill =>
-                t(skill.skillName).toLowerCase().includes(query)
-              );
-              const heroicMatches = cls.heroic &&
-                t(cls.heroic.name).toLowerCase().includes(query);
-              const spellMatches = cls.spells?.some(spell =>
-                (spell.name || spell.spellName || "").toLowerCase().includes(query)
-              );
-              return classNameMatches || skillMatches || heroicMatches || spellMatches;
-            })
-            .map((cls, classIdx) => {
-              const classKey = `class-${classIdx}`;
-              const visibleSpells = (cls.spells || []).filter(isVisibleSpell);
+                    )}
+                  </>
+                )}
+              </StyledTableCellHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {player.classes
+              .filter((cls) => {
+                if (!searchQuery) return true;
+                const query = searchQuery.toLowerCase();
+                return t(cls.name).toLowerCase().includes(query) ||
+                  cls.skills?.some(s => t(s.skillName).toLowerCase().includes(query)) ||
+                  (cls.heroic && t(cls.heroic.name).toLowerCase().includes(query)) ||
+                  cls.spells?.some(s => (s.name || s.spellName || "").toLowerCase().includes(query));
+              })
+              .map((cls, classIdx) => {
+                const classKey = `class-${classIdx}`;
+                const visibleSpells = (cls.spells || []).filter(isVisibleSpell);
 
-              return (
-                <React.Fragment key={classKey}>
-                  <TableRow>
-                    <StyledTableCell sx={{ width: 36 }}>
-                      <IconButton onClick={() => toggleRow(classKey)} size="small">
-                        {openRows[classKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                      </IconButton>
-                    </StyledTableCell>
-                    <StyledTableCell onClick={() => toggleRow(classKey)} sx={{ cursor: "pointer" }}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <Typography variant="body2" fontWeight="bold">
-                          {highlightMatch(t(cls.name), searchQuery)}
-                        </Typography>
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "nowrap", overflow: "hidden" }}>
-                          {isEditMode && onEditClass ? null : <BenefitChips benefits={cls.benefits} t={t} />}
-                        </Box>
-                      </Box>
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ width: 80 }} />
-                    <StyledTableCell sx={{ width: 90 }}>
-                      {isEditMode && onLevelChange ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.max(1, cls.lvl - 1))} sx={{ p: 0 }} disabled={cls.lvl <= 1}>
-                            <Remove fontSize="small" />
-                          </IconButton>
-                          <Typography variant="body2" fontWeight="bold" sx={{ mx: 0.25, minWidth: 32, textAlign: 'center' }}>
-                            {cls.lvl}/10
+                return (
+                  <React.Fragment key={classKey}>
+                    <TableRow sx={{ backgroundColor: openRows[classKey] ? 'rgba(0,0,0,0.02)' : 'inherit' }}>
+                      <StyledTableCell sx={{ width: 36 }}>
+                        <IconButton onClick={() => toggleRow(classKey)} size="small">
+                          {openRows[classKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                        </IconButton>
+                      </StyledTableCell>
+                      <StyledTableCell onClick={() => toggleRow(classKey)} sx={{ cursor: "pointer" }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Typography variant="body2" fontWeight="bold">
+                            {highlightMatch(t(cls.name), searchQuery)}
                           </Typography>
-                          <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.min(10, cls.lvl + 1))} sx={{ p: 0 }} disabled={cls.lvl >= 10}>
-                            <Add fontSize="small" />
-                          </IconButton>
+                          <Box sx={{ display: "flex", gap: 1, flexWrap: "nowrap", overflow: "hidden" }}>
+                            {isEditMode && onEditClass ? null : <BenefitChips benefits={cls.benefits} t={t} />}
+                          </Box>
                         </Box>
-                      ) : (
-                        <Typography variant="body2" fontWeight="bold" textAlign="center">{cls.lvl}/10</Typography>
-                      )}
-                    </StyledTableCell>
-                    <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
-                      {isEditMode && onEditClass && (
-                        <Tooltip title={t("Edit")}>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 80 }} />
+                      <StyledTableCell sx={{ width: 90 }}>
+                        {isEditMode && onLevelChange ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.max(1, cls.lvl - 1))} sx={{ p: 0 }} disabled={cls.lvl <= 1}>
+                              <Remove fontSize="small" />
+                            </IconButton>
+                            <Typography variant="body2" fontWeight="bold" sx={{ mx: 0.25, minWidth: 32, textAlign: 'center' }}>
+                              {cls.lvl}/10
+                            </Typography>
+                            <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.min(10, cls.lvl + 1))} sx={{ p: 0 }} disabled={cls.lvl >= 10}>
+                              <Add fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" fontWeight="bold" textAlign="center">{cls.lvl}/10</Typography>
+                        )}
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
+                        {isEditMode && onEditClass && (
                           <IconButton size="small" onClick={() => onEditClass(classIdx)} sx={{ p: 0.25 }}>
                             <Edit fontSize="small" />
                           </IconButton>
-                        </Tooltip>
-                      )}
-                    </StyledTableCell>
-                  </TableRow>
+                        )}
+                      </StyledTableCell>
+                    </TableRow>
 
-                  {/* Skills + Heroic — collapsed behind expand toggle */}
-                  <TableRow>
-                    <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                      <Collapse in={openRows[classKey]} timeout="auto" unmountOnExit>
-                        <Grid container>
-
-                          {/* Skills */}
-                          <Grid item xs={12}>
-                            <Table>
-                              {/* {isEditMode && onAddSkill && (
-                                <TableHead>
-                                  <TableRow>
-                                    <StyledTableCell colSpan={5} sx={{ pl: 0.5, py: 0.25 }}>
-                                      <Tooltip title={t("Add Skill")}>
-                                        <IconButton size="small" onClick={() => onAddSkill(classIdx)}>
-                                          <Add fontSize="small" />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </StyledTableCell>
-                                  </TableRow>
-                                </TableHead>
-                              )} */}
-                              <TableBody>
-                                {cls.skills?.filter(s => s.currentLvl >= 1).map((skill, skillIdx) => {
-                                  const skillKey = `skill-${classIdx}-${skillIdx}`;
-                                  return (
-                                    <React.Fragment key={skillKey}>
-                                      <TableRow>
-                                        <StyledTableCell sx={{ width: 36 }}>
-                                          <IconButton onClick={() => toggleRow(skillKey)} size="small">
-                                            {openRows[skillKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                                          </IconButton>
-                                        </StyledTableCell>
-                                        <StyledTableCell onClick={() => toggleRow(skillKey)} sx={{ cursor: "pointer" }}>
-                                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
-                                              {highlightMatch(t(skill.skillName), searchQuery)}
-                                            </Typography>
-                                            <Tooltip title={t("Skill")}>
-                                              <MoreVert />
-                                            </Tooltip>
-                                          </Box>
-                                        </StyledTableCell>
-                                        <StyledTableCell sx={{ width: 80 }} />
-                                        <StyledTableCell sx={{ width: 90 }}>
-                                          {isEditMode && onIncreaseSkillLevel ? (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                              <IconButton size="small" onClick={() => onDecreaseSkillLevel(classIdx, skillIdx)} sx={{ p: 0 }} disabled={skill.currentLvl <= 0}>
-                                                <Remove fontSize="small" />
+                    {/* NESTED CONTENT WITH VERTICAL CONNECTOR LINE */}
+                    <TableRow>
+                      <StyledTableCell colSpan={5} sx={{ p: 0, borderBottom: openRows[classKey] ? '1px solid rgba(0,0,0,0.12)' : 'none' }}>
+                        <Collapse in={openRows[classKey]} timeout="auto" unmountOnExit>
+                          <Box sx={{
+                            ml: 2.5,
+                            borderLeft: `2px solid ${theme.primary}55`, // Semi-transparent theme color
+                            pl: 1,
+                            pb: 1,
+                            mt: 0.5
+                          }}>
+                            {/* Skills Section */}
+                            <Grid container>
+                              <Grid item xs={12}>
+                                <Table size="small">
+                                  <TableBody>
+                                    {cls.skills?.filter(s => s.currentLvl >= 1).map((skill, skillIdx) => {
+                                      const skillKey = `skill-${classIdx}-${skillIdx}`;
+                                      return (
+                                        <React.Fragment key={skillKey}>
+                                          <TableRow sx={{ '& td': { border: 0 } }}>
+                                            <StyledTableCell sx={{ width: 36 }}>
+                                              <IconButton onClick={() => toggleRow(skillKey)} size="small">
+                                                {openRows[skillKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                                               </IconButton>
-                                              <Typography variant="body2" fontWeight="bold" sx={{ mx: 0.25, minWidth: 32, textAlign: 'center' }}>
-                                                {skill.currentLvl}/{skill.maxLvl}
-                                              </Typography>
-                                              <IconButton size="small" onClick={() => onIncreaseSkillLevel(classIdx, skillIdx)} sx={{ p: 0 }} disabled={skill.currentLvl >= skill.maxLvl}>
-                                                <Add fontSize="small" />
-                                              </IconButton>
-                                            </Box>
-                                          ) : (
-                                            <Typography variant="body2" fontWeight="bold" textAlign="center">{skill.currentLvl}/{skill.maxLvl}</Typography>
-                                          )}
-                                        </StyledTableCell>
-                                        <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
-                                          {isEditMode && onEditSkill && (
-                                            <Tooltip title={t("Edit Skill")}>
-                                              <IconButton size="small" onClick={() => onEditSkill(classIdx, skillIdx)} sx={{ p: 0.25 }}>
-                                                <Edit fontSize="small" />
-                                              </IconButton>
-                                            </Tooltip>
-                                          )}
-                                        </StyledTableCell>
-                                      </TableRow>
-                                      <TableRow>
-                                        <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                                          <Collapse in={openRows[skillKey]} timeout="auto" unmountOnExit>
-                                            <Box sx={{ p: 1 }}>
-                                              <StyledMarkdown allowedElements={["strong"]} unwrapDisallowed>
-                                                {t(skill.description)}
-                                              </StyledMarkdown>
-                                            </Box>
-                                          </Collapse>
-                                        </StyledTableCell>
-                                      </TableRow>
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </TableBody>
-                            </Table>
-                          </Grid>
+                                            </StyledTableCell>
+                                            <StyledTableCell onClick={() => toggleRow(skillKey)} sx={{ cursor: "pointer" }}>
+                                              <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                                  {highlightMatch(t(skill.skillName), searchQuery)}
+                                                </Typography>
+                                                <MoreVert sx={{ fontSize: '1rem', opacity: 0.6 }} />
+                                              </Box>
+                                            </StyledTableCell>
+                                            <StyledTableCell sx={{ width: 80 }} />
+                                            <StyledTableCell sx={{ width: 90 }}>
+                                              {isEditMode && onIncreaseSkillLevel ? (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                  <IconButton size="small" onClick={() => onDecreaseSkillLevel(classIdx, skillIdx)} sx={{ p: 0 }} disabled={skill.currentLvl <= 0}><Remove fontSize="small" /></IconButton>
+                                                  <Typography variant="body2" sx={{ mx: 0.5 }}>{skill.currentLvl}/{skill.maxLvl}</Typography>
+                                                  <IconButton size="small" onClick={() => onIncreaseSkillLevel(classIdx, skillIdx)} sx={{ p: 0 }} disabled={skill.currentLvl >= skill.maxLvl}><Add fontSize="small" /></IconButton>
+                                                </Box>
+                                              ) : (
+                                                <Typography variant="body2" textAlign="center">{skill.currentLvl}/{skill.maxLvl}</Typography>
+                                              )}
+                                            </StyledTableCell>
+                                            <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
+                                              {isEditMode && onEditSkill && (
+                                                <IconButton size="small" onClick={() => onEditSkill(classIdx, skillIdx)} sx={{ p: 0.25 }}><Edit fontSize="small" /></IconButton>
+                                              )}
+                                            </StyledTableCell>
+                                          </TableRow>
+                                          <TableRow>
+                                            <StyledTableCell colSpan={5} sx={{ p: 0 }}>
+                                              <Collapse in={openRows[skillKey]} timeout="auto" unmountOnExit>
+                                                <Box sx={{ p: 1.5, ml: 4, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                                                  <StyledMarkdown allowedElements={["strong"]} unwrapDisallowed>
+                                                    {t(skill.description)}
+                                                  </StyledMarkdown>
+                                                </Box>
+                                              </Collapse>
+                                            </StyledTableCell>
+                                          </TableRow>
+                                        </React.Fragment>
+                                      );
+                                    })}
 
-                          {/* Heroic Skill */}
-                          {cls.lvl === 10 && (
-                            <Grid item xs={12}>
-                              <Table>
-                                <TableBody>
-                                  <TableRow>
-                                    <StyledTableCell sx={{ width: 36 }}>
-                                      <IconButton onClick={() => toggleRow(`heroic-${classIdx}`)} size="small">
-                                        {openRows[`heroic-${classIdx}`] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                                      </IconButton>
-                                    </StyledTableCell>
-                                    <StyledTableCell onClick={() => toggleRow(`heroic-${classIdx}`)} sx={{ cursor: "pointer" }}>
-                                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                                        <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
-                                          {cls.heroic?.name ? highlightMatch(t(cls.heroic.name), searchQuery) : <em style={{ opacity: 0.5 }}>{t("No Heroic Skill")}</em>}
-                                        </Typography>
-                                        <Tooltip title={t("Heroic Skill")}>
-                                          <Star />
-                                        </Tooltip>
-                                      </Box>
-                                    </StyledTableCell>
-                                    <StyledTableCell sx={{ width: 80 }} />
-                                    <StyledTableCell sx={{ width: 90 }} />
-                                    <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
-                                      {isEditMode && setPlayer && (
-                                        <Tooltip title={t("Search Heroic Skills")}>
-                                          <IconButton size="small" onClick={() => setHeroicPickerClassIdx(classIdx)} sx={{ p: 0.25 }}>
-                                            <Search fontSize="small" />
-                                          </IconButton>
-                                        </Tooltip>
-                                      )}
-                                    </StyledTableCell>
-                                  </TableRow>
-                                  <TableRow>
-                                    <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                                      <Collapse in={openRows[`heroic-${classIdx}`]} timeout="auto" unmountOnExit>
-                                        <Box sx={{ p: 1 }}>
-                                          {cls.heroic?.description ? (
-                                            <StyledMarkdown allowedElements={["strong"]} unwrapDisallowed>
-                                              {t(cls.heroic.description)}
-                                            </StyledMarkdown>
-                                          ) : (
-                                            <Typography variant="body2" sx={{ opacity: 0.5 }}>{t("No description yet.")}</Typography>
-                                          )}
-                                        </Box>
-                                      </Collapse>
-                                    </StyledTableCell>
-                                  </TableRow>
-                                </TableBody>
-                              </Table>
-                            </Grid>
-                          )}
-
-                          {/* Spells */}
-                          {visibleSpells.length > 0 && (
-                            <Grid item xs={12}>
-                              <Table>
-                                <TableBody>
-                                  {visibleSpells.map((spell, spellIdx) => {
-                                    const spellKey = `spell-${classIdx}-${spellIdx}`;
-                                    const spellName = getSpellName(spell, t);
-                                    return (
-                                      <React.Fragment key={spellKey}>
-                                        <TableRow>
+                                    {/* Heroic Skill Row */}
+                                    {cls.lvl === 10 && (
+                                      <React.Fragment>
+                                        <TableRow sx={{ '& td': { border: 0 } }}>
                                           <StyledTableCell sx={{ width: 36 }}>
-                                            <IconButton onClick={() => toggleRow(spellKey)} size="small">
-                                              {openRows[spellKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                                            <IconButton onClick={() => toggleRow(`heroic-${classIdx}`)} size="small">
+                                              {openRows[`heroic-${classIdx}`] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                                             </IconButton>
                                           </StyledTableCell>
-                                          <StyledTableCell
-                                            onClick={() => toggleRow(spellKey)}
-                                            sx={{ cursor: "pointer" }}
-                                          >
+                                          <StyledTableCell onClick={() => toggleRow(`heroic-${classIdx}`)} sx={{ cursor: "pointer" }}>
                                             <Box sx={{ display: "flex", alignItems: "center" }}>
-                                              <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
-                                                {highlightMatch(spellName, searchQuery)}
+                                              <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5, color: theme.secondary }}>
+                                                {cls.heroic?.name ? highlightMatch(t(cls.heroic.name), searchQuery) : <em>{t("No Heroic Skill")}</em>}
                                               </Typography>
-                                              <Tooltip title={t("Spell")}>
-                                                <AutoFixHigh sx={{ color: theme.secondary }} />
-                                              </Tooltip>
+                                              <Star sx={{ color: theme.secondary, fontSize: '1rem' }} />
                                             </Box>
                                           </StyledTableCell>
-                                          <StyledTableCell sx={{ width: 80 }} />
-                                          <StyledTableCell sx={{ width: 90 }} />
+                                          <StyledTableCell colSpan={2} />
                                           <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
-                                            {isEditMode && onEditSpell && (
-                                              <Tooltip title={t("Edit Spell")}>
-                                                <IconButton size="small" onClick={() => onEditSpell(classIdx, spellIdx, spell)} sx={{ p: 0.25 }}>
-                                                  <Edit fontSize="small" />
-                                                </IconButton>
-                                              </Tooltip>
+                                            {isEditMode && setPlayer && (
+                                              <IconButton size="small" onClick={() => setHeroicPickerClassIdx(classIdx)}><Search fontSize="small" /></IconButton>
                                             )}
                                           </StyledTableCell>
                                         </TableRow>
                                         <TableRow>
                                           <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                                            <Collapse in={openRows[spellKey]} timeout="auto" unmountOnExit>
-                                              <Box sx={{ p: 1 }}>
-                                                {renderSpellContent(spell, setPlayer, searchQuery, highlightMatch)}
+                                            <Collapse in={openRows[`heroic-${classIdx}`]} timeout="auto" unmountOnExit>
+                                              <Box sx={{ p: 1.5, ml: 4, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
+                                                <StyledMarkdown allowedElements={["strong"]} unwrapDisallowed>
+                                                  {t(cls.heroic?.description || "No description yet.")}
+                                                </StyledMarkdown>
                                               </Box>
                                             </Collapse>
                                           </StyledTableCell>
                                         </TableRow>
                                       </React.Fragment>
-                                    );
-                                  })}
-                                </TableBody>
-                              </Table>
-                            </Grid>
-                          )}
+                                    )}
 
-                        </Grid>
-                      </Collapse>
-                    </StyledTableCell>
-                  </TableRow>
-                </React.Fragment>
-              );
-            })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <CompendiumViewerModal
-      open={heroicPickerClassIdx !== null}
-      onClose={() => setHeroicPickerClassIdx(null)}
-      onAddItem={handleAddHeroic}
-      initialType="heroics"
-      restrictToTypes={["heroics"]}
-      context="player"
-    />
-    <CompendiumViewerModal
-      open={classCompendiumOpen}
-      onClose={() => setClassCompendiumOpen(false)}
-      onAddItem={handleImportFromCompendium}
-      initialType="classes"
-      restrictToTypes={["classes"]}
-      context="player"
-    />
-    <Dialog open={blankClassDialogOpen} onClose={() => setBlankClassDialogOpen(false)} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ background: theme.primary, color: '#fff', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.9rem', py: 1.25 }}>
-        {t("Add Blank Class")}
-      </DialogTitle>
-      <DialogContent sx={{ pt: "16px !important" }}>
-        <TextField
-          label={t("Class Name")}
-          value={newBlankClassName}
-          onChange={(e) => setNewBlankClassName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleConfirmBlankClass()}
-          autoFocus
-          fullWidth
-          size="small"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => { setBlankClassDialogOpen(false); setNewBlankClassName(""); }}>{t("Cancel")}</Button>
-        <Button variant="contained" onClick={handleConfirmBlankClass} disabled={!newBlankClassName.trim()}>{t("Add")}</Button>
-      </DialogActions>
-    </Dialog>
+                                    {/* Spells Section */}
+                                    {visibleSpells.map((spell, spellIdx) => {
+                                      const spellKey = `spell-${classIdx}-${spellIdx}`;
+                                      return (
+                                        <React.Fragment key={spellKey}>
+                                          <TableRow sx={{ '& td': { border: 0 } }}>
+                                            <StyledTableCell sx={{ width: 36 }}>
+                                              <IconButton onClick={() => toggleRow(spellKey)} size="small">
+                                                {openRows[spellKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                                              </IconButton>
+                                            </StyledTableCell>
+                                            <StyledTableCell onClick={() => toggleRow(spellKey)} sx={{ cursor: "pointer" }}>
+                                              <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                                  {highlightMatch(getSpellName(spell, t), searchQuery)}
+                                                </Typography>
+                                                <AutoFixHigh sx={{ color: theme.secondary, fontSize: '1rem' }} />
+                                              </Box>
+                                            </StyledTableCell>
+                                            <StyledTableCell colSpan={2} />
+                                            <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
+                                              {isEditMode && onEditSpell && (
+                                                <IconButton size="small" onClick={() => onEditSpell(classIdx, spellIdx, spell)}><Edit fontSize="small" /></IconButton>
+                                              )}
+                                            </StyledTableCell>
+                                          </TableRow>
+                                          <TableRow>
+                                            <StyledTableCell colSpan={5} sx={{ p: 0 }}>
+                                              <Collapse in={openRows[spellKey]} timeout="auto" unmountOnExit>
+                                                <Box sx={{ p: 1.5, ml: 4 }}>
+                                                  {renderSpellContent(spell, setPlayer, searchQuery, highlightMatch)}
+                                                </Box>
+                                              </Collapse>
+                                            </StyledTableCell>
+                                          </TableRow>
+                                        </React.Fragment>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Collapse>
+                      </StyledTableCell>
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Modals remain the same */}
+      <CompendiumViewerModal
+        open={heroicPickerClassIdx !== null}
+        onClose={() => setHeroicPickerClassIdx(null)}
+        onAddItem={handleAddHeroic}
+        initialType="heroics"
+        restrictToTypes={["heroics"]}
+        context="player"
+      />
     </>
   );
 }

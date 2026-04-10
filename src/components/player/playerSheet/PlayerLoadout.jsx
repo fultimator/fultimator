@@ -247,14 +247,15 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
 
 // ─── PlayerLoadout ────────────────────────────────────────────────────────────
 
-export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharacterSheet }) {
+export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharacterSheet, isOwner }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const primary = theme.primary;
   const secondary = theme.secondary;
+  const canClickSlot = isEditMode || (isCharacterSheet && !!isOwner);
 
   const [pickerSlot, setPickerSlot] = useState(null);
-  const [moduleOverrideSlot, setModuleOverrideSlot] = useState(null);
+  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null); // { r1,r2,die1,die2,att1,att2,prec,damage,type,accuracy,damageRoll,isCritSuccess,isCritFail,slot }
@@ -485,7 +486,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         }
       });
     });
-    setModuleOverrideSlot(null);
   };
 
   const setModuleEnabledForSlot = (slot, enabled) => {
@@ -556,13 +556,11 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
     setVehicleModalOpen(false);
   };
 
-  // Slot click: if a vehicle module exists for this slot, show override dialog; otherwise regular picker
+  // Slot click: open picker, starting on module override view if slot already has an active module
   const handleSlotClick = (slot) => {
-    if (['mainHand', 'offHand', 'armor'].includes(slot) && getEquippedModuleForSlot(slot)) {
-      setModuleOverrideSlot(slot);
-    } else {
-      setPickerSlot(slot);
-    }
+    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(slot));
+    setPickerOpenModuleOverride(hasModule);
+    setPickerSlot(slot);
   };
 
   const resolveVehicleModule = (ref) => {
@@ -635,7 +633,8 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       <Box sx={{ p: 1.5, flexGrow: 1 }}>
 
         {/* Vehicle enter/exit + swap - shown when a pilot-vehicle spell exists */}
-        {pilotSpellInfo && isEditMode && (
+        {(isOwner || isEditMode) && pilotSpellInfo && (
+          
           <>
             <Box display="flex" alignItems="center" gap={1} mb={1.5}>
               <PrecisionManufacturingIcon sx={{ fontSize: 16, color: activeVehicle ? 'success.main' : 'text.disabled' }} />
@@ -675,7 +674,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 label={label}
                 resolved={resolved}
                 locked={locked}
-                isEditMode={isEditMode}
+                isEditMode={canClickSlot}
                 hasModule={!!getEquippedModuleForSlot(slot)}
                 onClick={() => handleSlotClick(slot)}
                 onRoll={(slot === 'mainHand' || slot === 'offHand') ? () => handleRollSlot(slot) : undefined}
@@ -689,7 +688,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 label={t('Aux Hand')}
                 resolved={{ kind: 'playerItem', item: auxHandItem }}
                 locked={false}
-                isEditMode={isEditMode}
+                isEditMode={canClickSlot}
                 isAux
                 onRoll={() => handleRollSlot('aux')}
               />
@@ -746,8 +745,8 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                     label={`${t('Support')} ${i + 1}`}
                     module={entry.module}
                     vehicle={activeVehicle}
-                    isEditMode={isEditMode}
-                    onClick={isEditMode ? () => setSupportPickerOpen(true) : undefined}
+                    isEditMode={canClickSlot}
+                    onClick={canClickSlot ? () => setSupportPickerOpen(true) : undefined}
                   />
                 </Grid>
               ))}
@@ -758,7 +757,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                     label={`${t('Support')} ${supportSlots.length + 1}`}
                     module={null}
                     vehicle={activeVehicle}
-                    isEditMode={isEditMode}
+                    isEditMode={canClickSlot}
                     onClick={() => setSupportPickerOpen(true)}
                   />
                 </Grid>
@@ -811,19 +810,18 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         </Dialog>
       )}
 
-      {/* Regular slot picker dialog */}
+      {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
           open={Boolean(pickerSlot)}
-          onClose={() => setPickerSlot(null)}
+          onClose={() => { setPickerSlot(null); setPickerOpenModuleOverride(false); }}
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
-          onUseModuleEquipment={
-            activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) && getEquippedModulesForSlot(pickerSlot).length > 0
-              ? () => { setPickerSlot(null); setModuleOverrideSlot(pickerSlot); }
-              : undefined
-          }
+          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(pickerSlot) : []}
+          onSelectModule={(idx) => setActiveModuleForSlot(pickerSlot, idx)}
+          onDisableModule={() => setModuleEnabledForSlot(pickerSlot, false)}
+          openModuleOverride={pickerOpenModuleOverride}
           onClearOtherHandModule={
             activeVehicle && ['mainHand', 'offHand'].includes(pickerSlot)
               ? () => setModuleEnabledForSlot(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand', false)
@@ -831,81 +829,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           }
         />
       )}
-
-      {/* Module override dialog */}
-      <Dialog
-        open={Boolean(moduleOverrideSlot)}
-        onClose={() => setModuleOverrideSlot(null)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <PrecisionManufacturingIcon color="success" fontSize="small" />
-          {t('Slot - Module Override')}
-        </DialogTitle>
-        <DialogContent sx={{ pb: 1 }}>
-          <Typography variant="caption" color="text.secondary" gutterBottom display="block">
-            {t('Select a vehicle module to override this slot:')}
-          </Typography>
-          <List dense>
-            {getEquippedModulesForSlot(moduleOverrideSlot).map((m) => {
-              const isEnabled = m.enabled && (
-                (moduleOverrideSlot === 'mainHand' && (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
-                (moduleOverrideSlot === 'offHand' && (m.equippedSlot === 'off' || m.equippedSlot === 'both')) ||
-                (moduleOverrideSlot === 'armor' && m.equippedSlot === 'armor')
-              );
-              return (
-                <ListItem key={m.originalIndex} disablePadding>
-                  <ListItemButton onClick={() => setActiveModuleForSlot(moduleOverrideSlot, m.originalIndex)}>
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      <Radio
-                        edge="start"
-                        checked={isEnabled}
-                        disableRipple
-                        size="small"
-                        color="success"
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={m.customName || t(m.name)}
-                      secondary={moduleStatLine(m)}
-                      primaryTypographyProps={{ variant: 'body2', fontWeight: isEnabled ? 700 : 400 }}
-                      secondaryTypographyProps={{ variant: 'caption' }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}>
-          <Button
-            size="small"
-            color="primary"
-            onClick={() => {
-              const slot = moduleOverrideSlot;
-              setModuleEnabledForSlot(slot, false);
-              setModuleOverrideSlot(null);
-              setPickerSlot(slot);
-            }}
-          >
-            {t('Use Regular Equipment')}
-          </Button>
-          <Box>
-            <Button
-              size="small"
-              color="error"
-              onClick={() => {
-                setModuleEnabledForSlot(moduleOverrideSlot, false);
-                setModuleOverrideSlot(null);
-              }}
-            >
-              {t('Disable Module')}
-            </Button>
-            <Button size="small" onClick={() => setModuleOverrideSlot(null)}>{t('Cancel')}</Button>
-          </Box>
-        </DialogActions>
-      </Dialog>
 
       {/* Support module picker dialog */}
       <Dialog

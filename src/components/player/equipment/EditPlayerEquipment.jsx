@@ -227,6 +227,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         init: itemData.init || 0,
         rework: false,
         cost: itemData.cost || 0,
+        def: (itemData.def || 0) + (itemData.defbonus || 0),
+        mdef: (itemData.mdef || 0) + (itemData.mdefbonus || 0),
         isEquipped: false,
       });
     } else if (equipType === "shield") {
@@ -240,6 +242,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         init: itemData.init || 0,
         rework: false,
         cost: itemData.cost || 0,
+        def: (itemData.def || 0) + (itemData.defbonus || 0),
+        mdef: (itemData.mdef || 0) + (itemData.mdefbonus || 0),
         isEquipped: false,
       });
     } else if (equipType === "custom-weapon") {

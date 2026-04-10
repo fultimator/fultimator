@@ -21,11 +21,12 @@ import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
 import PrettyArmor from "../equipment/armor/PrettyArmor";
 import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
 import PrettyCustomWeapon from "../equipment/customWeapons/PrettyCustomWeapon";
-import { Casino, SwapHoriz } from "@mui/icons-material";
+import { Casino, SwapHoriz, Edit } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
+import EditPlayerEquipment from "../equipment/EditPlayerEquipment";
 
 export default function PlayerEquipment({
   player,
@@ -43,6 +44,7 @@ export default function PlayerEquipment({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
+  const [openEdit, setOpenEdit] = useState(false);
 
   // Guardian - Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
@@ -313,21 +315,22 @@ export default function PlayerEquipment({
 
   const handleSwapForm = (weapon) => {
     if (!setPlayer || !isEditMode) return;
-    
+
     const customWeapon = weapon.originalData;
     if (!customWeapon) return;
 
     setPlayer(prevPlayer => {
-      const updatedCustomWeapons = [...(prevPlayer.customWeapons || [])];
-      // Search by reference to original data
-      const weaponIndex = updatedCustomWeapons.findIndex(w => w === customWeapon);
-      if (weaponIndex !== -1) {
-        const cw = updatedCustomWeapons[weaponIndex];
-        const newForm = cw.activeForm === "secondary" ? "primary" : "secondary";
-        updatedCustomWeapons[weaponIndex] = { ...cw, activeForm: newForm };
-        return { ...prevPlayer, customWeapons: updatedCustomWeapons };
-      }
-      return prevPlayer;
+      const customWeapons = prevPlayer.equipment?.[0]?.customWeapons ?? [];
+      const weaponIndex = customWeapons.findIndex(w => w === customWeapon);
+      if (weaponIndex === -1) return prevPlayer;
+      const updated = customWeapons.map((cw, i) =>
+        i === weaponIndex ? { ...cw, activeForm: cw.activeForm === 'secondary' ? 'primary' : 'secondary' } : cw
+      );
+      const equipment = [
+        { ...prevPlayer.equipment[0], customWeapons: updated },
+        ...(prevPlayer.equipment?.slice(1) ?? []),
+      ];
+      return { ...prevPlayer, equipment };
     });
   };
 
@@ -517,41 +520,55 @@ export default function PlayerEquipment({
             }
           >
             {isCharacterSheet ? (
-              <Typography
-                variant="h1"
-                sx={{
-                  textTransform: "uppercase",
-                  padding: "5px", // Adjust padding instead of margins
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
-                  fontSize: "1.5em",
-                }}
-                align="center"
-              >
-                {t("Equipment")}
-              </Typography>
+              <Box sx={{ backgroundColor: primary, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", borderRadius: "8px 8px 0 0" }}>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    textTransform: "uppercase",
+                    padding: "5px", // Adjust padding instead of margins
+                    color: custom.white,
+                    fontSize: "1.5em",
+                  }}
+                  align="center"
+                >
+                  {t("Equipment")}
+                </Typography>
+                {isEditMode && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setOpenEdit(true)}
+                    sx={{ position: "absolute", right: 8, color: custom.white }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
             ) : (
-              <Typography
-                variant="h1"
-                sx={{
-                  writingMode: "vertical-lr",
-                  textTransform: "uppercase",
-                  marginLeft: "-1px",
-                  marginRight: "10px",
-                  marginTop: "-1px",
-                  marginBottom: "-1px",
-                  paddingY: "10px",
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "0 8px 8px 0",
-                  transform: "rotate(180deg)",
-                  fontSize: "2em",
-                }}
-                align="center"
-              >
-                {t("Equipment")}
-              </Typography>
+              <Box sx={{ backgroundColor: primary, display: "flex", flexDirection: "column", alignItems: "center", py: 1, position: "relative", borderRadius: "8px 0 0 8px" }}>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    writingMode: "vertical-lr",
+                    textTransform: "uppercase",
+                    color: custom.white,
+                    transform: "rotate(180deg)",
+                    fontSize: "2em",
+                    minHeight: "100px",
+                  }}
+                  align="center"
+                >
+                  {t("Equipment")}
+                </Typography>
+                {isEditMode && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setOpenEdit(true)}
+                    sx={{ mt: 1, color: custom.white }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
             )}
             <Grid container spacing={2} sx={{ padding: "1em" }}>
               {allEquippedWeapons.length > 0 && (
@@ -748,6 +765,15 @@ export default function PlayerEquipment({
           </Paper>
         </>
       )}
+
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
+        <DialogContent sx={{ p: 0 }}>
+          <EditPlayerEquipment player={player} setPlayer={setPlayer} isEditMode={true} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

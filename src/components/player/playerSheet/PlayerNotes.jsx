@@ -33,14 +33,15 @@ export default function PlayerNotes({
   const theme = useCustomTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const visibleNotes = (player.notes || []).filter(
-    (note) => note.showInPlayerSheet !== false
-  );
+  // Create visible notes with original indices preserved
+  const visibleNotesWithIndices = (player.notes || [])
+    .map((note, index) => ({ note, originalIndex: index }))
+    .filter(({ note }) => note.showInPlayerSheet !== false);
 
-  const handleClockStateChange = (noteIndex, clockIndex, newState) => {
+  const handleClockStateChange = (originalNoteIndex, clockIndex, newState) => {
     setPlayer((prevPlayer) => {
       const updatedNotes = prevPlayer.notes.map((note, index) => {
-        if (index === noteIndex) {
+        if (index === originalNoteIndex) {
           const updatedClocks = note.clocks.map((clock, cIndex) => {
             if (cIndex === clockIndex) {
               return { ...clock, state: newState };
@@ -55,19 +56,19 @@ export default function PlayerNotes({
     });
   };
 
-  const resetClockState = (noteIndex, clockIndex) => {
+  const resetClockState = (originalNoteIndex, clockIndex) => {
     const resetState = new Array(
-      player.notes[noteIndex].clocks[clockIndex].sections
+      player.notes[originalNoteIndex].clocks[clockIndex].sections
     ).fill(false);
-    handleClockStateChange(noteIndex, clockIndex, resetState);
+    handleClockStateChange(originalNoteIndex, clockIndex, resetState);
   };
 
-  if (visibleNotes.length === 0) return null;
+  if (visibleNotesWithIndices.length === 0) return null;
 
   const noteList = (
     <Box sx={{ p: compact ? { xs: 1, sm: 2 } : "1em", width: "100%" }}>
-      {visibleNotes.map((note, noteIndex) => (
-        <Fragment key={noteIndex}>
+      {visibleNotesWithIndices.map(({ note, originalIndex }, visibleIndex) => (
+        <Fragment key={originalIndex}>
           <Box
             sx={{
               mb: 4,
@@ -132,14 +133,14 @@ export default function PlayerNotes({
                           size={isSmallScreen ? 140 : 180}
                           state={clock.state}
                           setState={(newState) =>
-                            handleClockStateChange(noteIndex, clockIndex, newState)
+                            handleClockStateChange(originalIndex, clockIndex, newState)
                           }
                         />
                         {!isCharacterSheet && (
                           <Tooltip title={`${t("Reset")} ${clock.name}`} arrow>
                             <IconButton
                               color="primary"
-                              onClick={() => resetClockState(noteIndex, clockIndex)}
+                              onClick={() => resetClockState(originalIndex, clockIndex)}
                               sx={{
                                 mt: 1,
                                 "&:hover": { bgcolor: "action.selected" },
@@ -168,13 +169,13 @@ export default function PlayerNotes({
                           size={200}
                           state={clock.state}
                           setState={(newState) =>
-                            handleClockStateChange(noteIndex, clockIndex, newState)
+                            handleClockStateChange(originalIndex, clockIndex, newState)
                           }
                         />
                         <Grid container justifyContent="center">
                           <IconButton
                             color="primary"
-                            onClick={() => resetClockState(noteIndex, clockIndex)}
+                            onClick={() => resetClockState(originalIndex, clockIndex)}
                             sx={{ mt: 1 }}
                           >
                             <RestartAltIcon />
@@ -188,7 +189,7 @@ export default function PlayerNotes({
             )}
           </Box>
 
-          {noteIndex < visibleNotes.length - 1 && (
+          {visibleIndex < visibleNotesWithIndices.length - 1 && (
             <Divider sx={{ my: 2 }} />
           )}
         </Fragment>

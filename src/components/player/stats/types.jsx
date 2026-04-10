@@ -57,7 +57,7 @@ export function TypeAffinity({ type, affinity }) {
       fontWeight="bold"
       fontFamily="inherit"
       textAlign="left"
-      sx={{ textTransform: "uppercase", px: 0.2, fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem"} }}
+      sx={{ textTransform: "uppercase", px: 0.2, fontSize: "1rem" }}
     >
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />

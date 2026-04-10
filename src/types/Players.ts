@@ -310,10 +310,12 @@ export type EquipmentSource =
   | 'armor'
   | 'accessories';
 
-/** Points to a player inventory item by its array name + item display name. */
+/** Points to a player inventory item by its array name + item display name.
+ *  `index` disambiguates when two items share the same name. */
 export interface SlotRef {
   source: EquipmentSource;
   name: string;
+  index?: number;
 }
 
 /** Named equipment slots on the player's body. */

@@ -111,6 +111,7 @@ function normalizeSkillLevels(player: TypePlayer): TypePlayer {
 /**
  * Ensures 'notes' is always a valid array of PlayerNotes objects.
  * Converts legacy string arrays to objects if needed.
+ * Preserves optional metadata fields (clocks, showInPlayerSheet) when present.
  */
 function normalizeNotes(player: TypePlayer): TypePlayer {
   if (!player.notes) return { ...player, notes: [] };
@@ -119,15 +120,50 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
   const normalized = player.notes.map((n: any) => {
     if (typeof n === 'string') return { name: '', description: n };
     if (typeof n === 'object' && n !== null) {
-      return {
+      const base = {
         name: n.name ?? '',
         description: n.description ?? ''
       };
+      // Preserve optional metadata fields used by sheet rendering
+      const result: any = base;
+      if (n.clocks !== undefined) result.clocks = n.clocks;
+      if (n.showInPlayerSheet !== undefined) result.showInPlayerSheet = n.showInPlayerSheet;
+      return result;
     }
     return { name: '', description: '' };
   });
 
   return { ...player, notes: normalized };
+}
+
+/**
+ * Backfill the `index` field on any SlotRef that was saved without one.
+ * Legacy equippedSlots entries only contain { source, name }; the index is
+ * needed so isItemEquipped can disambiguate items that share the same name.
+ * Safe to run on every load — no-ops when index is already present.
+ */
+function migrateSlotIndexes(player: TypePlayer): TypePlayer {
+  const slots = player.equippedSlots;
+  if (!slots) return player;
+
+  const inv = player.equipment?.[0];
+
+  const withIndex = (ref: any) => {
+    if (!ref || ref.index !== undefined) return ref;
+    const arr: any[] | undefined = (inv as any)?.[ref.source];
+    const idx = arr?.findIndex((it: any) => it.name === ref.name) ?? -1;
+    return idx >= 0 ? { ...ref, index: idx } : ref;
+  };
+
+  return {
+    ...player,
+    equippedSlots: {
+      mainHand:  withIndex(slots.mainHand),
+      offHand:   withIndex(slots.offHand),
+      armor:     withIndex(slots.armor),
+      accessory: withIndex(slots.accessory),
+    },
+  };
 }
 
 /**
@@ -141,10 +177,16 @@ function restoreRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
 
 /**
  * Ensures all required properties for TypePlayer are present.
+ * Guarantees player.info and player.info.bonds are always defined post-load.
  */
 function normalizeRequiredFields(player: any): any {
+  const info = player.info ?? {};
   return {
     ...player,
+    info: {
+      ...info,
+      bonds: Array.isArray(info.bonds) ? info.bonds : []
+    },
     rituals: player.rituals ?? {
       ritualism: false,
       arcanism: false,
@@ -196,12 +238,55 @@ function normalizeRequiredFields(player: any): any {
   };
 }
 
+/**
+ * Normalizes armor/shield items where def/mdef were stored as 0 but the
+ * original compendium data (preserved in base) has defbonus/mdefbonus values.
+ * This fixes items imported before the import normalization was in place.
+ */
+function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
+  const inv = player.equipment?.[0];
+  if (!inv) return player;
+
+  let changed = false;
+  const fix = (arr: any[]) => arr.map((item: any) => {
+    const patch: any = {};
+    if (!item.def) {
+      const v = (item.base?.def ?? 0) + (item.base?.defbonus ?? 0);
+      if (v) patch.def = v;
+    }
+    if (!item.mdef) {
+      const v = (item.base?.mdef ?? 0) + (item.base?.mdefbonus ?? 0);
+      if (v) patch.mdef = v;
+    }
+    if (Object.keys(patch).length) {
+      changed = true;
+      return { ...item, ...patch };
+    }
+    return item;
+  });
+
+  const fixedArmor   = fix(inv.armor   ?? []);
+  const fixedShields = fix(inv.shields ?? []);
+
+  if (!changed) return player;
+
+  return {
+    ...player,
+    equipment: [
+      { ...inv, armor: fixedArmor, shields: fixedShields },
+      ...(player.equipment?.slice(1) ?? []),
+    ],
+  };
+}
+
 const POST_LOAD_TRANSFORMS: PlayerTransform[] = [
   normalizeRequiredFields,
   migrateLegacyEquipment,
   normalizeSkillLevels,
   normalizeNotes,
+  normalizeArmorDefValues,
   migrateEquippedSlots,
+  migrateSlotIndexes,
   restoreRuntimeEquippedFlags,
 ];
 

@@ -18,7 +18,7 @@ import SpellInvoker from "../spells/SpellInvoker";
 import SpellDeck from "../spells/SpellDeck";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerSpellsFull({ player, isCharacterSheet }) {
+export default function PlayerSpellsFull({ player, isEditMode, isCharacterSheet }) {
   const { t } = useTranslate();
   const custom = useCustomTheme();
   const primary = custom.primary;
@@ -27,11 +27,11 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
   return (
     <>
       {player.classes.length > 0 && (
-        <Grid container spacing={2}>
+        <Grid container spacing={0}>
           {player.classes
             .filter((c) => c.spells && c.spells.length > 0)
             .map((c, classIndex) => (
-              <Grid item xs={12} md={6} key={classIndex}>
+              <Grid item xs={12} key={classIndex}>
                 <Paper
                   elevation={3}
                   sx={
@@ -87,7 +87,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                             targetDesc={spell.targetDesc}
                             duration={spell.duration}
                             description={spell.description}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                             isOffensive={spell.isOffensive}
                             isMagisphere={spell.isMagisphere || false}
                             attr1={spell.attr1}
@@ -99,7 +99,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                           <SpellEntropistGamble
                             key={spellIndex}
                             gamble={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {(spell.spellType === "arcanist" ||
@@ -107,7 +107,7 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                           <div style={{ marginTop: "0.5em", padding: "0.5em" }}>
                             <SpellArcanist
                               arcana={spell}
-                              isEditMode={false}
+                              isEditMode={isEditMode}
                               rework={spell.spellType === "arcanist-rework"}
                             />
                           </div>
@@ -115,73 +115,73 @@ export default function PlayerSpellsFull({ player, isCharacterSheet }) {
                         {spell.spellType === "tinkerer-alchemy" && (
                           <SpellTinkererAlchemy
                             alchemy={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "tinkerer-infusion" && (
                           <SpellTinkererInfusion
                             infusion={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "tinkerer-magitech" && (
                           <SpellTinkererMagitech
                             magitech={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "magichant" && (
                           <SpellChanter
                             magichant={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "symbol" && (
                           <SpellSymbolist
                             symbol={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "dance" && (
                           <SpellDancer
                             dance={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "gift" && (
                           <SpellGift
                             gift={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "therioform" && (
                           <SpellMutant
                             mutant={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "magiseed" && (
                           <SpellMagiseed
                             magiseed={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "cooking" && (
                           <SpellGourmet
                             spell={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "invocation" && (
                           <SpellInvoker
                             invoker={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                         {spell.spellType === "deck" && (
                           <SpellDeck
                             deck={spell}
-                            isEditMode={false}
+                            isEditMode={isEditMode}
                           />
                         )}
                       </React.Fragment>
