@@ -311,11 +311,18 @@ export default function PlayerEdit() {
         e.preventDefault();
         if (isOwner) {
           setIsUpdated(false);
-          activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
+          const playerToSave = {
+            ...playerTemp,
+            settings: {
+              ...playerTemp?.settings,
+              defaultView: compactView ? "compact" : "normal"
+            }
+          };
+          activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
         }
       }
     },
-    [ref, playerTemp, isOwner]
+    [ref, playerTemp, isOwner, compactView]
   );
 
   useEffect(() => {
@@ -1082,7 +1089,14 @@ export default function PlayerEdit() {
               aria-label="save"
               onClick={() => {
                 setIsUpdated(false);
-                activeSetDoc(ref, applyPreSaveTransforms(playerTemp));
+                const playerToSave = {
+                  ...playerTemp,
+                  settings: {
+                    ...playerTemp?.settings,
+                    defaultView: compactView ? "compact" : "normal"
+                  }
+                };
+                activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
               }}
               size="medium"
             >

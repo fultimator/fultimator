@@ -416,14 +416,17 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   // TOGGLE EQUIPPED
 
   // Equip an item to a specific slot, displacing the current occupant.
-  const equipToSlot = (source, itemName, slot, isTwoHand) => {
+  const equipToSlot = (source, itemName, itemIndex, slot, isTwoHand) => {
     let updated = player;
 
     // Clear current occupant of the target slot
     const currentRef = updated.equippedSlots?.[slot];
     if (currentRef) {
       updated = patchInv(updated, currentRef.source, arr =>
-        arr.map(it => it.name === currentRef.name ? { ...it, isEquipped: false } : it)
+        arr.map((it, idx) => {
+          const match = currentRef.index !== undefined ? idx === currentRef.index : it.name === currentRef.name;
+          return match ? { ...it, isEquipped: false } : it;
+        })
       );
     }
 
@@ -432,14 +435,20 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       const offRef = updated.equippedSlots?.offHand;
       if (offRef) {
         updated = patchInv(updated, offRef.source, arr =>
-          arr.map(it => it.name === offRef.name ? { ...it, isEquipped: false } : it)
+          arr.map((it, idx) => {
+            const match = offRef.index !== undefined ? idx === offRef.index : it.name === offRef.name;
+            return match ? { ...it, isEquipped: false } : it;
+          })
         );
       }
     }
 
     // Equip the item
     updated = patchInv(updated, source, arr =>
-      arr.map(it => it.name === itemName ? { ...it, isEquipped: true } : it)
+      arr.map((it, idx) => {
+        const match = itemIndex !== undefined ? idx === itemIndex : it.name === itemName;
+        return match ? { ...it, isEquipped: true } : it;
+      })
     );
 
     const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
@@ -447,7 +456,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       ...updated,
       equippedSlots: {
         ...prevSlots,
-        [slot]: { source, name: itemName },
+        [slot]: { source, name: itemName, index: itemIndex },
         ...(isTwoHand && slot === 'mainHand' ? { offHand: null } : {}),
       },
       vehicleSlots: deriveVehicleSlots(updated),
@@ -455,15 +464,21 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   };
 
   // Unequip an item by clearing whichever slot it currently occupies.
-  const unequipItem = (source, itemName) => {
+  const unequipItem = (source, itemName, itemIndex) => {
     const slots = player.equippedSlots ?? {};
     const slotKey = Object.keys(slots).find(k => {
       const ref = slots[k];
-      return ref?.source === source && ref?.name === itemName;
+      if (!ref || ref.source !== source) return false;
+      if (ref.index !== undefined && itemIndex !== undefined) return ref.index === itemIndex;
+      return ref.name === itemName;
     });
+    const slotRef = slotKey ? slots[slotKey] : null;
 
     let updated = patchInv(player, source, arr =>
-      arr.map(it => it.name === itemName ? { ...it, isEquipped: false } : it)
+      arr.map((it, idx) => {
+        const match = slotRef?.index !== undefined ? idx === slotRef.index : it.name === itemName;
+        return match ? { ...it, isEquipped: false } : it;
+      })
     );
 
     if (slotKey) {
@@ -482,28 +497,28 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     const weapon = (inv.weapons ?? [])[index];
     if (!weapon) return;
     guardMartialEquip('weapons', weapon, () => {
-      equipToSlot('weapons', weapon.name, slot, weapon.hands === 2 || weapon.isTwoHand);
+      equipToSlot('weapons', weapon.name, index, slot, weapon.hands === 2 || weapon.isTwoHand);
     });
   };
 
   const handleUnequipWeapon = (index) => {
     const weapon = (inv.weapons ?? [])[index];
     if (!weapon) return;
-    unequipItem('weapons', weapon.name);
+    unequipItem('weapons', weapon.name, index);
   };
 
   const handleEquipCustomWeapon = (index) => {
     const cw = (inv.customWeapons ?? [])[index];
     if (!cw) return;
     guardMartialEquip('customWeapons', cw, () => {
-      equipToSlot('customWeapons', cw.name, 'mainHand', true);
+      equipToSlot('customWeapons', cw.name, index, 'mainHand', true);
     });
   };
 
   const handleUnequipCustomWeapon = (index) => {
     const cw = (inv.customWeapons ?? [])[index];
     if (!cw) return;
-    unequipItem('customWeapons', cw.name);
+    unequipItem('customWeapons', cw.name, index);
   };
 
   const handleUpdateCustomWeapons = (updatedCustomWeapons) => {
@@ -515,10 +530,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     const armor = (inv.armor ?? [])[armorIndex];
     if (!armor) return;
     if (armor.isEquipped) {
-      unequipItem('armor', armor.name);
+      unequipItem('armor', armor.name, armorIndex);
     } else {
       guardMartialEquip('armor', armor, () => {
-        equipToSlot('armor', armor.name, 'armor', false);
+        equipToSlot('armor', armor.name, armorIndex, 'armor', false);
       });
     }
   };
@@ -527,24 +542,24 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     const shield = (inv.shields ?? [])[index];
     if (!shield) return;
     guardMartialEquip('shields', shield, () => {
-      equipToSlot('shields', shield.name, slot, false);
+      equipToSlot('shields', shield.name, index, slot, false);
     });
   };
 
   const handleUnequipShield = (index) => {
     const shield = (inv.shields ?? [])[index];
     if (!shield) return;
-    unequipItem('shields', shield.name);
+    unequipItem('shields', shield.name, index);
   };
 
   const handleEquipAccessory = (accessoryIndex) => {
     const accessory = (inv.accessories ?? [])[accessoryIndex];
     if (!accessory) return;
     if (accessory.isEquipped) {
-      unequipItem('accessories', accessory.name);
+      unequipItem('accessories', accessory.name, accessoryIndex);
     } else {
       guardMartialEquip('accessories', accessory, () => {
-        equipToSlot('accessories', accessory.name, 'accessory', false);
+        equipToSlot('accessories', accessory.name, accessoryIndex, 'accessory', false);
       });
     }
   };

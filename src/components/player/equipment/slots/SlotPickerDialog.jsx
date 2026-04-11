@@ -83,7 +83,9 @@ export default function SlotPickerDialog({
     const ref = player?.equippedSlots?.mainHand;
     if (!ref) return false;
     if (ref.source === 'customWeapons') return true; // always two-handed
-    const w = inv?.weapons?.find(x => x.name === ref.name);
+    const w = ref.index !== undefined
+      ? inv?.weapons?.[ref.index]
+      : inv?.weapons?.find(x => x.name === ref.name);
     return w?.hands === 2 || w?.isTwoHand || false;
   })();
 
@@ -132,6 +134,16 @@ export default function SlotPickerDialog({
       if (itemType === 'armor'        && martials.armor)  return true;
     }
     return false;
+  };
+
+  const isUnarmedStrike = (candidate) =>
+    candidate?.source === 'weapons' && candidate?.item?.name === 'Unarmed Strike';
+
+  const slotKeys = ['mainHand', 'offHand', 'armor', 'accessory'];
+  const candidateMatchesRef = (candidate, ref) => {
+    if (!ref || ref.source !== candidate.source) return false;
+    if (ref.index !== undefined && candidate.index !== undefined) return ref.index === candidate.index;
+    return ref.name === candidate.label;
   };
 
   /** Build the list of items valid for the given slot. */
@@ -185,8 +197,29 @@ export default function SlotPickerDialog({
     }
   }
 
-  const candidates = getCandidates();
+  const rawCandidates = getCandidates();
   const currentRef = player?.equippedSlots?.[slot];
+  const slots = player?.equippedSlots ?? {};
+
+  const candidates = rawCandidates
+    .map((c) => {
+      const assignedSlots = slotKeys.filter((slotKey) => candidateMatchesRef(c, slots[slotKey]));
+      const inCurrentSlot = assignedSlots.includes(slot);
+      const inOtherSlot = assignedSlots.some((slotKey) => slotKey !== slot);
+      return {
+        ...c,
+        inCurrentSlot,
+        inOtherSlot,
+        assignedSlots,
+      };
+    })
+    .filter((c) => {
+      // Allow re-selecting current slot occupant.
+      if (c.inCurrentSlot) return true;
+      // Prevent duplicates across slots, except Unarmed Strike which can be both hands.
+      if (c.inOtherSlot && !isUnarmedStrike(c)) return false;
+      return true;
+    });
 
   const handleSelect = (candidate) => {
     setPlayer(prev => equipItemToSlot(prev, slot, candidate));
@@ -408,6 +441,11 @@ export default function SlotPickerDialog({
                             primary={
                               <Box component="span" display="flex" alignItems="center" gap={0.5}>
                                 <span>{c.label}</span>
+                                {(c.inCurrentSlot || c.inOtherSlot) && (
+                                  <Typography component="span" variant="caption" color="text.secondary">
+                                    ({t('Equipped')})
+                                  </Typography>
+                                )}
                                 {!isProficient && (
                                   <Tooltip title={t('Not proficient  -  martial item')}>
                                     <WarningAmberIcon sx={{ fontSize: 13, color: 'warning.main', verticalAlign: 'middle' }} />

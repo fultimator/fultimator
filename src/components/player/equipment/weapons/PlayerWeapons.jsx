@@ -55,11 +55,17 @@ export default function PlayerWeapons({
     return false;
   };
 
-  const getWeaponSlot = (weapon) => {
+  const getWeaponSlot = (weapon, index) => {
     const slots = player.equippedSlots;
     if (!slots) return null;
-    if (slots.mainHand?.source === 'weapons' && slots.mainHand?.name === weapon.name) return 'mainHand';
-    if (slots.offHand?.source === 'weapons' && slots.offHand?.name === weapon.name) return 'offHand';
+    const isMain =
+      slots.mainHand?.source === 'weapons' &&
+      (slots.mainHand?.index !== undefined ? slots.mainHand.index === index : slots.mainHand?.name === weapon.name);
+    if (isMain) return 'mainHand';
+    const isOff =
+      slots.offHand?.source === 'weapons' &&
+      (slots.offHand?.index !== undefined ? slots.offHand.index === index : slots.offHand?.name === weapon.name);
+    if (isOff) return 'offHand';
     return null;
   };
 
@@ -123,7 +129,7 @@ export default function PlayerWeapons({
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
           {weapons.map((weapon, index) => {
-            const equippedSlot = getWeaponSlot(weapon);
+            const equippedSlot = getWeaponSlot(weapon, index);
             const isTwoHand = weapon.hands === 2 || weapon.isTwoHand;
             const tooltipTitle = weapon.isEquipped
               ? `${t('Unequip Weapon')}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ''}`

@@ -170,7 +170,7 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
     for (let i = 0; i < weapons.length; i++) {
       const w = weapons[i];
       if (!w.isEquipped) continue;
-      const is2H = (w as any).hands === 2 || (w as any).isTwoHand;
+      const is2H = w.isTwoHand;
       if (is2H) {
         slots.mainHand = ref('weapons', w.name, i);
         break;
@@ -268,8 +268,10 @@ export function isTwoHandedEquipped(player: TypePlayer): boolean {
   if (!ref) return false;
   if (ref.source === 'customWeapons') return true;
   const inv = player.equipment?.[0];
-  const w = (inv?.weapons ?? []).find(x => x.name === ref.name);
-  return w?.hands === 2 || w?.isTwoHand || false;
+  const w = ref.index !== undefined
+    ? (inv?.weapons ?? [])[ref.index]
+    : (inv?.weapons ?? []).find(x => x.name === ref.name);
+  return w?.isTwoHand || false;
 }
 
 // ─── validateSlots ────────────────────────────────────────────────────────────
@@ -300,7 +302,9 @@ export function validateSlots(player: TypePlayer): TypePlayer {
   const isValid = (ref: SlotRef | null | undefined): boolean => {
     if (!ref) return true;
     const arr = (inv as any)?.[ref.source] as AnyEquipmentItem[] | undefined;
-    return arr?.some((it: any) => it.name === ref.name) ?? false;
+    if (!arr) return false;
+    if (ref.index !== undefined) return !!arr[ref.index];
+    return arr.some((it: any) => it.name === ref.name);
   };
 
   if (!isValid(slots.mainHand))  slots.mainHand  = null;
@@ -316,7 +320,11 @@ export function validateSlots(player: TypePlayer): TypePlayer {
   // Two-handed / customWeapon in mainHand must clear offHand
   if (slots.mainHand) {
     const isCustom = slots.mainHand.source === 'customWeapons';
-    const w = isCustom ? undefined : (inv?.weapons ?? []).find(x => x.name === slots.mainHand!.name);
+    const w = isCustom
+      ? undefined
+      : (slots.mainHand.index !== undefined
+          ? (inv?.weapons ?? [])[slots.mainHand.index]
+          : (inv?.weapons ?? []).find(x => x.name === slots.mainHand!.name));
     if (isCustom || w?.isTwoHand) slots.offHand = null;
   }
 
@@ -361,7 +369,9 @@ export function resolveEffectiveSlot(
 
   const inv = player.equipment?.[0];
   const arr = (inv as any)?.[ref.source] as ResolvedPlayerItem[] | undefined;
-  const item = arr?.find((it: any) => it.name === ref.name);
+  const item = ref.index !== undefined
+    ? arr?.[ref.index]
+    : arr?.find((it: any) => it.name === ref.name);
   if (!item) return null;
 
   return { kind: 'playerItem', item };

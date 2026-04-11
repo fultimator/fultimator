@@ -59,11 +59,17 @@ export default function PlayerShields({
     return false;
   };
 
-  const getShieldSlot = (shield) => {
+  const getShieldSlot = (shield, index) => {
     const slots = player.equippedSlots;
     if (!slots) return null;
-    if (slots.mainHand?.source === 'shields' && slots.mainHand?.name === shield.name) return 'mainHand';
-    if (slots.offHand?.source === 'shields' && slots.offHand?.name === shield.name) return 'offHand';
+    const isMain =
+      slots.mainHand?.source === 'shields' &&
+      (slots.mainHand?.index !== undefined ? slots.mainHand.index === index : slots.mainHand?.name === shield.name);
+    if (isMain) return 'mainHand';
+    const isOff =
+      slots.offHand?.source === 'shields' &&
+      (slots.offHand?.index !== undefined ? slots.offHand.index === index : slots.offHand?.name === shield.name);
+    if (isOff) return 'offHand';
     return null;
   };
 
@@ -127,7 +133,7 @@ export default function PlayerShields({
       <AccordionDetails>
         <Grid container justifyContent="flex-end" spacing={2}>
           {shields.map((shield, index) => {
-            const equippedSlot = getShieldSlot(shield);
+            const equippedSlot = getShieldSlot(shield, index);
             const twoHandedBlocked = !shield.isEquipped && isTwoHandedEquipped(player);
             const tooltipTitle = twoHandedBlocked
               ? t('Both hands are occupied by a two-handed weapon')
