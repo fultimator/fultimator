@@ -15,7 +15,7 @@ import { useTranslate } from "../../../../translation/translate";
 import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { Casino, RadioButtonUnchecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import { Casino, RadioButtonUnchecked, RadioButtonChecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
@@ -50,7 +50,7 @@ export default function PlayerEquipment({
   const [compendiumType, setCompendiumType] = useState(null);
   const [martialWarning, setMartialWarning] = useState(null); // { item, event }
 
-  // Guardian - Dual Shieldbearer
+  // Guardian: Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
@@ -63,13 +63,13 @@ export default function PlayerEquipment({
       .filter(skill => skill.specialSkill === skillName)
       .reduce((acc, skill) => acc + skill.currentLvl, 0);
 
-  // Guardian - Defensive Mastery
+  // Guardian: Defensive Mastery
   const defensiveMasteryBonus = getSkillLevel(player, "Defensive Mastery");
 
-  // Weaponmaster - Melee Weapon Mastery Skill Bonus
+  // Weaponmaster: Melee Weapon Mastery Skill Bonus
   const meleeMasteryModifier = getSkillLevel(player, "Melee Weapon Mastery");
 
-  // Sharpshooter - Ranged Weapon Mastery Skill Bonus
+  // Sharpshooter: Ranged Weapon Mastery Skill Bonus
   const rangedMasteryModifier = getSkillLevel(player, "Ranged Weapon Mastery");
 
   // Twin Shields object as described in the comments
@@ -291,7 +291,7 @@ export default function PlayerEquipment({
     will: currWillpower,
   };
 
-  // --- Equip helpers (mirrors EditPlayerEquipment) ---
+  // Equip helpers (mirrors EditPlayerEquipment)
   const patchInv = (p, source, updater) => {
     const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
     const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
@@ -370,7 +370,7 @@ export default function PlayerEquipment({
     }
   };
 
-  // Slot menu state for 1H weapons and shields — stores { name, index }
+  // Slot menu state for 1H weapons and shields : stores { name, index }
   const [slotMenuAnchor, setSlotMenuAnchor] = useState(null);
   const [slotMenuWeapon, setSlotMenuWeapon] = useState(null);
   const [shieldMenuAnchor, setShieldMenuAnchor] = useState(null);
@@ -409,7 +409,7 @@ export default function PlayerEquipment({
       return idx >= 0 ? { item: arr[idx], index: idx } : { item: null, index: undefined };
     };
 
-    // Locate by identity/name in each source array — do NOT rely on item.category
+    // Locate by identity/name in each source array : do NOT rely on item.category
     // because compendium-imported items may be missing it.
     const pred = it => it === item || it.name === item.name;
     const shieldResult    = findWithIndex(eq0?.shields,     pred);
@@ -640,7 +640,7 @@ export default function PlayerEquipment({
     setDialogOpen(false);
   };
 
-  // Edit helpers — resolve item to inventory index and call parent callback
+  // Edit helpers : resolve item to inventory index and call parent callback
   const handleEditWeaponItem = (weapon) => {
     if (weapon.isCustomWeapon) {
       const idx = inv?.customWeapons?.indexOf(weapon.originalData) ?? -1;
@@ -795,7 +795,7 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {allEquippedWeapons.length > 0 && (
+        {isMainTab && allEquippedWeapons.length > 0 && (
           <CollapsibleWeapon
             weapons={allEquippedWeapons}
             handleEquipment={handleEquipment}
@@ -810,7 +810,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...(inv?.weapons?.filter(w => !isItemEquipped(player, w)) || []),
+              ...(inv?.weapons || []),
             ]}
             handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
@@ -861,7 +861,7 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {formattedCustomWeapons.length > 0 && (
+        {isMainTab && formattedCustomWeapons.length > 0 && (
           <CollapsibleWeapon
             weapons={formattedCustomWeapons}
             handleEquipment={handleEquipment}
@@ -877,7 +877,7 @@ export default function PlayerEquipment({
         {!isMainTab && (
           <AllWeapon
             weapons={[
-              ...((inv?.customWeapons?.filter(w => !isItemEquipped(player, w)) || []).map(cw => formatCustomWeapon(cw)))
+              ...((inv?.customWeapons || []).map(cw => formatCustomWeapon(cw)))
             ]}
             handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
@@ -929,12 +929,12 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {equippedShields.length > 0 && (
+        {isMainTab && equippedShields.length > 0 && (
           <CollapsibleArmor armors={equippedShields} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditArmorOrShieldItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllArmor
-            armors={inv?.shields?.filter(s => !isItemEquipped(player, s)) || []}
+            armors={inv?.shields || []}
             handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -984,12 +984,12 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {equippedArmor.length > 0 && (
+        {isMainTab && equippedArmor.length > 0 && (
           <CollapsibleArmor armors={equippedArmor} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditArmorOrShieldItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllArmor
-            armors={inv?.armor?.filter(a => !isItemEquipped(player, a)) || []}
+            armors={inv?.armor || []}
             handleEquipment={handleEquipmentGuarded}
             handleDiceRoll={handleDiceRoll}
             checkIfEquippable={checkIfEquippable}
@@ -1035,12 +1035,12 @@ export default function PlayerEquipment({
             </TableHead>
           </Table>
         )}
-        {equippedAccessories.length > 0 && (
+        {isMainTab && equippedAccessories.length > 0 && (
           <CollapsibleAccessory accessorys={equippedAccessories} handleEquipment={handleEquipment} handleDiceRoll={handleDiceRoll} isMainTab={isMainTab} searchQuery={searchQuery} isEditMode={isEditMode} onEdit={handleEditAccessoryItem} equippedSlots={player.equippedSlots} />
         )}
         {!isMainTab && (
           <AllAccessory
-            accessorys={inv?.accessories?.filter(ac => !isItemEquipped(player, ac)) || []}
+            accessorys={inv?.accessories || []}
             handleEquipment={handleEquipment}
             handleDiceRoll={handleDiceRoll}
             isMainTab={isMainTab}
@@ -1824,9 +1824,13 @@ function AllWeapon({ weapons, handleEquipment, handleDiceRoll, handleSwapForm, c
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={checkIfEquippable(weapon) ? t("Equip") : t("Not proficient — martial item")} arrow>
+                  <Tooltip title={checkIfEquippable(weapon) ? t("Equip") : t("Not proficient  -  martial item")} arrow>
                     <IconButton onClick={(e) => handleEquipment(weapon, e)} aria-label="equip" size="small" sx={{ p: 0.25 }}>
-                      {checkIfEquippable(weapon) ? <RadioButtonUnchecked /> : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
+                      {weapon.isEquipped
+                        ? <RadioButtonChecked />
+                        : checkIfEquippable(weapon)
+                          ? <RadioButtonUnchecked />
+                          : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
                     </IconButton>
                   </Tooltip>
                   {weapon.isTransforming && (
@@ -2017,14 +2021,18 @@ function AllArmor({ armors, handleEquipment, checkIfEquippable, isMainTab, searc
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Tooltip title={checkIfEquippable(armor) ? t("Equip") : t("Not proficient — martial item")} arrow>
+                  <Tooltip title={checkIfEquippable(armor) ? t("Equip") : t("Not proficient  -  martial item")} arrow>
                     <IconButton
                       onClick={(e) => handleEquipment(armor, e)}
                       aria-label="equip"
                       size="small"
                       sx={{ p: 0.25 }}
                     >
-                      {checkIfEquippable(armor) ? <RadioButtonUnchecked /> : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
+                      {armor.isEquipped
+                        ? <RadioButtonChecked />
+                        : checkIfEquippable(armor)
+                          ? <RadioButtonUnchecked />
+                          : <WarningAmberIcon sx={{ color: 'warning.main', fontSize: 20 }} />}
                     </IconButton>
                   </Tooltip>
                 </StyledTableCell>
@@ -2168,7 +2176,7 @@ function AllAccessory({ accessorys, handleEquipment, handleDiceRoll, isMainTab, 
                   )}
                   <Tooltip title={t("Equip")} arrow>
                     <IconButton onClick={(e) => handleEquipment(accessory, e)} aria-label="expand row" size="small" sx={{ p: 0.25 }}>
-                      <RadioButtonUnchecked />
+                      {accessory.isEquipped ? <RadioButtonChecked /> : <RadioButtonUnchecked />}
                     </IconButton>
                   </Tooltip>
                 </StyledTableCell>

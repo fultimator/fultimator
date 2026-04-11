@@ -8,7 +8,8 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import { useTranslate } from '../../../../translation/translate';
-import { resolveEffectiveSlot, deriveVehicleSlots } from './equipmentSlots';
+import { resolveEffectiveSlot } from './equipmentSlots';
+import { equipItemToSlot, clearSlotAction } from './loadoutActions';
 import attributes from '../../../../libs/attributes';
 
 function moduleStatLine(module) {
@@ -93,7 +94,7 @@ export default function SlotPickerDialog({
     return res?.kind === 'vehicleModule';
   })();
 
-  // ─── Martial proficiency check ─────────────────────────────────────────────
+  // Martial proficiency check
 
   /**
    * Returns true if the player is proficient with the candidate item,
@@ -187,91 +188,15 @@ export default function SlotPickerDialog({
   const candidates = getCandidates();
   const currentRef = player?.equippedSlots?.[slot];
 
-  // Helper: update one source array inside equipment[0] and return a new player.
-  const patchInv = (p, source, updater) => {
-    const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
-    const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
-    return { ...p, equipment };
-  };
-
   const handleSelect = (candidate) => {
-    // Un-equip anything currently in this slot, using index when available
-    const unequipCurrent = (p) => {
-      if (!currentRef) return p;
-      return patchInv(p, currentRef.source, arr =>
-        arr.map((it, idx) => {
-          const match = currentRef.index !== undefined ? idx === currentRef.index : it.name === currentRef.name;
-          return match ? { ...it, isEquipped: false } : it;
-        })
-      );
-    };
-
-    // Equip the new item using index for precision
-    const equipNew = (p) => {
-      return patchInv(p, candidate.source, arr =>
-        arr.map((it, idx) => {
-          const match = candidate.index !== undefined ? idx === candidate.index : it.name === candidate.label;
-          return match ? { ...it, isEquipped: true } : it;
-        })
-      );
-    };
-
-    const isCustom = candidate.source === 'customWeapons';
-    const isTwoHand = isCustom || (candidate.item?.hands === 2) || (candidate.item?.isTwoHand ?? false);
-
-    // If assigning a two-handed weapon to mainHand, clear offHand too
-    const clearOffHandIfNeeded = (p) => {
-      if (slot === 'mainHand' && isTwoHand) {
-        const offRef = p.equippedSlots?.offHand;
-        if (offRef) {
-          return patchInv(p, offRef.source, arr =>
-            arr.map((it, idx) => {
-              const match = offRef.index !== undefined ? idx === offRef.index : it.name === offRef.name;
-              return match ? { ...it, isEquipped: false } : it;
-            })
-          );
-        }
-      }
-      return p;
-    };
-
-    let updated = player;
-    updated = unequipCurrent(updated);
-    updated = clearOffHandIfNeeded(updated);
-    updated = equipNew(updated);
-
-    const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
-    const newSlots = {
-      ...prevSlots,
-      [slot]: { source: candidate.source, name: candidate.label, index: candidate.index },
-      ...(slot === 'mainHand' && isTwoHand ? { offHand: null } : {}),
-    };
-
-    updated = {
-      ...updated,
-      equippedSlots: newSlots,
-      vehicleSlots: deriveVehicleSlots(updated),
-    };
-
-    setPlayer(updated);
+    setPlayer(prev => equipItemToSlot(prev, slot, candidate));
     if (otherHandHasWeaponModule) onClearOtherHandModule?.();
     onClose();
   };
 
   const handleClear = () => {
     if (!currentRef) { onClose(); return; }
-    const updated = patchInv(player, currentRef.source, arr =>
-      arr.map((it, idx) => {
-        const match = currentRef.index !== undefined ? idx === currentRef.index : it.name === currentRef.name;
-        return match ? { ...it, isEquipped: false } : it;
-      })
-    );
-    const prevSlots = updated.equippedSlots ?? { mainHand: null, offHand: null, armor: null, accessory: null };
-    setPlayer({
-      ...updated,
-      equippedSlots: { ...prevSlots, [slot]: null },
-      vehicleSlots: deriveVehicleSlots(updated),
-    });
+    setPlayer(prev => clearSlotAction(prev, slot));
     onClose();
   };
 
@@ -300,7 +225,7 @@ export default function SlotPickerDialog({
     })
     ?? null;
 
-  // Preview: last hovered (latches - no onMouseLeave so no flicker), falls back to selection
+  // Preview: last hovered (latches: no onMouseLeave so no flicker), falls back to selection
   const previewCandidate = hoveredCandidate ?? selectedCandidate ?? null;
 
   // Module preview: hovered module wins, falls back to the currently active one
@@ -317,7 +242,7 @@ export default function SlotPickerDialog({
     <>
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
         {moduleOverrideOpen ? (
-          /* ── Module override view ─────────────────────────────── */
+          /* Module override view */
           <>
             <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
               <PrecisionManufacturingIcon color="success" fontSize="small" />
@@ -404,7 +329,7 @@ export default function SlotPickerDialog({
             </DialogActions>
           </>
         ) : (
-          /* ── Regular item picker view ─────────────────────────── */
+          /* Regular item picker view */
           <>
             <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
               {t('Choose item for')}: {slotLabel}
@@ -484,7 +409,7 @@ export default function SlotPickerDialog({
                               <Box component="span" display="flex" alignItems="center" gap={0.5}>
                                 <span>{c.label}</span>
                                 {!isProficient && (
-                                  <Tooltip title={t('Not proficient — martial item')}>
+                                  <Tooltip title={t('Not proficient  -  martial item')}>
                                     <WarningAmberIcon sx={{ fontSize: 13, color: 'warning.main', verticalAlign: 'middle' }} />
                                   </Tooltip>
                                 )}

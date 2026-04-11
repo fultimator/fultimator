@@ -24,6 +24,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import LinkIcon from "@mui/icons-material/Link";
+import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -41,11 +42,14 @@ import {
   getNonStaticSpellItems,
 } from "../../routes/compendium/compendium";
 import AddToCompendiumButton from "./AddToCompendiumButton";
+import Export from "../Export";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
 import QuickCreateModal from "./QuickCreateModal";
 import { ManageModulesModal } from "../manage-modules";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import classList, { spellList } from "../../libs/classes";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
+import useDownloadImage from "../../hooks/useDownloadImage";
 
 const NPC_TYPES    = ["spells", "attacks", "special", "actions"];
 const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
@@ -90,7 +94,8 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [manageModulesOpen, setManageModulesOpen] = useState(false);
-  const [editClassItem, setEditClassItem] = useState(null);
+  const [editPackItem, setEditPackItem] = useState(null); // { item, packItemId, itemType }
+  const [deletePackItem, setDeletePackItem] = useState(null); // { item, packItemId }
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
   const [editingDescription, setEditingDescription] = useState("");
@@ -103,8 +108,8 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const [pendingNavPackId, setPendingNavPackId] = useState(null);
-
   const mainRef = useRef(null);
+  const selectedCardRef = useRef(null);
 
   useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
 
@@ -171,7 +176,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       return items;
     }
 
-    // Official mode — non-player-spells
+    // Official mode : non-player-spells
     if (selectedType !== "player-spells") {
       let items = getItems(selectedType);
       if (selectedType === "classes") {
@@ -255,6 +260,29 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   }, [selectedIdx, itemIds]);
 
   const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
+  const [downloadSelectedImage] = useDownloadImage(selectedItem?.name ?? "item", selectedCardRef);
+
+  const toSlug = (value = "") =>
+    value
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const handleShareUrl = useCallback(async () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("type", selectedType);
+    if (selectedCompendium !== "official") {
+      url.searchParams.set("compendium", selectedCompendium);
+    } else {
+      url.searchParams.delete("compendium");
+    }
+    if (selectedItem?.name) {
+      url.searchParams.set("item", toSlug(selectedItem.name));
+    }
+    await navigator.clipboard.writeText(url.toString());
+  }, [selectedType, selectedCompendium, selectedItem]);
 
   // Handlers
   const handleTypeChange = useCallback((type) => {
@@ -331,9 +359,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     setNewPackDialogOpen(false);
   }, [newPackName, createPack]);
 
-  const handleRemoveFromPack = useCallback(async (item) => {
-    if (!activePack) return;
-    await removeItem(activePack.id, item._packItemId);
+  const handleRemoveFromPack = useCallback(async (packItemId) => {
+    if (!activePack || !packItemId) return;
+    await removeItem(activePack.id, packItemId);
     setSelectedIdx(null);
   }, [activePack, removeItem]);
 
@@ -532,6 +560,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               {filteredItems.map((item, idx) => (
                 <Grid item xs={12} lg={selectedType === "classes" ? 12 : 6} key={itemIds[idx]}>
                   <Box
+                    ref={idx === selectedIdx ? selectedCardRef : null}
                     sx={{
                       borderRadius: 1,
                       outline: idx === selectedIdx
@@ -549,6 +578,33 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                   </Box>
                   {idx === selectedIdx && (
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
+                      <Tooltip title={t("Share URL")}>
+                        <IconButton size="small" onClick={handleShareUrl}>
+                          <LinkIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t("Download as Image")}>
+                        <IconButton size="small" onClick={downloadSelectedImage}>
+                          <DownloadIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Export name={item.name} dataType={selectedType} data={item} size="small" />
+                      {selectedCompendium !== "official" && item._packItemId && !activePack?.locked && VIEWER_TO_PACK_TYPE[selectedType] && (
+                        <Tooltip title={t("Edit")}>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              setEditPackItem({
+                                item,
+                                packItemId: item._packItemId,
+                                itemType: VIEWER_TO_PACK_TYPE[selectedType],
+                              })
+                            }
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       {VIEWER_TO_PACK_TYPE[selectedType] && (
                         <AddToCompendiumButton
                           itemType={VIEWER_TO_PACK_TYPE[selectedType]}
@@ -557,16 +613,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                           tooltipOverride={selectedType === "classes" && selectedCompendium === "official" ? t("Clone to Custom") : undefined}
                         />
                       )}
-                      {selectedCompendium !== "official" && selectedType === "classes" && item._packItemId && !activePack?.locked && (
-                        <Tooltip title={t("Edit Class")}>
-                          <IconButton size="small" onClick={() => setEditClassItem({ item, packItemId: item._packItemId })}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
                       {selectedCompendium !== "official" && item._packItemId && !activePack?.locked && (
                         <Tooltip title={t("Remove from pack")}>
-                          <IconButton size="small" color="error" onClick={() => handleRemoveFromPack(item)}>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => setDeletePackItem({ item, packItemId: item._packItemId })}
+                          >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
@@ -646,17 +699,39 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         />
       )}
 
-      {/* Edit class dialog */}
-      {activePack && editClassItem && (
+      {/* Edit pack item dialog */}
+      {activePack && editPackItem && (
         <CompendiumItemCreateDialog
-          open={Boolean(editClassItem)}
-          onClose={() => setEditClassItem(null)}
-          itemType="class"
+          open={Boolean(editPackItem)}
+          onClose={() => setEditPackItem(null)}
+          itemType={editPackItem.itemType}
           packId={activePack.id}
-          editData={editClassItem.item}
-          editItemId={editClassItem.packItemId}
+          editData={editPackItem.item}
+          editItemId={editPackItem.packItemId}
         />
       )}
+
+      <DeleteConfirmationDialog
+        open={Boolean(deletePackItem)}
+        onClose={() => setDeletePackItem(null)}
+        onConfirm={async () => {
+          if (!deletePackItem?.packItemId) return;
+          await handleRemoveFromPack(deletePackItem.packItemId);
+          setDeletePackItem(null);
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to remove this item from the pack?")}
+        itemPreview={
+          deletePackItem?.item ? (
+            <Box>
+              <Typography variant="h4">{deletePackItem.item.name}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t(selectedType)}
+              </Typography>
+            </Box>
+          ) : null
+        }
+      />
 
       {/* New Pack dialog */}
       <Dialog

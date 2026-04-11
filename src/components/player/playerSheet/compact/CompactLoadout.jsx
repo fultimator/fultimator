@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, ButtonBase, Collapse, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid,
@@ -16,11 +16,20 @@ import { SwapHoriz } from '@mui/icons-material';
 import { useTranslate } from '../../../../translation/translate';
 import { useCustomTheme } from '../../../../hooks/useCustomTheme';
 import {
-  resolveEffectiveSlot, isItemEquipped, isTwoHandedEquipped,
-  getActiveVehicle, syncSlots, deriveVehicleSlots,
+  resolveEffectiveSlot,
+  getActiveVehicle,
 } from '../../equipment/slots/equipmentSlots';
-import { availableFrames } from '../../../../libs/pilotVehicleData';
-import { getModuleTypeForLimits } from '../../spells/vehicleReducer';
+import {
+  getSlotLocks,
+  getEquippedModulesForSlot,
+  getEquippedModuleForSlot,
+  getVehicleModuleUsage,
+  getEquippedSupportModules,
+  getSupportSlots,
+  getAuxHandItem,
+  getPilotSpellInfo,
+} from '../../equipment/slots/loadoutSelectors';
+import { useLoadoutStore } from '../../../../store/playerLoadoutStore';
 import { calculateAttribute, calculateCustomWeaponStats } from '../../common/playerCalculations';
 import attributes from '../../../../libs/attributes';
 import SlotPickerDialog from '../../equipment/slots/SlotPickerDialog';
@@ -85,7 +94,10 @@ export default function CompactLoadout({
   const [rollDialog, setRollDialog] = useState(null);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
 
-  // ─── Attributes ──────────────────────────────────────────────────────────────
+  const store = useLoadoutStore();
+  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+
+  // Attributes
   const getAttrDie = (key) => {
     const normKey = key === 'will' ? 'willpower' : key;
     const base = player?.attributes?.[normKey] ?? 8;
@@ -98,187 +110,32 @@ export default function CompactLoadout({
     return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
   };
 
-  // ─── Vehicle ─────────────────────────────────────────────────────────────────
+  // Vehicle / selectors
   const activeVehicle = getActiveVehicle(player);
   const vs = player?.vehicleSlots;
-  const inv = player?.equipment?.[0] ?? {};
 
-  const vehicleModuleUsage = activeVehicle ? (() => {
-    const frame = availableFrames.find(f => f.name === activeVehicle.frame) ?? { limits: { weapon: 2, armor: 1, support: -1 } };
-    const counts = { weapon: 0, armor: 0, support: 0 };
-    for (const m of activeVehicle.modules ?? []) {
-      if (!m.equipped) continue;
-      const type = getModuleTypeForLimits(m);
-      if (type === 'custom') continue;
-      counts[type] += (type === 'support' && m.isComplex) ? 2 : 1;
-    }
-    return { counts, limits: frame.limits };
-  })() : null;
+  const vehicleModuleUsage = getVehicleModuleUsage(player);
+  const pilotSpellInfo = getPilotSpellInfo(player);
+  const equippedSupportModules = getEquippedSupportModules(player);
+  const supportSlots = getSupportSlots(player);
+  const auxHandItem = getAuxHandItem(player);
+  const { mainHandLocked, offHandLocked } = getSlotLocks(player);
 
-  const pilotSpellInfo = (() => {
-    for (const [ci, cls] of (player?.classes ?? []).entries()) {
-      for (const [si, spell] of (cls.spells ?? []).entries()) {
-        if (spell.spellType === 'pilot-vehicle') return { spell, classIndex: ci, spellIndex: si };
-      }
-    }
-    return null;
-  })();
-
-  const updateActiveVehicleModules = (updaterFn) => {
-    if (!pilotSpellInfo || !activeVehicle) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : {
-              ...s,
-              vehicles: s.vehicles.map(v =>
-                !v.enabled ? v : { ...v, modules: updaterFn(v.modules ?? []) }
-              ),
-            }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
-  };
-
-  const getEquippedModulesForSlot = (slot) => {
-    if (!activeVehicle) return [];
-    return (activeVehicle.modules ?? [])
-      .map((m, originalIndex) => ({ ...m, originalIndex }))
-      .filter(m => {
-        if (!m.equipped) return false;
-        if (slot === 'armor') return m.type === 'pilot_module_armor';
-        if (['mainHand', 'offHand'].includes(slot)) return m.type === 'pilot_module_weapon';
-        return false;
-      });
-  };
-
-  const getEquippedModuleForSlot = (slot) => {
-    const mods = getEquippedModulesForSlot(slot);
-    return mods.find(m => {
-      if (slot === 'armor')    return m.equippedSlot === 'armor';
-      if (slot === 'mainHand') return m.equippedSlot === 'main' || m.equippedSlot === 'both';
-      if (slot === 'offHand')  return m.equippedSlot === 'off'  || m.equippedSlot === 'both';
-      return false;
-    }) || mods[0] || null;
-  };
-
-  const setActiveModuleForSlot = (slot, moduleIndex) => {
-    updateActiveVehicleModules(modules => {
-      const targetSlot = slot === 'armor' ? 'armor' : (slot === 'mainHand' ? 'main' : 'off');
-      const targetModule = modules[moduleIndex];
-      if (!targetModule) return modules;
-      return modules.map((m, idx) => {
-        if (!m.equipped) return m;
-        const isTarget = idx === moduleIndex;
-        const isCorrectType =
-          (slot === 'armor' && m.type === 'pilot_module_armor') ||
-          (['mainHand', 'offHand'].includes(slot) && m.type === 'pilot_module_weapon');
-        if (!isCorrectType) return m;
-        if (isTarget) {
-          return { ...m, enabled: true, equippedSlot: m.cumbersome ? 'both' : targetSlot };
-        }
-        const takingMain = targetSlot === 'main' || targetModule.cumbersome;
-        const takingOff  = targetSlot === 'off'  || targetModule.cumbersome;
-        const wasInMain  = m.equippedSlot === 'main' || m.equippedSlot === 'both';
-        const wasInOff   = m.equippedSlot === 'off'  || m.equippedSlot === 'both';
-        if ((takingMain && wasInMain) || (takingOff && wasInOff)) return { ...m, enabled: false };
-        return m;
-      });
-    });
-  };
-
-  const setModuleEnabledForSlot = (slot, enabled) => {
-    updateActiveVehicleModules(modules => modules.map(m => {
-      if (!m.equipped) return m;
-      const matches =
-        (slot === 'armor'    && m.type === 'pilot_module_armor') ||
-        (slot === 'mainHand' && m.type === 'pilot_module_weapon' && (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
-        (slot === 'offHand'  && m.type === 'pilot_module_weapon' && (m.equippedSlot === 'off'  || m.equippedSlot === 'both'));
-      return matches ? { ...m, enabled } : m;
-    }));
-  };
-
-  const equippedSupportModules = activeVehicle
-    ? (activeVehicle.modules ?? [])
-        .map((m, i) => ({ ...m, originalIndex: i }))
-        .filter(m => m.equipped && m.type === 'pilot_module_support')
-    : [];
-
-  const toggleSupportModule = (moduleIndex) => {
-    updateActiveVehicleModules(modules =>
-      modules.map((m, idx) => idx === moduleIndex ? { ...m, enabled: !m.enabled } : m)
-    );
-  };
-
-  // Support slots — deduplicate complex modules
-  const supportSlots = (() => {
-    if (!vs?.support?.length) return [];
-    const seen = new Set();
-    return vs.support.map(ref => {
-      if (!ref) return null;
-      const key = `${ref.vehicleName}|${ref.moduleName}`;
-      if (seen.has(key)) return null;
-      seen.add(key);
-      const module = activeVehicle?.modules.find(m => m.name === ref.moduleName && m.enabled) ?? null;
-      return { ref, module };
-    }).filter(Boolean);
-  })();
-
-  // ─── Slot click routing ───────────────────────────────────────────────────────
+  // Slot click routing
   const handleSlotClick = (slot) => {
-    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(slot));
+    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(player, slot));
     setPickerOpenModuleOverride(hasModule);
     setPickerSlot(slot);
   };
 
-  // ─── Vehicle handlers ─────────────────────────────────────────────────────────
-  const handleToggleVehicle = () => {
-    if (!pilotSpellInfo) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const spell = prev.classes[classIndex].spells[spellIndex];
-      const vehicles = (spell.vehicles ?? []).map((v, vi) =>
-        activeVehicle ? { ...v, enabled: false } : { ...v, enabled: vi === 0 }
-      );
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : { ...s, vehicles }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
-  };
-
+  // Vehicle handlers
+  const handleToggleVehicle = () => { store.toggleVehicle(); };
   const handleSaveVehicles = (_, updatedPilot) => {
-    if (!pilotSpellInfo) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : {
-              ...s,
-              vehicles: updatedPilot.vehicles,
-              showInPlayerSheet: updatedPilot.showInPlayerSheet,
-            }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
+    store.saveVehicles(updatedPilot);
     setVehicleModalOpen(false);
   };
 
-  // ─── Roll ─────────────────────────────────────────────────────────────────────
+  // Roll
   const handleRollSlot = (slot) => {
     const resolved = slot === 'aux'
       ? (auxHandItem ? { kind: 'playerItem', item: auxHandItem } : null)
@@ -322,52 +179,11 @@ export default function CompactLoadout({
     });
   };
 
-  // ─── Swap (Transforming weapon) ───────────────────────────────────────────────
-  const handleSwapSlot = (slot) => {
-    const resolved = resolveEffectiveSlot(player, slot);
-    if (!hasTransforming(resolved)) return;
-    const item = resolved.item;
-    setPlayer(prev => {
-      const customWeapons = (prev.equipment?.[0]?.customWeapons ?? []).map(cw =>
-        cw.name === item.name
-          ? { ...cw, activeForm: cw.activeForm === 'secondary' ? 'primary' : 'secondary' }
-          : cw
-      );
-      return syncSlots({ ...prev, equipment: [{ ...prev.equipment[0], customWeapons }] });
-    });
-  };
+  // Swap (Transforming weapon)
+  const handleSwapSlot = (slot) => { store.swapForm(slot); };
 
-  // ─── Twin Shields aux hand ────────────────────────────────────────────────────
-  const hasDualShieldBearer = (player?.classes ?? []).some(cls =>
-    (cls.skills ?? []).some(sk => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1)
-  );
-  const equippedShieldsCount = (player?.equipment?.[0]?.shields ?? [])
-    .filter(s => isItemEquipped(player, s)).length;
-  const defensiveMasteryBonus = (player?.classes ?? [])
-    .flatMap(cls => cls.skills ?? [])
-    .filter(sk => sk.specialSkill === 'Defensive Mastery')
-    .reduce((sum, sk) => sum + (sk.currentLvl ?? 0), 0);
-  const auxHandItem = (hasDualShieldBearer && equippedShieldsCount >= 2)
-    ? { name: 'Twin Shields', att1: 'might', att2: 'might', damage: 5 + defensiveMasteryBonus, prec: 0, type: 'physical', hands: 2, melee: true }
-    : null;
-
-  // ─── Lock logic (mirrors PlayerLoadout) ──────────────────────────────────────
   const mainHandResolved = resolveEffectiveSlot(player, 'mainHand');
   const offHandResolved  = resolveEffectiveSlot(player, 'offHand');
-
-  const mainHandLocked = (() => {
-    if (offHandResolved?.kind === 'vehicleModule' && !getEquippedModuleForSlot('mainHand')) return true;
-    return false;
-  })();
-
-  const offHandLocked = (() => {
-    if (mainHandResolved?.kind === 'vehicleModule') {
-      if (mainHandResolved.module.cumbersome) return true;
-      if (!getEquippedModuleForSlot('offHand')) return true;
-      return false;
-    }
-    return isTwoHandedEquipped(player);
-  })();
 
   const allSlots = [
     { slot: 'mainHand',  resolved: mainHandResolved,                        locked: mainHandLocked, isAux: false },
@@ -415,7 +231,7 @@ export default function CompactLoadout({
         {allSlots.map(({ slot, resolved, locked, isAux }) => {
           const isEmpty = !resolved;
           const isVehicle = resolved?.kind === 'vehicleModule';
-          const hasModule = !isAux && !!getEquippedModuleForSlot(slot);
+          const hasModule = !isAux && !!getEquippedModuleForSlot(player, slot);
           const clickable = !isAux && !locked && isEditMode && !!setPlayer;
           const showRoll = (slot === 'mainHand' || slot === 'offHand' || slot === 'aux') && !locked && isWeaponResolved(resolved);
           const showSwap = (slot === 'mainHand' || slot === 'offHand') && hasTransforming(resolved);
@@ -542,13 +358,13 @@ export default function CompactLoadout({
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
-          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(pickerSlot) : []}
-          onSelectModule={(idx) => setActiveModuleForSlot(pickerSlot, idx)}
-          onDisableModule={() => setModuleEnabledForSlot(pickerSlot, false)}
+          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(player, pickerSlot) : []}
+          onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
+          onDisableModule={() => store.disableModule(pickerSlot)}
           openModuleOverride={pickerOpenModuleOverride}
           onClearOtherHandModule={
             activeVehicle && ['mainHand', 'offHand'].includes(pickerSlot)
-              ? () => setModuleEnabledForSlot(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand', false)
+              ? () => store.disableModule(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand')
               : undefined
           }
         />
@@ -569,7 +385,7 @@ export default function CompactLoadout({
               <List dense>
                 {equippedSupportModules.map((m) => (
                   <ListItem key={m.originalIndex} disablePadding>
-                    <ListItemButton onClick={() => toggleSupportModule(m.originalIndex)}>
+                    <ListItemButton onClick={() => store.toggleSupportModule(m.originalIndex)}>
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <Checkbox edge="start" checked={m.enabled ?? false} disableRipple size="small" color="success" />
                       </ListItemIcon>

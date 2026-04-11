@@ -119,7 +119,7 @@ export default function PlayerEdit() {
   let params = useParams(); // URL parameters hook
 
   // UUIDs (crypto.randomUUID) come from IDB on both web and desktop.
-  // Firestore auto-IDs are 20-char alphanumeric - never match the UUID pattern.
+  // Firestore auto-IDs are 20-char alphanumeric: never match the UUID pattern.
   const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);
 
   const localDb = useDatabase("local");
@@ -131,7 +131,7 @@ export default function PlayerEdit() {
 
   const { cloudUser: user } = useDatabaseContext();
 
-  // Single hook call - both adapters are always instantiated so this is unconditionally stable.
+  // Single hook call: both adapters are always instantiated so this is unconditionally stable.
   const [player] = db.useDocumentData(ref);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
@@ -361,7 +361,7 @@ export default function PlayerEdit() {
           ipBonus += prevPlayer.modifiers.ip || 0;
         }
 
-        // Guardian - Fortress Skill Bonus
+        // Guardian: Fortress Skill Bonus
         const fortressBonus = prevPlayer.classes
           .map((cls) => cls.skills)
           .flat()
@@ -370,7 +370,7 @@ export default function PlayerEdit() {
           .reduce((a, b) => a + b, 0);
         hpBonus += fortressBonus;
 
-        // Loremaster - Focused Skill Bonus
+        // Loremaster: Focused Skill Bonus
         const focusedBonus = prevPlayer.classes
           .map((cls) => cls.skills)
           .flat()
@@ -451,7 +451,7 @@ export default function PlayerEdit() {
     quirks: settings.optionalRules?.quirks ?? false,
     campActivities: settings.optionalRules?.campActivities ?? false,
     zeroPower: settings.optionalRules?.zeroPower ?? false,
-    technospheres: settings.optionalRules?.technospheres ?? true,
+    technospheres: settings.optionalRules?.technospheres ?? false,
   };
   const specialSkillOverrides = settings.specialSkillOverrides ?? {};
 
@@ -616,7 +616,7 @@ export default function PlayerEdit() {
           </TabsList>
         )}
 
-        {/* Compact View Toggle - only show when on Player Sheet tab */}
+        {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
             <Grid item xs={isSmallScreen ? 10 : 6}>

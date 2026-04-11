@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyWeapon from "./PrettyWeapon";
-import { Edit, Error } from "@mui/icons-material";
+import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
@@ -197,9 +197,13 @@ export default function PlayerWeapons({
                           </Badge>
                         </Tooltip>
                       ) : (
-                        <Tooltip title={t("Not Equippable")}>
-                          <IconButton size="small">
-                            <Error color="error" fontSize="small" />
+                        <Tooltip title={t("Not proficient  -  martial item")}>
+                          <IconButton
+                            onClick={(e) => handleEquipClick(e, index)}
+                            disabled={!isEditMode}
+                            size="small"
+                          >
+                            <WarningAmber color="warning" fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       )}

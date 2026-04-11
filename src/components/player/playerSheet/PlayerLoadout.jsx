@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Paper, Grid, Typography, Card, CardActionArea, CardContent,
   Box, Chip, Divider, Tooltip, Button, Checkbox, IconButton,
@@ -16,14 +16,22 @@ import { SwapHoriz } from '@mui/icons-material';
 import { useTranslate } from '../../../translation/translate';
 import { useCustomTheme } from '../../../hooks/useCustomTheme';
 import attributes from '../../../libs/attributes';
-import { resolveEffectiveSlot, getActiveVehicle, syncSlots, isItemEquipped } from '../equipment/slots/equipmentSlots';
-import { availableFrames } from '../../../libs/pilotVehicleData';
-import { getModuleTypeForLimits } from '../spells/vehicleReducer';
+import { resolveEffectiveSlot, getActiveVehicle, isItemEquipped } from '../equipment/slots/equipmentSlots';
 import { calculateAttribute, calculateCustomWeaponStats } from '../common/playerCalculations';
+import {
+  getSlotLocks,
+  getEquippedModulesForSlot,
+  getEquippedModuleForSlot,
+  getVehicleModuleUsage,
+  getEquippedSupportModules,
+  getSupportSlots,
+  getAuxHandItem,
+} from '../equipment/slots/loadoutSelectors';
+import { useLoadoutStore } from '../../../store/playerLoadoutStore';
 import SlotPickerDialog from '../equipment/slots/SlotPickerDialog';
 import SpellPilotVehiclesModal from '../spells/SpellPilotVehiclesModal';
 
-// ─── Stat line helpers ────────────────────────────────────────────────────────
+// Stat line helpers
 
 function weaponStatLine(item) {
   if (!item) return '-';
@@ -62,7 +70,7 @@ function moduleStatLine(module) {
   return module.description ? module.description.slice(0, 40) : '-';
 }
 
-// ─── SlotCard ─────────────────────────────────────────────────────────────────
+// SlotCard
 
 function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onRoll, onSwap, isAux }) {
   const { t } = useTranslate();
@@ -83,7 +91,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
     if (!resolved) return null;
     if (isVehicle) return moduleStatLine(resolved.module);
     const item = resolved.item;
-    // Custom weapon - respect active form
+    // Custom weapon: respect active form
     if ('accuracyCheck' in item) {
       const isSecondary = item.activeForm === 'secondary';
       const acc = isSecondary ? item.secondSelectedAccuracyCheck : item.accuracyCheck;
@@ -200,7 +208,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
   );
 }
 
-// ─── VehicleSupportCard ───────────────────────────────────────────────────────
+// VehicleSupportCard
 
 function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
   const { t } = useTranslate();
@@ -245,7 +253,7 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
   );
 }
 
-// ─── PlayerLoadout ────────────────────────────────────────────────────────────
+// PlayerLoadout
 
 export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharacterSheet, isOwner }) {
   const { t } = useTranslate();
@@ -258,23 +266,15 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
-  const [rollDialog, setRollDialog] = useState(null); // { r1,r2,die1,die2,att1,att2,prec,damage,type,accuracy,damageRoll,isCritSuccess,isCritFail,slot }
+  const [rollDialog, setRollDialog] = useState(null);
 
-  // ─── Aux hand (Twin Shields and similar auto-generated items) ─────────────────
-  const hasDualShieldBearer = (player?.classes ?? []).some(cls =>
-    (cls.skills ?? []).some(sk => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1)
-  );
-  const equippedShieldsCount = (player?.equipment?.[0]?.shields ?? [])
-    .filter(s => isItemEquipped(player, s)).length;
-  const defensiveMasteryBonus = (player?.classes ?? [])
-    .flatMap(cls => cls.skills ?? [])
-    .filter(sk => sk.specialSkill === 'Defensive Mastery')
-    .reduce((sum, sk) => sum + (sk.currentLvl ?? 0), 0);
-  const auxHandItem = (hasDualShieldBearer && equippedShieldsCount >= 2)
-    ? { name: 'Twin Shields', att1: 'might', att2: 'might', damage: 5 + defensiveMasteryBonus, prec: 0, type: 'physical', hands: 2, melee: true }
-    : null;
+  const store = useLoadoutStore();
+  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
 
-  // ─── Roll ─────────────────────────────────────────────────────────────────────
+  // Shared selectors
+  const auxHandItem = getAuxHandItem(player);
+
+  // Roll
   const getAttrDie = (key) => {
     const normKey = key === 'will' ? 'willpower' : key;
     const base = player?.attributes?.[normKey] ?? 8;
@@ -305,7 +305,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       att2 = item.att2 ?? item.accuracyCheck?.att2;
       if (!att1 || !att2) return;
       if ('accuracyCheck' in item) {
-        // Custom weapon - derive stats from customizations
+        // Custom weapon: derive stats from customizations
         const isSecondary = item.activeForm === 'secondary';
         const stats = calculateCustomWeaponStats(item, isSecondary);
         prec = stats.precision;
@@ -331,95 +331,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
     });
   };
 
-  const handleSwapSlot = (slot) => {
-    const resolved = resolveEffectiveSlot(player, slot);
-    if (resolved?.kind !== 'playerItem' || !resolved.item?.customizations?.some(c => c.name === 'weapon_customization_transforming')) return;
-
-    const item = resolved.item;
-    setPlayer(prev => {
-      const customWeapons = (prev.equipment?.[0]?.customWeapons ?? []).map(cw => {
-        if (cw.name === item.name) {
-          return { ...cw, activeForm: cw.activeForm === 'secondary' ? 'primary' : 'secondary' };
-        }
-        return cw;
-      });
-      const equipment = [{ ...prev.equipment[0], customWeapons }];
-      return syncSlots({ ...prev, equipment });
-    });
-  };
+  const handleSwapSlot = (slot) => { store.swapForm(slot); };
 
   const mainHandResolved  = resolveEffectiveSlot(player, 'mainHand');
   const offHandResolved   = resolveEffectiveSlot(player, 'offHand');
   const armorResolved     = resolveEffectiveSlot(player, 'armor');
   const accessoryResolved = resolveEffectiveSlot(player, 'accessory');
 
-  const inv = player?.equipment?.[0] || {};
-
   const activeVehicle = getActiveVehicle(player);
   const vs = player?.vehicleSlots;
 
-  const vehicleModuleUsage = activeVehicle ? (() => {
-    const frame = availableFrames.find(f => f.name === activeVehicle.frame) ?? { limits: { weapon: 2, armor: 1, support: -1 } };
-    const counts = { weapon: 0, armor: 0, support: 0 };
-    for (const m of activeVehicle.modules ?? []) {
-      if (!m.equipped) continue;
-      const type = getModuleTypeForLimits(m);
-      if (type === 'custom') continue;
-      counts[type] += (type === 'support' && m.isComplex) ? 2 : 1;
-    }
-    return { counts, limits: frame.limits };
-  })() : null;
-
-  // Return all equipped modules for a loadout slot's type, including their original index.
-  const getEquippedModulesForSlot = (slot) => {
-    if (!activeVehicle) return [];
-    return (activeVehicle.modules ?? [])
-      .map((m, originalIndex) => ({ ...m, originalIndex }))
-      .filter(m => {
-        if (!m.equipped) return false;
-        if (slot === 'armor')    return m.type === 'pilot_module_armor';
-        if (['mainHand', 'offHand'].includes(slot)) return m.type === 'pilot_module_weapon';
-        return false;
-      });
-  };
-
-  // Shortcut for single module check (compatibility with existing code)
-  const getEquippedModuleForSlot = (slot) => {
-    const mods = getEquippedModulesForSlot(slot);
-    return mods.find(m => {
-      if (slot === 'armor')    return m.equippedSlot === 'armor';
-      if (slot === 'mainHand') return m.equippedSlot === 'main' || m.equippedSlot === 'both';
-      if (slot === 'offHand')  return m.equippedSlot === 'off'  || m.equippedSlot === 'both';
-      return false;
-    }) || mods[0] || null;
-  };
-
-  // Main hand is locked if off hand has a module and no modules are available for main hand
-  const mainHandLocked = (() => {
-    if (offHandResolved?.kind === 'vehicleModule' && !getEquippedModuleForSlot('mainHand')) {
-      return true;
-    }
-    return false;
-  })();
-
-  // Off hand is locked when main hand holds a two-handed item (player or vehicle)
-  // OR when main hand has a module and no modules are available for off hand
-  const offHandLocked = (() => {
-    // Check vehicle override first
-    if (mainHandResolved?.kind === 'vehicleModule') {
-      if (mainHandResolved.module.cumbersome) return true;
-      if (!getEquippedModuleForSlot('offHand')) return true;
-      return false;
-    }
-    // Fallback to player item
-    const ref = player?.equippedSlots?.mainHand;
-    if (!ref) return false;
-    if (ref.source === 'customWeapons') return true;
-    const w = inv?.weapons?.find(x => x.name === ref.name);
-    return w?.hands === 2 || w?.isTwoHand || false;
-  })();
-
-  // Find pilot spell info (classIndex + spellIndex needed for saves)
+  const vehicleModuleUsage = getVehicleModuleUsage(player);
+  const equippedSupportModules = getEquippedSupportModules(player);
+  const supportSlots = getSupportSlots(player);
+  const { mainHandLocked, offHandLocked } = getSlotLocks(player);
   const pilotSpellInfo = (() => {
     for (const [ci, cls] of (player.classes ?? []).entries()) {
       for (const [si, spell] of (cls.spells ?? []).entries()) {
@@ -429,159 +354,21 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
     return null;
   })();
 
-  // Update modules on the currently active vehicle
-  const updateActiveVehicleModules = (updaterFn) => {
-    if (!pilotSpellInfo || !activeVehicle) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : {
-              ...s,
-              vehicles: s.vehicles.map(v =>
-                !v.enabled ? v : { ...v, modules: updaterFn(v.modules ?? []) }
-              ),
-            }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
-  };
-
-  const setActiveModuleForSlot = (slot, moduleIndex) => {
-    updateActiveVehicleModules(modules => {
-      const targetSlot = slot === 'armor' ? 'armor' : (slot === 'mainHand' ? 'main' : 'off');
-      const targetModule = modules[moduleIndex];
-      if (!targetModule) return modules;
-
-      return modules.map((m, idx) => {
-        if (!m.equipped) return m;
-
-        const isTarget = idx === moduleIndex;
-        const mType = m.type;
-        const isCorrectType =
-          (slot === 'armor' && mType === 'pilot_module_armor') ||
-          (['mainHand', 'offHand'].includes(slot) && mType === 'pilot_module_weapon');
-
-        if (!isCorrectType) return m;
-
-        if (isTarget) {
-          const newSlot = m.cumbersome ? 'both' : targetSlot;
-          return { ...m, enabled: true, equippedSlot: newSlot };
-        } else {
-          // Disable other modules that would collide with the newly enabled one
-          const takingMain = targetSlot === 'main' || targetModule.cumbersome;
-          const takingOff = targetSlot === 'off' || targetModule.cumbersome;
-
-          const wasInMain = m.equippedSlot === 'main' || m.equippedSlot === 'both';
-          const wasInOff = m.equippedSlot === 'off' || m.equippedSlot === 'both';
-
-          if ((takingMain && wasInMain) || (takingOff && wasInOff)) {
-            return { ...m, enabled: false };
-          }
-          return m;
-        }
-      });
-    });
-  };
-
-  const setModuleEnabledForSlot = (slot, enabled) => {
-    updateActiveVehicleModules(modules => modules.map(m => {
-      if (!m.equipped) return m;
-      const matches =
-        (slot === 'armor'    && m.type === 'pilot_module_armor') ||
-        (slot === 'mainHand' && m.type === 'pilot_module_weapon' && (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
-        (slot === 'offHand'  && m.type === 'pilot_module_weapon' && (m.equippedSlot === 'off'  || m.equippedSlot === 'both'));
-      return matches ? { ...m, enabled } : m;
-    }));
-  };
-
-  // All support modules that are physically installed on the active vehicle
-  const equippedSupportModules = activeVehicle
-    ? (activeVehicle.modules ?? [])
-        .map((m, i) => ({ ...m, originalIndex: i }))
-        .filter(m => m.equipped && m.type === 'pilot_module_support')
-    : [];
-
-  const toggleSupportModule = (moduleIndex) => {
-    updateActiveVehicleModules(modules =>
-      modules.map((m, idx) =>
-        idx === moduleIndex ? { ...m, enabled: !m.enabled } : m
-      )
-    );
-  };
-
-  // Toggle vehicle enabled state (enter = enable first vehicle, exit = disable active)
-  const handleToggleVehicle = () => {
-    if (!pilotSpellInfo) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const spell = prev.classes[classIndex].spells[spellIndex];
-      const vehicles = (spell.vehicles ?? []).map((v, vi) =>
-        activeVehicle ? { ...v, enabled: false } : { ...v, enabled: vi === 0 }
-      );
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : { ...s, vehicles }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
-  };
-
+  const handleToggleVehicle = () => { store.toggleVehicle(); };
   const handleSaveVehicles = (_, updatedPilot) => {
-    if (!pilotSpellInfo) return;
-    const { classIndex, spellIndex } = pilotSpellInfo;
-    setPlayer(prev => {
-      const classes = prev.classes.map((cls, ci) =>
-        ci !== classIndex ? cls : {
-          ...cls,
-          spells: cls.spells.map((s, si) =>
-            si !== spellIndex ? s : {
-              ...s,
-              vehicles: updatedPilot.vehicles,
-              showInPlayerSheet: updatedPilot.showInPlayerSheet,
-            }
-          ),
-        }
-      );
-      return syncSlots({ ...prev, classes });
-    });
+    store.saveVehicles(updatedPilot);
     setVehicleModalOpen(false);
   };
 
-  // Slot click: open picker, starting on module override view if slot already has an active module
   const handleSlotClick = (slot) => {
-    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(slot));
+    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(player, slot));
     setPickerOpenModuleOverride(hasModule);
     setPickerSlot(slot);
   };
 
-  const resolveVehicleModule = (ref) => {
-    if (!ref || !activeVehicle) return null;
-    return activeVehicle.modules.find(m => m.name === ref.moduleName && m.enabled) ?? null;
-  };
-
-  const vehicleAccessoryModule = vs?.accessory ? resolveVehicleModule(vs.accessory) : null;
-
-  // Support slots - deduplicate consecutive same-module refs (complex modules)
-  const supportSlots = (() => {
-    if (!vs?.support?.length) return [];
-    const seen = new Set();
-    return vs.support.map(ref => {
-      if (!ref) return { ref: null, module: null };
-      const key = `${ref.vehicleName}|${ref.moduleName}`;
-      if (seen.has(key)) return null;
-      seen.add(key);
-      return { ref, module: resolveVehicleModule(ref) };
-    }).filter(Boolean);
-  })();
+  const vehicleAccessoryModule = vs?.accessory
+    ? activeVehicle?.modules.find(m => m.name === vs.accessory.moduleName && m.enabled) ?? null
+    : null;
 
   const slotCards = [
     { slot: 'mainHand',  label: t('Main Hand'),  resolved: mainHandResolved,  locked: mainHandLocked },
@@ -632,7 +419,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
 
       <Box sx={{ p: 1.5, flexGrow: 1 }}>
 
-        {/* Vehicle enter/exit + swap - shown when a pilot-vehicle spell exists */}
+        {/* Vehicle enter/exit + swap: shown when a pilot-vehicle spell exists */}
         {(isOwner || isEditMode) && pilotSpellInfo && (
           
           <>
@@ -675,7 +462,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 resolved={resolved}
                 locked={locked}
                 isEditMode={canClickSlot}
-                hasModule={!!getEquippedModuleForSlot(slot)}
+                hasModule={!!getEquippedModuleForSlot(player, slot)}
                 onClick={() => handleSlotClick(slot)}
                 onRoll={(slot === 'mainHand' || slot === 'offHand') ? () => handleRollSlot(slot) : undefined}
                 onSwap={(slot === 'mainHand' || slot === 'offHand') ? () => handleSwapSlot(slot) : undefined}
@@ -818,13 +605,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
-          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(pickerSlot) : []}
-          onSelectModule={(idx) => setActiveModuleForSlot(pickerSlot, idx)}
-          onDisableModule={() => setModuleEnabledForSlot(pickerSlot, false)}
+          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(player, pickerSlot) : []}
+          onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
+          onDisableModule={() => store.disableModule(pickerSlot)}
           openModuleOverride={pickerOpenModuleOverride}
           onClearOtherHandModule={
             activeVehicle && ['mainHand', 'offHand'].includes(pickerSlot)
-              ? () => setModuleEnabledForSlot(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand', false)
+              ? () => store.disableModule(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand')
               : undefined
           }
         />
@@ -854,7 +641,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
               <List dense>
                 {equippedSupportModules.map((m) => (
                   <ListItem key={m.originalIndex} disablePadding>
-                    <ListItemButton onClick={() => toggleSupportModule(m.originalIndex)}>
+                    <ListItemButton onClick={() => store.toggleSupportModule(m.originalIndex)}>
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <Checkbox
                           edge="start"

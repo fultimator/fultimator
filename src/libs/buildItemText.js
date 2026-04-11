@@ -3,9 +3,9 @@ import attributes from "./attributes";
 import types from "./types";
 import { calcHP, calcMP, calcInit, calcDef, calcMDef, calcDamage, calcPrecision, calcMagic } from "./npcs";
 
-// ---------------------------------------------------------------------------
+// 
 // Helpers
-// ---------------------------------------------------------------------------
+// 
 
 const ATTR_SHORT = {
   dexterity: "DEX",
@@ -82,9 +82,9 @@ function formatNpcAffinities(affinities, md) {
   return parts.length ? `${b("Affinities:")} ${parts.join(", ")}` : null;
 }
 
-// ---------------------------------------------------------------------------
+// 
 // NPC text formatter
-// ---------------------------------------------------------------------------
+// 
 
 function buildNpcText(npc, md) {
   const b = (s) => (md ? `**${s}**` : s);
@@ -125,7 +125,7 @@ function buildNpcText(npc, md) {
     const lines = allAttacks.map((atk) => {
       const rangeIcon = atk.range === "distance" ? "[Ranged]" : "[Melee]";
       const desc = formatAttackDesc(atk, npc, md);
-      return `${rangeIcon} ${b(atk.name)} — ${desc}`;
+      return `${rangeIcon} ${b(atk.name)}  -  ${desc}`;
     });
     parts.push(`${h2("Basic Attacks")}\n${lines.join("\n")}`);
   }
@@ -140,9 +140,9 @@ function buildNpcText(npc, md) {
         const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
         const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
-        header += ` (Offensive) — ${b(`[${a1} + ${a2}]${magicStr}`)} — ${spell.mp} MP — ${spell.target} — ${spell.duration}`;
+        header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
       } else {
-        header += ` — ${spell.mp} MP — ${spell.target} — ${spell.duration}`;
+        header += `  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
       }
       return `${header}\n${spell.effect ?? ""}`;
     });
@@ -164,9 +164,9 @@ function buildNpcText(npc, md) {
   return parts.join("\n\n");
 }
 
-// ---------------------------------------------------------------------------
+// 
 // NPC → Obsidian fu-vault formatter
-// ---------------------------------------------------------------------------
+// 
 
 function buildNpcObsidian(npc) {
   const rank = npc.rank || "soldier";
@@ -207,7 +207,7 @@ function buildNpcObsidian(npc) {
     }
   }
 
-  // Attacks — split melee/ranged
+  // Attacks : split melee/ranged
   const meleeAttacks = (npc.attacks ?? []).filter((a) => a.range !== "distance");
   const rangedAttacks = (npc.attacks ?? []).filter((a) => a.range === "distance");
 
@@ -269,9 +269,9 @@ function buildNpcObsidian(npc) {
   return lines.join("\n");
 }
 
-// ---------------------------------------------------------------------------
+// 
 // PC text formatter
-// ---------------------------------------------------------------------------
+// 
 
 function buildPcText(player, md) {
   const b = (s) => (md ? `**${s}**` : s);
@@ -360,9 +360,9 @@ function buildPcText(player, md) {
   return parts.join("\n\n");
 }
 
-// ---------------------------------------------------------------------------
+// 
 // Main dispatcher
-// ---------------------------------------------------------------------------
+// 
 
 export function buildItemText(type, item, fmt) {
   if (type === "npc") {
@@ -546,7 +546,7 @@ export function buildItemText(type, item, fmt) {
         item.category && field("Category", resolve(item.category)),
         field("DEF", defDisplay),
         field("MDEF", mdefDisplay),
-        item.init != null && field("Initiative", item.init === 0 ? "—" : item.init),
+        item.init != null && field("Initiative", item.init === 0 ? " - " : item.init),
         item.cost != null && field("Cost", `${item.cost}z`),
         item.martial && field("Martial", "Yes"),
       ].filter(Boolean);
@@ -605,10 +605,20 @@ export function buildItemText(type, item, fmt) {
         item.range && field("Range", resolve(staticT(item.range))),
         attr1 && attr2
           ? field("Accuracy", `[${attr1.shortcaps} + ${attr2.shortcaps}]${hitBonus}`)
-          : field("Accuracy", "—"),
+          : field("Accuracy", " - "),
         field("Damage", `[HR + ${item.flatdmg ?? 0}] ${dmgType?.long ?? ""}`),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
+      return parts.join("\n\n");
+    }
+    case "special":
+    case "actions": {
+      const parts = [h1(resolve(item.name))];
+      if (item.spCost != null && item.spCost !== "") {
+        parts.push(field("SP Cost", `${item.spCost} SP`));
+      }
+      if (item.effect) parts.push(resolve(item.effect));
+      else if (item.description) parts.push(resolve(item.description));
       return parts.join("\n\n");
     }
     default: {

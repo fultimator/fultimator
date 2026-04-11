@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, ButtonBase, Tooltip } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
@@ -7,9 +7,14 @@ import { useTheme } from "@mui/material/styles";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import {
   resolveEffectiveSlot,
-  isTwoHandedEquipped,
   getActiveVehicle,
 } from "../equipment/slots/equipmentSlots";
+import {
+  getSlotLocks,
+  getEquippedModulesForSlot,
+  getEquippedModuleForSlot,
+} from "../equipment/slots/loadoutSelectors";
+import { useLoadoutStore } from "../../../store/playerLoadoutStore";
 import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
 
 const SLOT_LABEL = (t) => ({
@@ -21,7 +26,7 @@ const SLOT_LABEL = (t) => ({
 
 function resolvedName(resolved, locked, t) {
   if (locked) return t("2-Handed");
-  if (!resolved) return "—";
+  if (!resolved) return " - ";
   if (resolved.kind === "vehicleModule") {
     return resolved.module.customName || t(resolved.module.name);
   }
@@ -29,7 +34,7 @@ function resolvedName(resolved, locked, t) {
   if ("accuracyCheck" in item && item.activeForm === "secondary") {
     return item.secondWeaponName || `${item.name} (Alt)`;
   }
-  return item?.name ?? "—";
+  return item?.name ?? " - ";
 }
 
 export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) {
@@ -37,25 +42,31 @@ export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) 
   const theme = useTheme();
   const custom = useCustomTheme();
   const [pickerSlot, setPickerSlot] = useState(null);
+  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
+
+  const store = useLoadoutStore();
+  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
 
   const activeVehicle = getActiveVehicle(player);
+  const { mainHandLocked, offHandLocked } = getSlotLocks(player);
 
   const mainHandResolved = resolveEffectiveSlot(player, "mainHand");
   const offHandResolved  = resolveEffectiveSlot(player, "offHand");
 
-  const offHandLocked = (() => {
-    if (mainHandResolved?.kind === "vehicleModule") {
-      return mainHandResolved.module.cumbersome;
-    }
-    return isTwoHandedEquipped(player);
-  })();
-
   const SLOTS = [
-    { key: "mainHand",  resolved: mainHandResolved,                        locked: false },
+    { key: "mainHand",  resolved: mainHandResolved,                        locked: mainHandLocked },
     { key: "offHand",   resolved: offHandResolved,                         locked: offHandLocked },
     { key: "armor",     resolved: resolveEffectiveSlot(player, "armor"),    locked: false },
     { key: "accessory", resolved: resolveEffectiveSlot(player, "accessory"),locked: false },
   ];
+
+  const handleSlotClick = (slot) => {
+    const hasModule =
+      ["mainHand", "offHand", "armor"].includes(slot) &&
+      Boolean(getEquippedModuleForSlot(player, slot));
+    setPickerOpenModuleOverride(hasModule);
+    setPickerSlot(slot);
+  };
 
   const primary = theme.palette.primary.main;
   const divider = theme.palette.divider;
@@ -101,6 +112,7 @@ export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) 
       {SLOTS.map(({ key, resolved, locked }) => {
         const isEmpty = !locked && !resolved;
         const isVehicle = resolved?.kind === "vehicleModule";
+        const hasModule = !locked && !!getEquippedModuleForSlot(player, key);
         const name = resolvedName(resolved, locked, t);
         const clickable = (isEditMode || isOwner) && !locked;
 
@@ -138,6 +150,9 @@ export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) 
             {isVehicle && !locked && (
               <PrecisionManufacturingIcon sx={{ fontSize: { xs: "0.5rem", sm: "0.6rem" }, color: "success.main", flexShrink: 0 }} />
             )}
+            {hasModule && !isVehicle && !isEmpty && !locked && (
+              <PrecisionManufacturingIcon sx={{ fontSize: { xs: "0.5rem", sm: "0.6rem" }, color: "success.light", opacity: 0.6, flexShrink: 0 }} />
+            )}
 
             {/* Item name */}
             <Tooltip title={isEmpty || locked ? "" : name} placement="top" enterDelay={600}>
@@ -171,7 +186,7 @@ export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) 
         return clickable ? (
           <ButtonBase
             key={key}
-            onClick={() => setPickerSlot(key)}
+            onClick={() => handleSlotClick(key)}
             sx={{
               display: "block",
               textAlign: "left",
@@ -187,14 +202,27 @@ export default function CardLoadout({ player, setPlayer, isEditMode, isOwner }) 
         );
       })}
 
-      {/* Slot picker dialog */}
+      {/* Slot picker dialog : with full module override wiring */}
       {pickerSlot && (
         <SlotPickerDialog
           open
-          onClose={() => setPickerSlot(null)}
+          onClose={() => { setPickerSlot(null); setPickerOpenModuleOverride(false); }}
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
+          vehicleModules={
+            activeVehicle && ["mainHand", "offHand", "armor"].includes(pickerSlot)
+              ? getEquippedModulesForSlot(player, pickerSlot)
+              : []
+          }
+          onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
+          onDisableModule={() => store.disableModule(pickerSlot)}
+          openModuleOverride={pickerOpenModuleOverride}
+          onClearOtherHandModule={
+            activeVehicle && ["mainHand", "offHand"].includes(pickerSlot)
+              ? () => store.disableModule(pickerSlot === "mainHand" ? "offHand" : "mainHand")
+              : undefined
+          }
         />
       )}
     </Box>

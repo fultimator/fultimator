@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -27,6 +27,7 @@ import types from "../../libs/types";
 import classList from "../../libs/classes";
 import spellClassesList from "../../libs/spellClasses";
 import specialSkillsList from "../../libs/skills";
+import { availableFrames } from "../../libs/pilotVehicleData";
 import {
   Chip,
   Box as MuiBox,
@@ -38,6 +39,7 @@ import PlayerArmorModal from "../player/equipment/armor/PlayerArmorModal";
 import PlayerShieldModal from "../player/equipment/shields/PlayerShieldModal";
 import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCustomWeaponModal";
 import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
+import CustomTextarea from "../common/CustomTextarea";
 
 // Shared attribute options
 const ATTRS = [
@@ -58,26 +60,65 @@ const TARGET_OPTIONS   = [
   "One equipped weapon",
   "Special",
 ];
+const NON_STATIC_TYPES = [
+  { value: "default",          label: "Standard Spell" },
+  { value: "gift",             label: "Gift" },
+  { value: "dance",            label: "Dance" },
+  { value: "therioform",       label: "Therioform" },
+  { value: "magichant",        label: "Tone (Chanter)" },
+  { value: "symbol",           label: "Symbol" },
+  { value: "invocation",       label: "Invocation" },
+  { value: "arcanist",         label: "Arcanum" },
+  { value: "arcanist-rework",  label: "Arcanum (Rework)" },
+  { value: "tinkerer-alchemy", label: "Alchemy" },
+  { value: "tinkerer-infusion",label: "Infusion" },
+  { value: "cooking",          label: "Delicacy" },
+  { value: "magiseed",         label: "Magiseed" },
+  { value: "pilot-vehicle",    label: "Pilot Vehicle" },
+];
+const WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
+const INV_TYPES   = ["Blast", "Hex", "Utility"];
+const PILOT_SUBTYPES = [
+  { value: "frame",   label: "Vehicle Frame" },
+  { value: "armor",   label: "Armor Module" },
+  { value: "weapon",  label: "Weapon Module" },
+  { value: "support", label: "Support Module" },
+];
+const PILOT_WEAPON_CATEGORIES = ["Arcane", "Brawling", "Bow", "Dagger", "Firearm", "Flail", "Heavy", "Spear", "Sword"];
+const PILOT_DAMAGE_TYPES = ["Physical", "Air", "Bolt", "Dark", "Earth", "Fire", "Ice", "Light", "Poison"];
+const PILOT_ATTRS = ["dexterity", "insight", "might", "willpower"];
+const PILOT_RANGES = ["Melee", "Ranged"];
+const STANDARD_SPELL_CLASSES = ["Chimerist", "Tinkerer", "Elementalist", "Entropist", "Spiritist"];
 
-// ── NPC Attack form ──────────────────────────────────────────────────────────
+// NPC Attack form
 
-function NpcAttackForm({ packId, onClose }) {
+function NpcAttackForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name,    setName]    = useState("");
-  const [range,   setRange]   = useState("melee");
-  const [attr1,   setAttr1]   = useState("dexterity");
-  const [attr2,   setAttr2]   = useState("dexterity");
-  const [dmgType, setDmgType] = useState("physical");
-  const [special, setSpecial] = useState("");
+  const [name,    setName]    = useState(editData?.name ?? "");
+  const [range,   setRange]   = useState(editData?.range ?? "melee");
+  const [attr1,   setAttr1]   = useState(editData?.attr1 ?? "dexterity");
+  const [attr2,   setAttr2]   = useState(editData?.attr2 ?? "dexterity");
+  const [dmgType, setDmgType] = useState(editData?.type ?? "physical");
+  const [special, setSpecial] = useState(Array.isArray(editData?.special) ? (editData.special[0] ?? "") : (editData?.special ?? ""));
   const [saving,  setSaving]  = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setRange(editData?.range ?? "melee");
+    setAttr1(editData?.attr1 ?? "dexterity");
+    setAttr2(editData?.attr2 ?? "dexterity");
+    setDmgType(editData?.type ?? "physical");
+    setSpecial(Array.isArray(editData?.special) ? (editData.special[0] ?? "") : (editData?.special ?? ""));
+  }, [editData]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "npc-attack", {
+    const payload = {
       itemType: "basic",
       name: name.trim(),
       range,
@@ -85,7 +126,12 @@ function NpcAttackForm({ packId, onClose }) {
       attr2,
       type: dmgType,
       special: special.trim() ? [special.trim()] : [],
-    });
+    };
+    if (isEditing) {
+      await updateItem(packId, editItemId, payload);
+    } else {
+      await addItem(packId, "npc-attack", payload);
+    }
     setSaving(false);
     onClose();
   };
@@ -160,14 +206,11 @@ function NpcAttackForm({ packId, onClose }) {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextarea
               label={t("Special")}
               value={special}
               onChange={(e) => setSpecial(e.target.value)}
-              fullWidth
-              size="small"
-              multiline
-              rows={2}
+              helperText=""
               placeholder={t("Optional special effect description")}
             />
           </Grid>
@@ -176,37 +219,52 @@ function NpcAttackForm({ packId, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
-          {t("Add")}
+          {t(isEditing ? "Save" : "Add")}
         </Button>
       </DialogActions>
     </>
   );
 }
 
-// ── NPC Spell form ───────────────────────────────────────────────────────────
+// NPC Spell form
 
-function NpcSpellForm({ packId, onClose }) {
+function NpcSpellForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name,       setName]       = useState("");
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp,         setMp]         = useState("");
-  const [maxTargets, setMaxTargets] = useState("");
-  const [duration,   setDuration]   = useState("");
-  const [target,     setTarget]     = useState("");
-  const [range,      setRange]      = useState("melee");
-  const [attr1,      setAttr1]      = useState("dexterity");
-  const [attr2,      setAttr2]      = useState("dexterity");
-  const [dmgType,    setDmgType]    = useState("physical");
-  const [special,    setSpecial]    = useState("");
+  const [name,       setName]       = useState(editData?.name ?? "");
+  const [isOffensive, setIsOffensive] = useState(editData?.type === "offensive");
+  const [mp,         setMp]         = useState(editData?.mp != null ? String(editData.mp) : "");
+  const [maxTargets, setMaxTargets] = useState(editData?.maxTargets != null ? String(editData.maxTargets) : "");
+  const [duration,   setDuration]   = useState(editData?.duration ?? "");
+  const [target,     setTarget]     = useState(editData?.target ?? "");
+  const [range,      setRange]      = useState(editData?.range ?? "melee");
+  const [attr1,      setAttr1]      = useState(editData?.attr1 ?? "dexterity");
+  const [attr2,      setAttr2]      = useState(editData?.attr2 ?? "dexterity");
+  const [dmgType,    setDmgType]    = useState(editData?.damagetype ?? "physical");
+  const [special,    setSpecial]    = useState(Array.isArray(editData?.special) ? (editData.special[0] ?? "") : (editData?.special ?? ""));
   const [saving,     setSaving]     = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setIsOffensive(editData?.type === "offensive");
+    setMp(editData?.mp != null ? String(editData.mp) : "");
+    setMaxTargets(editData?.maxTargets != null ? String(editData.maxTargets) : "");
+    setDuration(editData?.duration ?? "");
+    setTarget(editData?.target ?? "");
+    setRange(editData?.range ?? "melee");
+    setAttr1(editData?.attr1 ?? "dexterity");
+    setAttr2(editData?.attr2 ?? "dexterity");
+    setDmgType(editData?.damagetype ?? "physical");
+    setSpecial(Array.isArray(editData?.special) ? (editData.special[0] ?? "") : (editData?.special ?? ""));
+  }, [editData]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "npc-spell", {
+    const payload = {
       itemType: "spell",
       name: name.trim(),
       type: isOffensive ? "offensive" : "",
@@ -219,7 +277,12 @@ function NpcSpellForm({ packId, onClose }) {
       attr1,
       attr2,
       special: special.trim() ? [special.trim()] : [],
-    });
+    };
+    if (isEditing) {
+      await updateItem(packId, editItemId, payload);
+    } else {
+      await addItem(packId, "npc-spell", payload);
+    }
     setSaving(false);
     onClose();
   };
@@ -351,14 +414,11 @@ function NpcSpellForm({ packId, onClose }) {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextarea
               label={t("Special")}
               value={special}
               onChange={(e) => setSpecial(e.target.value)}
-              fullWidth
-              size="small"
-              multiline
-              rows={3}
+              helperText=""
               placeholder={t("Spell effect description")}
             />
           </Grid>
@@ -367,52 +427,421 @@ function NpcSpellForm({ packId, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
-          {t("Add")}
+          {t(isEditing ? "Save" : "Add")}
         </Button>
       </DialogActions>
     </>
   );
 }
 
-// ── Player Spell form ────────────────────────────────────────────────────────
-
-const spellClasses = classList
-  .filter((c) => c.benefits?.spellClasses?.length > 0)
-  .map((c) => c.name);
-
-function PlayerSpellForm({ packId, onClose }) {
+function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [spellClass,  setSpellClass]  = useState(spellClasses[0] ?? "");
-  const [name,        setName]        = useState("");
-  const [description, setDescription] = useState("");
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp,          setMp]          = useState("");
-  const [maxTargets,  setMaxTargets]  = useState("1");
-  const [targetDesc,  setTargetDesc]  = useState("");
-  const [duration,    setDuration]    = useState("");
-  const [attr1,       setAttr1]       = useState("insight");
-  const [attr2,       setAttr2]       = useState("will");
-  const [saving,      setSaving]      = useState(false);
+  const [name, setName] = useState(editData?.name ?? "");
+  const [effect, setEffect] = useState(editData?.effect ?? "");
+  const [spCost, setSpCost] = useState(editData?.spCost != null ? String(editData.spCost) : "");
+  const [saving, setSaving] = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setEffect(editData?.effect ?? "");
+    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
+  }, [editData]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "player-spell", {
-      class: spellClass,
+    const payload = {
       name: name.trim(),
-      description: description.trim(),
-      isOffensive,
-      mp: mp === "" ? 0 : Number(mp),
-      maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
-      targetDesc: targetDesc.trim() || "One creature",
-      duration: duration.trim() || "Instantaneous",
-      attr1,
-      attr2,
-      spellType: "default",
-    });
+      effect: effect.trim(),
+      spCost: spCost === "" ? undefined : Number(spCost),
+    };
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "npc-special", payload);
+    setSaving(false);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle
+        sx={{
+          background: customTheme.primary,
+          color: "#fff",
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          fontSize: "0.95rem",
+          py: 1.25,
+        }}
+      >
+        {t("New Special Rule")}
+        <IconButton
+          size="small"
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
+        >
+          <Close fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ pt: "16px !important" }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label={t("Name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+              size="small"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label={t("SP Cost")}
+              value={spCost}
+              onChange={(e) => setSpCost(e.target.value)}
+              fullWidth
+              size="small"
+              type="number"
+              inputProps={{ min: 0 }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextarea
+              label={t("Effect")}
+              value={effect}
+              onChange={(e) => setEffect(e.target.value)}
+              helperText=""
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
+          {t(isEditing ? "Save" : "Add")}
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
+function NpcActionForm({ packId, onClose, editData, editItemId }) {
+  const { t } = useTranslate();
+  const { addItem, updateItem } = useCompendiumPacks();
+  const customTheme = useCustomTheme();
+
+  const [name, setName] = useState(editData?.name ?? "");
+  const [effect, setEffect] = useState(editData?.effect ?? "");
+  const [spCost, setSpCost] = useState(editData?.spCost != null ? String(editData.spCost) : "");
+  const [saving, setSaving] = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setEffect(editData?.effect ?? "");
+    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
+  }, [editData]);
+
+  const handleSave = async () => {
+    if (!name.trim()) return;
+    setSaving(true);
+    const payload = {
+      name: name.trim(),
+      effect: effect.trim(),
+      spCost: spCost === "" ? undefined : Number(spCost),
+    };
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "npc-action", payload);
+    setSaving(false);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle
+        sx={{
+          background: customTheme.primary,
+          color: "#fff",
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          fontSize: "0.95rem",
+          py: 1.25,
+        }}
+      >
+        {t("New Other Action")}
+        <IconButton
+          size="small"
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
+        >
+          <Close fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ pt: "16px !important" }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label={t("Name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+              size="small"
+              autoFocus
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label={t("SP Cost")}
+              value={spCost}
+              onChange={(e) => setSpCost(e.target.value)}
+              fullWidth
+              size="small"
+              type="number"
+              inputProps={{ min: 0 }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextarea
+              label={t("Effect")}
+              value={effect}
+              onChange={(e) => setEffect(e.target.value)}
+              helperText=""
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
+          {t(isEditing ? "Save" : "Add")}
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
+// Player Spell form
+
+const spellClasses = STANDARD_SPELL_CLASSES;
+
+function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
+  const { t } = useTranslate();
+  const { addItem, updateItem } = useCompendiumPacks();
+  const customTheme = useCustomTheme();
+
+  const [spellType,   setSpellType]   = useState(editData?.spellType ?? "default");
+  const [spellClass,  setSpellClass]  = useState(editData?.class ?? spellClasses[0] ?? "");
+  const [name,        setName]        = useState(editData?.name ?? "");
+  const [description, setDescription] = useState(editData?.description ?? "");
+  const [isOffensive, setIsOffensive] = useState(Boolean(editData?.isOffensive));
+  const [mp,          setMp]          = useState(editData?.mp != null ? String(editData.mp) : "");
+  const [maxTargets,  setMaxTargets]  = useState(editData?.maxTargets != null ? String(editData.maxTargets) : "1");
+  const [targetDesc,  setTargetDesc]  = useState(editData?.targetDesc ?? "");
+  const [duration,    setDuration]    = useState(editData?.duration ?? "");
+  const [attr1,       setAttr1]       = useState(editData?.attr1 ?? "insight");
+  const [attr2,       setAttr2]       = useState(editData?.attr2 ?? "will");
+  const [effect,      setEffect]      = useState(editData?.effect ?? "");
+  const [event,       setEvent]       = useState(editData?.event ?? "");
+  const [genoclepsis, setGenoclepsis] = useState(editData?.genoclepsis ?? "");
+  const [wellspring,  setWellspring]  = useState(editData?.wellspring ?? "");
+  const [invType,     setInvType]     = useState(editData?.type ?? "");
+  const [domain,      setDomain]      = useState(editData?.domain ?? "");
+  const [domainDesc,  setDomainDesc]  = useState(editData?.domainDesc ?? "");
+  const [merge,       setMerge]       = useState(editData?.merge ?? "");
+  const [mergeDesc,   setMergeDesc]   = useState(editData?.mergeDesc ?? "");
+  const [dismiss,     setDismiss]     = useState(editData?.dismiss ?? "");
+  const [dismissDesc, setDismissDesc] = useState(editData?.dismissDesc ?? "");
+  const [pulse,       setPulse]       = useState(editData?.pulse ?? "");
+  const [pulseDesc,   setPulseDesc]   = useState(editData?.pulseDesc ?? "");
+  const [itemCategory,setItemCategory]= useState(editData?.category ?? "");
+  const [infusionRank,setInfusionRank]= useState(editData?.infusionRank != null ? String(editData.infusionRank) : "");
+  const [seedRangeStart, setSeedRangeStart] = useState(editData?.rangeStart ?? 1);
+  const [seedRangeEnd, setSeedRangeEnd] = useState(editData?.rangeEnd ?? 4);
+  const [seedDescription, setSeedDescription] = useState(editData?.description ?? "");
+  const [seedEffects, setSeedEffects] = useState(editData?.effects ?? {});
+  const [cookingEffects, setCookingEffects] = useState(
+    Array.from({ length: 12 }, (_, i) => editData?.cookbookEffects?.[i]?.effect ?? "")
+  );
+  const [pilotSubtype, setPilotSubtype] = useState(editData?.pilotSubtype ?? "frame");
+  const [vehicleFrame, setVehicleFrame] = useState(editData?.frame ?? availableFrames[0]?.name ?? "");
+  const [moduleDef, setModuleDef] = useState(editData?.def != null ? String(editData.def) : "");
+  const [moduleMdef, setModuleMdef] = useState(editData?.mdef != null ? String(editData.mdef) : "");
+  const [moduleMartial, setModuleMartial] = useState(Boolean(editData?.martial));
+  const [moduleDamage, setModuleDamage] = useState(editData?.damage != null ? String(editData.damage) : "");
+  const [moduleRange, setModuleRange] = useState(editData?.range ?? "Melee");
+  const [modulePrec, setModulePrec] = useState(editData?.prec != null ? String(editData.prec) : "0");
+  const [moduleCost, setModuleCost] = useState(editData?.cost != null ? String(editData.cost) : "0");
+  const [moduleDescription, setModuleDescription] = useState(editData?.description ?? "");
+  const [weaponCategory, setWeaponCategory] = useState(editData?.category ?? "Heavy");
+  const [damageType, setDamageType] = useState(editData?.damageType ?? "Physical");
+  const [pilotAtt1, setPilotAtt1] = useState(editData?.att1 ?? "might");
+  const [pilotAtt2, setPilotAtt2] = useState(editData?.att2 ?? "dexterity");
+  const [pilotQuality, setPilotQuality] = useState(editData?.quality ?? "");
+  const [pilotQualityCost, setPilotQualityCost] = useState(editData?.qualityCost != null ? String(editData.qualityCost) : "0");
+  const [isShield, setIsShield] = useState(Boolean(editData?.isShield));
+  const [moduleCumbersome, setModuleCumbersome] = useState(Boolean(editData?.cumbersome));
+  const [saving,      setSaving]      = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setSpellType(editData?.spellType ?? "default");
+    setSpellClass(editData?.class ?? spellClasses[0] ?? "");
+    setName(editData?.name ?? "");
+    setDescription(editData?.description ?? "");
+    setIsOffensive(Boolean(editData?.isOffensive));
+    setMp(editData?.mp != null ? String(editData.mp) : "");
+    setMaxTargets(editData?.maxTargets != null ? String(editData.maxTargets) : "1");
+    setTargetDesc(editData?.targetDesc ?? "");
+    setDuration(editData?.duration ?? "");
+    setAttr1(editData?.attr1 ?? "insight");
+    setAttr2(editData?.attr2 ?? "will");
+    setEffect(editData?.effect ?? "");
+    setEvent(editData?.event ?? "");
+    setGenoclepsis(editData?.genoclepsis ?? "");
+    setWellspring(editData?.wellspring ?? "");
+    setInvType(editData?.type ?? "");
+    setDomain(editData?.domain ?? "");
+    setDomainDesc(editData?.domainDesc ?? "");
+    setMerge(editData?.merge ?? "");
+    setMergeDesc(editData?.mergeDesc ?? "");
+    setDismiss(editData?.dismiss ?? "");
+    setDismissDesc(editData?.dismissDesc ?? "");
+    setPulse(editData?.pulse ?? "");
+    setPulseDesc(editData?.pulseDesc ?? "");
+    setItemCategory(editData?.category ?? "");
+    setInfusionRank(editData?.infusionRank != null ? String(editData.infusionRank) : "");
+    setSeedRangeStart(editData?.rangeStart ?? 1);
+    setSeedRangeEnd(editData?.rangeEnd ?? 4);
+    setSeedDescription(editData?.description ?? "");
+    setSeedEffects(editData?.effects ?? {});
+    setCookingEffects(Array.from({ length: 12 }, (_, i) => editData?.cookbookEffects?.[i]?.effect ?? ""));
+    setPilotSubtype(editData?.pilotSubtype ?? "frame");
+    setVehicleFrame(editData?.frame ?? availableFrames[0]?.name ?? "");
+    setModuleDef(editData?.def != null ? String(editData.def) : "");
+    setModuleMdef(editData?.mdef != null ? String(editData.mdef) : "");
+    setModuleMartial(Boolean(editData?.martial));
+    setModuleDamage(editData?.damage != null ? String(editData.damage) : "");
+    setModuleRange(editData?.range ?? "Melee");
+    setModulePrec(editData?.prec != null ? String(editData.prec) : "0");
+    setModuleCost(editData?.cost != null ? String(editData.cost) : "0");
+    setModuleDescription(editData?.description ?? "");
+    setWeaponCategory(editData?.category ?? "Heavy");
+    setDamageType(editData?.damageType ?? "Physical");
+    setPilotAtt1(editData?.att1 ?? "might");
+    setPilotAtt2(editData?.att2 ?? "dexterity");
+    setPilotQuality(editData?.quality ?? "");
+    setPilotQualityCost(editData?.qualityCost != null ? String(editData.qualityCost) : "0");
+    setIsShield(Boolean(editData?.isShield));
+    setModuleCumbersome(Boolean(editData?.cumbersome));
+  }, [editData]);
+
+  const handleSave = async () => {
+    if (!name.trim()) return;
+    setSaving(true);
+    let payload;
+    if (spellType === "default") {
+      payload = {
+        class: spellClass,
+        name: name.trim(),
+        description: description.trim(),
+        isOffensive,
+        mp: mp === "" ? 0 : Number(mp),
+        maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
+        targetDesc: targetDesc.trim() || "One creature",
+        duration: duration.trim() || "Instantaneous",
+        attr1,
+        attr2,
+        spellType: "default",
+      };
+    } else {
+      payload = {
+        name: name.trim(),
+        spellType,
+        effect: effect.trim(),
+        description: spellType === "magiseed" ? seedDescription.trim() : effect.trim(),
+        event: event.trim() || undefined,
+        genoclepsis: genoclepsis.trim() || undefined,
+        duration: duration.trim() || undefined,
+        wellspring: wellspring.trim() || undefined,
+        type: invType.trim() || undefined,
+        domain: domain.trim() || undefined,
+        domainDesc: domainDesc.trim() || undefined,
+        merge: merge.trim() || undefined,
+        mergeDesc: mergeDesc.trim() || undefined,
+        dismiss: dismiss.trim() || undefined,
+        dismissDesc: dismissDesc.trim() || undefined,
+        pulse: pulse.trim() || undefined,
+        pulseDesc: pulseDesc.trim() || undefined,
+        category: itemCategory.trim() || undefined,
+        infusionRank: infusionRank === "" ? undefined : Number(infusionRank),
+        rangeStart: spellType === "magiseed" ? Number(seedRangeStart) : undefined,
+        rangeEnd: spellType === "magiseed" ? Number(seedRangeEnd) : undefined,
+        effects: spellType === "magiseed" ? seedEffects : undefined,
+        cookbookEffects: spellType === "cooking"
+          ? cookingEffects.map((fx, i) => ({ id: i + 1, effect: fx.trim(), customChoices: {} }))
+          : undefined,
+        ...(spellType === "pilot-vehicle" && (() => {
+          const frameData = availableFrames.find((f) => f.name === vehicleFrame);
+          const base = { pilotSubtype, customName: name.trim(), enabled: false, equipped: false, equippedSlot: null };
+          if (pilotSubtype === "frame") {
+            return {
+              ...base,
+              frame: vehicleFrame,
+              passengers: frameData?.passengers ?? 0,
+              distance: frameData?.distance ?? 1,
+              description: effect.trim(),
+            };
+          }
+          if (pilotSubtype === "armor") {
+            return {
+              ...base,
+              name: "pilot_custom_armor",
+              type: "pilot_module_armor",
+              category: "Armor",
+              cost: Number(moduleCost) || 0,
+              def: Number(moduleDef) || 0,
+              mdef: Number(moduleMdef) || 0,
+              martial: moduleMartial,
+              description: moduleDescription.trim() || undefined,
+            };
+          }
+          if (pilotSubtype === "weapon") {
+            return {
+              ...base,
+              name: "pilot_custom_weapon",
+              type: "pilot_module_weapon",
+              category: weaponCategory,
+              cost: Number(moduleCost) || 0,
+              damage: Number(moduleDamage) || 0,
+              range: moduleRange || "Melee",
+              damageType,
+              prec: Number(modulePrec) || 0,
+              cumbersome: moduleCumbersome,
+              att1: pilotAtt1,
+              att2: pilotAtt2,
+              quality: pilotQuality.trim(),
+              qualityCost: Number(pilotQualityCost) || 0,
+              isShield,
+              equippedSlot: "main",
+            };
+          }
+          return {
+            ...base,
+            name: "pilot_custom_support",
+            type: "pilot_module_support",
+            description: effect.trim(),
+            isComplex: true,
+            cost: Number(moduleCost) || 0,
+          };
+        })()),
+      };
+    }
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "player-spell", payload);
     setSaving(false);
     onClose();
   };
@@ -442,16 +871,26 @@ function PlayerSpellForm({ packId, onClose }) {
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={5}>
             <FormControl fullWidth size="small">
-              <InputLabel>{t("Class")}</InputLabel>
-              <Select value={spellClass} label={t("Class")} onChange={(e) => setSpellClass(e.target.value)}>
-                {spellClasses.map((c) => (
-                  <MenuItem key={c} value={c}>{t(c)}</MenuItem>
-                ))}
-                <MenuItem value="">{t("Custom")}</MenuItem>
+              <InputLabel>{t("Spell Type")}</InputLabel>
+              <Select value={spellType} label={t("Spell Type")} onChange={(e) => setSpellType(e.target.value)}>
+                {NON_STATIC_TYPES.map((st) => <MenuItem key={st.value} value={st.value}>{t(st.label)}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={10} sm={6}>
+          {spellType === "default" && (
+            <Grid item xs={12} sm={7}>
+              <FormControl fullWidth size="small">
+                <InputLabel>{t("Class")}</InputLabel>
+                <Select value={spellClass} label={t("Class")} onChange={(e) => setSpellClass(e.target.value)}>
+                  {spellClasses.map((c) => (
+                    <MenuItem key={c} value={c}>{t(c)}</MenuItem>
+                  ))}
+                  <MenuItem value="">{t("Custom")}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+          <Grid item xs={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -461,101 +900,366 @@ function PlayerSpellForm({ packId, onClose }) {
               autoFocus
             />
           </Grid>
-          <Grid item xs={2} sm={1}>
-            <ToggleButton
-              value="offensive"
-              selected={isOffensive}
-              onChange={() => setIsOffensive((v) => !v)}
-              size="small"
-              sx={{ width: "100%" }}
-            >
-              <OffensiveSpellIcon />
-            </ToggleButton>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <TextField
-              label={t("MP")}
-              value={mp}
-              onChange={(e) => setMp(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              inputProps={{ min: 0 }}
-            />
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <TextField
-              label={t("Max Targets")}
-              value={maxTargets}
-              onChange={(e) => setMaxTargets(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              inputProps={{ min: 0 }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              freeSolo
-              options={TARGET_OPTIONS.map(t)}
-              value={targetDesc}
-              onInputChange={(_, v) => setTargetDesc(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Target")} size="small" />
+          {spellType === "default" ? (
+            <>
+              <Grid item xs={2} sm={1}>
+                <ToggleButton
+                  value="offensive"
+                  selected={isOffensive}
+                  onChange={() => setIsOffensive((v) => !v)}
+                  size="small"
+                  sx={{ width: "100%" }}
+                >
+                  <OffensiveSpellIcon />
+                </ToggleButton>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <TextField
+                  label={t("MP")}
+                  value={mp}
+                  onChange={(e) => setMp(e.target.value)}
+                  fullWidth
+                  size="small"
+                  type="number"
+                  inputProps={{ min: 0 }}
+                />
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <TextField
+                  label={t("Max Targets")}
+                  value={maxTargets}
+                  onChange={(e) => setMaxTargets(e.target.value)}
+                  fullWidth
+                  size="small"
+                  type="number"
+                  inputProps={{ min: 0 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Autocomplete
+                  freeSolo
+                  options={TARGET_OPTIONS.map(t)}
+                  value={targetDesc}
+                  onInputChange={(_, v) => setTargetDesc(v)}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("Target")} size="small" />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Autocomplete
+                  freeSolo
+                  options={DURATION_OPTIONS.map(t)}
+                  value={duration}
+                  onInputChange={(_, v) => setDuration(v)}
+                  renderInput={(params) => (
+                    <TextField {...params} label={t("Duration")} size="small" />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t("Attr 1")}</InputLabel>
+                  <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
+                    {ATTRS.map((a) => <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6} sm={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t("Attr 2")}</InputLabel>
+                  <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
+                    {ATTRS.map((a) => <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
+                <CustomTextarea
+                  label={t("Description")}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  helperText=""
+                />
+              </Grid>
+            </>
+          ) : (
+            <>
+              {spellType === "gift" && (
+                <Grid item xs={12}>
+                  <TextField label={t("Event / Trigger")} value={event} onChange={(e) => setEvent(e.target.value)} fullWidth size="small" />
+                </Grid>
               )}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              freeSolo
-              options={DURATION_OPTIONS.map(t)}
-              value={duration}
-              onInputChange={(_, v) => setDuration(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Duration")} size="small" />
+              {spellType === "therioform" && (
+                <Grid item xs={12}>
+                  <TextField label={t("Genoclepsis (optional)")} value={genoclepsis} onChange={(e) => setGenoclepsis(e.target.value)} fullWidth size="small" />
+                </Grid>
               )}
-            />
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 1")}</InputLabel>
-              <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
-                {ATTRS.map((a) => <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 2")}</InputLabel>
-              <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
-                {ATTRS.map((a) => <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-              size="small"
-              multiline
-              rows={3}
-            />
-          </Grid>
+              {spellType === "dance" && (
+                <Grid item xs={12}>
+                  <Autocomplete
+                    freeSolo
+                    options={DURATION_OPTIONS.map(t)}
+                    value={duration}
+                    onInputChange={(_, v) => setDuration(v)}
+                    renderInput={(params) => <TextField {...params} label={t("Duration")} size="small" />}
+                  />
+                </Grid>
+              )}
+              {spellType === "invocation" && (
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      options={WELLSPRINGS}
+                      value={wellspring || null}
+                      onChange={(_, v) => setWellspring(v ?? "")}
+                      renderInput={(params) => <TextField {...params} label={t("Wellspring")} size="small" />}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Autocomplete
+                      options={INV_TYPES}
+                      value={invType || null}
+                      onChange={(_, v) => setInvType(v ?? "")}
+                      renderInput={(params) => <TextField {...params} label={t("Type")} size="small" />}
+                    />
+                  </Grid>
+                </>
+              )}
+              {(spellType === "arcanist" || spellType === "arcanist-rework") && (
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("Domain name")} value={domain} onChange={(e) => setDomain(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextarea label={t("Domain effect")} value={domainDesc} onChange={(e) => setDomainDesc(e.target.value)} helperText="" />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("Merge name")} value={merge} onChange={(e) => setMerge(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextarea label={t("Merge effect")} value={mergeDesc} onChange={(e) => setMergeDesc(e.target.value)} helperText="" />
+                  </Grid>
+                  {spellType === "arcanist-rework" && (
+                    <>
+                      <Grid item xs={12} sm={6}>
+                        <TextField label={t("Pulse name")} value={pulse} onChange={(e) => setPulse(e.target.value)} fullWidth size="small" />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <CustomTextarea label={t("Pulse effect")} value={pulseDesc} onChange={(e) => setPulseDesc(e.target.value)} helperText="" />
+                      </Grid>
+                    </>
+                  )}
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("Dismiss name")} value={dismiss} onChange={(e) => setDismiss(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextarea label={t("Dismiss effect")} value={dismissDesc} onChange={(e) => setDismissDesc(e.target.value)} helperText="" />
+                  </Grid>
+                </>
+              )}
+              {spellType === "tinkerer-alchemy" && (
+                <Grid item xs={12}>
+                  <TextField label={t("Category")} value={itemCategory} onChange={(e) => setItemCategory(e.target.value)} fullWidth size="small" />
+                </Grid>
+              )}
+              {spellType === "tinkerer-infusion" && (
+                <Grid item xs={12} sm={4}>
+                  <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 1, max: 3 }} />
+                </Grid>
+              )}
+              {spellType === "cooking" && (
+                <>
+                  {cookingEffects.map((fx, i) => (
+                    <Grid item xs={12} key={i}>
+                      <CustomTextarea
+                        label={`${t("Roll")} ${i + 1}`}
+                        value={fx}
+                        onChange={(e) => {
+                          const next = [...cookingEffects];
+                          next[i] = e.target.value;
+                          setCookingEffects(next);
+                        }}
+                        helperText=""
+                      />
+                    </Grid>
+                  ))}
+                </>
+              )}
+              {spellType === "magiseed" && (
+                <>
+                  <Grid item xs={6}>
+                    <TextField label={t("Range Start")} value={seedRangeStart} onChange={(e) => setSeedRangeStart(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 0, max: 4 }} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField label={t("Range End")} value={seedRangeEnd} onChange={(e) => setSeedRangeEnd(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 1, max: 6 }} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <CustomTextarea label={t("Description")} value={seedDescription} onChange={(e) => setSeedDescription(e.target.value)} helperText="" />
+                  </Grid>
+                  {Array.from({ length: Math.max(0, Number(seedRangeEnd) - Number(seedRangeStart) + 1) }, (_, i) => {
+                    const tick = Number(seedRangeStart) + i;
+                    return (
+                      <Grid item xs={12} key={tick}>
+                        <CustomTextarea
+                          label={`${t("Tick")} ${tick}`}
+                          value={seedEffects[tick] ?? ""}
+                          onChange={(e) => setSeedEffects((prev) => ({ ...prev, [tick]: e.target.value }))}
+                          helperText=""
+                        />
+                      </Grid>
+                    );
+                  })}
+                </>
+              )}
+              {spellType === "pilot-vehicle" && (
+                <>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("Component Type")}</InputLabel>
+                      <Select value={pilotSubtype} label={t("Component Type")} onChange={(e) => setPilotSubtype(e.target.value)}>
+                        {PILOT_SUBTYPES.map((s) => (
+                          <MenuItem key={s.value} value={s.value}>{t(s.label)}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {pilotSubtype === "frame" && (
+                    <Grid item xs={12}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Frame")}</InputLabel>
+                        <Select value={vehicleFrame} label={t("Frame")} onChange={(e) => setVehicleFrame(e.target.value)}>
+                          {availableFrames.map((f) => (
+                            <MenuItem key={f.name} value={f.name}>
+                              {t(f.name)}  -  {t("Passengers")}: {f.passengers} · {t("Distance")}: {f.distance}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  )}
+                  {pilotSubtype !== "frame" && (
+                    <Grid item xs={6} sm={4}>
+                      <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
+                        inputProps={{ min: 0 }} onChange={(e) => setModuleCost(e.target.value)} />
+                    </Grid>
+                  )}
+                  {pilotSubtype === "armor" && (
+                    <>
+                      <Grid item xs={4}>
+                        <TextField label="DEF" value={moduleDef} type="number" fullWidth size="small"
+                          onChange={(e) => setModuleDef(e.target.value)} />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField label="MDEF" value={moduleMdef} type="number" fullWidth size="small"
+                          onChange={(e) => setModuleMdef(e.target.value)} />
+                      </Grid>
+                      <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+                        <ToggleButton value="martial" selected={moduleMartial} onChange={() => setModuleMartial((v) => !v)} size="small" sx={{ width: "100%" }}>
+                          {t("Martial")}
+                        </ToggleButton>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <CustomTextarea label={t("Description (optional)")} value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
+                      </Grid>
+                    </>
+                  )}
+                  {pilotSubtype === "weapon" && (
+                    <>
+                      <Grid item xs={6} sm={4}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Category")}</InputLabel>
+                          <Select value={weaponCategory} label={t("Category")} onChange={(e) => setWeaponCategory(e.target.value)}>
+                            {PILOT_WEAPON_CATEGORIES.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Damage Type")}</InputLabel>
+                          <Select value={damageType} label={t("Damage Type")} onChange={(e) => setDamageType(e.target.value)}>
+                            {PILOT_DAMAGE_TYPES.map((d) => <MenuItem key={d} value={d}>{d}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Range")}</InputLabel>
+                          <Select value={moduleRange || "Melee"} label={t("Range")} onChange={(e) => setModuleRange(e.target.value)}>
+                            {PILOT_RANGES.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Att 1")}</InputLabel>
+                          <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
+                            {PILOT_ATTRS.map((a) => <MenuItem key={a} value={a}>{t(a)}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Att 2")}</InputLabel>
+                          <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
+                            {PILOT_ATTRS.map((a) => <MenuItem key={a} value={a}>{t(a)}</MenuItem>)}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={4} sm={2}>
+                        <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
+                      </Grid>
+                      <Grid item xs={4} sm={2}>
+                        <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
+                      </Grid>
+                      <Grid item xs={4} sm={2}>
+                        <TextField label={t("Quality Cost")} value={pilotQualityCost} type="number" fullWidth size="small" onChange={(e) => setPilotQualityCost(e.target.value)} />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <CustomTextarea label={t("Quality")} value={pilotQuality} onChange={(e) => setPilotQuality(e.target.value)} helperText="" />
+                      </Grid>
+                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                        <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
+                          {t("Cumbersome")}
+                        </ToggleButton>
+                      </Grid>
+                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                        <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
+                          {t("Shield")}
+                        </ToggleButton>
+                      </Grid>
+                    </>
+                  )}
+                </>
+              )}
+              {spellType !== "default" &&
+               spellType !== "arcanist" &&
+               spellType !== "arcanist-rework" &&
+               spellType !== "cooking" &&
+               !(spellType === "pilot-vehicle" && (pilotSubtype === "armor" || pilotSubtype === "weapon")) && (
+                <Grid item xs={12}>
+                  <CustomTextarea
+                    label={spellType === "therioform" || spellType === "pilot-vehicle" ? t("Description") : t("Effect")}
+                    value={effect}
+                    onChange={(e) => setEffect(e.target.value)}
+                    helperText=""
+                  />
+                </Grid>
+              )}
+            </>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
-          {t("Add")}
+          {t(isEditing ? "Save" : "Add")}
         </Button>
       </DialogActions>
     </>
   );
 }
 
-// ── Quality form ─────────────────────────────────────────────────────────────
+// Quality form
 
 const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
 const FILTER_OPTIONS = [
@@ -566,28 +1270,39 @@ const FILTER_OPTIONS = [
   { label: "Accessories", value: "accessory" },
 ];
 
-function QualityForm({ packId, onClose }) {
+function QualityForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState(QUALITY_CATEGORIES[0]);
-  const [quality, setQuality] = useState("");
-  const [cost, setCost] = useState(0);
-  const [filter, setFilter] = useState([]);
+  const [name, setName] = useState(editData?.name ?? "");
+  const [category, setCategory] = useState(editData?.category ?? QUALITY_CATEGORIES[0]);
+  const [quality, setQuality] = useState(editData?.quality ?? "");
+  const [cost, setCost] = useState(editData?.cost ?? 0);
+  const [filter, setFilter] = useState(editData?.filter ?? []);
   const [saving, setSaving] = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setCategory(editData?.category ?? QUALITY_CATEGORIES[0]);
+    setQuality(editData?.quality ?? "");
+    setCost(editData?.cost ?? 0);
+    setFilter(editData?.filter ?? []);
+  }, [editData]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "quality", {
+    const payload = {
       name: name.trim(),
       category,
       quality: quality.trim(),
       cost: Number(cost),
       filter,
-    });
+    };
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "quality", payload);
     setSaving(false);
     onClose();
   };
@@ -649,14 +1364,11 @@ function QualityForm({ packId, onClose }) {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextarea
               label={t("Quality Effect")}
               value={quality}
               onChange={(e) => setQuality(e.target.value)}
-              fullWidth
-              size="small"
-              multiline
-              rows={3}
+              helperText=""
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -704,40 +1416,51 @@ function QualityForm({ packId, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
-          {t("Add")}
+          {t(isEditing ? "Save" : "Add")}
         </Button>
       </DialogActions>
     </>
   );
 }
 
-// ── Heroic form ──────────────────────────────────────────────────────────────
+// Heroic form
 
 const CLASS_NAME_OPTIONS = classList.map((c) => c.name);
 const HEROIC_BOOK_OPTIONS = ["core", "rework", "bonus", "high", "techno", "natural"];
 
-function HeroicForm({ packId, onClose }) {
+function HeroicForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState("");
-  const [book, setBook] = useState("");
-  const [quote, setQuote] = useState("");
-  const [description, setDescription] = useState("");
-  const [applicableTo, setApplicableTo] = useState([]);
+  const [name, setName] = useState(editData?.name ?? "");
+  const [book, setBook] = useState(editData?.book ?? "");
+  const [quote, setQuote] = useState(editData?.quote ?? "");
+  const [description, setDescription] = useState(editData?.description ?? "");
+  const [applicableTo, setApplicableTo] = useState(editData?.applicableTo ?? []);
   const [saving, setSaving] = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setName(editData?.name ?? "");
+    setBook(editData?.book ?? "");
+    setQuote(editData?.quote ?? "");
+    setDescription(editData?.description ?? "");
+    setApplicableTo(editData?.applicableTo ?? []);
+  }, [editData]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "heroic", {
+    const payload = {
       name: name.trim(),
       book,
       quote: quote.trim(),
       description: description.trim(),
       applicableTo,
-    });
+    };
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "heroic", payload);
     setSaving(false);
     onClose();
   };
@@ -826,15 +1549,12 @@ function HeroicForm({ packId, onClose }) {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
+            <CustomTextarea
               label={t("Description")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-              size="small"
-              multiline
-              rows={4}
-              inputProps={{ maxLength: 1500 }}
+              helperText=""
+              maxLength={1500}
             />
           </Grid>
         </Grid>
@@ -842,14 +1562,14 @@ function HeroicForm({ packId, onClose }) {
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
-          {t("Add")}
+          {t(isEditing ? "Save" : "Add")}
         </Button>
       </DialogActions>
     </>
   );
 }
 
-// ── Class form ───────────────────────────────────────────────────────────────
+// Class form
 
 const BLANK_BENEFITS = {
   hpplus: 0,
@@ -897,7 +1617,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
   const updateSkillField = (idx, field, value) =>
     setSkills((prev) => prev.map((s, i) => i === idx ? { ...s, [field]: value } : s));
 
-  // ── Save ──────────────────────────────────────────────────────────────────
+  // Save
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
@@ -954,7 +1674,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
 
-          {/* ── Identity ─────────────────────────────────────────────────── */}
+          {/* Identity */}
           <Grid item xs={8} sm={9}>
             <TextField label={t("Class Name")} value={name} onChange={(e) => setName(e.target.value)}
               fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
@@ -964,7 +1684,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
               fullWidth size="small" placeholder="homebrew" />
           </Grid>
 
-          {/* ── Free Benefits ────────────────────────────────────────────── */}
+          {/* Free Benefits */}
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Free Benefits")}
@@ -1036,7 +1756,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
             </Button>
           </Grid>
 
-          {/* ── Spell Types ──────────────────────────────────────────────── */}
+          {/* Spell Types */}
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Spell Types")}
@@ -1060,7 +1780,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
             </Box>
           </Grid>
 
-          {/* ── Skills ───────────────────────────────────────────────────── */}
+          {/* Skills */}
           <Grid item xs={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
               {t("Skills")}
@@ -1091,12 +1811,12 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <TextField
+                    <CustomTextarea
                       label={t("Description")}
                       value={skill.description}
                       onChange={(e) => updateSkillField(i, "description", e.target.value)}
-                      fullWidth size="small" multiline rows={3}
-                      inputProps={{ maxLength: 1500 }}
+                      helperText=""
+                      maxLength={1500}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -1137,7 +1857,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
 }
 
 // Inline skill editor sub-component
-// ── Main dispatcher ──────────────────────────────────────────────────────────
+// Main dispatcher
 
 /**
  * Renders the appropriate creation form for the given CompendiumItemType.
@@ -1147,10 +1867,10 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
  * @param {object} props
  * @param {boolean} props.open
  * @param {() => void} props.onClose
- * @param {string} props.itemType  — VIEWER_TO_PACK_TYPE value, e.g. "weapon"
- * @param {string} props.packId   — the target pack's id
- * @param {object} [props.editData]   — existing item data (for editing)
- * @param {string} [props.editItemId] — existing item id in the pack (for editing)
+ * @param {string} props.itemType   -  VIEWER_TO_PACK_TYPE value, e.g. "weapon"
+ * @param {string} props.packId    -  the target pack's id
+ * @param {object} [props.editData]    -  existing item data (for editing)
+ * @param {string} [props.editItemId]  -  existing item id in the pack (for editing)
  */
 const OPTIONAL_SUBTYPES = [
   { value: "quirk",        label: "Quirk"        },
@@ -1161,21 +1881,22 @@ const OPTIONAL_SUBTYPES = [
   { value: "other",        label: "Other"        },
 ];
 
-function OptionalForm({ packId, onClose }) {
+function OptionalForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem, packs } = useCompendiumPacks();
+  const { addItem, updateItem, packs } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [subtype,       setSubtype]       = useState("quirk");
-  const [name,          setName]          = useState("");
-  const [description,   setDescription]   = useState("");
-  const [effect,        setEffect]        = useState("");
-  const [targetDescription, setTargetDescription] = useState("");
-  const [clockSections, setClockSections] = useState(6);
-  const [showClock,     setShowClock]     = useState(false);
+  const [subtype,       setSubtype]       = useState(editData?.subtype ?? "quirk");
+  const [name,          setName]          = useState(editData?.name ?? "");
+  const [description,   setDescription]   = useState(editData?.description ?? "");
+  const [effect,        setEffect]        = useState(editData?.effect ?? "");
+  const [targetDescription, setTargetDescription] = useState(editData?.targetDescription ?? "");
+  const [clockSections, setClockSections] = useState(editData?.clock?.sections ?? 6);
+  const [showClock,     setShowClock]     = useState(Boolean(editData?.clock));
   const [zeroTrigger,   setZeroTrigger]   = useState(null);
   const [zeroEffect,    setZeroEffect]    = useState(null);
   const [saving,        setSaving]        = useState(false);
+  const isEditing = Boolean(editItemId);
 
   const allOptionals = packs.flatMap((p) =>
     (p.active !== false ? p.items : []).filter((i) => i.type === "optional").map((i) => i.data)
@@ -1188,6 +1909,21 @@ function OptionalForm({ packId, onClose }) {
     t("Yourself or one ally"),
   ];
 
+  useEffect(() => {
+    setSubtype(editData?.subtype ?? "quirk");
+    setName(editData?.name ?? "");
+    setDescription(editData?.description ?? "");
+    setEffect(editData?.effect ?? "");
+    setTargetDescription(editData?.targetDescription ?? "");
+    setClockSections(editData?.clock?.sections ?? 6);
+    setShowClock(Boolean(editData?.clock));
+
+    const triggerMatch = zeroTriggerOptions.find((o) => o.name === (editData?.zeroTrigger ?? ""));
+    const effectMatch = zeroEffectOptions.find((o) => o.name === (editData?.zeroEffect ?? ""));
+    setZeroTrigger(triggerMatch ?? null);
+    setZeroEffect(effectMatch ?? null);
+  }, [editData, packs]);
+
   const buildData = () => {
     if (subtype === "quirk") return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() };
     if (subtype === "camp-activities") return { subtype, name: name.trim(), targetDescription: targetDescription.trim(), effect: effect.trim() };
@@ -1199,7 +1935,9 @@ function OptionalForm({ packId, onClose }) {
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
-    await addItem(packId, "optional", buildData());
+    const payload = buildData();
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "optional", payload);
     setSaving(false);
     onClose();
   };
@@ -1228,10 +1966,10 @@ function OptionalForm({ packId, onClose }) {
 
           {(subtype === "quirk" || subtype === "other") && <>
             <Grid item xs={12}>
-              <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={2} />
+              <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
             <Grid item xs={12}>
-              <TextField label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} fullWidth size="small" multiline rows={3} />
+              <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
@@ -1255,13 +1993,13 @@ function OptionalForm({ packId, onClose }) {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} fullWidth size="small" multiline rows={3} />
+              <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
           {(subtype === "zero-trigger" || subtype === "zero-effect") && (
             <Grid item xs={12}>
-              <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={4} />
+              <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
           )}
 
@@ -1315,14 +2053,14 @@ function OptionalForm({ packId, onClose }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!name.trim() || saving}>{t("Save")}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={!name.trim() || saving}>{t(isEditing ? "Save" : "Add")}</Button>
       </DialogActions>
     </>
   );
 }
 
 export default function CompendiumItemCreateDialog({ open, onClose, itemType, packId, editData, editItemId }) {
-  const { addItem } = useCompendiumPacks();
+  const { addItem, updateItem } = useCompendiumPacks();
 
   if (itemType === "weapon") {
     return (
@@ -1330,8 +2068,12 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         open={open}
         onClose={onClose}
         editWeaponIndex={null}
-        weapon={null}
-        onAddWeapon={async (data) => { await addItem(packId, "weapon", data); onClose(); }}
+        weapon={editData ?? null}
+        onAddWeapon={async (data) => {
+          if (editItemId) await updateItem(packId, editItemId, data);
+          else await addItem(packId, "weapon", data);
+          onClose();
+        }}
         onDeleteWeapon={() => {}}
       />
     );
@@ -1343,8 +2085,12 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         open={open}
         onClose={onClose}
         editArmorIndex={null}
-        armorPlayer={null}
-        onAddArmor={async (data) => { await addItem(packId, "armor", data); onClose(); }}
+        armorPlayer={editData ?? null}
+        onAddArmor={async (data) => {
+          if (editItemId) await updateItem(packId, editItemId, data);
+          else await addItem(packId, "armor", data);
+          onClose();
+        }}
         onDeleteArmor={() => {}}
       />
     );
@@ -1356,8 +2102,12 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         open={open}
         onClose={onClose}
         editShieldIndex={null}
-        shield={null}
-        onAddShield={async (data) => { await addItem(packId, "shield", data); onClose(); }}
+        shield={editData ?? null}
+        onAddShield={async (data) => {
+          if (editItemId) await updateItem(packId, editItemId, data);
+          else await addItem(packId, "shield", data);
+          onClose();
+        }}
         onDeleteShield={() => {}}
       />
     );
@@ -1369,8 +2119,12 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         open={open}
         onClose={onClose}
         editCustomWeaponIndex={null}
-        customWeapon={null}
-        onAddCustomWeapon={async (data) => { await addItem(packId, "custom-weapon", data); onClose(); }}
+        customWeapon={editData ?? null}
+        onAddCustomWeapon={async (data) => {
+          if (editItemId) await updateItem(packId, editItemId, data);
+          else await addItem(packId, "custom-weapon", data);
+          onClose();
+        }}
         onDeleteCustomWeapon={() => {}}
       />
     );
@@ -1382,14 +2136,18 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
         open={open}
         onClose={onClose}
         editAccIndex={null}
-        accessory={null}
-        onAddAccessory={async (data) => { await addItem(packId, "accessory", data); onClose(); }}
+        accessory={editData ?? null}
+        onAddAccessory={async (data) => {
+          if (editItemId) await updateItem(packId, editItemId, data);
+          else await addItem(packId, "accessory", data);
+          onClose();
+        }}
         onDeleteAccessory={() => {}}
       />
     );
   }
 
-  // Class has its own full Dialog internally — only render when open to avoid state leaking
+  // Class has its own full Dialog internally : only render when open to avoid state leaking
   if (itemType === "class") {
     if (!open) return null;
     return <ClassForm open={open} packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />;
@@ -1398,12 +2156,14 @@ export default function CompendiumItemCreateDialog({ open, onClose, itemType, pa
   // Remaining types use a simple Dialog
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      {itemType === "npc-attack" && <NpcAttackForm packId={packId} onClose={onClose} />}
-      {itemType === "npc-spell"  && <NpcSpellForm  packId={packId} onClose={onClose} />}
-      {itemType === "player-spell" && <PlayerSpellForm packId={packId} onClose={onClose} />}
-      {itemType === "quality" && <QualityForm packId={packId} onClose={onClose} />}
-      {itemType === "heroic" && <HeroicForm packId={packId} onClose={onClose} />}
-      {itemType === "optional" && <OptionalForm packId={packId} onClose={onClose} />}
+      {itemType === "npc-attack" && <NpcAttackForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "npc-spell"  && <NpcSpellForm  packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "player-spell" && <PlayerSpellForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "npc-special" && <NpcSpecialForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "npc-action" && <NpcActionForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "quality" && <QualityForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "heroic" && <HeroicForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
+      {itemType === "optional" && <OptionalForm packId={packId} onClose={onClose} editData={editData} editItemId={editItemId} />}
     </Dialog>
   );
 }

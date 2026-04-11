@@ -27,9 +27,9 @@ import { availableTones } from "../player/spells/SpellChanterTonesModal";
 import { availableSymbols } from "../player/spells/SpellSymbolistSymbolsModal";
 import { invocationsByWellspring } from "../player/spells/SpellInvokerInvocationsModal";
 
-// ---------------------------------------------------------------------------
+// 
 // Spell type description keys (per-character types have no static list)
-// ---------------------------------------------------------------------------
+// 
 
 const SPELL_TYPE_DESC_KEYS = {
   dance:             ["dance_details_1"],
@@ -50,9 +50,9 @@ const SPELL_TYPE_DESC_KEYS = {
   gamble:            [],
 };
 
-// ---------------------------------------------------------------------------
+// 
 // Styled markdown (defined once outside components to avoid re-creation)
-// ---------------------------------------------------------------------------
+// 
 
 const _StyledMarkdown = styled(ReactMarkdown)({
   "& ul, & ol": { paddingLeft: "1.5em", margin: 0, marginTop: "0.25em", marginBottom: "0.25em" },
@@ -67,9 +67,9 @@ export const StyledMarkdown = ({ remarkPlugins = [], children, ...props }) => (
   </_StyledMarkdown>
 );
 
-// ---------------------------------------------------------------------------
+// 
 // WeaponCard
-// ---------------------------------------------------------------------------
+// 
 
 export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -215,9 +215,9 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
   );
 });
 
-// ---------------------------------------------------------------------------
-// ArmorCard  (handles both Armor and Shield)
-// ---------------------------------------------------------------------------
+// 
+// ArmorCard (handles both Armor and Shield)
+// 
 
 function getArmorDefDisplay(armor, t) {
   if (armor.category === "Shield") {
@@ -325,7 +325,7 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
           </Grid>
           <Grid item xs={2}>
             <Typography fontWeight="bold" textAlign="center">
-              {armor.init === 0 ? "—" : armor.init}
+              {armor.init === 0 ? " - " : armor.init}
             </Typography>
           </Grid>
         </Grid>
@@ -345,9 +345,9 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // SpellCard
-// ---------------------------------------------------------------------------
+// 
 
 export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -360,6 +360,9 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
 
   const attr1 = attributes[spell.attr1];
   const attr2 = attributes[spell.attr2];
+  const effectText =
+    spell.effect ??
+    (Array.isArray(spell.special) ? spell.special.join("; ") : (spell.special ?? ""));
 
   return (
     <Card id={id} elevation={1}>
@@ -454,21 +457,23 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
           <Typography variant="body2">{spell.effect}</Typography>
         </Box> */}
 
+        {effectText && (
           <Box sx={{ px: 1, py: 0.75 }}>
             <Typography variant="body2">
               <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                {spell.effect}
+                {effectText}
               </StyledMarkdown>
             </Typography>
           </Box>
+        )}
       </Stack>
     </Card>
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // PlayerSpellCard
-// ---------------------------------------------------------------------------
+// 
 
 export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -580,9 +585,9 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // NonStaticSpellCard
-// ---------------------------------------------------------------------------
+// 
 
 export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -731,7 +736,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
               {t(item.frame ?? "")}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {t("Passengers")}: {item.passengers ?? "—"} · {t("Distance")}: {item.distance ?? "—"}
+              {t("Passengers")}: {item.passengers ?? " - "} · {t("Distance")}: {item.distance ?? " - "}
             </Typography>
             {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(t(item.description))}</Typography>}
           </>
@@ -739,7 +744,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
         if (item.pilotSubtype === "armor" || item.def != null) return (
           <>
             <Typography variant="caption" color="text.secondary">
-              DEF {item.def ?? "—"} · MDEF {item.mdef ?? "—"}{item.martial ? " · Martial" : ""}
+              DEF {item.def ?? " - "} · MDEF {item.mdef ?? " - "}{item.martial ? " · Martial" : ""}
               {item.cost ? ` · ${item.cost}z` : ""}
             </Typography>
             {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(item.description)}</Typography>}
@@ -846,9 +851,9 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // AttackCard
-// ---------------------------------------------------------------------------
+// 
 
 export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -930,7 +935,7 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
                   {attack.flathit > 0 ? `+${attack.flathit}` : ""}
                 </>
               ) : (
-                "—"
+                " - "
               )}
             </Typography>
           </Grid>
@@ -963,9 +968,9 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // QualityCard
-// ---------------------------------------------------------------------------
+// 
 
 export const QualityCard = React.memo(function QualityCard({ quality, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1067,9 +1072,9 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // Per-character spell-type content renderer (internal)
-// ---------------------------------------------------------------------------
+// 
 
 function renderSpellTypeContent(sc, t, customTheme) {
   const border = { borderTop: `1px solid ${customTheme.secondary}` };
@@ -1267,7 +1272,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
       ];
       return magitechRanks.flatMap((rank, ri) => [
         <Box key={"mtr_" + ri} sx={sectionHeaderSx}>
-          {captionHeader(`${rank.rankLabel} — ${rank.name}`)}
+          {captionHeader(`${rank.rankLabel}  -  ${rank.name}`)}
         </Box>,
         <Box key={"mtc_" + ri} sx={itemSx}>
           {rank.descKeys.map((key, ki) => (
@@ -1364,9 +1369,9 @@ function renderSpellTypeContent(sc, t, customTheme) {
   }
 }
 
-// ---------------------------------------------------------------------------
+// 
 // ClassCard
-// ---------------------------------------------------------------------------
+// 
 
 export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1652,9 +1657,9 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // SpecialRuleCard
-// ---------------------------------------------------------------------------
+// 
 
 export const SpecialRuleCard = React.memo(function SpecialRuleCard({ item, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1704,9 +1709,9 @@ export const SpecialRuleCard = React.memo(function SpecialRuleCard({ item, id, o
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // ActionCard
-// ---------------------------------------------------------------------------
+// 
 
 export const ActionCard = React.memo(function ActionCard({ item, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1756,13 +1761,13 @@ export const ActionCard = React.memo(function ActionCard({ item, id, onHeaderCli
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // HeroicCard
-// ---------------------------------------------------------------------------
+// 
 
-// ---------------------------------------------------------------------------
+// 
 // CustomWeaponCard
-// ---------------------------------------------------------------------------
+// 
 
 export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1774,7 +1779,14 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
       : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
 
   const { precision, damage } = calculateCustomWeaponStats(weapon, false);
-  const [att1Key, att2Key] = weapon.accuracyCheck || ["dex", "ins"];
+  const att1KeyRaw = Array.isArray(weapon.accuracyCheck)
+    ? weapon.accuracyCheck[0]
+    : weapon.accuracyCheck?.att1;
+  const att2KeyRaw = Array.isArray(weapon.accuracyCheck)
+    ? weapon.accuracyCheck[1]
+    : weapon.accuracyCheck?.att2;
+  const att1Key = att1KeyRaw || "dexterity";
+  const att2Key = att2KeyRaw || "might";
   const attr1 = attributes[att1Key];
   const attr2 = attributes[att2Key];
   const dmgType = types[weapon.type];
@@ -1894,9 +1906,9 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // AccessoryCard
-// ---------------------------------------------------------------------------
+// 
 
 export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1967,9 +1979,9 @@ export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, 
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // HeroicCard
-// ---------------------------------------------------------------------------
+// 
 
 export const HeroicCard = React.memo(function HeroicCard({ heroic, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -2067,9 +2079,9 @@ export const HeroicCard = React.memo(function HeroicCard({ heroic, id, onHeaderC
   );
 });
 
-// ---------------------------------------------------------------------------
+// 
 // OptionalCard (dispatcher → QuirkCard | ZeroPowerCard | GenericOptionalCard)
-// ---------------------------------------------------------------------------
+// 
 
 function QuirkCard({ item, customTheme, t }) {
   const background =

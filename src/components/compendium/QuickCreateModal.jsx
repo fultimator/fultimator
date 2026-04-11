@@ -24,15 +24,18 @@ import {
   AccordionSummary,
   AccordionDetails,
   Tooltip,
-  Menu,
+  Divider,
   ListSubheader,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Close, AutoFixHigh, Delete as DeleteIcon } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
-import IosShareIcon from "@mui/icons-material/IosShare";
+import LinkIcon from "@mui/icons-material/Link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { OffensiveSpellIcon } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
+import Export from "../Export";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
@@ -47,14 +50,14 @@ import armor from "../../libs/armor";
 import shields from "../../libs/shields";
 import weaponQualities from "../../routes/equip/weapons/qualities";
 import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
-import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "./ItemCards";
+import { WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, NonStaticSpellCard, CustomWeaponCard, AccessoryCard, OptionalCard, SpecialRuleCard, ActionCard } from "./ItemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
 import CustomTextarea from "../common/CustomTextarea";
 import { availableFrames } from "../../libs/pilotVehicleData";
 
-// ── Change* sub-components (reuse from equip routes) ─────────────────────────
+// Change* sub-components (reuse from equip routes)
 import ChangeWeaponBase from "../../routes/equip/weapons/ChangeBase";
 import ChangeArmorBase from "../player/equipment/armor/ChangeBase";
 import ChangeShieldBase from "../player/equipment/shields/ChangeBase";
@@ -71,7 +74,7 @@ import ApplyRework from "../../routes/equip/common/ApplyRework";
 import ChangeCategory from "../player/equipment/weapons/ChangeCategory";
 import ChangeModifiers from "../player/equipment/ChangeModifiers";
 
-// ── Custom weapon / accessory sub-components ──────────────────────────────────
+// Custom weapon / accessory sub-components
 import ChangeCWCategory from "../../routes/equip/customWeapons/ChangeCategory";
 import ChangeRange from "../../routes/equip/customWeapons/ChangeRange";
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
@@ -79,9 +82,9 @@ import ChangeCWType from "../../routes/equip/customWeapons/ChangeType";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import SelectAccessoryQuality from "../../routes/equip/Accessories/SelectQuality";
 import accessoryQualities from "../../routes/equip/Accessories/qualities";
-import { categories as cwCategories, range as cwRange, accuracyChecks as cwAccuracyChecks, types as cwTypes } from "../../routes/equip/customWeapons/libs.jsx";
+import { categories as cwCategories, range as cwRange, accuracyChecks as cwAccuracyChecks, customizations as cwCustomizations, types as cwTypes } from "../../routes/equip/customWeapons/libs.jsx";
 
-// ── Shared constants ──────────────────────────────────────────────────────────
+// Shared constants
 
 const ATTRS = [
   { value: "dexterity", label: "DEX" },
@@ -119,28 +122,15 @@ const CLASS_NAME_OPTIONS  = classList.map((c) => c.name);
 const STANDARD_SPELL_CLASSES = ["Chimerist", "Tinkerer", "Elementalist", "Entropist", "Spiritist"];
 const spellClasses = STANDARD_SPELL_CLASSES;
 
-// ── Shared panel layout ───────────────────────────────────────────────────────
+// Shared panel layout
 
-function PanelLayout({ formContent, previewContent, data, itemName, addButton }) {
+function PanelLayout({ formContent, previewContent, data, itemName, addButton, exportDataType }) {
   const { t } = useTranslate();
   const previewRef = useRef(null);
   const [downloadImage] = useDownloadImage(itemName || "item", previewRef);
-  const [exportAnchor, setExportAnchor] = useState(null);
 
-  const handleExportJSON = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${(itemName || "item").replace(/\s+/g, "_")}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setExportAnchor(null);
-  };
-
-  const handleCopyJSON = () => {
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    setExportAnchor(null);
+  const handleCopyShareUrl = () => {
+    navigator.clipboard.writeText(window.location.href);
   };
 
   return (
@@ -155,20 +145,24 @@ function PanelLayout({ formContent, previewContent, data, itemName, addButton })
               {previewContent}
             </Box>
             <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5 }}>
+              <Tooltip title={t("Share URL")}>
+                <IconButton size="small" onClick={handleCopyShareUrl}>
+                  <LinkIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
               <Tooltip title={t("Download as Image")}>
                 <IconButton size="small" onClick={downloadImage}>
                   <DownloadIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t("Export")}>
-                <IconButton size="small" onClick={(e) => setExportAnchor(e.currentTarget)}>
-                  <IosShareIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Menu anchorEl={exportAnchor} open={Boolean(exportAnchor)} onClose={() => setExportAnchor(null)}>
-                <MenuItem onClick={handleExportJSON}>{t("Export as JSON file")}</MenuItem>
-                <MenuItem onClick={handleCopyJSON}>{t("Copy JSON to Clipboard")}</MenuItem>
-              </Menu>
+              {exportDataType ? (
+                <Export
+                  name={itemName || "item"}
+                  dataType={exportDataType}
+                  data={data}
+                  size="small"
+                />
+              ) : null}
               {addButton}
             </Box>
           </Stack>
@@ -178,7 +172,7 @@ function PanelLayout({ formContent, previewContent, data, itemName, addButton })
   );
 }
 
-// ── NPC Attack panel ──────────────────────────────────────────────────────────
+// NPC Attack panel
 
 function NpcAttackPanel() {
   const { t } = useTranslate();
@@ -201,6 +195,17 @@ function NpcAttackPanel() {
     martial: false,
     category: range === "melee" ? "Melee Attack" : "Ranged Attack",
     special: special.trim() ? [special.trim()] : [],
+  };
+
+  const handleClear = () => {
+    setName("");
+    setRange("melee");
+    setAttr1("dexterity");
+    setAttr2("dexterity");
+    setDmgType("physical");
+    setSpecial("");
+    setFlathit(0);
+    setFlatdmg(0);
   };
 
   return (
@@ -257,15 +262,19 @@ function NpcAttackPanel() {
           <Grid item xs={12}>
             <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Optional special effect description")} />
           </Grid>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={<AttackCard attack={data} />}
       addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
+      exportDataType="attacks"
     />
   );
 }
 
-// ── NPC Spell panel ───────────────────────────────────────────────────────────
+// NPC Spell panel
 
 function NpcSpellPanel() {
   const { t } = useTranslate();
@@ -292,6 +301,20 @@ function NpcSpellPanel() {
     target:     target     || undefined,
     range, attr1, attr2,
     special: special.trim() ? [special.trim()] : [],
+  };
+
+  const handleClear = () => {
+    setName("");
+    setIsOffensive(false);
+    setMp("");
+    setMaxTargets("");
+    setDuration("");
+    setTarget("");
+    setRange("melee");
+    setAttr1("dexterity");
+    setAttr2("dexterity");
+    setDmgType("physical");
+    setSpecial("");
   };
 
   return (
@@ -364,17 +387,115 @@ function NpcSpellPanel() {
           <Grid item xs={12}>
             <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Spell effect description")} />
           </Grid>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={<SpellCard spell={{ ...data, effect: data.special?.join("; ") ?? "" }} />}
       addButton={<AddToCompendiumButton itemType="npc-spell" data={data} />}
       data={data}
       itemName={data.name}
+      exportDataType="spells"
     />
   );
 }
 
-// ── Player Spell panel ────────────────────────────────────────────────────────
+// NPC Special Rule panel
+
+function NpcSpecialPanel() {
+  const { t } = useTranslate();
+  const [name, setName] = useState("");
+  const [effect, setEffect] = useState("");
+  const [spCost, setSpCost] = useState("");
+
+  const data = {
+    name: name.trim(),
+    effect: effect.trim(),
+    spCost: spCost === "" ? undefined : Number(spCost),
+  };
+
+  const handleClear = () => {
+    setName("");
+    setEffect("");
+    setSpCost("");
+  };
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
+          </Grid>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<SpecialRuleCard item={data} />}
+      addButton={<AddToCompendiumButton itemType="npc-special" data={data} />}
+      data={data}
+      itemName={data.name || ""}
+      exportDataType="special"
+    />
+  );
+}
+
+// NPC Other Action panel
+
+function NpcActionPanel() {
+  const { t } = useTranslate();
+  const [name, setName] = useState("");
+  const [effect, setEffect] = useState("");
+  const [spCost, setSpCost] = useState("");
+
+  const data = {
+    name: name.trim(),
+    effect: effect.trim(),
+    spCost: spCost === "" ? undefined : Number(spCost),
+  };
+
+  const handleClear = () => {
+    setName("");
+    setEffect("");
+    setSpCost("");
+  };
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+          </Grid>
+          <Grid item xs={12}>
+            <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
+          </Grid>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<ActionCard item={data} />}
+      addButton={<AddToCompendiumButton itemType="npc-action" data={data} />}
+      data={data}
+      itemName={data.name || ""}
+      exportDataType="actions"
+    />
+  );
+}
+
+// Player Spell panel
 
 const NON_STATIC_TYPES = [
   { value: "default",          label: "Standard Spell" },
@@ -438,7 +559,7 @@ function PlayerSpellPanel() {
   const [itemCategory,setItemCategory]= useState("");
   // tinkerer-infusion
   const [infusionRank,setInfusionRank]= useState("");
-  // cooking — 12 roll-result effects (indices 0-11 = results 1-12)
+  // cooking : 12 roll-result effects (indices 0-11 = results 1-12)
   const [cookingEffects, setCookingEffects] = useState(Array.from({ length: 12 }, () => ""));
   // magiseed
   const [seedDescription, setSeedDescription] = useState("");
@@ -465,6 +586,58 @@ function PlayerSpellPanel() {
   const [quality,           setQuality]           = useState("");
   const [qualityCost,       setQualityCost]       = useState(0);
   const [isShield,          setIsShield]          = useState(false);
+
+  const handleClear = () => {
+    setSpellType("default");
+    setSpellClass(spellClasses[0] ?? "");
+    setName("");
+    setDescription("");
+    setIsOffensive(false);
+    setMp("");
+    setMaxTargets("1");
+    setTargetDesc("");
+    setDuration("");
+    setAttr1("insight");
+    setAttr2("will");
+    setEffect("");
+    setEvent("");
+    setGenoclepsis("");
+    setWellspring("");
+    setInvType("");
+    setDomain("");
+    setDomainDesc("");
+    setMerge("");
+    setMergeDesc("");
+    setDismiss("");
+    setDismissDesc("");
+    setPulse("");
+    setPulseDesc("");
+    setItemCategory("");
+    setInfusionRank("");
+    setCookingEffects(Array.from({ length: 12 }, () => ""));
+    setSeedDescription("");
+    setSeedRangeStart(1);
+    setSeedRangeEnd(4);
+    setSeedEffects({});
+    setPilotSubtype("frame");
+    setVehicleFrame(availableFrames[0]?.name ?? "");
+    setModuleDef("");
+    setModuleMdef("");
+    setModuleMartial(false);
+    setModuleDamage("");
+    setModuleRange("");
+    setModulePrec(0);
+    setModuleCumbersome(false);
+    setModuleCost(0);
+    setModuleDescription("");
+    setWeaponCategory("Heavy");
+    setDamageType("Physical");
+    setPilotAtt1("might");
+    setPilotAtt2("dexterity");
+    setQuality("");
+    setQualityCost(0);
+    setIsShield(false);
+  };
 
   const data = {
     class: spellClass, name: name.trim(), description: description.trim(), isOffensive,
@@ -511,7 +684,7 @@ function PlayerSpellPanel() {
       rangeEnd: Number(seedRangeEnd),
       effects: seedEffects,
     }),
-    // pilot-vehicle — flat structure per subtype for later import into player-edit
+    // pilot-vehicle : flat structure per subtype for later import into player-edit
     ...(spellType === "pilot-vehicle" && (() => {
       const frameData = availableFrames.find((f) => f.name === vehicleFrame);
       const base = { pilotSubtype, customName: name.trim(), enabled: false, equipped: false, equippedSlot: null };
@@ -681,7 +854,7 @@ function PlayerSpellPanel() {
                 </Grid>
               )}
 
-              {/* Cooking — one text field per roll result 1-12 */}
+              {/* Cooking : one text field per roll result 1-12 */}
               {spellType === "cooking" && (
                 <>
                   {cookingEffects.map((fx, i) => (
@@ -701,7 +874,7 @@ function PlayerSpellPanel() {
                 </>
               )}
 
-              {/* Magiseed — description + per-tick effects */}
+              {/* Magiseed : description + per-tick effects */}
               {spellType === "magiseed" && (
                 <>
                   <Grid item xs={6} sm={3}>
@@ -756,7 +929,7 @@ function PlayerSpellPanel() {
                         <Select value={vehicleFrame} label={t("Frame")} onChange={(e) => setVehicleFrame(e.target.value)}>
                           {availableFrames.map((f) => (
                             <MenuItem key={f.name} value={f.name}>
-                              {t(f.name)} — {t("Passengers")}: {f.passengers} · {t("Distance")}: {f.distance}
+                              {t(f.name)}  -  {t("Passengers")}: {f.passengers} · {t("Distance")}: {f.distance}
                             </MenuItem>
                           ))}
                         </Select>
@@ -764,7 +937,7 @@ function PlayerSpellPanel() {
                     </Grid>
                   )}
 
-                  {/* Cost — shown for all module types */}
+                  {/* Cost : shown for all module types */}
                   {pilotSubtype !== "frame" && (
                     <Grid item xs={6} sm={4}>
                       <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
@@ -935,6 +1108,9 @@ function PlayerSpellPanel() {
               </Grid>
             </>
           )}
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={spellType === "default"
@@ -942,11 +1118,12 @@ function PlayerSpellPanel() {
         : <NonStaticSpellCard item={nonStaticData} />
       }
       addButton={<AddToCompendiumButton itemType="player-spell" data={spellType === "default" ? data : nonStaticData} />}
+      exportDataType="player-spells"
     />
   );
 }
 
-// ── Quality panel ─────────────────────────────────────────────────────────────
+// Quality panel
 
 function QualityPanel() {
   const { t } = useTranslate();
@@ -958,6 +1135,14 @@ function QualityPanel() {
   const [qualityTab, setQualityTab] = useState(0);
 
   const data = { name: name.trim(), category, quality: quality.trim(), cost: Number(cost), filter };
+
+  const handleClear = () => {
+    setName("");
+    setCategory(QUALITY_CATEGORIES[0]);
+    setQuality("");
+    setCost(0);
+    setFilter([]);
+  };
 
   return (
     <PanelLayout
@@ -1023,15 +1208,19 @@ function QualityPanel() {
           ) : (
             <QualitiesGenerator onGenerate={(text) => setQuality(text)} />
           )}
+          <Box sx={{ mt: 2 }}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Box>
         </Box>
       }
       previewContent={data.name ? <QualityCard quality={data} /> : <Box sx={{ p: 2 }}><Typography color="text.secondary">Fill in the form to see a preview</Typography></Box>}
       addButton={<AddToCompendiumButton itemType="quality" data={data} />}
+      exportDataType="qualities"
     />
   );
 }
 
-// ── Heroic panel ──────────────────────────────────────────────────────────────
+// Heroic panel
 
 function HeroicPanel() {
   const { t } = useTranslate();
@@ -1042,6 +1231,14 @@ function HeroicPanel() {
   const [applicableTo, setApplicableTo] = useState([]);
 
   const data = { name: name.trim(), book, quote: quote.trim(), description: description.trim(), applicableTo };
+
+  const handleClear = () => {
+    setName("");
+    setBook("");
+    setQuote("");
+    setDescription("");
+    setApplicableTo([]);
+  };
 
   return (
     <PanelLayout
@@ -1076,17 +1273,21 @@ function HeroicPanel() {
           <Grid item xs={12}>
             <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" maxLength={1500} />
           </Grid>
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={<HeroicCard heroic={data} />}
       addButton={<AddToCompendiumButton itemType="heroic" data={data} />}
       data={data}
       itemName={data.name || ""}
+      exportDataType="heroics"
     />
   );
 }
 
-// ── Class panel (inline form) ─────────────────────────────────────────────────
+// Class panel (inline form)
 
 const BLANK_BENEFITS = {
   hpplus: 0, mpplus: 0, ipplus: 0, isCustomBenefit: false,
@@ -1127,6 +1328,19 @@ function ClassPanel() {
       spellClasses: spellClassesSelected,
     },
     skills,
+  };
+
+  const handleClear = () => {
+    setName("");
+    setBook("homebrew");
+    setHpplus(0);
+    setMpplus(0);
+    setIpplus(0);
+    setMartials({ armor: false, shields: false, melee: false, ranged: false });
+    setRitualism(false);
+    setCustomBenefits([]);
+    setSpellClassesSelected([]);
+    setSkills(Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })));
   };
 
   return (
@@ -1266,17 +1480,21 @@ function ClassPanel() {
               </Box>
             </Grid>
           ))}
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={<ClassCard cls={{ ...classData, skills: classData.skills.filter(s => s.skillName.trim()) }} />}
       addButton={<AddToCompendiumButton itemType="class" data={classData} />}
       data={classData}
       itemName={classData.name || ""}
+      exportDataType="classes"
     />
   );
 }
 
-// ── Weapon panel (inline form) ────────────────────────────────────────────────
+// Weapon panel (inline form)
 
 function WeaponPanel() {
   const { t } = useTranslate();
@@ -1303,6 +1521,7 @@ function WeaponPanel() {
     mDefModifier, setMDefModifier,
     modifiersExpanded, setModifiersExpanded,
     modifiers,
+    clearModifiers,
   } = useEquipmentForm(null);
 
   const calcCost = () => {
@@ -1359,9 +1578,10 @@ function WeaponPanel() {
     setBase(weapons[0]); setName(weapons[0].name); setCategory(weapons[0].category ?? "");
     setType(weapons[0].type); setHands(weapons[0].hands);
     setAtt1(weapons[0].att1); setAtt2(weapons[0].att2);
-    setMartial(false); setDamageBonus(false); setDamageReworkBonus(false);
+    setMartial(weapons[0].martial || false); setDamageBonus(false); setDamageReworkBonus(false);
     setPrecBonus(false); setRework(false); setQuality(""); setQualityCost(0);
     setSelectedQuality(""); setTotalBonus(0);
+    clearModifiers();
   };
 
   return (
@@ -1446,11 +1666,12 @@ function WeaponPanel() {
       addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
       data={weaponObj}
       itemName={weaponObj.name || ""}
+      exportDataType="weapons"
     />
   );
 }
 
-// ── Armor panel (inline form) ─────────────────────────────────────────────────
+// Armor panel (inline form)
 
 function ArmorPanel() {
   const { t } = useTranslate();
@@ -1549,11 +1770,12 @@ function ArmorPanel() {
       addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
       data={armorObj}
       itemName={armorObj.name || ""}
+      exportDataType="armor"
     />
   );
 }
 
-// ── Shield panel (inline form) ────────────────────────────────────────────────
+// Shield panel (inline form)
 
 function ShieldPanel() {
   const { t } = useTranslate();
@@ -1652,11 +1874,12 @@ function ShieldPanel() {
       addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
       data={shieldObj}
       itemName={shieldObj.name || ""}
+      exportDataType="shields"
     />
   );
 }
 
-// ── Custom Weapon panel ───────────────────────────────────────────────────────
+// Custom Weapon panel
 
 function CustomWeaponPanel() {
   const { t } = useTranslate();
@@ -1667,6 +1890,22 @@ function CustomWeaponPanel() {
   const [type,                  setType]                  = useState(cwTypes[0]);
   const [customizations,        setCustomizations]        = useState([]);
   const [selectedCustomization, setSelectedCustomization] = useState("");
+  const [secondWeaponName,                  setSecondWeaponName]                  = useState("");
+  const [secondSelectedCategory,            setSecondSelectedCategory]            = useState(cwCategories[0]);
+  const [secondSelectedRange,               setSecondSelectedRange]               = useState(cwRange[0]);
+  const [secondSelectedAccuracyCheck,       setSecondSelectedAccuracyCheck]       = useState(cwAccuracyChecks[0]);
+  const [secondSelectedType,                setSecondSelectedType]                = useState(cwTypes[0]);
+  const [secondCurrentCustomizations,       setSecondCurrentCustomizations]       = useState([]);
+  const [secondSelectedCustomization,       setSecondSelectedCustomization]       = useState("");
+  const [secondDamageModifier,              setSecondDamageModifier]              = useState(0);
+  const [secondPrecModifier,                setSecondPrecModifier]                = useState(0);
+  const [secondDefModifier,                 setSecondDefModifier]                 = useState(0);
+  const [secondMDefModifier,                setSecondMDefModifier]                = useState(0);
+  const [secondOverrideDamageType,          setSecondOverrideDamageType]          = useState(false);
+  const [secondCustomDamageType,            setSecondCustomDamageType]            = useState("physical");
+  const [secondModifiersExpanded,           setSecondModifiersExpanded]           = useState(false);
+  const [overrideDamageType,                setOverrideDamageType]                = useState(false);
+  const [customDamageType,                  setCustomDamageType]                  = useState("physical");
   const [quality,               setQuality]               = useState("");
   const [qualityCost,           setQualityCost]           = useState(0);
   const [selectedQuality,       setSelectedQuality]       = useState("");
@@ -1679,21 +1918,78 @@ function CustomWeaponPanel() {
     modifiers,
     clearModifiers,
   } = useEquipmentForm(null);
+  const hasTransforming = customizations.some(
+    (c) => c.name === "weapon_customization_transforming"
+  );
+
+  useEffect(() => {
+    if (hasTransforming && secondCurrentCustomizations.length === 0) {
+      const transformingCustomization = cwCustomizations.find(
+        (c) => c.name === "weapon_customization_transforming"
+      );
+      if (transformingCustomization) {
+        setSecondCurrentCustomizations([transformingCustomization]);
+      }
+    }
+  }, [hasTransforming, secondCurrentCustomizations.length]);
+
+  const hasElementalCustomization = customizations.some(
+    (c) => c.name === "weapon_customization_elemental"
+  );
+  const isDamageTypeEnabled = hasElementalCustomization || overrideDamageType;
+  const secondHasElementalCustomization = secondCurrentCustomizations.some(
+    (c) => c.name === "weapon_customization_elemental"
+  );
+
+  const calculateTotalCost = () => {
+    const baseCost = 300;
+    const transformingCost = hasTransforming ? 100 : 0;
+    const qualityCostValue = parseInt(qualityCost) || 0;
+    return baseCost + transformingCost + qualityCostValue;
+  };
+  const isMartial = () => {
+    const martialCustomizations = [
+      "weapon_customization_quick",
+      "weapon_customization_magicdefenseboost",
+      "weapon_customization_powerful",
+    ];
+    return customizations.some((c) => martialCustomizations.includes(c.name));
+  };
 
   const weaponObj = {
     name,
     category,
     range,
-    accuracyCheck: [accuracyCheck.att1, accuracyCheck.att2],
+    accuracyCheck: { att1: accuracyCheck.att1, att2: accuracyCheck.att2 },
     type,
     customizations,
     quality,
     qualityCost,
     selectedQuality,
+    cost: calculateTotalCost(),
+    hands: 2,
+    martial: isMartial(),
+    secondWeaponName,
+    secondSelectedCategory,
+    secondSelectedRange,
+    secondSelectedAccuracyCheck: {
+      att1: secondSelectedAccuracyCheck.att1,
+      att2: secondSelectedAccuracyCheck.att2,
+    },
+    secondSelectedType,
+    secondCurrentCustomizations,
+    secondDamageModifier: parseInt(secondDamageModifier),
+    secondPrecModifier: parseInt(secondPrecModifier),
+    secondDefModifier: parseInt(secondDefModifier),
+    secondMDefModifier: parseInt(secondMDefModifier),
+    secondOverrideDamageType,
+    secondCustomDamageType,
     damageModifier: parseInt(damageModifier),
     precModifier: parseInt(precModifier),
     defModifier: parseInt(defModifier),
     mDefModifier: parseInt(mDefModifier),
+    overrideDamageType,
+    customDamageType,
     ...modifiers(),
   };
 
@@ -1701,6 +1997,13 @@ function CustomWeaponPanel() {
     setName(""); setCategory(cwCategories[0]); setRange(cwRange[0]);
     setAccuracyCheck(cwAccuracyChecks[0]); setType(cwTypes[0]);
     setCustomizations([]); setSelectedCustomization("");
+    setSecondWeaponName(""); setSecondSelectedCategory(cwCategories[0]); setSecondSelectedRange(cwRange[0]);
+    setSecondSelectedAccuracyCheck(cwAccuracyChecks[0]); setSecondSelectedType(cwTypes[0]);
+    setSecondCurrentCustomizations([]); setSecondSelectedCustomization("");
+    setSecondDamageModifier(0); setSecondPrecModifier(0); setSecondDefModifier(0); setSecondMDefModifier(0);
+    setSecondOverrideDamageType(false); setSecondCustomDamageType("physical");
+    setSecondModifiersExpanded(false);
+    setOverrideDamageType(false); setCustomDamageType("physical");
     setQuality(""); setQualityCost(0); setSelectedQuality("");
     clearModifiers();
   };
@@ -1708,8 +2011,17 @@ function CustomWeaponPanel() {
   const handleCategoryChange = (e) => {
     const newCat = e.target.value;
     setCategory(newCat);
+    setType(cwTypes[0]);
     if (newCat === "weapon_category_arcane" || newCat === "weapon_category_dagger") {
       setCustomizations((prev) => prev.filter((c) => c.name !== "weapon_customization_powerful"));
+    }
+  };
+  const handleSecondCategoryChange = (e) => {
+    const newCat = e.target.value;
+    setSecondSelectedCategory(newCat);
+    setSecondSelectedType(cwTypes[0]);
+    if (newCat === "weapon_category_arcane" || newCat === "weapon_category_dagger") {
+      setSecondCurrentCustomizations((prev) => prev.filter((c) => c.name !== "weapon_customization_powerful"));
     }
   };
 
@@ -1730,7 +2042,17 @@ function CustomWeaponPanel() {
             <ChangeAccuracyCheck value={accuracyCheck} onChange={(val) => setAccuracyCheck(val)} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <ChangeCWType value={type} onChange={(e) => setType(e.target.value)} />
+            <ChangeCWType
+              value={isDamageTypeEnabled ? (overrideDamageType ? customDamageType : type) : "physical"}
+              onChange={(e) => {
+                if (overrideDamageType) {
+                  setCustomDamageType(e.target.value);
+                } else {
+                  setType(e.target.value);
+                }
+              }}
+              disabled={!isDamageTypeEnabled}
+            />
           </Grid>
           <Grid item xs={12}>
             <ChangeCustomizations
@@ -1740,8 +2062,93 @@ function CustomWeaponPanel() {
               onCustomizationRemove={(name) => setCustomizations((prev) => prev.filter((c) => c.name !== name))}
               currentCustomizations={customizations}
               selectedCategory={category}
+              isSecondForm={false}
             />
           </Grid>
+          {hasTransforming && (
+            <>
+              <Grid item xs={12}>
+                <Divider sx={{ mt: 1, mb: 0.5 }} />
+                <Typography variant="h6">{t("weapon_customization_transforming_form")}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label={t("weapon_customization_transforming_form_name")}
+                  value={secondWeaponName}
+                  onChange={(e) => setSecondWeaponName(e.target.value)}
+                  fullWidth
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ChangeCWCategory value={secondSelectedCategory} onChange={handleSecondCategoryChange} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ChangeRange value={secondSelectedRange} onChange={(e) => setSecondSelectedRange(e.target.value)} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ChangeAccuracyCheck value={secondSelectedAccuracyCheck} onChange={(val) => setSecondSelectedAccuracyCheck(val)} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ChangeCWType
+                  value={secondSelectedType}
+                  onChange={(e) => setSecondSelectedType(e.target.value)}
+                  disabled={!secondHasElementalCustomization}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <ChangeCustomizations
+                  selectedCustomization={secondSelectedCustomization}
+                  setSelectedCustomization={setSecondSelectedCustomization}
+                  onCustomizationAdd={(c) => setSecondCurrentCustomizations((prev) => [...prev, c])}
+                  onCustomizationRemove={(name) => setSecondCurrentCustomizations((prev) => prev.filter((c) => c.name !== name))}
+                  currentCustomizations={secondCurrentCustomizations}
+                  selectedCategory={secondSelectedCategory}
+                  isSecondForm={true}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Accordion sx={{ width: "100%", marginLeft: "10px" }}
+                  expanded={secondModifiersExpanded} onChange={() => setSecondModifiersExpanded(!secondModifiersExpanded)}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>{t("weapon_customization_transforming_form_modifiers")}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      {[
+                        { label: "Damage Modifier",    value: secondDamageModifier, set: setSecondDamageModifier },
+                        { label: "Precision Modifier", value: secondPrecModifier,   set: setSecondPrecModifier },
+                        { label: "DEF Modifier",       value: secondDefModifier,    set: setSecondDefModifier },
+                        { label: "MDEF Modifier",      value: secondMDefModifier,   set: setSecondMDefModifier },
+                      ].map(({ label, value, set }) => (
+                        <Grid item xs={6} key={label}>
+                          <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
+                        </Grid>
+                      ))}
+                      <Grid item xs={6}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={secondOverrideDamageType}
+                              onChange={(e) => setSecondOverrideDamageType(e.target.checked)}
+                            />
+                          }
+                          label={t("override_damage_type")}
+                        />
+                        {secondOverrideDamageType && (
+                          <ChangeCWType
+                            value={secondCustomDamageType}
+                            onChange={(e) => setSecondCustomDamageType(e.target.value)}
+                            disabled={false}
+                          />
+                        )}
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+              </Grid>
+            </>
+          )}
           <Grid item xs={12}>
             <SelectWeaponQuality quality={selectedQuality} setQuality={(e) => {
               const q = weaponQualities.find((el) => el.name === e.target.value);
@@ -1769,6 +2176,35 @@ function CustomWeaponPanel() {
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
+                <Grid item xs={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={overrideDamageType}
+                        onChange={(e) => setOverrideDamageType(e.target.checked)}
+                      />
+                    }
+                    label={t("override_damage_type")}
+                  />
+                </Grid>
+                {overrideDamageType && (
+                  <Grid item xs={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("weapon_damage_type")}</InputLabel>
+                      <Select
+                        value={customDamageType}
+                        onChange={(e) => setCustomDamageType(e.target.value)}
+                        label={t("weapon_damage_type")}
+                      >
+                        {cwTypes.map((damageType) => (
+                          <MenuItem key={damageType} value={damageType}>
+                            {t(damageType)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                )}
               </Grid>
             </AccordionDetails>
           </Accordion>
@@ -1781,11 +2217,12 @@ function CustomWeaponPanel() {
       addButton={<AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />}
       data={weaponObj}
       itemName={weaponObj.name || ""}
+      exportDataType="custom-weapons"
     />
   );
 }
 
-// ── Accessory panel ───────────────────────────────────────────────────────────
+// Accessory panel
 
 function AccessoryPanel() {
   const { t } = useTranslate();
@@ -1877,11 +2314,12 @@ function AccessoryPanel() {
       addButton={<AddToCompendiumButton itemType="accessory" data={accessoryObj} />}
       data={accessoryObj}
       itemName={accessoryObj.name || ""}
+      exportDataType="accessories"
     />
   );
 }
 
-// ── Optional panel ────────────────────────────────────────────────────────────
+// Optional panel
 
 const OPTIONAL_SUBTYPES = [
   { value: "quirk",        label: "Quirk"        },
@@ -1935,6 +2373,18 @@ function OptionalPanel() {
         subtype, name: name.trim(), description: description.trim(), effect: effect.trim(),
         ...(showClock ? { clock: { sections: Number(clockSections) } } : {}),
       };
+
+  const handleClear = () => {
+    setSubtype("quirk");
+    setName("");
+    setDescription("");
+    setEffect("");
+    setTargetDescription("");
+    setClockSections(6);
+    setShowClock(false);
+    setZeroTrigger(null);
+    setZeroEffect(null);
+  };
 
   return (
     <PanelLayout
@@ -2043,19 +2493,25 @@ function OptionalPanel() {
               </Grid>
             )}
           </>}
+          <Grid item xs={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
+          </Grid>
         </Grid>
       }
       previewContent={data.name ? <OptionalCard optional={data} /> : <Box sx={{ p: 2 }}><Typography color="text.secondary">{t("Fill in the form to see a preview")}</Typography></Box>}
       addButton={<AddToCompendiumButton itemType="optional" data={data} />}
+      exportDataType="optionals"
     />
   );
 }
 
-// ── Tab definitions ───────────────────────────────────────────────────────────
+// Tab definitions
 
 const TABS = [
   { key: "npc-attack",   label: "NPC Attack",   Panel: NpcAttackPanel   },
   { key: "npc-spell",    label: "NPC Spell",    Panel: NpcSpellPanel    },
+  { key: "npc-special",  label: "Special Rule", Panel: NpcSpecialPanel  },
+  { key: "npc-action",   label: "Other Action", Panel: NpcActionPanel   },
   { key: "player-spell", label: "Player Spell", Panel: PlayerSpellPanel },
   { key: "quality",      label: "Quality",      Panel: QualityPanel     },
   { key: "heroic",       label: "Heroic Skill", Panel: HeroicPanel      },
@@ -2068,11 +2524,13 @@ const TABS = [
   { key: "optional",      label: "Optional",      Panel: OptionalPanel      },
 ];
 
-// ── Viewer type → Quick Create tab key ───────────────────────────────────────
+// Viewer type → Quick Create tab key
 
 const VIEWER_TYPE_TO_TAB_KEY = {
   "attacks":       "npc-attack",
   "spells":        "npc-spell",
+  "special":       "npc-special",
+  "actions":       "npc-action",
   "player-spells": "player-spell",
   "qualities":     "quality",
   "heroics":       "heroic",
@@ -2085,7 +2543,7 @@ const VIEWER_TYPE_TO_TAB_KEY = {
   "optionals":     "optional",
 };
 
-// ── Main component ────────────────────────────────────────────────────────────
+// Main component
 
 export default function QuickCreateModal({ open, onClose, lockedToViewerType }) {
   const { t } = useTranslate();
