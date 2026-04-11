@@ -18,11 +18,11 @@ import {
 import { useLoadoutStore } from "../../../store/playerLoadoutStore";
 import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
 
-const SLOT_LABEL = {
-  mainHand: t("MAIN"),
-  offHand: t("OFF"),
-  armor: t("ARM"),
-  accessory: t("ACC"),
+const SLOT_LABEL_KEY = {
+  mainHand: "MAIN",
+  offHand: "OFF",
+  armor: "ARM",
+  accessory: "ACC",
 };
 
 function resolvedName(resolved, locked, t) {
@@ -115,7 +115,7 @@ export default function CardLoadout({
             width: { xs: "26px", sm: "34px", lg: "52px" },
           }}
         >
-          {SLOT_LABEL[key]}
+          {t(SLOT_LABEL_KEY[key])}
         </Typography>
 
         {/* Lock / vehicle icon */}
