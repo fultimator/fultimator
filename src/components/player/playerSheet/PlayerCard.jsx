@@ -67,6 +67,12 @@ const StatBarWrapper = styled(Box)(({ theme }) => ({
     [theme.breakpoints.down("sm")]: {
       fontSize: "0.6rem",
     },
+    [theme.breakpoints.up("md")]: {
+      fontSize: "0.8rem",
+    },
+    [theme.breakpoints.up("lg")]: {
+      fontSize: "0.88rem",
+    },
     letterSpacing: "0.04em",
     color: "#fff",
     textShadow: "0 1px 3px rgba(0,0,0,0.6)",
@@ -87,6 +93,12 @@ const AffinityCell = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   padding: "4px 2px",
+  [theme.breakpoints.up("md")]: {
+    padding: "6px 4px",
+  },
+  [theme.breakpoints.up("lg")]: {
+    padding: "8px 4px",
+  },
   borderRight: `1px solid ${theme.palette.divider}`,
   [theme.breakpoints.down("sm")]: {
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -101,14 +113,32 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   border: `0.5px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
   padding: "4px 6px",
+  [theme.breakpoints.up("md")]: {
+    padding: "6px 8px",
+  },
+  [theme.breakpoints.up("lg")]: {
+    padding: "8px 10px",
+  },
   textAlign: "center",
   flex: 1,
 }));
 
-const StyledMarkdown = styled(ReactMarkdown)({
+const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
   whiteSpace: "pre-line",
   "& p": {
     margin: "4px 0",
+    fontSize: "0.8rem",
+    lineHeight: 1.45,
+    [theme.breakpoints.up("sm")]: {
+      fontSize: "0.9rem",
+    },
+    [theme.breakpoints.up("md")]: {
+      fontSize: "0.95rem",
+    },
+    [theme.breakpoints.up("lg")]: {
+      fontSize: "1rem",
+      lineHeight: 1.55,
+    },
   },
   "& p:first-of-type": {
     marginTop: 0,
@@ -116,7 +146,7 @@ const StyledMarkdown = styled(ReactMarkdown)({
   "& p:last-of-type": {
     marginBottom: 0,
   },
-});
+}));
 
 
 const DescriptionWrapper = styled(Box, {
@@ -215,7 +245,7 @@ function CombatStat({ icon, label, value, theme }) {
         sx={{
           fontFamily: "'Antonio', fantasy, sans-serif",
           fontWeight: "bold",
-          fontSize: { xs: "0.55rem", sm: "0.62rem" },
+          fontSize: { xs: "0.55rem", sm: "0.62rem", md: "0.68rem", lg: "0.74rem" },
           letterSpacing: "0.06em",
           textTransform: "uppercase",
           color: theme.palette.text.secondary,
@@ -229,7 +259,7 @@ function CombatStat({ icon, label, value, theme }) {
         <Typography
           sx={{
             fontFamily: "'Antonio', fantasy, sans-serif",
-            fontSize: { xs: "0.9rem", sm: "1.1rem" },
+            fontSize: { xs: "0.9rem", sm: "1.1rem", md: "1.2rem", lg: "1.3rem" },
             fontWeight: "bold",
             lineHeight: 1.3,
           }}
@@ -423,7 +453,7 @@ export default function PlayerCard({
       variant="body2"
       sx={{
         fontFamily: "'Antonio', fantasy, sans-serif",
-        fontSize: { xs: "0.68rem", sm: "0.8rem" },
+        fontSize: { xs: "0.68rem", sm: "0.8rem", md: "0.86rem", lg: "0.92rem" },
       }}
     >
       {label}
@@ -456,7 +486,7 @@ export default function PlayerCard({
             flex: 1,
             background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%)`,
             px: { xs: 1, sm: 2 },
-            py: 1,
+            py: { xs: 0.75, sm: 1, md: 1.2 },
             display: "flex",
             alignItems: "center",
           }}
@@ -472,7 +502,7 @@ export default function PlayerCard({
                 "& .MuiInputBase-input": {
                   color: "#fff",
                   fontFamily: "Antonio",
-                  fontSize: { xs: "1.2rem", sm: "1.5rem" },
+                  fontSize: { xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" },
                   fontWeight: "medium",
                   textTransform: "uppercase",
                 },
@@ -485,7 +515,7 @@ export default function PlayerCard({
             <Typography
               color="#fff"
               fontFamily="Antonio"
-              fontSize={{ xs: "1.2rem", sm: "1.5rem" }}
+              fontSize={{ xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" }}
               fontWeight="medium"
               sx={{ textTransform: "uppercase" }}
             >
@@ -497,7 +527,7 @@ export default function PlayerCard({
         <Box
           sx={{
             px: { xs: 1, sm: 2 },
-            py: 0.5,
+            py: { xs: 0.4, sm: 0.5, md: 0.65 },
             borderLeft: "2px solid #fff",
             borderBottom: `2px solid ${primary}`,
             display: "flex",
@@ -507,14 +537,14 @@ export default function PlayerCard({
           {isEditMode ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {player.info.pronouns && (
-                <Typography fontFamily="Antonio" fontSize={{ xs: "0.8rem", sm: "1rem" }} sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                <Typography fontFamily="Antonio" fontSize={{ xs: "0.78rem", sm: "1rem", md: "1.08rem" }} sx={{ textTransform: "uppercase", mr: 0.5 }}>
                   {player.info.pronouns} <Diamond color={primary} />
                 </Typography>
               )}
               <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); updateMaxStats?.(); }}>
                 <Remove fontSize="small" />
               </IconButton>
-              <Typography fontFamily="Antonio" fontSize={{ xs: "1rem", sm: "1.25rem" }} fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
+              <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
                 {t("Lvl")} {player.lvl}
               </Typography>
               <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); updateMaxStats?.(); }}>
@@ -522,7 +552,7 @@ export default function PlayerCard({
               </IconButton>
             </Box>
           ) : (
-            <Typography fontFamily="Antonio" fontSize={{ xs: "1rem", sm: "1.25rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
+            <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
               {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
               {t("Lvl")} {player.lvl}
             </Typography>
@@ -531,7 +561,7 @@ export default function PlayerCard({
       </Box>
 
       {/* Body  */}
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr" }, alignItems: "stretch" }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
         {/* Left column */}
         <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden", height: "100%", justifyContent: "space-between" }}>          {/* Avatar */}
           <Box sx={{ position: "relative" }}>
@@ -541,7 +571,7 @@ export default function PlayerCard({
               style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }}
             />
             {inCrisis && (
-              <Box sx={{ position: "absolute", bottom: 0, width: "100%", background: "rgba(0,0,0,0.65)", color: "#fff", textAlign: "center", py: "3px", fontFamily: "Antonio", fontSize: "0.7rem", letterSpacing: "0.1em", textShadow: "0 0 4px red" }}>
+              <Box sx={{ position: "absolute", bottom: 0, width: "100%", background: "rgba(0,0,0,0.65)", color: "#fff", textAlign: "center", py: "3px", fontFamily: "Antonio", fontSize: { xs: "0.62rem", sm: "0.7rem", md: "0.78rem" }, letterSpacing: "0.1em", textShadow: "0 0 4px red" }}>
                 !! {t("CRISIS")} !!
               </Box>
             )}
@@ -599,13 +629,13 @@ export default function PlayerCard({
         </Box>
 
         {/* Right column */}
-        <Box sx={{ display: "flex", flexDirection: "column", p: { xs: 0.5, sm: 1 }, gap: 1, minWidth: 0 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", p: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 }, gap: { xs: 0.75, sm: 1, md: 1.2, lg: 1.4 }, minWidth: 0 }}>
 
           {/* Description */}
           {player.info.description && (
             <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden", minWidth: 0 }}>
               <Box sx={{ background: primary, px: 1, py: "2px" }}>
-                <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem", lg: "1.16rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   {t("Description")}
                 </Typography>
               </Box>
@@ -627,11 +657,11 @@ export default function PlayerCard({
           {/* Traits */}
           <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
             <Box sx={{ background: primary, px: 1, py: "2px" }}>
-              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem", lg: "1.16rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 {t("Traits")}
               </Typography>
             </Box>
-            <Box sx={{ px: 1, py: "5px", display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "2px 8px" }}>
+            <Box sx={{ px: { xs: 1, md: 1.25 }, py: { xs: "5px", md: "8px" }, display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: { xs: "2px 8px", md: "6px 12px" } }}>
               <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
                 {isEditMode ? (
                   <TextField
@@ -643,7 +673,7 @@ export default function PlayerCard({
                     inputProps={{ maxLength: 300, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
                   />
                 ) : (
-                  <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     <strong>{t("Identity")}: </strong>
                     {player.info.identity && player.info.identity.length > (isCharacterSheet ? 100 : 50)
                       ? player.info.identity.slice(0, (isCharacterSheet ? 100 : 50)) + "…"
@@ -669,7 +699,7 @@ export default function PlayerCard({
                   )}
                 />
               ) : (
-                <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   <strong>{t("Theme")}: </strong>
                   {t(player.info.theme)?.length > 18 ? t(player.info.theme).slice(0, 18) + "…" : t(player.info.theme)}
                 </Typography>
@@ -684,7 +714,7 @@ export default function PlayerCard({
                   inputProps={{ maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
                 />
               ) : (
-                <Typography sx={{ fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   <strong>{t("Origin")}: </strong>
                   {player.info.origin?.length > 18 ? player.info.origin.slice(0, 18) + "…" : player.info.origin}
                 </Typography>
@@ -706,8 +736,8 @@ export default function PlayerCard({
                 : { xs: "auto auto auto auto", md: "auto auto auto auto 1fr" },
               gridTemplateRows: "repeat(4, auto)",
               alignItems: "center",
-              rowGap: "2px",
-              columnGap: { xs: "2px", sm: "6px" },
+              rowGap: { xs: "2px", md: "6px", lg: "8px" },
+              columnGap: { xs: "2px", sm: "6px", md: "10px", lg: "12px" },
             }}
           >
             {/* Right column desktop loadout */}
@@ -733,10 +763,10 @@ export default function PlayerCard({
                     sx={{
                       fontFamily: "'Antonio'",
                       fontWeight: "bold",
-                      fontSize: { xs: "0.85rem", sm: "1rem" },
+                      fontSize: { xs: "0.8rem", sm: "1rem", md: "1.08rem", lg: "1.14rem" },
                       lineHeight: 1,
                       whiteSpace: "nowrap",
-                      py: "6px",
+                      py: { xs: "5px", sm: "6px", md: "8px" },
                     }}
                   >
                     {label}:
@@ -755,7 +785,7 @@ export default function PlayerCard({
                         size="small"
                         sx={{
                           fontFamily: "'Antonio', fantasy, sans-serif",
-                          fontSize: { xs: "0.85rem", sm: "1rem" },
+                          fontSize: { xs: "0.8rem", sm: "1rem", md: "1.08rem", lg: "1.14rem" },
                           minWidth: { xs: 35, sm: 52 },
                         }}
                       >
@@ -767,7 +797,7 @@ export default function PlayerCard({
                       <Typography
                         sx={{
                           fontFamily: "'Antonio', fantasy, sans-serif",
-                          fontSize: { xs: "0.85rem", sm: "1rem" },
+                          fontSize: { xs: "0.8rem", sm: "1rem", md: "1.08rem", lg: "1.14rem" },
                           fontWeight: "bold",
                           color: getAttributeColor(player.attributes[key], curr),
                           lineHeight: 1,
@@ -803,7 +833,7 @@ export default function PlayerCard({
           </Box>
 
           {/* DEF / MDEF / INIT */}
-          <Box sx={{ display: "flex", gap: { xs: 0.5, sm: 1 }, flexWrap: "wrap" }}>
+          <Box sx={{ display: "flex", gap: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 }, flexWrap: "wrap" }}>
             <CombatStat
               theme={theme}
               label={t("DEF")}

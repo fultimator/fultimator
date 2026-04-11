@@ -47,12 +47,19 @@ function applyModuleUpdater(
           spells: (cls.spells ?? []).map((s: any, si: number) =>
             si !== spellIndex
               ? s
-              : {
-                  ...s,
-                  vehicles: (s.vehicles ?? []).map((v: any) =>
+              : (() => {
+                  const vehicles = Array.isArray(s.vehicles)
+                    ? s.vehicles
+                    : (Array.isArray(s.currentVehicles) ? s.currentVehicles : []);
+                  const updatedVehicles = vehicles.map((v: any) =>
                     !v.enabled ? v : { ...v, modules: updaterFn(v.modules ?? []) },
-                  ),
-                },
+                  );
+                  return {
+                    ...s,
+                    vehicles: updatedVehicles,
+                    currentVehicles: updatedVehicles,
+                  };
+                })(),
           ),
         },
   );
@@ -149,23 +156,85 @@ export function selectModuleForSlot(
     const targetSlot = slot === 'armor' ? 'armor' : slot === 'mainHand' ? 'main' : 'off';
     const targetModule = modules[moduleIndex];
     if (!targetModule) return modules;
+    const selectingArmor = slot === 'armor';
+    const selectingWeapon = slot === 'mainHand' || slot === 'offHand';
+
+    const normalizeWeaponSlot = (raw: string | null | undefined, module: any): 'main' | 'off' | 'both' => {
+      if (raw === 'both') return 'both';
+      if (raw === 'main' || raw === 'mainHand') return 'main';
+      if (raw === 'off' || raw === 'offHand') return 'off';
+      return module?.isShield ? 'off' : 'main';
+    };
+
+    const isWeaponActive = (m: any): boolean =>
+      m.type === 'pilot_module_weapon' && (m.enabled || m.equipped);
+
+    const occupies = (m: any, hand: 'main' | 'off'): boolean => {
+      const s = normalizeWeaponSlot(m.equippedSlot, m);
+      return s === 'both' || s === hand;
+    };
+
+    const otherActiveWeapons = modules.filter((m: any, idx: number) => idx !== moduleIndex && isWeaponActive(m));
+
+    let resolvedWeaponSlot: 'main' | 'off' | 'both' = targetSlot as 'main' | 'off' | 'both';
+    if (selectingWeapon) {
+      if (targetModule.cumbersome) {
+        resolvedWeaponSlot = 'both';
+      } else if (targetModule.isShield) {
+        const mainOccupied = otherActiveWeapons.some((m: any) => occupies(m, 'main'));
+        const offOccupied = otherActiveWeapons.some((m: any) => occupies(m, 'off'));
+        const offShieldExists = otherActiveWeapons.some(
+          (m: any) => m.isShield && occupies(m, 'off'),
+        );
+        const requestedMain = targetSlot === 'main';
+
+        if (requestedMain) {
+          // Main-hand shield is legal only when another shield occupies off-hand.
+          if (!(offShieldExists && !mainOccupied)) return modules;
+          resolvedWeaponSlot = 'main';
+        } else {
+          if (!offOccupied) {
+            resolvedWeaponSlot = 'off';
+          } else if (offShieldExists && !mainOccupied) {
+            // Second shield can move to main hand.
+            resolvedWeaponSlot = 'main';
+          } else {
+            return modules;
+          }
+        }
+      } else {
+        resolvedWeaponSlot = targetSlot as 'main' | 'off';
+      }
+    }
 
     return modules.map((m: any, idx: number) => {
-      if (!m.equipped) return m;
       const isTarget = idx === moduleIndex;
       const isCorrectType =
-        (slot === 'armor' && m.type === 'pilot_module_armor') ||
-        (['mainHand', 'offHand'].includes(slot) && m.type === 'pilot_module_weapon');
+        (selectingArmor && m.type === 'pilot_module_armor') ||
+        (selectingWeapon && m.type === 'pilot_module_weapon');
       if (!isCorrectType) return m;
       if (isTarget) {
-        return { ...m, enabled: true, equippedSlot: m.cumbersome ? 'both' : targetSlot };
+        return {
+          ...m,
+          enabled: true,
+          equipped: true,
+          equippedSlot: selectingWeapon ? resolvedWeaponSlot : targetSlot,
+        };
       }
-      // Disable other modules that collide with the newly activated one
-      const takingMain = targetSlot === 'main' || targetModule.cumbersome;
-      const takingOff = targetSlot === 'off' || targetModule.cumbersome;
-      const wasInMain = m.equippedSlot === 'main' || m.equippedSlot === 'both';
-      const wasInOff = m.equippedSlot === 'off' || m.equippedSlot === 'both';
-      if ((takingMain && wasInMain) || (takingOff && wasInOff)) return { ...m, enabled: false };
+
+      if (selectingArmor) {
+        // Only one armor override can be active at a time.
+        return m.enabled ? { ...m, enabled: false } : m;
+      }
+
+      // Weapon slot collision rules.
+      const takingMain = resolvedWeaponSlot === 'main' || resolvedWeaponSlot === 'both';
+      const takingOff = resolvedWeaponSlot === 'off' || resolvedWeaponSlot === 'both';
+      const wasInMain = m.equippedSlot === 'main' || m.equippedSlot === 'mainHand' || m.equippedSlot === 'both';
+      const wasInOff = m.equippedSlot === 'off' || m.equippedSlot === 'offHand' || m.equippedSlot === 'both';
+      if ((takingMain && wasInMain) || (takingOff && wasInOff)) {
+        return { ...m, enabled: false };
+      }
       return m;
     });
   });
@@ -181,15 +250,14 @@ export function disableModuleForSlot(
 ): TypePlayer {
   return applyModuleUpdater(player, pilotInfo, modules =>
     modules.map((m: any) => {
-      if (!m.equipped) return m;
       const matches =
         (slot === 'armor' && m.type === 'pilot_module_armor') ||
         (slot === 'mainHand' &&
           m.type === 'pilot_module_weapon' &&
-          (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
+          (m.equippedSlot === 'main' || m.equippedSlot === 'mainHand' || m.equippedSlot === 'both')) ||
         (slot === 'offHand' &&
           m.type === 'pilot_module_weapon' &&
-          (m.equippedSlot === 'off' || m.equippedSlot === 'both'));
+          (m.equippedSlot === 'off' || m.equippedSlot === 'offHand' || m.equippedSlot === 'both'));
       return matches ? { ...m, enabled: false } : m;
     }),
   );
@@ -221,7 +289,11 @@ export function toggleActiveVehicle(
   pilotInfo: PilotSpellInfo,
 ): TypePlayer {
   const { classIndex, spellIndex } = pilotInfo;
-  const isActive = (player.classes as any)?.[classIndex]?.spells?.[spellIndex]?.vehicles?.some(
+  const spell = (player.classes as any)?.[classIndex]?.spells?.[spellIndex];
+  const vehicles = Array.isArray(spell?.vehicles)
+    ? spell.vehicles
+    : (Array.isArray(spell?.currentVehicles) ? spell.currentVehicles : []);
+  const isActive = vehicles.some(
     (v: any) => v.enabled,
   );
   const classes = (player.classes ?? []).map((cls: any, ci: number) =>
@@ -231,10 +303,13 @@ export function toggleActiveVehicle(
           ...cls,
           spells: (cls.spells ?? []).map((s: any, si: number) => {
             if (si !== spellIndex) return s;
-            const vehicles = (s.vehicles ?? []).map((v: any, vi: number) =>
+            const baseVehicles = Array.isArray(s.vehicles)
+              ? s.vehicles
+              : (Array.isArray(s.currentVehicles) ? s.currentVehicles : []);
+            const updatedVehicles = baseVehicles.map((v: any, vi: number) =>
               isActive ? { ...v, enabled: false } : { ...v, enabled: vi === 0 },
             );
-            return { ...s, vehicles };
+            return { ...s, vehicles: updatedVehicles, currentVehicles: updatedVehicles };
           }),
         },
   );
@@ -261,6 +336,7 @@ export function saveVehiclesAction(
               : {
                   ...s,
                   vehicles: updatedPilot.vehicles,
+                  currentVehicles: updatedPilot.vehicles,
                   showInPlayerSheet: updatedPilot.showInPlayerSheet,
                 },
           ),

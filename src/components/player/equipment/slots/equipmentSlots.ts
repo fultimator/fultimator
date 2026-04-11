@@ -65,11 +65,17 @@ function findPilotSpell(player: TypePlayer): { vehicles: ResolvedVehicle[] } | n
   return null;
 }
 
+function getPilotVehicles(pilotSpell: any): ResolvedVehicle[] {
+  if (!pilotSpell) return [];
+  const vehicles = pilotSpell.vehicles ?? pilotSpell.currentVehicles ?? [];
+  return Array.isArray(vehicles) ? vehicles : [];
+}
+
 /** Return the currently enabled vehicle, or null. */
 export function getActiveVehicle(player: TypePlayer): ResolvedVehicle | null {
   const pilot = findPilotSpell(player);
   if (!pilot) return null;
-  return (pilot.vehicles as ResolvedVehicle[]).find(v => v.enabled) ?? null;
+  return getPilotVehicles(pilot).find(v => v.enabled) ?? null;
 }
 
 // ─── deriveVehicleSlots ───────────────────────────────────────────────────────

@@ -15,9 +15,8 @@ import {
   Checkbox,
   ToggleButton,
   ToggleButtonGroup,
-  Divider,
 } from "@mui/material";
-import { ExpandMore, Delete } from "@mui/icons-material";
+import { ExpandMore, Delete, ContentCopy } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import CustomTextarea from "../../common/CustomTextarea";
@@ -46,6 +45,13 @@ const VehicleModule = memo(({
   const handleDelete = (e) => {
     e.stopPropagation();
     onDeleteModule(vehicleIndex, moduleIndex);
+  };
+
+  const handleClone = (e) => {
+    e.stopPropagation();
+    if (onCloneModule) {
+      onCloneModule(vehicleIndex, moduleIndex);
+    }
   };
 
   const handleModuleDropdownChange = (e) => {
@@ -142,15 +148,28 @@ const VehicleModule = memo(({
           </Grid>
 
           <Grid item xs={12} sm={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              onClick={handleDelete}
-              variant="outlined"
-              color="error"
-              size="small"
-              sx={{ minWidth: "auto", padding: 1 }}
-            >
-              <Delete />
-            </Button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button
+                onClick={handleDelete}
+                variant="outlined"
+                color="error"
+                size="small"
+                sx={{ minWidth: "auto", padding: 1 }}
+              >
+                <Delete />
+              </Button>
+              {onCloneModule && (
+                <Button
+                  onClick={handleClone}
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: "auto", padding: 1 }}
+                  title={t("Clone to Custom")}
+                >
+                  <ContentCopy />
+                </Button>
+              )}
+            </div>
           </Grid>
         </Grid>
       </AccordionSummary>
@@ -568,19 +587,6 @@ const VehicleModule = memo(({
             </>
           )}
 
-          {!isCustomModule && onCloneModule && (
-            <Grid item xs={12}>
-              <Divider sx={{ my: 1 }} />
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => onCloneModule(vehicleIndex, moduleIndex)}
-                sx={{ mt: 1 }}
-              >
-                {t("Clone to Custom")}
-              </Button>
-            </Grid>
-          )}
         </Grid>
       </AccordionDetails>
     </Accordion>

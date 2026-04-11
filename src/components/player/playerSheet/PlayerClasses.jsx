@@ -90,7 +90,16 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
           ? {
               ...cls,
               skills: cls.skills.map((s, j) =>
-                j === skillIndex ? { ...s, skillName: skill.skillName, description: skill.description } : s
+                j === skillIndex
+                  ? {
+                      ...s,
+                      skillName: skill.skillName,
+                      description: skill.description,
+                      specialSkill: skill.specialSkill || "",
+                      maxLvl: Number(skill.maxLvl) || s.maxLvl,
+                      currentLvl: Math.min(s.currentLvl, Number(skill.maxLvl) || s.maxLvl),
+                    }
+                  : s
               ),
             }
           : cls

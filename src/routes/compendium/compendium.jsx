@@ -83,12 +83,12 @@ import types from "../../libs/types";
 import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
 import { magiseeds } from "../../libs/floralistMagiseedData";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-import { availableGifts } from "../../components/player/spells/SpellGiftGiftsModal";
-import { availableDances } from "../../components/player/spells/SpellDancerDancesModal";
-import { availableTherioforms } from "../../components/player/spells/SpellMutantTherioformsModal";
+import { availableGifts } from "../../components/player/spells/spellOptionData";
+import { availableDances } from "../../components/player/spells/spellOptionData";
+import { availableTherioforms } from "../../components/player/spells/spellOptionData";
 import { availableTones } from "../../components/player/spells/SpellChanterTonesModal";
-import { availableSymbols } from "../../components/player/spells/SpellSymbolistSymbolsModal";
-import { invocationsByWellspring } from "../../components/player/spells/SpellInvokerInvocationsModal";
+import { availableSymbols } from "../../components/player/spells/spellOptionData";
+import { invocationsByWellspring } from "../../components/player/spells/spellOptionData";
 
 export const CLASS_BOOK_OPTIONS = [
   { label: "Core", value: "core" },
@@ -318,6 +318,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   selectedIdx,
   selectedSpellClass,
   onSpellClassChange,
+  selectedModuleType = "",
+  onModuleTypeChange,
   selectedQualityFilters,
   onQualityFiltersChange,
   selectedQualityCategories,
@@ -493,7 +495,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           </Box>
         )}
 
-        {selectedType === "player-spells" && !isPackMode && (
+        {selectedType === "player-spells" && (
           <FormControl fullWidth size="small">
             <InputLabel>{t("Class")}</InputLabel>
             <Select
@@ -512,6 +514,25 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             </Select>
           </FormControl>
         )}
+
+        {selectedType === "player-spells" &&
+          String(selectedSpellClass).toLowerCase() === "pilot" &&
+          typeof onModuleTypeChange === "function" && (
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Module Type")}</InputLabel>
+              <Select
+                value={selectedModuleType}
+                onChange={(e) => onModuleTypeChange?.(e.target.value)}
+                label={t("Module Type")}
+              >
+                <MenuItem value="">{t("All")}</MenuItem>
+                <MenuItem value="frame">{t("Vehicle Frame")}</MenuItem>
+                <MenuItem value="armor">{t("pilot_module_armor")}</MenuItem>
+                <MenuItem value="weapon">{t("pilot_module_weapon")}</MenuItem>
+                <MenuItem value="support">{t("pilot_module_support")}</MenuItem>
+              </Select>
+            </FormControl>
+          )}
 
         {(selectedType === "classes" || selectedType === "heroics") && (
           <Autocomplete
@@ -774,14 +795,14 @@ export function getNonStaticSpellItems(sc) {
       }));
     case "pilot-vehicle":
       return [
-        ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame" })),
+        ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame", pilotSubtype: "frame" })),
         ...availableModules.armor
           .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module" })),
-        ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module" })),
+          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module", pilotSubtype: "armor" })),
+        ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module", pilotSubtype: "weapon" })),
         ...availableModules.support
           .filter(m => m.name !== "pilot_custom_support")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module" })),
+          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module", pilotSubtype: "support" })),
       ];
     default:
       return null;
@@ -880,6 +901,8 @@ function CompendiumViewer() {
 
   const selectedType = searchParams.get("type") ?? "weapons";
   const selectedSpellClass = searchParams.get("class") ?? "";
+  const selectedModuleType = searchParams.get("moduleType") ?? "";
+  const isPilotClassSelected = String(selectedSpellClass).toLowerCase() === "pilot";
   const selectedBook = useMemo(() => {
     const books = searchParams.get("book");
     return books ? books.split(",") : [];
@@ -904,6 +927,43 @@ function CompendiumViewer() {
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const matchesPilotModuleType = useCallback((item, moduleType) => {
+    const filter = String(moduleType || "").toLowerCase();
+    if (!filter) return true;
+
+    if (filter === "frame") {
+      return item?.pilotSubtype === "frame"
+        || String(item?.category || "").toLowerCase() === "frame"
+        || item?.passengers != null
+        || String(item?.name || "").toLowerCase().includes("pilot_frame_");
+    }
+
+    const normalizedValues = [item?.type, item?.category, item?.name, item?.spellType]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase());
+
+    const matchesFlatField = normalizedValues.some((value) =>
+      value === `pilot_module_${filter}` ||
+      value.endsWith(`_${filter}`) ||
+      value.includes(`module_${filter}`) ||
+      value.includes(`${filter} module`)
+    );
+    if (matchesFlatField) return true;
+
+    if (!Array.isArray(item?.modules) || item.modules.length === 0) return false;
+    return item.modules.some((module) => {
+      const moduleValues = [module?.type, module?.category, module?.name]
+        .filter(Boolean)
+        .map((value) => String(value).toLowerCase());
+      return moduleValues.some((value) =>
+        value === `pilot_module_${filter}` ||
+        value.endsWith(`_${filter}`) ||
+        value.includes(`module_${filter}`) ||
+        value.includes(`${filter} module`)
+      );
+    });
+  }, []);
 
   // Lock page scroll while this route is mounted
   React.useEffect(() => {
@@ -962,6 +1022,19 @@ function CompendiumViewer() {
 
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
         items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+      }
+
+      if (selectedType === "player-spells" && selectedSpellClass) {
+        const spellClasses = activeSpellCls?.benefits?.spellClasses ?? [];
+        items = items.filter((item) => {
+          if (spellClasses.includes("default") && item.class === selectedSpellClass) {
+            return true;
+          }
+          return spellClasses.includes(item.spellType);
+        });
+      }
+      if (selectedType === "player-spells" && isPilotClassSelected && selectedModuleType) {
+        items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
       }
 
       if (searchQuery.trim()) {
@@ -1039,6 +1112,10 @@ function CompendiumViewer() {
       }
     }
 
+    if (isPilotClassSelected && selectedModuleType) {
+      items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
+    }
+
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
     return items.filter((item) =>
@@ -1048,7 +1125,7 @@ function CompendiumViewer() {
         .toLowerCase()
         .includes(q)
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedSpellClass, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedSpellClass, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, isPilotClassSelected, selectedModuleType, matchesPilotModuleType]);
 
   // Stable IDs per item (index in the filtered list)
   const itemIds = useMemo(
@@ -1097,9 +1174,28 @@ function CompendiumViewer() {
   const handleSpellClassChange = useCallback((cls) => {
     setSearchQuery("");
     setSelectedIdx(null);
-    setSearchParams({ type: selectedType, ...(cls ? { class: cls } : {}) });
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const newParams = { ...base, type: selectedType, ...(cls ? { class: cls } : {}) };
+    if (String(cls).toLowerCase() === "pilot" && selectedModuleType) {
+      newParams.moduleType = selectedModuleType;
+    }
+    setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, selectedModuleType]);
+
+  const handleModuleTypeChange = useCallback((moduleType) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const newParams = {
+      ...base,
+      type: selectedType,
+      ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+      ...(moduleType ? { moduleType } : {}),
+    };
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedType, selectedSpellClass, setSearchParams]);
 
   const handleBookChange = useCallback((books) => {
     setSearchQuery("");
@@ -1196,7 +1292,13 @@ function CompendiumViewer() {
     (item, idx) => {
       setSelectedIdx(idx);
       const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
-      setSearchParams({ ...base, type: selectedType, ...(selectedSpellClass ? { class: selectedSpellClass } : {}), item: toSlug(item.name) });
+      setSearchParams({
+        ...base,
+        type: selectedType,
+        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+        ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+        item: toSlug(item.name),
+      });
       const id = itemIds[idx];
       const scrollToItem = () => {
         const el = document.getElementById(id);
@@ -1209,7 +1311,7 @@ function CompendiumViewer() {
         requestAnimationFrame(scrollToItem);
       }
     },
-    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, setSearchParams]
+    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, setSearchParams]
   );
 
   const sidebarContent = (
@@ -1225,6 +1327,7 @@ function CompendiumViewer() {
           ...base,
           type: selectedType,
           ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
           ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
           ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
           ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
@@ -1236,6 +1339,8 @@ function CompendiumViewer() {
       selectedIdx={selectedIdx}
       selectedSpellClass={selectedSpellClass}
       onSpellClassChange={handleSpellClassChange}
+      selectedModuleType={selectedModuleType}
+      onModuleTypeChange={handleModuleTypeChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

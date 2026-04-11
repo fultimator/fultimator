@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useSpellModals } from "../common/hooks/useSpellModals";
 import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, TextField, Button, Divider } from "@mui/material";
+import { Paper, Grid, TextField, Button, Divider, Box, Typography, IconButton, Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
+import SearchIcon from "@mui/icons-material/Search";
 import CustomHeader from "../../common/CustomHeader";
 import SpellDefault from "./SpellDefault";
 import SpellArcanistModal from "./SpellArcanistModal";
@@ -27,34 +28,35 @@ import SpellChanterModal from "./SpellChanterModal";
 import SpellChanterKeysModal from "./SpellChanterKeysModal";
 import SpellChanterTonesModal from "./SpellChanterTonesModal";
 import SpellSymbolist from "./SpellSymbolist";
-import SpellSymbolistModal from "./SpellSymbolistModal";
-import SpellSymbolistSymbolsModal from "./SpellSymbolistSymbolsModal";
 import SpellDancer from "./SpellDancer";
-import SpellDancerModal from "./SpellDancerModal";
-import SpellDancerDancesModal from "./SpellDancerDancesModal";
 import SpellGift from "./SpellGift";
-import SpellGiftModal from "./SpellGiftModal";
-import SpellGiftGiftsModal from "./SpellGiftGiftsModal";
 import SpellMutant from "./SpellMutant";
-import SpellMutantModal from "./SpellMutantModal";
-import SpellMutantTherioformsModal from "./SpellMutantTherioformsModal";
 import SpellPilot from "./SpellPilot";
-import SpellPilotModal from "./SpellPilotModal";
-import SpellPilotVehiclesModal from "./SpellPilotVehiclesModal";
 import SpellMagiseed from "./SpellMagiseed";
-import SpellMagiseedModal from "./SpellMagiseedModal";
-import SpellMagiseedMagiseedsModal from "./SpellMagiseedMagiseedsModal";
+import UnifiedSpellModal from "./modals/UnifiedSpellModal";
+import GeneralSection from "./sections/GeneralSection";
+import MagiseedGeneralSection from "./sections/MagiseedGeneralSection";
+import MagiseedContentSection from "./sections/MagiseedContentSection";
+import GiftContentSection from "./sections/GiftContentSection";
+import DancerContentSection from "./sections/DancerContentSection";
+import SymbolistContentSection from "./sections/SymbolistContentSection";
+import MutantContentSection from "./sections/MutantContentSection";
+import PilotGeneralSection from "./sections/PilotGeneralSection";
+import PilotContentSection from "./sections/PilotContentSection";
+import InvokerGeneralSection from "./sections/InvokerGeneralSection";
+import InvokerContentSection from "./sections/InvokerContentSection";
+import GourmetGeneralSection from "./sections/GourmetGeneralSection";
+import GourmetContentSection from "./sections/GourmetContentSection";
+import GourmetInventoryTab from "./sections/GourmetInventoryTab";
+import GourmetCookingTab from "./sections/GourmetCookingTab";
 import SpellGourmet from "./SpellGourmet";
-import SpellGourmetModal from "./SpellGourmetModal";
-import SpellGourmetCookingModal from "./SpellGourmetCookingModal";
 import SpellInvoker from "./SpellInvoker";
-import SpellInvokerModal from "./SpellInvokerModal";
-import SpellInvokerInvocationsModal from "./SpellInvokerInvocationsModal";
 import SpellDeck from "./SpellDeck";
 import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
 import { syncSlots, deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -63,6 +65,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSpell, setSelectedSpell] = useState(null);
+  const [defaultCompendiumClass, setDefaultCompendiumClass] = useState(null);
+  const [arcanaCompendiumClass, setArcanaCompendiumClass] = useState(null);
+  const [arcanaReworkCompendiumClass, setArcanaReworkCompendiumClass] = useState(null);
+  const [systemCompendiumTarget, setSystemCompendiumTarget] = useState(null); // { className, spellType, label }
 
   const {
     isOpen,
@@ -612,6 +618,172 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedSpell(null);
   };
 
+  const addDefaultSpellFromCompendium = (spell, className) => {
+    if (!className) return;
+    if (spell?.spellType !== "default") {
+      if (window.electron) window.electron.alert("Please select a Default Spell.");
+      else alert("Please select a Default Spell.");
+      return false;
+    }
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name !== className) return cls;
+        return {
+          ...cls,
+          spells: [
+            ...cls.spells,
+            {
+              spellType: spell.spellType,
+              name: t(spell.name),
+              mp: spell.mp,
+              maxTargets: spell.maxTargets,
+              targetDesc: t(spell.targetDesc),
+              duration: t(spell.duration),
+              description: t(spell.description),
+              isOffensive: spell.isOffensive,
+              attr1: spell.attr1,
+              attr2: spell.attr2,
+              isMagisphere: spell.isMagisphere || false,
+              showInPlayerSheet: true,
+            },
+          ],
+        };
+      }),
+    }));
+    return true;
+  };
+
+  const addArcanaFromCompendium = (spell, className) => {
+    if (!className) return;
+    if (spell?.spellType !== "arcanist") {
+      if (window.electron) window.electron.alert("Please select an Arcana spell.");
+      else alert("Please select an Arcana spell.");
+      return false;
+    }
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name !== className) return cls;
+        return {
+          ...cls,
+          spells: [
+            ...cls.spells,
+            {
+              spellType: "arcanist",
+              name: t(spell.name),
+              domain: t(spell.domain || ""),
+              description: t(spell.description || ""),
+              domainDesc: t(spell.domainDesc || ""),
+              merge: t(spell.merge || ""),
+              mergeDesc: t(spell.mergeDesc || ""),
+              dismiss: t(spell.dismiss || ""),
+              dismissDesc: t(spell.dismissDesc || ""),
+              showInPlayerSheet: true,
+            },
+          ],
+        };
+      }),
+    }));
+    return true;
+  };
+
+  const addArcanaReworkFromCompendium = (spell, className) => {
+    if (!className) return false;
+    if (spell?.spellType !== "arcanist-rework") {
+      if (window.electron) window.electron.alert("Please select an Arcana - Rework spell.");
+      else alert("Please select an Arcana - Rework spell.");
+      return false;
+    }
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name !== className) return cls;
+        return {
+          ...cls,
+          spells: [
+            ...cls.spells,
+            {
+              spellType: "arcanist-rework",
+              name: t(spell.name),
+              domain: t(spell.domain || ""),
+              description: t(spell.description || ""),
+              domainDesc: t(spell.domainDesc || ""),
+              merge: t(spell.merge || ""),
+              mergeDesc: t(spell.mergeDesc || ""),
+              pulse: t(spell.pulse || ""),
+              pulseDesc: t(spell.pulseDesc || ""),
+              dismiss: t(spell.dismiss || ""),
+              dismissDesc: t(spell.dismissDesc || ""),
+              showInPlayerSheet: true,
+            },
+          ],
+        };
+      }),
+    }));
+    return true;
+  };
+
+  const addSystemSpellFromCompendium = (spell, className, spellType, label) => {
+    if (!className) return false;
+    if (spell?.spellType !== spellType) {
+      if (window.electron) window.electron.alert(`Please select a ${label} spell.`);
+      else alert(`Please select a ${label} spell.`);
+      return false;
+    }
+    const clonedSpell = JSON.parse(JSON.stringify(spell));
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) => {
+        if (cls.name !== className) return cls;
+        return {
+          ...cls,
+          spells: [
+            ...cls.spells,
+            {
+              ...clonedSpell,
+              showInPlayerSheet:
+                clonedSpell.showInPlayerSheet === undefined
+                  ? true
+                  : clonedSpell.showInPlayerSheet,
+            },
+          ],
+        };
+      }),
+    }));
+    return true;
+  };
+
+  const renderCompendiumHeader = (headerText, onClick) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        fontFamily: "Antonio",
+        fontWeight: "normal",
+        fontSize: "1em",
+        pl: "17px",
+        pt: "5px",
+        pb: "5px",
+        color: theme.palette.mode === "dark" ? "white" : "black",
+        textAlign: "left",
+        mb: "10px",
+        textTransform: "uppercase",
+        backgroundColor: theme.palette.ternary.main,
+      }}
+    >
+      <Typography variant="h2" sx={{ fontSize: "1.3em" }}>
+        {headerText}
+      </Typography>
+      <Tooltip title={t("Add from Compendium")}>
+        <IconButton size="small" onClick={onClick} sx={{ mr: 1 }}>
+          <SearchIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
+
   const handleEditDefaultSpell = (spell, spellClass, spellIndex) => openModal("spellDefault", spell, spellClass, spellIndex);
   const handleEditArcanistSpell = (spell, spellClass, spellIndex) => openModal("spellArcanist", spell, spellClass, spellIndex);
   const handleEditAlchemyRank = (spell, spellClass, spellIndex) => openModal("alchemyRank", spell, spellClass, spellIndex);
@@ -623,21 +795,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const handleEditChantSpell = (spell, spellClass, spellIndex) => openModal("chant", spell, spellClass, spellIndex);
   const handleEditChantKey = (spell, spellClass, spellIndex) => openModal("chantKey", spell, spellClass, spellIndex);
   const handleEditChantTone = (spell, spellClass, spellIndex) => openModal("chantTone", spell, spellClass, spellIndex);
-  const handleEditSymbol = (spell, spellClass, spellIndex) => openModal("symbol", spell, spellClass, spellIndex);
-  const handleEditSymbolSymbols = (spell, spellClass, spellIndex) => openModal("symbolSymbols", spell, spellClass, spellIndex);
-  const handleEditDanceSpell = (spell, spellClass, spellIndex) => openModal("dancer", spell, spellClass, spellIndex);
-  const handleEditDancerDances = (spell, spellClass, spellIndex) => openModal("dancerDances", spell, spellClass, spellIndex);
-  const handleEditGiftSpell = (spell, spellClass, spellIndex) => openModal("gift", spell, spellClass, spellIndex);
-  const handleEditGiftGifts = (spell, spellClass, spellIndex) => openModal("giftGifts", spell, spellClass, spellIndex);
-  const handleEditMutantSpell = (spell, spellClass, spellIndex) => openModal("mutant", spell, spellClass, spellIndex);
-  const handleEditMutantTherioforms = (spell, spellClass, spellIndex) => openModal("mutantTherioforms", spell, spellClass, spellIndex);
-  const handleEditPilotSpell = (spell, spellClass, spellIndex) => openModal("pilot", spell, spellClass, spellIndex);
-  const handleEditPilotVehicles = (spell, spellClass, spellIndex) => openModal("pilotVehicles", spell, spellClass, spellIndex);
-  const handleEditMagiseedSpell = (spell, spellClass, spellIndex) => openModal("magiseed", spell, spellClass, spellIndex);
-  const handleEditGourmetSpell = (spell, spellClass, spellIndex) => openModal("gourmet", spell, spellClass, spellIndex);
-  const handleEditGourmetCooking = (spell, spellClass, spellIndex) => openModal("gourmetCooking", spell, spellClass, spellIndex);
-  const handleEditInvokerSpell = (spell, spellClass, spellIndex) => openModal("invoker", spell, spellClass, spellIndex);
-  const handleEditInvokerInvocations = (spell, spellClass, spellIndex) => openModal("invokerInvocations", spell, spellClass, spellIndex);
+  const handleEditSymbol = (spell, spellClass, spellIndex) => openModal("symbolist", spell, spellClass, spellIndex);
+  const handleEditDancer = (spell, spellClass, spellIndex) => openModal("dancer", spell, spellClass, spellIndex);
+  const handleEditGift = (spell, spellClass, spellIndex) => openModal("gift", spell, spellClass, spellIndex);
+  const handleEditMutant = (spell, spellClass, spellIndex) => openModal("mutant", spell, spellClass, spellIndex);
+  const handleEditPilot = (spell, spellClass, spellIndex) => openModal("pilot", spell, spellClass, spellIndex);
+  const handleEditMagiseed = (spell, spellClass, spellIndex) => openModal("magiseed", spell, spellClass, spellIndex);
+  const handleEditGourmet = (spell, spellClass, spellIndex) => openModal("gourmet", spell, spellClass, spellIndex);
+  const handleEditInvoker = (spell, spellClass, spellIndex) => openModal("invoker", spell, spellClass, spellIndex);
   const handleEditDeckSpell = (spell, spellClass, spellIndex) => openModal("deck", spell, spellClass, spellIndex);
 
   const handleDeckUpdate = (spellClass, spellIndex, updatedDeck) => {
@@ -704,7 +869,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }));
   };
 
-  const handleEditMagiseedMagiseeds = (spell, spellClass, spellIndex) => openModal("magiseedMagiseeds", spell, spellClass, spellIndex);
 
   const handleMagiseedChange = (spellClass, spellIndex, newMagiseed) => {
     setPlayer((prev) => ({
@@ -1056,25 +1220,111 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "default" &&
                               !spellTypeHeaders.default && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("Default Spells")}
-                                  />
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "space-between",
+                                      fontFamily: "Antonio",
+                                      fontWeight: "normal",
+                                      fontSize: "1em",
+                                      pl: "17px",
+                                      pt: "5px",
+                                      pb: "5px",
+                                      color: theme.palette.mode === "dark" ? "white" : "black",
+                                      textAlign: "left",
+                                      mb: "10px",
+                                      textTransform: "uppercase",
+                                      backgroundColor: theme.palette.ternary.main,
+                                    }}
+                                  >
+                                    <Typography variant="h2" sx={{ fontSize: "1.3em" }}>
+                                      {t("Default Spells")}
+                                    </Typography>
+                                    <Tooltip title={t("Add from Compendium")}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => setDefaultCompendiumClass(cls.name)}
+                                        sx={{ mr: 1 }}
+                                      >
+                                        <SearchIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
                                   {(spellTypeHeaders.default = true)}
                                 </>
                               )}
                             {spell.spellType === "arcanist" &&
                               !spellTypeHeaders.arcanist && (
                                 <>
-                                  <CustomHeader2 headerText={t("Arcana")} />
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "space-between",
+                                      fontFamily: "Antonio",
+                                      fontWeight: "normal",
+                                      fontSize: "1em",
+                                      pl: "17px",
+                                      pt: "5px",
+                                      pb: "5px",
+                                      color: theme.palette.mode === "dark" ? "white" : "black",
+                                      textAlign: "left",
+                                      mb: "10px",
+                                      textTransform: "uppercase",
+                                      backgroundColor: theme.palette.ternary.main,
+                                    }}
+                                  >
+                                    <Typography variant="h2" sx={{ fontSize: "1.3em" }}>
+                                      {t("Arcana")}
+                                    </Typography>
+                                    <Tooltip title={t("Add from Compendium")}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => setArcanaCompendiumClass(cls.name)}
+                                        sx={{ mr: 1 }}
+                                      >
+                                        <SearchIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
                                   {(spellTypeHeaders.arcanist = true)}
                                 </>
                               )}
                             {spell.spellType === "arcanist-rework" &&
                               !spellTypeHeaders.arcanistRework && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("Arcana - Rework")}
-                                  />
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "space-between",
+                                      fontFamily: "Antonio",
+                                      fontWeight: "normal",
+                                      fontSize: "1em",
+                                      pl: "17px",
+                                      pt: "5px",
+                                      pb: "5px",
+                                      color: theme.palette.mode === "dark" ? "white" : "black",
+                                      textAlign: "left",
+                                      mb: "10px",
+                                      textTransform: "uppercase",
+                                      backgroundColor: theme.palette.ternary.main,
+                                    }}
+                                  >
+                                    <Typography variant="h2" sx={{ fontSize: "1.3em" }}>
+                                      {t("Arcana - Rework")}
+                                    </Typography>
+                                    <Tooltip title={t("Add from Compendium")}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => setArcanaReworkCompendiumClass(cls.name)}
+                                        sx={{ mr: 1 }}
+                                      >
+                                        <SearchIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
                                   {(spellTypeHeaders.arcanistRework = true)}
                                 </>
                               )}
@@ -1110,43 +1360,70 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "magichant" &&
                               !spellTypeHeaders.magichant && (
                                 <>
-                                  <CustomHeader2 headerText={t("Magichant")} />
+                                  {renderCompendiumHeader(
+                                    t("Magichant"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "magichant",
+                                      label: t("Magichant"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.magichant = true)}
                                 </>
                               )}
                             {spell.spellType === "symbol" &&
                               !spellTypeHeaders.symbol && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("symbol_symbol")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("symbol_symbol"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "symbol",
+                                      label: t("symbol_symbol"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.symbol = true)}
                                 </>
                               )}
                             {spell.spellType === "dance" &&
                               !spellTypeHeaders.dance && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("dance_dance")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("dance_dance"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "dance",
+                                      label: t("dance_dance"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.dance = true)}
                                 </>
                               )}
                             {spell.spellType === "gift" &&
                               !spellTypeHeaders.gift && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("esper_gift")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("esper_gift"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "gift",
+                                      label: t("esper_gift"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.gift = true)}
                                 </>
                               )}
                             {spell.spellType === "therioform" &&
                               !spellTypeHeaders.therioform && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("mutant_therioforms")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("mutant_therioforms"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "therioform",
+                                      label: t("mutant_therioforms"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.therioform = true)}
                                 </>
                               )}
@@ -1162,9 +1439,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "magiseed" &&
                               !spellTypeHeaders.magiseed && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("magiseed_garden")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("magiseed_garden"),
+                                    () => setSystemCompendiumTarget({
+                                      className: cls.name,
+                                      spellType: "magiseed",
+                                      label: t("magiseed_garden"),
+                                    })
+                                  )}
                                   {(spellTypeHeaders.magiseed = true)}
                                 </>
                               )}
@@ -1315,9 +1597,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               onEdit={() =>
                                 handleEditSymbol(spell, cls.name, index)
                               }
-                              onEditSymbols={() =>
-                                handleEditSymbolSymbols(spell, cls.name, index)
-                              }
                               isEditMode={isEditMode}
                             />
                           )}
@@ -1326,10 +1605,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               dance={spell}
                               key={index}
                               onEdit={() =>
-                                handleEditDanceSpell(spell, cls.name, index)
-                              }
-                              onEditDances={() =>
-                                handleEditDancerDances(spell, cls.name, index)
+                                handleEditDancer(spell, cls.name, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -1339,10 +1615,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               gift={spell}
                               key={index}
                               onEdit={() =>
-                                handleEditGiftSpell(spell, cls.name, index)
-                              }
-                              onEditGifts={() =>
-                                handleEditGiftGifts(spell, cls.name, index)
+                                handleEditGift(spell, cls.name, index)
                               }
                               onClockChange={(newValue) =>
                                 handleGiftClockChange(cls.name, index, newValue)
@@ -1355,10 +1628,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               mutant={spell}
                               key={index}
                               onEdit={() =>
-                                handleEditMutantSpell(spell, cls.name, index)
-                              }
-                              onEditTherioforms={() =>
-                                handleEditMutantTherioforms(spell, cls.name, index)
+                                handleEditMutant(spell, cls.name, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -1368,10 +1638,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               pilot={spell}
                               key={index}
                               onEdit={() =>
-                                handleEditPilotSpell(spell, cls.name, index)
-                              }
-                              onEditVehicles={() =>
-                                handleEditPilotVehicles(spell, cls.name, index)
+                                handleEditPilot(spell, cls.name, index)
                               }
                               onModuleChange={(vehicleIndex, moduleIndex, field, value) =>
                                 handlePilotModuleChange(cls.name, index, vehicleIndex, moduleIndex, field, value)
@@ -1387,10 +1654,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               magiseed={spell}
                               key={index}
                               onEdit={() =>
-                                handleEditMagiseedSpell(spell, cls.name, index)
-                              }
-                              onEditMagiseeds={() =>
-                                handleEditMagiseedMagiseeds(spell, cls.name, index)
+                                handleEditMagiseed(spell, cls.name, index)
                               }
                               onMagiseedChange={(newMagiseed) =>
                                 handleMagiseedChange(cls.name, index, newMagiseed)
@@ -1406,10 +1670,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               spell={spell}
                               key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
                               onEdit={() =>
-                                handleEditGourmetSpell(spell, cls.name, index)
-                              }
-                              onEditCooking={() =>
-                                handleEditGourmetCooking(spell, cls.name, index)
+                                handleEditGourmet(spell, cls.name, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -1419,10 +1680,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               invoker={spell}
                               key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
                               onEdit={() =>
-                                handleEditInvokerSpell(spell, cls.name, index)
-                              }
-                              onEditInvocations={() =>
-                                handleEditInvokerInvocations(spell, cls.name, index)
+                                handleEditInvoker(spell, cls.name, index)
                               }
                               onWellspringToggle={(wellspringName) =>
                                 handleWellspringToggle(cls.name, index, wellspringName)
@@ -1529,124 +1787,213 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onSave={handleSaveEditedSpell}
         magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
-      <SpellSymbolistModal
-        open={isOpen("symbol")}
+      <UnifiedSpellModal
+        open={isOpen("symbolist")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={handleDeleteSpell}
-        symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
+        spellType="symbol"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "symbol_edit_symbols_button",
+            component: SymbolistContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "symbol_settings_button",
+            component: GeneralSection,
+            props: { customFields: [] },
+            order: 1,
+          },
+        ]}
       />
-      <SpellSymbolistSymbolsModal
-        open={isOpen("symbolSymbols")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        symbol={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellDancerModal
+      <UnifiedSpellModal
         open={isOpen("dancer")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
-        onDelete={handleDeleteSpell}
-        dance={{ ...spellBeingEdited, index: editingSpellIndex }}
+        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
+        spellType="dancer"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "dance_edit_dances_button",
+            component: DancerContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "dance_settings_button",
+            component: GeneralSection,
+            props: { customFields: [] },
+            order: 1,
+          },
+        ]}
       />
-      <SpellDancerDancesModal
-        open={isOpen("dancerDances")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        dance={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellGiftModal
+      <UnifiedSpellModal
         open={isOpen("gift")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
-        gift={{ ...spellBeingEdited, index: editingSpellIndex }}
+        spellType="gift"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "esper_gifts",
+            component: GiftContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "esper_settings_modal",
+            component: GeneralSection,
+            props: { customFields: [] },
+            order: 1,
+          },
+        ]}
       />
-      <SpellGiftGiftsModal
-        open={isOpen("giftGifts")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        gift={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellMutantModal
+      <UnifiedSpellModal
         open={isOpen("mutant")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
-        mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
+        spellType="mutant"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "mutant_therioforms",
+            component: MutantContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "mutant_settings_button",
+            component: GeneralSection,
+            props: { customFields: [] },
+            order: 1,
+          },
+        ]}
       />
-      <SpellMutantTherioformsModal
-        open={isOpen("mutantTherioforms")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        mutant={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellPilotModal
+      <UnifiedSpellModal
         open={isOpen("pilot")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
-        pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
+        spellType="pilot"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "pilot_vehicles",
+            component: PilotContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "pilot_settings_button",
+            component: PilotGeneralSection,
+            props: {},
+            order: 1,
+          },
+        ]}
       />
-      <SpellPilotVehiclesModal
-        open={isOpen("pilotVehicles")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        pilot={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellMagiseedModal
+      <UnifiedSpellModal
         open={isOpen("magiseed")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
-        magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
+        spellType="magiseed"
+        spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+        sections={[
+          {
+            id: "content",
+            title: "magiseed_edit_magiseeds_button",
+            component: MagiseedContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "magiseed_settings_button",
+            component: MagiseedGeneralSection,
+            props: {},
+            order: 1,
+          },
+        ]}
       />
-      <SpellMagiseedMagiseedsModal
-        open={isOpen("magiseedMagiseeds")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        magiseed={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellGourmetModal
+      <UnifiedSpellModal
         open={isOpen("gourmet")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
+        spellType="gourmet"
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
-        player={player}
-        onPlayerUpdate={setPlayer}
+        title={spellBeingEdited?.spellName}
+        sections={[
+          {
+            id: "cookbook",
+            title: "gourmet_cookbook",
+            component: GourmetContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "inventory",
+            title: "gourmet_ingredient_inventory",
+            component: GourmetInventoryTab,
+            props: {},
+            order: 1,
+          },
+          {
+            id: "cooking",
+            title: "gourmet_cooking",
+            component: GourmetCookingTab,
+            props: {},
+            order: 2,
+          },
+          {
+            id: "general",
+            title: "gourmet_edit_cooking_button",
+            component: GourmetGeneralSection,
+            props: {},
+            order: 3,
+          },
+        ]}
       />
-      <SpellGourmetCookingModal
-        open={isOpen("gourmetCooking")}
-        onClose={closeModal}
-        onSave={(cookbookEffects, inventory, spellData) => {
-          const updatedSpell = {
-            ...spellBeingEdited,
-            cookbookEffects,
-            ingredientInventory: inventory || [],
-            ...spellData,
-          };
-          handleSaveEditedSpell(editingSpellIndex, updatedSpell);
-        }}
-        cookbookEffects={spellBeingEdited?.cookbookEffects || []}
-        ingredientInventory={spellBeingEdited?.ingredientInventory || []}
-        player={player}
-        onPlayerUpdate={setPlayer}
-        spell={spellBeingEdited}
-      />
-      <SpellInvokerModal
+      <UnifiedSpellModal
         open={isOpen("invoker")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
+        spellType="invoker"
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellInvokerInvocationsModal
-        open={isOpen("invokerInvocations")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        onDelete={(spellIndex) => handleDeleteSpell(spellIndex, editingSpellClass)}
-        invoker={{ ...spellBeingEdited, index: editingSpellIndex }}
+        title={spellBeingEdited?.spellName}
+        sections={[
+          {
+            id: "content",
+            title: "invoker_manage_invocation_button",
+            component: InvokerContentSection,
+            props: {},
+            order: 0,
+          },
+          {
+            id: "general",
+            title: "invoker_edit_invocation_button",
+            component: InvokerGeneralSection,
+            props: {},
+            order: 1,
+          },
+        ]}
       />
       <SpellDeckModal
         open={isOpen("deck")}
@@ -1660,6 +2007,65 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onClose={closeModal}
         typeName={selectedClass}
         onSave={(spell) => addSpellFromCompendium(spell)}
+      />
+      <CompendiumViewerModal
+        open={defaultCompendiumClass !== null}
+        onClose={() => setDefaultCompendiumClass(null)}
+        onAddItem={(item) => {
+          if (addDefaultSpellFromCompendium(item, defaultCompendiumClass)) {
+            setDefaultCompendiumClass(null);
+          }
+        }}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass={defaultCompendiumClass || ""}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={arcanaCompendiumClass !== null}
+        onClose={() => setArcanaCompendiumClass(null)}
+        onAddItem={(item) => {
+          if (addArcanaFromCompendium(item, arcanaCompendiumClass)) {
+            setArcanaCompendiumClass(null);
+          }
+        }}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass={arcanaCompendiumClass || ""}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={arcanaReworkCompendiumClass !== null}
+        onClose={() => setArcanaReworkCompendiumClass(null)}
+        onAddItem={(item) => {
+          if (addArcanaReworkFromCompendium(item, arcanaReworkCompendiumClass)) {
+            setArcanaReworkCompendiumClass(null);
+          }
+        }}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass={arcanaReworkCompendiumClass || ""}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={systemCompendiumTarget !== null}
+        onClose={() => setSystemCompendiumTarget(null)}
+        onAddItem={(item) => {
+          if (
+            addSystemSpellFromCompendium(
+              item,
+              systemCompendiumTarget?.className,
+              systemCompendiumTarget?.spellType,
+              systemCompendiumTarget?.label || t("Spell")
+            )
+          ) {
+            setSystemCompendiumTarget(null);
+          }
+        }}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass={systemCompendiumTarget?.className || ""}
+        context="player"
       />
     </>
   );

@@ -35,7 +35,6 @@ import {
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import {
-  ContentCopy,
   ContentPaste,
   Delete,
   Download,
@@ -47,6 +46,8 @@ import {
   HistoryEdu,
   Badge,
   BugReport,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
@@ -62,6 +63,7 @@ import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
+import useDownloadImage from "../../hooks/useDownloadImage";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -819,14 +821,14 @@ function Personal() {
         </div>
       )}
       <Grid container spacing={1} sx={{ py: 1 }}>
-        {filteredList.map((player, index) => (
+        {filteredList.map((player) => (
           <Grid
             item
             xs={12}
             md={6}
             alignItems="center"
             justifyContent="center"
-            key={index}
+            key={player.id}
             sx={{
               marginBottom: "20px",
               ...(selectMode ? {
@@ -838,49 +840,18 @@ function Personal() {
             }}
             onClick={selectMode ? () => toggleSelectPlayer(player.id) : undefined}
           >
-            <PlayerCardGallery
+            <PlayerGalleryCardActions
               player={player}
-              setPlayer={null}
-              sx={{ marginBottom: 1 }}
+              t={t}
+              dbMode={dbMode}
+              handleNavigation={handleNavigation}
+              deletePlayer={deletePlayer}
+              sharePlayer={sharePlayer}
+              copyPlayerToLocal={copyPlayerToLocal}
+              copyPlayerToCloud={copyPlayerToCloud}
+              movePlayerToLocal={movePlayerToLocal}
+              movePlayerToCloud={movePlayerToCloud}
             />
-            <div style={{ marginTop: "3px" }} onClick={(e) => e.stopPropagation()}>
-                  {/* <Tooltip title={t("Copy")}>
-                    <IconButton onClick={copyPlayer(player)}>
-                      <ContentCopy />
-                    </IconButton>
-                  </Tooltip> */}
-                  <PlayerTransferButton
-                    player={player}
-                    copyPlayerToLocal={copyPlayerToLocal}
-                    copyPlayerToCloud={copyPlayerToCloud}
-                    movePlayerToLocal={movePlayerToLocal}
-                    movePlayerToCloud={movePlayerToCloud}
-                    t={t}
-                  />
-                  <Tooltip title={t("Edit")}>
-                    <IconButton onClick={() => handleNavigation(`/pc-gallery/${player.id}`)}>
-                      <Edit />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("Delete")}>
-                    <IconButton onClick={deletePlayer(player)}>
-                      <Delete />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("Share URL")}>
-                    <span>
-                      <IconButton onClick={() => sharePlayer(player.id)} disabled={dbMode === "local"}>
-                        <Share />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                  <Tooltip title={t("Player Sheet")}>
-                    <IconButton onClick={() => handleNavigation(`/character-sheet/${player.id}`)}>
-                      <Badge />
-                    </IconButton>
-                  </Tooltip>
-                  <Export name={`${player.name}`} dataType="pc" data={player} />
-            </div>
           </Grid>
         ))}
         <Grid item xs={12}>
@@ -969,6 +940,80 @@ function Personal() {
           </Fab>
         </Tooltip>
       )}
+    </>
+  );
+}
+
+function PlayerGalleryCardActions({
+  player,
+  t,
+  dbMode,
+  handleNavigation,
+  deletePlayer,
+  sharePlayer,
+  copyPlayerToLocal,
+  copyPlayerToCloud,
+  movePlayerToLocal,
+  movePlayerToCloud,
+}) {
+  const cardRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
+
+  return (
+    <>
+      <Box ref={cardRef}>
+        <PlayerCardGallery
+          player={player}
+          setPlayer={null}
+          isExpanded={expanded}
+          sx={{ marginBottom: 1 }}
+        />
+      </Box>
+      <Box sx={{ mt: "3px", display: "flex", alignItems: "center", gap: 0.25, flexWrap: "wrap" }} onClick={(e) => e.stopPropagation()}>
+        <PlayerTransferButton
+          player={player}
+          copyPlayerToLocal={copyPlayerToLocal}
+          copyPlayerToCloud={copyPlayerToCloud}
+          movePlayerToLocal={movePlayerToLocal}
+          movePlayerToCloud={movePlayerToCloud}
+          t={t}
+        />
+        <Tooltip title={t("Download")}>
+          <IconButton onClick={downloadImage}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Edit")}>
+          <IconButton onClick={() => handleNavigation(`/pc-gallery/${player.id}`)}>
+            <Edit />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Delete")}>
+          <IconButton onClick={deletePlayer(player)}>
+            <Delete />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Share URL")}>
+          <span>
+            <IconButton onClick={() => sharePlayer(player.id)} disabled={dbMode === "local"}>
+              <Share />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip title={t("Player Sheet")}>
+          <IconButton onClick={() => handleNavigation(`/character-sheet/${player.id}`)}>
+            <Badge />
+          </IconButton>
+        </Tooltip>
+        <Export name={`${player.name}`} dataType="pc" data={player} />
+        <Box sx={{ ml: "auto" }} />
+        <Tooltip title={expanded ? t("Collapse Details") : t("Expand Details")}>
+          <IconButton onClick={() => setExpanded((prev) => !prev)}>
+            {expanded ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Tooltip>
+      </Box>
     </>
   );
 }

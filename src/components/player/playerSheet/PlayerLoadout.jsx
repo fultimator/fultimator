@@ -361,8 +361,10 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   };
 
   const handleSlotClick = (slot) => {
-    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(player, slot));
-    setPickerOpenModuleOverride(hasModule);
+    const hasModuleCandidates = ['mainHand', 'offHand', 'armor'].includes(slot)
+      && Boolean(activeVehicle)
+      && getEquippedModulesForSlot(player, slot).length > 0;
+    setPickerOpenModuleOverride(hasModuleCandidates);
     setPickerSlot(slot);
   };
 

@@ -67,16 +67,20 @@ export default function PlayerVehicle({
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
     );
 
-  // Find the enabled vehicle
+  // Find the spell with enabled vehicle (for display), or use first pilot spell (for editing)
   const activePilotSpell = pilotSpells.find((s) =>
     (s.vehicles || []).some((v) => v.enabled)
-  );
+  ) || pilotSpells[0];
 
   if (!activePilotSpell) {
     return null;
   }
 
-  const activeVehicle = activePilotSpell.vehicles.find((v) => v.enabled);
+  const activeVehicle = activePilotSpell.vehicles.find((v) => v.enabled) || activePilotSpell.vehicles?.[0];
+
+  if (!activeVehicle) {
+    return null;
+  }
 
   const frame = availableFrames.find(
     (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton")

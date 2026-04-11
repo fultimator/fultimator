@@ -56,7 +56,7 @@ const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessor
 
 const SIDEBAR_WIDTH = 300;
 
-const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false, initialOptionalSubtypes = [] }) => {
+const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false, initialOptionalSubtypes = [], initialSpellClass = "", initialSearchQuery = "", initialModuleTypeFilter = "" }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
@@ -65,15 +65,53 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
 
   // Viewer state (local instead of URL params)
   const [selectedType, setSelectedType] = useState(initialType);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [selectedCompendium, setSelectedCompendium] = useState("official");
-  const [selectedSpellClass, setSelectedSpellClass] = useState("");
+  const [selectedSpellClass, setSelectedSpellClass] = useState(initialSpellClass);
+  const [selectedModuleType, setSelectedModuleType] = useState(initialModuleTypeFilter);
   const [selectedBook, setSelectedBook] = useState([]);
   const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
   const [selectedQualityCategories, setSelectedQualityCategories] = useState([]);
   const [selectedHeroicClasses, setSelectedHeroicClasses] = useState([]);
   const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(initialOptionalSubtypes);
+
+  const matchesPilotModuleType = useCallback((item, moduleType) => {
+    const filter = String(moduleType || "").toLowerCase();
+    if (!filter) return true;
+
+    if (filter === "frame") {
+      return item?.pilotSubtype === "frame"
+        || String(item?.category || "").toLowerCase() === "frame"
+        || item?.passengers != null
+        || String(item?.name || "").toLowerCase().includes("pilot_frame_");
+    }
+
+    const normalizedValues = [item?.type, item?.category, item?.name, item?.spellType]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase());
+
+    const matchesFlatField = normalizedValues.some((value) =>
+      value === `pilot_module_${filter}` ||
+      value.endsWith(`_${filter}`) ||
+      value.includes(`module_${filter}`) ||
+      value.includes(`${filter} module`)
+    );
+    if (matchesFlatField) return true;
+
+    if (!Array.isArray(item?.modules) || item.modules.length === 0) return false;
+    return item.modules.some((module) => {
+      const moduleValues = [module?.type, module?.category, module?.name]
+        .filter(Boolean)
+        .map((value) => String(value).toLowerCase());
+      return moduleValues.some((value) =>
+        value === `pilot_module_${filter}` ||
+        value.endsWith(`_${filter}`) ||
+        value.includes(`module_${filter}`) ||
+        value.includes(`${filter} module`)
+      );
+    });
+  }, []);
 
   // Pack state
   const {
@@ -120,16 +158,17 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         ? (restrictToTypes.includes(initialType) ? initialType : restrictToTypes[0])
         : initialType;
       setSelectedType(resolvedType);
-      setSearchQuery("");
+      setSearchQuery(initialSearchQuery);
       setSelectedIdx(null);
-      setSelectedSpellClass("");
+      setSelectedSpellClass(initialSpellClass);
+      setSelectedModuleType(initialModuleTypeFilter);
       setSelectedBook([]);
       setSelectedQualityFilters([]);
       setSelectedQualityCategories([]);
       setSelectedHeroicClasses([]);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
     }
-  }, [open, initialType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, initialType, initialSpellClass, initialSearchQuery, initialModuleTypeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activePack = selectedCompendium !== "official"
     ? packs.find((p) => p.id === selectedCompendium) ?? null
@@ -168,6 +207,18 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       }
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
         items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+      }
+      if (selectedType === "player-spells" && selectedSpellClass) {
+        const spellClasses = activeSpellCls?.benefits?.spellClasses ?? [];
+        items = items.filter((item) => {
+          if (spellClasses.includes("default") && item.class === selectedSpellClass) {
+            return true;
+          }
+          return spellClasses.includes(item.spellType);
+        });
+      }
+      if (selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "pilot" && selectedModuleType) {
+        items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -234,6 +285,11 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         }
       }
     }
+    // Filter by module type (for Pilot spells)
+    const isPilotClassSelected = String(selectedSpellClass).toLowerCase() === "pilot";
+    if (selectedModuleType && selectedType === "player-spells" && isPilotClassSelected) {
+      items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
+    }
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
     return items.filter((item) =>
@@ -243,7 +299,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         .toLowerCase()
         .includes(q)
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, selectedModuleType, selectedSpellClass, matchesPilotModuleType]);
 
   const itemIds = useMemo(
     () => filteredItems.map((item, idx) => makeId(item.name, idx)),
@@ -300,6 +356,16 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
 
   const handleSpellClassChange = useCallback((cls) => {
     setSelectedSpellClass(cls);
+    if (String(cls).toLowerCase() !== "pilot") {
+      setSelectedModuleType("");
+    }
+    setSearchQuery("");
+    setSelectedIdx(null);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, []);
+
+  const handleModuleTypeChange = useCallback((moduleType) => {
+    setSelectedModuleType(moduleType);
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
@@ -432,6 +498,8 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       selectedIdx={selectedIdx}
       selectedSpellClass={selectedSpellClass}
       onSpellClassChange={handleSpellClassChange}
+      selectedModuleType={selectedModuleType}
+      onModuleTypeChange={handleModuleTypeChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

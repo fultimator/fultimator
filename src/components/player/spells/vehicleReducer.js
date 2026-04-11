@@ -82,12 +82,18 @@ const ensureShieldConstraints = (vehicle) => {
 export const vehicleReducer = (state, action) => {
   switch (action.type) {
     case VEHICLE_ACTIONS.SET_VEHICLES:
+      if (action.payload.vehicles === state.currentVehicles) {
+        return state;
+      }
       return {
         ...state,
         currentVehicles: action.payload.vehicles || [],
       };
 
     case VEHICLE_ACTIONS.SET_SHOW_IN_PLAYER_SHEET:
+      if (action.payload === state.showInPlayerSheet) {
+        return state;
+      }
       return {
         ...state,
         showInPlayerSheet: action.payload,
@@ -347,10 +353,20 @@ export const vehicleReducer = (state, action) => {
   }
 };
 
-export const createInitialState = (pilot) => ({
-  currentVehicles: pilot?.vehicles?.map(vehicle => ({
-    ...vehicle,
-    maxEnabledModules: vehicle.maxEnabledModules ?? 3,
-  })) || [],
-  showInPlayerSheet: pilot ? !!pilot.showInPlayerSheet : true,
-});
+export const createInitialState = (initialData) => {
+  // Extract vehicles from multiple possible locations
+  const vehicles =
+    initialData?.vehicles ||
+    initialData?.currentVehicles ||
+    initialData?.spell?.vehicles ||
+    initialData?.pilot?.vehicles ||
+    [];
+
+  return {
+    currentVehicles: Array.isArray(vehicles) ? vehicles.map(vehicle => ({
+      ...vehicle,
+      maxEnabledModules: vehicle.maxEnabledModules ?? 3,
+    })) : [],
+    showInPlayerSheet: initialData ? !!initialData.showInPlayerSheet : true,
+  };
+};

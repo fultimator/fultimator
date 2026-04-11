@@ -17,7 +17,7 @@ import {
   AccordionDetails,
   Divider,
 } from "@mui/material";
-import { Delete, ExpandMore } from "@mui/icons-material";
+import { Delete, ExpandMore, ContentCopy } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
@@ -28,6 +28,7 @@ export default function MagiseedItem({
   magiseedIndex,
   onMagiseedChange,
   onDeleteMagiseed,
+  onCloneMagiseed,
 }) {
   const { t } = useTranslate();
 
@@ -58,26 +59,58 @@ export default function MagiseedItem({
     p: ({ ...props }) => <p style={inlineStyles} {...props} />,
   };
 
+  const handleCloneToCustom = () => {
+    if (!onCloneMagiseed) return;
+
+    const clone = {
+      ...magiseed,
+      name: "floralist_custom_magiseed",
+      customName: magiseed.customName || (magiseed.name ? t(magiseed.name) : ""),
+      description:
+        typeof magiseed.description === "string"
+          ? t(magiseed.description)
+          : magiseed.description,
+      effects: Object.fromEntries(
+        Object.entries(magiseed.effects || {}).map(([key, value]) => [
+          key,
+          typeof value === "string" ? t(value) : value,
+        ])
+      ),
+    };
+
+    onCloneMagiseed(magiseedIndex, clone);
+  };
+
   return (
     <Card variant="outlined" sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
           {/* Header with name and delete button */}
-          <Grid item xs={10}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h6" gutterBottom>
               {magiseed.customName || t(magiseed.name)}
             </Typography>
           </Grid>
-          <Grid item xs={2} style={{ textAlign: "right" }}>
-            <Button
-              onClick={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
-              variant="outlined"
-              color="error"
-              size="small"
-              startIcon={<Delete />}
-            >
-              {t("Delete")}
-            </Button>
+          <Grid item xs={12} sm={4} style={{ textAlign: "right" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              <Button
+                onClick={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
+                variant="outlined"
+                color="error"
+                size="small"
+                startIcon={<Delete />}
+              >
+                {t("Delete")}
+              </Button>
+              <Button
+                onClick={handleCloneToCustom}
+                variant="outlined"
+                size="small"
+                startIcon={<ContentCopy />}
+              >
+                {t("Clone to Custom")}
+              </Button>
+            </div>
           </Grid>
 
           {/* Magiseed Type Selection */}

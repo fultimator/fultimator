@@ -65,6 +65,22 @@ export default function SpellFloralistMagiseedsModal({
     setCurrentMagiseeds(prev => prev.filter((_, i) => i !== index));
   }, []);
 
+  const handleCloneMagiseed = useCallback((index, clonedMagiseed) => {
+    setCurrentMagiseeds((prev) => {
+      if (index < 0 || index >= prev.length) return prev;
+
+      const source = clonedMagiseed ?? prev[index];
+      const cloned =
+        typeof structuredClone === "function"
+          ? structuredClone(source)
+          : JSON.parse(JSON.stringify(source));
+
+      const updated = [...prev];
+      updated.splice(index + 1, 0, cloned);
+      return updated;
+    });
+  }, []);
+
   const handleShowInPlayerSheetChange = useCallback((e) => {
     setShowInPlayerSheet(e.target.checked);
   }, []);
@@ -183,6 +199,7 @@ export default function SpellFloralistMagiseedsModal({
                   magiseedIndex={index}
                   onMagiseedChange={handleMagiseedChange}
                   onDeleteMagiseed={handleDeleteMagiseed}
+                  onCloneMagiseed={handleCloneMagiseed}
                 />
               </Grid>
             ))

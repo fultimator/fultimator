@@ -55,8 +55,8 @@ export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
 // Vehicle module queries
 
 /**
- * All modules physically installed (equipped) on the active vehicle that are
- * relevant for `slot`  -  with their original array index attached.
+ * All modules installed on the active vehicle that are relevant for `slot`
+ * (regardless of enabled/equipped state), with their original array index attached.
  */
 export function getEquippedModulesForSlot(player: TypePlayer, slot: string): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
@@ -64,7 +64,6 @@ export function getEquippedModulesForSlot(player: TypePlayer, slot: string): Ind
   return vehicle.modules
     .map((m, originalIndex) => ({ ...m, originalIndex }))
     .filter(m => {
-      if (!m.equipped) return false;
       if (slot === 'armor') return m.type === 'pilot_module_armor';
       if (slot === 'mainHand' || slot === 'offHand') return m.type === 'pilot_module_weapon';
       return false;
@@ -77,16 +76,21 @@ export function getEquippedModulesForSlot(player: TypePlayer, slot: string): Ind
  */
 export function getEquippedModuleForSlot(player: TypePlayer, slot: string): IndexedModule | null {
   const mods = getEquippedModulesForSlot(player, slot);
+  const activeMods = mods.filter(m => m.enabled || m.equipped);
   return (
-    mods.find(m => {
+    activeMods.find(m => {
       if (slot === 'armor') return (m as any).equippedSlot === 'armor';
       if (slot === 'mainHand')
-        return (m as any).equippedSlot === 'main' || (m as any).equippedSlot === 'both';
+        return (m as any).equippedSlot === 'main'
+          || (m as any).equippedSlot === 'mainHand'
+          || (m as any).equippedSlot === 'both';
       if (slot === 'offHand')
-        return (m as any).equippedSlot === 'off' || (m as any).equippedSlot === 'both';
+        return (m as any).equippedSlot === 'off'
+          || (m as any).equippedSlot === 'offHand'
+          || (m as any).equippedSlot === 'both';
       return false;
     }) ??
-    mods[0] ??
+    activeMods[0] ??
     null
   );
 }

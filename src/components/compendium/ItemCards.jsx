@@ -20,12 +20,12 @@ import { calculateCustomWeaponStats } from "../player/common/playerCalculations"
 import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
 import { magiseeds } from "../../libs/floralistMagiseedData";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-import { availableGifts } from "../player/spells/SpellGiftGiftsModal";
-import { availableDances } from "../player/spells/SpellDancerDancesModal";
-import { availableTherioforms } from "../player/spells/SpellMutantTherioformsModal";
+import { availableGifts } from "../player/spells/spellOptionData";
+import { availableDances } from "../player/spells/spellOptionData";
+import { availableTherioforms } from "../player/spells/spellOptionData";
 import { availableTones } from "../player/spells/SpellChanterTonesModal";
-import { availableSymbols } from "../player/spells/SpellSymbolistSymbolsModal";
-import { invocationsByWellspring } from "../player/spells/SpellInvokerInvocationsModal";
+import { availableSymbols } from "../player/spells/spellOptionData";
+import { invocationsByWellspring } from "../player/spells/spellOptionData";
 
 // 
 // Spell type description keys (per-character types have no static list)
@@ -602,6 +602,16 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
     <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>{text || ""}</StyledMarkdown>
   );
 
+  const pilotSubtype = item.pilotSubtype
+    || (item.passengers != null ? "frame" : null)
+    || (String(item.type || "").includes("pilot_module_armor") ? "armor" : null)
+    || (String(item.type || "").includes("pilot_module_weapon") ? "weapon" : null)
+    || (String(item.type || "").includes("pilot_module_support") ? "support" : null)
+    || (String(item.category || "").toLowerCase().includes("frame") ? "frame" : null)
+    || (String(item.category || "").toLowerCase().includes("armor module") ? "armor" : null)
+    || (String(item.category || "").toLowerCase().includes("weapon module") ? "weapon" : null)
+    || (String(item.category || "").toLowerCase().includes("support module") ? "support" : null);
+
   const renderBody = () => {
     switch (item.spellType) {
       case "gift":
@@ -730,7 +740,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
           </>
         );
       case "pilot-vehicle":
-        if (item.pilotSubtype === "frame" || item.passengers != null) return (
+        if (pilotSubtype === "frame" || item.passengers != null) return (
           <>
             <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: "bold", display: "block", mb: 0.25 }}>
               {t(item.frame ?? "")}
@@ -741,7 +751,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(t(item.description))}</Typography>}
           </>
         );
-        if (item.pilotSubtype === "armor" || item.def != null) return (
+        if (pilotSubtype === "armor" || item.def != null) return (
           <>
             <Typography variant="caption" color="text.secondary">
               DEF {item.def ?? " - "} · MDEF {item.mdef ?? " - "}{item.martial ? " · Martial" : ""}
@@ -750,7 +760,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(item.description)}</Typography>}
           </>
         );
-        if (item.pilotSubtype === "weapon" || item.damage != null) return (
+        if (pilotSubtype === "weapon" || item.damage != null) return (
           <>
             <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
               {[item.category, item.att1 && item.att2 ? `${item.att1}+${item.att2}` : null].filter(Boolean).join(" · ")}
@@ -806,10 +816,10 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
     "arcanist-rework": "Arcanum",
     "tinkerer-alchemy": "Alchemy",
     "tinkerer-infusion": "Infusion",
-    "pilot-vehicle": item.pilotSubtype === "frame" ? "Vehicle Frame"
-      : item.pilotSubtype === "armor" ? "Armor Module"
-      : item.pilotSubtype === "weapon" ? "Weapon Module"
-      : item.pilotSubtype === "support" ? "Support Module"
+    "pilot-vehicle": pilotSubtype === "frame" ? "Vehicle Frame"
+      : pilotSubtype === "armor" ? "Armor Module"
+      : pilotSubtype === "weapon" ? "Weapon Module"
+      : pilotSubtype === "support" ? "Support Module"
       : "Pilot Vehicle",
     cooking: "Delicacy",
   }[item.spellType] ?? item.spellType;

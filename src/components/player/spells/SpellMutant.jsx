@@ -15,7 +15,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-function ThemedSpellMutant({ mutant, onEditTherioforms, isEditMode, onEdit }) {
+function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -57,14 +57,7 @@ function ThemedSpellMutant({ mutant, onEditTherioforms, isEditMode, onEdit }) {
             variant="outlined"
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
-            {t("mutant_therioforms")}
-          </Button>
-          <Button
-            onClick={onEditTherioforms}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("mutant_settings_modal")}
+            {t("mutant_settings_button")}
           </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>

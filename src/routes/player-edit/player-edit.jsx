@@ -716,8 +716,16 @@ export default function PlayerEdit() {
               </Grid>
               {!battleMode && (
                 <>
-                  <PlayerTraits player={playerTemp} isEditMode={isEditMode} />
+                  {/* <PlayerTraits player={playerTemp} isEditMode={isEditMode} /> */}
                   <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
+                  <PlayerRituals
+                    player={playerTemp}
+                    isEditMode={isEditMode}
+                    clockSections={ritualClockSections}
+                    setClockSections={setRitualClockSections}
+                    clockState={ritualClockState}
+                    setClockState={setRitualClockState}
+                  />
                   {optionalRules.quirks && (
                     <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
                   )}

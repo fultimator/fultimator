@@ -1,17 +1,6 @@
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Grid,
-  FormControlLabel,
-  Switch,
-} from "@mui/material";
-import { useTranslate } from "../../../translation/translate";
-import { Close } from "@mui/icons-material";
-
+import UnifiedSpellModal from "./modals/UnifiedSpellModal";
+import GeneralSection from "./sections/GeneralSection";
+import DancerContentSection from "./sections/DancerContentSection";
 
 export default function SpellDancerModal({
   open,
@@ -20,74 +9,28 @@ export default function SpellDancerModal({
   onDelete,
   dance,
 }) {
-  const { t } = useTranslate();
-
-  const [showInPlayerSheet, setShowInPlayerSheet] = useState(
-    dance ? !!dance.showInPlayerSheet : true
-  );
-
-  useEffect(() => {
-    if (dance) {
-      setShowInPlayerSheet(!!dance.showInPlayerSheet);
-    }
-  }, [dance]);
-
-  const handleSave = () => {
-    onSave(dance.index, {
-      ...dance,
-      showInPlayerSheet: showInPlayerSheet,
-    });
-  };
-
-  const handleDelete = () => {
-    onDelete(dance.index);
-  };
-
   return (
-    <Dialog
+    <UnifiedSpellModal
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
-    >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-        {t("dance_settings_modal")}
-      </DialogTitle>
-      <Button
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
-        }}
-      >
-        <Close />
-      </Button>
-      <DialogContent>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={12}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showInPlayerSheet}
-                  onChange={(e) => setShowInPlayerSheet(e.target.checked)}
-                />
-              }
-              label={t("Show in Character Sheet")}
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
-
-      <DialogActions>
-        <Button variant="contained" color="error" onClick={handleDelete}>
-          {t("dance_delete_button")}
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          {t("Save Changes")}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      onSave={onSave}
+      onDelete={onDelete}
+      spellType="dancer"
+      spell={dance}
+      sections={[
+        {
+          id: "content",
+          title: "dance_edit_dances_button",
+          component: DancerContentSection,
+          props: {},
+        },
+        {
+          id: "general",
+          title: "dance_settings_button",
+          component: GeneralSection,
+          props: { customFields: [] },
+        },
+      ]}
+    />
   );
 }
