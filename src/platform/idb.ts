@@ -28,6 +28,20 @@ export function getDb(): Promise<IDBPDatabase> {
           }
         }
       },
+      blocking() {
+        if (dbPromise) {
+          dbPromise.then((db) => db.close());
+          dbPromise = null;
+        }
+      },
+      terminated() {
+        dbPromise = null;
+      },
+    }).then((db) => {
+      db.onclose = () => {
+        dbPromise = null;
+      };
+      return db;
     });
   }
   return dbPromise;

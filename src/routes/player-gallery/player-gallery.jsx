@@ -245,7 +245,9 @@ function Personal() {
     };
 
     try {
-      const res = await db.addDoc(db.collection("player-personal"), data);
+      // Normalize and migrate before saving
+      const normalizedData = applyPreSaveTransforms(applyPostLoadTransforms(data));
+      const res = await db.addDoc(db.collection("player-personal"), normalizedData);
       console.debug(res);
     } catch (e) {
       console.debug(e);
