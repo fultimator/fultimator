@@ -44,6 +44,7 @@ import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
 import PlayerRituals from "./PlayerRituals";
 import PlayerQuirk from "./PlayerQuirk";
+import PlayerCampActivities from "./PlayerCampActivities";
 import PlayerZeroPower from "./PlayerZeroPower";
 import PlayerOthers from "./PlayerOthers";
 import PlayerNotes from "./PlayerNotes";
@@ -73,6 +74,7 @@ export default function PlayerCardSheet({
     isMainTab,
     isEditMode,
     isCharacterSheet,
+    optionalRules = { quirks: false, campActivities: false, zeroPower: false, technospheres: false },
     characterImage,
     id,
     updateMaxStats,
@@ -688,8 +690,15 @@ export default function PlayerCardSheet({
                     />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
-                    <PlayerQuirk player={player} isCharacterSheet={true} />
-                    <PlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+                    {optionalRules.quirks && (
+                        <PlayerQuirk player={player} isCharacterSheet={true} />
+                    )}
+                    {optionalRules.campActivities && (
+                        <PlayerCampActivities player={player} />
+                    )}
+                    {optionalRules.zeroPower && (
+                        <PlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+                    )}
                     <PlayerOthers player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
                     <PlayerRituals player={player} isCharacterSheet={true} />
                     <PlayerSpells player={player} setPlayer={setPlayer} isCharacterSheet={true} searchQuery={searchQuery} />

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/DatabaseContext";
@@ -17,6 +17,16 @@ import {
   Typography,
   Fab,
   Stack,
+  Paper,
+  Checkbox,
+  Select,
+  MenuItem,
+  TextField,
+  FormControl,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -29,6 +39,7 @@ import EditPlayerTraits from "../../components/player/informations/EditPlayerTra
 import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
 import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
 import EditPlayerQuirk from "../../components/player/informations/EditPlayerQuirk";
+import EditPlayerCampActivities from "../../components/player/informations/EditPlayerCampActivities";
 import EditPlayerZeroPower from "../../components/player/informations/EditPlayerZeroPower";
 import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
 import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
@@ -54,13 +65,14 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download, Lock, LockOpen } from "@mui/icons-material";
+import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download, Settings, Lock, LockOpen } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
 import useDownload from "../../hooks/useDownload";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
+import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
 import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
 import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
@@ -89,7 +101,10 @@ import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerS
 import { fixVerticalLabels } from "../../utility/screenshotFix";
 import { isItemEquipped } from '../../components/player/equipment/slots/equipmentSlots';
 import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
+import classList from "../../libs/classes";
 import PlayerLoadout from '../../components/player/playerSheet/PlayerLoadout';
+import CustomHeader from "../../components/common/CustomHeader";
+import SettingRow from "../../components/common/SettingRow";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -97,6 +112,9 @@ export default function PlayerEdit() {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
+
+  const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] = useState(false);
+  const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] = useState(false);
 
   let params = useParams(); // URL parameters hook
 
@@ -228,7 +246,9 @@ export default function PlayerEdit() {
     if (player) {
       // Perform a deep copy of the player object
       const updatedPlayerTemp = JSON.parse(JSON.stringify(player));
-      setPlayerTemp(applyPostLoadTransforms(updatedPlayerTemp));
+      const transformedPlayer = applyPostLoadTransforms(updatedPlayerTemp);
+      setPlayerTemp(transformedPlayer);
+      setCompactView(transformedPlayer?.settings?.defaultView === "compact");
       setIsUpdated(false);
     }
   }, [player]);
@@ -425,6 +445,98 @@ export default function PlayerEdit() {
     setIsBugDialogOpen(false);
   };
 
+  const settings = playerTemp?.settings ?? {};
+  const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
+  const optionalRules = {
+    quirks: settings.optionalRules?.quirks ?? false,
+    campActivities: settings.optionalRules?.campActivities ?? false,
+    zeroPower: settings.optionalRules?.zeroPower ?? false,
+    technospheres: settings.optionalRules?.technospheres ?? true,
+  };
+  const specialSkillOverrides = settings.specialSkillOverrides ?? {};
+
+  const updatePlayerSettings = useCallback((updater) => {
+    setPlayerTemp((prev) => {
+      if (!prev) return prev;
+      const currentSettings = prev.settings ?? {};
+      const nextSettings =
+        typeof updater === "function" ? updater(currentSettings) : updater;
+      return { ...prev, settings: nextSettings };
+    });
+  }, []);
+
+  const allSpecialSkills = useMemo(() => {
+    const specialSkills = classList
+      .flatMap((cls) => cls.skills ?? [])
+      .map((skill) => skill.specialSkill)
+      .filter(Boolean);
+    return Array.from(new Set(specialSkills)).sort((a, b) => a.localeCompare(b));
+  }, []);
+
+  const activeSpecialSkillMap = useMemo(() => {
+    const grouped = new Map();
+    (playerTemp?.classes ?? []).forEach((cls) => {
+      (cls.skills ?? []).forEach((skill) => {
+        if (!skill?.specialSkill || !skill.currentLvl) return;
+        const key = skill.specialSkill;
+        const existing = grouped.get(key);
+        if (existing) {
+          existing.levels.push(skill.currentLvl);
+          existing.classes.push(cls.name || t("Class"));
+        } else {
+          grouped.set(key, {
+            name: key,
+            levels: [skill.currentLvl],
+            classes: [cls.name || t("Class")],
+          });
+        }
+      });
+    });
+
+    const normalized = new Map();
+    Array.from(grouped.values()).forEach((entry) => {
+      normalized.set(entry.name, {
+        ...entry,
+        level: Math.max(...entry.levels),
+        classList: Array.from(new Set(entry.classes)),
+      });
+    });
+
+    return normalized;
+  }, [playerTemp?.classes, t]);
+
+  const handleDefaultViewChange = (value) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      defaultView: value,
+    }));
+    setCompactView(value === "compact");
+  };
+
+  const handleOptionalRuleChange = (rule, checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      optionalRules: {
+        ...(prevSettings.optionalRules ?? {}),
+        [rule]: checked,
+      },
+    }));
+  };
+
+  const handleSpecialSkillOverrideChange = (skillName, checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      specialSkillOverrides: {
+        ...Object.fromEntries(
+          Object.entries(prevSettings.specialSkillOverrides ?? {}).filter(
+            ([name, value]) => name !== skillName && value === true
+          )
+        ),
+        ...(checked ? { [skillName]: true } : {}),
+      },
+    }));
+  };
+
   if (!playerTemp) {
     return null;
   }
@@ -470,6 +582,10 @@ export default function PlayerEdit() {
                   <NotesIcon color="black" size="1.5em" />
                   <ListItemText primary={t("Notes")} sx={{ ml: 1 }} />
                 </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 7)}>
+                  <Settings />
+                  <ListItemText primary={t("Settings")} sx={{ ml: 1 }} />
+                </ListItem>
               </List>
             </Drawer>
           </>
@@ -486,6 +602,7 @@ export default function PlayerEdit() {
               <Tab value={4}>{t("Spells")}</Tab>
               <Tab value={5}>{t("Equipment")}</Tab>
               <Tab value={6}>{t("Notes")}</Tab>
+              <Tab value={7}><Settings /></Tab>
             </Box>
             {isOwner ? (
               <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
@@ -557,6 +674,7 @@ export default function PlayerEdit() {
                   setPlayer={setPlayerTemp}
                   isEditMode={isEditMode}
                   isCharacterSheet={true}
+                  optionalRules={optionalRules}
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
                   updateMaxStats={updateMaxStats}
@@ -593,7 +711,16 @@ export default function PlayerEdit() {
                 <>
                   <PlayerTraits player={playerTemp} isEditMode={isEditMode} />
                   <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
-                  <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
+                  {optionalRules.quirks && (
+                    <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
+                  )}
+                  {optionalRules.campActivities && (
+                    <PlayerCampActivities
+                      player={playerTemp}
+                      setPlayer={setPlayerTemp}
+                      isEditMode={isEditMode}
+                    />
+                  )}
                   <PlayerRituals
                     player={playerTemp}
                     isEditMode={isEditMode}
@@ -602,11 +729,13 @@ export default function PlayerEdit() {
                     clockState={ritualClockState}
                     setClockState={setRitualClockState}
                   />
-                  <PlayerZeroPower
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
+                  {optionalRules.zeroPower && (
+                    <PlayerZeroPower
+                      player={playerTemp}
+                      setPlayer={setPlayerTemp}
+                      isEditMode={isEditMode}
+                    />
+                  )}
                   <PlayerOthers
                     player={playerTemp}
                     setPlayer={setPlayerTemp}
@@ -729,18 +858,36 @@ export default function PlayerEdit() {
             isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
-          <EditPlayerQuirk
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerZeroPower
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
+          {optionalRules.quirks && (
+            <>
+              <EditPlayerQuirk
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <Divider sx={{ my: 1 }} />
+            </>
+          )}
+          {optionalRules.campActivities && (
+            <>
+              <EditPlayerCampActivities
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <Divider sx={{ my: 1 }} />
+            </>
+          )}
+          {optionalRules.zeroPower && (
+            <>
+              <EditPlayerZeroPower
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <Divider sx={{ my: 1 }} />
+            </>
+          )}
           <EditPlayerOther
             player={playerTemp}
             setPlayer={setPlayerTemp}
@@ -815,6 +962,72 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
           />
+        </TabPanel>
+        <TabPanel value={7}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: "15px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <CustomHeader
+                  type="top"
+                  headerText={t("Settings")}
+                  icon={Settings}
+                  showIconButton={false}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Box sx={{ px: 2, pb: 2 }}>
+                  <SettingRow
+                    label={t("Default View")}
+                    hint={t("Choose which view opens first in Player Edit.")}
+                  >
+                    <FormControl variant="outlined" size="small" sx={{ minWidth: 180 }}>
+                      <Select
+                        value={defaultView}
+                        onChange={(e) => handleDefaultViewChange(e.target.value)}
+                      >
+                        <MenuItem value="normal">{t("Normal View")}</MenuItem>
+                        <MenuItem value="compact">{t("Compact View")}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Special Skills Overrides")}
+                    hint={t("Open a modal with active special skills and override toggles.")}
+                  >
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setIsSpecialSkillsModalOpen(true)}
+                    >
+                      {t("Open")}
+                    </Button>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Optional Rules")}
+                    hint={t("Open optional features such as Quirks, Zero Power, and Technospheres.")}
+                  >
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setIsOptionalRulesModalOpen(true)}
+                    >
+                      {t("Open")}
+                    </Button>
+                  </SettingRow>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
         </TabPanel>
         <Button
           variant="outlined"
@@ -902,6 +1115,106 @@ export default function PlayerEdit() {
           </Tooltip>
         )}
       </Box>
+
+      <Dialog
+        open={isSpecialSkillsModalOpen}
+        onClose={() => setIsSpecialSkillsModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("Special Skills Overrides")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            {allSpecialSkills.length > 0 ? (
+              allSpecialSkills.map((skillName) => {
+                const activeSkill = activeSpecialSkillMap.get(skillName);
+                const isActive = Boolean(activeSkill);
+                return (
+                  <SettingRow
+                    key={skillName}
+                    label={skillName}
+                    hint={
+                      isActive
+                        ? `${t("Active in")}: ${activeSkill.classList.join(", ")} • ${t("Highest Level")}: ${activeSkill.level}`
+                        : t("Not currently active. Enable to force this special skill behavior.")
+                    }
+                  >
+                    <Checkbox
+                      checked={isActive || Boolean(specialSkillOverrides[skillName])}
+                      disabled={isActive}
+                      onChange={(e) =>
+                        handleSpecialSkillOverrideChange(skillName, e.target.checked)
+                      }
+                    />
+                  </SettingRow>
+                );
+              })
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                {t("No special skills found in class definitions.")}
+              </Typography>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={isOptionalRulesModalOpen}
+        onClose={() => setIsOptionalRulesModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("Optional Rules")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            <SettingRow
+              label={t("Quirks")}
+              hint={t("Enable or disable Quirk sections in Player Sheet and edit tabs.")}
+            >
+              <Checkbox
+                checked={optionalRules.quirks}
+                onChange={(e) => handleOptionalRuleChange("quirks", e.target.checked)}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Camp Activities")}
+              hint={t("Enable or disable Camp Activities sections in Player Sheet and edit tabs.")}
+            >
+              <Checkbox
+                checked={optionalRules.campActivities}
+                onChange={(e) => handleOptionalRuleChange("campActivities", e.target.checked)}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Zero Power")}
+              hint={t("Enable or disable Zero Power sections in Player Sheet and edit tabs.")}
+            >
+              <Checkbox
+                checked={optionalRules.zeroPower}
+                onChange={(e) => handleOptionalRuleChange("zeroPower", e.target.checked)}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Technospheres")}
+              hint={t("Placeholder toggle stored in settings for future Technospheres behavior.")}
+            >
+              <Checkbox
+                checked={optionalRules.technospheres}
+                onChange={(e) => handleOptionalRuleChange("technospheres", e.target.checked)}
+              />
+            </SettingRow>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsOptionalRulesModalOpen(false)}>{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
 
       <HelpFeedbackDialog
         open={isBugDialogOpen}

@@ -1,9 +1,12 @@
 import React, { useCallback, useState } from "react";
-import { Grid, TextField, useTheme, Paper } from "@mui/material";
+import { Grid, TextField, useTheme, Paper, IconButton, Tooltip, Box, Typography } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const QUIRK_SUBTYPES = ["quirk"];
 
@@ -12,6 +15,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [compendiumOpen, setCompendiumOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const onChangeQuirk = useCallback(
     (key) => (value) => {
@@ -56,11 +60,10 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
             type="top"
             headerText={t("Quirk")}
             showIconButton={false}
-            openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
           />
         </Grid>
         <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-          <Grid item xs={7}>
+          <Grid item xs={10} sm={11}>
             <TextField
               id="name"
               label={t("Quirk Name") + ":"}
@@ -70,8 +73,23 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
               InputProps={{
                 readOnly: !isEditMode,
               }}
+              fullWidth
             />
           </Grid>
+          {isEditMode && (
+            <Grid item xs={2} sm={1} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+              <Tooltip title={t("Replace from Compendium")}>
+                <IconButton size="small" onClick={() => setCompendiumOpen(true)}>
+                  <SearchIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Remove")}>
+                <IconButton size="small" color="error" onClick={() => setDeleteDialogOpen(true)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          )}
           <Grid item xs={12} sm={12}>
             <CustomTextarea
               id="description"
@@ -107,6 +125,23 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           initialOptionalSubtypes={QUIRK_SUBTYPES}
         />
       )}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          setPlayer((prev) => ({
+            ...prev,
+            quirk: { name: "", description: "", effect: "" },
+          }));
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to delete this quirk?")}
+        itemPreview={
+          <Box>
+            <Typography variant="h4">{player.quirk?.name || t("Quirk")}</Typography>
+          </Box>
+        }
+      />
     </Paper>
   );
 }

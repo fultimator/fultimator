@@ -213,7 +213,7 @@ export function getItemSearchText(item) {
   const skillNames = item.skills
     ? item.skills.map((s) => s.skillName).join(" ")
     : "";
-  return [item.name, item.category, item.type, item.range, item.book, skillNames, item.quality]
+  return [item.name, item.category, item.type, item.range, item.book, skillNames, item.quality, item.subtype, item.description, item.effect, item.targetDescription]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -581,8 +581,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             multiple
             size="small"
             fullWidth
-            options={["quirk", "zero-trigger", "zero-effect", "zero-power", "other"]}
-            getOptionLabel={(o) => t({ "quirk": "Quirk", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[o] ?? o)}
+            options={["quirk", "camp-activities", "zero-trigger", "zero-effect", "zero-power", "other"]}
+            getOptionLabel={(o) => t({ "quirk": "Quirk", "camp-activities": "Camp Activities", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[o] ?? o)}
             value={selectedOptionalSubtypes}
             onChange={(e, newValue) => onOptionalSubtypesChange(newValue)}
             renderInput={(params) => (
@@ -591,7 +591,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderTags={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
-                const label = { "quirk": "Quirk", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[option] ?? option;
+                const label = { "quirk": "Quirk", "camp-activities": "Camp Activities", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[option] ?? option;
                 return <Chip key={key} label={t(label)} size="small" {...tagProps} />;
               })
             }

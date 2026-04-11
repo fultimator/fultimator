@@ -1885,6 +1885,7 @@ function AccessoryPanel() {
 
 const OPTIONAL_SUBTYPES = [
   { value: "quirk",        label: "Quirk"        },
+  { value: "camp-activities", label: "Camp Activities" },
   { value: "zero-trigger", label: "Zero Trigger" },
   { value: "zero-effect",  label: "Zero Effect"  },
   { value: "zero-power",   label: "Zero Power"   },
@@ -1898,6 +1899,7 @@ function OptionalPanel() {
   const [name,          setName]          = useState("");
   const [description,   setDescription]   = useState("");
   const [effect,        setEffect]        = useState("");
+  const [targetDescription, setTargetDescription] = useState("");
   const [clockSections, setClockSections] = useState(6);
   const [showClock,     setShowClock]     = useState(false);
   const [zeroTrigger,   setZeroTrigger]   = useState(null);
@@ -1909,10 +1911,17 @@ function OptionalPanel() {
   );
   const zeroTriggerOptions = allOptionals.filter((i) => i.subtype === "zero-trigger");
   const zeroEffectOptions  = allOptionals.filter((i) => i.subtype === "zero-effect");
+  const campTargetOptions = [
+    t("Yourself"),
+    t("One ally"),
+    t("Yourself or one ally"),
+  ];
 
   const data =
     subtype === "quirk"
       ? { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() }
+    : subtype === "camp-activities"
+      ? { subtype, name: name.trim(), targetDescription: targetDescription.trim(), effect: effect.trim() }
     : subtype === "zero-trigger" || subtype === "zero-effect"
       ? { subtype, name: name.trim(), description: description.trim() }
     : subtype === "zero-power"
@@ -1948,6 +1957,30 @@ function OptionalPanel() {
           {(subtype === "quirk") && <>
             <Grid item xs={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
+            </Grid>
+            <Grid item xs={12}>
+              <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
+            </Grid>
+          </>}
+
+          {subtype === "camp-activities" && <>
+            <Grid item xs={12}>
+              <Autocomplete
+                freeSolo
+                options={campTargetOptions}
+                value={targetDescription}
+                onInputChange={(_, value) => setTargetDescription(value)}
+                onChange={(_, value) => setTargetDescription(typeof value === "string" ? value : "")}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("Target")}
+                    size="small"
+                    helperText={t("Suggested: Yourself, One ally, Yourself or one ally")}
+                  />
+                )}
+                size="small"
+              />
             </Grid>
             <Grid item xs={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />

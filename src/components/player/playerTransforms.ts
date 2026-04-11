@@ -40,7 +40,47 @@ function stripRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
   };
 }
 
+/**
+ * Normalizes settings payload for storage:
+ * - Always persists optionalRules with explicit booleans.
+ * - Persists only true specialSkillOverrides flags to reduce payload size.
+ */
+function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
+  const rawPlayer = player as any;
+  const settings = rawPlayer.settings ?? {};
+  const rawOptionalRules = settings.optionalRules ?? {};
+  const optionalRules = {
+    quirks: rawOptionalRules.quirks ?? false,
+    campActivities: rawOptionalRules.campActivities ?? false,
+    zeroPower: rawOptionalRules.zeroPower ?? false,
+    technospheres: rawOptionalRules.technospheres ?? false,
+  };
+
+  const rawOverrides = settings.specialSkillOverrides ?? {};
+  const specialSkillOverrides = Object.fromEntries(
+    Object.entries(rawOverrides).filter(([, value]) => value === true)
+  );
+
+  const nextSettings: any = {
+    ...settings,
+    defaultView: settings.defaultView === "compact" ? "compact" : "normal",
+    optionalRules,
+  };
+
+  if (Object.keys(specialSkillOverrides).length > 0) {
+    nextSettings.specialSkillOverrides = specialSkillOverrides;
+  } else {
+    delete nextSettings.specialSkillOverrides;
+  }
+
+  return {
+    ...player,
+    settings: nextSettings,
+  } as TypePlayer;
+}
+
 const PRE_SAVE_TRANSFORMS: PlayerTransform[] = [
+  normalizeSettingsForSave,
   stripRuntimeEquippedFlags,
 ];
 

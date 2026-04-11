@@ -1154,6 +1154,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
  */
 const OPTIONAL_SUBTYPES = [
   { value: "quirk",        label: "Quirk"        },
+  { value: "camp-activities", label: "Camp Activities" },
   { value: "zero-trigger", label: "Zero Trigger" },
   { value: "zero-effect",  label: "Zero Effect"  },
   { value: "zero-power",   label: "Zero Power"   },
@@ -1169,6 +1170,7 @@ function OptionalForm({ packId, onClose }) {
   const [name,          setName]          = useState("");
   const [description,   setDescription]   = useState("");
   const [effect,        setEffect]        = useState("");
+  const [targetDescription, setTargetDescription] = useState("");
   const [clockSections, setClockSections] = useState(6);
   const [showClock,     setShowClock]     = useState(false);
   const [zeroTrigger,   setZeroTrigger]   = useState(null);
@@ -1180,9 +1182,15 @@ function OptionalForm({ packId, onClose }) {
   );
   const zeroTriggerOptions = allOptionals.filter((i) => i.subtype === "zero-trigger");
   const zeroEffectOptions  = allOptionals.filter((i) => i.subtype === "zero-effect");
+  const campTargetOptions = [
+    t("Yourself"),
+    t("One ally"),
+    t("Yourself or one ally"),
+  ];
 
   const buildData = () => {
     if (subtype === "quirk") return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() };
+    if (subtype === "camp-activities") return { subtype, name: name.trim(), targetDescription: targetDescription.trim(), effect: effect.trim() };
     if (subtype === "zero-trigger" || subtype === "zero-effect") return { subtype, name: name.trim(), description: description.trim() };
     if (subtype === "zero-power") return { subtype, name: name.trim(), zeroTrigger: zeroTrigger?.name ?? "", zeroEffect: zeroEffect?.name ?? "", clock: { sections: Number(clockSections) } };
     return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim(), ...(showClock ? { clock: { sections: Number(clockSections) } } : {}) };
@@ -1221,6 +1229,30 @@ function OptionalForm({ packId, onClose }) {
           {(subtype === "quirk" || subtype === "other") && <>
             <Grid item xs={12}>
               <TextField label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} fullWidth size="small" multiline rows={2} />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} fullWidth size="small" multiline rows={3} />
+            </Grid>
+          </>}
+
+          {subtype === "camp-activities" && <>
+            <Grid item xs={12}>
+              <Autocomplete
+                freeSolo
+                options={campTargetOptions}
+                value={targetDescription}
+                onInputChange={(_, value) => setTargetDescription(value)}
+                onChange={(_, value) => setTargetDescription(typeof value === "string" ? value : "")}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("Target")}
+                    size="small"
+                    helperText={t("Suggested: Yourself, One ally, Yourself or one ally")}
+                  />
+                )}
+                size="small"
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} fullWidth size="small" multiline rows={3} />

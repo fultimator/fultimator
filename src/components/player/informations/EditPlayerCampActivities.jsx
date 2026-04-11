@@ -8,8 +8,7 @@ import {
   Tooltip,
   Divider,
   Typography,
-  Switch,
-  FormControlLabel,
+  Autocomplete,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
@@ -20,13 +19,13 @@ import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
-const OTHER_SUBTYPES = ["other"];
+const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
 
-function emptyOther() {
-  return { name: "", description: "", effect: "" };
+function emptyCampActivity() {
+  return { name: "", targetDescription: "", effect: "" };
 }
 
-export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
+export default function EditPlayerCampActivities({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -35,14 +34,19 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
-  const others = player.others ?? [];
+  const activities = player.campActivities ?? [];
+  const targetOptions = [
+    t("Yourself"),
+    t("One ally"),
+    t("Yourself or one ally"),
+  ];
 
-  const onChangeOther = useCallback(
+  const onChangeActivity = useCallback(
     (index, key) => (value) => {
       setPlayer((prev) => {
-        const updated = [...(prev.others ?? [])];
+        const updated = [...(prev.campActivities ?? [])];
         updated[index] = { ...updated[index], [key]: value };
-        return { ...prev, others: updated };
+        return { ...prev, campActivities: updated };
       });
     },
     [setPlayer]
@@ -51,16 +55,16 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const handleAdd = useCallback(() => {
     setPlayer((prev) => ({
       ...prev,
-      others: [...(prev.others ?? []), emptyOther()],
+      campActivities: [...(prev.campActivities ?? []), emptyCampActivity()],
     }));
   }, [setPlayer]);
 
   const handleRemove = useCallback(
     (index) => {
       setPlayer((prev) => {
-        const updated = [...(prev.others ?? [])];
+        const updated = [...(prev.campActivities ?? [])];
         updated.splice(index, 1);
-        return { ...prev, others: updated };
+        return { ...prev, campActivities: updated };
       });
     },
     [setPlayer]
@@ -71,16 +75,15 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
       if (replaceIndex === null) return;
       setPlayer((prev) => ({
         ...prev,
-        others: (prev.others ?? []).map((other, idx) =>
+        campActivities: (prev.campActivities ?? []).map((activity, idx) =>
           idx === replaceIndex
             ? {
-                ...other,
+                ...activity,
                 name: item.name ?? "",
-                description: item.description ?? "",
+                targetDescription: item.targetDescription ?? "",
                 effect: item.effect ?? "",
-                ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : { clock: undefined }),
               }
-            : other
+            : activity
         ),
       }));
       setReplaceCompendiumOpen(false);
@@ -103,23 +106,23 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         <Grid item xs={12}>
           <CustomHeader
             type="top"
-            headerText={t("Other Optionals")}
+            headerText={t("Camp Activities (Max 2)")}
             showIconButton={isEditMode}
             addItem={handleAdd}
             icon={AddIcon}
-            customTooltip={t("Add Optional")}
+            customTooltip={t("Add Camp Activity")}
           />
         </Grid>
 
-        {others.length === 0 && (
+        {activities.length === 0 && (
           <Grid item xs={12} sx={{ py: 2 }}>
             <Typography variant="body2" color="text.secondary" textAlign="center">
-              {t("No optional entries yet.")}
+              {t("No camp activities yet.")}
             </Typography>
           </Grid>
         )}
 
-        {others.map((other, index) => (
+        {activities.map((activity, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
               <Grid item xs={12}>
@@ -130,8 +133,8 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
               <Grid item xs={9} sm={10}>
                 <TextField
                   label={t("Name") + ":"}
-                  value={other.name ?? ""}
-                  onChange={(e) => onChangeOther(index, "name")(e.target.value)}
+                  value={activity.name ?? ""}
+                  onChange={(e) => onChangeActivity(index, "name")(e.target.value)}
                   inputProps={{ maxLength: 100 }}
                   InputProps={{ readOnly: !isEditMode }}
                   fullWidth
@@ -165,74 +168,45 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   </Tooltip>
                 </Grid>
               )}
+
               <Grid item xs={12}>
-                <CustomTextarea
-                  label={t("Description") + ":"}
-                  value={other.description ?? ""}
-                  onChange={(e) => onChangeOther(index, "description")(e.target.value)}
-                  maxLength={5000}
-                  maxRows={8}
-                  readOnly={!isEditMode}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <CustomTextarea
-                  label={t("Effect") + ":"}
-                  value={other.effect ?? ""}
-                  onChange={(e) => onChangeOther(index, "effect")(e.target.value)}
-                  maxLength={5000}
-                  maxRows={8}
-                  readOnly={!isEditMode}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
                 {isEditMode ? (
-                  <FormControlLabel
-                    control={
-                      <Switch
+                  <Autocomplete
+                    freeSolo
+                    options={targetOptions}
+                    value={activity.targetDescription ?? ""}
+                    onInputChange={(_, value) => onChangeActivity(index, "targetDescription")(value)}
+                    onChange={(_, value) => onChangeActivity(index, "targetDescription")(typeof value === "string" ? value : "")}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={t("Target") + ":"}
                         size="small"
-                        checked={!!other.clock?.sections}
-                        onChange={(e) => {
-                          setPlayer((prev) => {
-                            const updated = [...(prev.others ?? [])];
-                            updated[index] = e.target.checked
-                              ? { ...updated[index], clock: { sections: 6 } }
-                              : { ...updated[index], clock: undefined };
-                            return { ...prev, others: updated };
-                          });
-                        }}
                       />
-                    }
-                    label={t("Clock")}
+                    )}
+                    size="small"
                   />
                 ) : (
-                  other.clock?.sections && (
-                    <Typography variant="body2" color="text.secondary">
-                      {t("Clock")}: {other.clock.sections}
-                    </Typography>
-                  )
-                )}
-              </Grid>
-              {other.clock?.sections && (
-                <Grid item xs={12} sm={6}>
                   <TextField
-                    label={t("Clock Sections") + ":"}
-                    value={other.clock.sections}
-                    onChange={(e) => {
-                      setPlayer((prev) => {
-                        const updated = [...(prev.others ?? [])];
-                        updated[index] = { ...updated[index], clock: { sections: Number(e.target.value) || 6 } };
-                        return { ...prev, others: updated };
-                      });
-                    }}
-                    type="number"
-                    inputProps={{ min: 2, max: 12, readOnly: !isEditMode }}
-                    InputProps={{ readOnly: !isEditMode }}
+                    label={t("Target") + ":"}
+                    value={activity.targetDescription ?? ""}
+                    InputProps={{ readOnly: true }}
                     fullWidth
                     size="small"
                   />
-                </Grid>
-              )}
+                )}
+              </Grid>
+
+              <Grid item xs={12}>
+                <CustomTextarea
+                  label={t("Effect") + ":"}
+                  value={activity.effect ?? ""}
+                  onChange={(e) => onChangeActivity(index, "effect")(e.target.value)}
+                  maxLength={5000}
+                  maxRows={8}
+                  readOnly={!isEditMode}
+                />
+              </Grid>
             </Grid>
           </React.Fragment>
         ))}
@@ -248,7 +222,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
           onAddItem={handleReplaceFromCompendium}
           initialType="optionals"
           restrictToTypes={["optionals"]}
-          initialOptionalSubtypes={OTHER_SUBTYPES}
+          initialOptionalSubtypes={CAMP_ACTIVITY_SUBTYPES}
         />
       )}
       <DeleteConfirmationDialog
@@ -261,11 +235,11 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
           if (deleteIndex !== null) handleRemove(deleteIndex);
         }}
         title={t("Confirm Deletion")}
-        message={t("Are you sure you want to delete this optional entry?")}
+        message={t("Are you sure you want to delete this camp activity?")}
         itemPreview={
           deleteIndex !== null && (
             <Typography variant="h4">
-              {others[deleteIndex]?.name || t("Optional")}
+              {activities[deleteIndex]?.name || t("Camp Activity")}
             </Typography>
           )
         }

@@ -2100,6 +2100,35 @@ function QuirkCard({ item, customTheme, t }) {
   );
 }
 
+function CampActivitiesCard({ item, customTheme, t }) {
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Stack>
+      <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+        <Typography fontWeight="bold">{item.name}</Typography>
+      </Box>
+      {item.targetDescription && (
+        <Box sx={{ px: 2, py: "5px", borderBottom: `1px solid ${customTheme.secondary}` }}>
+          <Typography variant="body2">
+            <strong>{t("Target")}:</strong> {item.targetDescription}
+          </Typography>
+        </Box>
+      )}
+      {item.effect && (
+        <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+            {item.effect}
+          </StyledMarkdown>
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
 function ZeroTriggerCard({ item, customTheme, t }) {
   const background =
     customTheme.mode === "dark"
@@ -2232,6 +2261,7 @@ export const OptionalCard = React.memo(function OptionalCard({ optional, id, onH
 
   const subtypeLabel = {
     "quirk":        t("Quirk"),
+    "camp-activities": t("Camp Activities"),
     "zero-trigger": t("Zero Trigger"),
     "zero-effect":  t("Zero Effect"),
     "zero-power":   t("Zero Power"),
@@ -2264,6 +2294,9 @@ export const OptionalCard = React.memo(function OptionalCard({ optional, id, onH
         </Box>
         {optional.subtype === "quirk" && (
           <QuirkCard item={optional} customTheme={customTheme} t={t} />
+        )}
+        {optional.subtype === "camp-activities" && (
+          <CampActivitiesCard item={optional} customTheme={customTheme} t={t} />
         )}
         {optional.subtype === "zero-trigger" && (
           <ZeroTriggerCard item={optional} customTheme={customTheme} t={t} />

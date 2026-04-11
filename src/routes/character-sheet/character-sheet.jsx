@@ -11,6 +11,7 @@ import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
+import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
 import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
 import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
@@ -243,6 +244,14 @@ export default function CharacterSheet() {
     return null;
   }
 
+  const settings = player?.settings ?? {};
+  const optionalRules = {
+    quirks: settings.optionalRules?.quirks ?? false,
+    campActivities: settings.optionalRules?.campActivities ?? false,
+    zeroPower: settings.optionalRules?.zeroPower ?? false,
+    technospheres: settings.optionalRules?.technospheres ?? false,
+  };
+
   return (
     <Layout fullWidth={true}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
@@ -349,11 +358,20 @@ export default function CharacterSheet() {
                   clockState={ritualClockState}
                   setClockState={setRitualClockState}
                 />
-                <PlayerZeroPower
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                />
+                {optionalRules.zeroPower && (
+                  <PlayerZeroPower
+                    player={player}
+                    setPlayer={handleSetPlayer}
+                    isEditMode={isEditMode}
+                  />
+                )}
+                {optionalRules.campActivities && (
+                  <PlayerCampActivities
+                    player={player}
+                    setPlayer={handleSetPlayer}
+                    isEditMode={isEditMode}
+                  />
+                )}
                 <PlayerOthers
                   player={player}
                   setPlayer={handleSetPlayer}
@@ -397,7 +415,9 @@ export default function CharacterSheet() {
                   isCharacterSheet={true}
                   updateMaxStats={updateMaxStats}
                 />
-                <PlayerQuirk player={player} isEditMode={isEditMode} isCharacterSheet={true} />
+                {optionalRules.quirks && (
+                  <PlayerQuirk player={player} isEditMode={isEditMode} isCharacterSheet={true} />
+                )}
               </Stack>
             </Grid>
           </Grid>
@@ -443,6 +463,7 @@ export default function CharacterSheet() {
               isEditMode={isEditMode}
               isOwner={isOwner}
               isCharacterSheet={true}
+              optionalRules={optionalRules}
               characterImage={player.info.imgurl}
               id="character-sheet-short"
             />
