@@ -214,6 +214,9 @@ const CombatSimEncounters = () => {
 
     try {
       await db.deleteDoc(db.doc("encounters", id));
+      setEncountersList((prev) => prev.filter((encounter) => encounter.id !== id));
+      setEncounters((prev) => prev.filter((encounter) => encounter.id !== id));
+      fetchEncounters();
       showNotification(t("combat_sim_encounter_deleted"));
     } catch (e) {
       console.error("Error deleting encounter:", e);
@@ -251,9 +254,13 @@ const CombatSimEncounters = () => {
       `${t("combat_sim_delete_encounter_confirm")} (${selectedIds.size})`
     );
     if (!confirmDelete) return;
-    for (const id of selectedIds) {
+    const idsToDelete = new Set(selectedIds);
+    for (const id of idsToDelete) {
       await db.deleteDoc(db.doc("encounters", id));
     }
+    setEncountersList((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
+    setEncounters((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
+    fetchEncounters();
     setSelectedIds(new Set());
   };
 
