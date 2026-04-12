@@ -19,6 +19,7 @@ import { CheckCircle, Cancel, OpenInNew } from "@mui/icons-material";
 import { createClient } from "@supabase/supabase-js";
 import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
+import { useTranslate } from "../../translation/translate";
 
 interface PendingSubmission {
   id: number;
@@ -55,6 +56,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   open,
   onClose,
 }) => {
+  const { t } = useTranslate();
   const [user] = useAuthState(auth);
   const [pendingSubmissions, setPendingSubmissions] = useState<PendingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,14 +240,14 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   if (!user) {
     return (
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle>Access Denied</DialogTitle>
+        <DialogTitle>{t("resources_access_denied")}</DialogTitle>
         <DialogContent>
           <Alert severity="warning">
-            You must be logged in to access the moderation panel.
+            {t("resources_must_be_logged_in")}
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{t("resources_close")}</Button>
         </DialogActions>
       </Dialog>
     );
@@ -254,14 +256,14 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   if (!isModerator) {
     return (
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle>Access Denied</DialogTitle>
+        <DialogTitle>{t("resources_access_denied")}</DialogTitle>
         <DialogContent>
           <Alert severity="error">
-            You do not have moderator permissions to access this panel.
+            {t("resources_no_moderator_permissions")}
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={onClose}>{t("resources_close")}</Button>
         </DialogActions>
       </Dialog>
     );
@@ -278,9 +280,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       }}
     >
       <DialogTitle>
-        <Typography variant="h5">Resource Moderation Panel</Typography>
+        <Typography variant="h5">{t("resources_moderation_panel")}</Typography>
         <Typography variant="body2" color="textSecondary">
-          Review and approve pending community resources
+          {t("resources_review_pending")}
         </Typography>
       </DialogTitle>
 
@@ -291,12 +293,12 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
           </Box>
         ) : pendingSubmissions.length === 0 ? (
           <Alert severity="info">
-            No pending submissions to review.
+            {t("resources_no_pending_submissions")}
           </Alert>
         ) : (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Pending Submissions ({pendingSubmissions.length})
+              {t("resources_pending_submissions")} ({pendingSubmissions.length})
             </Typography>
 
             {pendingSubmissions.map((submission) => (
@@ -323,7 +325,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                   </Box>
 
                   <Typography color="text.secondary" gutterBottom>
-                    <strong>Author:</strong> {submission.author}
+                    <strong>{t("resources_author")}:</strong> {submission.author}
                   </Typography>
 
                   <Typography variant="body2" paragraph>

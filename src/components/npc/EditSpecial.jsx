@@ -7,14 +7,17 @@ import {
   TextField,
   useMediaQuery
 } from "@mui/material";
+import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
   const isSmallScreen = useMediaQuery('(max-width: 899px)');
+  const [modalOpen, setModalOpen] = useState(false);
   const onChangeSpecial = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -49,7 +52,7 @@ export default function EditSpecial({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type={isSmallScreen ? 'middle' : 'top'} addItem={addSpecial} headerText={t("Special Rules")} icon={Add} />
+      <CustomHeader type={isSmallScreen ? 'middle' : 'top'} addItem={addSpecial} headerText={t("Special Rules")} icon={Add} openCompendium={() => setModalOpen(true)} />
       {npc.special?.map((special, i) => {
         return (
           <Grid container key={i} spacing={1}>
@@ -107,6 +110,20 @@ export default function EditSpecial({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <CompendiumViewerModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        context="npc"
+        initialType="special"
+        onAddItem={(item) => {
+          setNpc((prev) => {
+            const newState = { ...prev };
+            if (!newState.special) newState.special = [];
+            newState.special.push({ name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 });
+            return newState;
+          });
+        }}
+      />
     </>
   );
 }

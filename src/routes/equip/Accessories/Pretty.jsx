@@ -128,7 +128,7 @@ function PrettySingle({ accessory, showActions }) {
                   }}
                 >
                   <Typography>
-                    {!accessory.quality && t("No Qualities")}{" "}
+                    {!accessory.quality}{" "}
                     <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                       {accessory.quality}
                     </StyledMarkdown>

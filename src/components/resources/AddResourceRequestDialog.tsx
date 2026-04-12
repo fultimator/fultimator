@@ -66,34 +66,34 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const resourceTypes = [
-    { value: "adventure", label: "Adventure" },
-    { value: "supplement", label: "Supplement" },
-    { value: "bestiary", label: "Bestiary" },
-    { value: "character_sheet", label: "Character Sheet" },
-    { value: "tool", label: "Tool" },
-    { value: "campaign_setting", label: "Campaign Setting" },
-    { value: "module", label: "Module" },
-    { value: "homebrew_rule", label: "Homebrew Rule" },
-    { value: "map", label: "Map" },
-    { value: "other", label: "Other" },
+    { value: "adventure", label: "resources_type_adventure" },
+    { value: "supplement", label: "resources_type_supplement" },
+    { value: "bestiary", label: "resources_type_bestiary" },
+    { value: "character_sheet", label: "resources_type_character_sheet" },
+    { value: "tool", label: "resources_type_tool" },
+    { value: "campaign_setting", label: "resources_type_campaign_setting" },
+    { value: "module", label: "resources_type_module" },
+    { value: "homebrew_rule", label: "resources_type_homebrew_rule" },
+    { value: "map", label: "resources_type_map" },
+    { value: "other", label: "resources_type_other" },
   ];
 
   const languages = [
-    { value: "en", label: "English" },
-    { value: "it", label: "Italian" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "de", label: "German" },
-    { value: "pt", label: "Portuguese" },
-    { value: "other", label: "Other" },
+    { value: "en", label: "resources_language_english" },
+    { value: "it", label: "resources_language_italian" },
+    { value: "es", label: "resources_language_spanish" },
+    { value: "fr", label: "resources_language_french" },
+    { value: "de", label: "resources_language_german" },
+    { value: "pt", label: "resources_language_portuguese" },
+    { value: "other", label: "resources_language_other" },
   ];
 
   const pricingTypes = [
-    { value: "free", label: "Free" },
-    { value: "paid", label: "Paid/Commercial" },
-    { value: "crowdfunding", label: "Crowdfunding (Kickstarter, etc.)" },
-    { value: "donation", label: "Donation/Pay-what-you-want" },
-    { value: "other", label: "Other" },
+    { value: "free", label: "resources_pricing_free" },
+    { value: "paid", label: "resources_pricing_paid" },
+    { value: "crowdfunding", label: "resources_pricing_crowdfunding" },
+    { value: "donation", label: "resources_pricing_donation" },
+    { value: "other", label: "resources_pricing_other" },
   ];
 
   const checkUser = async () => {
@@ -111,8 +111,8 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
         if (author.is_banned) {
           setErrorMessage(
             author.ban_reason
-              ? `You are blocked from submitting resources. Reason: ${author.ban_reason}`
-              : "You are blocked from submitting resources."
+              ? t("submitting_resources_ban_reason", { reason: author.ban_reason })
+              : t("submitting_resources_ban")
           );
           return;
         }
@@ -151,48 +151,46 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
 
   const validateForm = () => {
     if (!formData.resourceName.trim()) {
-      setErrorMessage(t("Resource name is required"));
+      setErrorMessage(t("resources_name_required"));
       return false;
     }
     if (!formData.resourceUrl.trim()) {
-      setErrorMessage(t("Resource URL is required"));
+      setErrorMessage(t("resources_url_required"));
       return false;
     }
     if (!formData.resourceType) {
-      setErrorMessage(t("Resource type is required"));
+      setErrorMessage(t("resources_type_required"));
       return false;
     }
     if (!formData.language) {
-      setErrorMessage(t("Language is required"));
+      setErrorMessage(t("resources_language_required"));
       return false;
     }
     if (!formData.author.trim()) {
-      setErrorMessage(t("Author name is required"));
+      setErrorMessage(t("resources_author_required"));
       return false;
     }
     if (!formData.description.trim()) {
-      setErrorMessage(t("Description is required"));
+      setErrorMessage(t("resources_description_required"));
       return false;
     }
     if (!formData.pricingType) {
-      setErrorMessage(t("Pricing type is required"));
+      setErrorMessage(t("resources_pricing_required"));
       return false;
     }
     if (!formData.termsAccepted) {
-      setErrorMessage(t("You must accept the terms and conditions"));
+      setErrorMessage(t("resources_terms_required"));
       return false;
     }
     if (!formData.contactConsent) {
       setErrorMessage(
-        t("You must consent to contact regarding your submission")
+        t("resources_contact_consent_required")
       );
       return false;
     }
     if (!formData.licenseAccepted) {
       setErrorMessage(
-        t(
-          "You must confirm compliance with the Fabula Ultima Third Party License"
-        )
+        t("resources_license_required")
       );
       return false;
     }
@@ -341,9 +339,9 @@ To approve this resource, accept it through moderate submissions dialog or manua
       onSuccess();
     } catch (error) {
       if (error instanceof Error) {
-        setErrorMessage(t("Failed to submit your request: ") + error.message);
+        setErrorMessage(t("resources_submission_failed") + error.message);
       } else {
-        setErrorMessage(t("An unexpected error occurred. Please try again."));
+        setErrorMessage(t("resources_unexpected_error"));
       }
     } finally {
       setIsSubmitting(false);
@@ -378,18 +376,18 @@ To approve this resource, accept it through moderate submissions dialog or manua
     return (
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle variant="h3">
-          {t("Request Homebrew Resource Addition")}
+          {t("resources_request_addition")}
         </DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
             <Typography variant="body1">
-              {t("You must be logged in to submit a resource request.")}
+              {t("resources_login_required")}
             </Typography>
           </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" variant="contained">
-            {t("Close")}
+            {t("resources_close")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -400,7 +398,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
     return (
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle variant="h3">
-          {t("Request Homebrew Resource Addition")}
+          {t("resources_request_addition")}
         </DialogTitle>
         <DialogContent>
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -409,7 +407,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" variant="contained">
-            {t("Close")}
+            {t("resources_close")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -432,19 +430,17 @@ To approve this resource, accept it through moderate submissions dialog or manua
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <Typography variant={isMobile ? "h5" : "h3"}>
-            {t("Request Homebrew Resource Addition")}
+            {t("resources_request_addition")}
           </Typography>
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="body2">
-              {t(
-                "Submit high-quality homebrew resources for community review. All submissions are manually reviewed before approval."
-              )}
+              {t("resources_submit_high_quality")}
             </Typography>
           </Alert>
 
           <TextField
             autoFocus
-            label={t("Resource Name")}
+            label={t("resources_resource_name")}
             type="text"
             fullWidth
             required
@@ -454,12 +450,12 @@ To approve this resource, accept it through moderate submissions dialog or manua
               maxLength: 200,
             }}
             helperText={t(
-              "The title/name of the homebrew resource (max 200 characters)"
+              "resources_resource_name_helper"
             )}
           />
 
           <TextField
-            label={t("Resource URL")}
+            label={t("resources_resource_url")}
             type="url"
             fullWidth
             required
@@ -468,17 +464,15 @@ To approve this resource, accept it through moderate submissions dialog or manua
             inputProps={{
               maxLength: 500,
             }}
-            helperText={t(
-              "Direct link to the resource (PDF, webpage, etc.). Must be publicly accessible."
-            )}
+            helperText={t("resources_resource_url_helper")}
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
             <FormControl fullWidth required>
-              <InputLabel>{t("Resource Type")}</InputLabel>
+              <InputLabel>{t("resources_resource_type")}</InputLabel>
               <Select
                 value={formData.resourceType}
-                label={t("Resource Type")}
+                label={t("resources_resource_type")}
                 onChange={(e) =>
                   handleInputChange("resourceType", e.target.value)
                 }
@@ -492,10 +486,10 @@ To approve this resource, accept it through moderate submissions dialog or manua
             </FormControl>
 
             <FormControl fullWidth required>
-              <InputLabel>{t("Language")}</InputLabel>
+              <InputLabel>{t("resources_language")}</InputLabel>
               <Select
                 value={formData.language}
-                label={t("Language")}
+                label={t("resources_language")}
                 onChange={(e) => handleInputChange("language", e.target.value)}
               >
                 {languages.map((lang) => (
@@ -508,10 +502,10 @@ To approve this resource, accept it through moderate submissions dialog or manua
           </Box>
 
           <FormControl fullWidth required>
-            <InputLabel>{t("Pricing Type")}</InputLabel>
+            <InputLabel>{t("resources_pricing_type")}</InputLabel>
             <Select
               value={formData.pricingType}
-              label={t("Pricing Type")}
+              label={t("resources_pricing_type")}
               onChange={(e) => handleInputChange("pricingType", e.target.value)}
             >
               {pricingTypes.map((pricing) => (
@@ -523,7 +517,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
           </FormControl>
 
           <TextField
-            label={t("Author/Creator Name")}
+            label={t("resources_author")}
             type="text"
             fullWidth
             required
@@ -533,12 +527,12 @@ To approve this resource, accept it through moderate submissions dialog or manua
               maxLength: 100,
             }}
             helperText={t(
-              "The original creator/author of this homebrew content"
+              "resources_author_helper"
             )}
           />
 
           <TextField
-            label={t("Resource Description")}
+            label={t("resources_description")}
             fullWidth
             required
             multiline
@@ -549,12 +543,12 @@ To approve this resource, accept it through moderate submissions dialog or manua
               maxLength: 1000,
             }}
             helperText={t(
-              "Detailed description of the resource content, mechanics, and intended use (max 1000 characters)"
+              "resources_description_helper"
             )}
           />
 
           <TextField
-            label={t("Discord Username (Optional)")}
+            label={t("resources_discord_username")}
             type="text"
             fullWidth
             value={formData.discordAccount}
@@ -565,12 +559,12 @@ To approve this resource, accept it through moderate submissions dialog or manua
               maxLength: 100,
             }}
             helperText={t(
-              "Your Discord username for follow-up questions or community discussions"
+              "resources_discord_username_helper"
             )}
           />
 
           <TextField
-            label={t("Additional Notes (Optional)")}
+            label={t("resources_additional_notes")}
             fullWidth
             multiline
             rows={2}
@@ -582,7 +576,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
               maxLength: 500,
             }}
             helperText={t(
-              "Any special considerations, dependencies, or installation notes (max 500 characters)"
+              "resources_additional_notes_helper"
             )}
           />
 
@@ -597,7 +591,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             }
             label={
               <Typography variant="body2">
-                {t("This resource contains AI-generated content")}
+                {t("resources_uses_ai_content")}
               </Typography>
             }
           />
@@ -605,7 +599,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
           <Divider sx={{ my: 2 }} />
 
           <Typography variant="h6" gutterBottom>
-            {t("Terms and Responsibility")}
+            {t("resources_terms_and_responsibility")}
           </Typography>
 
           <FormControlLabel
@@ -621,7 +615,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             label={
               <Typography variant="body2">
                 {t(
-                  "I confirm that this content complies with community standards and applicable laws, is not plagiarized, stolen, duplicated, offensive, inappropriate, or sexual in nature. I accept full legal and moral responsibility for this submission. I understand that violations, spam, or inappropriate content may result in account suspension or permanent ban, and immediate content removal."
+                  "resources_terms_accepted"
                 )}
               </Typography>
             }
@@ -640,7 +634,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             label={
               <Typography variant="body2">
                 {t(
-                  "I confirm that this resource complies with the Fabula Ultima Third Party Tabletop License 1.0 and all applicable copyright laws. I understand that my content must respect the intellectual property rights of Need Games and Rooster Games."
+                  "resources_license_accepted"
                 )}
               </Typography>
             }
@@ -658,7 +652,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             label={
               <Typography variant="body2">
                 {t(
-                  "I consent to being contacted via my account email regarding this submission, including approval status, feedback, or content-related questions."
+                  "resources_contact_consent"
                 )}
               </Typography>
             }
@@ -668,11 +662,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             <Typography variant="body2">
               <strong>{t("Important:")}</strong>{" "}
               {t(
-                "For content removal requests, additional information, or appeals, contact us at"
+                "resources_content_removal_info"
               )}{" "}
               <strong>fultimator@gmail.com</strong>.{" "}
               {t(
-                "Include your submission details and account information in your message."
+                "resources_include_submission_details"
               )}
             </Typography>
           </Alert>
@@ -700,10 +694,10 @@ To approve this resource, accept it through moderate submissions dialog or manua
           disabled={isSubmitting || cooldown > 0}
         >
           {cooldown > 0
-            ? t(`Please wait ${cooldown}s before submitting again`)
+            ? t(`resources_submit_cooldown`, { seconds: cooldown })
             : isSubmitting
-              ? t("Submitting...")
-              : t("Submit Request")}
+              ? t("resources_submitting")
+              : t("resources_submit_request")}
         </Button>
       </DialogActions>
     </Dialog>

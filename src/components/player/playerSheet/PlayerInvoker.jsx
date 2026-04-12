@@ -23,8 +23,9 @@ import {
   ElectricBolt,
   Water,
 } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
 export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -143,7 +144,12 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
               {t("Invoker")}
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
-              {invokerSpells.map((invokerSpell, isIndex) => (
+              {invokerSpells.map((invokerSpell, isIndex) => {
+                const availableInvocations =
+                  invokerSpell.availableInvocations && invokerSpell.availableInvocations.length > 0
+                    ? invokerSpell.availableInvocations
+                    : buildInvokerAvailableInvocations(invokerSpell.skillLevel);
+                return (
                 <React.Fragment key={isIndex}>
                   {/* Wellspring Selection Section */}
                   <Grid item xs={12} sx={{ mb: 2 }}>
@@ -194,14 +200,14 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                   </Grid>
 
                   {/* Available Invocations */}
-                  {(!invokerSpell.availableInvocations || invokerSpell.availableInvocations.length === 0) ? (
+                  {availableInvocations.length === 0 ? (
                     <Grid item xs={12}>
                       <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
                         {t("invoker_no_invocation_warning")}
                       </Typography>
                     </Grid>
                   ) : (
-                    invokerSpell.availableInvocations
+                    availableInvocations
                       .filter((invocation) => {
                         if (invokerSpell.activeWellsprings?.includes(invocation.wellspring)) return true;
                         if (invokerSpell.innerWellspring && invokerSpell.chosenWellspring === invocation.wellspring) return true;
@@ -269,40 +275,20 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                       ))
                   )}
                 </React.Fragment>
-              ))}
+                );
+              })}
             </Grid>
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedInvocation && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {t(selectedInvocation.name)}
-                      {" - "}
-                      {selectedInvokerSpell && t(selectedInvokerSpell.className)}
-                    </Typography>
-
-                    <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                      <Chip 
-                        label={t(`invoker_${selectedInvocation.wellspring.toLowerCase()}`)} 
-                        sx={{ 
-                          backgroundColor: getWellspringColor(selectedInvocation.wellspring), 
-                          color: (selectedInvocation.wellspring === 'Air' || selectedInvocation.wellspring === 'Lightning') ? "black" : "white", 
-                          fontWeight: "bold" 
-                        }} 
-                      />
-                      <Chip label={t(selectedInvocation.type)} variant="outlined" />
-                    </Box>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {t(selectedInvocation.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedInvocation,
+                    spellType: "invocation",
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Typography, IconButton, Tooltip } from "@mui/material";
-import { Add, Edit, Remove } from "@mui/icons-material";
+import { Add, Edit, Remove, Search } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/system";
 
@@ -11,6 +11,7 @@ interface CustomHeader3Props {
   onIncrease: () => void;
   onDecrease: () => void;
   onEdit: () => void;
+  onOpenCompendium?: () => void;
   isEditMode: boolean;
   isHeroicSkill: boolean;
 }
@@ -22,6 +23,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   onIncrease,
   onDecrease,
   onEdit,
+  onOpenCompendium,
   isEditMode,
   isHeroicSkill,
 }) => {
@@ -166,15 +168,28 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
           </>
         )}
         {isEditMode && isHeroicSkill && (
-          <span>
-            <Tooltip title={t("Edit Heroic Skill")}>
+          <>
+            {onOpenCompendium && (
               <span>
-                <IconButton size="small" onClick={onEdit}>
-                  <Edit style={{ color: "white" }} />
-                </IconButton>
+                <Tooltip title={t("Search Heroic Skills")}>
+                  <span>
+                    <IconButton size="small" onClick={onOpenCompendium}>
+                      <Search style={{ color: "white" }} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
               </span>
-            </Tooltip>
-          </span>
+            )}
+            <span>
+              <Tooltip title={t("Edit Heroic Skill")}>
+                <span>
+                  <IconButton size="small" onClick={onEdit}>
+                    <Edit style={{ color: "white" }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </span>
+          </>
         )}
       </div>
     </div>

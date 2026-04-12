@@ -21,6 +21,7 @@ import {
   // ListItemText,
   // Menu as MuiMenu,
   // MenuItem,
+  Fab,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -30,7 +31,7 @@ import Layout from "../../components/Layout";
 import { useTheme } from "@mui/material/styles";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import SettingsDialog from "../../components/combatSim/SettingsDialog";
-import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts } from "@mui/icons-material";
+import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts, KeyboardArrowUp } from "@mui/icons-material";
 import { t } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import EncounterCard from "../../components/combatSim/EncounterCard";
@@ -91,6 +92,13 @@ const CombatSimEncounters = () => {
   useEffect(() => {
     fetchEncounters();
   }, [fetchEncounters, location.key]);
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const [encounters, setEncounters] = useState([]);
   const [encounterName, setEncounterName] = useState("");
@@ -189,6 +197,7 @@ const CombatSimEncounters = () => {
       const res = await db.addDoc(db.collection("encounters"), newEncounter);
       console.debug(res);
       showNotification(t("combat_sim_encounter_created"));
+      fetchEncounters();
     } catch (e) {
       console.error("Error saving encounter:", e);
       showNotification(t("combat_sim_error_creating_encounter"), "error");
@@ -205,6 +214,9 @@ const CombatSimEncounters = () => {
 
     try {
       await db.deleteDoc(db.doc("encounters", id));
+      setEncountersList((prev) => prev.filter((encounter) => encounter.id !== id));
+      setEncounters((prev) => prev.filter((encounter) => encounter.id !== id));
+      fetchEncounters();
       showNotification(t("combat_sim_encounter_deleted"));
     } catch (e) {
       console.error("Error deleting encounter:", e);
@@ -242,9 +254,13 @@ const CombatSimEncounters = () => {
       `${t("combat_sim_delete_encounter_confirm")} (${selectedIds.size})`
     );
     if (!confirmDelete) return;
-    for (const id of selectedIds) {
+    const idsToDelete = new Set(selectedIds);
+    for (const id of idsToDelete) {
       await db.deleteDoc(db.doc("encounters", id));
     }
+    setEncountersList((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
+    setEncounters((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
+    fetchEncounters();
     setSelectedIds(new Set());
   };
 
@@ -474,6 +490,18 @@ const CombatSimEncounters = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </Box>
   );
 };

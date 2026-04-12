@@ -84,7 +84,7 @@ export default function ResourceCard({
       </DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Choose your preferred reseller:
+          {t("resources_choose_reseller")}
         </Typography>
         <List>
           {options.map((option, index) => (
@@ -206,7 +206,7 @@ export default function ResourceCard({
                     fontStyle: "italic",
                   }}
                 >
-                  {t("by")} {resource.author}
+                  {t("resources_by")} {resource.author}
                 </Typography>
               )}
               {!isHomebrew && resource.publisher && (
@@ -357,7 +357,7 @@ export default function ResourceCard({
                     fontSize: "0.8rem",
                   }}
                 >
-                  Digital
+                  {t("resources_digital")}
                 </Button>
               )}
               {physicalOptions.length > 0 && (
@@ -406,7 +406,7 @@ export default function ResourceCard({
                     fontSize: "0.8rem",
                   }}
                 >
-                  Physical
+                  {t("resources_physical")}
                 </Button>
               )}
             </Box>
@@ -457,10 +457,10 @@ export default function ResourceCard({
               }}
             >
               {resource.type === "coming_soon" || resource.url === "#"
-                ? t("Coming Soon")
+                ? t("resources_coming_soon")
                 : activeTab === 0
-                ? t("Access Resource")
-                : t("View Content")}
+                ? t("resources_access_resource")
+                : t("resources_view_content")}
             </Button>
           )}
         </CardActions>

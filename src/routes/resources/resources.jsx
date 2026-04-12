@@ -404,7 +404,7 @@ function Resources() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          {t("Resource request submitted successfully! We'll review it soon.")}
+          {t("resource_request_submitted_successfully")}
         </Alert>
       </Snackbar>
     </Layout>

@@ -5,10 +5,12 @@ import {
   AccordionDetails,
   IconButton,
   Tooltip,
+  Badge,
+  Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyCustomWeapon from "../../../../routes/equip/customWeapons/PrettyCustomWeapon";
-import { Edit, Error, SwapHoriz } from "@mui/icons-material";
+import { Edit, WarningAmber, SwapHoriz } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
@@ -20,6 +22,10 @@ export default function PlayerCustomWeapons({
   customWeapons,
   onEditCustomWeapon,
   onEquipCustomWeapon,
+  onUnequipCustomWeapon,
+  onUpdateCustomWeapons,
+  onAddItem,
+  onOpenCompendium,
   isEditMode,
 }) {
   const { t } = useTranslate();
@@ -63,100 +69,21 @@ export default function PlayerCustomWeapons({
     return false;
   };
 
-  const countEquippedWeapons = () => {
-    let oneHandedCount = 0;
-    let twoHandedCount = 0;
-
-    // Count regular weapons
-    if (player.weapons && player.weapons.length > 0) {
-      player.weapons.forEach((weapon) => {
-        if (weapon.isEquipped) {
-          if (weapon.hands === 1) {
-            oneHandedCount++;
-          } else if (weapon.hands === 2) {
-            twoHandedCount++;
-          }
-        }
-      });
-    }
-
-    // Count custom weapons (all are two-handed)
-    customWeapons.forEach((weapon) => {
-      if (weapon.isEquipped) {
-        twoHandedCount++;
-      }
-    });
-
-    return { oneHandedCount, twoHandedCount };
-  };
-
-  const countEquippedShields = () => {
-    let count = 0;
-    if (player.shields && player.shields.length > 0) {
-      player.shields.forEach((shield) => {
-        if (shield.isEquipped) {
-          count++;
-        }
-      });
-    }
-    return count;
-  };
-
-  const canEquipCustomWeapon = () => {
-    const { oneHandedCount, twoHandedCount } = countEquippedWeapons();
-    const shieldsCount = countEquippedShields();
-
-    // Custom weapons are always two-handed, so both hands must be free
-    return oneHandedCount === 0 && twoHandedCount === 0 && shieldsCount === 0;
-  };
-
-  const handleEquipCustomWeapon = (index, checked) => {
-    if (canEquipCustomWeapon() || !checked) {
-      const updatedCustomWeapons = [...customWeapons];
-      updatedCustomWeapons[index].isEquipped = checked;
-      
-      // If equipping this custom weapon, unequip all other weapons
-      if (checked) {
-        // Unequip all regular weapons
-        const updatedWeapons = (player.weapons || []).map(weapon => ({
-          ...weapon,
-          isEquipped: false
-        }));
-        
-        // Unequip all shields
-        const updatedShields = (player.shields || []).map(shield => ({
-          ...shield,
-          isEquipped: false
-        }));
-        
-        // Unequip all other custom weapons
-        updatedCustomWeapons.forEach((cw, i) => {
-          if (i !== index) {
-            cw.isEquipped = false;
-          }
-        });
-        
-        // Update all equipment states
-        onEquipCustomWeapon(updatedCustomWeapons, updatedWeapons, updatedShields);
-      } else {
-        onEquipCustomWeapon(updatedCustomWeapons);
-      }
+  const handleEquipClick = (index) => {
+    const cw = customWeapons[index];
+    if (cw.isEquipped) {
+      onUnequipCustomWeapon(index);
     } else {
-      if (window.electron) {
-        window.electron.alert(
-          t("You cannot equip this weapon as no hands are free.")
-        );
-      } else {
-        alert(t("You cannot equip this weapon as no hands are free."));
-      }
+      onEquipCustomWeapon(index);
     }
   };
 
   const handleSwapForm = (index) => {
-    const updatedCustomWeapons = [...customWeapons];
-    const cw = updatedCustomWeapons[index];
-    cw.activeForm = cw.activeForm === "secondary" ? "primary" : "secondary";
-    onEquipCustomWeapon(updatedCustomWeapons);
+    const updatedCustomWeapons = customWeapons.map((cw, i) => {
+      if (i !== index) return cw;
+      return { ...cw, activeForm: cw.activeForm === "secondary" ? "primary" : "secondary" };
+    });
+    onUpdateCustomWeapons(updatedCustomWeapons);
   };
 
   useEffect(() => {
@@ -188,9 +115,11 @@ export default function PlayerCustomWeapons({
         headerText={t("Custom Weapons")}
         showIconButton={false}
         icon={<MeleeIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={3}>
+        <Grid container justifyContent="flex-end" spacing={2}>
           {customWeapons.map((customWeapon, index) => {
             // Check if weapon has transforming customization
             const hasTransforming = customWeapon.customizations && customWeapon.customizations.some(
@@ -199,9 +128,9 @@ export default function PlayerCustomWeapons({
 
             return (
               <React.Fragment key={index}>
-                {/* Primary Weapon */}
-                <Grid item container xs={12} alignItems="center" spacing={1} sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
-                  <Grid item xs={11}>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  {/* Primary Weapon */}
+                  <Box sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
                     <PrettyCustomWeapon 
                       weaponData={{
                         ...customWeapon,
@@ -216,108 +145,11 @@ export default function PlayerCustomWeapons({
                       }} 
                       showActions={false}
                     />
-                  </Grid>
-                  <Grid
-                    item
-                    container
-                    xs={1}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    {isEditMode && (
-                      <Grid item xs={12}>
-                        <IconButton onClick={() => onEditCustomWeapon(index)}>
-                          <Edit />
-                        </IconButton>
-                      </Grid>
-                    )}
-                    <Grid item xs={12}>
-                      {checkIfEquippable(customWeapon) ? (
-                        <Tooltip
-                          title={
-                            customWeapon.isEquipped
-                              ? t("Unequip Weapon")
-                              : t("Equip Weapon")
-                          }
-                        >
-                          <IconButton
-                            onClick={() =>
-                              handleEquipCustomWeapon(index, !customWeapon.isEquipped)
-                            }
-                            disabled={!isEditMode}
-                            sx={{
-                              mt: 1,
-                              boxShadow: "1px 1px 5px",
-                              backgroundColor: customWeapon.isEquipped
-                                ? theme.palette.ternary.main
-                                : theme.palette.background.paper,
-                              "&:hover": {
-                                backgroundColor: customWeapon.isEquipped
-                                  ? theme.palette.quaternary.main
-                                  : theme.palette.secondary.main,
-                              },
-                              transition: "background-color 0.3s",
-                            }}
-                          >
-                            <Equip
-                              color={
-                                customWeapon.isEquipped
-                                  ? theme.palette.mode === "dark"
-                                    ? theme.palette.white.main
-                                    : theme.palette.primary.main
-                                  : theme.palette.background.default
-                              }
-                              strokeColor={
-                                customWeapon.isEquipped &&
-                                theme.palette.mode === "dark"
-                                  ? theme.palette.white.main
-                                  : theme.palette.secondary.main
-                              }
-                            />
-                          </IconButton>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={t("Not Equippable")}>
-                          <IconButton>
-                            <Error color="error" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </Grid>
-                    {hasTransforming && (
-                      <Grid item xs={12}>
-                        <Tooltip title={t("weapon_customization_swap_form")}>
-                          <IconButton
-                            onClick={() => handleSwapForm(index)}
-                            disabled={!isEditMode}
-                            sx={{
-                              mt: 1,
-                              boxShadow: "1px 1px 5px",
-                              backgroundColor: theme.palette.background.paper,
-                              "&:hover": {
-                                backgroundColor: theme.palette.secondary.main,
-                              },
-                            }}
-                          >
-                            <SwapHoriz />
-                          </IconButton>
-                        </Tooltip>
-                      </Grid>
-                    )}
-                    <Grid item xs={12} sx={{ mt: 1 }}>
-                      <Export
-                        name={customWeapon.name}
-                        dataType="weapon"
-                        data={customWeapon}
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
+                  </Box>
 
-                {/* Secondary Weapon (Transforming Form) */}
-                {hasTransforming && (
-                  <Grid item container xs={12} alignItems="center" spacing={1} sx={{ mt: 1, opacity: customWeapon.activeForm === "secondary" ? 1 : 0.6 }}>
-                    <Grid item xs={11}>
+                  {/* Secondary Weapon (Transforming Form) */}
+                  {hasTransforming && (
+                    <Box sx={{ mt: 0.5, opacity: customWeapon.activeForm === "secondary" ? 1 : 0.6 }}>
                       {(() => {
                         const secondWeaponData = {
                           ...customWeapon,
@@ -339,12 +171,115 @@ export default function PlayerCustomWeapons({
                         
                         return <PrettyCustomWeapon weaponData={secondWeaponData} showActions={false} />;
                       })()}
-                    </Grid>
-                    <Grid item xs={1}>
-                      {/* Empty space - no buttons for secondary form */}
-                    </Grid>
-                  </Grid>
-                )}
+                    </Box>
+                  )}
+
+                  {/* Compact Actions Row Below Card */}
+                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                    {isEditMode && (
+                      <Tooltip title={t("Edit")}>
+                        <IconButton onClick={() => onEditCustomWeapon(index)} size="small">
+                          <Edit fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    
+                    <Box sx={{ ml: 0.5 }}>
+                      {checkIfEquippable(customWeapon) ? (
+                        <Tooltip
+                          title={
+                            customWeapon.isEquipped
+                              ? t("Unequip Weapon") + ` (${t("Main Hand")} + ${t("Off Hand")})`
+                              : t("Equip Weapon") + ` (${t("Main Hand")} + ${t("Off Hand")})`
+                          }
+                        >
+                          <Badge
+                            badgeContent="M+O"
+                            color="primary"
+                            invisible={!customWeapon.isEquipped}
+                            sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                          >
+                            <IconButton
+                              onClick={() => handleEquipClick(index)}
+                              disabled={!isEditMode}
+                              size="small"
+                              sx={{
+                                backgroundColor: customWeapon.isEquipped
+                                  ? theme.palette.ternary.main
+                                  : theme.palette.background.paper,
+                                "&:hover": {
+                                  backgroundColor: customWeapon.isEquipped
+                                    ? theme.palette.quaternary.main
+                                    : theme.palette.secondary.main,
+                                },
+                                transition: "background-color 0.3s",
+                                p: 0.5,
+                                border: `1px solid ${theme.palette.divider}`
+                              }}
+                            >
+                              <Equip
+                                color={
+                                  customWeapon.isEquipped
+                                    ? theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.primary.main
+                                    : theme.palette.text.secondary
+                                }
+                                strokeColor={
+                                  customWeapon.isEquipped &&
+                                  theme.palette.mode === "dark"
+                                    ? theme.palette.white.main
+                                    : theme.palette.secondary.main
+                                }
+                              />
+                            </IconButton>
+                          </Badge>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={t("Not proficient  -  martial item")}>
+                          <IconButton
+                            onClick={() => handleEquipClick(index)}
+                            disabled={!isEditMode}
+                            size="small"
+                          >
+                            <WarningAmber color="warning" fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
+
+                    {hasTransforming && (
+                      <Box sx={{ ml: 0.5 }}>
+                        <Tooltip title={t("weapon_customization_swap_form")}>
+                          <IconButton
+                            onClick={() => handleSwapForm(index)}
+                            disabled={!isEditMode}
+                            size="small"
+                            sx={{
+                              backgroundColor: theme.palette.background.paper,
+                              "&:hover": {
+                                backgroundColor: theme.palette.secondary.main,
+                              },
+                              p: 0.5,
+                              border: `1px solid ${theme.palette.divider}`
+                            }}
+                          >
+                            <SwapHoriz fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
+
+                    <Box sx={{ ml: 0.5 }}>
+                      <Export
+                        name={customWeapon.name}
+                        dataType="weapon"
+                        data={customWeapon}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                </Grid>
             </React.Fragment>
             );
           })}

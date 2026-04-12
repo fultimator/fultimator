@@ -5,26 +5,64 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 import HealthBar from "./HealthBar";
 import { GiHearts } from "react-icons/gi";
 import { FaStar } from "react-icons/fa";
 import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
+import DefenseModifierDialog from "./DefenseModifierDialog";
 
 const StatsTab = ({
   selectedNPC,
   calcHP,
   calcMP,
+  calcDef,
+  calcMDef,
+  calcAttr,
   handleOpen,
   toggleStatusEffect,
   handleDecreaseUltima,
   handleIncreaseUltima,
+  onUpdateDefenseModifiers,
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const [defenseDialogType, setDefenseDialogType] = useState(null);
 
   const isCrisis =
     selectedNPC?.combatStats?.currentHp <= Math.floor(calcHP(selectedNPC) / 2);
+
+  const getDefenseValue = (defenseType) => {
+    const baseValue =
+      defenseType === "DEF"
+        ? (calcDef ? calcDef(selectedNPC) : 0)
+        : (calcMDef ? calcMDef(selectedNPC) : 0);
+    const modifier =
+      defenseType === "DEF"
+        ? selectedNPC?.combatStats?.defenseModifier
+        : selectedNPC?.combatStats?.mdefenseModifier;
+    const overrideMap = selectedNPC?.combatStats?.defenseOverride || {};
+    const overrideValue =
+      defenseType === "MDEF" && overrideMap.MDEF === undefined
+        ? overrideMap["M.DEF"]
+        : overrideMap[defenseType];
+    const hasOverride =
+      overrideValue !== "" && overrideValue !== null && overrideValue !== undefined;
+    if (hasOverride) {
+      return Number.parseInt(overrideValue, 10) || 0;
+    }
+
+    const calculatedValue =
+      modifier === null || modifier === undefined
+        ? baseValue
+        : baseValue + modifier;
+    const attrValue =
+      defenseType === "DEF"
+        ? (calcAttr ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC) : 0)
+        : (calcAttr ? calcAttr("Dazed", "Enraged", "insight", selectedNPC) : 0);
+    return (calculatedValue || 0) + (attrValue || 0);
+  };
 
   return (
     <Box>
@@ -100,6 +138,49 @@ const StatsTab = ({
           startIcon={<FaStar />}
         >
           {t("combat_sim_edit_mp")}
+        </Button>
+      </Box>
+
+      {/* DEF / M.DEF Section */}
+      <Box sx={{ marginTop: 1, display: "flex", alignItems: "center" }}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setDefenseDialogType("DEF")}
+          sx={{
+            borderRadius: 0,
+            fontWeight: "bold",
+            fontFamily: "'Press Start 2P', cursive",
+            fontSize: {
+              xs: "0.5rem",
+              sm: "0.6rem",
+              md: "0.7rem",
+              lg: "0.8rem",
+            },
+          }}
+          fullWidth
+        >
+          {t("DEF")}: {getDefenseValue("DEF")}
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => setDefenseDialogType("MDEF")}
+          sx={{
+            ml: 1,
+            borderRadius: 0,
+            fontWeight: "bold",
+            fontFamily: "'Press Start 2P', cursive",
+            fontSize: {
+              xs: "0.5rem",
+              sm: "0.6rem",
+              md: "0.7rem",
+              lg: "0.8rem",
+            },
+          }}
+          fullWidth
+        >
+          {t("M.DEF")}: {getDefenseValue("MDEF")}
         </Button>
       </Box>
 
@@ -228,6 +309,17 @@ const StatsTab = ({
             </Button>
           </Box>
         )}
+
+      <DefenseModifierDialog
+        open={!!defenseDialogType}
+        onClose={() => setDefenseDialogType(null)}
+        defenseType={defenseDialogType}
+        npc={selectedNPC}
+        onUpdate={onUpdateDefenseModifiers}
+        calcDef={calcDef}
+        calcMDef={calcMDef}
+        calcAttr={calcAttr}
+      />
     </Box>
   );
 };

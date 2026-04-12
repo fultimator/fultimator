@@ -245,6 +245,18 @@ const NotesMarkdown = ({ children, ...props }) => {
           />
         ),
 
+        // Custom styling for highlighted text (search matches)
+        mark: ({ ...props }) => (
+          <mark
+            style={{
+              backgroundColor: "#ffeb3b",
+              padding: "0 2px",
+              fontWeight: 600,
+            }}
+            {...props}
+          />
+        ),
+
         // Custom styling for ordered lists (ol)
         ol: ({ children, start = 1, ...props }) => {
           let itemIndex = start - 1;

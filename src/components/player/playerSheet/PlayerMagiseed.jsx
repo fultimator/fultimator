@@ -16,8 +16,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import Clock from "./Clock";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
 
@@ -274,54 +274,20 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
-                {selectedSeed && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedSeed.customName || t(selectedSeed.name)}
-                      {" - "}
-                      {selectedMagiseedSpell && t(selectedMagiseedSpell.className)}
-                    </Typography>
-                    
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 2 }}>
-                       {selectedSeed.description ? t(selectedSeed.description) : (magiseeds.find(m => m.name === selectedSeed.name)?.description && t(magiseeds.find(m => m.name === selectedSeed.name).description)) || t("No description available")}
-                    </Typography>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-                      {t("magiseed_effect_by_growth_clock")}
-                    </Typography>
-
-                    {(() => {
-                      const magiseedTemplate = magiseeds.find(m => m.name === selectedSeed.name);
-                      const rangeStart = selectedSeed.rangeStart ?? (magiseedTemplate?.rangeStart ?? 0);
-                      const rangeEnd = selectedSeed.rangeEnd ?? (magiseedTemplate?.rangeEnd ?? 3);
-                      const sections = [];
-                      for (let i = rangeStart; i <= rangeEnd; i++) {
-                        sections.push(i);
-                      }
-                      return sections;
-                    })().map((section) => {
-                      const magiseedTemplate = magiseeds.find(m => m.name === selectedSeed.name);
-                      const effect = selectedSeed.effects?.[section] || (magiseedTemplate && magiseedTemplate.effects?.[section]);
-                      if (!effect) return null;
-                      
-                      return (
-                        <Box key={section} sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" fontWeight="bold" sx={{ color: primary }}>
-                            T = {section}:
-                          </Typography>
-                          <Box sx={{ ml: 2, mt: 0.5 }}>
-                            <ReactMarkdown components={{ p: "span" }}>
-                              {t(effect)}
-                            </ReactMarkdown>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </>
-                )}
+              <DialogContent sx={{ p: 0 }}>
+                {selectedSeed && (() => {
+                  const template = magiseeds.find(m => m.name === selectedSeed.name) || {};
+                  return (
+                    <NonStaticSpellCard item={{
+                      ...template,
+                      ...selectedSeed,
+                      spellType: "magiseed",
+                      name: selectedSeed.customName || selectedSeed.name,
+                      description: selectedSeed.description || template.description,
+                      effects: selectedSeed.effects || template.effects,
+                    }} />
+                  );
+                })()}
               </DialogContent>
               <DialogActions>
                 <Button variant="contained" color="primary" onClick={handleCloseModal}>

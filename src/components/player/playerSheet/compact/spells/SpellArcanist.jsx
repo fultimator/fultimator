@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 
@@ -21,6 +22,7 @@ const StyledMarkdown = ({ children, ...props }) => {
     <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 0 }}>
       <ReactMarkdown
         {...props}
+        rehypePlugins={[rehypeRaw]}
         components={{
           p: (props) => <p style={{ margin: 0, padding: 0, fontSize: "0.75rem" }} {...props} />,
           ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
@@ -29,6 +31,9 @@ const StyledMarkdown = ({ children, ...props }) => {
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
           em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+          mark: (props) => (
+            <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />
+          ),
         }}
       >
         {children}
@@ -61,10 +66,14 @@ export default function SpellArcanist({ arcana, rework }) {
                 t("No Description")
               ) : (
                 <ReactMarkdown
-                  allowedElements={["strong", "em"]}
+                  rehypePlugins={[rehypeRaw]}
+                  allowedElements={["strong", "em", "mark"]}
                   unwrapDisallowed={true}
                   components={{
                     p: (props) => <span style={{ fontSize: "0.8rem" }} {...props} />,
+                    mark: (props) => (
+                      <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />
+                    ),
                   }}
                 >
                   {arcana.description}

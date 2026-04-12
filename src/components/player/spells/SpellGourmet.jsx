@@ -18,7 +18,7 @@ import {
   getAttributes,
 } from "../../../libs/gourmetCookingData";
 
-export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode }) {
+export default function SpellGourmet({ spell, onEdit, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -128,11 +128,6 @@ export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode 
     }
   };
 
-  const handleEditCooking = () => {
-    if (onEditCooking && typeof onEditCooking === 'function') {
-      onEditCooking();
-    }
-  };
 
   return (
     <Paper
@@ -285,22 +280,6 @@ export default function SpellGourmet({ spell, onEdit, onEditCooking, isEditMode 
         )}
       </Box>
 
-      {/* Cooking Modal Button */}
-      {isEditMode && onEditCooking && (
-        <Box sx={{ p: 1, borderTop: `1px solid ${theme.secondary}`, backgroundColor: theme.ternary }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={handleEditCooking}
-            sx={{
-              fontSize: { xs: "0.75rem", sm: "0.875rem" },
-              textTransform: "none",
-            }}
-          >
-            {t("gourmet_manage_cookbook_button")}
-          </Button>
-        </Box>
-      )}
     </Paper>
   );
 }

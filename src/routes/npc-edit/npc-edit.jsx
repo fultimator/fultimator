@@ -6,20 +6,20 @@ import {
   Grid,
   Divider,
   Fab,
-  Fade,
   Tooltip,
   IconButton,
   Paper,
   useTheme,
   useMediaQuery,
   Alert,
-  Snackbar
+  Snackbar,
+  Fade,
 } from "@mui/material";
 import {
   Download,
   Save,
   Share,
-  ArrowUpward,
+  KeyboardArrowUp,
   ContentCopy,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
@@ -83,7 +83,7 @@ export default function NpcEdit() {
   const activeCollection = (_, path) => db.collection(path);
 
   const { cloudUser: user } = useDatabaseContext();
-  const [showScrollTop, setShowScrollTop] = useState(true); // State for scroll-to-top button visibility
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
@@ -152,28 +152,13 @@ export default function NpcEdit() {
     [ref, npcTemp]
   );
 
-  // Effect for scroll, focus, and blur events, and keyboard shortcuts
+  // Effect for scroll and keyboard shortcuts
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
-
-    const handleFocus = () => {
-      setShowScrollTop(false);
-    };
-
-    const handleBlur = () => {
-      setShowScrollTop(window.scrollY > 200);
-    };
-
+    const handleScroll = () => setShowScrollTop(window.scrollY > 200);
     window.addEventListener("scroll", handleScroll);
-    document.body.addEventListener("focus", handleFocus, true);
-    document.body.addEventListener("blur", handleBlur, true);
     document.addEventListener("keydown", handleCtrlS);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      document.body.removeEventListener("focus", handleFocus, true);
-      document.body.removeEventListener("blur", handleBlur, true);
       document.removeEventListener("keydown", handleCtrlS);
     };
   }, [handleCtrlS]);
@@ -568,42 +553,34 @@ export default function NpcEdit() {
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* Save Button, shown if there are unsaved changes */}
         {isUpdated && (
-          <Grid
-            style={{ position: "fixed", bottom: 65, right: 10, zIndex: 100 }}
-          >
-            <Fade in={showScrollTop} timeout={300}>
-              <Tooltip title="Save" placement="bottom">
-                <Fab
-                  color="primary"
-                  aria-label="save"
-                  onClick={() => {
-                    setIsUpdated(false);
-                    activeSetDoc(ref, npcTemp);
-                  }}
-                  disabled={!isUpdated}
-                  size="medium"
-                  style={{ marginLeft: "5px" }}
-                >
-                  <Save />
-                </Fab>
-              </Tooltip>
-            </Fade>
-          </Grid>
-        )}
-
-        {/* Move to Top Button */}
-        <Grid style={{ position: "fixed", bottom: 15, right: 10, zIndex: 100 }}>
-          <Fade in={showScrollTop} timeout={300}>
+          <Tooltip title={t("Save")} placement="left">
             <Fab
               color="primary"
-              aria-label="move-to-top"
-              onClick={handleMoveToTop}
+              aria-label="save"
               size="medium"
+              sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
+              onClick={() => {
+                setIsUpdated(false);
+                activeSetDoc(ref, npcTemp);
+              }}
             >
-              <ArrowUpward />
+              <Save />
             </Fab>
-          </Fade>
-        </Grid>
+          </Tooltip>
+        )}
+
+        {showScrollTop && (
+          <Tooltip title={t("Scroll to top")} placement="left">
+            <Fab
+              size="medium"
+              color="primary"
+              onClick={handleMoveToTop}
+              sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
+            >
+              <KeyboardArrowUp />
+            </Fab>
+          </Tooltip>
+        )}
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openShareSnackbar}

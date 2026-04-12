@@ -1,5 +1,17 @@
-import { Grid, Paper, useTheme, Button, Divider } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  useTheme,
+  Button,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChangeModifiers from "../../../components/player/equipment/ChangeModifiers";
 import { useState, useRef } from "react";
 import armor from "./base";
 import ChangeBase from "./ChangeBase";
@@ -26,6 +38,14 @@ function ArmorShield() {
   const [selectedQuality, setSelectedQuality] = useState("");
   const [init, setInit] = useState(0);
   const [rework, setRework] = useState(false);
+  const [defModifier, setDefModifier] = useState(0);
+  const [mDefModifier, setMDefModifier] = useState(0);
+  const [initModifier, setInitModifier] = useState(0);
+  const [magicModifier, setMagicModifier] = useState(0);
+  const [precModifier, setPrecModifier] = useState(0);
+  const [damageMeleeModifier, setDamageMeleeModifier] = useState(0);
+  const [damageRangedModifier, setDamageRangedModifier] = useState(0);
+  const [modifiersExpanded, setModifiersExpanded] = useState(false);
 
   function calcCost() {
     let cost = base.cost;
@@ -42,27 +62,21 @@ function ArmorShield() {
     if (data) {
       const { base, name, quality, martial, cost, init, rework } = data;
 
-      if (base) {
-        setBase(base);
-      }
-      if (name) {
-        setName(name);
-      }
-      if (quality) {
-        setQuality(quality);
-      }
-      if (martial) {
-        setMartial(martial);
-      }
-      if (cost) {
-        setQualityCost(cost);
-      }
-      if (init) {
-        setInit(init);
-      }
-      if (rework) {
-        setRework(rework);
-      }
+      if (base) setBase(base);
+      if (name) setName(name);
+      if (quality) setQuality(quality);
+      if (martial) setMartial(martial);
+      if (cost) setQualityCost(cost);
+      if (init) setInit(init);
+      if (rework) setRework(rework);
+
+      if (data.defModifier) { setDefModifier(data.defModifier); setModifiersExpanded(true); }
+      if (data.mDefModifier) { setMDefModifier(data.mDefModifier); setModifiersExpanded(true); }
+      if (data.initModifier) { setInitModifier(data.initModifier); setModifiersExpanded(true); }
+      if (data.magicModifier) { setMagicModifier(data.magicModifier); setModifiersExpanded(true); }
+      if (data.precModifier) { setPrecModifier(data.precModifier); setModifiersExpanded(true); }
+      if (data.damageMeleeModifier) { setDamageMeleeModifier(data.damageMeleeModifier); setModifiersExpanded(true); }
+      if (data.damageRangedModifier) { setDamageRangedModifier(data.damageRangedModifier); setModifiersExpanded(true); }
     }
   });
 
@@ -75,6 +89,14 @@ function ArmorShield() {
     setSelectedQuality("");
     setInit(armor[0].init);
     setRework(false);
+    setDefModifier(0);
+    setMDefModifier(0);
+    setInitModifier(0);
+    setMagicModifier(0);
+    setPrecModifier(0);
+    setDamageMeleeModifier(0);
+    setDamageRangedModifier(0);
+    setModifiersExpanded(false);
   };
 
   return (
@@ -142,6 +164,43 @@ function ArmorShield() {
               />
               <Divider />
             </Grid>
+            <Grid item xs={12}>
+              <Accordion
+                sx={{ width: "100%" }}
+                expanded={modifiersExpanded}
+                onChange={() => setModifiersExpanded(!modifiersExpanded)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>{t("Modifiers")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"DEF Modifier"} value={defModifier} onChange={(e) => setDefModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"MDEF Modifier"} value={mDefModifier} onChange={(e) => setMDefModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"INIT Modifier"} value={initModifier} onChange={(e) => setInitModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"Magic Modifier"} value={magicModifier} onChange={(e) => setMagicModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"Precision Modifier"} value={precModifier} onChange={(e) => setPrecModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"Damage (Melee) Modifier"} value={damageMeleeModifier} onChange={(e) => setDamageMeleeModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6} md={4}>
+                      <ChangeModifiers label={"Damage (Ranged) Modifier"} value={damageRangedModifier} onChange={(e) => setDamageRangedModifier(e.target.value)} />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+              <Divider />
+            </Grid>
             <Grid item xs={12} sx={{ py: 0 }}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item>
@@ -185,8 +244,19 @@ function ArmorShield() {
             cost: cost,
             martial: martial,
             quality: quality,
+            qualityCost: qualityCost,
+            selectedQuality: selectedQuality,
             init: init,
             rework: rework,
+            defModifier: defModifier,
+            mDefModifier: mDefModifier,
+            initModifier: initModifier,
+            magicModifier: magicModifier,
+            precModifier: precModifier,
+            damageMeleeModifier: damageMeleeModifier,
+            damageRangedModifier: damageRangedModifier,
+            damageModifier: 0,
+            isEquipped: false,
           }}
         />
       </Grid>

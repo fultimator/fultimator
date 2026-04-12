@@ -55,6 +55,7 @@ export default function NpcSelector({
   npcDrawerOpen,
   setNpcDrawerOpen,
   loading,
+  contentOnly = false, // When true, renders only the filter + list (no outer box, drawer, or collapse)
 }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -82,6 +83,106 @@ export default function NpcSelector({
 
     return value.toLowerCase().includes(filterText.toLowerCase());
   });
+
+  // Content-only mode: render just the filter + list (used by SelectorPanel)
+  if (contentOnly) {
+    return (
+      <>
+        {/* Filter Controls */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            marginBottom: 2,
+          }}
+        >
+          <TextField
+            label={t("combat_sim_search")}
+            variant="outlined"
+            size="small"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            sx={{ width: "60%" }}
+          />
+          <FormControl size="small" sx={{ width: "35%" }}>
+            <InputLabel>{t("combat_sim_filter_by")}</InputLabel>
+            <Select
+              value={filterField}
+              onChange={(e) => setFilterField(e.target.value)}
+              label={t("combat_sim_filter_by")}
+            >
+              <MenuItem value="name">{t("Name")}</MenuItem>
+              <MenuItem value="lvl">{t("Level")}</MenuItem>
+              <MenuItem value="species">{t("Species")}</MenuItem>
+              <MenuItem value="rank">{t("Rank")}</MenuItem>
+              <MenuItem value="tags">{t("Personal Tags")}</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        {/* NPC List */}
+        <Box sx={{ maxHeight: "calc(100vh - 295px)", overflowY: "auto" }}>
+          <List sx={{ height: "calc(100vh - 295px)", overflowY: "auto" }}>
+            {loading && (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {filteredNpcList.map((npc) => (
+              <Box key={npc.id}>
+                <ListItem
+                  button
+                  onClick={() => handleSelectNPC(npc.id)}
+                  sx={{ padding: "5px 10px" }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography variant="h5" fontWeight={"bold"}>
+                          {npc.name}
+                        </Typography>
+                      }
+                      secondary={
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontFamily: "Antonio" }}
+                          component="span"
+                        >
+                          <Tooltip title={t(npc.species)}>
+                            <span>
+                              {npc.species === "Beast" && <GiWolfHead />}
+                              {npc.species === "Construct" && <GiRobotGolem />}
+                              {npc.species === "Demon" && <GiEvilBat />}
+                              {npc.species === "Elemental" && <GiFire />}
+                              {npc.species === "Humanoid" && <GiSwordwoman />}
+                              {npc.species === "Undead" && <GiRaiseZombie />}
+                              {npc.species === "Plant" && <GiRose />}
+                              {npc.species === "Monster" && <GiGooeyDaemon />}
+                            </span>
+                          </Tooltip>
+                          {" | "}
+                          {t("Level")}: {npc.lvl}
+                          {npc.rank && " | " + t(rankText(npc.rank))}
+                        </Typography>
+                      }
+                    />
+                  </Box>
+                </ListItem>
+                <Divider />
+              </Box>
+            ))}
+          </List>
+        </Box>
+      </>
+    );
+  }
 
   return isMobile ? (
     <>

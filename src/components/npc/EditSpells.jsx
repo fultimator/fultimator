@@ -16,11 +16,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, t as staticT } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
-import CompendiumHandler from "./CompendiumHandler";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
 
 export default function EditSpells({ npc, setNpc }) {
@@ -60,6 +60,7 @@ export default function EditSpells({ npc, setNpc }) {
         attr2: "dexterity",
         type: "",
         damagetype: "physical",
+        damage: 0,
         special: [],
       });
       return newState;
@@ -103,12 +104,35 @@ export default function EditSpells({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <CompendiumHandler
-        npc={npc}
-        setNpc={setNpc}
-        typeName="spell"
+      <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
+        context="npc"
+        initialType="spells"
+        onAddItem={(item, sourceType) => {
+          setNpc((prev) => {
+            const newState = { ...prev };
+            if (!newState.spells) newState.spells = [];
+            // player-spells have a different shape than npc spells
+            const isPlayerSpell = sourceType === "player-spells";
+            newState.spells.push({
+              itemType: "spell",
+              name: item.name,
+              attr1: item.attr1 || "insight",
+              attr2: item.attr2 || "will",
+              type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
+              damagetype: item.damagetype || "physical",
+              damage: item.damage || 0,
+              mp: String(item.mp ?? ""),
+              maxTargets: item.maxTargets || 0,
+              target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
+              duration: isPlayerSpell ? staticT(item.duration || "") : (item.duration || ""),
+              effect: isPlayerSpell ? staticT(item.description || "") : (item.effect || ""),
+              special: item.special || [],
+            });
+            return newState;
+          });
+        }}
       />
     </>
   );
@@ -421,6 +445,41 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               </MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+      )}
+      {spell.type === "offensive" && (
+        <Grid item xs={12} sm={4}>
+          <TextField
+            type="number"
+            label={t("Damage")}
+            variant="outlined"
+            fullWidth
+            size="small"
+            placeholder="0"
+            value={
+              spell.damage === null || spell.damage === undefined
+                ? ""
+                : spell.damage.toString()
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (
+                value === "" ||
+                (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
+              ) {
+                handleChange("damage", value === "" ? 0 : parseInt(value, 10));
+              }
+            }}
+            onBlur={(e) => {
+              let value = parseInt(e.target.value, 10);
+              if (isNaN(value) || value < 0) {
+                value = 0;
+              } else if (value > 999) {
+                value = 999;
+              }
+              handleChange("damage", value);
+            }}
+          />
         </Grid>
       )}
       <Grid item xs={12}>

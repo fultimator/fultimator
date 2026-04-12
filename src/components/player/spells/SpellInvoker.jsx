@@ -14,8 +14,9 @@ import { ExpandMore, FlashOn, Air, Terrain, LocalFireDepartment, ElectricBolt, W
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { buildInvokerAvailableInvocations } from "./invokerUtils";
 
-function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspringToggle }) {
+function ThemedSpellInvoker({ invoker, isEditMode, onEdit, onWellspringToggle }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -33,14 +34,22 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
   // Helper function to get wellspring colors
   const getWellspringColor = (wellspring) => {
     const colorMap = {
-      'Air': '#87cfebb9',
+      'Air': '#87cfeb',
       'Earth': '#8B4513',
-      'Fire': '#FF4500',
-      'Lightning': '#ffd900bb',
-      'Water': '#4682B4'
+      'Fire': '#D63B00',
+      'Lightning': '#E6C800',
+      'Water': '#2F6FA1'
     };
     return colorMap[wellspring] || theme.primary;
   };
+
+  const getSelectedTextColor = (wellspring) =>
+    wellspring === "Air" || wellspring === "Lightning" ? "black" : "white";
+
+  const availableInvocations =
+    invoker.availableInvocations && invoker.availableInvocations.length > 0
+      ? invoker.availableInvocations
+      : buildInvokerAvailableInvocations(invoker.skillLevel);
 
   return (
     <>
@@ -82,6 +91,7 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
               const isActive = invoker.activeWellsprings?.includes(wellspring.name) || false;
               const isInnerWellspring = invoker.innerWellspring && invoker.chosenWellspring === wellspring.name;
               const IconComponent = wellspring.icon;
+              const selectedTextColor = getSelectedTextColor(wellspring.name);
 
               return (
                 <Chip
@@ -93,13 +103,19 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
                   variant={isActive || isInnerWellspring ? "filled" : "outlined"}
                   sx={{
                     backgroundColor: (isActive || isInnerWellspring) ? wellspringColor : 'transparent',
-                    color: (isActive || isInnerWellspring) ? 'white' : 'white',
+                    color: (isActive || isInnerWellspring) ? `${selectedTextColor} !important` : 'text.primary',
                     borderColor: isInnerWellspring ? '#4CAF50' : wellspringColor,
                     borderWidth: (isActive || isInnerWellspring) ? '2px' : '1px',
                     fontWeight: (isActive || isInnerWellspring) ? 'bold' : 'normal',
                     cursor: isInnerWellspring || !isEditMode ? 'default' : 'pointer',
+                    '& .MuiChip-label': {
+                      color: (isActive || isInnerWellspring) ? `${selectedTextColor} !important` : undefined,
+                    },
                     '& .MuiChip-icon': {
-                      color: (isActive || isInnerWellspring) ? 'white' : wellspringColor,
+                      color: (isActive || isInnerWellspring) ? `${selectedTextColor} !important` : wellspringColor,
+                    },
+                    '&:hover': {
+                      color: (isActive || isInnerWellspring) ? `${selectedTextColor} !important` : 'text.primary',
                     },
                     ...(isInnerWellspring && {
                       boxShadow: `0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)`,
@@ -125,10 +141,10 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
         {isEditMode && (
           <Box sx={{ display: "flex", alignItems: "center", padding: "16px 17px", gap: 2 }}>
             <Button
-              onClick={onEditInvocations}
+              onClick={onEdit}
               variant="outlined"
             >
-              {t("Manage Invocations")}
+              {t("invoker_edit_invocation_button")}
             </Button>
           </Box>
         )}
@@ -223,7 +239,7 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
         </Box>
       </div>
 
-      {(!invoker.availableInvocations || invoker.availableInvocations.length === 0) ? (
+      {availableInvocations.length === 0 ? (
         <Typography
           sx={{
             padding: "3px 17px",
@@ -236,8 +252,7 @@ function ThemedSpellInvoker({ invoker, onEditInvocations, isEditMode, onWellspri
           {t("invoker_no_invocation_warning")}
         </Typography>
       ) : (
-        invoker.availableInvocations &&
-        invoker.availableInvocations
+        availableInvocations
           .filter(invocation => {
             // Show if invocation matches active wellsprings
             if (invoker.activeWellsprings && invoker.activeWellsprings.includes(invocation.wellspring)) {

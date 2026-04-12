@@ -11,6 +11,7 @@ import { styled } from "@mui/system";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
+import { buildInvokerAvailableInvocations } from "../../../spells/invokerUtils";
 
 const StyledTableCell = styled(TableCell)({ 
   padding: "2px 4px",
@@ -23,17 +24,25 @@ export default function SpellInvoker({ spell, setPlayer }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const availableInvocations =
+    spell.availableInvocations && spell.availableInvocations.length > 0
+      ? spell.availableInvocations
+      : buildInvokerAvailableInvocations(spell.skillLevel);
 
   const getWellspringColor = (wellspring, isActive) => {
     if (!isActive) return theme.mode === 'dark' ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)";
     const colorMap = {
-      Air: "#87cfebb9",
+      Air: "#87cfeb",
       Earth: "#8B4513",
-      Fire: "#FF4500",
-      Lightning: "#ffd900bb",
-      Water: "#4682B4"
+      Fire: "#D63B00",
+      Lightning: "#E6C800",
+      Water: "#2F6FA1"
     };
     return colorMap[wellspring] || theme.primary;
+  };
+
+  const getSelectedTextColor = (wellspring) => {
+    return wellspring === "Air" || wellspring === "Lightning" ? "#000" : "#fff";
   };
 
   const handleWellspringToggle = (wellspring) => {
@@ -77,7 +86,9 @@ export default function SpellInvoker({ spell, setPlayer }) {
               {["Air", "Earth", "Fire", "Lightning", "Water"].map((ws) => {
                 const isActive = spell.activeWellsprings?.includes(ws);
                 const isInner = spell.innerWellspring && spell.chosenWellspring === ws;
-                const isLightColor = ws === 'Air' || ws === 'Lightning';
+                const isSelected = isActive || isInner;
+                const backgroundColor = getWellspringColor(ws, isSelected);
+                const selectedTextColor = getSelectedTextColor(ws);
                 return (
                   <Box 
                     key={ws} 
@@ -86,12 +97,12 @@ export default function SpellInvoker({ spell, setPlayer }) {
                       px: 0.75, 
                       py: 0.25,
                       borderRadius: 1, 
-                      backgroundColor: getWellspringColor(ws, isActive || isInner),
-                      color: isActive || isInner ? (isLightColor ? "black" : "white") : "text.secondary",
+                      backgroundColor,
+                      color: isSelected ? selectedTextColor : "text.primary",
                       fontSize: "0.65rem",
                       fontWeight: "bold",
                       cursor: isInner ? 'default' : 'pointer',
-                      border: isActive || isInner ? 'none' : `1px solid ${theme.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
+                      border: isSelected ? 'none' : `1px solid ${theme.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
                       opacity: isInner ? 0.9 : 1,
                       '&:hover': {
                         opacity: isInner ? 0.9 : 0.8
@@ -107,7 +118,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
         </TableRow>
 
         {/* Invocations */}
-        {spell.availableInvocations?.filter(invocation => {
+        {availableInvocations.filter(invocation => {
           if (spell.activeWellsprings?.includes(invocation.wellspring)) return true;
           if (spell.innerWellspring && spell.chosenWellspring === invocation.wellspring) return true;
           return false;

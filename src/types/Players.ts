@@ -85,12 +85,25 @@ export interface Benefits {
 export interface Skills {
     name: string,
     description: string,
-    currentSL: number,
-    maxSL: number
+    currentLvl: number,
+    maxLvl: number
+}
+
+export interface PlayerModifiers {
+    hp: number,
+    mp: number,
+    ip: number,
+    def: number,
+    mdef: number,
+    init: number,
+    meleePrec: number,
+    rangedPrec: number,
+    magicPrec: number
 }
 
 export interface HeroicSkills {
     name: string,
+    quote: string,
     description: string
 }
 
@@ -284,5 +297,52 @@ export interface TypePlayer {
     rituals: Rituals,
     items: PlayerItems[],
     consumables: PlayerConsumables[],
-    notes: PlayerNotes[]
+    notes: PlayerNotes[],
+    modifiers: PlayerModifiers,
+    equippedSlots?: EquippedSlots,
+    vehicleSlots?:  VehicleSlots,
+}
+
+export type EquipmentSource =
+  | 'weapons'
+  | 'customWeapons'
+  | 'shields'
+  | 'armor'
+  | 'accessories';
+
+/** Points to a player inventory item by its array name + item display name.
+ *  `index` disambiguates when two items share the same name. */
+export interface SlotRef {
+  source: EquipmentSource;
+  name: string;
+  index?: number;
+}
+
+/** Named equipment slots on the player's body. */
+export interface EquippedSlots {
+  mainHand?:  SlotRef | null;
+  offHand?:   SlotRef | null;
+  armor?:     SlotRef | null;
+  accessory?: SlotRef | null;
+}
+
+/** Points to a module by the vehicle's customName and the module's name field. */
+export interface VehicleModuleRef {
+  vehicleName: string;
+  moduleName:  string;
+}
+
+/**
+ * Cached slot state derived from the active vehicle's modules.
+ * Re-derived whenever a module's enabled/equipped state changes.
+ * mainHand/offHand/armor override the matching player slot when non-null.
+ * accessory are always available.
+ * support are vehicle-only (never override player slots).
+ */
+export interface VehicleSlots {
+  mainHand?:  VehicleModuleRef | null;
+  offHand?:   VehicleModuleRef | null;
+  armor?:     VehicleModuleRef | null;
+  accessory?: VehicleModuleRef | null;
+  support?:   (VehicleModuleRef | null)[];
 }

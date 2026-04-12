@@ -11,6 +11,7 @@ export const STORES = [
   "encounters",
   "rolls",
   "rolls-prepared",
+  "compendium-packs",
 ] as const;
 
 export type StoreName = (typeof STORES)[number];
@@ -19,7 +20,7 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 
 export function getDb(): Promise<IDBPDatabase> {
   if (!dbPromise) {
-    dbPromise = openDB("fultimator", 1, {
+    dbPromise = openDB("fultimator", 2, {
       upgrade(db) {
         for (const store of STORES) {
           if (!db.objectStoreNames.contains(store)) {
@@ -27,6 +28,20 @@ export function getDb(): Promise<IDBPDatabase> {
           }
         }
       },
+      blocking() {
+        if (dbPromise) {
+          dbPromise.then((db) => db.close());
+          dbPromise = null;
+        }
+      },
+      terminated() {
+        dbPromise = null;
+      },
+    }).then((db) => {
+      db.onclose = () => {
+        dbPromise = null;
+      };
+      return db;
     });
   }
   return dbPromise;

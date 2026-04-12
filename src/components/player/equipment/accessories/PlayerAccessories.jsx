@@ -5,9 +5,11 @@ import {
   AccordionDetails,
   IconButton,
   Tooltip,
+  Box,
+  Badge,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import { Edit, Error } from "@mui/icons-material";
+import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import PrettyAccessory from "./PrettyAccessory";
 import Export from "../../../Export";
@@ -20,6 +22,8 @@ export default function PlayerAccessories({
   accessories,
   onEditAccessory,
   onEquipAccessory,
+  onAddItem,
+  onOpenCompendium,
   isEditMode,
 }) {
   const { t } = useTranslate();
@@ -55,42 +59,6 @@ export default function PlayerAccessories({
     return false;
   };
 
-  const countEquippedAccessories = () => {
-    let count = 0;
-    accessories.forEach((accessory) => {
-      if (accessory.isEquipped) {
-        count++;
-      }
-    });
-    return count;
-  };
-
-  const canEquipAccessory = () => {
-    if (countEquippedAccessories() === 0) {
-      return true;
-    }
-    return false;
-  };
-
-  const handleEquipAccessory = (index, checked) => {
-    const accSelected = accessories[index];
-    if (canEquipAccessory(accSelected) || !checked) {
-      const updatedAcc = { ...accessories };
-      updatedAcc[index].isEquipped = checked;
-      onEquipAccessory(updatedAcc);
-    } else {
-      if (window.electron) {
-        window.electron.alert(
-          t("You cannot equip this accessory as you have already equipped one.")
-        );
-      } else {
-        alert(
-          "You cannot equip this accessory as you have already equipped one."
-        );
-      }
-    }
-  };
-
   useEffect(() => {
     // Open the Accordion when a new weapon is added
     if (accessories.length > 0) {
@@ -120,33 +88,29 @@ export default function PlayerAccessories({
         headerText={t("Accessories")}
         showIconButton={false}
         icon={<AccessoryIcon />}
+        addItem={isEditMode ? onAddItem : undefined}
+        openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={3}>
+        <Grid container justifyContent="flex-end" spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {accessories.map((accessory, index) => (
             <React.Fragment key={index}>
-              <Grid item container xs={12} alignItems="center" spacing={1}>
-                {/* Updated grid item */}
-                <Grid item xs={11}>
+              <Grid item xs={12} sx={{ mb: 1 }}>
+                <Box>
                   <PrettyAccessory accessory={accessory} />
-                </Grid>
-                <Grid
-                  item
-                  container
-                  xs={1}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {/* Updated grid item */}
+                </Box>
+
+                <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
                   {isEditMode && (
-                    <Grid item xs={12}>
-                      <IconButton onClick={() => onEditAccessory(index)}>
-                        <Edit />
+                    <Tooltip title={t("Edit")}>
+                      <IconButton onClick={() => onEditAccessory(index)} size="small">
+                        <Edit fontSize="small" />
                       </IconButton>
-                    </Grid>
+                    </Tooltip>
                   )}
-                  <Grid item xs={12}>
+                  
+                  <Box sx={{ ml: 0.5 }}>
                     {checkIfEquippable(accessory) ? (
                       <Tooltip
                         title={
@@ -155,58 +119,71 @@ export default function PlayerAccessories({
                             : t("Equip Accessory")
                         }
                       >
-                        <IconButton
-                          onClick={() =>
-                            handleEquipAccessory(index, !accessory.isEquipped)
-                          }
-                          disabled={!isEditMode}
-                          sx={{
-                            mt: 1,
-                            boxShadow: "1px 1px 5px",
-                            backgroundColor: accessory.isEquipped
-                              ? theme.palette.ternary.main
-                              : theme.palette.background.paper,
-                            "&:hover": {
-                              backgroundColor: accessory.isEquipped
-                                ? theme.palette.quaternary.main // Darker for equipped state
-                                : theme.palette.secondary.main, // Highlight when not equipped
-                            },
-                            transition: "background-color 0.3s",
-                          }}
+                        <Badge
+                          badgeContent="E"
+                          color="primary"
+                          invisible={!accessory.isEquipped}
+                          sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
                         >
-                          <Equip
-                            color={
-                              accessory.isEquipped
-                                ? theme.palette.mode === "dark"
-                                  ? theme.palette.white.main // White in dark mode
-                                  : theme.palette.primary.main // Primary in light mode
-                                : theme.palette.background.default
-                            }
-                            strokeColor={
-                              accessory.isEquipped &&
-                              theme.palette.mode === "dark"
-                                ? theme.palette.white.main // White stroke in dark mode
-                                : theme.palette.secondary.main // Default primary stroke
-                            }
-                          />
-                        </IconButton>
+                          <IconButton
+                            onClick={() => onEquipAccessory(index)}
+
+                            disabled={!isEditMode}
+                            size="small"
+                            sx={{
+                              backgroundColor: accessory.isEquipped
+                                ? theme.palette.ternary.main
+                                : theme.palette.background.paper,
+                              "&:hover": {
+                                backgroundColor: accessory.isEquipped
+                                  ? theme.palette.quaternary.main
+                                  : theme.palette.secondary.main,
+                              },
+                              transition: "background-color 0.3s",
+                              p: 0.5,
+                              border: `1px solid ${theme.palette.divider}`
+                            }}
+                          >
+                            <Equip
+                              size={18}
+                              color={
+                                accessory.isEquipped
+                                  ? theme.palette.mode === "dark"
+                                    ? theme.palette.white.main
+                                    : theme.palette.primary.main
+                                  : theme.palette.text.secondary
+                              }
+                              strokeColor={
+                                accessory.isEquipped &&
+                                theme.palette.mode === "dark"
+                                  ? theme.palette.white.main
+                                  : theme.palette.secondary.main
+                              }
+                            />
+                          </IconButton>
+                        </Badge>
                       </Tooltip>
                     ) : (
-                      <Tooltip title={t("Not Equippable")}>
-                        <IconButton>
-                          <Error color="error" />
+                      <Tooltip title={t("Not proficient  -  martial item")}>
+                        <IconButton
+                          onClick={() => onEquipAccessory(index)}
+                          disabled={!isEditMode}
+                          size="small"
+                        >
+                          <WarningAmber color="warning" fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                  </Grid>
-                  <Grid item xs={12} sx={{ mt: 1 }}>
+                  </Box>
+                  <Box sx={{ ml: 0.5 }}>
                     <Export
                       name={accessory.name}
                       dataType="accessory"
                       data={accessory}
+                      size="small"
                     />
-                  </Grid>
-                </Grid>
+                  </Box>
+                </Box>
               </Grid>
             </React.Fragment>
           ))}

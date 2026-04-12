@@ -24,14 +24,19 @@ import { Close } from "@mui/icons-material";
 import Diamond from "../../Diamond";
 import { OffensiveSpellIcon } from "../../icons";
 import { spellList } from "../../../libs/classes";
+import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 
 const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   const { t } = useTranslate();
+  const { packs } = useCompendiumPacks();
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("Elementalist");
   const [filteredSpells, setFilteredSpells] = useState([]);
   const [isMagisphere, setIsMagisphere] = useState(false);
+  const [source, setSource] = useState("official");
+  const [selectedPackId, setSelectedPackId] = useState("");
 
   // Extract unique classes from spellList
   useEffect(() => {
@@ -39,25 +44,54 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     setClasses(uniqueClasses);
   }, []);
 
-  // Filter spells based on the selected class
+  // Filter official spells based on the selected class
   useEffect(() => {
+    if (source !== "official") return;
     const spellsForClass = spellList.filter(
       (spell) => spell.class === selectedClass
     );
     setFilteredSpells(spellsForClass);
     setSelectedItem(spellsForClass.length > 0 ? spellsForClass[0] : null);
-  }, [selectedClass]);
+  }, [selectedClass, source]);
 
-  // Effect to set the default selectedClass when dialog opens
+  // Pack spell items (player-spell type)
+  const packSpells = React.useMemo(() => {
+    if (source !== "packs" || !selectedPackId) return [];
+    const pack = packs.find((p) => p.id === selectedPackId);
+    if (!pack) return [];
+    return pack.items.filter((i) => i.type === "player-spell").map((i) => i.data);
+  }, [source, selectedPackId, packs]);
+
+  // Reset selection when pack spells change
+  useEffect(() => {
+    if (source === "packs") {
+      setSelectedItem(packSpells.length > 0 ? packSpells[0] : null);
+    }
+  }, [source, packSpells]);
+
+  // Reset on open
   useEffect(() => {
     if (open) {
       setSelectedClass(typeName || "Elementalist");
+      setSource("official");
+      setIsMagisphere(false);
+      if (packs.length > 0 && !selectedPackId) {
+        setSelectedPackId(packs[0].id);
+      }
     }
-  }, [open, typeName]);
+  }, [open, typeName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Set default pack when packs load
+  useEffect(() => {
+    if (packs.length > 0 && !selectedPackId) {
+      setSelectedPackId(packs[0].id);
+    }
+  }, [packs, selectedPackId]);
+
+  const displayItems = source === "packs" ? packSpells : filteredSpells;
 
   const handleSave = () => {
     if (selectedItem) {
-      // Include isMagisphere in the selectedItem if checkbox is checked
       const updatedItem = {
         ...selectedItem,
         isMagisphere,
@@ -112,22 +146,40 @@ const StyledMarkdown = ({ children, ...props }) => {
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item xs>
-            <Select
-              value={selectedClass}
-              onChange={handleClassChange}
-              fullWidth
-              displayEmpty
-              inputProps={{ "aria-label": "Select class" }}
-            >
-              {classes.map((className) => (
-                <MenuItem key={className} value={className}>
-                  {t(className)}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
+        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
+          {source === "official" && (
+            <Grid item xs>
+              <Select
+                value={selectedClass}
+                onChange={handleClassChange}
+                fullWidth
+                displayEmpty
+                inputProps={{ "aria-label": "Select class" }}
+              >
+                {classes.map((className) => (
+                  <MenuItem key={className} value={className}>
+                    {t(className)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+          )}
+          {source === "packs" && (
+            <Grid item xs>
+              <Select
+                value={selectedPackId}
+                onChange={(e) => setSelectedPackId(e.target.value)}
+                fullWidth
+                displayEmpty
+              >
+                {packs.map((pack) => (
+                  <MenuItem key={pack.id} value={pack.id}>
+                    {pack.isPersonal ? `⭐ ${pack.name}` : pack.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+          )}
           <Grid item>
             <IconButton
               aria-label="close"
@@ -139,30 +191,53 @@ const StyledMarkdown = ({ children, ...props }) => {
               <Close />
             </IconButton>
           </Grid>
+          {/* Source selector row */}
+          <Grid item xs={12}>
+            <Select
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              fullWidth
+              size="small"
+              inputProps={{ "aria-label": "Select source" }}
+            >
+              <MenuItem value="official">{t("Official Data")}</MenuItem>
+              <MenuItem value="packs" disabled={packs.length === 0}>
+                {t("My Packs")}
+              </MenuItem>
+            </Select>
+          </Grid>
         </Grid>
       </DialogTitle>
       <Divider />
       <DialogContent>
         <Grid container>
           <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
-            <List component="nav">
-              {filteredSpells.map((item, index) => (
-                <ListItemButton
-                  key={index}
-                  onClick={() => handleItemClick(item)}
-                  selected={selectedItem === item}
-                >
-                  <ListItemText
-                    primary={
-                      <>
-                        {t(item.name) || t(item.spellName)}
-                        {item.isOffensive && <OffensiveSpellIcon />}
-                      </>
-                    }
-                  />
-                </ListItemButton>
-              ))}
-            </List>
+            {displayItems.length === 0 ? (
+              <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
+                {source === "packs"
+                  ? t("No player spells in this pack.")
+                  : t("No spells available.")}
+              </Typography>
+            ) : (
+              <List component="nav">
+                {displayItems.map((item, index) => (
+                  <ListItemButton
+                    key={index}
+                    onClick={() => handleItemClick(item)}
+                    selected={selectedItem === item}
+                  >
+                    <ListItemText
+                      primary={
+                        <>
+                          {t(item.name) || t(item.spellName)}
+                          {item.isOffensive && <OffensiveSpellIcon />}
+                        </>
+                      }
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            )}
           </Grid>
           <Grid
             item

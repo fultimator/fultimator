@@ -21,15 +21,16 @@ import {
 } from "@mui/material";
 import { Add, Remove, Shuffle } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }) {
   const { t } = useTranslate();
-  
+
   const [editedDeck, setEditedDeck] = useState({
     spellType: "deck",
     spellName: "Ace of Cards Deck",
     showInPlayerSheet: true,
-    
+
     // Deck configuration
     suitConfiguration: {
       Air: 'air',
@@ -37,12 +38,12 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
       Fire: 'fire',
       Ice: 'ice'
     },
-    
+
     // Current deck state (only available during conflict)
     cardsInDeck: 30,
     hand: [],
     discardPile: [],
-    
+
     // Deck composition (for reference)
     deckComposition: [
       // Jokers
@@ -57,6 +58,8 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
       ...Array.from({length: 7}, (_, i) => ({ type: 'card', suit: 'Ice', value: i + 1, count: 1 })),
     ]
   });
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (deck) {
@@ -77,9 +80,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
   };
 
   const handleDelete = () => {
-    if (window.confirm(t("Are you sure you want to delete this spell?"))) {
-      onDelete(deck?.index || 0);
-    }
+    setDeleteDialogOpen(true);
   };
 
   const handleSuitConfigChange = (suit, damageType) => {
@@ -94,10 +95,10 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
 
   const generateNewDeck = () => {
     const newDeck = [];
-    
+
     // Add 2 jokers
     newDeck.push({ type: 'joker', isJoker: true }, { type: 'joker', isJoker: true });
-    
+
     // Add cards for each suit (1-7)
     ['Air', 'Earth', 'Fire', 'Ice'].forEach(suit => {
       for (let value = 1; value <= 7; value++) {
@@ -109,13 +110,13 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
         });
       }
     });
-    
+
     // Shuffle the deck
     for (let i = newDeck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
     }
-    
+
     setEditedDeck(prev => ({
       ...prev,
       cardsInDeck: 30,
@@ -129,12 +130,12 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
     const newHand = [...(editedDeck.hand || [])];
     const remaining = editedDeck.cardsInDeck || 0;
     const actualDraw = Math.min(count, remaining);
-    
+
     // For simulation purposes, generate random cards
     for (let i = 0; i < actualDraw; i++) {
       const suits = ['Air', 'Earth', 'Fire', 'Ice'];
       const isJoker = Math.random() < 0.067; // ~2/30 chance
-      
+
       if (isJoker) {
         newHand.push({ type: 'joker', isJoker: true });
       } else {
@@ -143,7 +144,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
         newHand.push({ type: 'card', suit, value, isJoker: false });
       }
     }
-    
+
     setEditedDeck(prev => ({
       ...prev,
       hand: newHand,
@@ -170,6 +171,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
   };
 
   return (
+    <>
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>{deck ? t("ace_deck_edit") : t("ace_deck_add")}</DialogTitle>
       <DialogContent>
@@ -180,7 +182,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
               {t("Basic Information")}
             </Typography>
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -191,7 +193,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
               }
             />
           </Grid>
-          
+
           <Grid item xs={12} sm={6}>
             <FormControlLabel
               control={
@@ -254,7 +256,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
               </CardContent>
             </Card>
           </Grid>
-          
+
           <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
@@ -263,7 +265,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
               </CardContent>
             </Card>
           </Grid>
-          
+
           <Grid item xs={12} sm={4}>
             <Card>
               <CardContent>
@@ -347,5 +349,21 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        onDelete(deck?.index || 0);
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this deck?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{editedDeck.spellName}</Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

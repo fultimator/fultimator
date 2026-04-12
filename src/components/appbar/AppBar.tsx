@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar as MuiAppBar,
   Container,
@@ -7,10 +7,12 @@ import {
   Typography,
   useScrollTrigger,
   Slide,
+  Tooltip,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Search } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 
 import logo929 from "./../logo_929.webp";
 import logo1400 from "./../logo_1400.webp";
@@ -53,8 +55,12 @@ const AppBar: React.FC<AppBarProps> = ({
   showGoBackButton,
   handleNavigation,
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
   const viewportWidth = window.innerWidth;
   const isSmallViewport = viewportWidth <= 600;
+
+  const openCompendiumModal = () => setModalOpen(true);
+  const closeCompendiumModal = () => setModalOpen(false);
   return (
     <>
       <HideOnScroll>
@@ -132,6 +138,11 @@ const AppBar: React.FC<AppBarProps> = ({
                     justifyContent: "flex-end",
                   }}
                 >
+                  <Tooltip title="Open Compendium">
+                    <IconButton color="inherit" onClick={openCompendiumModal}>
+                      <Search />
+                    </IconButton>
+                  </Tooltip>
                   <MenuOption
                     selectedTheme={selectedTheme}
                     onSelectTheme={handleSelectTheme}
@@ -144,6 +155,11 @@ const AppBar: React.FC<AppBarProps> = ({
           </Container>
         </MuiAppBar>
       </HideOnScroll>
+      <CompendiumViewerModal
+        open={modalOpen}
+        onClose={closeCompendiumModal}
+        viewOnly
+      />
     </>
   );
 };

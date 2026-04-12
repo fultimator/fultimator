@@ -1,5 +1,17 @@
-import { Grid, Paper, Button, useTheme, Divider } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  Button,
+  useTheme,
+  Divider,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChangeModifiers from "../../../components/player/equipment/ChangeModifiers";
 import { useState, useRef, useEffect } from "react";
 import weapons from "../../../libs/weapons";
 import ChangeBase from "./ChangeBase";
@@ -37,6 +49,11 @@ function Weapons() {
   const [totalBonus, setTotalBonus] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
+  const [damageModifier, setDamageModifier] = useState(0);
+  const [precModifier, setPrecModifier] = useState(0);
+  const [defModifier, setDefModifier] = useState(0);
+  const [mDefModifier, setMDefModifier] = useState(0);
+  const [modifiersExpanded, setModifiersExpanded] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -98,6 +115,10 @@ function Weapons() {
       if (rework) {
         setRework(rework);
       }
+      if (data.damageModifier) { setDamageModifier(data.damageModifier); setModifiersExpanded(true); }
+      if (data.precModifier) { setPrecModifier(data.precModifier); setModifiersExpanded(true); }
+      if (data.defModifier) { setDefModifier(data.defModifier); setModifiersExpanded(true); }
+      if (data.mDefModifier) { setMDefModifier(data.mDefModifier); setModifiersExpanded(true); }
     }
   };
 
@@ -116,6 +137,11 @@ function Weapons() {
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
+    setDamageModifier(0);
+    setPrecModifier(0);
+    setDefModifier(0);
+    setMDefModifier(0);
+    setModifiersExpanded(false);
   };
 
   function calcCost() {
@@ -321,6 +347,34 @@ function Weapons() {
               <Divider />
             </Grid>
             <Grid item xs={12}>
+              <Accordion
+                sx={{ width: "100%" }}
+                expanded={modifiersExpanded}
+                onChange={() => setModifiersExpanded(!modifiersExpanded)}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>{t("Modifiers")}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <ChangeModifiers label={"Damage Modifier"} value={damageModifier} onChange={(e) => setDamageModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <ChangeModifiers label={"Precision Modifier"} value={precModifier} onChange={(e) => setPrecModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <ChangeModifiers label={"DEF Modifier"} value={defModifier} onChange={(e) => setDefModifier(e.target.value)} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <ChangeModifiers label={"MDEF Modifier"} value={mDefModifier} onChange={(e) => setMDefModifier(e.target.value)} />
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
               <Grid container spacing={1} alignItems="center">
                 <Grid item>
                   <Button
@@ -382,10 +436,21 @@ function Weapons() {
             prec: prec,
             quality: quality,
             qualityCost: qualityCost,
+            selectedQuality: selectedQuality,
+            totalBonus: totalBonus,
             damageBonus: damageBonus,
             damageReworkBonus: damageReworkBonus,
             precBonus: precBonus,
             rework: rework,
+            damageModifier: damageModifier,
+            precModifier: precModifier,
+            defModifier: defModifier,
+            mDefModifier: mDefModifier,
+            initModifier: 0,
+            magicModifier: 0,
+            damageMeleeModifier: 0,
+            damageRangedModifier: 0,
+            isEquipped: false,
           }}
         />
       </Grid>

@@ -17,7 +17,7 @@ import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import Clock from "../../player/playerSheet/Clock";
 
-function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange }) {
+function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -109,13 +109,6 @@ function ThemedSpellGift({ gift, onEditGifts, isEditMode, onEdit, onClockChange 
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
             {t("esper_settings_button")}
-          </Button>
-          <Button
-            onClick={onEditGifts}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("esper_settings_modal")}
           </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("Gifts not shown in player sheet")}>

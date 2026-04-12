@@ -941,6 +941,10 @@ function Spells({ npc }) {
                       {attributes[spell.attr2].shortcaps}
                       <CloseBracket />
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
+                      <OpenBracket />
+                      HR + {spell.damage || 0}
+                      <CloseBracket /> {spell.damagetype ? t(spell.damagetype) : "physical"}
+                      <Diamond />
                     </>
                   )}{" "}
                   {spell.mp} MP <Diamond /> {spell.target} <Diamond />{" "}

@@ -8,11 +8,6 @@ import {
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   IconButton,
   ListItemIcon,
@@ -34,13 +29,12 @@ import {
   Autocomplete,
   ToggleButtonGroup,
   ToggleButton,
+  Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcPretty from "../../components/npc/Pretty";
 import {
-  ContentCopy,
-  ContentPaste,
   Delete,
   Download,
   DriveFileMove,
@@ -51,22 +45,30 @@ import {
   PhotoLibrary,
   Share,
   UploadFile,
+  ContentPaste,
+  ExpandLess,
+  ExpandMore,
+  KeyboardArrowUp,
 } from "@mui/icons-material";
 import JSZip from "jszip";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { buildItemText } from "../../libs/buildItemText";
 import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
 import ExportAllNPCs from "../../components/common/ExportAllNPCs";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
-import { SUPPORTS_LOCAL_DB } from "../../platform";
+import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import MigrationDialog from "../../components/common/MigrationDialog";
+import { npcNeedsMigration, applyNpcPreSaveTransforms, applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -100,10 +102,25 @@ function Personal() {
 
   const fileInputRef = useRef(null);
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const { dbMode, requestModeSwitch, cloudUser } = useDatabaseContext();
   const db = useDatabase();
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
+
+  // Deletion confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [npcToDelete, setNpcToDelete] = useState(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
+
+  // Migration states
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
 
   const [personalList, loading, err] = db.useCollectionData(
     db.query(
@@ -112,6 +129,21 @@ function Personal() {
       db.orderBy("name", "asc")
     )
   );
+
+  const staleNpcs = useMemo(() => {
+    if (!personalList) return [];
+    return personalList.filter(npcNeedsMigration);
+  }, [personalList]);
+
+  const handleMigrateAllNpcs = async () => {
+    for (const npc of staleNpcs) {
+      const ref = db.doc("npc-personal", npc.id);
+      const migrated = applyNpcPostLoadTransforms(npc);
+      await db.setDoc(ref, applyNpcPreSaveTransforms(migrated));
+    }
+    setMigrationDialogOpen(false);
+    notify(t("All NPCs migrated successfully"));
+  };
 
   const tagCounts = personalList
     ? personalList.reduce((accumulator, npc) => {
@@ -217,94 +249,17 @@ function Personal() {
     }
   };
 
-  const deleteNpc = (npc) => () => setDeleteTarget(npc);
-
-  // ── Cross-DB copy ────────────────────────────────────────────────────────────
-
-  const uniqueName = (name, existingNames) => {
-    const s = new Set(existingNames);
-    if (!s.has(name)) return name;
-    const base = `${name} (Copy)`;
-    if (!s.has(base)) return base;
-    let i = 2;
-    while (s.has(`${name} (Copy ${i})`)) i++;
-    return `${name} (Copy ${i})`;
-  };
-
-  // Bulk copy: 1 read of target + N writes (vs N reads + N writes for per-NPC)
-  const bulkCopyToDb = async (npcs, targetDb, targetUid) => {
-    const existing = await targetDb.getDocs(targetDb.query(targetDb.collection("npc-personal")));
-    const namesUsed = new Set(existing.map((n) => n.name));
-    for (const npc of npcs) {
-      const newName = uniqueName(npc.name, namesUsed);
-      namesUsed.add(newName);
-      const data = { ...npc, name: newName, published: false };
-      if (targetUid) data.uid = targetUid;
-      delete data.id;
-      await targetDb.addDoc(targetDb.collection("npc-personal"), data);
-    }
-  };
-
-  const bulkDeleteFromDb = async (npcs, sourceDb) => {
-    const chunkSize = 499;
-    for (let i = 0; i < npcs.length; i += chunkSize) {
-      const batch = sourceDb.writeBatch();
-      npcs.slice(i, i + chunkSize).forEach((npc) =>
-        batch.delete(sourceDb.doc("npc-personal", npc.id))
-      );
-      await batch.commit();
-    }
-  };
-
-  const copyNpcToLocal = (npc) => async () => {
-    try {
-      await bulkCopyToDb([npc], localDb, "local-user");
-      notify(t("Copied to Local"));
-    } catch { notify(t("Failed to copy to Local")); }
-  };
-
-  const copyNpcToCloud = (npc) => async () => {
-    if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
-    try {
-      await bulkCopyToDb([npc], cloudDb);
-      notify(t("Copied to Cloud"));
-    } catch { notify(t("Failed to copy to Cloud")); }
-  };
-
-  const moveNpcToLocal = (npc) => async () => {
-    try {
-      await bulkCopyToDb([npc], localDb, "local-user");
-      await db.deleteDoc(db.doc("npc-personal", npc.id));
-      notify(t("Moved to Local"));
-    } catch { notify(t("Failed to move to Local")); }
-  };
-
-  const moveNpcToCloud = (npc) => async () => {
-    if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
-    try {
-      await bulkCopyToDb([npc], cloudDb);
-      await db.deleteDoc(db.doc("npc-personal", npc.id));
-      notify(t("Moved to Cloud"));
-    } catch { notify(t("Failed to move to Cloud")); }
+  const deleteNpc = (npc) => () => {
+    setNpcToDelete(npc);
+    setIsBulkDelete(false);
+    setDeleteDialogOpen(true);
   };
 
   const [snackMsg, setSnackMsg] = useState(null);
   const notify = (msg) => setSnackMsg(msg);
 
-  const [deleteTarget, setDeleteTarget] = useState(null);
-
-  const handleDeleteConfirm = () => {
-    const npc = deleteTarget;
-    setDeleteTarget(null);
-    db.deleteDoc(db.doc("npc-personal", npc.id))
-      .then(() => notify(t("NPC deleted")))
-      .catch(() => notify(t("Failed to delete NPC")));
-  };
-
-  // ── Select mode ─────────────────────────────────────────────────────────────
-  const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
-  const downloadCallbacksRef = useRef(new Map());
+  const [selectMode, setSelectMode] = useState(false);
 
   const toggleSelectMode = () => {
     setSelectMode((prev) => {
@@ -322,71 +277,81 @@ function Personal() {
   };
 
   const deleteSelected = async () => {
-    if (!window.confirm(`Delete ${selectedIds.size} NPC(s)?`)) return;
-    for (const id of selectedIds) {
-      await db.deleteDoc(db.doc("npc-personal", id));
-    }
-    setSelectedIds(new Set());
+    setIsBulkDelete(true);
+    setDeleteDialogOpen(true);
   };
 
   const [copyAnchor, setCopyAnchor] = useState(null);
   const [moveAnchor, setMoveAnchor] = useState(null);
+  const [exportAnchor, setExportAnchor] = useState(null);
 
   // ── Bulk cross-DB copy / move ────────────────────────────────────────────────
 
+  const bulkCopyToDb = async (npcs, targetDb) => {
+    for (const npc of npcs) {
+      const data = { ...npc, published: false };
+      delete data.id;
+      await targetDb.addDoc(targetDb.collection("npc-personal"), data);
+    }
+  };
+
+  const bulkDeleteFromDb = async (npcs, sourceDb) => {
+    for (const npc of npcs) {
+      await sourceDb.deleteDoc(sourceDb.doc("npc-personal", npc.id));
+    }
+  };
+
   const copySelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
-    if (!selected.length) return;
     try {
-      await bulkCopyToDb(selected, localDb, "local-user");
+      await bulkCopyToDb(selected, localDb);
       notify(t("Copied to Local"));
+      setSelectedIds(new Set());
     } catch { notify(t("Failed to copy to Local")); }
   };
 
   const copySelectedToCloud = async () => {
     if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
-    if (!selected.length) return;
     try {
       await bulkCopyToDb(selected, cloudDb);
       notify(t("Copied to Cloud"));
+      setSelectedIds(new Set());
     } catch { notify(t("Failed to copy to Cloud")); }
   };
 
   const moveSelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
-    if (!selected.length) return;
-    if (!window.confirm(`Move ${selected.length} NPC(s) to Local?`)) return;
     try {
-      await bulkCopyToDb(selected, localDb, "local-user");
+      await bulkCopyToDb(selected, localDb);
       await bulkDeleteFromDb(selected, db);
-      setSelectedIds(new Set());
       notify(t("Moved to Local"));
+      setSelectedIds(new Set());
     } catch { notify(t("Failed to move to Local")); }
   };
 
   const moveSelectedToCloud = async () => {
     if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
-    if (!selected.length) return;
-    if (!window.confirm(`Move ${selected.length} NPC(s) to Cloud?`)) return;
     try {
       await bulkCopyToDb(selected, cloudDb);
       await bulkDeleteFromDb(selected, db);
-      setSelectedIds(new Set());
       notify(t("Moved to Cloud"));
+      setSelectedIds(new Set());
     } catch { notify(t("Failed to move to Cloud")); }
   };
 
   const copyAllToLocal = async () => {
+    if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Local?`)) return;
     try {
-      await bulkCopyToDb(filteredList, localDb, "local-user");
+      await bulkCopyToDb(filteredList, localDb);
       notify(t("Copied to Local"));
     } catch { notify(t("Failed to copy to Local")); }
   };
 
   const copyAllToCloud = async () => {
     if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
+    if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Cloud?`)) return;
     try {
       await bulkCopyToDb(filteredList, cloudDb);
       notify(t("Copied to Cloud"));
@@ -396,7 +361,7 @@ function Personal() {
   const moveAllToLocal = async () => {
     if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Local?`)) return;
     try {
-      await bulkCopyToDb(filteredList, localDb, "local-user");
+      await bulkCopyToDb(filteredList, localDb);
       await bulkDeleteFromDb(filteredList, db);
       notify(t("Moved to Local"));
     } catch { notify(t("Failed to move to Local")); }
@@ -425,7 +390,37 @@ function Personal() {
     a.download = "selected_npcs.zip";
     a.click();
     URL.revokeObjectURL(url);
+    setExportAnchor(null);
   };
+
+  const copySelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const separator = fmt === "obsidian" ? "\n\n" : "\n\n---\n\n";
+    const text = selected.map((npc) => buildItemText("npc", npc, fmt)).join(separator);
+    await navigator.clipboard.writeText(text);
+    setExportAnchor(null);
+    notify(t("Copied to Clipboard!"));
+  };
+
+  const exportSelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const ext = fmt === "plain" ? "txt" : "md";
+    const zip = new JSZip();
+    selected.forEach((npc) => {
+      const text = buildItemText("npc", npc, fmt);
+      zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
+    });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selected_npcs_${fmt}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportAnchor(null);
+  };
+
+  const downloadCallbacksRef = useRef(new Map());
 
   const downloadSelectedAsImages = () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
@@ -447,7 +442,10 @@ function Personal() {
   };
 
   const shareNpc = async (id) => {
-    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    if (IS_ELECTRON) {
+      baseUrl = "https://fultimator.com";
+    }
     await navigator.clipboard.writeText(`${baseUrl}/npc-gallery/${id}`);
     notify(t("Copied to Clipboard!"));
   };
@@ -508,6 +506,38 @@ function Personal() {
           return true;
         })
     : [];
+
+  const copyNpcToLocal = (npc) => async () => {
+    try {
+      await bulkCopyToDb([npc], localDb);
+      notify(t("NPC copied to Local"));
+    } catch { notify(t("Failed to copy NPC to Local")); }
+  };
+
+  const copyNpcToCloud = (npc) => async () => {
+    if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
+    try {
+      await bulkCopyToDb([npc], cloudDb);
+      notify(t("NPC copied to Cloud"));
+    } catch { notify(t("Failed to copy NPC to Cloud")); }
+  };
+
+  const moveNpcToLocal = (npc) => async () => {
+    try {
+      await bulkCopyToDb([npc], localDb);
+      await db.deleteDoc(db.doc("npc-personal", npc.id));
+      notify(t("NPC moved to Local"));
+    } catch { notify(t("Failed to move NPC to Local")); }
+  };
+
+  const moveNpcToCloud = (npc) => async () => {
+    if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
+    try {
+      await bulkCopyToDb([npc], cloudDb);
+      await db.deleteDoc(db.doc("npc-personal", npc.id));
+      notify(t("NPC moved to Cloud"));
+    } catch { notify(t("Failed to move NPC to Cloud")); }
+  };
 
   return (
     <>
@@ -680,6 +710,19 @@ function Personal() {
             <Typography variant="body1" fontWeight={600}>
               {t("filtered_npc_count") + " " + filteredList?.length}
             </Typography>
+            {staleNpcs.length > 0 && (
+              <Tooltip title={t("Some NPCs need a data migration")}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  startIcon={<SystemUpdateAltIcon />}
+                  onClick={() => setMigrationDialogOpen(true)}
+                >
+                  {t("Migrate")} ({staleNpcs.length})
+                </Button>
+              </Tooltip>
+            )}
             <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select NPCs")}>
               <Button
                 variant={selectMode ? "contained" : "outlined"}
@@ -770,11 +813,35 @@ function Personal() {
               </Tooltip>
               <Tooltip title={`${t("export_selected_npcs_button")} (${selectedIds.size})`}>
                 <span>
-                  <IconButton onClick={exportSelectedAsJSON} disabled={selectedIds.size === 0}>
+                  <IconButton onClick={(e) => setExportAnchor(e.currentTarget)} disabled={selectedIds.size === 0}>
                     <Download />
                   </IconButton>
                 </span>
               </Tooltip>
+              <MuiMenu anchorEl={exportAnchor} open={Boolean(exportAnchor)} onClose={() => setExportAnchor(null)}>
+                <MenuItem disabled={selectedIds.size === 0} onClick={exportSelectedAsJSON}>
+                  <ListItemText primary={t("export_json_file")} />
+                </MenuItem>
+                <Divider />
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("markdown")}>
+                  <ListItemText primary={t("Copy Markdown to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("markdown")}>
+                  <ListItemText primary={t("Export as Markdown (.zip)")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("plain")}>
+                  <ListItemText primary={t("Copy Plaintext to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("plain")}>
+                  <ListItemText primary={t("Export as Plaintext (.zip)")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => copySelectedAsText("obsidian")}>
+                  <ListItemText primary={t("Copy Obsidian (BlueCorvid) to Clipboard")} />
+                </MenuItem>
+                <MenuItem disabled={selectedIds.size === 0} onClick={() => exportSelectedAsText("obsidian")}>
+                  <ListItemText primary={t("Export as Obsidian (.zip)")} />
+                </MenuItem>
+              </MuiMenu>
               <Tooltip title={`${t("Download Selected as Images")} (${selectedIds.size})`}>
                 <span>
                   <IconButton onClick={downloadSelectedAsImages} disabled={selectedIds.size === 0}>
@@ -902,22 +969,59 @@ function Personal() {
         message={snackMsg}
       />
 
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t("Delete NPC")}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {t("Are you sure you want to delete")} <strong>{deleteTarget?.name}</strong>?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)} variant="contained" color="secondary">
-            {t("Cancel")}
-          </Button>
-          <Button onClick={handleDeleteConfirm} variant="contained" color="error">
-            {t("Delete")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <MigrationDialog
+        open={migrationDialogOpen}
+        onClose={() => setMigrationDialogOpen(false)}
+        actors={staleNpcs}
+        actorType="npc"
+        onMigrateAll={handleMigrateAllNpcs}
+      />
+
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          if (isBulkDelete) {
+            for (const id of selectedIds) {
+              await db.deleteDoc(db.doc("npc-personal", id));
+            }
+            setSelectedIds(new Set());
+            notify(t("NPCs deleted"));
+          } else if (npcToDelete) {
+            await db.deleteDoc(db.doc("npc-personal", npcToDelete.id));
+            setNpcToDelete(null);
+            notify(t("NPC deleted"));
+          }
+        }}
+        title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
+        message={
+          isBulkDelete
+            ? t("Are you sure you want to delete {count} NPC(s)?").replace("{count}", String(selectedIds.size))
+            : t("Are you sure you want to delete this NPC?")
+        }
+        itemPreview={
+          !isBulkDelete && npcToDelete && (
+            <Box>
+              <Typography variant="h4">{npcToDelete.name}</Typography>
+              <Typography variant="body2">
+                {t("Level")} {npcToDelete.lvl} - {t(npcToDelete.species)}
+              </Typography>
+            </Box>
+          )
+        }
+      />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }

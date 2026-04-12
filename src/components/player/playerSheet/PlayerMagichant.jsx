@@ -14,6 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -312,21 +313,13 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedTone && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedTone.name === "magichant_custom_name" ? selectedTone.customName : t(selectedTone.name)}
-                      {" - "}
-                      {selectedMagichantSpell && t(selectedMagichantSpell.className)}
-                    </Typography>
-                    
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {selectedTone.name === "magichant_custom_name" ? selectedTone.effect : t(selectedTone.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedTone,
+                    spellType: "magichant",
+                    name: selectedTone.name === "magichant_custom_name" ? selectedTone.customName : selectedTone.name,
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

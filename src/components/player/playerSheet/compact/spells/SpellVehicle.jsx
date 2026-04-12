@@ -11,6 +11,7 @@ import { styled } from "@mui/system";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import { availableFrames } from "../../../../../libs/pilotVehicleData";
 import { Martial } from "../../../../icons";
 import { OpenBracket, CloseBracket } from "../../../../Bracket";
@@ -28,6 +29,7 @@ const StyledMarkdown = ({ children, ...props }) => {
     <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 0 }}>
       <ReactMarkdown
         {...props}
+        rehypePlugins={[rehypeRaw]}
         components={{
           p: (props) => <p style={{ margin: 0, padding: 0, fontSize: "0.75rem" }} {...props} />,
           ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
@@ -44,7 +46,31 @@ const StyledMarkdown = ({ children, ...props }) => {
   );
 };
 
-export default function SpellVehicle({ spell }) {
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? "" : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.split(regex).map((part, idx) =>
+    idx % 2 === 1 ? (
+      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
+    ) : part
+  );
+}
+
+function highlightMarkdownText(markdown, query) {
+  const source = markdown == null ? "" : String(markdown);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.replace(regex, "<mark>$1</mark>");
+}
+
+export default function SpellVehicle({ spell, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -88,7 +114,7 @@ export default function SpellVehicle({ spell }) {
               <TableRow key={`armor-${i}`}>
                 <StyledTableCell sx={{ fontWeight: 'bold', width: '30%' }}>
                   <Box display="flex" alignItems="center">
-                    {m.name === "pilot_custom_armor" ? m.customName : t(m.name)}
+                    {highlightMatch(m.name === "pilot_custom_armor" ? m.customName : t(m.name), searchQuery)}
                     {m.martial && <Martial sx={{ fontSize: '0.8rem', ml: 0.5 }} />}
                   </Box>
                 </StyledTableCell>
@@ -119,7 +145,7 @@ export default function SpellVehicle({ spell }) {
                 <TableRow>
                   <StyledTableCell sx={{ fontWeight: 'bold' }}>
                     <Box display="flex" alignItems="center">
-                      {m.name === "pilot_custom_weapon" ? m.customName : t(m.name)}
+                    {highlightMatch(m.name === "pilot_custom_weapon" ? m.customName : t(m.name), searchQuery)}
                       {m.martial && <Martial sx={{ fontSize: '0.8rem', ml: 0.5 }} />}
                     </Box>
                   </StyledTableCell>
@@ -134,12 +160,12 @@ export default function SpellVehicle({ spell }) {
                     {types[m.damageType?.toLowerCase() || "physical"]?.long || t(m.damageType || "Physical")}
                   </StyledTableCell>
                   <StyledTableCell sx={{ fontSize: '0.7rem' }}>
-                    {t(m.category)}
+                    {highlightMatch(t(m.category), searchQuery)}
                   </StyledTableCell>
                 </TableRow>
                 <TableRow>
                   <StyledTableCell colSpan={4} sx={{ py: 0.5 }}>
-                    <StyledMarkdown>{m.name === "pilot_custom_weapon" ? m.description : t(m.description)}</StyledMarkdown>
+                    <StyledMarkdown>{highlightMarkdownText(m.name === "pilot_custom_weapon" ? m.description : t(m.description), searchQuery)}</StyledMarkdown>
                   </StyledTableCell>
                 </TableRow>
               </React.Fragment>
@@ -158,10 +184,10 @@ export default function SpellVehicle({ spell }) {
             {supportModules.map((m, i) => (
               <TableRow key={`support-${i}`}>
                 <StyledTableCell sx={{ fontWeight: 'bold', width: '30%' }}>
-                  {m.name === "pilot_custom_support" ? m.customName : t(m.name)}
+                  {highlightMatch(m.name === "pilot_custom_support" ? m.customName : t(m.name), searchQuery)}
                 </StyledTableCell>
                 <StyledTableCell colSpan={3} sx={{ fontSize: '0.75rem' }}>
-                  <StyledMarkdown>{m.name === "pilot_custom_support" ? m.description : t(m.description)}</StyledMarkdown>
+                  <StyledMarkdown>{highlightMarkdownText(m.name === "pilot_custom_support" ? m.description : t(m.description), searchQuery)}</StyledMarkdown>
                 </StyledTableCell>
               </TableRow>
             ))}

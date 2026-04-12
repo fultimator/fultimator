@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { IS_ELECTRON } from "./platform";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -20,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 let firestore;
 try {
   firestore = initializeFirestore(app, {
-    cache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    cache: persistentLocalCache(IS_ELECTRON ? {} : { tabManager: persistentMultipleTabManager() }),
   });
 } catch {
   firestore = getFirestore(app);

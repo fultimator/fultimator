@@ -12,6 +12,7 @@ import {
   MenuItem,
   FormControlLabel,
   Switch,
+  TextField,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
@@ -26,15 +27,17 @@ export default function SpellTinkererMagitechRankModal({
   const { t } = useTranslate();
 
   // Initialize state variables
-  const [selectedRank, setSelectedRank] = useState(magitech.rank || 1);
+  const [selectedRank, setSelectedRank] = useState(magitech?.rank || 1);
+  const [spellName, setSpellName] = useState(magitech?.spellName || "");
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
-    magitech ? !!magitech.showInPlayerSheet : true
+    magitech?.showInPlayerSheet !== false
   );
 
-  // Update showInPlayerSheet state if magitech prop changes
+  // Update state if magitech prop changes
   useEffect(() => {
     if (magitech) {
       setSelectedRank(magitech.rank || 1);
+      setSpellName(magitech.spellName || "");
       setShowInPlayerSheet(!!magitech.showInPlayerSheet);
     }
   }, [magitech]);
@@ -42,6 +45,7 @@ export default function SpellTinkererMagitechRankModal({
   const handleSave = () => {
     onSave(magitech.index, {
       ...magitech,
+      spellName,
       rank: selectedRank,
       showInPlayerSheet: showInPlayerSheet,
     });
@@ -77,37 +81,37 @@ export default function SpellTinkererMagitechRankModal({
       >
         <Close />
       </Button>
-      <DialogContent>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="rank-select-label">{t("Select Rank")}</InputLabel>
-              <Select
-                labelId="rank-select-label"
-                id="rank-select"
-                value={selectedRank}
-                label={t("Select Rank")}
-                onChange={(e) => setSelectedRank(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value={1}>{t("Basic")}</MenuItem>
-                <MenuItem value={2}>{t("Advanced")}</MenuItem>
-                <MenuItem value={3}>{t("Superior")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={12}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={showInPlayerSheet}
-                  onChange={(e) => setShowInPlayerSheet(e.target.checked)}
-                />
-              }
-              label={t("Show in Character Sheet")}
+      <DialogContent sx={{ minWidth: 400 }}>
+        <TextField
+          fullWidth
+          label={t("Magitech Name")}
+          value={spellName}
+          onChange={(e) => setSpellName(e.target.value)}
+          inputProps={{ maxLength: 50 }}
+          margin="normal"
+        />
+        <FormControl fullWidth sx={{ mt: 2 }}>
+          <InputLabel>{t("Select Rank")}</InputLabel>
+          <Select
+            value={selectedRank}
+            label={t("Select Rank")}
+            onChange={(e) => setSelectedRank(e.target.value)}
+          >
+            <MenuItem value={1}>{t("Basic")}</MenuItem>
+            <MenuItem value={2}>{t("Advanced")}</MenuItem>
+            <MenuItem value={3}>{t("Superior")}</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showInPlayerSheet}
+              onChange={(e) => setShowInPlayerSheet(e.target.checked)}
             />
-          </Grid>
-        </Grid>
+          }
+          label={t("Show in Character Sheet")}
+          sx={{ mt: 2, display: "block" }}
+        />
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="error" onClick={handleDelete}>

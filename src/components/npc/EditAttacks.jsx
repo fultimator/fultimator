@@ -23,7 +23,7 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
-import CompendiumHandler from "./CompendiumHandler";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
 
 export default function EditAttacks({ npc, setNpc }) {
@@ -111,12 +111,29 @@ export default function EditAttacks({ npc, setNpc }) {
           </Grid>
         );
       })}
-      <CompendiumHandler
-        npc={npc}
-        setNpc={setNpc}
-        typeName="basic"
+      <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
+        context="npc"
+        initialType="attacks"
+        onAddItem={(item) => {
+          setNpc((prev) => {
+            const newState = { ...prev };
+            if (!newState.attacks) newState.attacks = [];
+            newState.attacks.push({
+              itemType: "basic",
+              name: item.name,
+              range: item.ranged === true ? "distance" : "melee",
+              attr1: item.attr1 || "dexterity",
+              attr2: item.attr2 || "dexterity",
+              type: item.type,
+              flathit: item.flathit,
+              flatdmg: item.flatdmg,
+              special: [],
+            });
+            return newState;
+          });
+        }}
       />
     </>
   );

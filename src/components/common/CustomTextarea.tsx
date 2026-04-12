@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { TextareaAutosize, Button } from "@mui/material";
+import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
@@ -14,6 +15,7 @@ interface CustomTextareaProps {
   readOnly?: boolean;
   maxRows?: number;
   maxLength?: number;
+  placeholder?: string;
 }
 
 const CustomTextarea: React.FC<CustomTextareaProps> = ({
@@ -28,12 +30,21 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   readOnly = false,
   maxRows,
   maxLength,
+  placeholder,
 }) => {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [pendingFocus, setPendingFocus] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (pendingFocus && textareaRef.current) {
+      textareaRef.current.focus();
+      setPendingFocus(false);
+    }
+  }, [pendingFocus]);
 
   const handleFocus = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
     setIsFocused(true);
@@ -156,45 +167,67 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     fontWeight: "normal",
     color: isDarkMode ? "white" : "black",
   };
+  const showMarkdown = !isFocused && !pendingFocus && !!value;
+
+  const previewStyle: React.CSSProperties = {
+    ...textareaStyle,
+    resize: undefined,
+    overflow: "auto",
+    minHeight: "56px",
+    cursor: readOnly ? "not-allowed" : "text",
+  };
+
   return (
     <div style={{ position: "relative", margin: "5px 0" }}>
-      <div style={toolbarStyle}>
-        <Button
-          onClick={() => handleFormat("bold")}
-          style={buttonStyle}
-          disabled={readOnly}
+      {!showMarkdown && (
+        <div style={toolbarStyle}>
+          <Button
+            onMouseDown={(e) => { e.preventDefault(); handleFormat("bold"); }}
+            style={buttonStyle}
+            disabled={readOnly}
+          >
+            Bold
+          </Button>
+          <Button
+            onMouseDown={(e) => { e.preventDefault(); handleFormat("italic"); }}
+            style={buttonStyle}
+            disabled={readOnly}
+          >
+            Italic
+          </Button>
+          <Button
+            onMouseDown={(e) => { e.preventDefault(); handleFormat("brackets"); }}
+            style={buttonStyle}
+            disabled={readOnly}
+          >
+            【】
+          </Button>
+        </div>
+      )}
+      {showMarkdown ? (
+        <div
+          style={previewStyle}
+          onClick={() => { if (!readOnly) setPendingFocus(true); }}
         >
-          Bold
-        </Button>
-        <Button
-          onClick={() => handleFormat("italic")}
-          style={buttonStyle}
-          disabled={readOnly}
-        >
-          Italic
-        </Button>
-        <Button
-          onClick={() => handleFormat("brackets")}
-          style={buttonStyle}
-          disabled={readOnly}
-        >
-          【】
-        </Button>
-      </div>
-      <TextareaAutosize
-        ref={textareaRef}
-        aria-label={label}
-        value={value}
-        onChange={onChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
-        readOnly={readOnly}
-        style={textareaStyle}
-        maxRows={maxRows}
-        maxLength={maxLength}
-      />
+          <ReactMarkdown>{value}</ReactMarkdown>
+        </div>
+      ) : (
+        <TextareaAutosize
+          ref={textareaRef}
+          aria-label={label}
+          value={value}
+          onChange={onChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
+          readOnly={readOnly}
+          style={textareaStyle}
+          maxRows={maxRows}
+          maxLength={maxLength}
+          placeholder={placeholder}
+        />
+      )}
       <label style={labelStyle}>{label}</label>
       <div style={helperStyle}>{helperText}</div>
     </div>

@@ -188,7 +188,7 @@ function PrettySingle({ armor, showActions }) {
                   }}
                 >
                   <Typography>
-                    {!armor.quality && t("No Qualities")}{" "}
+                    {!armor.quality}{" "}
                     <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
                       {armor.quality}
                     </StyledMarkdown>

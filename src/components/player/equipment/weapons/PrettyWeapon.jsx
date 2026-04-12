@@ -57,11 +57,11 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
             justifyContent="space-between"
             alignItems="center"
             sx={{
-              p: 1,
+              p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
               "& .MuiTypography-root": {
-                fontSize: { xs: "0.6rem", sm: "1.2rem" },
+                fontSize: { xs: "0.6rem", sm: "1.0rem" },
                 textTransform: "uppercase",
               },
             }}
@@ -98,7 +98,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               sx={{
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
-                padding: "5px",
+                padding: "2px 5px",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
@@ -149,7 +149,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               sx={{
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
-                padding: "5px",
+                padding: "2px 5px",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
@@ -186,7 +186,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
             background: "transparent",
             borderBottom: `1px solid ${theme.secondary}`,
             px: 1,
-            py: 1,
+            py: 0.5,
           }}
         >
           {!weapon.quality && t("No Qualities")}{" "}

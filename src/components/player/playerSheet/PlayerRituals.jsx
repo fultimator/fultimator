@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Grid,
   Typography,
@@ -13,11 +13,18 @@ import {
   Radio,
   Input,
   InputLabel,
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Clock from "./Clock";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+
+const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
 export default function PlayerRituals({
   player,
@@ -27,6 +34,7 @@ export default function PlayerRituals({
   setClockState,
   isEditMode,
   isCharacterSheet,
+  compact = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -108,251 +116,206 @@ export default function PlayerRituals({
     resetClock();
   };
 
+  if (
+    !hasRitualism &&
+    !hasSpiritism &&
+    !hasArcanism &&
+    !hasElementalism &&
+    !hasEntropism &&
+    !hasChimerism
+  ) {
+    return null;
+  }
+
+  const checkboxFontSize = compact
+    ? { xs: "0.8em" }
+    : { xs: "0.8em", sm: "1.0em", md: "1.2em" };
+
+  const verticalHeader = (
+    <Typography
+      variant="h1"
+      sx={{
+        writingMode: "vertical-lr",
+        textTransform: "uppercase",
+        marginLeft: "-1px",
+        marginRight: "10px",
+        marginTop: "-1px",
+        marginBottom: "-1px",
+        backgroundColor: primary,
+        color: custom.white,
+        borderRadius: "0 8px 8px 0",
+        transform: "rotate(180deg)",
+        fontSize: "2em",
+        minHeight: "100px",
+      }}
+      align="center"
+    >
+      {t("Rituals")}
+    </Typography>
+  );
+
+  const checkboxGrid = (
+    <Grid
+      container
+      spacing={compact ? 0 : 2}
+      sx={{ padding: compact ? "0.2em 0.4em" : "0.7em" }}
+    >
+      {[
+        { checked: hasArcanism, label: "Arcanism" },
+        { checked: hasChimerism, label: "Chimerism" },
+        { checked: hasElementalism, label: "Elementalism" },
+        { checked: hasEntropism, label: "Entropism" },
+        { checked: hasRitualism, label: "Ritualism" },
+        { checked: hasSpiritism, label: "Spiritism" },
+      ].map(({ checked, label }) => (
+        <Grid item xs={4} md={2} key={label}>
+          <FormControlLabel
+            sx={compact ? { margin: 0 } : undefined}
+            control={
+              <Checkbox
+                checked={checked}
+                size={compact ? "small" : "medium"}
+                sx={{ pointerEvents: "none", opacity: 1, ...(compact && { p: "2px" }) }}
+              />
+            }
+            label={
+              <Typography sx={{ fontSize: checkboxFontSize }}>
+                {t(label)}
+              </Typography>
+            }
+          />
+        </Grid>
+      ))}
+
+      {isEditMode && (
+        <Grid container spacing={compact ? 1 : 2} sx={{ padding: compact ? "0.4em" : "1em" }}>
+          <Grid item xs={12} md={8}>
+            <RitualsCalculator
+              compact={compact}
+              power={power}
+              setPower={setPower}
+              area={area}
+              setArea={setArea}
+              ingredient={ingredient}
+              setIngredient={setIngredient}
+              itemHeld={itemHeld}
+              setItemHeld={setItemHeld}
+              fastRitual={fastRitual}
+              setFastRitual={setFastRitual}
+              dlReduction={dlReduction}
+              setDLReduction={setDLReduction}
+              calcPM={calcPM()}
+              calcLD={calcLD()}
+              calcClock={calcClock()}
+            />
+          </Grid>
+
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            item
+            xs={12}
+            md={4}
+            sx={{ textAlign: "center" }}
+          >
+            <Clock
+              numSections={clockSections}
+              size={compact ? 140 : 200}
+              state={clockState}
+              setState={setClockState}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={8}>
+            <Button
+              variant="contained"
+              size={compact ? "small" : "medium"}
+              sx={{ width: "100%" }}
+              onClick={setNewClock}
+            >
+              {t("Set New Clock")}
+            </Button>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Button
+              variant="outlined"
+              size={compact ? "small" : "medium"}
+              sx={{ width: "100%" }}
+              onClick={resetClock}
+            >
+              {t("Reset Clock")}
+            </Button>
+          </Grid>
+        </Grid>
+      )}
+    </Grid>
+  );
+
+  if (compact) {
+    return (
+      <>
+        {isCharacterSheet ? (
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  background: primary,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}
+              >
+                <StyledTableCellHeader sx={{ width: 36 }} />
+                <StyledTableCellHeader>
+                  <Typography variant="h4">{t("Rituals")}</Typography>
+                </StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+          </Table>
+        ) : (
+          verticalHeader
+        )}
+        {checkboxGrid}
+      </>
+    );
+  }
+
   return (
     <>
-      {(hasRitualism ||
-        hasSpiritism ||
-        hasArcanism ||
-        hasElementalism ||
-        hasEntropism ||
-        hasChimerism) && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <Paper
-            elevation={3}
-            sx={
-              isCharacterSheet
-                ? {
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                    flexDirection: "column",
-                    boxShadow: "none",
-                  }
-                : {
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                    display: "flex",
-                  }
-            }
+      <Divider sx={{ my: 1 }} />
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          display: "flex",
+          flexDirection: isCharacterSheet ? "column" : undefined,
+          boxShadow: isCharacterSheet ? "none" : undefined,
+        }}
+      >
+        {isCharacterSheet ? (
+          <Typography
+            variant="h1"
+            sx={{
+              textTransform: "uppercase",
+              padding: "5px",
+              backgroundColor: primary,
+              color: custom.white,
+              borderRadius: "8px 8px 0 0",
+              fontSize: "1.5em",
+            }}
+            align="center"
           >
-            {isCharacterSheet ? (
-              <Typography
-                variant="h1"
-                sx={{
-                  textTransform: "uppercase",
-                  padding: "5px", // Adjust padding instead of margins
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "8px 8px 0 0", // Rounded corners only at the top
-                  fontSize: "1.5em",
-                }}
-                align="center"
-              >
-                {t("Rituals")}
-              </Typography>
-            ) : (
-              <Typography
-                variant="h1"
-                sx={{
-                  writingMode: "vertical-lr",
-                  textTransform: "uppercase",
-                  marginLeft: "-1px",
-                  marginRight: "10px",
-                  marginTop: "-1px",
-                  marginBottom: "-1px",
-                  backgroundColor: primary,
-                  color: custom.white,
-                  borderRadius: "0 8px 8px 0",
-                  transform: "rotate(180deg)",
-                  fontSize: "2em",
-                  minHeight: "100px",
-                }}
-                align="center"
-              >
-                {t("Rituals")}
-              </Typography>
-            )}
-            <Grid container spacing={2} sx={{ padding: "0.7em" }}>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasArcanism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Arcanism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasChimerism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Chimerism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasElementalism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Elementalism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasEntropism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Entropism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasRitualism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Ritualism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              <Grid item xs={4} md={2}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hasSpiritism}
-                      sx={{ pointerEvents: "none", opacity: 1 }}
-                    />
-                  }
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Spiritism")}
-                    </Typography>
-                  }
-                />
-              </Grid>
-              {isEditMode && (
-                <Grid container spacing={2} sx={{ padding: "1em" }}>
-                  <Grid item xs={12} md={8}>
-                    <Rituals
-                      power={power}
-                      setPower={setPower}
-                      area={area}
-                      setArea={setArea}
-                      ingredient={ingredient}
-                      setIngredient={setIngredient}
-                      itemHeld={itemHeld}
-                      setItemHeld={setItemHeld}
-                      fastRitual={fastRitual}
-                      setFastRitual={setFastRitual}
-                      dlReduction={dlReduction}
-                      setDLReduction={setDLReduction}
-                      calcPM={calcPM()}
-                      calcLD={calcLD()}
-                      calcClock={calcClock()}
-                    />
-                  </Grid>
-
-                  <Grid
-                    container
-                    justifyContent="center"
-                    alignItems="center"
-                    item
-                    xs={12}
-                    md={4}
-                    sx={{ textAlign: "center" }}
-                  >
-                    <Clock
-                      numSections={clockSections}
-                      size={200}
-                      state={clockState}
-                      setState={setClockState}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={8}>
-                    <Button
-                      variant="contained"
-                      sx={{ width: "100%" }}
-                      onClick={setNewClock}
-                    >
-                      {t("Set New Clock")}
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Button
-                      variant="outlined"
-                      sx={{ width: "100%" }}
-                      onClick={resetClock}
-                    >
-                      {t("Reset Clock")}
-                    </Button>
-                  </Grid>
-                </Grid>
-              )}
-            </Grid>
-          </Paper>
-        </>
-      )}
+            {t("Rituals")}
+          </Typography>
+        ) : (
+          verticalHeader
+        )}
+        {checkboxGrid}
+      </Paper>
     </>
   );
 }
@@ -385,7 +348,8 @@ const areaPMs = {
   huge: 4,
 };
 
-function Rituals({
+function RitualsCalculator({
+  compact = false,
   power,
   setPower,
   area,
@@ -404,253 +368,151 @@ function Rituals({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const custom = useCustomTheme();
   const secondary = theme.palette.secondary.main;
 
+  const labelFontSize = compact
+    ? { xs: "0.75em" }
+    : { xs: "0.8em", sm: "1.0em", md: "1.2em" };
+  const legendFontSize = compact
+    ? { xs: "0.8em" }
+    : { xs: "0.9em", sm: "1.1em", md: "1.3em" };
+  const controlSize = compact ? "small" : "medium";
+  const controlSx = compact ? { p: "2px" } : undefined;
+
   return (
-    <>
-      <Paper
-        elevation={3}
-        sx={{
-          p: "14px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-        }}
-      >
-        <Grid container>
-          <Grid item xs={4}>
-            <FormControl component="fieldset">
-              <FormLabel
-                component="legend"
-                sx={{ fontSize: { xs: "0.9em", sm: "1.1em", md: "1.3em" } }}
-              >
-                {t("Potency")}
-              </FormLabel>
-              <RadioGroup
-                aria-label="power"
-                name="power-group"
-                value={power}
-                onChange={(e) => {
-                  setPower(e.target.value);
-                }}
-              >
+    <Paper
+      elevation={3}
+      sx={{
+        p: compact ? "8px" : "14px",
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: secondary,
+      }}
+    >
+      <Grid container>
+        <Grid item xs={4}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
+              {t("Potency")}
+            </FormLabel>
+            <RadioGroup
+              aria-label="power"
+              name="power-group"
+              value={power}
+              onChange={(e) => setPower(e.target.value)}
+            >
+              {["minor", "medium", "major", "extreme"].map((val) => (
                 <FormControlLabel
-                  value="minor"
-                  control={<Radio />}
+                  key={val}
+                  value={val}
+                  sx={compact ? { margin: 0 } : undefined}
+                  control={<Radio size={controlSize} sx={controlSx} />}
                   label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Minor")}
+                    <Typography sx={{ fontSize: labelFontSize }}>
+                      {t(val.charAt(0).toUpperCase() + val.slice(1))}
                     </Typography>
                   }
                 />
-                <FormControlLabel
-                  value="medium"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Medium")}
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="major"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Major")}
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="extreme"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Extreme")}
-                    </Typography>
-                  }
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid item xs={4}>
-            <FormControl component="fieldset">
-              <FormLabel
-                component="legend"
-                sx={{ fontSize: { xs: "0.9em", sm: "1.1em", md: "1.3em" } }}
-              >
-                {t("Area")}
-              </FormLabel>
-              <RadioGroup
-                aria-label="area"
-                name="area-group"
-                value={area}
-                onChange={(e) => {
-                  setArea(e.target.value);
-                }}
-              >
-                <FormControlLabel
-                  value="individual"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Individual")}
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="small"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Small")}
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="large"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Large")}
-                    </Typography>
-                  }
-                />
-                <FormControlLabel
-                  value="huge"
-                  control={<Radio />}
-                  label={
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                      }}
-                    >
-                      {t("Huge")}
-                    </Typography>
-                  }
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid item xs={4}>
-            <FormControl component="fieldset">
-              <FormLabel
-                component="legend"
-                sx={{ fontSize: { xs: "0.9em", sm: "1.1em", md: "1.3em" } }}
-              >
-                {t("Reductions")}
-              </FormLabel>
-
-              <FormControlLabel
-                control={<Checkbox value={ingredient} />}
-                onChange={(e) => {
-                  setIngredient(e.target.checked);
-                }}
-                label={
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                    }}
-                  >
-                    {t("Using special ingredient")}
-                  </Typography>
-                }
-              />
-
-              <FormControlLabel
-                control={<Checkbox value={itemHeld} />}
-                onChange={(e) => {
-                  setItemHeld(e.target.checked);
-                }}
-                label={
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                    }}
-                  >
-                    {t("Relevant item held")}
-                  </Typography>
-                }
-              />
-              {itemHeld && (
-                <FormControl variant="standard" fullWidth>
-                  <InputLabel htmlFor="dlReduction">
-                    {t("DL Reduction")}
-                  </InputLabel>
-                  <Input
-                    id="dlReduction"
-                    type="number"
-                    value={dlReduction}
-                    onChange={(e) => setDLReduction(e.target.value)}
-                  />
-                </FormControl>
-              )}
-
-              <FormControlLabel
-                control={<Checkbox value={fastRitual} />}
-                onChange={(e) => {
-                  setFastRitual(e.target.checked);
-                }}
-                label={
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "0.8em", sm: "1.0em", md: "1.2em" },
-                    }}
-                  >
-                    {t("Fast Ritual")}
-                  </Typography>
-                }
-              />
-            </FormControl>
-          </Grid>
+              ))}
+            </RadioGroup>
+          </FormControl>
         </Grid>
-        <Divider />
-        <Grid container sx={{ m: 1 }}>
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">
-              {calcPM} {t("MP")}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">
-              {calcLD} {t("DL")}
-            </Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography fontWeight="bold">
-              {t("Clock")} {calcClock}
-            </Typography>
-          </Grid>
+        <Grid item xs={4}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
+              {t("Area")}
+            </FormLabel>
+            <RadioGroup
+              aria-label="area"
+              name="area-group"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+            >
+              {["individual", "small", "large", "huge"].map((val) => (
+                <FormControlLabel
+                  key={val}
+                  value={val}
+                  sx={compact ? { margin: 0 } : undefined}
+                  control={<Radio size={controlSize} sx={controlSx} />}
+                  label={
+                    <Typography sx={{ fontSize: labelFontSize }}>
+                      {t(val.charAt(0).toUpperCase() + val.slice(1))}
+                    </Typography>
+                  }
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
         </Grid>
-      </Paper>
-    </>
+        <Grid item xs={4}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
+              {t("Reductions")}
+            </FormLabel>
+
+            {[
+              { value: ingredient, onChange: setIngredient, label: "Using special ingredient" },
+              { value: itemHeld, onChange: setItemHeld, label: "Relevant item held" },
+            ].map(({ value, onChange, label }) => (
+              <FormControlLabel
+                key={label}
+                sx={compact ? { margin: 0 } : undefined}
+                control={<Checkbox value={value} size={controlSize} sx={controlSx} />}
+                onChange={(e) => onChange(e.target.checked)}
+                label={
+                  <Typography sx={{ fontSize: labelFontSize }}>
+                    {t(label)}
+                  </Typography>
+                }
+              />
+            ))}
+            {itemHeld && (
+              <FormControl variant="standard" fullWidth>
+                <InputLabel htmlFor="dlReduction" sx={{ fontSize: labelFontSize }}>
+                  {t("DL Reduction")}
+                </InputLabel>
+                <Input
+                  id="dlReduction"
+                  type="number"
+                  value={dlReduction}
+                  onChange={(e) => setDLReduction(e.target.value)}
+                  sx={compact ? { fontSize: "0.85em" } : undefined}
+                />
+              </FormControl>
+            )}
+
+            <FormControlLabel
+              sx={compact ? { margin: 0 } : undefined}
+              control={<Checkbox value={fastRitual} size={controlSize} sx={controlSx} />}
+              onChange={(e) => setFastRitual(e.target.checked)}
+              label={
+                <Typography sx={{ fontSize: labelFontSize }}>
+                  {t("Fast Ritual")}
+                </Typography>
+              }
+            />
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Divider />
+      <Grid container sx={{ m: compact ? 0.5 : 1 }}>
+        <Grid item xs={4}>
+          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+            {calcPM} {t("MP")}
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+            {calcLD} {t("DL")}
+          </Typography>
+        </Grid>
+        <Grid item xs={4}>
+          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+            {t("Clock")} {calcClock}
+          </Typography>
+        </Grid>
+      </Grid>
+    </Paper>
   );
 }

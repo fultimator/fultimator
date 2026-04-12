@@ -1,19 +1,9 @@
-import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Grid,
-  TextField,
-  IconButton,
-  Switch,
-  FormControlLabel,
-} from "@mui/material";
-import { Close } from "@mui/icons-material";
+import UnifiedSpellModal from "./modals/UnifiedSpellModal";
+import GourmetGeneralSection from "./sections/GourmetGeneralSection";
+import GourmetContentSection from "./sections/GourmetContentSection";
+import GourmetCookingTab from "./sections/GourmetCookingTab";
+import GourmetInventoryTab from "./sections/GourmetInventoryTab";
 import { useTranslate } from "../../../translation/translate";
-import SpellGourmetCookingModal from "./SpellGourmetCookingModal";
 
 export default function SpellGourmetModal({
   open,
@@ -21,167 +11,44 @@ export default function SpellGourmetModal({
   onSave,
   onDelete,
   spell,
-  player,
-  onPlayerUpdate,
 }) {
   const { t } = useTranslate();
-  const [editedSpell, setEditedSpell] = useState(
-    spell || {
-      spellName: "",
-      cookbookEffects: {},
-      showInPlayerSheet: true,
-      allYouCanEat: false,
-      usedAllYouCanEat: false,
-    }
-  );
-  const [cookingModalOpen, setCookingModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (spell) {
-      setEditedSpell({
-        spellName: spell.spellName || "",
-        cookbookEffects: spell.cookbookEffects || {},
-        ingredientInventory: spell.ingredientInventory || [],
-        showInPlayerSheet: spell.showInPlayerSheet !== undefined ? spell.showInPlayerSheet : true,
-        allYouCanEat: spell.allYouCanEat || false,
-        usedAllYouCanEat: spell.usedAllYouCanEat || false,
-        index: spell.index,
-      });
-    }
-  }, [spell]);
-
-  const handleChange = (field, value) => {
-    setEditedSpell((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = () => {
-    // Ensure spell has a name and all required fields
-    const spellToSave = {
-      ...editedSpell,
-      spellName: editedSpell.spellName.trim() || t("gourmet_cookbook"),
-      spellType: "cooking", // Ensure spell type is preserved
-      cookbookEffects: editedSpell.cookbookEffects || {},
-      ingredientInventory: editedSpell.ingredientInventory || [],
-      showInPlayerSheet: editedSpell.showInPlayerSheet !== undefined ? editedSpell.showInPlayerSheet : true,
-      allYouCanEat: editedSpell.allYouCanEat || false,
-      usedAllYouCanEat: editedSpell.usedAllYouCanEat || false,
-    };
-    onSave(editedSpell.index, spellToSave);
-  };
-
-  const handleDelete = () => {
-    onDelete(editedSpell.index);
-  };
-
-  const handleCookingModalSave = (cookbookEffects, inventory, metadata) => {
-    setEditedSpell((prev) => ({ 
-      ...prev, 
-      cookbookEffects,
-      ingredientInventory: inventory || prev.ingredientInventory || [],
-      usedAllYouCanEat: metadata?.usedAllYouCanEat !== undefined ? metadata.usedAllYouCanEat : prev.usedAllYouCanEat
-    }));
-    setCookingModalOpen(false);
-  };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: "80%",
-            maxWidth: "md",
-          },
-        }}
-      >
-        <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-          {t("gourmet_edit_cooking_button")}
-        </DialogTitle>
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <Close />
-        </IconButton>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label={t("gourmet_cookbook_name")}
-                variant="outlined"
-                fullWidth
-                value={editedSpell.spellName}
-                onChange={(e) => handleChange("spellName", e.target.value)}
-                inputProps={{ maxLength: 50 }}
-              />
-            </Grid>
-            
-
-            <Grid item xs={12}>
-              <Button 
-                variant="contained" 
-                color="secondary"
-                onClick={() => setCookingModalOpen(true)}
-                fullWidth
-              >
-                {t("gourmet_manage_cookbook_button")}
-              </Button>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={editedSpell.showInPlayerSheet || false}
-                    onChange={(e) => handleChange("showInPlayerSheet", e.target.checked)}
-                  />
-                }
-                label={t("Show in Character Sheet")}
-              />
-            </Grid>
-
-            {/* Add 'All You Can Eat' Switch Toggle */}
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={editedSpell.allYouCanEat || false}
-                    onChange={(e) => handleChange("allYouCanEat", e.target.checked)}
-                  />
-                }
-                label={t("gourmet_all_you_can_eat")}
-              />
-            </Grid>
-            
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" color="error" onClick={handleDelete}>
-            {t("Delete Spell")}
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleSave}>
-            {t("Save Changes")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <SpellGourmetCookingModal
-        open={cookingModalOpen}
-        onClose={() => setCookingModalOpen(false)}
-        onSave={handleCookingModalSave}
-        cookbookEffects={editedSpell.cookbookEffects}
-        ingredientInventory={editedSpell.ingredientInventory || []}
-        player={player}
-        onPlayerUpdate={onPlayerUpdate}
-        spell={editedSpell}
-      />
-    </>
+    <UnifiedSpellModal
+      open={open}
+      onClose={onClose}
+      onSave={onSave}
+      onDelete={onDelete}
+      spellType="gourmet"
+      spell={spell}
+      title={t("gourmet_edit_cooking_button")}
+      sections={[
+        {
+          id: "cookbook",
+          title: "gourmet_cookbook",
+          component: GourmetContentSection,
+          props: {},
+        },
+        {
+          id: "inventory",
+          title: "gourmet_ingredient_inventory",
+          component: GourmetInventoryTab,
+          props: {},
+        },
+        {
+          id: "cooking",
+          title: "gourmet_cooking",
+          component: GourmetCookingTab,
+          props: {},
+        },
+        {
+          id: "general",
+          title: "gourmet_edit_cooking_button",
+          component: GourmetGeneralSection,
+          props: {},
+        },
+      ]}
+    />
   );
 }

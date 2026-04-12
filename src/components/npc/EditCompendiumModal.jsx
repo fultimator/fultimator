@@ -26,12 +26,23 @@ import { npcSpells } from "../../libs/npcSpells";
 import { npcAttacks } from "../../libs/npcAttacks";
 import attributes from "../../libs/attributes";
 import { CloseBracket, OpenBracket } from "../Bracket";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+
+// Maps selectedType → CompendiumItemType stored in packs
+const TYPE_TO_PACK_TYPE = {
+  spell: "npc-spell",
+  basic: "npc-attack",
+};
 
 const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   const { t } = useTranslate();
+  const { packs, loading: packsLoading } = useCompendiumPacks();
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [type, setType] = useState([]);
   const [selectedType, setSelectedType] = useState(typeName || "spell");
+  const [source, setSource] = useState("official");
+  const [selectedPackId, setSelectedPackId] = useState("");
 
   const damageTypeLabels = {
     physical: "physical_damage",
@@ -45,8 +56,18 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     poison: "poison_damage",
   };
 
-  // Effect to set the correct type based on selectedType
+  // Compute the list of items to display based on source
+  const packItemsForType = React.useMemo(() => {
+    if (source !== "packs" || !selectedPackId) return [];
+    const pack = packs.find((p) => p.id === selectedPackId);
+    if (!pack) return [];
+    const packType = TYPE_TO_PACK_TYPE[selectedType];
+    return pack.items.filter((i) => i.type === packType).map((i) => i.data);
+  }, [source, selectedPackId, packs, selectedType]);
+
+  // Effect to set the correct official type list
   useEffect(() => {
+    if (source !== "official") return;
     let newType = [];
     switch (selectedType) {
       case "spell":
@@ -61,14 +82,32 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     }
     setType(newType);
     setSelectedItem(newType.length > 0 ? newType[0] : null);
-  }, [selectedType]);
+  }, [selectedType, source]);
 
-  // Effect to set the default selectedType when dialog opens
+  // When switching to packs source, reset selection
+  useEffect(() => {
+    if (source === "packs") {
+      setSelectedItem(packItemsForType.length > 0 ? packItemsForType[0] : null);
+    }
+  }, [source, packItemsForType]);
+
+  // Reset on open
   useEffect(() => {
     if (open) {
       setSelectedType(typeName || "spell");
+      setSource("official");
+      setSelectedPackId(packs.length > 0 ? packs[0].id : "");
     }
-  }, [open, typeName]);
+  }, [open, typeName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Set default pack when packs load
+  useEffect(() => {
+    if (packs.length > 0 && !selectedPackId) {
+      setSelectedPackId(packs[0].id);
+    }
+  }, [packs, selectedPackId]);
+
+  const displayItems = source === "packs" ? packItemsForType : type;
 
   const handleSave = () => {
     if (selectedItem) {
@@ -108,7 +147,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       </div>
     );
   };
-  
+
   const handleTypeChange = (event) => {
     setSelectedType(event.target.value);
   };
@@ -125,7 +164,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between">
+        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
           <Grid item xs>
             <Select
               value={selectedType}
@@ -149,31 +188,75 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               <Close />
             </IconButton>
           </Grid>
+          {/* Source selector row */}
+          <Grid item xs={12}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={source === "packs" ? 4 : 12}>
+                <Select
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                  fullWidth
+                  size="small"
+                  inputProps={{ "aria-label": "Select source" }}
+                >
+                  <MenuItem value="official">{t("Official Data")}</MenuItem>
+                  <MenuItem value="packs" disabled={packs.length === 0}>
+                    {t("My Packs")}
+                  </MenuItem>
+                </Select>
+              </Grid>
+              {source === "packs" && (
+                <Grid item xs={8}>
+                  <Select
+                    value={selectedPackId}
+                    onChange={(e) => setSelectedPackId(e.target.value)}
+                    fullWidth
+                    size="small"
+                    displayEmpty
+                  >
+                    {packs.map((pack) => (
+                      <MenuItem key={pack.id} value={pack.id}>
+                        {pack.isPersonal ? `⭐ ${pack.name}` : pack.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+              )}
+            </Grid>
+          </Grid>
         </Grid>
       </DialogTitle>
       <Divider />
       <DialogContent>
         <Grid container>
           <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
-            <List component="nav">
-              {type.map((item, index) => (
-                <ListItemButton
-                  key={index}
-                  onClick={() => handleItemClick(item)}
-                  selected={selectedItem === item}
-                >
-                  <ListItemText
-                    primary={
-                      <>
-                        {item.name}
-                        {item.type === "offensive" && <OffensiveSpellIcon />}
-                        {item.martial === true && <Martial />}
-                      </>
-                    }
-                  />
-                </ListItemButton>
-              ))}
-            </List>
+            {displayItems.length === 0 ? (
+              <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
+                {source === "packs"
+                  ? t("No items in this pack for the selected type.")
+                  : t("No items available.")}
+              </Typography>
+            ) : (
+              <List component="nav">
+                {displayItems.map((item, index) => (
+                  <ListItemButton
+                    key={index}
+                    onClick={() => handleItemClick(item)}
+                    selected={selectedItem === item}
+                  >
+                    <ListItemText
+                      primary={
+                        <>
+                          {item.name}
+                          {item.type === "offensive" && <OffensiveSpellIcon />}
+                          {item.martial === true && <Martial />}
+                        </>
+                      }
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            )}
           </Grid>
           <Grid
             item
@@ -216,7 +299,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       </Box>
                       <strong>
                         <OpenBracket />
-                        {t("HR")} + {5 + selectedItem.flatdmg}
+                        {t("HR")} + {5 + (selectedItem.flatdmg || 0)}
                         <CloseBracket />
                       </strong>{" "}
                       <span>

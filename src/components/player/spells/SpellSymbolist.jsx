@@ -15,7 +15,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-function ThemedSpellSymbolist({ symbol, onEditSymbols, isEditMode, onEdit }) {
+function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -58,13 +58,6 @@ function ThemedSpellSymbolist({ symbol, onEditSymbols, isEditMode, onEdit }) {
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
             {t("symbol_settings_button")}
-          </Button>
-          <Button
-            onClick={onEditSymbols}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("symbol_edit_symbols_button")}
           </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("Symbols not shown in player sheet")}>

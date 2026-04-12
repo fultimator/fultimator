@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import qualities from "../../../../routes/equip/Accessories/qualities";
@@ -23,6 +24,8 @@ import ChangeModifiers from "../ChangeModifiers";
 import PrettyAccessory from "./PrettyAccessory";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
+import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerAccessoryModal({
   open,
@@ -40,57 +43,31 @@ export default function PlayerAccessoryModal({
   const [selectedQuality, setSelectedQuality] = useState(
     accessory?.selectedQuality || ""
   );
-  const [defModifier, setDefModifier] = useState(accessory?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(
-    accessory?.mDefModifier || 0
-  );
-  const [initModifier, setInitModifier] = useState(
-    accessory?.initModifier || 0
-  );
-  const [magicModifier, setMagicModifier] = useState(
-    accessory?.magicModifier || 0
-  );
-  const [precModifier, setPrecModifier] = useState(
-    accessory?.precModifier || 0
-  );
-  const [damageMeleeModifier, setDamageMeleeModifier] = useState(
-    accessory?.damageMeleeModifier || 0
-  );
-  const [damageRangedModifier, setDamageRangedModifier] = useState(
-    accessory?.damageRangedModifier || 0
-  );
-  const [isEquipped, setIsEquipped] = useState(accessory?.isEquipped || false);
-
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const {
+    defModifier, setDefModifier,
+    mDefModifier, setMDefModifier,
+    initModifier, setInitModifier,
+    magicModifier, setMagicModifier,
+    precModifier, setPrecModifier,
+    damageMeleeModifier, setDamageMeleeModifier,
+    damageRangedModifier, setDamageRangedModifier,
+    isEquipped, setIsEquipped,
+    modifiersExpanded, setModifiersExpanded,
+    expandModifiers,
+    modifiers,
+    clearModifiers,
+  } = useEquipmentForm(accessory);
 
   const fileInputRef = useRef(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     setName(accessory?.name || "");
     setQuality(accessory?.quality || "");
     setQualityCost(accessory?.qualityCost || 0);
     setSelectedQuality(accessory?.selectedQuality || "");
-    setIsEquipped(accessory?.isEquipped || false);
-    setDefModifier(accessory?.defModifier || 0);
-    setMDefModifier(accessory?.mDefModifier || 0);
-    setInitModifier(accessory?.initModifier || 0);
-    setMagicModifier(accessory?.magicModifier || 0);
-    setPrecModifier(accessory?.precModifier || 0);
-    setDamageMeleeModifier(accessory?.damageMeleeModifier || 0);
-    setDamageRangedModifier(accessory?.damageRangedModifier || 0);
-    setModifiersExpanded(
-      (accessory?.defModifier && accessory?.defModifier !== 0) ||
-        (accessory?.mDefModifier && accessory?.mDefModifier !== 0) ||
-        (accessory?.initModifier && accessory?.initModifier !== 0) ||
-        (accessory?.magicModifier && accessory?.magicModifier !== 0) ||
-        (accessory?.precModifier && accessory?.precModifier !== 0) ||
-        (accessory?.damageMeleeModifier &&
-          accessory?.damageMeleeModifier !== 0) ||
-        (accessory?.damageRangedModifier &&
-          accessory?.damageRangedModifier !== 0)
-        ? true
-        : false
-    );
+    // modifier fields are handled by useEquipmentForm
   }, [accessory]);
 
   const { handleFileUpload } = useUploadJSON((data) => {
@@ -118,34 +95,13 @@ export default function PlayerAccessoryModal({
       if (qualityCost) {
         setQualityCost(qualityCost);
       }
-      if (defModifier) {
-        setDefModifier(defModifier);
-        setModifiersExpanded(true);
-      }
-      if (mDefModifier) {
-        setMDefModifier(mDefModifier);
-        setModifiersExpanded(true);
-      }
-      if (initModifier) {
-        setInitModifier(initModifier);
-        setModifiersExpanded(true);
-      }
-      if (magicModifier) {
-        setMagicModifier(magicModifier);
-        setModifiersExpanded(true);
-      }
-      if (precModifier) {
-        setPrecModifier(precModifier);
-        setModifiersExpanded(true);
-      }
-      if (damageMeleeModifier) {
-        setDamageMeleeModifier(damageMeleeModifier);
-        setModifiersExpanded(true);
-      }
-      if (damageRangedModifier) {
-        setDamageRangedModifier(damageRangedModifier);
-        setModifiersExpanded(true);
-      }
+      if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
+      if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
+      if (initModifier) { setInitModifier(initModifier); expandModifiers(); }
+      if (magicModifier) { setMagicModifier(magicModifier); expandModifiers(); }
+      if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
+      if (damageMeleeModifier) { setDamageMeleeModifier(damageMeleeModifier); expandModifiers(); }
+      if (damageRangedModifier) { setDamageRangedModifier(damageRangedModifier); expandModifiers(); }
     }
     fileInputRef.current.value = null;
   });
@@ -161,14 +117,7 @@ export default function PlayerAccessoryModal({
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
-    setDefModifier(0);
-    setMDefModifier(0);
-    setInitModifier(0);
-    setMagicModifier(0);
-    setPrecModifier(0);
-    setDamageMeleeModifier(0);
-    setDamageRangedModifier(0);
-    setModifiersExpanded(false);
+    clearModifiers();
   };
 
   const handleSave = () => {
@@ -178,31 +127,18 @@ export default function PlayerAccessoryModal({
       qualityCost,
       selectedQuality,
       cost,
-      isEquipped,
-      defModifier: parseInt(defModifier),
-      mDefModifier: parseInt(mDefModifier),
-      initModifier: parseInt(initModifier),
-      magicModifier: parseInt(magicModifier),
-      precModifier: parseInt(precModifier),
-      damageMeleeModifier: parseInt(damageMeleeModifier),
-      damageRangedModifier: parseInt(damageRangedModifier),
+      ...modifiers(),
     };
 
     onAddAccessory(updatedAccessory);
   };
 
-  const handleDelete = async (accIndex) => {
-    const confirmed = window.confirm(t("Are you sure you want to delete this accessory?"));
-
-    if (confirmed) {
-      if (accIndex !== null) {
-        onDeleteAccessory(accIndex); // Call the delete function if confirmed
-      }
-      onClose(); // Close the dialog or perform any necessary cleanup
-    }
+  const handleDelete = async () => {
+    setDeleteDialogOpen(true);
   };
 
   return (
+    <>
     <Dialog
       open={open}
       onClose={onClose}
@@ -371,7 +307,7 @@ export default function PlayerAccessoryModal({
       </DialogContent>
       <DialogActions>
         {editAccIndex !== null && (
-          <Button onClick={() => handleDelete(editAccIndex)} color="error" variant="contained" >
+          <Button onClick={handleDelete} color="error" variant="contained" >
             {t("Delete")}
           </Button>
         )}
@@ -384,5 +320,26 @@ export default function PlayerAccessoryModal({
         </Button>
       </DialogActions>
     </Dialog>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+      onClose={() => setDeleteDialogOpen(false)}
+      onConfirm={() => {
+        if (editAccIndex !== null) {
+          onDeleteAccessory(editAccIndex);
+        }
+        onClose();
+      }}
+      title={t("Confirm Deletion")}
+      message={t("Are you sure you want to delete this accessory?")}
+      itemPreview={
+        <Box>
+          <Typography variant="h4">{name}</Typography>
+          <Typography variant="body2">
+            {cost} {t("zenit")}
+          </Typography>
+        </Box>
+      }
+    />
+    </>
   );
 }

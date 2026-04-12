@@ -19,7 +19,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import attributes from "../../../libs/attributes";
 import { availableFrames } from "../../../libs/pilotVehicleData";
 
-function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleChange, onVehicleChange }) {
+function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicleChange }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -169,13 +169,6 @@ function ThemedSpellPilot({ pilot, onEditVehicles, isEditMode, onEdit, onModuleC
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
             {t("pilot_settings_button")}
-          </Button>
-          <Button
-            onClick={onEditVehicles}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("pilot_edit_vehicles_button")}
           </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("pilot_vehicles_not_shown_tooltip")}>

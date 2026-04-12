@@ -23,6 +23,7 @@ import adversary_designer from "./adversary_designer.webp";
 import combat_simulator from "./combat_simulator.webp";
 import dice_roller from "./dice_roller.webp";
 import items_rituals_projects from "./items_rituals_projects.webp";
+import compendium_viewer from "./compendia_viewer.webp"; // placeholder, replace with dedicated asset
 import character_designer from "./character_designer.webp";
 import PublicIcon from "@mui/icons-material/Public";
 import FeedbackIcon from "@mui/icons-material/Feedback";
@@ -74,10 +75,16 @@ function Home() {
       hoverKey: "items_rituals_projects",
     },
     {
+      image: compendium_viewer,
+      link: "/compendium",
+      hoverKey: "compendium_viewer",
+    },
+    {
       image: dice_roller,
       link: "/roller",
       hoverKey: "dice_roller",
     },
+
   ];
 
   return (
@@ -121,8 +128,8 @@ function Home() {
         ))}
       </div>
       <Alert severity="warning" sx={{ mx: "1em" }}>
-        <AlertTitle>Important Announcement!</AlertTitle>
-        Our URL has been updated! Please use the new address:{" "}
+        <AlertTitle>{t("important_announcement")}</AlertTitle>
+          {t("important_announcement_desc")}:{" "}
         <Link href="https://fultimator.com" target="_blank" rel="noopener noreferrer">
           https://fultimator.com
         </Link>
@@ -173,10 +180,10 @@ function Home() {
                     color={isDarkMode ? "#7289da" : "#7289da"}
                   />
                 </Box>
-                {t("Join the Fultimator Community!")}
+                {t("join_fultimator_community")}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {t("We would love to have you on board!")}
+                {t("join_fultimator_community_desc")}
               </Typography>
               <Button
                 variant="contained"
@@ -189,7 +196,7 @@ function Home() {
                   fontWeight: "bold",
                 }}
               >
-                {t("Dive into the Discord Hub!")}
+                {t("join_discord")}
               </Button>
             </Paper>
           </Grid>
@@ -222,12 +229,11 @@ function Home() {
                     color: isDarkMode ? theme.secondary : theme.primary,
                   }}
                 />
-                {t("Download the Fultimator Desktop App")}
+                {t("download_desktop_app_header")}
               </Typography>
 
               <Typography variant="body1" sx={{ mb: 2 }}>
-                {t("desktop_app_description") ||
-                  "Get the full experience with our desktop app, available for Windows, macOS, and Linux."}
+                {t("download_desktop_app_desc")}
               </Typography>
 
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -301,7 +307,7 @@ function Home() {
                   </Tooltip>
                 </Typography>
                 <Typography variant="body1">
-                  {t("Monster Icons are taken from:")}
+                  {t("akashics_moe_desc")}
                   <Button
                     variant="text"
                     href="http://www.akashics.moe/"
@@ -351,7 +357,7 @@ function Home() {
                     color: isDarkMode ? "#ffb74d" : "#f57c00",
                   }}
                 />
-                {t("Contact Us")}
+                {t("contact_us_header")}
               </Typography>
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {t("feedback_description")}
@@ -393,7 +399,6 @@ function Home() {
             </Paper>
           </Grid>
 
-          {!IS_ELECTRON && (
           <Grid item xs={12}>
             <Paper
               elevation={3}
@@ -422,13 +427,11 @@ function Home() {
                     color: isDarkMode ? "#ffb74d" : "#f57c00",
                   }}
                 />
-                {t("Fabula Ultima Resources")}
+                {t("fabula_ultima_resources_header")}
               </Typography>
 
               <Typography variant="body1" sx={{ mb: 3 }}>
-                {t(
-                  "Access the list of official and homebrew Fabula Ultima resources in multiple languages."
-                )}
+                {t("fabula_ultima_resources_desc")}
               </Typography>
 
               <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -445,13 +448,11 @@ function Home() {
                     py: 1.5,
                   }}
                 >
-                  {t("View All Resources")}
+                  {t("fabula_ultima_resources_btn")}
                 </Button>
               </Box>
             </Paper>
           </Grid>
-          )}
-
           <Grid item xs={12}>
             <Divider sx={{ marginBottom: 3 }} />
             <Box
@@ -483,13 +484,13 @@ function Home() {
                       color: isDarkMode ? "#bbdefb" : "#1976d2",
                     }}
                   />
-                  {t("Copyright Notice")}
+                  {t("copyright_notice_header")}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ mb: 1, color: isDarkMode ? "#e0e0e0" : "#555555" }}
                 >
-                  {"Fultimator is an independent production by"}{" "}
+                  {t("copyright_notice_desc_1")}{" "}
                   <Link
                     href="https://github.com/fultimator"
                     target="_blank"
@@ -500,15 +501,15 @@ function Home() {
                       fontWeight: "bold",
                     }}
                   >
-                    {t("Fultimator Dev Team")}
+                    {"Fultimator Dev Team"}
                   </Link>
-                  {" and is not affiliated with Need Games or Rooster Games."}
+                  {t("copyright_notice_desc_2")}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{ mb: 1, color: isDarkMode ? "#e0e0e0" : "#555555" }}
                 >
-                  {"It is published under the"}{" "}
+                  {t("copyright_notice_desc_3")}{" "}
                   <Link
                     href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
                     target="_blank"
@@ -526,11 +527,9 @@ function Home() {
                   variant="body2"
                   sx={{ color: isDarkMode ? "#e0e0e0" : "#555555" }}
                 >
-                  {
-                    "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games."
-                  }
+                  {t("copyright_notice_desc_4")}
                   <br />
-                  {"Fabula Ultima is © Need Games and Rooster Games."}
+                  {t("copyright_notice_desc_5")}
                 </Typography>
               </Box>
 

@@ -13,10 +13,12 @@ import {
   Divider,
   Stack,
   Card,
+  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, Info } from "@mui/icons-material";
+import { VehicleModuleCard } from "../../compendium/ItemCards";
 import attributes from "../../../libs/attributes";
 import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -26,6 +28,7 @@ import { OpenBracket, CloseBracket } from "../../Bracket";
 import Diamond from "../../Diamond";
 import { availableFrames } from "../../../libs/pilotVehicleData";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
+import { calculateAttribute } from "../common/playerCalculations";
 
 export default function PlayerVehicle({
   player,
@@ -44,6 +47,8 @@ export default function PlayerVehicle({
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentModule, setCurrentModule] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const background =
     custom.mode === "dark"
@@ -66,16 +71,20 @@ export default function PlayerVehicle({
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
     );
 
-  // Find the enabled vehicle
+  // Find the spell with enabled vehicle (for display), or use first pilot spell (for editing)
   const activePilotSpell = pilotSpells.find((s) =>
     (s.vehicles || []).some((v) => v.enabled)
-  );
+  ) || pilotSpells[0];
 
   if (!activePilotSpell) {
     return null;
   }
 
-  const activeVehicle = activePilotSpell.vehicles.find((v) => v.enabled);
+  const activeVehicle = activePilotSpell.vehicles.find((v) => v.enabled) || activePilotSpell.vehicles?.[0];
+
+  if (!activeVehicle) {
+    return null;
+  }
 
   const frame = availableFrames.find(
     (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton")
@@ -95,28 +104,8 @@ export default function PlayerVehicle({
     (m) => m.type === "pilot_module_support"
   );
 
-  const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
-  const calculateAttribute = (
-    base,
-    decreaseStatuses,
-    increaseStatuses,
-    min,
-    max
-  ) => {
-    let adjustedValue = base;
-
-    decreaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue -= 2;
-    });
-
-    increaseStatuses.forEach((status) => {
-      if (player.statuses[status]) adjustedValue += 2;
-    });
-
-    return clamp(adjustedValue, min, max);
-  };
-
   const currDex = calculateAttribute(
+    player,
     player.attributes.dexterity,
     ["slow", "enraged"],
     ["dexUp"],
@@ -124,6 +113,7 @@ export default function PlayerVehicle({
     12
   );
   const currInsight = calculateAttribute(
+    player,
     player.attributes.insight,
     ["dazed", "enraged"],
     ["insUp"],
@@ -131,6 +121,7 @@ export default function PlayerVehicle({
     12
   );
   const currMight = calculateAttribute(
+    player,
     player.attributes.might,
     ["weak", "poisoned"],
     ["migUp"],
@@ -138,6 +129,7 @@ export default function PlayerVehicle({
     12
   );
   const currWillpower = calculateAttribute(
+    player,
     player.attributes.willpower,
     ["shaken", "poisoned"],
     ["wlpUp"],
@@ -380,542 +372,221 @@ export default function PlayerVehicle({
             {t("pilot_vehicle")}
           </Typography>
         )}
-        <Grid container spacing={2} sx={{ padding: "1em" }}>
+        <Grid container spacing={1} sx={{ padding: "1em" }}>
           {frame && (
-            <Grid item xs={12}>
-              <Grid container alignItems="center">
-                <Grid item xs={isEditMode ? 10 : 12}>
-                  <Card
-                    sx={{
-                      backgroundColor:
-                        custom.mode === "dark" ? "#181a1b" : "#ffffff",
-                      boxShadow: isCharacterSheet ? 0 : 2,
-                    }}
-                  >
-                    <Stack>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{
-                          p: 1,
-                          background: primary,
-                          color: "#ffffff",
-                          "& .MuiTypography-root": {
-                            fontSize: { xs: "0.6rem", sm: "1.2rem" },
-                            textTransform: "uppercase",
-                          },
-                        }}
-                      >
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="h4"
-                            textAlign="left"
-                            sx={{ pl: 1 }}
-                          >
-                            {t("pilot_vehicles_frame")}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        sx={{
-                          background,
-                          padding: "5px",
-                          "& .MuiTypography-root": {
-                            fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                          },
-                        }}
-                      >
-                        <Grid
-                          item
-                          xs={4}
-                          sx={{ display: "flex", alignItems: "center" }}
-                        >
-                          <Typography
-                            fontWeight="bold"
-                            sx={{ marginRight: "4px" }}
-                          >
-                            {t(frame.name)}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography textAlign="center">
-                            <strong>{t("pilot_passengers")}:</strong>{" "}
-                            {frame.passengers > 0
-                              ? frame.passengers
-                              : t("None")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography textAlign="center">
-                            <strong>{t("pilot_distance")}:</strong>{" "}
-                            {frame.distance > 1
-                              ? `×${frame.distance}`
-                              : t("pilot_distance_no_mod")}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      <Typography
-                        sx={{
-                          background: "transparent",
-                          px: 1,
-                          py: 1,
-                        }}
-                      >
-                        <StyledMarkdown>{t(frame.description)}</StyledMarkdown>
-                      </Typography>
-                    </Stack>
-                  </Card>
-                </Grid>
-                {isEditMode && (
-                  <Grid
-                    item
-                    xs={2}
-                    container
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Tooltip title={t("pilot_vehicles_edit")}>
-                      <IconButton onClick={() => setOpenEditModal(true)}>
-                        <Info />
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                )}
+            <Grid
+              item
+              container
+              xs={12}
+              md={6}
+              sx={{ display: "flex", alignItems: "stretch" }}
+            >
+              <Grid item xs={10} sx={{ display: "flex" }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    backgroundColor: primary,
+                    padding: "5px",
+                    paddingLeft: "10px",
+                    color: "#fff",
+                    borderRadius: "8px 0 0 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {t(frame.name)}
+                </Typography>
               </Grid>
-              <br />
+              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    backgroundColor: custom.ternary,
+                    borderRadius: "0 8px 8px 0",
+                    marginRight: "15px",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Tooltip title={t("Info")}>
+                    <IconButton size="small" onClick={() => { setSelectedModule(frame); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                      <Info fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Grid>
             </Grid>
           )}
 
-          {armorModules.length > 0 && (
-            <Grid item xs={12}>
-              <Grid container alignItems="center">
-                <Grid item xs={12}>
-                  <Card
-                    sx={{
-                      backgroundColor:
-                        custom.mode === "dark" ? "#181a1b" : "#ffffff",
-                      boxShadow: isCharacterSheet ? 0 : 2,
-                    }}
-                  >
-                    <Stack>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{
-                          p: 1,
-                          background: primary,
-                          color: "#ffffff",
-                          "& .MuiTypography-root": {
-                            fontSize: { xs: "0.6rem", sm: "1.2rem" },
-                            textTransform: "uppercase",
-                          },
-                        }}
-                      >
-                        <Grid item xs={3}>
-                          <Typography variant="h4" textAlign="left">
-                            {t("Armor")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={1}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("Cost")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={2}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("Defense")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={2}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("M. Defense")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={2}></Grid>
-                      </Grid>
-                      {armorModules.map((module, index) => (
-                        <React.Fragment key={index}>
-                          <Grid
-                            container
-                            justifyContent="space-between"
-                            sx={{
-                              background,
-                              padding: "5px",
-                              "& .MuiTypography-root": {
-                                fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                              },
-                            }}
-                          >
-                            <Grid
-                              item
-                              xs={3}
-                              sx={{ display: "flex", alignItems: "center" }}
-                            >
-                              <Typography
-                                fontWeight="bold"
-                                sx={{ marginRight: "4px" }}
-                              >
-                                {module.name === "pilot_custom_armor"
-                                  ? module.customName
-                                  : t(module.name)}
-                              </Typography>
-                              {module.martial && <Martial />}
-                            </Grid>
-                            <Grid item xs={1}>
-                              <Typography textAlign="center">{`${
-                                module.cost || 0
-                              }z`}</Typography>
-                            </Grid>
-                            <Grid item xs={2}>
-                              <Typography fontWeight="bold" textAlign="center">
-                                {module.martial
-                                  ? module.def || 0
-                                  : module.def && module.def > 0
-                                  ? `${t("DEX die")} + ${module.def}`
-                                  : t("DEX die")}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={2}>
-                              <Typography fontWeight="bold" textAlign="center">
-                                {module.martial
-                                  ? module.mdef || 0
-                                  : module.mdef && module.mdef > 0
-                                  ? `${t("INS die")} + ${module.mdef}`
-                                  : t("INS die")}
-                              </Typography>
-                            </Grid>
-                            <Grid item xs={2}></Grid>
-                          </Grid>
-                          {index < armorModules.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
-                </Grid>
-                {isEditMode && <Grid item xs={1}></Grid>}
+          {armorModules.map((module, index) => (
+            <Grid
+              item
+              container
+              xs={12}
+              md={6}
+              key={`armor-${index}`}
+              sx={{ display: "flex", alignItems: "stretch" }}
+            >
+              <Grid item xs={10} sx={{ display: "flex" }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    backgroundColor: primary,
+                    padding: "5px",
+                    paddingLeft: "10px",
+                    color: "#fff",
+                    borderRadius: "8px 0 0 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {module.name === "pilot_custom_armor"
+                    ? module.customName
+                    : t(module.name)}
+                </Typography>
               </Grid>
-              <br />
-            </Grid>
-          )}
-
-          {weaponModules.length > 0 && (
-            <Grid item xs={12}>
-              <Card
-                sx={{
-                  backgroundColor:
-                    custom.mode === "dark" ? "#181a1b" : "#ffffff",
-                  boxShadow: isCharacterSheet ? 0 : 2,
-                }}
-              >
-                <Stack>
-                  <Grid container alignItems="center">
-                    <Grid item xs={isEditMode ? 10 : 12}>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{
-                          p: 1,
-                          background: primary,
-                          color: "#ffffff",
-                          "& .MuiTypography-root": {
-                            fontSize: { xs: "0.6rem", sm: "1.2rem" },
-                            textTransform: "uppercase",
-                          },
-                        }}
-                      >
-                        <Grid item xs={3}>
-                          <Typography variant="h4" textAlign="left">
-                            {t("Weapons")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={1}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("Cost")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("Accuracy")}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography variant="h4" textAlign="center">
-                            {t("Damage")}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                    {isEditMode && <Grid item xs={2}></Grid>}
-                  </Grid>
-                  {weaponModules.map((module, index) => (
-                    <React.Fragment key={index}>
-                      <Grid container alignItems="center">
-                        <Grid item xs={isEditMode ? 10 : 12}>
-                          <Stack>
-                            <Grid
-                              container
-                              justifyContent="space-between"
-                              sx={{
-                                background,
-                                borderBottom: `1px solid ${custom.secondary}`,
-                                padding: "5px",
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                                },
-                              }}
-                            >
-                              <Grid
-                                item
-                                xs={3}
-                                sx={{ display: "flex", alignItems: "center" }}
-                              >
-                                <Typography
-                                  fontWeight="bold"
-                                  sx={{ marginRight: "4px" }}
-                                >
-                                  {module.name === "pilot_custom_weapon"
-                                    ? module.customName
-                                    : t(module.name)}
-                                </Typography>
-                                {module.martial && <Martial />}
-                              </Grid>
-                              <Grid item xs={1}>
-                                <Typography textAlign="center">{`${
-                                  module.cost || 0
-                                }z`}</Typography>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <Typography
-                                  fontWeight="bold"
-                                  textAlign="center"
-                                >
-                                  <OpenBracket />
-                                  {`${
-                                    attributes[module.att1 || "might"].shortcaps
-                                  } + ${
-                                    attributes[module.att2 || "dexterity"]
-                                      .shortcaps
-                                  }`}
-                                  <CloseBracket />
-                                  {(module.prec || 0) > 0
-                                    ? `+${module.prec}`
-                                    : (module.prec || 0) < 0
-                                    ? `${module.prec}`
-                                    : ""}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <Typography
-                                  fontWeight="bold"
-                                  textAlign="center"
-                                >
-                                  <OpenBracket />
-                                  {t("HR")}{" "}
-                                  {(module.damage || 0) >= 0 ? "+" : ""}{" "}
-                                  {module.damage || 0}
-                                  <CloseBracket />
-                                  {types[
-                                    module.damageType?.toLowerCase() ||
-                                      "physical"
-                                  ]?.long || t(module.damageType || "Physical")}
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                            <Grid
-                              container
-                              justifyContent="flex-end"
-                              sx={{
-                                background: "transparent",
-                                borderBottom: `1px solid ${custom.secondary}`,
-                                padding: "5px",
-                                "& .MuiTypography-root": {
-                                  fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                                },
-                              }}
-                            >
-                              <Grid item xs={3}>
-                                <Typography fontWeight="bold">
-                                  {t(module.category)}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={1}>
-                                <Diamond color={primary} />
-                              </Grid>
-                              <Grid item xs={4}>
-                                <Typography textAlign="center">
-                                  {module.equippedSlot === "main" &&
-                                    !module.cumbersome &&
-                                    t("Main Hand")}
-                                  {module.equippedSlot === "off" &&
-                                    !module.cumbersome &&
-                                    t("Off Hand")}
-                                  {(module.equippedSlot === "both" ||
-                                    module.cumbersome) &&
-                                    t("Two-handed")}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={1}>
-                                <Diamond color={primary} />
-                              </Grid>
-                              <Grid item xs={3}>
-                                <Typography textAlign="center">
-                                  {module.range === "Melee" && t("Melee")}
-                                  {module.range === "Ranged" && t("Ranged")}
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                            <Typography
-                              sx={{
-                                background: "transparent",
-                                px: 1,
-                                py: 1,
-                              }}
-                            >
-                              <StyledMarkdown>
-                                {module.name === "pilot_custom_weapon"
-                                  ? module.description
-                                  : t(module.description)}
-                              </StyledMarkdown>
-                            </Typography>
-                          </Stack>
-                        </Grid>
-                        {isEditMode && (
-                          <Grid
-                            item
-                            xs={2}
-                            container
-                            direction="column"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Tooltip title={t("Roll")}>
-                              <IconButton
-                                size="small"
-                                onClick={() => handleDiceRoll(module)}
-                              >
-                                <Casino fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Typography
-                              variant="caption"
-                              sx={{ fontWeight: "bold" }}
-                            >
-                              {module.cumbersome ||
-                              module.equippedSlot === "both"
-                                ? "M+O"
-                                : module.equippedSlot === "main"
-                                ? "M"
-                                : module.equippedSlot === "off"
-                                ? "O"
-                                : ""}
-                            </Typography>
-                          </Grid>
-                        )}
-                      </Grid>
-                      {index < weaponModules.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </Stack>
-              </Card>
-              <br />
-            </Grid>
-          )}
-
-          {supportModules.length > 0 && (
-            <Grid item xs={12}>
-              <Grid container alignItems="center">
-                <Grid item xs={12}>
-                  <Card
-                    sx={{
-                      backgroundColor:
-                        custom.mode === "dark" ? "#181a1b" : "#ffffff",
-                      boxShadow: isCharacterSheet ? 0 : 2,
-                    }}
-                  >
-                    <Stack>
-                      <Grid
-                        container
-                        justifyContent="space-between"
-                        alignItems="center"
-                        sx={{
-                          p: 1,
-                          background: primary,
-                          color: "#ffffff",
-                          "& .MuiTypography-root": {
-                            fontSize: { xs: "0.6rem", sm: "1.2rem" },
-                            textTransform: "uppercase",
-                          },
-                        }}
-                      >
-                        <Grid item xs={12}>
-                          <Typography
-                            variant="h4"
-                            textAlign="left"
-                            sx={{ pl: 1 }}
-                          >
-                            {t("Support")}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                      {supportModules.map((module, index) => (
-                        <React.Fragment key={index}>
-                          <Grid
-                            container
-                            justifyContent="space-between"
-                            sx={{
-                              background,
-                              borderBottom: `1px solid ${custom.secondary}`,
-                              padding: "5px",
-                              "& .MuiTypography-root": {
-                                fontSize: { xs: "0.7rem", sm: "1.0rem" },
-                              },
-                            }}
-                          >
-                            <Grid
-                              item
-                              xs={12}
-                              sx={{ display: "flex", alignItems: "center" }}
-                            >
-                              <Typography
-                                fontWeight="bold"
-                                sx={{ marginRight: "4px" }}
-                              >
-                                {module.name === "pilot_custom_support"
-                                  ? module.customName
-                                  : t(module.name)}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                          <Typography
-                            sx={{
-                              background: "transparent",
-                              px: 1,
-                              py: 1,
-                            }}
-                          >
-                            <StyledMarkdown>
-                              {module.name === "pilot_custom_support"
-                                ? module.description
-                                : t(module.description)}
-                            </StyledMarkdown>
-                          </Typography>
-                          {index < supportModules.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
-                </Grid>
-                {isEditMode && <Grid item xs={1}></Grid>}
+              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    backgroundColor: custom.ternary,
+                    borderRadius: "0 8px 8px 0",
+                    marginRight: "15px",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Tooltip title={t("Info")}>
+                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                      <Info fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Grid>
-              <br />
             </Grid>
-          )}
+          ))}
+
+          {weaponModules.map((module, index) => (
+            <Grid
+              item
+              container
+              xs={12}
+              md={6}
+              key={`weapon-${index}`}
+              sx={{ display: "flex", alignItems: "stretch" }}
+            >
+              <Grid item xs={10} sx={{ display: "flex" }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    backgroundColor: primary,
+                    padding: "5px",
+                    paddingLeft: "10px",
+                    color: "#fff",
+                    borderRadius: "8px 0 0 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {module.name === "pilot_custom_weapon"
+                    ? module.customName
+                    : t(module.name)}
+                </Typography>
+              </Grid>
+              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    backgroundColor: custom.ternary,
+                    borderRadius: "0 8px 8px 0",
+                    marginRight: "15px",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    gap: 0.5,
+                  }}
+                >
+                  <Tooltip title={t("Info")}>
+                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                      <Info fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("Roll")}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDiceRoll(module)}
+                      sx={{ p: 0.5 }}
+                    >
+                      <Casino fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Grid>
+            </Grid>
+          ))}
+
+          {supportModules.map((module, index) => (
+            <Grid
+              item
+              container
+              xs={12}
+              md={6}
+              key={`support-${index}`}
+              sx={{ display: "flex", alignItems: "stretch" }}
+            >
+              <Grid item xs={10} sx={{ display: "flex" }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    backgroundColor: primary,
+                    padding: "5px",
+                    paddingLeft: "10px",
+                    color: "#fff",
+                    borderRadius: "8px 0 0 8px",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {module.name === "pilot_custom_support"
+                    ? module.customName
+                    : t(module.name)}
+                </Typography>
+              </Grid>
+              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                <Box
+                  sx={{
+                    padding: "5px",
+                    backgroundColor: custom.ternary,
+                    borderRadius: "0 8px 8px 0",
+                    marginRight: "15px",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Tooltip title={t("Info")}>
+                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                      <Info fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Grid>
+            </Grid>
+          ))}
         </Grid>
         <Dialog
           open={dialogOpen}
@@ -964,6 +635,14 @@ export default function PlayerVehicle({
           onSave={handleSaveVehicles}
           pilot={activePilotSpell}
         />
+        <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
+          <DialogContent sx={{ p: 0 }}>
+            {selectedModule && <VehicleModuleCard module={selectedModule} />}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setInfoModalOpen(false)} variant="contained" color="primary">{t("Close")}</Button>
+          </DialogActions>
+        </Dialog>
       </Paper>
     </>
   );

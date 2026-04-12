@@ -15,7 +15,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-function ThemedSpellDancer({ dance, onEditDances, isEditMode, onEdit }) {
+function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -58,13 +58,6 @@ function ThemedSpellDancer({ dance, onEditDances, isEditMode, onEdit }) {
             sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
           >
             {t("dance_settings_button")}
-          </Button>
-          <Button
-            onClick={onEditDances}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("dance_edit_dances_button")}
           </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("Dance not shown in player sheet")}>

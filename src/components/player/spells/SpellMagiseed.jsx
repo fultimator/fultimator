@@ -21,7 +21,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
 import Clock from "../../player/playerSheet/Clock";
 
-function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
+function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -118,7 +118,7 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <LocalFlorist />
@@ -143,13 +143,6 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
           >
             {t("magiseed_settings_button")}
           </Button>
-          <Button
-            onClick={onEditMagiseeds}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("magiseed_edit_magiseeds_button")}
-          </Button>
           {!showInPlayerSheet && (
             <Tooltip title={t("Garden not shown in player sheet")}>
               <Icon>
@@ -172,7 +165,6 @@ function ThemedSpellMagiseed({ magiseed, onEditMagiseeds, isEditMode, onEdit, on
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
-          marginTop: "20px",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>

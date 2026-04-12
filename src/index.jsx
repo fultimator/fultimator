@@ -56,6 +56,9 @@ const RollerScoped = React.lazy(() => import("./routes/roller/roller-scoped"));
 const Resources = React.lazy(() =>
   import("./routes/resources/resources")
 );
+const CompendiumViewer = React.lazy(() =>
+  import("./routes/compendium/compendium")
+);
 
 const themes = {
   Fabula: { light: lightFabula, dark: darkFabula },
@@ -93,7 +96,31 @@ const App = () => {
                 }
               />
               <Route
+                path="/player-edit/:playerId"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <PlayerEdit />
+                  </Suspense>
+                }
+              />
+              <Route
                 path="/pc-gallery"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <PlayerGallery />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/player-edit"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <PlayerGallery />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/player-gallery"
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <PlayerGallery />
@@ -177,6 +204,14 @@ const App = () => {
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <Resources />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/compendium"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <CompendiumViewer />
                   </Suspense>
                 }
               />
