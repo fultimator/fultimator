@@ -16,7 +16,23 @@ import Pretty from "../../../npc/Pretty";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
-export default function PlayerCompanion({ player }) {
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? "" : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.split(regex).map((part, idx) =>
+    idx % 2 === 1 ? (
+      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
+    ) : part
+  );
+}
+
+export default function PlayerCompanion({ player, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -38,6 +54,12 @@ export default function PlayerCompanion({ player }) {
   }
 
   if (faithfulCompanionSkills.length !== 1 || !companion) return null;
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const matches =
+    !normalizedQuery ||
+    t("Faithful Companion").toLowerCase().includes(normalizedQuery) ||
+    companion?.name?.toLowerCase().includes(normalizedQuery);
+  if (!matches) return null;
 
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
@@ -47,7 +69,7 @@ export default function PlayerCompanion({ player }) {
             <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader sx={{ px: 1, py: 0.5 }}>
               <Typography variant="h4" sx={{ fontSize: "0.85rem", textTransform: "uppercase" }}>
-                {t("Faithful Companion")} (SL: {faithfulCompanionSkills[0].currentLvl})
+                {highlightMatch(t("Faithful Companion"), searchQuery)} (SL: {faithfulCompanionSkills[0].currentLvl})
               </Typography>
             </StyledTableCellHeader>
           </TableRow>

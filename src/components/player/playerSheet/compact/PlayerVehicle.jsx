@@ -13,7 +13,22 @@ import SpellVehicle from "./spells/SpellVehicle";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
-export default function PlayerVehicle({ player }) {
+function collectStringValues(value, bag = []) {
+  if (typeof value === "string") {
+    bag.push(value);
+    return bag;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectStringValues(entry, bag));
+    return bag;
+  }
+  if (value && typeof value === "object") {
+    Object.values(value).forEach((entry) => collectStringValues(entry, bag));
+  }
+  return bag;
+}
+
+export default function PlayerVehicle({ player, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -27,7 +42,15 @@ export default function PlayerVehicle({ player }) {
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
     );
 
-  if (pilotSpells.length === 0) return null;
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const visiblePilotSpells = pilotSpells.filter((spell) => {
+    if (!normalizedQuery) return true;
+    const rawStrings = collectStringValues(spell, []);
+    const translatedStrings = rawStrings.map((text) => t(text));
+    return [...rawStrings, ...translatedStrings].join(" ").toLowerCase().includes(normalizedQuery);
+  });
+
+  if (visiblePilotSpells.length === 0) return null;
 
   return (
     <>
@@ -49,8 +72,8 @@ export default function PlayerVehicle({ player }) {
           </TableRow>
         </TableHead>
       </Table>
-      {pilotSpells.map((spell, index) => (
-        <SpellVehicle key={index} spell={spell} />
+      {visiblePilotSpells.map((spell, index) => (
+        <SpellVehicle key={index} spell={spell} searchQuery={searchQuery} />
       ))}
     </>
   );

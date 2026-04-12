@@ -38,6 +38,27 @@ import PlayerEquipment from './PlayerEquipment';
 
 const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? '' : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, 'ig');
+  return source.split(regex).map((part, index) =>
+    index % 2 === 1 ? (
+      <mark key={`${part}-${index}`} style={{ backgroundColor: 'yellow', padding: 0 }}>
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
+
 function slotLabel(t, slot) {
   return {
     mainHand:  t('Main Hand'),
@@ -123,8 +144,10 @@ export default function CompactLoadout({
 
   // Slot click routing
   const handleSlotClick = (slot) => {
-    const hasModule = ['mainHand', 'offHand', 'armor'].includes(slot) && Boolean(getEquippedModuleForSlot(player, slot));
-    setPickerOpenModuleOverride(hasModule);
+    const hasModuleCandidates = ['mainHand', 'offHand', 'armor'].includes(slot)
+      && Boolean(activeVehicle)
+      && getEquippedModulesForSlot(player, slot).length > 0;
+    setPickerOpenModuleOverride(hasModuleCandidates);
     setPickerSlot(slot);
   };
 
@@ -257,7 +280,7 @@ export default function CompactLoadout({
               {isVehicle && !locked && <PrecisionManufacturingIcon sx={{ fontSize: '0.65rem', color: 'success.main', flexShrink: 0, mr: 0.25 }} />}
               {hasModule && !isVehicle && !isEmpty && !locked && <PrecisionManufacturingIcon sx={{ fontSize: '0.65rem', color: 'success.light', opacity: 0.6, flexShrink: 0, mr: 0.25 }} />}
               <Typography component="span" noWrap sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: (isEmpty || locked) ? 400 : 600, color: locked ? 'text.disabled' : isEmpty ? 'text.disabled' : isVehicle ? 'success.main' : isAux ? 'warning.main' : 'text.primary', fontStyle: (isEmpty || locked) ? 'italic' : 'normal', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {name}
+                {highlightMatch(name, searchQuery)}
               </Typography>
               {(showSwap || showRoll) && (
                 <Box sx={{ display: 'flex', flexShrink: 0, ml: 0.25 }}>
@@ -327,7 +350,7 @@ export default function CompactLoadout({
                     {`${t('Support')} ${i + 1}`}
                   </Typography>
                   <Typography component="span" noWrap sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' }, fontWeight: isEmpty ? 400 : 600, color: isEmpty ? 'text.disabled' : 'success.main', fontStyle: isEmpty ? 'italic' : 'normal', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {isEmpty ? t('- Empty -') : (entry.module.customName || t(entry.module.name))}
+                    {isEmpty ? t('- Empty -') : highlightMatch(entry.module.customName || t(entry.module.name), searchQuery)}
                   </Typography>
                 </Box>
               );

@@ -24,6 +24,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { useTheme } from "@mui/material/styles";
@@ -46,7 +47,23 @@ function bondStrength(bond) {
   return [...POSITIVE, ...NEGATIVE].filter((s) => bond[s]).length;
 }
 
-export default function PlayerBonds({ player, setPlayer, isEditMode }) {
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? "" : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.split(regex).map((part, idx) =>
+    idx % 2 === 1 ? (
+      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
+    ) : part
+  );
+}
+
+export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery = "" }) {
   const { t } = useTranslate();
   const custom = useCustomTheme();
   const theme = useTheme();
@@ -58,6 +75,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const bonds = player.info?.bonds ?? [];
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (editBondIndex !== null && bonds[editBondIndex]) {
@@ -102,7 +120,19 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
     closeModal();
   };
 
-  if (bonds.length === 0 && !isEditMode) return null;
+  const visibleBonds = bonds.filter((bond) => {
+    if (!normalizedQuery) return true;
+    const sentiments = [...POSITIVE, ...NEGATIVE]
+      .filter((s) => bond[s])
+      .map((s) => t(s.charAt(0).toUpperCase() + s.slice(1)))
+      .join(" ");
+    return (
+      bond.name?.toLowerCase().includes(normalizedQuery) ||
+      sentiments.toLowerCase().includes(normalizedQuery)
+    );
+  });
+
+  if (visibleBonds.length === 0 && !isEditMode) return null;
 
   const iconColWidth = 36;
   const starColWidth = 60;
@@ -142,7 +172,8 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bonds.map((bond, index) => {
+            {visibleBonds.map((bond, index) => {
+              const originalIndex = bonds.indexOf(bond);
               const positive = POSITIVE.filter((s) => bond[s]);
               const negative = NEGATIVE.filter((s) => bond[s]);
               const strength = bondStrength(bond);
@@ -152,7 +183,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
                 <TableRow key={index}>
                   <StyledTableCell sx={{ width: iconColWidth }}>
                     {isEditMode && (
-                      <IconButton size="small" onClick={() => setEditBondIndex(index)} sx={{ p: 0 }}>
+                      <IconButton size="small" onClick={() => setEditBondIndex(originalIndex)} sx={{ p: 0 }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                     )}
@@ -164,7 +195,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
                         fontWeight="bold"
                         sx={{ textTransform: "uppercase", whiteSpace: "nowrap", mr: 1 }}
                       >
-                        {bond.name}
+                        {highlightMatch(bond.name, searchQuery)}
                       </Typography>
 
                       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 0.5 }}>
@@ -178,7 +209,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode }) {
                               fontSize: "0.75rem"
                             }}
                           >
-                            {t(s.charAt(0).toUpperCase() + s.slice(1))}
+                            {highlightMatch(t(s.charAt(0).toUpperCase() + s.slice(1)), searchQuery)}
                             {i < sentiments.length - 1 && ","}
                           </Typography>
                         ))}

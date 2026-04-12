@@ -691,16 +691,16 @@ export default function PlayerCardSheet({
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={2}>
                     {optionalRules.quirks && (
-                        <PlayerQuirk player={player} isCharacterSheet={true} />
+                        <PlayerQuirk player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                     )}
                     {optionalRules.campActivities && (
-                        <PlayerCampActivities player={player} />
+                        <PlayerCampActivities player={player} searchQuery={searchQuery} />
                     )}
                     {optionalRules.zeroPower && (
-                        <PlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+                        <PlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isEditMode} searchQuery={searchQuery} />
                     )}
-                    <PlayerOthers player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
-                    <PlayerRituals player={player} isCharacterSheet={true} />
+                    <PlayerOthers player={player} setPlayer={setPlayer} isEditMode={isEditMode} searchQuery={searchQuery} />
+                    <PlayerRituals player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                     <PlayerSpells player={player} setPlayer={setPlayer} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={3}>
@@ -717,8 +717,8 @@ export default function PlayerCardSheet({
                         onAddAccessory={isEditMode ? openAddAccessory : undefined}
                         onEditAccessory={isEditMode ? (idx) => { const ac = inv?.accessories?.[idx]; if (ac) { setAccessory(ac); setEditAccessoryIndex(idx); setOpenNewAccessory(true); } } : undefined}
                     />
-                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
-                    <PlayerCompanion player={player} isCharacterSheet={true} />
+                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} />
+                    <PlayerCompanion player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={4}>
                     <PlayerNotes player={player} setPlayer={setPlayer} searchQuery={searchQuery}
@@ -726,7 +726,7 @@ export default function PlayerCardSheet({
                         onAddNote={isEditMode ? handleAddNote : undefined}
                         onEditNote={isEditMode ? handleOpenEditNote : undefined}
                     />
-                    <PlayerBonds player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
+                    <PlayerBonds player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
             </Box>
 

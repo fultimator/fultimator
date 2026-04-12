@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Paper, Typography, Box, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Collapse, IconButton, Tooltip } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, MoreVert } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
+import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import SpellDefault from "./spells/SpellDefault";
 import SpellArcanist from "./spells/SpellArcanist";
 import SpellEntropistGamble from "./spells/SpellEntropistGamble";
@@ -23,14 +24,90 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: 0 });
 
+function collectStringValues(value, bag = []) {
+  if (typeof value === "string") {
+    bag.push(value);
+    return bag;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectStringValues(entry, bag));
+    return bag;
+  }
+  if (value && typeof value === "object") {
+    Object.values(value).forEach((entry) => collectStringValues(entry, bag));
+  }
+  return bag;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMarkdownText(text, query) {
+  if (!text || !query) return text;
+  const pattern = new RegExp(`(${escapeRegExp(query)})`, "ig");
+  return String(text).replace(pattern, "<mark>$1</mark>");
+}
+
+function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
+  switch (spell.spellType) {
+    case "default":
+      return (
+        <SpellDefault
+          spellName={highlightMatchFn(spell.name, searchQuery)}
+          mp={spell.mp}
+          maxTargets={spell.maxTargets}
+          targetDesc={spell.targetDesc}
+          duration={spell.duration}
+          description={highlightMatchFn(spell.description, searchQuery)}
+          isEditMode={false}
+          isOffensive={spell.isOffensive}
+          isMagisphere={spell.isMagisphere || false}
+          attr1={spell.attr1}
+          attr2={spell.attr2}
+        />
+      );
+    case "gamble":
+      return <SpellEntropistGamble gamble={spell} isEditMode={false} />;
+    case "invocation":
+      return <SpellInvoker spell={spell} setPlayer={setPlayer} open={true} />;
+    case "cooking":
+      return <SpellGourmet spell={spell} open={true} />;
+    case "magiseed":
+      return <SpellMagiseed spell={spell} setPlayer={setPlayer} open={true} />;
+    case "magichant":
+      return <SpellMagichant spell={spell} />;
+    case "symbol":
+      return <SpellSymbol spell={spell} />;
+    case "dance":
+      return <SpellDance spell={spell} />;
+    case "gift":
+      return <SpellGift spell={spell} setPlayer={setPlayer} open={true} />;
+    case "therioform":
+      return <SpellTherioform spell={spell} />;
+    case "pilot-vehicle":
+      return <SpellVehicle spell={spell} />;
+    case "deck":
+      return <SpellDeck spell={spell} setPlayer={setPlayer} open={true} />;
+    case "arcanist":
+    case "arcanist-rework":
+      return (
+        <SpellArcanist
+          arcana={spell}
+          isEditMode={false}
+          rework={spell.spellType === "arcanist-rework"}
+        />
+      );
+    default:
+      if (spell.spellType?.startsWith("tinkerer-")) return <SpellGadget spell={spell} />;
+      return null;
+  }
+}
+
 export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, searchQuery = '' }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-
-  const [openRows, setOpenRows] = useState({});
-
-  const toggleRow = (key) =>
-    setOpenRows((prev) => ({ ...prev, [key]: !prev[key] }));
+  const { openRows, toggleRow } = usePlayerSheetCompactStore();
 
   const highlightMatch = (text, query) => {
     if (!query) return text;
@@ -48,11 +125,14 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
   const filterSpells = (spells, query) => {
     if (!query) return spells;
     const q = query.toLowerCase();
-    return spells.filter(s => 
-      (s.name && s.name.toLowerCase().includes(q)) || 
-      (s.spellName && s.spellName.toLowerCase().includes(q)) ||
-      (s.description && s.description.toLowerCase().includes(q))
-    );
+    return spells.filter((spell) => {
+      const rawStrings = collectStringValues(spell, []);
+      const translatedStrings = rawStrings.map((text) => t(text));
+      return [...rawStrings, ...translatedStrings]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
   };
 
   const getSpellName = (spell) => {
@@ -82,144 +162,82 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
   if (!player.classes?.length) return null;
 
   return (
-    <TableContainer component={Paper}>
-      {player.classes.some((c) =>
-        c.spells.some(
-          (spell) =>
-            (spell.spellType === "default" || 
-             spell.spellType === "gamble" ||
-             spell.spellType === "invocation" ||
-             spell.spellType === "cooking" ||
-             spell.spellType === "magiseed" ||
-             spell.spellType?.startsWith("tinkerer-") ||
-             spell.spellType === "magichant" ||
-             spell.spellType === "symbol" ||
-             spell.spellType === "dance" ||
-             spell.spellType === "gift" ||
-             spell.spellType === "therioform" ||
-             spell.spellType === "pilot-vehicle" ||
-             spell.spellType === "deck" ||
-             spell.spellType === "arcanist" ||
-             spell.spellType === "arcanist-rework") &&
-            (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
-        )
-      ) && (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader sx={{ width: 36 }} />
-              <StyledTableCellHeader />
-              <StyledTableCellHeader sx={{ width: 80 }} />
-              <StyledTableCellHeader sx={{ width: 90 }} />
-              <StyledTableCellHeader sx={{ width: 100 }} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {player.classes
-              .map((c, classIndex) => {
-                const spellsInClass = c.spells
-                  .map(s => ({ ...s, className: c.name }))
-                  .filter(spell => (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined));
-                
-                const filteredSpells = filterSpells(spellsInClass, searchQuery);
-                
-                if (filteredSpells.length === 0) return null;
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {player.classes
+        .map((c, classIndex) => {
+          const spellsInClass = c.spells
+            .map(s => ({ ...s, className: c.name }))
+            .filter(spell => (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined));
+          
+          const filteredSpells = filterSpells(spellsInClass, searchQuery);
+          
+          if (filteredSpells.length === 0) return null;
 
-                const classKey = `class-${classIndex}`;
-
-                return (
-                  <React.Fragment key={classKey}>
-                    <TableRow sx={{ background: theme.primary }}>
-                      <StyledTableCellHeader colSpan={5} sx={{ px: 1, py: 0.5 }}>
-                        <Typography variant="h4" sx={{ textTransform: "uppercase", color: "white" }}>
-                          {t("Spells") + " - " + t(c.name)}
-                        </Typography>
-                      </StyledTableCellHeader>
-                    </TableRow>
-
-                    {filteredSpells.map((spell, spellIndex) => {
-                      const spellKey = `spell-${classIndex}-${spellIndex}`;
-                      const spellName = getSpellName(spell);
-                      
-                      return (
-                        <React.Fragment key={spellKey}>
-                          <TableRow>
-                            <StyledTableCell sx={{ width: 36 }}>
-                              <IconButton onClick={() => toggleRow(spellKey)} size="small">
-                                {openRows[spellKey] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                              </IconButton>
-                            </StyledTableCell>
-                            <StyledTableCell onClick={() => toggleRow(spellKey)} sx={{ cursor: "pointer" }}>
-                              <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
-                                  {highlightMatch(spellName, searchQuery)}
-                                </Typography>
-                                <Tooltip title={t("Spell")}>
-                                  <MoreVert sx={{ color: theme.secondary }} />
-                                </Tooltip>
+          return (
+            <TableContainer key={classIndex} component={Paper} sx={{ overflowX: "auto" }}>
+              <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+                <TableHead>
+                  <TableRow sx={{ background: theme.primary }}>
+                    <StyledTableCellHeader sx={{ width: 36 }} />
+                    <StyledTableCellHeader>
+                      <Typography variant="h4" sx={{ textTransform: "uppercase", color: "white" }}>
+                        {t("Spells") + " - " + t(c.name)}
+                      </Typography>
+                    </StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                    <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                    <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+                      <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>
+                    </StyledTableCellHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredSpells.map((spell, spellIndex) => {
+                    const spellKey = `spell-${classIndex}-${spellIndex}`;
+                    const spellName = getSpellName(spell, t);
+                    
+                    return (
+                      <React.Fragment key={spellKey}>
+                        <TableRow sx={{ backgroundColor: openRows.spells[spellKey] ? 'rgba(0,0,0,0.02)' : 'inherit' }}>
+                          <StyledTableCell sx={{ width: 36 }}>
+                            <IconButton onClick={(e) => { e.stopPropagation(); toggleRow('spells', spellKey); }} size="small" sx={{ p: 0.5 }}>
+                              {openRows.spells[spellKey] ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
+                            </IconButton>
+                          </StyledTableCell>
+                          <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('spells', spellKey); }} sx={{ cursor: "pointer", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
+                            <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0.5 }}>
+                              <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' }, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                                {highlightMatch(spellName, searchQuery)}
+                              </Typography>
+                              <Tooltip title={t("Spell")}>
+                                <MoreVert sx={{ color: theme.secondary, fontSize: '1rem' }} />
+                              </Tooltip>
+                            </Box>
+                          </StyledTableCell>
+                          <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                          <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                          <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+                            {/* Actions if any */}
+                          </StyledTableCell>
+                        </TableRow>
+                        
+                        <TableRow>
+                          <StyledTableCell colSpan={5} sx={{ p: 0 }}>
+                            <Collapse in={openRows.spells[spellKey]} timeout="auto" unmountOnExit>
+                              <Box sx={{ p: 1, ml: { xs: 1, sm: 4 } }}>
+                                {renderSpellContent(spell, setPlayer, searchQuery, highlightMatch)}
                               </Box>
-                            </StyledTableCell>
-                            <StyledTableCell sx={{ width: 80 }} />
-                            <StyledTableCell sx={{ width: 90 }} />
-                            <StyledTableCell sx={{ width: 100 }} />
-                          </TableRow>
-                          
-                          <TableRow>
-                            <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                              <Collapse in={openRows[spellKey]} timeout="auto" unmountOnExit>
-                                <Box sx={{ p: 1 }}>
-                                  {spell.spellType === "default" && (
-                                    <SpellDefault
-                                      spellName={highlightMatch(spell.name, searchQuery)}
-                                      mp={spell.mp}
-                                      maxTargets={spell.maxTargets}
-                                      targetDesc={spell.targetDesc}
-                                      duration={spell.duration}
-                                      description={highlightMatch(spell.description, searchQuery)}
-                                      isEditMode={false}
-                                      isOffensive={spell.isOffensive}
-                                      isMagisphere={spell.isMagisphere || false}
-                                      attr1={spell.attr1}
-                                      attr2={spell.attr2}
-                                    />
-                                  )}
-                                  {spell.spellType === "gamble" && (
-                                    <SpellEntropistGamble
-                                      gamble={spell}
-                                      isEditMode={false}
-                                    />
-                                  )}
-                                  {spell.spellType === "invocation" && <SpellInvoker spell={spell} setPlayer={setPlayer} open={true} />}
-                                  {spell.spellType === "cooking" && <SpellGourmet spell={spell} open={true} />}
-                                  {spell.spellType === "magiseed" && <SpellMagiseed spell={spell} setPlayer={setPlayer} open={true} />}
-                                  {spell.spellType?.startsWith("tinkerer-") && <SpellGadget spell={spell} />}
-                                  {spell.spellType === "magichant" && <SpellMagichant spell={spell} />}
-                                  {spell.spellType === "symbol" && <SpellSymbol spell={spell} />}
-                                  {spell.spellType === "dance" && <SpellDance spell={spell} />}
-                                  {spell.spellType === "gift" && <SpellGift spell={spell} setPlayer={setPlayer} open={true} />}
-                                  {spell.spellType === "therioform" && <SpellTherioform spell={spell} />}
-                                  {spell.spellType === "pilot-vehicle" && <SpellVehicle spell={spell} />}
-                                  {spell.spellType === "deck" && <SpellDeck spell={spell} setPlayer={setPlayer} open={true} />}
-                                  {(spell.spellType === "arcanist" || spell.spellType === "arcanist-rework") && (
-                                    <SpellArcanist
-                                      arcana={spell}
-                                      isEditMode={false}
-                                      rework={spell.spellType === "arcanist-rework"}
-                                    />
-                                  )}
-                                </Box>
-                              </Collapse>
-                            </StyledTableCell>
-                          </TableRow>
-                        </React.Fragment>
-                      );
-                    })}
-                  </React.Fragment>
-                );
-              })}
-          </TableBody>
-        </Table>
-      )}
-    </TableContainer>
+                            </Collapse>
+                          </StyledTableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          );
+        })}
+    </Box>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Paper,
   Typography,
@@ -24,22 +24,52 @@ import {
 } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
 
-export default function PlayerOthers({ player, setPlayer, isEditMode }) {
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? "" : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.split(regex).map((part, idx) =>
+    idx % 2 === 1 ? (
+      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
+    ) : part
+  );
+}
+
+function highlightMarkdownText(markdown, query) {
+  const source = markdown == null ? "" : String(markdown);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.replace(regex, "<mark>$1</mark>");
+}
+
+export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const [openRows, setOpenRows] = useState({});
+  const { openRows, toggleRow } = usePlayerSheetCompactStore();
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const others = (player.others ?? []).filter((o) => o?.name);
+  const others = (player.others ?? [])
+    .filter((o) => o?.name)
+    .filter((other) =>
+      !normalizedQuery ||
+      other.name?.toLowerCase().includes(normalizedQuery) ||
+      other.description?.toLowerCase().includes(normalizedQuery) ||
+      other.effect?.toLowerCase().includes(normalizedQuery)
+    );
   if (others.length === 0) return null;
-
-  const toggleRow = (idx) =>
-    setOpenRows((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
   const updateClock = (index, newState) => {
     if (!setPlayer) return;
@@ -92,7 +122,13 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
               ? (other.clockState ?? new Array(sections).fill(false))
               : [];
             const filled = hasClock ? clockState.filter(Boolean).length : 0;
+            const otherKey = `other-${index}`;
             const hasDetails = other.description || other.effect;
+            const forceOpen =
+              !!normalizedQuery &&
+              (other.description?.toLowerCase().includes(normalizedQuery) ||
+                other.effect?.toLowerCase().includes(normalizedQuery));
+            const isOpen = !!openRows.others[otherKey] || forceOpen;
 
             return (
               <React.Fragment key={index}>
@@ -100,8 +136,8 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                 <TableRow>
                   <StyledTableCell sx={{ width: 36 }}>
                     {hasDetails ? (
-                      <IconButton size="small" onClick={() => toggleRow(index)}>
-                        {openRows[index] ? (
+                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleRow('others', otherKey); }}>
+                        {isOpen ? (
                           <KeyboardArrowUp fontSize="small" />
                         ) : (
                           <KeyboardArrowDown fontSize="small" />
@@ -117,20 +153,20 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={() => hasDetails && toggleRow(index)}
-                    sx={{ cursor: hasDetails ? "pointer" : "default" }}
+                    onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('others', otherKey); }}
+                    sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
                   >
                     <Typography
                       variant="body2"
                       fontWeight="bold"
-                      sx={{ textTransform: "uppercase" }}
+                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
                     >
-                      {other.name}
+                      {highlightMatch(other.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
-                  <StyledTableCell sx={{ width: 80 }} />
-                  <StyledTableCell sx={{ width: 90 }} />
-                  <StyledTableCell sx={{ width: 100 }} />
+                  <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                  <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                  <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
                 </TableRow>
 
                 {/* Clock row */}
@@ -150,13 +186,13 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                         {t("Clock")}
                       </Typography>
                     </StyledTableCell>
-                    <StyledTableCell sx={{ width: 80, textAlign: "center" }}>
+                    <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
                       <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
                         {filled}/{sections}
                       </Typography>
                     </StyledTableCell>
-                    <StyledTableCell sx={{ width: 90 }} />
-                    <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
+                    <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                    <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
                         <IconButton
                           size="small"
@@ -192,16 +228,16 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                 {hasDetails && (
                   <TableRow>
                     <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
-                      <Collapse in={!!openRows[index]} timeout="auto" unmountOnExit>
+                      <Collapse in={isOpen} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 2, py: 1 }}>
                           {other.description && (
                             <NotesMarkdown sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
-                              {other.description}
+                              {highlightMarkdownText(other.description, searchQuery)}
                             </NotesMarkdown>
                           )}
                           {other.effect && (
                             <NotesMarkdown sx={{ fontSize: "0.85rem", mt: 0.5 }}>
-                              {other.effect}
+                              {highlightMarkdownText(other.effect, searchQuery)}
                             </NotesMarkdown>
                           )}
                         </Box>

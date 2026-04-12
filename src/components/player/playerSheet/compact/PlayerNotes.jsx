@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Paper,
   Typography,
@@ -24,31 +24,60 @@ import {
 } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function highlightMatch(text, query) {
+  const source = text == null ? "" : String(text);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.split(regex).map((part, index) =>
+    index % 2 === 1 ? (
+      <mark key={`${part}-${index}`} style={{ backgroundColor: "yellow", padding: 0 }}>
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
+
+function highlightMarkdownText(markdown, query) {
+  const source = markdown == null ? "" : String(markdown);
+  const trimmedQuery = query?.trim();
+  if (!trimmedQuery) return source;
+  const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
+  return source.replace(regex, "<mark>$1</mark>");
+}
+
 export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEditMode = false, onAddNote, onEditNote }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const [openNotes, setOpenNotes] = useState({});
+  const { openRows, toggleRow } = usePlayerSheetCompactStore();
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const visibleNotes = (player.notes || [])
     .map((note, index) => ({ ...note, originalIndex: index }))
     .filter(
       (note) =>
         note.showInPlayerSheet !== false &&
-        (!searchQuery ||
-          note.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          note.description?.toLowerCase().includes(searchQuery.toLowerCase()))
+        (!normalizedQuery ||
+          note.name?.toLowerCase().includes(normalizedQuery) ||
+          note.description?.toLowerCase().includes(normalizedQuery) ||
+          note.clocks?.some((clock) => clock?.name?.toLowerCase().includes(normalizedQuery)))
     );
 
   if (visibleNotes.length === 0 && !(isEditMode && onAddNote)) return null;
-
-  const toggleNote = (idx) =>
-    setOpenNotes((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
   const updateClock = (noteIndex, clockIndex, newState) => {
     setPlayer((prev) => ({
@@ -117,13 +146,18 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
             <StyledTableCellHeader>
               <Typography variant="h4">{t("Notes")}</Typography>
             </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: 80 }} />
-            <StyledTableCellHeader sx={{ width: 90 }} />
-            <StyledTableCellHeader sx={{ width: 100 }} />
+            <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
+            <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+            <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 } }} />
           </TableRow>
         </TableHead>
         <TableBody>
-          {visibleNotes.map((note, noteIndex) => (
+          {visibleNotes.map((note, noteIndex) => {
+            const noteKey = `note-${noteIndex}`;
+            const descriptionMatchesQuery =
+              !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
+            const isOpen = !!openRows.notes[noteKey] || descriptionMatchesQuery;
+            return (
             <React.Fragment key={noteIndex}>
               {/* Note title row */}
               <TableRow key={`note-${noteIndex}`}>
@@ -131,9 +165,9 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                   {note.description ? (
                     <IconButton
                       size="small"
-                      onClick={() => toggleNote(noteIndex)}
+                      onClick={(e) => { e.stopPropagation(); toggleRow('notes', noteKey); }}
                     >
-                      {openNotes[noteIndex] ? (
+                      {isOpen ? (
                         <KeyboardArrowUp fontSize="small" />
                       ) : (
                         <KeyboardArrowDown fontSize="small" />
@@ -148,13 +182,13 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                     </Tooltip>
                   )}
                 </StyledTableCell>
-                <StyledTableCell onClick={() => note.description && toggleNote(noteIndex)} sx={{ cursor: note.description ? "pointer" : "default" }}>
+                <StyledTableCell onClick={(e) => { e.stopPropagation(); note.description && toggleRow('notes', noteKey); }} sx={{ cursor: note.description ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
                   <Typography
                     variant="body2"
                     fontWeight="bold"
-                    sx={{ textTransform: "uppercase" }}
+                    sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
                   >
-                    {note.name}
+                    {highlightMatch(note.name, searchQuery)}
                   </Typography>
                 </StyledTableCell>
                 <StyledTableCell sx={{ width: 80 }} />
@@ -174,10 +208,10 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
               {note.description && (
                 <TableRow key={`desc-${noteIndex}`}>
                   <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
-                    <Collapse in={!!openNotes[noteIndex]} timeout="auto" unmountOnExit>
+                    <Collapse in={isOpen} timeout="auto" unmountOnExit>
                       <Box sx={{ px: 2, py: 1 }}>
                         <NotesMarkdown sx={{ fontSize: "0.85rem" }}>
-                          {note.description}
+                          {highlightMarkdownText(note.description, searchQuery)}
                         </NotesMarkdown>
                       </Box>
                     </Collapse>
@@ -209,7 +243,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
 
                     <StyledTableCell>
                       <Typography variant="body2" sx={{ fontSize: "0.75rem" }}>
-                        {clock.name}
+                        {highlightMatch(clock.name, searchQuery)}
                       </Typography>
                     </StyledTableCell>
 
@@ -254,7 +288,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                 );
               })}
             </React.Fragment>
-          ))}
+          )})}
         </TableBody>
       </Table>
     </TableContainer>

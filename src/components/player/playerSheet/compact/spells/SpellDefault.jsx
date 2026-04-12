@@ -14,6 +14,7 @@ import { CloseBracket, OpenBracket } from "../../../../Bracket";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 const StyledTableCell = styled(TableCell)({ 
   padding: "4px 8px",
@@ -26,6 +27,7 @@ const StyledMarkdown = ({ children, ...props }) => {
     <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 0 }}>
       <ReactMarkdown
         {...props}
+        rehypePlugins={[rehypeRaw]}
         components={{
           p: (props) => <p style={{ margin: 0, padding: 0, fontSize: "0.8rem" }} {...props} />,
           ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
@@ -34,6 +36,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
           em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+          mark: (props) => <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />,
         }}
       >
         {children}
@@ -99,7 +102,7 @@ export default function SpellDefault({
           <StyledTableCell colSpan={4}>
             <Box sx={{ padding: "4px 0" }}>
               <Typography component="div" sx={{ fontSize: "0.8rem", marginBottom: 0.5 }}>
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                <StyledMarkdown allowedElements={["p", "ul", "li", "strong", "em", "mark"]} unwrapDisallowed>
                   {description}
                 </StyledMarkdown>
               </Typography>
