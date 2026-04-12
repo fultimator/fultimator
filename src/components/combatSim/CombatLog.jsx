@@ -94,7 +94,7 @@ function replaceTagsWithComponents(
   value5
 ) {
   if (value1 === "--isAttack--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -154,7 +154,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isSpell--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -196,7 +196,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isStandardRoll--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -222,7 +222,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isClock--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         // If the part matches the value placeholders, replace with actual values
@@ -241,7 +241,7 @@ function replaceTagsWithComponents(
       });
   } else {
     // Use a regular expression to replace tags with the corresponding component
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         // If the part matches the value placeholders, replace with actual values
@@ -621,9 +621,11 @@ export default function CombatLog({
                   }}
                 >
                   <Typography variant="caption" color="textSecondary">
-                    {log.timestamp && isToday(log.timestamp)
-                      ? format(log.timestamp, "HH:mm:ss")
-                      : log.timestamp ? format(log.timestamp, "PP HH:mm:ss") : "--:--:--"}
+                    {log.timestamp && new Date(log.timestamp).getTime() > 0
+                      ? isToday(log.timestamp)
+                        ? format(log.timestamp, "HH:mm:ss")
+                        : format(log.timestamp, "PP HH:mm:ss")
+                      : "--:--:--"}
                   </Typography>
                   <Tooltip
                     title={t("combat_sim_copy_log_entry")}
