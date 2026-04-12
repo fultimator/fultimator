@@ -95,8 +95,9 @@ export default function CardLoadout({
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: "1px",
-          py: "1px",
+          gap: 0.45,
+          px: 0.65,
+          py: 0.45,
           minWidth: 0,
           width: "100%",
           height: "100%",
@@ -106,14 +107,14 @@ export default function CardLoadout({
         <Typography
           sx={{
             fontFamily: "Antonio",
-            fontSize: { xs: "0.64rem", sm: "0.74rem", lg: "0.78rem" },
+            fontSize: { xs: "0.66rem", sm: "0.74rem", lg: "0.78rem" },
             fontWeight: 800,
             textTransform: "uppercase",
             letterSpacing: "0.05em",
             color: theme.palette.text.secondary,
             whiteSpace: "nowrap",
             flexShrink: 0,
-            width: { xs: "26px", sm: "34px", lg: "52px" },
+            width: { xs: "28px", sm: "34px", lg: "52px" },
           }}
         >
           {t(SLOT_LABEL_KEY[key])}
@@ -136,8 +137,8 @@ export default function CardLoadout({
             noWrap
             sx={{
               fontFamily: "Antonio",
-              fontSize: { xs: "0.75rem", sm: "0.82rem" },
-              fontWeight: isEmpty || locked ? 400 : 600,
+              fontSize: { xs: "0.8rem", sm: "0.88rem" },
+              fontWeight: isEmpty || locked ? 500 : 700,
               color: locked
                 ? theme.palette.text.disabled
                 : isEmpty
@@ -150,7 +151,7 @@ export default function CardLoadout({
               textOverflow: "ellipsis",
               flex: 1,
               minWidth: 0,
-              lineHeight: 1.3,
+              lineHeight: 1.2,
             }}
           >
             {name}
@@ -169,14 +170,31 @@ export default function CardLoadout({
           width: "100%",
           height: "100%",
           flex: 1,
-          borderRadius: "2px",
+          borderRadius: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.02)",
           "&:hover": { bgcolor: "action.hover" },
         }}
       >
         {inner}
       </ButtonBase>
     ) : (
-      <Box key={key} sx={{ flex: 1, width: "100%", height: "100%", display: "flex" }}>{inner}</Box>
+      <Box
+        key={key}
+        sx={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          borderRadius: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.015)",
+        }}
+      >
+        {inner}
+      </Box>
     );
   };
 
@@ -190,7 +208,6 @@ export default function CardLoadout({
         ml: showSideDivider ? "4px" : 0,
         height: "100%",
         width: "100%",
-        justifyContent: "space-between",
       }}
     >
       {/* Header */}
@@ -208,9 +225,10 @@ export default function CardLoadout({
             sx={{
               color: "#fff",
               fontFamily: "Antonio",
-              fontSize: "1rem",
+              fontSize: { xs: "0.96rem", sm: "1rem" },
+              fontWeight: 800,
               textTransform: "uppercase",
-              letterSpacing: "0.08em",
+              letterSpacing: "0.06em",
               whiteSpace: "nowrap",
             }}
           >
@@ -221,20 +239,50 @@ export default function CardLoadout({
 
       {/* Slot rows (+ optional support column) */}
       {hasSupportColumn ? (
-        <Box sx={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(84px, 42%)", columnGap: "6px", alignItems: "stretch", flex: 1, width: "100%", height: "100%" }}>
-          <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "minmax(0, 1fr) minmax(88px, 38%)",
+              sm: "minmax(0, 1fr) minmax(96px, 40%)",
+              md: "minmax(0, 1fr) minmax(110px, 36%)",
+            },
+            "@media (max-width:430px)": {
+              gridTemplateColumns: "1fr",
+            },
+            columnGap: 0.65,
+            rowGap: 0.55,
+            alignItems: "start",
+            flex: 1,
+            width: "100%",
+          }}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.45, width: "100%" }}>
             {SLOTS.map(renderSlotRow)}
           </Box>
-          <Box sx={{ minWidth: 0, borderLeft: `0.5px solid ${divider}`, pl: "6px" }}>
+          <Box
+            sx={{
+              minWidth: 0,
+              borderLeft: `1px solid ${divider}`,
+              pl: 0.65,
+              pt: 0,
+              "@media (max-width:430px)": {
+                borderLeft: "none",
+                borderTop: `1px solid ${divider}`,
+                pl: 0,
+                pt: 0.5,
+              },
+            }}
+          >
             <Typography
               sx={{
                 fontFamily: "Antonio",
-                fontSize: { xs: "0.58rem", sm: "0.66rem" },
-                fontWeight: 700,
+                fontSize: { xs: "0.66rem", sm: "0.72rem" },
+                fontWeight: 800,
                 letterSpacing: "0.04em",
                 textTransform: "uppercase",
                 color: theme.palette.text.secondary,
-                mb: "2px",
+                mb: 0.3,
                 lineHeight: 1.1,
               }}
             >
@@ -244,27 +292,38 @@ export default function CardLoadout({
               const displayName = module.customName || t(module.name);
               return (
                 <Tooltip key={`${module.originalIndex}-${module.name}-${idx}`} title={displayName || ""} placement="top" enterDelay={600}>
-                  <Typography
-                    noWrap
+                  <Box
                     sx={{
-                      fontFamily: "Antonio",
-                      fontSize: { xs: "0.66rem", sm: "0.74rem" },
-                      fontWeight: module.enabled ? 600 : 400,
-                      color: module.enabled ? theme.palette.text.primary : theme.palette.text.disabled,
-                      fontStyle: module.enabled ? "normal" : "italic",
-                      lineHeight: 1.2,
-                      py: "1px",
+                      px: 0.55,
+                      py: 0.35,
+                      mb: 0.35,
+                      borderRadius: 0.8,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.015)",
                     }}
                   >
-                    {displayName || " - "}
-                  </Typography>
+                    <Typography
+                      noWrap
+                      sx={{
+                        fontFamily: "Antonio",
+                        fontSize: { xs: "0.74rem", sm: "0.8rem" },
+                        fontWeight: module.enabled ? 700 : 500,
+                        color: module.enabled ? theme.palette.text.primary : theme.palette.text.disabled,
+                        fontStyle: module.enabled ? "normal" : "italic",
+                        lineHeight: 1.15,
+                      }}
+                    >
+                      {displayName || " - "}
+                    </Typography>
+                  </Box>
                 </Tooltip>
               );
             })}
           </Box>
         </Box>
       ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.45, flex: 1, width: "100%" }}>
           {SLOTS.map(renderSlotRow)}
         </Box>
       )}

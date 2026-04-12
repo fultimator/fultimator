@@ -29,7 +29,13 @@ import NpcPretty from "../npc/Pretty";
 import StatsTab from "./npcDetail/StatsTab";
 import NotesTab from "./npcDetail/NotesTab";
 import AttributeSection from "./npcDetail/AttributeSection";
-import { calcPrecision, calcDamage, calcMagic } from "../../libs/npcs";
+import {
+  calcPrecision,
+  calcDamage,
+  calcMagic,
+  calcDef,
+  calcMDef,
+} from "../../libs/npcs";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import RollsTab from "./npcDetail/RollsTab";
@@ -452,6 +458,23 @@ const NPCDetail = ({
 
   const handleTabChange = (_, newIndex) => setTabIndex(newIndex);
 
+  const handleUpdateDefenseModifiers = (updates) => {
+    if (!selectedNPC) return;
+
+    const updatedNPC = {
+      ...selectedNPC,
+      combatStats: {
+        ...selectedNPC.combatStats,
+        ...updates,
+      },
+    };
+
+    setSelectedNPC(updatedNPC);
+    setSelectedNPCs((prev) =>
+      prev.map((npc) => (npc.combatId === updatedNPC.combatId ? updatedNPC : npc))
+    );
+  };
+
   const renderTabs = (
     <Tabs
       value={tabIndex}
@@ -578,10 +601,14 @@ const NPCDetail = ({
             selectedNPC={selectedNPC}
             calcHP={calcHP}
             calcMP={calcMP}
+            calcDef={calcDef}
+            calcMDef={calcMDef}
+            calcAttr={calcAttr}
             handleOpen={handleOpen}
             toggleStatusEffect={toggleStatusEffect}
             handleDecreaseUltima={handleDecreaseUltima}
             handleIncreaseUltima={handleIncreaseUltima}
+            onUpdateDefenseModifiers={handleUpdateDefenseModifiers}
             isMobile={isMobile}
           />
         )}

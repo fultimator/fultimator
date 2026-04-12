@@ -8,6 +8,9 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
+const POSITIVE_SENTIMENTS = ["admiration", "loyality", "affection"];
+const NEGATIVE_SENTIMENTS = ["inferiority", "mistrust", "hatred"];
+
 export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -66,25 +69,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
     closeModal();
   };
 
-  const FilledStarSVG = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 95.74 95.98"
-      width="18"
-      height="18"
-    >
-      <path
-        fill={theme.palette.mode === 'dark' ? "white" : "black"}
-        opacity=".96"
-        stroke={theme.palette.mode === 'dark' ? "white" : "black"}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="6px"
-        d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
-      />
-    </svg>
-  );
-
   const calculateBondStrength = (bond) => {
     return (
       (bond.admiration ? 1 : 0) +
@@ -95,6 +79,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
       (bond.hatred ? 1 : 0)
     );
   };
+
+  const getSentiments = (bond) =>
+    [...POSITIVE_SENTIMENTS, ...NEGATIVE_SENTIMENTS].filter((key) => bond[key]);
 
   return (
     <>
@@ -165,96 +152,85 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
               </Box>
             )}
 
-            <Grid container spacing={2} sx={{ padding: "1em" }}>
+            <Grid container spacing={0.75} sx={{ p: 0.75 }}>
               {bonds && bonds.length > 0
                 ? bonds.map((bond, index) => (
-                  <Grid item xs={12} md={6} key={index} sx={{ display: "flex", alignItems: "flex-start" }}>
-                    {isEditMode && (
-                      <IconButton size="small" onClick={() => setEditBondIndex(index)} sx={{ mt: "2px", mr: 0.5, flexShrink: 0 }}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                    <Typography variant="h4">
-                      <span
-                        style={{
-                          fontWeight: "bolder",
-                          fontSize: "1.6em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        <span style={{ wordWrap: "break-word" }}>
-                          {bond.name + ": "}
-                        </span>
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "1.4em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {/* BOND TYPES
-                    Admiration
-                    Loyality
-                    Affection
-                    Inferiority
-                    Mistrust
-                    Hatred*/}
-                        {[
-                          bond.admiration && (
-                            <span key="admiration" style={{ color: positiveColor }}>
-                              {t("Admiration")}
-                            </span>
-                          ),
-                          bond.loyality && (
-                            <span key="loyality" style={{ color: positiveColor }}>
-                              {t("Loyality")}
-                            </span>
-                          ),
-                          bond.affection && (
-                            <span key="affection" style={{ color: positiveColor }}>
-                              {t("Affection")}
-                            </span>
-                          ),
-                          bond.inferiority && (
-                            <span key="inferiority" style={{ color: negativeColor }}>
-                              {t("Inferiority")}
-                            </span>
-                          ),
-                          bond.mistrust && (
-                            <span key="mistrust" style={{ color: negativeColor }}>
-                              {t("Mistrust")}
-                            </span>
-                          ),
-                          bond.hatred && (
-                            <span key="hatred" style={{ color: negativeColor }}>
-                              {t("Hatred")}
-                            </span>
-                          ),
-                        ]
-                          .filter(Boolean)
-                          .reduce(
-                            (acc, curr, i, arr) => [
-                              ...acc,
-                              curr,
-                              i < arr.length - 1 ? ", " : "",
-                            ],
-                            []
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Box
+                      sx={{
+                        border: "1px solid",
+                        borderColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
+                        borderRadius: 1,
+                        px: 1.1,
+                        py: 0.8,
+                        minHeight: 64,
+                        bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.03)",
+                        boxShadow: theme.palette.mode === "dark"
+                          ? "inset 0 0 0 1px rgba(255,255,255,0.05)"
+                          : "inset 0 0 0 1px rgba(255,255,255,0.55)",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            lineHeight: 1.1,
+                            wordBreak: "break-word",
+                            fontSize: { xs: "1rem", sm: "1.08rem" },
+                            letterSpacing: "0.02em",
+                          }}
+                        >
+                          {bond.name || t("Bond Name")}
+                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, flexShrink: 0 }}>
+                          {calculateBondStrength(bond) > 0 && (
+                            <Typography variant="body2" sx={{ fontWeight: 800, fontSize: { xs: "0.9rem", sm: "1rem" } }}>
+                              {"★ " + calculateBondStrength(bond)}
+                            </Typography>
                           )}
-                        {calculateBondStrength(bond) > 0 && (
-                          <span>
-                            {" "}
-                            <Typography component="span" sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}>
-                              【
+                          {isEditMode && (
+                            <IconButton size="small" onClick={() => setEditBondIndex(index)} sx={{ p: 0.5 }}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      </Box>
+                      <Box sx={{ mt: 0.5, display: "flex", flexWrap: "wrap", gap: 0.45 }}>
+                        {getSentiments(bond).length > 0 ? (
+                          getSentiments(bond).map((key) => (
+                            <Typography
+                              key={key}
+                              variant="caption"
+                              sx={{
+                                px: 0.8,
+                                py: 0.35,
+                                borderRadius: 0.75,
+                                textTransform: "uppercase",
+                                fontWeight: 800,
+                                fontSize: { xs: "0.7rem", sm: "0.74rem" },
+                                letterSpacing: "0.02em",
+                                color: POSITIVE_SENTIMENTS.includes(key) ? positiveColor : negativeColor,
+                                bgcolor: POSITIVE_SENTIMENTS.includes(key)
+                                  ? "rgba(76, 175, 80, 0.2)"
+                                  : "rgba(244, 67, 54, 0.2)",
+                                border: "1px solid",
+                                borderColor: POSITIVE_SENTIMENTS.includes(key)
+                                  ? "rgba(76, 175, 80, 0.35)"
+                                  : "rgba(244, 67, 54, 0.35)",
+                              }}
+                            >
+                              {t(key.charAt(0).toUpperCase() + key.slice(1))}
                             </Typography>
-                            {FilledStarSVG}
-                            {calculateBondStrength(bond)}
-                            <Typography component="span" sx={{ mr: -0.7, fontSize: "1.2em" }}>
-                              】
-                            </Typography>
-                          </span>
+                          ))
+                        ) : (
+                          <Typography variant="caption" color="text.secondary">
+                            {"-"}
+                          </Typography>
                         )}
-                      </span>
-                    </Typography>
+                      </Box>
+                    </Box>
                   </Grid>
                 ))
                 : null}

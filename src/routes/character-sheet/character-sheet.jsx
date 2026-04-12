@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/DatabaseContext";
-import { Grid, Button, Typography, Stack, IconButton, useMediaQuery, Divider, Tooltip } from "@mui/material";
+import { Grid, Button, Typography, Stack, IconButton, Fab, Box, useMediaQuery, Divider, Tooltip } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
@@ -23,7 +23,7 @@ import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
-import { Download, Lock, LockOpen, Save } from "@mui/icons-material";
+import { Download, Lock, LockOpen, Save, KeyboardArrowUp } from "@mui/icons-material";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 // import { getPc } from "../../utility/db";
 import { useTheme } from "@mui/material/styles";
@@ -50,6 +50,14 @@ export default function CharacterSheet() {
   const [player, setPlayer] = useState(null);
   const [isSheetEditMode, setIsSheetEditMode] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 250);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (playerData) {
@@ -253,7 +261,7 @@ export default function CharacterSheet() {
   };
 
   return (
-    <Layout fullWidth={true}>
+    <Layout fullWidth={true} unsavedChanges={isUpdated}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
         <Grid item xs={isMobile ? 8 : 10}>
           <Button
@@ -307,15 +315,6 @@ export default function CharacterSheet() {
                     </IconButton>
                   </Tooltip>
                 )}
-                <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
-                  <IconButton
-                    onClick={() => setIsSheetEditMode(!isSheetEditMode)}
-                    style={{ marginBottom: '16px' }}
-                    color="primary"
-                  >
-                    {isSheetEditMode ? <LockOpen /> : <Lock />}
-                  </IconButton>
-                </Tooltip>
               </Stack>
             )}
           </Stack>
@@ -469,6 +468,41 @@ export default function CharacterSheet() {
             />
           </Grid>
         </Grid>
+      )}
+
+      {isOwner && (
+        <Box
+          sx={{
+            position: "fixed",
+            right: 16,
+            bottom: 16,
+            zIndex: 1200,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
+        >
+          {showScrollTop && (
+            <Tooltip title={t("Scroll to top")} placement="left">
+              <Fab
+                color="primary"
+                size="medium"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
+                <KeyboardArrowUp fontSize="medium" />
+              </Fab>
+            </Tooltip>
+          )}
+          <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")} placement="left">
+            <Fab
+              color="primary"
+              size="medium"
+              onClick={() => setIsSheetEditMode(!isSheetEditMode)}
+            >
+              {isSheetEditMode ? <LockOpen fontSize="medium" /> : <Lock fontSize="medium" />}
+            </Fab>
+          </Tooltip>
+        </Box>
       )}
     </Layout>
   );

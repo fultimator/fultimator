@@ -290,14 +290,26 @@ export default function SlotPickerDialog({
             </DialogTitle>
             <DialogContent dividers sx={{ p: 0 }}>
               {/* Module preview panel */}
-              <Box sx={{ px: 2, py: 1, minHeight: 72 }}>
+              <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewModule ? (
-                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1 }}>
-                    <Typography variant="body2" fontWeight={700}>{previewModule.customName || t(previewModule.name)}</Typography>
-                    <Typography variant="caption" color="text.secondary" display="block">{moduleStatLine(previewModule)}</Typography>
+                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
+                    <Typography variant="body2" fontWeight={700} noWrap>{previewModule.customName || t(previewModule.name)}</Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" noWrap>{moduleStatLine(previewModule)}</Typography>
                     {previewModule.description && (
-                      <Typography variant="caption" color="text.primary" display="block" sx={{ mt: 0.5, fontStyle: 'italic', whiteSpace: 'pre-line' }}>
-                        {t(previewModule.description).slice(0, 120)}
+                      <Typography
+                        variant="caption"
+                        color="text.primary"
+                        display="block"
+                        sx={{
+                          mt: 0.5,
+                          fontStyle: 'italic',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {t(previewModule.description)}
                       </Typography>
                     )}
                   </Box>
@@ -376,20 +388,32 @@ export default function SlotPickerDialog({
             </DialogTitle>
             <DialogContent dividers sx={{ p: 0 }}>
               {/* Item preview panel */}
-              <Box sx={{ px: 2, py: 1, minHeight: 72 }}>
+              <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewCandidate ? (
-                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1 }}>
+                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
                     <Box display="flex" alignItems="center" gap={0.5}>
-                      <Typography variant="body2" fontWeight={700}>{previewCandidate.label}</Typography>
+                      <Typography variant="body2" fontWeight={700} noWrap>{previewCandidate.label}</Typography>
                       {!checkMartialProficiency(previewCandidate) && (
                         <Tooltip title={t('Not proficient with this martial item')}>
                           <WarningAmberIcon sx={{ fontSize: 14, color: 'warning.main' }} />
                         </Tooltip>
                       )}
                     </Box>
-                    <Typography variant="caption" color="text.secondary" display="block">{previewCandidate.sub}</Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" noWrap>{previewCandidate.sub}</Typography>
                     {previewCandidate.item?.quality && previewCandidate.item.quality !== previewCandidate.sub && (
-                      <Typography variant="caption" color="text.primary" display="block" sx={{ mt: 0.5, fontStyle: 'italic', whiteSpace: 'pre-line' }}>
+                      <Typography
+                        variant="caption"
+                        color="text.primary"
+                        display="block"
+                        sx={{
+                          mt: 0.5,
+                          fontStyle: 'italic',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
                         {previewCandidate.item.quality}
                       </Typography>
                     )}

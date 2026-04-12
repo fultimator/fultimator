@@ -121,9 +121,9 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
   const showSwap = !!onSwap && !isEmpty && !isVehicle && resolved.item?.customizations?.some(c => c.name === 'weapon_customization_transforming');
 
   const cardInner = (
-    <CardContent sx={{ pb: '8px !important' }}>
+    <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
       <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-        <Typography variant="caption" color="text.secondary" fontWeight={700} letterSpacing={0.5}>
+        <Typography variant="caption" color="text.secondary" fontWeight={800} letterSpacing={0.4} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>
           {label}
         </Typography>
         {isAux && (
@@ -148,11 +148,22 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         </Typography>
       ) : (
         <>
-          <Typography variant="body2" fontWeight={600} noWrap>
+          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>
             {itemName}
           </Typography>
           {statLine && (
-            <Typography variant="caption" color="text.secondary" noWrap>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                fontSize: { xs: "0.72rem", sm: "0.76rem" },
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                lineHeight: 1.2,
+              }}
+            >
               {statLine}
             </Typography>
           )}
@@ -168,6 +179,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         opacity: locked ? 0.45 : 1,
         position: 'relative',
         height: '100%',
+        minWidth: isEmpty ? 120 : 0,
         border: isAux ? '1px dashed' : isVehicle ? '1px solid' : (hasModule && !isVehicle && !isEmpty) ? '1px dashed' : undefined,
         borderColor: isAux ? 'warning.main' : isVehicle ? 'success.main' : (hasModule && !isVehicle && !isEmpty) ? 'success.light' : undefined,
       }}
@@ -214,16 +226,29 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
   const { t } = useTranslate();
   const clickable = isEditMode && !!onClick;
   const content = (
-    <CardContent sx={{ pb: '8px !important' }}>
+    <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
       {module ? (
         <>
           <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-            <Typography variant="caption" color="text.secondary" fontWeight={700}>{label}</Typography>
+            <Typography variant="caption" color="text.secondary" fontWeight={800} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>{label}</Typography>
             <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
           </Box>
-          <Typography variant="body2" fontWeight={600} noWrap>{module.customName || t(module.name)}</Typography>
+          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>{module.customName || t(module.name)}</Typography>
           {module.description && (
-            <Typography variant="caption" color="text.secondary" noWrap>{(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 50)}</Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                fontSize: { xs: "0.72rem", sm: "0.76rem" },
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                lineHeight: 1.2,
+              }}
+            >
+              {(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 80)}
+            </Typography>
           )}
         </>
       ) : (
@@ -240,6 +265,7 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
       elevation={1}
       sx={{
         height: '100%',
+        minWidth: !module ? 120 : 0,
         border: module ? '1px solid' : undefined,
         borderColor: module ? 'success.main' : undefined,
       }}
@@ -458,7 +484,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {/* 4-slot grid + aux hand */}
         <Grid container spacing={1}>
           {slotCards.map(({ slot, label, resolved, locked }) => (
-            <Grid item xs={6} sm={3} key={slot} sx={{ display: 'flex' }}>
+            <Grid item xs={6} sm={3} md={3} key={slot} sx={{ display: 'flex' }}>
               <SlotCard
                 label={label}
                 resolved={resolved}
@@ -472,7 +498,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Grid>
           ))}
           {auxHandItem && (
-            <Grid item xs={6} sm={3} sx={{ display: 'flex' }}>
+            <Grid item xs={6} sm={3} md={3} sx={{ display: 'flex' }}>
               <SlotCard
                 label={t('Aux Hand')}
                 resolved={{ kind: 'playerItem', item: auxHandItem }}
@@ -520,7 +546,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Divider>
             <Grid container spacing={1}>
               {vehicleAccessoryModule && (
-                <Grid item xs={6} sm={3}>
+                <Grid item xs={6} sm={3} md={3}>
                   <VehicleSupportCard
                     label={t('Accessory')}
                     module={vehicleAccessoryModule}
@@ -529,7 +555,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 </Grid>
               )}
               {supportSlots.map((entry, i) => (
-                <Grid item xs={6} sm={3} key={i}>
+                <Grid item xs={6} sm={3} md={3} key={i}>
                   <VehicleSupportCard
                     label={`${t('Support')} ${i + 1}`}
                     module={entry.module}
@@ -541,7 +567,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
               ))}
               {/* Add slot card when there are equipped-but-not-all-enabled support modules */}
               {isEditMode && equippedSupportModules.some(m => !m.enabled) && (
-                <Grid item xs={6} sm={3}>
+                <Grid item xs={6} sm={3} md={3}>
                   <VehicleSupportCard
                     label={`${t('Support')} ${supportSlots.length + 1}`}
                     module={null}

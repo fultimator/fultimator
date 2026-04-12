@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   Typography,
@@ -9,9 +9,256 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
+import { typesList } from "../../../libs/types";
+
+const STAT_INCREMENTS = {
+  hp: [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20],
+  mp: [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20],
+  ip: [-3, -2, -1, 1, 2, 3],
+};
+
+function StatChangeDialog({
+  open,
+  handleClose,
+  stat,
+  statKey,
+  value,
+  max,
+  onApply,
+  t,
+  player,
+}) {
+  const [amount, setValue] = useState("");
+  const [isHealing, setIsHealing] = useState(true);
+  const [damageType, setDamageType] = useState("");
+  const [isGuarding, setIsGuarding] = useState(false);
+  const [isIgnoreResistance, setIsIgnoreResistance] = useState(false);
+  const [isIgnoreImmunity, setIsIgnoreImmunity] = useState(false);
+
+  const isHpStat = statKey === "hp";
+
+  useEffect(() => {
+    if (!open) return;
+    setValue("");
+    setIsHealing(true);
+    setDamageType("");
+    setIsGuarding(false);
+    setIsIgnoreResistance(false);
+    setIsIgnoreImmunity(false);
+  }, [open, statKey]);
+
+  const calculateDamage = (
+    target,
+    damageValue,
+    damageTypeValue = "",
+    guarding = false,
+    ignoreResistance = false,
+    ignoreImmunity = false
+  ) => {
+    const affinities = target?.affinities || {};
+    const damage = Number.parseInt(damageValue, 10) || 0;
+    let finalDamage = damage;
+
+    if (affinities[damageTypeValue]) {
+      switch (affinities[damageTypeValue]) {
+        case "vu":
+          finalDamage = guarding ? damage : damage * 2;
+          break;
+        case "rs":
+          finalDamage = ignoreResistance ? damage : Math.floor(damage * 0.5);
+          break;
+        case "ab":
+          finalDamage = -damage;
+          break;
+        case "im":
+          finalDamage = ignoreImmunity ? damage : 0;
+          break;
+        default:
+          break;
+      }
+    } else if (guarding) {
+      finalDamage = ignoreResistance ? damage : Math.floor(damage * 0.5);
+    }
+
+    return finalDamage;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const val = Number.parseInt(amount, 10) || 0;
+    let adjustedValue;
+
+    if (isHealing) {
+      adjustedValue = val;
+    } else if (isHpStat) {
+      adjustedValue = -calculateDamage(
+        player,
+        val,
+        damageType,
+        isGuarding,
+        isIgnoreResistance,
+        isIgnoreImmunity
+      );
+    } else {
+      adjustedValue = -val;
+    }
+
+    onApply(adjustedValue);
+    setValue("");
+    handleClose();
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            textAlign: "center",
+            borderBottom: "1px solid #ddd",
+            pb: 1,
+          }}
+        >
+          {t("Update")} {stat}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            mt: 2,
+            minWidth: 250,
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {stat}: {value} / {max}
+          </Typography>
+          <ToggleButtonGroup
+            value={isHealing ? "heal" : "damage"}
+            exclusive
+            onChange={(_, v) => v !== null && setIsHealing(v === "heal")}
+            sx={{ mb: 2 }}
+          >
+            <ToggleButton value="heal" color="success" sx={{ px: 3 }}>
+              {t("Heal")}
+            </ToggleButton>
+            <ToggleButton value="damage" color="error" sx={{ px: 3 }}>
+              {t("Damage")}
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <TextField
+            fullWidth
+            type="number"
+            label={t("Amount")}
+            value={amount}
+            onChange={(e) => setValue(e.target.value)}
+            autoFocus
+          />
+          {isHpStat && !isHealing && (
+            <>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <InputLabel id="player-damage-type-label">
+                  {t("combat_sim_damage_type")}
+                </InputLabel>
+                <Select
+                  label={t("combat_sim_damage_type")}
+                  labelId="player-damage-type-label"
+                  value={damageType}
+                  onChange={(e) => setDamageType(e.target.value)}
+                >
+                  <MenuItem value="">{t("combat_sim_none")}</MenuItem>
+                  {typesList.map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {t(type)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isGuarding}
+                    onChange={(e) => setIsGuarding(e.target.checked)}
+                  />
+                }
+                label={t("combat_sim_is_guarding")}
+              />
+              {(damageType !== "" || isGuarding) && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isIgnoreResistance}
+                      onChange={(e) => setIsIgnoreResistance(e.target.checked)}
+                    />
+                  }
+                  label={t("combat_sim_ignore_resistance")}
+                />
+              )}
+              {damageType !== "" && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isIgnoreImmunity}
+                      onChange={(e) => setIsIgnoreImmunity(e.target.checked)}
+                    />
+                  }
+                  label={t("combat_sim_ignore_immunity")}
+                />
+              )}
+              {(damageType !== "" || isGuarding) && amount !== "" && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body2">
+                    {t("combat_sim_calculated_damage")}:{" "}
+                    <strong>
+                      {(() => {
+                        const calculated = calculateDamage(
+                          player,
+                          amount,
+                          damageType,
+                          isGuarding,
+                          isIgnoreResistance,
+                          isIgnoreImmunity
+                        );
+                        return calculated < 0
+                          ? `${Math.abs(calculated)} ${t("combat_sim_healing")}`
+                          : `${calculated}`;
+                      })()}
+                    </strong>
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button onClick={handleClose} color="secondary" variant="contained">
+            {t("Cancel")}
+          </Button>
+          <Button type="submit" variant="contained" color="primary">
+            {t("Apply")}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+}
 
 export default function PlayerControls({ player, setPlayer }) {
   const { t } = useTranslate();
@@ -21,6 +268,7 @@ export default function PlayerControls({ player, setPlayer }) {
 
   const [zenitChange, setZenitChange] = useState(0);
   const [changeType, setChangeType] = useState("+");
+  const [statDialog, setStatChangeDialog] = useState(null);
 
   const changeStat = (stat, value) => () => {
     setPlayer((prevPlayer) => {
@@ -57,7 +305,10 @@ export default function PlayerControls({ player, setPlayer }) {
   const changeZenit = () => {
     const changeValue = changeType === "+" ? zenitChange : -zenitChange;
     setPlayer((prevPlayer) => {
-      const newZenit = Math.max(0, Math.min(99999999, prevPlayer.info.zenit + changeValue));
+      const newZenit = Math.max(
+        0,
+        Math.min(99999999, prevPlayer.info.zenit + changeValue)
+      );
       return {
         ...prevPlayer,
         info: {
@@ -66,64 +317,101 @@ export default function PlayerControls({ player, setPlayer }) {
         },
       };
     });
-    setZenitChange(0); // Reset the input field after applying the change
-  };  
+    setZenitChange(0);
+  };
 
-  const renderStatControls = (stat, label, color, increments) => {
+  const handleZenitChangeInput = (e) => {
+    const next = Number.parseInt(e.target.value, 10);
+    setZenitChange(Number.isNaN(next) ? 0 : Math.max(0, next));
+  };
+
+  const handleStatApply = (amount) => {
+    if (!statDialog) return;
+    const key = statDialog.key;
+    setPlayer((prev) => {
+      const current = Math.max(
+        0,
+        Math.min(prev.stats[key].current + amount, prev.stats[key].max)
+      );
+      return {
+        ...prev,
+        stats: { ...prev.stats, [key]: { ...prev.stats[key], current } },
+      };
+    });
+  };
+
+  const renderStatControls = (stat, label, color) => {
+    const increments = STAT_INCREMENTS[stat];
     const negativeIncrements = increments.filter((val) => val < 0);
     const positiveIncrements = increments.filter((val) => val > 0);
 
     return (
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={4} sm={2}>
-          <Typography variant="h2" sx={{ minWidth: "50px" }}>
-            {t(label) + "【" + player.stats[stat].current + "/" + player.stats[stat].max + "】"}
+      <Grid container spacing={1} alignItems="center" wrap="wrap">
+        <Grid item xs={12} sm={3} md={3}>
+          <Typography
+            variant="h3"
+            sx={{ lineHeight: 1.2, width: "fit-content" }}
+          >
+            {`${t(label)}【${player.stats[stat].current}/${player.stats[stat].max}】`}
           </Typography>
         </Grid>
-        <Grid item xs={4} sm={stat === "hp" ? 1 : 2}>
-          <Button
-            variant="contained"
-            color={color}
-            onClick={changeStat(stat, player.stats[stat].max)}
-          >
-            {t("Full")}
-          </Button>
-        </Grid>
-        {stat === "hp" && (
-          <Grid item xs={4} sm={1}>
+
+        <Grid item xs={12} sm>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Button
+              variant="outlined"
+              color={color}
+              size="small"
+              onClick={() =>
+                setStatChangeDialog({
+                  key: stat,
+                  label: t(label),
+                  value: player.stats[stat].current,
+                  max: player.stats[stat].max,
+                })
+              }
+            >
+              {t("Edit")}
+            </Button>
             <Button
               variant="contained"
-              color="warning"
-              onClick={changeStat(
-                "hp",
-                Math.floor(player.stats.hp.max / 2) - player.stats.hp.current
-              )}
+              color={color}
+              size="small"
+              onClick={changeStat(stat, player.stats[stat].max)}
             >
-              {t("Half")}
+              {t("Full")}
             </Button>
-          </Grid>
-        )}
-        <Grid item xs={12} sm={6}>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm="auto">
-              <ButtonGroup variant="outlined" size="small" color={color}>
-                {negativeIncrements.map((val) => (
-                  <Button key={val} onClick={changeStat(stat, val)}>
-                    {val}
-                  </Button>
-                ))}
-              </ButtonGroup>
-            </Grid>
-            <Grid item xs={12} sm="auto">
-              <ButtonGroup variant="outlined" size="small" color={color}>
-                {positiveIncrements.map((val) => (
-                  <Button key={val} onClick={changeStat(stat, val)}>
-                    +{val}
-                  </Button>
-                ))}
-              </ButtonGroup>
-            </Grid>
-          </Grid>
+
+            {stat === "hp" && (
+              <Button
+                variant="contained"
+                color="warning"
+                size="small"
+                onClick={changeStat(
+                  "hp",
+                  Math.floor(player.stats.hp.max / 2) - player.stats.hp.current
+                )}
+              >
+                {t("Half")}
+              </Button>
+            )}
+
+            <ButtonGroup variant="outlined" size="small" color={color}>
+              {negativeIncrements.map((val) => (
+                <Button key={val} onClick={changeStat(stat, val)}>
+                  {val}
+                </Button>
+              ))}
+            </ButtonGroup>
+
+            <ButtonGroup variant="outlined" size="small" color={color}>
+              {positiveIncrements.map((val) => (
+                <Button key={val} onClick={changeStat(stat, val)}>
+                  +{val}
+                </Button>
+              ))}
+            </ButtonGroup>
+          </Stack>
         </Grid>
       </Grid>
     );
@@ -131,7 +419,7 @@ export default function PlayerControls({ player, setPlayer }) {
 
   return (
     <>
-      <Divider sx={{ my: 1 }} />
+      <Divider sx={{ my: 0.75 }} />
       <Paper
         elevation={3}
         sx={{
@@ -160,35 +448,26 @@ export default function PlayerControls({ player, setPlayer }) {
         >
           {t("Controls")}
         </Typography>
-        <Grid container spacing={2} sx={{ padding: "1em" }}>
+
+        <Grid container spacing={1} sx={{ p: 1 }}>
           <Grid item xs={12}>
-            {renderStatControls(
-              "hp",
-              "HP",
-              "error",
-              [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
-            )}
+            {renderStatControls("hp", "HP", "error")}
           </Grid>
           <Grid item xs={12}>
-            {renderStatControls(
-              "mp",
-              "MP",
-              "info",
-              [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
-            )}
+            {renderStatControls("mp", "MP", "info")}
           </Grid>
           <Grid item xs={12}>
-            {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
+            {renderStatControls("ip", "IP", "success")}
           </Grid>
-          {/* Fabula Points Section */}
+
           <Grid item xs={12}>
             <Grid container spacing={1} alignItems="center">
-              <Grid item xs={5} sm={4}>
-                <Typography variant="h2" sx={{ minWidth: "100px" }}>
-                  {t("Fabula Points") + "【" + player.info.fabulapoints + "】"}
+              <Grid item xs={12} sm={3} md={3}>
+                <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
+                  {`${t("Fabula Points")}【${player.info.fabulapoints}】`}
                 </Typography>
               </Grid>
-              <Grid item xs={7} sm={8} sx={{ textAlign: "left" }}>
+              <Grid item xs={12} sm>
                 <ButtonGroup variant="outlined" size="small" color="primary">
                   <Button onClick={changeFabulaPoints(-1)}>-1</Button>
                   <Button onClick={changeFabulaPoints(1)}>+1</Button>
@@ -196,58 +475,67 @@ export default function PlayerControls({ player, setPlayer }) {
               </Grid>
             </Grid>
           </Grid>
-          {/* Zenit Section */}
-<Grid item xs={12}>
-  <Grid container spacing={2} alignItems="center">
-    <Grid item xs={12} sm={4}>
-      <Typography variant="h2" sx={{ minWidth: "100px" }}>
-        {t("Zenit") + "【" + player.info.zenit + "】"}
-      </Typography>
-    </Grid>
-    <Grid item xs={12} sm={8} container spacing={2} alignItems="center">
-      <Grid item>
-        <ToggleButtonGroup
-          value={changeType}
-          exclusive
-          onChange={(event, newChangeType) =>
-            newChangeType !== null && setChangeType(newChangeType)
-          }
-          aria-label="zenit-change-type"
-        >
-          <ToggleButton value="+" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
-            {t("+")}
-          </ToggleButton>
-          <ToggleButton value="-" sx={{ fontWeight: "bold", fontSize: 20, height: 40 }}>
-            {t("-")}
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Grid>
-      <Grid item>
-        <TextField
-          type="number"
-          size="small"
-          value={zenitChange}
-          onChange={(e) => setZenitChange(parseInt(e.target.value))}
-          inputProps={{ min: 0 }}
-          sx={{ width: 80 }}
-        />
-      </Grid>
-      <Grid item>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={changeZenit}
-          sx={{ height: 40 }}
-        >
-          {t("Apply")}
-        </Button>
-      </Grid>
-    </Grid>
-  </Grid>
-</Grid>
 
+          <Grid item xs={12}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item xs={12} sm={3} md={3}>
+                <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
+                  {`${t("Zenit")}【${player.info.zenit}】`}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm>
+                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                  <ToggleButtonGroup
+                    value={changeType}
+                    exclusive
+                    size="small"
+                    onChange={(event, newChangeType) =>
+                      newChangeType !== null && setChangeType(newChangeType)
+                    }
+                    aria-label="zenit-change-type"
+                  >
+                    <ToggleButton value="+" sx={{ fontWeight: 700, px: 1.2 }}>
+                      {t("+")}
+                    </ToggleButton>
+                    <ToggleButton value="-" sx={{ fontWeight: 700, px: 1.2 }}>
+                      {t("-")}
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+
+                  <TextField
+                    type="number"
+                    size="small"
+                    value={zenitChange}
+                    onChange={handleZenitChangeInput}
+                    inputProps={{ min: 0 }}
+                    sx={{ width: 90 }}
+                  />
+
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    onClick={changeZenit}
+                  >
+                    {t("Apply")}
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
       </Paper>
+      <StatChangeDialog
+        open={!!statDialog}
+        handleClose={() => setStatChangeDialog(null)}
+        stat={statDialog?.label}
+        statKey={statDialog?.key}
+        value={statDialog?.value}
+        max={statDialog?.max}
+        onApply={handleStatApply}
+        t={t}
+        player={player}
+      />
     </>
   );
 }
