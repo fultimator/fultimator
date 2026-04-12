@@ -15,8 +15,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import Clock from "./Clock";
 
 export default function PlayerGift({ player, setPlayer, isEditMode }) {
@@ -229,32 +229,13 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedGift && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedGift.name === "esper_gift_custom_name" ? selectedGift.customName : t(selectedGift.name)}
-                      {" - "}
-                      {selectedGiftSpell && t(selectedGiftSpell.className)}
-                    </Typography>
-                    
-                    {selectedGift.event && (
-                      <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1, display: "flex", gap: 1 }}>
-                        {t("esper_events")}:{" "}
-                        <ReactMarkdown components={{ p: "span" }}>
-                          {selectedGift.event.startsWith("esper_event_")
-                            ? t(selectedGift.event)
-                            : selectedGift.event}
-                        </ReactMarkdown>
-                      </Typography>
-                    )}
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {selectedGift.name === "gift_custom_name" ? selectedGift.effect : t(selectedGift.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedGift,
+                    spellType: "gift",
+                    name: selectedGift.name === "esper_gift_custom_name" ? selectedGift.customName : selectedGift.name,
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

@@ -99,6 +99,7 @@ export default function CardLoadout({
           py: "1px",
           minWidth: 0,
           width: "100%",
+          height: "100%",
         }}
       >
         {/* Slot abbreviation */}
@@ -163,9 +164,11 @@ export default function CardLoadout({
         key={key}
         onClick={() => handleSlotClick(key)}
         sx={{
-          display: "block",
+          display: "flex",
           textAlign: "left",
           width: "100%",
+          height: "100%",
+          flex: 1,
           borderRadius: "2px",
           "&:hover": { bgcolor: "action.hover" },
         }}
@@ -173,7 +176,7 @@ export default function CardLoadout({
         {inner}
       </ButtonBase>
     ) : (
-      <Box key={key}>{inner}</Box>
+      <Box key={key} sx={{ flex: 1, width: "100%", height: "100%", display: "flex" }}>{inner}</Box>
     );
   };
 
@@ -218,8 +221,8 @@ export default function CardLoadout({
 
       {/* Slot rows (+ optional support column) */}
       {hasSupportColumn ? (
-        <Box sx={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(84px, 42%)", columnGap: "6px", alignItems: "start" }}>
-          <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(84px, 42%)", columnGap: "6px", alignItems: "stretch", flex: 1, width: "100%", height: "100%" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
             {SLOTS.map(renderSlotRow)}
           </Box>
           <Box sx={{ minWidth: 0, borderLeft: `0.5px solid ${divider}`, pl: "6px" }}>
@@ -261,7 +264,9 @@ export default function CardLoadout({
           </Box>
         </Box>
       ) : (
-        SLOTS.map(renderSlotRow)
+        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, width: "100%" }}>
+          {SLOTS.map(renderSlotRow)}
+        </Box>
       )}
 
       {/* Slot picker dialog : with full module override wiring */}

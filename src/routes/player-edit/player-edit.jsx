@@ -685,6 +685,7 @@ export default function PlayerEdit() {
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
                   updateMaxStats={updateMaxStats}
+                  battleMode={battleMode}
                   onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
                   onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}

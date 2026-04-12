@@ -51,8 +51,10 @@ export default function SpellEntropistGamble({ gamble }) {
       <TableBody>
         {/* Header Row */}
         <TableRow sx={{ backgroundColor: theme.primary }}>
-          <StyledTableCell colSpan={4} sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem", textAlign: "center" }}>
-            {gamble.spellName} - {gamble.mp}MP × {gamble.maxTargets} {t("Max Dices")} - {t(attributes[gamble.attr].shortcaps)}
+          <StyledTableCell colSpan={4} sx={{ color: "#fff", fontWeight: "bold", fontSize: "0.8rem", textAlign: "center" }}>
+            <Typography sx={{ color: "#fff", fontWeight: "bold", fontSize: "0.8rem" }}>
+              {gamble.spellName} - {gamble.mp}MP × {gamble.maxTargets} {t("Max Dices")} - {t(attributes[gamble.attr].shortcaps)}
+            </Typography>
           </StyledTableCell>
         </TableRow>
 

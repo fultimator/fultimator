@@ -5,7 +5,6 @@ import {
   Paper,
   IconButton,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -15,7 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
+import { SkillCard } from "../../compendium/ItemCards";
 
 export default function PlayerSkills({ player }) {
   const { t } = useTranslate();
@@ -163,46 +162,15 @@ export default function PlayerSkills({ player }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              fullWidth
+              maxWidth="sm"
             >
-              <DialogTitle>
-                <Typography
-                  variant="h2"
-                  sx={{ textTransform: "uppercase" }}
-                  fontWeight="bold"
-                >
-                  {selectedSkill &&
-                    (selectedSkill.isHomebrew
-                      ? selectedSkill.skillName
-                      : t(selectedSkill.skillName))}
-                  {" - "}
-                  {selectedSkill && t(selectedSkill.className)} {" -  "}
-                  <Typography
-                    component="span"
-                    sx={{ ml: -1, mr: 0, fontSize: "1.2em" }}
-                  >
-                    【
-                  </Typography>
-                  {selectedSkill && t("SL") + " " + selectedSkill.currentLvl}
-                  <Typography
-                    component="span"
-                    sx={{ mr: -0.7, fontSize: "1.2em" }}
-                  >
-                    】
-                  </Typography>
-                </Typography>
-              </DialogTitle>
-              <DialogContent sx={{ marginTop: "10px" }}>
-                <ReactMarkdown>
-                  {selectedSkill &&
-                    (selectedSkill.isHomebrew
-                      ? selectedSkill.description
-                      : t(selectedSkill.description))}
-                </ReactMarkdown>
+              <DialogContent sx={{ p: 0 }}>
+                {selectedSkill && <SkillCard skill={selectedSkill} />}
               </DialogContent>
               <DialogActions>
                 <Button variant="contained" color="primary" onClick={handleOK} fullWidth>
-                  OK
+                  {t("Close")}
                 </Button>
               </DialogActions>
             </Dialog>

@@ -86,7 +86,7 @@ import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 import { availableGifts } from "../../components/player/spells/spellOptionData";
 import { availableDances } from "../../components/player/spells/spellOptionData";
 import { availableTherioforms } from "../../components/player/spells/spellOptionData";
-import { availableTones } from "../../components/player/spells/SpellChanterTonesModal";
+import { availableMagichantKeys, availableMagichantTones } from "../../components/player/spells/spellOptionData";
 import { availableSymbols } from "../../components/player/spells/spellOptionData";
 import { invocationsByWellspring } from "../../components/player/spells/spellOptionData";
 
@@ -320,6 +320,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onSpellClassChange,
   selectedModuleType = "",
   onModuleTypeChange,
+  selectedMagichantSubtype = "",
+  onMagichantSubtypeChange,
   selectedQualityFilters,
   onQualityFiltersChange,
   selectedQualityCategories,
@@ -530,6 +532,23 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 <MenuItem value="armor">{t("pilot_module_armor")}</MenuItem>
                 <MenuItem value="weapon">{t("pilot_module_weapon")}</MenuItem>
                 <MenuItem value="support">{t("pilot_module_support")}</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
+        {selectedType === "player-spells" &&
+          String(selectedSpellClass).toLowerCase() === "chanter" &&
+          typeof onMagichantSubtypeChange === "function" && (
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Chant Type")}</InputLabel>
+              <Select
+                value={selectedMagichantSubtype}
+                onChange={(e) => onMagichantSubtypeChange?.(e.target.value)}
+                label={t("Chant Type")}
+              >
+                <MenuItem value="">{t("All")}</MenuItem>
+                <MenuItem value="key">{t("Key")}</MenuItem>
+                <MenuItem value="tone">{t("Tone")}</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -756,9 +775,14 @@ export function getNonStaticSpellItems(sc) {
         .filter(tf => !tf.name.includes("_custom_"))
         .map(tf => ({ ...tf, spellType: "therioform" }));
     case "magichant":
-      return availableTones
-        .filter(tone => !tone.name.includes("_custom_"))
-        .map(tone => ({ ...tone, spellType: "magichant" }));
+      return [
+        ...availableMagichantKeys
+          .filter((key) => !key.name.includes("_custom_"))
+          .map((key) => ({ ...key, spellType: "magichant", magichantSubtype: "key" })),
+        ...availableMagichantTones
+          .filter((tone) => !tone.name.includes("_custom_"))
+          .map((tone) => ({ ...tone, spellType: "magichant", magichantSubtype: "tone" })),
+      ];
     case "symbol":
       return availableSymbols
         .filter(s => !s.name.includes("_custom_"))
@@ -902,7 +926,12 @@ function CompendiumViewer() {
   const selectedType = searchParams.get("type") ?? "weapons";
   const selectedSpellClass = searchParams.get("class") ?? "";
   const selectedModuleType = searchParams.get("moduleType") ?? "";
+  const rawMagichantSubtype = searchParams.get("magichantSubtype") ?? "";
+  const selectedMagichantSubtype = rawMagichantSubtype === "key" || rawMagichantSubtype === "tone"
+    ? rawMagichantSubtype
+    : "";
   const isPilotClassSelected = String(selectedSpellClass).toLowerCase() === "pilot";
+  const isChanterClassSelected = String(selectedSpellClass).toLowerCase() === "chanter";
   const selectedBook = useMemo(() => {
     const books = searchParams.get("book");
     return books ? books.split(",") : [];
@@ -923,6 +952,19 @@ function CompendiumViewer() {
     const subtypes = searchParams.get("optionalSubtypes");
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
+
+  useEffect(() => {
+    const hasSubtypeParam = searchParams.has("magichantSubtype");
+    if (!hasSubtypeParam) return;
+    const shouldKeepSubtype =
+      selectedType === "player-spells" &&
+      isChanterClassSelected &&
+      (selectedMagichantSubtype === "key" || selectedMagichantSubtype === "tone");
+    if (shouldKeepSubtype) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("magichantSubtype");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, selectedType, isChanterClassSelected, selectedMagichantSubtype, setSearchParams]);
 
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
@@ -1036,6 +1078,12 @@ function CompendiumViewer() {
       if (selectedType === "player-spells" && isPilotClassSelected && selectedModuleType) {
         items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
       }
+      if (selectedType === "player-spells" && isChanterClassSelected && selectedMagichantSubtype) {
+        items = items.filter((item) => {
+          const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+          return selectedMagichantSubtype === "key" ? isKey : !isKey;
+        });
+      }
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -1115,6 +1163,12 @@ function CompendiumViewer() {
     if (isPilotClassSelected && selectedModuleType) {
       items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
     }
+    if (isChanterClassSelected && selectedMagichantSubtype) {
+      items = items.filter((item) => {
+        const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+        return selectedMagichantSubtype === "key" ? isKey : !isKey;
+      });
+    }
 
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
@@ -1125,7 +1179,7 @@ function CompendiumViewer() {
         .toLowerCase()
         .includes(q)
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedSpellClass, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, isPilotClassSelected, selectedModuleType, matchesPilotModuleType]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedSpellClass, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, isPilotClassSelected, isChanterClassSelected, selectedModuleType, selectedMagichantSubtype, matchesPilotModuleType]);
 
   // Stable IDs per item (index in the filtered list)
   const itemIds = useMemo(
@@ -1179,9 +1233,12 @@ function CompendiumViewer() {
     if (String(cls).toLowerCase() === "pilot" && selectedModuleType) {
       newParams.moduleType = selectedModuleType;
     }
+    if (String(cls).toLowerCase() === "chanter" && selectedMagichantSubtype) {
+      newParams.magichantSubtype = selectedMagichantSubtype;
+    }
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams, selectedModuleType]);
+  }, [selectedCompendium, selectedType, setSearchParams, selectedModuleType, selectedMagichantSubtype]);
 
   const handleModuleTypeChange = useCallback((moduleType) => {
     setSearchQuery("");
@@ -1196,6 +1253,22 @@ function CompendiumViewer() {
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [selectedCompendium, selectedType, selectedSpellClass, setSearchParams]);
+
+  const handleMagichantSubtypeChange = useCallback((magichantSubtype) => {
+    setSearchQuery("");
+    setSelectedIdx(null);
+    const safeSubtype = magichantSubtype === "key" || magichantSubtype === "tone" ? magichantSubtype : "";
+    const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const newParams = {
+      ...base,
+      type: selectedType,
+      ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+      ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+      ...(safeSubtype ? { magichantSubtype: safeSubtype } : {}),
+    };
+    setSearchParams(newParams);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [selectedCompendium, selectedSpellClass, selectedType, selectedModuleType, setSearchParams]);
 
   const handleBookChange = useCallback((books) => {
     setSearchQuery("");
@@ -1297,6 +1370,7 @@ function CompendiumViewer() {
         type: selectedType,
         ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
         ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+        ...(selectedMagichantSubtype ? { magichantSubtype: selectedMagichantSubtype } : {}),
         item: toSlug(item.name),
       });
       const id = itemIds[idx];
@@ -1311,7 +1385,7 @@ function CompendiumViewer() {
         requestAnimationFrame(scrollToItem);
       }
     },
-    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, setSearchParams]
+    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, setSearchParams]
   );
 
   const sidebarContent = (
@@ -1328,6 +1402,7 @@ function CompendiumViewer() {
           type: selectedType,
           ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
           ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+          ...(selectedMagichantSubtype ? { magichantSubtype: selectedMagichantSubtype } : {}),
           ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
           ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
           ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
@@ -1341,6 +1416,8 @@ function CompendiumViewer() {
       onSpellClassChange={handleSpellClassChange}
       selectedModuleType={selectedModuleType}
       onModuleTypeChange={handleModuleTypeChange}
+      selectedMagichantSubtype={selectedMagichantSubtype}
+      onMagichantSubtypeChange={handleMagichantSubtypeChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

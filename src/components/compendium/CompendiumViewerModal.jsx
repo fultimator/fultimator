@@ -70,6 +70,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [selectedCompendium, setSelectedCompendium] = useState("official");
   const [selectedSpellClass, setSelectedSpellClass] = useState(initialSpellClass);
   const [selectedModuleType, setSelectedModuleType] = useState(initialModuleTypeFilter);
+  const [selectedMagichantSubtype, setSelectedMagichantSubtype] = useState("");
   const [selectedBook, setSelectedBook] = useState([]);
   const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
   const [selectedQualityCategories, setSelectedQualityCategories] = useState([]);
@@ -162,6 +163,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       setSelectedIdx(null);
       setSelectedSpellClass(initialSpellClass);
       setSelectedModuleType(initialModuleTypeFilter);
+      setSelectedMagichantSubtype("");
       setSelectedBook([]);
       setSelectedQualityFilters([]);
       setSelectedQualityCategories([]);
@@ -219,6 +221,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       }
       if (selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "pilot" && selectedModuleType) {
         items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
+      }
+      if (selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "chanter" && selectedMagichantSubtype) {
+        items = items.filter((item) => {
+          const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+          return selectedMagichantSubtype === "key" ? isKey : !isKey;
+        });
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -290,6 +298,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     if (selectedModuleType && selectedType === "player-spells" && isPilotClassSelected) {
       items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
     }
+    if (selectedMagichantSubtype && selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "chanter") {
+      items = items.filter((item) => {
+        const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+        return selectedMagichantSubtype === "key" ? isKey : !isKey;
+      });
+    }
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
     return items.filter((item) =>
@@ -299,7 +313,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         .toLowerCase()
         .includes(q)
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, selectedModuleType, selectedSpellClass, matchesPilotModuleType]);
+  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, selectedModuleType, selectedMagichantSubtype, selectedSpellClass, matchesPilotModuleType]);
 
   const itemIds = useMemo(
     () => filteredItems.map((item, idx) => makeId(item.name, idx)),
@@ -359,6 +373,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     if (String(cls).toLowerCase() !== "pilot") {
       setSelectedModuleType("");
     }
+    if (String(cls).toLowerCase() !== "chanter") {
+      setSelectedMagichantSubtype("");
+    }
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
@@ -366,6 +383,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
 
   const handleModuleTypeChange = useCallback((moduleType) => {
     setSelectedModuleType(moduleType);
+    setSearchQuery("");
+    setSelectedIdx(null);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, []);
+
+  const handleMagichantSubtypeChange = useCallback((magichantSubtype) => {
+    setSelectedMagichantSubtype(magichantSubtype);
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
@@ -500,6 +524,8 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       onSpellClassChange={handleSpellClassChange}
       selectedModuleType={selectedModuleType}
       onModuleTypeChange={handleModuleTypeChange}
+      selectedMagichantSubtype={selectedMagichantSubtype}
+      onMagichantSubtypeChange={handleMagichantSubtypeChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

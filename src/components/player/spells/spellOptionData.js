@@ -146,6 +146,109 @@ export const availableDances = [
   },
 ];
 
+export const availableMagichantKeys = [
+  {
+    name: "magichant_flame",
+    type: "fire",
+    status: "Shaken",
+    attribute: "MIG",
+    recovery: "HP",
+  },
+  {
+    name: "magichant_frost",
+    type: "ice",
+    status: "Weak",
+    attribute: "WLP",
+    recovery: "MP",
+  },
+  {
+    name: "magichant_iron",
+    type: "physical",
+    status: "Slow",
+    attribute: "WLP",
+    recovery: "MP",
+  },
+  {
+    name: "magichant_radiance",
+    type: "light",
+    status: "Dazed",
+    attribute: "INS",
+    recovery: "HP",
+  },
+  {
+    name: "magichant_shadow",
+    type: "dark",
+    status: "Weak",
+    attribute: "DEX",
+    recovery: "MP",
+  },
+  {
+    name: "magichant_stone",
+    type: "earth",
+    status: "Dazed",
+    attribute: "MIG",
+    recovery: "HP",
+  },
+  {
+    name: "magichant_thunder",
+    type: "bolt",
+    status: "Shaken",
+    attribute: "DEX",
+    recovery: "HP",
+  },
+  {
+    name: "magichant_wind",
+    type: "wind",
+    status: "Slow",
+    attribute: "INS",
+    recovery: "MP",
+  },
+  {
+    name: "magichant_custom_name",
+    type: "",
+    status: "",
+    attribute: "",
+    recovery: "",
+    customName: "",
+  },
+];
+
+export const availableMagichantTones = [
+  {
+    name: "magichant_tone_calm",
+    effect: "magichant_tone_calm_desc",
+  },
+  {
+    name: "magichant_tone_energetic",
+    effect: "magichant_tone_energetic_desc",
+  },
+  {
+    name: "magichant_tone_frantic",
+    effect: "magichant_tone_frantic_desc",
+  },
+  {
+    name: "magichant_tone_haunting",
+    effect: "magichant_tone_haunting_desc",
+  },
+  {
+    name: "magichant_tone_lively",
+    effect: "magichant_tone_lively_desc",
+  },
+  {
+    name: "magichant_tone_menacing",
+    effect: "magichant_tone_menacing_desc",
+  },
+  {
+    name: "magichant_tone_solemn",
+    effect: "magichant_tone_solemn_desc",
+  },
+  {
+    name: "magichant_custom_name",
+    effect: "",
+    customName: "",
+  },
+];
+
 export const availableTherioforms = [
   {
     name: "mutant_therioform_amphibia",

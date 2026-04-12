@@ -21,7 +21,6 @@ import { useSpellModals } from "../../common/hooks/useSpellModals";
 import SpellDefaultModal from "../../spells/SpellDefaultModal";
 import SpellArcanistModal from "../../spells/SpellArcanistModal";
 import SpellEntropistGambleModal from "../../spells/SpellEntropistGambleModal";
-import SpellChanterModal from "../../spells/SpellChanterModal";
 import SpellSymbolistModal from "../../spells/SpellSymbolistModal";
 import SpellDancerModal from "../../spells/SpellDancerModal";
 import SpellGiftModal from "../../spells/SpellGiftModal";
@@ -35,6 +34,10 @@ import SpellTinkererAlchemyRankModal from "../../spells/SpellTinkererAlchemyRank
 import SpellTinkererInfusionModal from "../../spells/SpellTinkererInfusionModal";
 import SpellTinkererMagitechRankModal from "../../spells/SpellTinkererMagitechRankModal";
 import SpellDeckModal from "../../spells/SpellDeckModal";
+import UnifiedSpellModal from "../../spells/modals/UnifiedSpellModal";
+import GeneralSection from "../../spells/sections/GeneralSection";
+import MagichantKeysContentSection from "../../spells/sections/MagichantKeysContentSection";
+import MagichantTonesContentSection from "../../spells/sections/MagichantTonesContentSection";
 import PlayerNoteModal from "../../informations/PlayerNoteModal";
 import ReactMarkdown from "react-markdown";
 import { fontSize, styled, width } from "@mui/system";
@@ -78,6 +81,7 @@ export default function PlayerCardSheet({
     characterImage,
     id,
     updateMaxStats,
+    battleMode = false,
     onToggleEditMode,
     onAddClass,
     onAddFeature,
@@ -661,6 +665,17 @@ export default function PlayerCardSheet({
                 {/* Tab Panels */}
                 <CustomTabPanel value={value} index={0}>
                     <PlayerBonds player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
+                    <PlayerNotes
+                        player={{
+                            ...player,
+                            notes: (player.notes || []).filter(note => note.showInPlayerSheet !== false)
+                        }}
+                        setPlayer={setPlayer}
+                        searchQuery={searchQuery}
+                        isEditMode={isEditMode}
+                        onAddNote={isEditMode ? handleAddNote : undefined}
+                        onEditNote={isEditMode ? handleOpenEditNote : undefined}
+                    />
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} withEquipment isMainTab={true} searchQuery={searchQuery} />
                     <PlayerClasses player={player} setPlayer={setPlayer} isCharacterSheet={true} isMainTab={true} searchQuery={searchQuery}
                         isEditMode={isEditMode}
@@ -705,7 +720,7 @@ export default function PlayerCardSheet({
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={3}>
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} isMainTab={false} searchQuery={searchQuery} />
-                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery}
+                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} battleMode={battleMode}
                         onAddWeapon={isEditMode ? openAddWeapon : undefined}
                         onEditWeapon={isEditMode ? (idx) => { const w = inv?.weapons?.[idx]; if (w) { setWeapon(w); setEditWeaponIndex(idx); setOpenNewWeapon(true); } } : undefined}
                         onAddCustomWeapon={isEditMode ? openAddCustomWeapon : undefined}
@@ -717,7 +732,7 @@ export default function PlayerCardSheet({
                         onAddAccessory={isEditMode ? openAddAccessory : undefined}
                         onEditAccessory={isEditMode ? (idx) => { const ac = inv?.accessories?.[idx]; if (ac) { setAccessory(ac); setEditAccessoryIndex(idx); setOpenNewAccessory(true); } } : undefined}
                     />
-                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} />
+                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} battleMode={battleMode} />
                     <PlayerCompanion player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={4}>
@@ -780,7 +795,19 @@ export default function PlayerCardSheet({
                     <SpellDefaultModal open={isSpellOpen("default")} onClose={closeSpellModal} spell={spellBeingEdited} onSave={saveSpell} />
                     <SpellArcanistModal open={isSpellOpen("arcanist")} onClose={closeSpellModal} spell={spellBeingEdited} isRework={spellBeingEdited?.spellType === "arcanist-rework"} onSave={saveSpell} />
                     <SpellEntropistGambleModal open={isSpellOpen("gamble")} onClose={closeSpellModal} gamble={spellBeingEdited} onSave={saveSpell} />
-                    <SpellChanterModal open={isSpellOpen("chanter")} onClose={closeSpellModal} magichant={spellBeingEdited} onSave={saveSpell} />
+                    <UnifiedSpellModal
+                        open={isSpellOpen("chanter")}
+                        onClose={closeSpellModal}
+                        onSave={saveSpell}
+                        spellType="magichant"
+                        spell={spellBeingEdited}
+                        initialSectionId="general"
+                        sections={[
+                            { id: "keys", title: "magichant_edit_keys_button", component: MagichantKeysContentSection, props: {}, order: 0 },
+                            { id: "tones", title: "magichant_edit_tones_button", component: MagichantTonesContentSection, props: {}, order: 1 },
+                            { id: "general", title: "magichant_settings_button", component: GeneralSection, props: { customFields: [] }, order: 2 },
+                        ]}
+                    />
                     <SpellSymbolistModal open={isSpellOpen("symbolist")} onClose={closeSpellModal} symbol={spellBeingEdited} onSave={saveSpell} />
                     <SpellDancerModal open={isSpellOpen("dancer")} onClose={closeSpellModal} dance={spellBeingEdited} onSave={saveSpell} />
                     <SpellGiftModal open={isSpellOpen("gift")} onClose={closeSpellModal} gift={spellBeingEdited} onSave={saveSpell} />

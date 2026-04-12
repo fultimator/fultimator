@@ -94,6 +94,7 @@ export default function UnifiedSpellModal({
       therioform: "mutant_therioforms",
       "tinkerer-alchemy": "Alchemy",
       "tinkerer-infusion": "Infusion",
+      "tinkerer-magitech": "Magitech",
     };
 
     return (

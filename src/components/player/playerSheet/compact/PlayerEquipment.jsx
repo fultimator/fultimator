@@ -500,7 +500,7 @@ export default function PlayerEquipment({
               <TableRow sx={{ background: theme.primary }}>
                 <StyledTableCellHeader sx={{ width: 36 }} />
                 <StyledTableCellHeader>
-                  <Typography variant="h4" sx={{ textTransform: "uppercase", color: "#fff" }}>{group.label}</Typography>
+                  <Typography variant="h4" sx={{ textTransform: "uppercase", color: "#fff", textAlign: "center" }}>{group.label}</Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader sx={{ width: { xs: 70, sm: 120 }, textAlign: "center" }}>
                   <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{group.col1}</Typography>

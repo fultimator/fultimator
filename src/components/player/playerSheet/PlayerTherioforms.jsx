@@ -14,8 +14,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 
 export default function PlayerTherioforms({ player }) {
   const { t } = useTranslate();
@@ -156,32 +156,13 @@ export default function PlayerTherioforms({ player }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedTherioform && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.customName : t(selectedTherioform.name)}
-                      {" - "}
-                      {selectedMutantSpell && t(selectedMutantSpell.className)}
-                    </Typography>
-
-                    {selectedTherioform.genoclepsis && (
-                      <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1, display: "flex", gap: 1 }}>
-                        {t("mutant_genoclepsis_suggestions")}:{" "}
-                        <ReactMarkdown components={{ p: "span" }}>
-                          {selectedTherioform.name === "mutant_therioform_custom_name"
-                            ? selectedTherioform.genoclepsis
-                            : t(selectedTherioform.genoclepsis)}
-                        </ReactMarkdown>
-                      </Typography>
-                    )}
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.description : t(selectedTherioform.description)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedTherioform,
+                    spellType: "therioform",
+                    name: selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.customName : selectedTherioform.name,
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

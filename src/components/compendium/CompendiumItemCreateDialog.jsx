@@ -65,6 +65,7 @@ const NON_STATIC_TYPES = [
   { value: "gift",             label: "Gift" },
   { value: "dance",            label: "Dance" },
   { value: "therioform",       label: "Therioform" },
+  { value: "magichant-key",    label: "Key (Chanter)" },
   { value: "magichant",        label: "Tone (Chanter)" },
   { value: "symbol",           label: "Symbol" },
   { value: "invocation",       label: "Invocation" },
@@ -633,7 +634,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [spellType,   setSpellType]   = useState(editData?.spellType ?? "default");
+  const [spellType,   setSpellType]   = useState(
+    editData?.spellType === "magichant" && editData?.magichantSubtype === "key"
+      ? "magichant-key"
+      : (editData?.spellType ?? "default")
+  );
   const [spellClass,  setSpellClass]  = useState(editData?.class ?? spellClasses[0] ?? "");
   const [name,        setName]        = useState(editData?.name ?? "");
   const [description, setDescription] = useState(editData?.description ?? "");
@@ -647,6 +652,10 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const [effect,      setEffect]      = useState(editData?.effect ?? "");
   const [event,       setEvent]       = useState(editData?.event ?? "");
   const [genoclepsis, setGenoclepsis] = useState(editData?.genoclepsis ?? "");
+  const [keyType,     setKeyType]     = useState(editData?.type ?? "");
+  const [keyStatus,   setKeyStatus]   = useState(editData?.status ?? "");
+  const [keyAttribute,setKeyAttribute]= useState(editData?.attribute ?? "");
+  const [keyRecovery, setKeyRecovery] = useState(editData?.recovery ?? "");
   const [wellspring,  setWellspring]  = useState(editData?.wellspring ?? "");
   const [invType,     setInvType]     = useState(editData?.type ?? "");
   const [domain,      setDomain]      = useState(editData?.domain ?? "");
@@ -688,7 +697,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setSpellType(editData?.spellType ?? "default");
+    setSpellType(
+      editData?.spellType === "magichant" && editData?.magichantSubtype === "key"
+        ? "magichant-key"
+        : (editData?.spellType ?? "default")
+    );
     setSpellClass(editData?.class ?? spellClasses[0] ?? "");
     setName(editData?.name ?? "");
     setDescription(editData?.description ?? "");
@@ -702,6 +715,10 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setEffect(editData?.effect ?? "");
     setEvent(editData?.event ?? "");
     setGenoclepsis(editData?.genoclepsis ?? "");
+    setKeyType(editData?.type ?? "");
+    setKeyStatus(editData?.status ?? "");
+    setKeyAttribute(editData?.attribute ?? "");
+    setKeyRecovery(editData?.recovery ?? "");
     setWellspring(editData?.wellspring ?? "");
     setInvType(editData?.type ?? "");
     setDomain(editData?.domain ?? "");
@@ -760,14 +777,20 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     } else {
       payload = {
         name: name.trim(),
-        spellType,
+        spellType: spellType === "magichant-key" ? "magichant" : spellType,
+        magichantSubtype: spellType === "magichant-key" ? "key" : spellType === "magichant" ? "tone" : undefined,
         effect: effect.trim(),
         description: spellType === "magiseed" ? seedDescription.trim() : effect.trim(),
         event: event.trim() || undefined,
         genoclepsis: genoclepsis.trim() || undefined,
         duration: duration.trim() || undefined,
         wellspring: wellspring.trim() || undefined,
-        type: invType.trim() || undefined,
+        type: spellType === "magichant-key"
+          ? keyType.trim() || undefined
+          : invType.trim() || undefined,
+        status: spellType === "magichant-key" ? keyStatus.trim() || undefined : undefined,
+        attribute: spellType === "magichant-key" ? keyAttribute.trim() || undefined : undefined,
+        recovery: spellType === "magichant-key" ? keyRecovery.trim() || undefined : undefined,
         domain: domain.trim() || undefined,
         domainDesc: domainDesc.trim() || undefined,
         merge: merge.trim() || undefined,
@@ -993,6 +1016,22 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                 <Grid item xs={12}>
                   <TextField label={t("Genoclepsis (optional)")} value={genoclepsis} onChange={(e) => setGenoclepsis(e.target.value)} fullWidth size="small" />
                 </Grid>
+              )}
+              {spellType === "magichant-key" && (
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("magichant_type")} value={keyType} onChange={(e) => setKeyType(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("magichant_status_effect")} value={keyStatus} onChange={(e) => setKeyStatus(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("magichant_attribute")} value={keyAttribute} onChange={(e) => setKeyAttribute(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label={t("magichant_recovery")} value={keyRecovery} onChange={(e) => setKeyRecovery(e.target.value)} fullWidth size="small" />
+                  </Grid>
+                </>
               )}
               {spellType === "dance" && (
                 <Grid item xs={12}>
@@ -1235,6 +1274,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                spellType !== "arcanist" &&
                spellType !== "arcanist-rework" &&
                spellType !== "cooking" &&
+               spellType !== "magichant-key" &&
                !(spellType === "pilot-vehicle" && (pilotSubtype === "armor" || pilotSubtype === "weapon")) && (
                 <Grid item xs={12}>
                   <CustomTextarea

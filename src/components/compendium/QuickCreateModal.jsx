@@ -56,6 +56,7 @@ import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator"
 import qualities from "../../libs/qualities";
 import CustomTextarea from "../common/CustomTextarea";
 import { availableFrames } from "../../libs/pilotVehicleData";
+import { availableMagichantKeys } from "../player/spells/spellOptionData";
 
 // Change* sub-components (reuse from equip routes)
 import ChangeWeaponBase from "../../routes/equip/weapons/ChangeBase";
@@ -288,6 +289,7 @@ function NpcSpellPanel() {
   const [attr1,       setAttr1]       = useState("dexterity");
   const [attr2,       setAttr2]       = useState("dexterity");
   const [dmgType,     setDmgType]     = useState("physical");
+  const [damage,      setDamage]      = useState("");
   const [special,     setSpecial]     = useState("");
 
   const data = {
@@ -295,6 +297,7 @@ function NpcSpellPanel() {
     name: name.trim(),
     type: isOffensive ? "offensive" : "",
     damagetype: dmgType,
+    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
     mp:         mp         === "" ? undefined : Number(mp),
     maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
     duration:   duration   || undefined,
@@ -314,6 +317,7 @@ function NpcSpellPanel() {
     setAttr1("dexterity");
     setAttr2("dexterity");
     setDmgType("physical");
+    setDamage("");
     setSpecial("");
   };
 
@@ -366,6 +370,12 @@ function NpcSpellPanel() {
                   {Object.keys(types).map((type) => <MenuItem key={type} value={type}>{types[type].long}</MenuItem>)}
                 </Select>
               </FormControl>
+            </Grid>
+          )}
+          {isOffensive && (
+            <Grid item xs={6} sm={3}>
+              <TextField label={t("Damage")} value={damage} onChange={(e) => setDamage(e.target.value)}
+                fullWidth size="small" type="number" inputProps={{ min: 0 }} />
             </Grid>
           )}
           <Grid item xs={6} sm={3}>
@@ -502,6 +512,7 @@ const NON_STATIC_TYPES = [
   { value: "gift",             label: "Gift" },
   { value: "dance",            label: "Dance" },
   { value: "therioform",       label: "Therioform" },
+  { value: "magichant-key",    label: "Key (Chanter)" },
   { value: "magichant",        label: "Tone (Chanter)" },
   { value: "symbol",           label: "Symbol" },
   { value: "invocation",       label: "Invocation" },
@@ -526,6 +537,10 @@ const PILOT_WEAPON_CATEGORIES = ["Arcane", "Brawling", "Bow", "Dagger", "Firearm
 const PILOT_DAMAGE_TYPES = ["Physical", "Air", "Bolt", "Dark", "Earth", "Fire", "Ice", "Light", "Poison"];
 const PILOT_ATTRS = ["dexterity", "insight", "might", "willpower"];
 const PILOT_RANGES = ["Melee", "Ranged"];
+const MAGICHANT_KEY_TYPES = Array.from(new Set(availableMagichantKeys.map((k) => k.type).filter(Boolean)));
+const MAGICHANT_KEY_STATUSES = Array.from(new Set(availableMagichantKeys.map((k) => k.status).filter(Boolean)));
+const MAGICHANT_KEY_ATTRIBUTES = Array.from(new Set(availableMagichantKeys.map((k) => k.attribute).filter(Boolean)));
+const MAGICHANT_KEY_RECOVERIES = Array.from(new Set(availableMagichantKeys.map((k) => k.recovery).filter(Boolean)));
 
 function PlayerSpellPanel() {
   const { t } = useTranslate();
@@ -540,10 +555,16 @@ function PlayerSpellPanel() {
   const [duration,    setDuration]    = useState("");
   const [attr1,       setAttr1]       = useState("insight");
   const [attr2,       setAttr2]       = useState("will");
+  const [damage,      setDamage]      = useState("");
+  const [damageType,  setDamageType]  = useState("physical");
   // Non-static type fields
   const [effect,      setEffect]      = useState("");
   const [event,       setEvent]       = useState("");
   const [genoclepsis, setGenoclepsis] = useState("");
+  const [keyType,     setKeyType]     = useState("");
+  const [keyStatus,   setKeyStatus]   = useState("");
+  const [keyAttribute,setKeyAttribute]= useState("");
+  const [keyRecovery, setKeyRecovery] = useState("");
   const [wellspring,  setWellspring]  = useState("");
   const [invType,     setInvType]     = useState("");
   // arcanist / arcanist-rework
@@ -580,7 +601,6 @@ function PlayerSpellPanel() {
   const [moduleDescription, setModuleDescription] = useState("");
   // weapon-specific
   const [weaponCategory,    setWeaponCategory]    = useState("Heavy");
-  const [damageType,        setDamageType]        = useState("Physical");
   const [pilotAtt1,         setPilotAtt1]         = useState("might");
   const [pilotAtt2,         setPilotAtt2]         = useState("dexterity");
   const [quality,           setQuality]           = useState("");
@@ -599,9 +619,15 @@ function PlayerSpellPanel() {
     setDuration("");
     setAttr1("insight");
     setAttr2("will");
+    setDamage("");
+    setDamageType("physical");
     setEffect("");
     setEvent("");
     setGenoclepsis("");
+    setKeyType("");
+    setKeyStatus("");
+    setKeyAttribute("");
+    setKeyRecovery("");
     setWellspring("");
     setInvType("");
     setDomain("");
@@ -645,21 +671,30 @@ function PlayerSpellPanel() {
     maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
     targetDesc: targetDesc.trim() || "One creature",
     duration: duration.trim() || "Instantaneous",
-    attr1, attr2, spellType: "default",
+    attr1, attr2,
+    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
+    damageType: isOffensive ? damageType : undefined,
+    spellType: "default",
   };
 
   const nonStaticData = spellType === "default" ? null : {
     name: name.trim(),
-    spellType,
+    spellType: spellType === "magichant-key" ? "magichant" : spellType,
+    magichantSubtype: spellType === "magichant-key" ? "key" : spellType === "magichant" ? "tone" : undefined,
     // generic effect/description (therioform, magichant, symbol, dance, gift, tinkerer-infusion, etc.)
     effect: effect.trim(),
     description: effect.trim(),
     event: event.trim(),
     genoclepsis: genoclepsis.trim() || undefined,
+    status: spellType === "magichant-key" ? keyStatus.trim() || undefined : undefined,
+    attribute: spellType === "magichant-key" ? keyAttribute.trim() || undefined : undefined,
+    recovery: spellType === "magichant-key" ? keyRecovery.trim() || undefined : undefined,
     duration: duration || undefined,
     // invocation
     wellspring: wellspring.trim() || undefined,
-    type: invType.trim() || undefined,
+    type: spellType === "magichant-key"
+      ? keyType.trim() || undefined
+      : invType.trim() || undefined,
     // arcanist / arcanist-rework
     domain: domain.trim() || undefined,
     domainDesc: domainDesc.trim() || undefined,
@@ -779,6 +814,56 @@ function PlayerSpellPanel() {
                 <Grid item xs={12}>
                   <TextField label={t("Genoclepsis (optional)")} value={genoclepsis} onChange={(e) => setGenoclepsis(e.target.value)} fullWidth size="small" />
                 </Grid>
+              )}
+
+              {/* Magichant Key */}
+              {spellType === "magichant-key" && (
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("magichant_type")}</InputLabel>
+                      <Select value={keyType} label={t("magichant_type")} onChange={(e) => setKeyType(e.target.value)}>
+                        <MenuItem value="">{t("Select")}</MenuItem>
+                        {MAGICHANT_KEY_TYPES.map((value) => (
+                          <MenuItem key={value} value={value}>{t(value)}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("magichant_status_effect")}</InputLabel>
+                      <Select value={keyStatus} label={t("magichant_status_effect")} onChange={(e) => setKeyStatus(e.target.value)}>
+                        <MenuItem value="">{t("Select")}</MenuItem>
+                        {MAGICHANT_KEY_STATUSES.map((value) => (
+                          <MenuItem key={value} value={value}>{t(value)}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("magichant_attribute")}</InputLabel>
+                      <Select value={keyAttribute} label={t("magichant_attribute")} onChange={(e) => setKeyAttribute(e.target.value)}>
+                        <MenuItem value="">{t("Select")}</MenuItem>
+                        {MAGICHANT_KEY_ATTRIBUTES.map((value) => (
+                          <MenuItem key={value} value={value}>{t(value)}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("magichant_recovery")}</InputLabel>
+                      <Select value={keyRecovery} label={t("magichant_recovery")} onChange={(e) => setKeyRecovery(e.target.value)}>
+                        <MenuItem value="">{t("Select")}</MenuItem>
+                        {MAGICHANT_KEY_RECOVERIES.map((value) => (
+                          <MenuItem key={value} value={value}>{t(value)}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </>
               )}
 
               {/* Dance */}
@@ -1046,7 +1131,7 @@ function PlayerSpellPanel() {
               )}
 
               {/* Generic effect/description for types that use it */}
-              {!(spellType === "arcanist" || spellType === "arcanist-rework" || spellType === "cooking" || spellType === "magiseed") &&
+              {!(spellType === "arcanist" || spellType === "arcanist-rework" || spellType === "cooking" || spellType === "magiseed" || spellType === "magichant-key") &&
                !(spellType === "pilot-vehicle" && (pilotSubtype === "armor" || pilotSubtype === "weapon")) && (
                 <Grid item xs={12}>
                   <CustomTextarea

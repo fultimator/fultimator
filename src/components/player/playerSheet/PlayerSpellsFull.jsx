@@ -22,9 +22,6 @@ import { useSpellModals } from "../common/hooks/useSpellModals";
 import SpellDefaultModal from "../spells/SpellDefaultModal";
 import SpellArcanistModal from "../spells/SpellArcanistModal";
 import SpellEntropistGambleModal from "../spells/SpellEntropistGambleModal";
-import SpellChanterModal from "../spells/SpellChanterModal";
-import SpellChanterKeysModal from "../spells/SpellChanterKeysModal";
-import SpellChanterTonesModal from "../spells/SpellChanterTonesModal";
 import SpellSymbolistModal from "../spells/SpellSymbolistModal";
 import SpellDancerModal from "../spells/SpellDancerModal";
 import SpellGiftModal from "../spells/SpellGiftModal";
@@ -39,6 +36,10 @@ import SpellTinkererAlchemyTargetModal from "../spells/SpellTinkererAlchemyTarge
 import SpellTinkererAlchemyEffectsModal from "../spells/SpellTinkererAlchemyEffectsModal";
 import SpellTinkererInfusionModal from "../spells/SpellTinkererInfusionModal";
 import SpellTinkererMagitechRankModal from "../spells/SpellTinkererMagitechRankModal";
+import UnifiedSpellModal from "../spells/modals/UnifiedSpellModal";
+import GeneralSection from "../spells/sections/GeneralSection";
+import MagichantKeysContentSection from "../spells/sections/MagichantKeysContentSection";
+import MagichantTonesContentSection from "../spells/sections/MagichantTonesContentSection";
 
 export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isCharacterSheet }) {
   const { t } = useTranslate();
@@ -374,24 +375,101 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
             onDelete={deleteSpell}
             magitech={{ ...spellBeingEdited, index: editingSpellIndex }}
           />
-          <SpellChanterModal
+          <UnifiedSpellModal
             open={isOpen("chanter")}
             onClose={closeModal}
             onSave={saveSpell}
             onDelete={deleteSpell}
-            magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+            spellType="magichant"
+            spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+            initialSectionId="general"
+            sections={[
+              {
+                id: "keys",
+                title: "magichant_edit_keys_button",
+                component: MagichantKeysContentSection,
+                props: {},
+                order: 0,
+              },
+              {
+                id: "tones",
+                title: "magichant_edit_tones_button",
+                component: MagichantTonesContentSection,
+                props: {},
+                order: 1,
+              },
+              {
+                id: "general",
+                title: "magichant_settings_button",
+                component: GeneralSection,
+                props: { customFields: [] },
+                order: 2,
+              },
+            ]}
           />
-          <SpellChanterKeysModal
+          <UnifiedSpellModal
             open={isOpen("chantKey")}
             onClose={closeModal}
             onSave={saveSpell}
-            magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+            onDelete={deleteSpell}
+            spellType="magichant"
+            spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+            initialSectionId="keys"
+            sections={[
+              {
+                id: "keys",
+                title: "magichant_edit_keys_button",
+                component: MagichantKeysContentSection,
+                props: {},
+                order: 0,
+              },
+              {
+                id: "tones",
+                title: "magichant_edit_tones_button",
+                component: MagichantTonesContentSection,
+                props: {},
+                order: 1,
+              },
+              {
+                id: "general",
+                title: "magichant_settings_button",
+                component: GeneralSection,
+                props: { customFields: [] },
+                order: 2,
+              },
+            ]}
           />
-          <SpellChanterTonesModal
+          <UnifiedSpellModal
             open={isOpen("chantTone")}
             onClose={closeModal}
             onSave={saveSpell}
-            magichant={{ ...spellBeingEdited, index: editingSpellIndex }}
+            onDelete={deleteSpell}
+            spellType="magichant"
+            spell={{ ...spellBeingEdited, index: editingSpellIndex }}
+            initialSectionId="tones"
+            sections={[
+              {
+                id: "keys",
+                title: "magichant_edit_keys_button",
+                component: MagichantKeysContentSection,
+                props: {},
+                order: 0,
+              },
+              {
+                id: "tones",
+                title: "magichant_edit_tones_button",
+                component: MagichantTonesContentSection,
+                props: {},
+                order: 1,
+              },
+              {
+                id: "general",
+                title: "magichant_settings_button",
+                component: GeneralSection,
+                props: { customFields: [] },
+                order: 2,
+              },
+            ]}
           />
           <SpellSymbolistModal
             open={isOpen("symbolist")}

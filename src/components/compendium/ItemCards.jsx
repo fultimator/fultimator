@@ -10,7 +10,7 @@ import remarkBreaks from "remark-breaks";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
-import { Martial } from "../icons";
+import { Martial, OffensiveSpellIcon } from "../icons";
 import { OpenBracket, CloseBracket } from "../Bracket";
 import Diamond from "../Diamond";
 import attributes from "../../libs/attributes";
@@ -23,7 +23,7 @@ import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 import { availableGifts } from "../player/spells/spellOptionData";
 import { availableDances } from "../player/spells/spellOptionData";
 import { availableTherioforms } from "../player/spells/spellOptionData";
-import { availableTones } from "../player/spells/SpellChanterTonesModal";
+import { availableMagichantKeys, availableMagichantTones } from "../player/spells/spellOptionData";
 import { availableSymbols } from "../player/spells/spellOptionData";
 import { invocationsByWellspring } from "../player/spells/spellOptionData";
 
@@ -55,11 +55,14 @@ const SPELL_TYPE_DESC_KEYS = {
 // 
 
 const _StyledMarkdown = styled(ReactMarkdown)({
-  "& ul, & ol": { paddingLeft: "1.5em", margin: 0, marginTop: "0.25em", marginBottom: "0.25em" },
-  "& p": { margin: 0, marginTop: "0.25em", marginBottom: "0.25em" },
-  "& ul": { listStyle: "disc" },
-  "& ol": { listStyle: "decimal" },
-  "& li": { display: "list-item" },
+  "& ul, & ol": { paddingLeft: "1.5em", margin: 0, marginTop: "0.5em", marginBottom: "0.5em" },
+  "& p": { margin: 0, marginTop: "0.5em", marginBottom: "0.5em", lineHeight: 1.5 },
+  "& ul": { listStyle: "disc", lineHeight: 1.6 },
+  "& ol": { listStyle: "decimal", lineHeight: 1.6 },
+  "& li": { display: "list-item", lineHeight: 1.6 },
+  "& strong": { fontWeight: 600 },
+  "& em": { fontStyle: "italic" },
+  display: "inline",
 });
 export const StyledMarkdown = ({ remarkPlugins = [], children, ...props }) => (
   <_StyledMarkdown remarkPlugins={[remarkBreaks, ...remarkPlugins]} {...props}>
@@ -99,26 +102,29 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
           <Grid item xs={4}>
-            <Typography variant="h4">{t("Weapon")}</Typography>
+            <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>{t("Weapon")}</Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Cost")}
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Accuracy")}
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Damage")}
             </Typography>
           </Grid>
@@ -137,7 +143,7 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
           }}
         >
           <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
-            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
+            <Typography fontWeight="600" sx={{ mr: 0.5, fontSize: "0.9rem" }}>
               {t(weapon.name)}
             </Typography>
             {weapon.martial && <Martial />}
@@ -146,7 +152,7 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
+            <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
               <OpenBracket />
               {attr1?.shortcaps} + {attr2?.shortcaps}
               <CloseBracket />
@@ -154,7 +160,7 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography fontWeight="bold" textAlign="center">
+            <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
               <OpenBracket />
               {t("HR +")} {weapon.damage}
               <CloseBracket />
@@ -174,7 +180,7 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
           }}
         >
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(weapon.category)}</Typography>
+            <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>{t(weapon.category)}</Typography>
           </Grid>
           <Grid item xs={1}>
             <Diamond color={customTheme.primary} />
@@ -195,21 +201,18 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
         </Grid>
 
         {/* Row 3 – quality */}
-        <Box>
-          <Typography variant="body2">
-            {!weapon.quality ? (
-              ""
-            ) : (
+        {weapon.quality && (
+          <Box sx={{ px: 1, py: 1 }}>
+            <Typography variant="body2" sx={{ lineHeight: 1.5 }}>
               <StyledMarkdown
                 allowedElements={["strong", "em"]}
                 unwrapDisallowed
-                 sx={{ px: 1, py: 0.75 }}
               >
                 {weapon.quality}
               </StyledMarkdown>
-            )}
-          </Typography>
-        </Box>
+            </Typography>
+          </Box>
+        )}
       </Stack>
     </Card>
   );
@@ -262,31 +265,34 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
           <Grid item xs={3}>
-            <Typography variant="h4">{t(armor.category)}</Typography>
+            <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>{t(armor.category)}</Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Cost")}
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Defense")}
             </Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("M. Defense")}
             </Typography>
           </Grid>
           <Grid item xs={2}>
-            <Typography variant="h4" textAlign="center">
+            <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Init.")}
             </Typography>
           </Grid>
@@ -305,7 +311,7 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
           }}
         >
           <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
-            <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
+            <Typography fontWeight="600" sx={{ mr: 0.5, fontSize: "0.9rem" }}>
               {t(armor.name)}
             </Typography>
             {armor.martial && <Martial />}
@@ -362,7 +368,9 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
   const attr2 = attributes[spell.attr2];
   const effectText =
     spell.effect ??
+    spell.description ??
     (Array.isArray(spell.special) ? spell.special.join("; ") : (spell.special ?? ""));
+  const targetText = spell.target ?? spell.targetDesc ?? "";
 
   return (
     <Card id={id} elevation={1}>
@@ -378,8 +386,11 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
@@ -415,7 +426,10 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
           }}
         >
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(spell.name)}</Typography>
+            <Typography fontWeight="bold" sx={{ fontSize: "0.9rem", display: "flex", alignItems: "center", gap: 0.5 }}>
+              {t(spell.name)}
+              {spell.type === "offensive" && <OffensiveSpellIcon fontSize="small" />}
+            </Typography>
           </Grid>
           <Grid item xs={2}>
             <Typography textAlign="center">{spell.mp}</Typography>
@@ -424,45 +438,29 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
             <Typography textAlign="center">{spell.duration}</Typography>
           </Grid>
           <Grid item xs={3}>
-            <Typography textAlign="center">{spell.target}</Typography>
+            <Typography textAlign="center">{t(targetText)}</Typography>
           </Grid>
         </Grid>
 
-        {/* Row 2 – accuracy (if applicable) */}
-        {/* {attr1 && attr2 && (
-          <Grid
-            container
-            alignItems="center"
-            sx={{
-              borderBottom: `1px solid ${customTheme.secondary}`,
-              px: 1,
-              py: "4px",
-            }}
-          >
-            <Grid item xs={12}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="right"
-                fontWeight="bold"
-              >
-                {attr1.shortcaps} + {attr2.shortcaps}
-              </Typography>
-            </Grid>
-          </Grid>
-        )} */}
-
-        {/* Effect */}
-        {/* <Box sx={{ px: 1, py: 0.75 }}>
-          <Typography variant="body2">{spell.effect}</Typography>
-        </Box> */}
-
+        {/* Effect with accuracy/damage prefix (if offensive) */}
         {effectText && (
           <Box sx={{ px: 1, py: 0.75 }}>
-            <Typography variant="body2">
-              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                {effectText}
-              </StyledMarkdown>
+            <Typography variant="body2" sx={{ lineHeight: 1.5, display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 0.5 }}>
+<span>
+  {spell.type === "offensive" && attr1 && attr2 && (
+    <strong style={{ whiteSpace: "nowrap" }}>
+      <OpenBracket />
+      {attr1.shortcaps} + {attr2.shortcaps}
+      <CloseBracket /> <Diamond /> <OpenBracket />HR + {spell.damage || 0}<CloseBracket />{" "}
+      {spell.damagetype ? t(spell.damagetype) : "physical"} <Diamond />{" "}
+    </strong>
+  )}
+  <span style={{ display: "inline" }}>
+    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+      {t(effectText)}
+    </StyledMarkdown>
+  </span>
+</span>
             </Typography>
           </Box>
         )}
@@ -501,8 +499,11 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
@@ -532,7 +533,10 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
           }}
         >
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(spell.name)}</Typography>
+            <Typography fontWeight="bold" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              {t(spell.name)}
+              {spell.isOffensive && <OffensiveSpellIcon fontSize="small" />}
+            </Typography>
             <Typography variant="caption" color="text.secondary">
               {spell.class}{attr1 && attr2 ? ` · ${attr1.shortcaps}+${attr2.shortcaps}` : ""}
             </Typography>
@@ -572,12 +576,21 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
           </Grid>
         )} */}
 
-        {/* Description */}
+        {/* Description with accuracy/damage prefix (if offensive) */}
         <Box sx={{ px: 1, py: 0.75 }}>
-          <Typography variant="body2">
-            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-              {t(spell.description)}
-            </StyledMarkdown>
+          <Typography variant="body2" sx={{ lineHeight: 1.5, wordWrap: "break-word", overflowWrap: "break-word" }}>
+            {spell.isOffensive && attr1 && attr2 && (
+              <strong>
+                <OpenBracket />
+                {attr1.shortcaps} + {attr2.shortcaps}
+                <CloseBracket /> <Diamond /> <OpenBracket />HR + {spell.damage || 0}<CloseBracket /> {spell.damageType || "physical"} <Diamond />{" "}
+              </strong>
+            )}
+            <span style={{ display: "inline" }}>
+              <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                {t(spell.description)}
+              </StyledMarkdown>
+            </span>
           </Typography>
         </Box>
       </Stack>
@@ -617,67 +630,96 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
       case "gift":
         return (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 0.5 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 1, lineHeight: 1.5 }}>
               {md(t(item.event))}
             </Typography>
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.effect))}</Typography>
           </>
         );
       case "dance":
         return (
           <>
             {item.duration && (
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, lineHeight: 1.5 }}>
                 <strong>{t("Duration")}:</strong> {t(item.duration)}
               </Typography>
             )}
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.effect))}</Typography>
           </>
         );
       case "therioform":
         return (
           <>
             {item.genoclepsis && (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 0.5 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic", mb: 1, lineHeight: 1.5 }}>
                 {md(t(item.genoclepsis))}
               </Typography>
             )}
-            <Typography variant="body2" color="text.secondary">{md(t(item.description))}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.description))}</Typography>
           </>
         );
       case "magichant":
+        if (item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery) {
+          const keyDetails = [
+            { label: t("Type"), value: item.type ? t(item.type) : "" },
+            { label: t("Status"), value: item.status ? t(item.status) : "" },
+            { label: t("Attribute"), value: item.attribute ? t(item.attribute) : "" },
+            { label: t("Recovery"), value: item.recovery ? t(item.recovery) : "" },
+          ].filter((entry) => entry.value);
+          return (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "auto 1fr",
+                columnGap: 1.5,
+                rowGap: 0.75,
+              }}
+            >
+              {keyDetails.map((entry) => (
+                <React.Fragment key={entry.label}>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                    {entry.label}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                    {entry.value}
+                  </Typography>
+                </React.Fragment>
+              ))}
+            </Box>
+          );
+        }
       case "symbol":
-        return <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>;
+        return <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.effect))}</Typography>;
       case "invocation":
         return (
           <>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               {item.wellspring && (
                 <Chip label={item.wellspring} size="small" variant="outlined"
-                  sx={{ fontSize: "0.65rem", height: 18 }} />
+                  sx={{ fontSize: "0.7rem", height: 22 }} />
               )}
               {item.type && (
                 <Chip label={item.type} size="small" variant="outlined"
-                  sx={{ fontSize: "0.65rem", height: 18 }} />
+                  sx={{ fontSize: "0.7rem", height: 22 }} />
               )}
             </Box>
-            <Typography variant="body2" color="text.secondary">{md(t(item.effect))}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.effect))}</Typography>
           </>
         );
       case "magiseed":
         return (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>{md(t(item.description))}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, lineHeight: 1.5 }}>{md(t(item.description))}</Typography>
             {Array.from({ length: item.rangeEnd - item.rangeStart + 1 }, (_, j) => {
               const tier = item.rangeStart + j;
               const effect = item.effects?.[tier];
               return effect ? (
-                <Box key={tier} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
+                <Box key={tier} sx={{ display: "flex", gap: 1, mb: 0.75 }}>
                   <Typography variant="caption" fontWeight="bold" color={customTheme.primary}
-                    sx={{ minWidth: 22, flexShrink: 0, pt: "1px" }}>
+                    sx={{ minWidth: 22, flexShrink: 0, pt: "2px", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.3px" }}>
                     T{tier}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">{md(t(effect))}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(effect))}</Typography>
                 </Box>
               ) : null;
             })}
@@ -689,34 +731,34 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
           <Stack divider={<Divider />}>
             {item.domainDesc && (
               <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>
+                <Typography variant="body2" fontWeight="600" sx={{ mb: 0.5, textTransform: "uppercase", fontSize: "0.85rem", letterSpacing: "0.3px" }}>
                   {item.domain ? t(item.domain) : t("Domain")}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.domainDesc))}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.domainDesc))}</Typography>
               </Box>
             )}
             {item.mergeDesc && (
               <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>
+                <Typography variant="body2" fontWeight="600" sx={{ textTransform: "uppercase", mb: 0.5, fontSize: "0.85rem", letterSpacing: "0.3px" }}>
                   {item.merge ? t(item.merge) : t("Merge")}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.mergeDesc))}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.mergeDesc))}</Typography>
               </Box>
             )}
             {item.pulseDesc && (
               <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>
+                <Typography variant="body2" fontWeight="600" sx={{ textTransform: "uppercase", mb: 0.5, fontSize: "0.85rem", letterSpacing: "0.3px" }}>
                   {item.pulse ? t(item.pulse) : t("Pulse")}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.pulseDesc))}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.pulseDesc))}</Typography>
               </Box>
             )}
             {item.dismissDesc && (
               <Box>
-                <Typography variant="body2" fontWeight="bold" sx={{ textTransform: "uppercase", mb: 0.25 }}>
+                <Typography variant="body2" fontWeight="600" sx={{ textTransform: "uppercase", mb: 0.5, fontSize: "0.85rem", letterSpacing: "0.3px" }}>
                   {item.dismiss ? t(item.dismiss) : t("Dismiss")}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">{md(t(item.dismissDesc))}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.dismissDesc))}</Typography>
               </Box>
             )}
           </Stack>
@@ -724,61 +766,61 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
       case "tinkerer-alchemy":
         return (
           <>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: 600, fontSize: "0.75rem", letterSpacing: "0.3px", display: "block", mb: 0.5 }}>
               {item.category}
             </Typography>
-            <Typography variant="body2" color="text.secondary">{md(item.effect)}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(item.effect)}</Typography>
           </>
         );
       case "tinkerer-infusion":
         return (
           <>
             {item.infusionRank && (
-              <Typography variant="caption" color="text.secondary">Rank {item.infusionRank}</Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5, fontWeight: 600, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.3px" }}>Rank {item.infusionRank}</Typography>
             )}
-            <Typography variant="body2" color="text.secondary">{md(item.effect ?? item.description ?? "")}</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(item.effect ?? item.description ?? "")}</Typography>
           </>
         );
       case "pilot-vehicle":
         if (pilotSubtype === "frame" || item.passengers != null) return (
           <>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: "bold", display: "block", mb: 0.25 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", fontWeight: 600, display: "block", mb: 0.5, fontSize: "0.75rem", letterSpacing: "0.3px" }}>
               {t(item.frame ?? "")}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.75, lineHeight: 1.5 }}>
               {t("Passengers")}: {item.passengers ?? " - "} · {t("Distance")}: {item.distance ?? " - "}
             </Typography>
-            {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(t(item.description))}</Typography>}
+            {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.5 }}>{md(t(item.description))}</Typography>}
           </>
         );
         if (pilotSubtype === "armor" || item.def != null) return (
           <>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.75, lineHeight: 1.5 }}>
               DEF {item.def ?? " - "} · MDEF {item.mdef ?? " - "}{item.martial ? " · Martial" : ""}
               {item.cost ? ` · ${item.cost}z` : ""}
             </Typography>
-            {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{md(item.description)}</Typography>}
+            {item.description && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.5 }}>{md(item.description)}</Typography>}
           </>
         );
         if (pilotSubtype === "weapon" || item.damage != null) return (
           <>
-            <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.25, lineHeight: 1.5 }}>
               {[item.category, item.att1 && item.att2 ? `${item.att1}+${item.att2}` : null].filter(Boolean).join(" · ")}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.75, lineHeight: 1.5 }}>
               {[`HR+${item.damage ?? 0}`, item.damageType, item.range,
                 item.prec ? `+${item.prec} acc` : null,
                 item.cumbersome ? "Cumbersome" : null,
                 item.isShield ? "Shield" : null,
               ].filter(Boolean).join(" · ")}
             </Typography>
-            {item.quality && <Typography variant="caption" color="text.secondary">{item.quality}</Typography>}
-            {item.cost ? <Typography variant="caption" color="text.secondary"> · {item.cost}z</Typography> : null}
+            {item.quality && <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.25, lineHeight: 1.5 }}>{item.quality}</Typography>}
+            {item.cost ? <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}> · {item.cost}z</Typography> : null}
           </>
         );
         // support module
         return item.description
-          ? <Typography variant="body2" color="text.secondary">{md(t(item.description))}</Typography>
+          ? <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(t(item.description))}</Typography>
           : null;
       case "cooking":
         if (item.cookbookEffects?.length) {
@@ -786,19 +828,21 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             <>
               {item.cookbookEffects.map((entry) =>
                 entry.effect ? (
-                  <Box key={entry.id} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                    <Typography variant="caption" fontWeight="bold" color={customTheme.primary}
-                      sx={{ minWidth: 22, flexShrink: 0, pt: "1px" }}>
+                  <Box key={entry.id} sx={{ display: "flex", gap: 1, mb: 0.75 }}>
+                    <Typography variant="caption" fontWeight="600" color={customTheme.primary}
+                      sx={{ minWidth: 22, flexShrink: 0, pt: "2px", fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.3px" }}>
                       {entry.id}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">{md(entry.effect)}</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(entry.effect)}</Typography>
                   </Box>
                 ) : null
               )}
             </>
           );
         }
-        return <Typography variant="body2" color="text.secondary">{md(item.effect ?? "")}</Typography>;
+        return <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>{md(item.effect ?? "")}</Typography>;
+      case "default":
+        return null;
       default:
         return null;
     }
@@ -808,7 +852,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
     gift: "Gift",
     dance: "Dance",
     therioform: "Therioform",
-    magichant: "Tone",
+    magichant: item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery ? "Key" : "Tone",
     symbol: "Symbol",
     invocation: "Invocation",
     magiseed: "Magiseed",
@@ -822,6 +866,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
       : pilotSubtype === "support" ? "Support Module"
       : "Pilot Vehicle",
     cooking: "Delicacy",
+    default: "Spell",
   }[item.spellType] ?? item.spellType;
 
   return (
@@ -839,7 +884,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             alignItems: "center",
           }}
         >
-          <Typography variant="body2" color="inherit" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>
+          <Typography variant="body2" color="inherit" sx={{ textTransform: "uppercase", fontWeight: 600, fontSize: "0.85rem", letterSpacing: "0.5px", lineHeight: 1.4 }}>
             {t(typeLabel)}
           </Typography>
         </Box>
@@ -848,12 +893,12 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             background,
             borderBottom: `1px solid ${customTheme.secondary}`,
             px: 1,
-            py: "5px",
+            py: "8px",
           }}
         >
-          <Typography fontWeight="bold">{t(item.name)}</Typography>
+          <Typography fontWeight="600" sx={{ fontSize: "0.95rem" }}>{t(item.name)}</Typography>
         </Box>
-        <Box sx={{ px: 1, py: 0.75 }}>
+        <Box sx={{ px: 1, py: 1 }}>
           {renderBody()}
         </Box>
       </Stack>
@@ -893,8 +938,11 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
@@ -1008,8 +1056,11 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
             color: "#ffffff",
             cursor: onHeaderClick ? "pointer" : "default",
             "& .MuiTypography-root": {
-              fontSize: "0.9rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
               textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              lineHeight: 1.4,
             },
           }}
         >
@@ -1153,14 +1204,31 @@ function renderSpellTypeContent(sc, t, customTheme) {
         ));
 
     case "magichant":
-      return availableTones
-        .filter(tone => !tone.name.includes("_custom_"))
-        .map((tone, i) => (
-          <Box key={i} sx={itemSx}>
-            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(tone.name)}</Typography>
-            <Typography variant="body2" color="text.secondary">{md(t(tone.effect))}</Typography>
-          </Box>
-        ));
+      return [
+        <Box key="keys_h" sx={sectionHeaderSx}>{captionHeader(t("magichant_key"))}</Box>,
+        ...availableMagichantKeys
+          .filter((key) => !key.name.includes("_custom_"))
+          .map((key, i) => (
+            <Box key={`key_${i}`} sx={itemSx}>
+              <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(key.name)}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {[t(key.type || ""), t(key.status || "")].filter(Boolean).join(" · ")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {[t(key.attribute || ""), t(key.recovery || "")].filter(Boolean).join(" / ")}
+              </Typography>
+            </Box>
+          )),
+        <Box key="tones_h" sx={sectionHeaderSx}>{captionHeader(t("magichant_tone"))}</Box>,
+        ...availableMagichantTones
+          .filter((tone) => !tone.name.includes("_custom_"))
+          .map((tone, i) => (
+            <Box key={`tone_${i}`} sx={itemSx}>
+              <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.25 }}>{t(tone.name)}</Typography>
+              <Typography variant="body2" color="text.secondary">{md(t(tone.effect))}</Typography>
+            </Box>
+          )),
+      ];
 
     case "symbol":
       return availableSymbols
@@ -1881,7 +1949,7 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
           }}
         >
           <Grid item xs={4}>
-            <Typography fontWeight="bold">{t(weapon.category)}</Typography>
+            <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>{t(weapon.category)}</Typography>
           </Grid>
           <Grid item xs={1}>
             <Diamond color={customTheme.primary} />
@@ -1989,9 +2057,446 @@ export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, 
   );
 });
 
-// 
+//
+// VehicleModuleCard
+//
+
+export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module, id, onHeaderClick }) {
+  const { t } = useTranslate();
+  const customTheme = useCustomTheme();
+
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  const getModuleName = () => {
+    if (module.name === "pilot_custom_armor" || module.name === "pilot_custom_weapon" || module.name === "pilot_custom_support") {
+      return module.customName;
+    }
+    return t(module.name);
+  };
+
+  // SUPPORT MODULE (and default) - follows AccessoryCard format - CHECK FIRST
+  if (module.type === "pilot_module_support") {
+    return (
+      <Card id={id} elevation={1}>
+        <Stack>
+          {/* Header */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            onClick={onHeaderClick}
+            sx={{
+              p: 1,
+              background: customTheme.primary,
+              color: "#ffffff",
+              cursor: onHeaderClick ? "pointer" : "default",
+              "& .MuiTypography-root": {
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                lineHeight: 1.4,
+              },
+            }}
+          >
+            <Grid item xs={3}>
+              <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Support Module")}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Cost")}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h4" textAlign="right" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Type")}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Row 1 – name + stats */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              background,
+              borderBottom: `1px solid ${customTheme.secondary}`,
+              px: 1,
+              py: "5px",
+            }}
+          >
+            <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+              <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
+                {getModuleName()}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography textAlign="right" sx={{ fontSize: "0.9rem" }}>
+                {module.category ? t(module.category) : " - "}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Quality row (optional) */}
+          {module.quality && (
+            <Box sx={{ px: 1, py: 0.75 }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {module.quality}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+
+          {/* Description row (optional) */}
+          {module.description && (
+            <Box sx={{ px: 1, py: 0.75, borderTop: `1px solid ${customTheme.secondary}` }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {t(module.description)}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+      </Card>
+    );
+  }
+
+  // ARMOR MODULE - follows ArmorCard format
+  if (module.type === "pilot_module_armor") {
+    return (
+      <Card id={id} elevation={1}>
+        <Stack>
+          {/* Header */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            onClick={onHeaderClick}
+            sx={{
+              p: 1,
+              background: customTheme.primary,
+              color: "#ffffff",
+              cursor: onHeaderClick ? "pointer" : "default",
+              "& .MuiTypography-root": {
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                lineHeight: 1.4,
+              },
+            }}
+          >
+            <Grid item xs={3}>
+              <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Armor Module")}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Cost")}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Defense")}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("M. Defense")}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Type")}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Row 1 – name + stats */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              background,
+              borderBottom: `1px solid ${customTheme.secondary}`,
+              px: 1,
+              py: "5px",
+            }}
+          >
+            <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+              <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
+                {getModuleName()}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography fontWeight="bold" textAlign="center">
+                {module.def ?? " - "}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography fontWeight="bold" textAlign="center">
+                {module.mdef ?? " - "}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography fontWeight="bold" textAlign="center">
+                {module.martial ? t("Martial") : " - "}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Quality row (optional) */}
+          {module.quality && (
+            <Box sx={{ px: 1, py: 0.75 }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {module.quality}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+
+          {/* Description row (optional) */}
+          {module.description && (
+            <Box sx={{ px: 1, py: 0.75, borderTop: `1px solid ${customTheme.secondary}` }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {t(module.description)}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+      </Card>
+    );
+  }
+
+  // WEAPON MODULE - follows WeaponCard format
+  if (module.type === "pilot_module_weapon") {
+    const attr1 = attributes[module.att1];
+    const attr2 = attributes[module.att2];
+    return (
+      <Card id={id} elevation={1}>
+        <Stack>
+          {/* Header */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            onClick={onHeaderClick}
+            sx={{
+              p: 1,
+              background: customTheme.primary,
+              color: "#ffffff",
+              cursor: onHeaderClick ? "pointer" : "default",
+              "& .MuiTypography-root": {
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                lineHeight: 1.4,
+              },
+            }}
+          >
+            <Grid item xs={4}>
+              <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Weapon Module")}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Cost")}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Accuracy")}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
+                {t("Damage")}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Row 1 – name + stats */}
+          <Grid
+            container
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              background,
+              borderBottom: `1px solid ${customTheme.secondary}`,
+              px: 1,
+              py: "5px",
+            }}
+          >
+            <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+              <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
+                {getModuleName()}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
+                <OpenBracket />
+                {attr1?.shortcaps || "?"} + {attr2?.shortcaps || "?"}
+                <CloseBracket />
+                {module.prec && module.prec > 0 ? `+${module.prec}` : ""}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
+                <OpenBracket />
+                {t("HR +")} {module.damage ?? 0}
+                <CloseBracket />
+                {module.damageType ? t(module.damageType) : ""}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Row 2 – category / range */}
+          <Grid
+            container
+            justifyContent="space-between"
+            sx={{
+              borderBottom: `1px solid ${customTheme.secondary}`,
+              px: 1,
+              py: "5px",
+            }}
+          >
+            <Grid item xs={4}>
+              <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
+                {module.category ? t(module.category) : " - "}
+              </Typography>
+            </Grid>
+            <Grid item xs={2}>
+              <Diamond color={customTheme.primary} />
+            </Grid>
+            <Grid item xs={3}>
+              <Typography textAlign="center">
+                {module.range ? t(module.range) : " - "}
+              </Typography>
+            </Grid>
+            <Grid item xs={1}>
+              <Diamond color={customTheme.primary} />
+            </Grid>
+            <Grid item xs={2} sx={{ textAlign: "right" }}>
+              <Typography>{module.martial ? t("Martial") : " - "}</Typography>
+            </Grid>
+          </Grid>
+
+          {/* Quality row (optional) */}
+          {module.quality && (
+            <Box sx={{ px: 1, py: 0.75 }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {module.quality}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+
+          {/* Description row (optional) */}
+          {module.description && (
+            <Box sx={{ px: 1, py: 0.75, borderTop: `1px solid ${customTheme.secondary}` }}>
+              <Typography variant="body2">
+                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                  {t(module.description)}
+                </StyledMarkdown>
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+      </Card>
+    );
+  }
+
+  // Fallback/default should not reach here but just in case
+  return null;
+});
+
+//
+// SkillCard
+//
+
+export const SkillCard = React.memo(function SkillCard({ skill, id, onHeaderClick }) {
+  const { t } = useTranslate();
+  const customTheme = useCustomTheme();
+
+  const background =
+    customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
+
+  return (
+    <Card id={id} elevation={1}>
+      <Stack>
+        <Box
+          onClick={onHeaderClick}
+          sx={{
+            px: 2, py: 1,
+            background: customTheme.primary,
+            color: "#ffffff",
+            cursor: onHeaderClick ? "pointer" : "default",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h4" color="inherit" sx={{ textTransform: "uppercase", fontSize: "1rem", fontWeight: "bold" }}>
+            {t(skill.className)}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Chip
+              label={`SL ${skill.currentLvl}`}
+              size="small"
+              sx={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#ffffff", fontWeight: "bold", fontSize: "0.7rem" }}
+            />
+            {skill.isHomebrew && (
+              <Chip
+                label="Homebrew"
+                size="small"
+                sx={{ backgroundColor: "rgba(255,165,0,0.3)", color: "#ffffff", fontWeight: "bold", fontSize: "0.65rem" }}
+              />
+            )}
+          </Box>
+        </Box>
+        <Box sx={{ background, borderBottom: `1px solid ${customTheme.secondary}`, px: 2, py: "6px" }}>
+          <Typography fontWeight="bold">{skill.isHomebrew ? skill.skillName : t(skill.skillName)}</Typography>
+        </Box>
+        {skill.description && (
+          <Box sx={{ px: 2, py: 1, fontSize: "0.875rem" }}>
+            <StyledMarkdown allowedElements={["p", "strong", "em", "ul", "ol", "li", "br"]} unwrapDisallowed>
+              {skill.isHomebrew ? skill.description : t(skill.description)}
+            </StyledMarkdown>
+          </Box>
+        )}
+      </Stack>
+    </Card>
+  );
+});
+
+//
 // HeroicCard
-// 
+//
 
 export const HeroicCard = React.memo(function HeroicCard({ heroic, id, onHeaderClick }) {
   const { t } = useTranslate();

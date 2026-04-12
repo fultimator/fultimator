@@ -14,8 +14,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 
 export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -160,32 +160,13 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedSymbol && (
-                  <>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        mb: 1,
-                      }}
-                    >
-                      {selectedSymbol.name === "symbol_custom_name"
-                        ? selectedSymbol.customName
-                        : t(selectedSymbol.name)}
-                      {" - "}
-                      {selectedSymbolSpell && t(selectedSymbolSpell.className)}
-                    </Typography>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {selectedSymbol.name === "symbol_custom_name"
-                        ? selectedSymbol.effect
-                        : t(selectedSymbol.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedSymbol,
+                    spellType: "symbol",
+                    name: selectedSymbol.name === "symbol_custom_name" ? selectedSymbol.customName : selectedSymbol.name,
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

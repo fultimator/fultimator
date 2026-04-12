@@ -11,6 +11,8 @@ import {
   Typography,
   Divider,
   Box,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Close, Add, RemoveCircleOutline } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
@@ -30,6 +32,7 @@ export default function PlayerNoteModal({
   const [name, setName] = useState(note?.name || "");
   const [description, setDescription] = useState(note?.description || "");
   const [clocks, setClocks] = useState(note?.clocks || []);
+  const [showInPlayerSheet, setShowInPlayerSheet] = useState(note?.showInPlayerSheet !== false);
 
   const [clockDialogOpen, setClockDialogOpen] = useState(false);
   const [clockName, setClockName] = useState("");
@@ -41,6 +44,7 @@ export default function PlayerNoteModal({
     setName(note?.name || "");
     setDescription(note?.description || "");
     setClocks(note?.clocks || []);
+    setShowInPlayerSheet(note?.showInPlayerSheet !== false);
   }, [note, open]);
 
   const handleSave = () => {
@@ -49,6 +53,7 @@ export default function PlayerNoteModal({
       name,
       description,
       clocks,
+      showInPlayerSheet,
     });
     onClose();
   };
@@ -117,6 +122,17 @@ export default function PlayerNoteModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxRows={10}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showInPlayerSheet}
+                    onChange={(e) => setShowInPlayerSheet(e.target.checked)}
+                  />
+                }
+                label={t("Show in Character Sheet")}
               />
             </Grid>
             <Grid item xs={12}>

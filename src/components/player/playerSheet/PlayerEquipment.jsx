@@ -17,12 +17,11 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import PrettyWeapon from "../equipment/weapons/PrettyWeapon";
-import PrettyArmor from "../equipment/armor/PrettyArmor";
-import PrettyAccessory from "../equipment/accessories/PrettyAccessory";
-import PrettyCustomWeapon from "../equipment/customWeapons/PrettyCustomWeapon";
-import { Casino, SwapHoriz, Edit } from "@mui/icons-material";
+import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
+import { WeaponCard, ArmorCard, CustomWeaponCard, AccessoryCard } from "../../compendium/ItemCards";
+import { OpenBracket, CloseBracket } from "../../Bracket";
 import attributes from "../../../libs/attributes";
+import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
@@ -45,6 +44,8 @@ export default function PlayerEquipment({
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
   const [openEdit, setOpenEdit] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // Guardian - Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
@@ -554,8 +555,10 @@ export default function PlayerEquipment({
                     transform: "rotate(180deg)",
                     fontSize: "2em",
                     minHeight: "100px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                  align="center"
                 >
                   {t("Equipment")}
                 </Typography>
@@ -570,127 +573,216 @@ export default function PlayerEquipment({
                 )}
               </Box>
             )}
-            <Grid container spacing={2} sx={{ padding: "1em" }}>
-              {allEquippedWeapons.length > 0 && (
-                <Grid item xs={12}>
-                  <Card sx={{ 
-                    backgroundColor: custom.mode === "dark" ? "#181a1b" : "#ffffff", 
-                    boxShadow: isCharacterSheet ? 0 : 2,
-                    opacity: hasWeaponModule ? 0.5 : 1
-                  }}>
-                    <Stack>
-                      {allEquippedWeapons.map((weapon, index) => (
-                        <React.Fragment key={index}>
-                          <Grid item xs={12} sx={{ mb: index < allEquippedWeapons.length - 1 ? 1 : 0 }}>
-                            <Box>
-                              {weapon.isCustomWeapon ? (
-                                <PrettyCustomWeapon
-                                  weaponData={weapon}
-                                  isCharacterSheet={isCharacterSheet}
-                                  showActions={false}
-                                  showCard={false}
-                                  showHeader={index === 0}
-                                />
-                              ) : (
-                                <PrettyWeapon
-                                  weapon={weapon}
-                                  player={player}
-                                  setPlayer={setPlayer}
-                                  isCharacterSheet={isCharacterSheet}
-                                  showCard={false}
-                                  showHeader={index === 0}
-                                />
-                              )}
-                            </Box>
-                            <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
-                              {weapon.isTransforming && isEditMode && (
-                                <Tooltip title={t("weapon_customization_swap_form")}>
-                                  <IconButton
-                                    onClick={() => handleSwapForm(weapon)}
-                                    size="small"
-                                  >
-                                    <SwapHoriz fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              <Tooltip title={t("Roll")}>
-                                <IconButton
-                                  onClick={() => handleDiceRoll(weapon)}
-                                  size="small"
-                                >
-                                  <Casino fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          </Grid>
-                          {index < allEquippedWeapons.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
+            <Grid container spacing={1} sx={{ padding: "1em" }}>
+              {allEquippedWeapons.map((weapon, index) => (
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  md={6}
+                  key={index}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {weapon.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                    <Box
+                      sx={{
+                        padding: "5px",
+                        backgroundColor: theme.palette.ternary?.main || "#999",
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                        gap: 0.5,
+                      }}
+                    >
+                      {weapon.isTransforming && isEditMode && (
+                        <Tooltip title={t("weapon_customization_swap_form")}>
+                          <IconButton size="small" onClick={() => handleSwapForm(weapon)} sx={{ p: 0.5 }}>
+                            <SwapHoriz fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title={t("Info")}>
+                        <IconButton size="small" onClick={() => { setSelectedItem(weapon); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                          <Info fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t("Roll")}>
+                        <IconButton size="small" onClick={() => handleDiceRoll(weapon)} sx={{ p: 0.5 }}>
+                          <Casino fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Grid>
                 </Grid>
-              )}
-              {equippedArmor.length > 0 && (
-                <Grid item xs={12}>
-                  <Card sx={{ 
-                    backgroundColor: custom.mode === "dark" ? "#181a1b" : "#ffffff", 
-                    boxShadow: isCharacterSheet ? 0 : 2,
-                    opacity: hasArmorModule ? 0.5 : 1
-                  }}>
-                    <Stack>
-                      {equippedArmor.map((armor, index) => (
-                        <React.Fragment key={index}>
-                          <PrettyArmor 
-                            armor={armor} 
-                            isCharacterSheet={isCharacterSheet}
-                            showCard={false}
-                            showHeader={index === 0}
-                          />
-                          {index < equippedArmor.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
+              ))}
+              {equippedArmor.map((armor, index) => (
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  md={6}
+                  key={`armor-${index}`}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {armor.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                    <Box
+                      sx={{
+                        padding: "5px",
+                        backgroundColor: theme.palette.ternary?.main || "#999",
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton size="small" onClick={() => { setSelectedItem(armor); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                          <Info fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Grid>
                 </Grid>
-              )}
-              {equippedShields.length > 0 && (
-                <Grid item xs={12}>
-                  <Card sx={{ backgroundColor: custom.mode === "dark" ? "#181a1b" : "#ffffff", boxShadow: isCharacterSheet ? 0 : 2 }}>
-                    <Stack>
-                      {equippedShields.map((shield, index) => (
-                        <React.Fragment key={index}>
-                          <PrettyArmor 
-                            armor={shield} 
-                            isCharacterSheet={isCharacterSheet}
-                            showCard={false}
-                            showHeader={index === 0}
-                          />
-                          {index < equippedShields.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
+              ))}
+              {equippedShields.map((shield, index) => (
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  md={6}
+                  key={`shield-${index}`}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {shield.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                    <Box
+                      sx={{
+                        padding: "5px",
+                        backgroundColor: theme.palette.ternary?.main || "#999",
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton size="small" onClick={() => { setSelectedItem(shield); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                          <Info fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Grid>
                 </Grid>
-              )}
-              {equippedAccessories.length > 0 && (
-                <Grid item xs={12}>
-                  <Card sx={{ backgroundColor: custom.mode === "dark" ? "#181a1b" : "#ffffff", boxShadow: isCharacterSheet ? 0 : 2 }}>
-                    <Stack>
-                      {equippedAccessories.map((accessory, index) => (
-                        <React.Fragment key={index}>
-                          <PrettyAccessory 
-                            accessory={accessory} 
-                            isCharacterSheet={isCharacterSheet}
-                            showCard={false}
-                            showHeader={index === 0}
-                          />
-                          {index < equippedAccessories.length - 1 && <Divider />}
-                        </React.Fragment>
-                      ))}
-                    </Stack>
-                  </Card>
+              ))}
+              {equippedAccessories.map((accessory, index) => (
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  md={6}
+                  key={`accessory-${index}`}
+                  sx={{ display: "flex", alignItems: "stretch" }}
+                >
+                  <Grid item xs={10} sx={{ display: "flex" }}>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {accessory.name}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                    <Box
+                      sx={{
+                        padding: "5px",
+                        backgroundColor: theme.palette.ternary?.main || "#999",
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Tooltip title={t("Info")}>
+                        <IconButton size="small" onClick={() => { setSelectedItem(accessory); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                          <Info fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Grid>
                 </Grid>
-              )}
+              ))}
               {(precMeleeModifier !== 0 ||
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
@@ -772,6 +864,29 @@ export default function PlayerEquipment({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
+        <DialogContent sx={{ p: 0 }}>
+          {selectedItem && (
+            <>
+              {selectedItem.isCustomWeapon ? (
+                <CustomWeaponCard weapon={selectedItem} />
+              ) : allEquippedWeapons.includes(selectedItem) ? (
+                <WeaponCard weapon={selectedItem} />
+              ) : equippedArmor.includes(selectedItem) ? (
+                <ArmorCard armor={selectedItem} />
+              ) : equippedShields.includes(selectedItem) ? (
+                <ArmorCard armor={selectedItem} />
+              ) : equippedAccessories.includes(selectedItem) ? (
+                <AccessoryCard accessory={selectedItem} />
+              ) : null}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInfoModalOpen(false)} variant="contained" color="primary">{t("Close")}</Button>
         </DialogActions>
       </Dialog>
     </>

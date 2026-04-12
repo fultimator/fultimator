@@ -23,8 +23,8 @@ import {
   ElectricBolt,
   Water,
 } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
 export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
@@ -283,33 +283,12 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedInvocation && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {t(selectedInvocation.name)}
-                      {" - "}
-                      {selectedInvokerSpell && t(selectedInvokerSpell.className)}
-                    </Typography>
-
-                    <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                      <Chip 
-                        label={t(`invoker_${selectedInvocation.wellspring.toLowerCase()}`)} 
-                        sx={{ 
-                          backgroundColor: getWellspringColor(selectedInvocation.wellspring), 
-                          color: (selectedInvocation.wellspring === 'Air' || selectedInvocation.wellspring === 'Lightning') ? "black" : "white", 
-                          fontWeight: "bold" 
-                        }} 
-                      />
-                      <Chip label={t(selectedInvocation.type)} variant="outlined" />
-                    </Box>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {t(selectedInvocation.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedInvocation,
+                    spellType: "invocation",
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>

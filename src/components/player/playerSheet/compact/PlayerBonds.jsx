@@ -19,6 +19,7 @@ import {
   Grid,
   Checkbox,
   FormControlLabel,
+  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/system";
@@ -31,13 +32,12 @@ import { useTheme } from "@mui/material/styles";
 import DeleteConfirmationDialog from "../../../../components/common/DeleteConfirmationDialog";
 
 const StyledTableCellHeader = styled(TableCell)({
-  padding: "2px 8px",
-  color: "#fff",
-  borderBottom: "none"
+  padding: 0,
+  color: "#fff"
 });
 
 const StyledTableCell = styled(TableCell)({
-  padding: "2px 8px"
+  padding: 0
 });
 
 const POSITIVE = ["admiration", "loyality", "affection"];
@@ -134,13 +134,10 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   if (visibleBonds.length === 0 && !isEditMode) return null;
 
-  const iconColWidth = 36;
-  const starColWidth = 60;
-
   return (
     <>
       <TableContainer component={Paper} sx={{ width: '100%' }}>
-        <Table size="small">
+        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow
               sx={{
@@ -151,23 +148,27 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                 },
               }}
             >
-              <StyledTableCellHeader sx={{ width: iconColWidth }}>
-                {isEditMode && (
-                  <IconButton
-                    size="small"
-                    onClick={addNewBond}
-                    disabled={bonds.length >= 6}
-                    sx={{ color: "#fff", p: 0 }}
-                  >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: 36 }} />
               <StyledTableCellHeader>
                 <Typography variant="h4">{t("Bonds")}</Typography>
               </StyledTableCellHeader>
-              <StyledTableCellHeader sx={{ width: starColWidth, textAlign: "center", pr: 0 }}>
-                <Typography variant="h4">★</Typography>
+              <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }}>
+                <Typography variant="h4" sx={{ fontSize: '0.875rem' }}>{t("Sentiments")}</Typography>
+              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+              <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+                {isEditMode && (
+                  <Tooltip title={t("Add Bond")}>
+                    <IconButton
+                      size="small"
+                      onClick={addNewBond}
+                      disabled={bonds.length >= 6}
+                      sx={{ color: "#fff", p: 0.5 }}
+                    >
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </StyledTableCellHeader>
             </TableRow>
           </TableHead>
@@ -181,48 +182,49 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
               return (
                 <TableRow key={index}>
-                  <StyledTableCell sx={{ width: iconColWidth }}>
-                    {isEditMode && (
-                      <IconButton size="small" onClick={() => setEditBondIndex(originalIndex)} sx={{ p: 0 }}>
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    )}
+                  <StyledTableCell sx={{ width: 36 }} />
+                  <StyledTableCell sx={{ minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
+                    <Typography
+                      variant="body2"
+                      fontWeight="bold"
+                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word", fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                    >
+                      {highlightMatch(bond.name, searchQuery)}
+                    </Typography>
                   </StyledTableCell>
-                  <StyledTableCell>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", width: "100%" }}>
-                      <Typography
-                        variant="body2"
-                        fontWeight="bold"
-                        sx={{ textTransform: "uppercase", whiteSpace: "nowrap", mr: 1 }}
-                      >
-                        {highlightMatch(bond.name, searchQuery)}
-                      </Typography>
-
-                      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 0.5 }}>
-                        {sentiments.map((s, i) => (
-                          <Typography
-                            key={s}
-                            variant="body2"
-                            sx={{
-                              color: POSITIVE.includes(s) ? "success.main" : "error.main",
-                              textTransform: "uppercase",
-                              fontSize: "0.75rem"
-                            }}
-                          >
-                            {highlightMatch(t(s.charAt(0).toUpperCase() + s.slice(1)), searchQuery)}
-                            {i < sentiments.length - 1 && ","}
-                          </Typography>
-                        ))}
-                      </Box>
+                  <StyledTableCell sx={{ width: { xs: 150, sm: 220 }, display: { xs: 'none', sm: 'table-cell' } }}>
+                    <Box sx={{ display: "flex", flexWrap: "nowrap", gap: 0.5, overflow: "visible" }}>
+                      {sentiments.map((s, i) => (
+                        <Typography
+                          key={s}
+                          variant="body2"
+                          sx={{
+                            color: POSITIVE.includes(s) ? "success.main" : "error.main",
+                            textTransform: "uppercase",
+                            fontSize: "0.75rem",
+                            whiteSpace: "nowrap"
+                          }}
+                        >
+                          {highlightMatch(t(s.charAt(0).toUpperCase() + s.slice(1)), searchQuery)}
+                          {i < sentiments.length - 1 && ","}
+                        </Typography>
+                      ))}
                     </Box>
                   </StyledTableCell>
-
-                  <StyledTableCell sx={{ width: starColWidth, textAlign: "center", pr: 0 }}>
-                    {strength > 0 && (
-                      <Typography variant="body2" fontWeight="bold">
-                        ★{strength}
-                      </Typography>
-                    )}
+                  <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                  <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 0.5 }}>
+                      {strength > 0 && (
+                        <Typography variant="body2" fontWeight="bold">
+                          ★{strength}
+                        </Typography>
+                      )}
+                      {isEditMode && (
+                        <IconButton size="small" onClick={() => setEditBondIndex(originalIndex)} sx={{ p: 0.5 }}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Box>
                   </StyledTableCell>
                 </TableRow>
               );

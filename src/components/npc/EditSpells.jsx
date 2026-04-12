@@ -60,6 +60,7 @@ export default function EditSpells({ npc, setNpc }) {
         attr2: "dexterity",
         type: "",
         damagetype: "physical",
+        damage: 0,
         special: [],
       });
       return newState;
@@ -121,6 +122,7 @@ export default function EditSpells({ npc, setNpc }) {
               attr2: item.attr2 || "will",
               type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
               damagetype: item.damagetype || "physical",
+              damage: item.damage || 0,
               mp: String(item.mp ?? ""),
               maxTargets: item.maxTargets || 0,
               target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
@@ -443,6 +445,41 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               </MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+      )}
+      {spell.type === "offensive" && (
+        <Grid item xs={12} sm={4}>
+          <TextField
+            type="number"
+            label={t("Damage")}
+            variant="outlined"
+            fullWidth
+            size="small"
+            placeholder="0"
+            value={
+              spell.damage === null || spell.damage === undefined
+                ? ""
+                : spell.damage.toString()
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (
+                value === "" ||
+                (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
+              ) {
+                handleChange("damage", value === "" ? 0 : parseInt(value, 10));
+              }
+            }}
+            onBlur={(e) => {
+              let value = parseInt(e.target.value, 10);
+              if (isNaN(value) || value < 0) {
+                value = 0;
+              } else if (value > 999) {
+                value = 999;
+              }
+              handleChange("damage", value);
+            }}
+          />
         </Grid>
       )}
       <Grid item xs={12}>

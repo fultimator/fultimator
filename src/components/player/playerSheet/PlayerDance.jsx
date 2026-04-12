@@ -14,8 +14,8 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { NonStaticSpellCard } from "../../compendium/ItemCards";
 
 export default function PlayerDance({ player }) {
   const { t } = useTranslate();
@@ -156,32 +156,13 @@ export default function PlayerDance({ player }) {
               onClose={handleCloseModal}
               PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
             >
-              <DialogContent>
+              <DialogContent sx={{ p: 0 }}>
                 {selectedDance && (
-                  <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.customName : t(selectedDance.name)}
-                      {" - "}
-                      {selectedDanceSpell && t(selectedDanceSpell.className)}
-                    </Typography>
-
-                    {selectedDance.duration && (
-                      <Typography variant="h5" sx={{ fontWeight: "bold", mt: 1, display: "flex", gap: 1 }}>
-                        {t("dance_duration")}:{" "}
-                        <ReactMarkdown components={{ p: "span" }}>
-                          {selectedDance.name === "dance_custom_name"
-                            ? selectedDance.duration
-                            : t(selectedDance.duration)}
-                        </ReactMarkdown>
-                      </Typography>
-                    )}
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ReactMarkdown>
-                      {selectedDance.name === "dance_custom_name" ? selectedDance.effect : t(selectedDance.effect)}
-                    </ReactMarkdown>
-                  </>
+                  <NonStaticSpellCard item={{
+                    ...selectedDance,
+                    spellType: "dance",
+                    name: selectedDance.name === "dance_custom_name" ? selectedDance.customName : selectedDance.name,
+                  }} />
                 )}
               </DialogContent>
               <DialogActions>
