@@ -55,7 +55,7 @@
     "process": "^0.11.10",
     "react": "^19.0.0",
     "react-confetti": "^6.4.0",
-    "react-copy-to-clipboard": "^5.1.0",
+    "react-copy-to-clipboard": "^5.1.1",
     "react-dom": "^19.0.0",
     "react-firebase-hooks": "^4.0.0",
     "react-icons": "^4.3.1",
