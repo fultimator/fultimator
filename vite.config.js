@@ -27,7 +27,14 @@ export default defineConfig({
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
+  css: {
+    preprocessorOptions: {
+      sass: {
+        api: 'modern',
+      },
+    },
+  },
   build: {
-    chunkSizeWarningLimit: 500,   
+    chunkSizeWarningLimit: 500,
   },
 });

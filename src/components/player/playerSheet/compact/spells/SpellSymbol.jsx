@@ -32,7 +32,7 @@ export default function SpellSymbol({ spell }) {
               {sym.name === "symbol_custom_name" ? sym.customName : t(sym.name)}
             </StyledTableCell>
             <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
-              <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+              <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                 {sym.name === "symbol_custom_name" ? sym.effect : t(sym.effect)}
               </ReactMarkdown>
             </StyledTableCell>

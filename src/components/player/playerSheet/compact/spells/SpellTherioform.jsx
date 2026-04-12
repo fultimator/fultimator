@@ -38,7 +38,7 @@ export default function SpellTherioform({ spell }) {
               )}
             </StyledTableCell>
             <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
-              <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+              <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                 {form.name === "mutant_therioform_custom_name" ? form.description : t(form.description)}
               </ReactMarkdown>
             </StyledTableCell>

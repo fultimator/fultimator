@@ -4,7 +4,7 @@ import DeleteConfirmationDialog from "../../components/common/DeleteConfirmation
 import MigrationDialog from "../../components/common/MigrationDialog";
 import { playerNeedsMigration, applyPreSaveTransforms, applyPostLoadTransforms } from "../../components/player/playerTransforms";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import {
   Divider,

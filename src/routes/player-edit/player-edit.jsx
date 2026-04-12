@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/DatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";

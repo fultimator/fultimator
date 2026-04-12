@@ -19,7 +19,7 @@ export default function GeneralSection({
   customFields = [],
 }) {
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   const handleShowInPlayerSheetChange = (checked) => {

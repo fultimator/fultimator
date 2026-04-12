@@ -106,7 +106,7 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
 
   const availableInvocations = getAvailableInvocations();
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   return (

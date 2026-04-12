@@ -42,9 +42,9 @@ import {
 } from "../../../../libs/gourmetCookingData";
 
 const MarkdownComponents = {
-  p: (props) => <span style={{ margin: 0, padding: 0 }} {...props} />,
-  strong: (props) => <strong {...props} />,
-  em: (props) => <em {...props} />,
+  p: ({ _node, ...props }) => <span style={{ margin: 0, padding: 0 }} {...props} />,
+  strong: ({ _node, ...props }) => <strong {...props} />,
+  em: ({ _node, ...props }) => <em {...props} />,
 };
 
 /**

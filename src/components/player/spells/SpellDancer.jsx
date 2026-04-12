@@ -30,7 +30,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
   };
 
   const components = {
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   return (

@@ -49,13 +49,13 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -310,10 +310,10 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                       <Typography key="qualities" component="span">
                         <StyledMarkdown
                           components={{
-                            strong: (props) => (
+                            strong: ({ _node, ...props }) => (
                               <strong style={{ fontWeight: "bold" }} {...props} />
                             ),
-                            em: (props) => (
+                            em: ({ _node, ...props }) => (
                               <em style={{ fontStyle: "italic" }} {...props} />
                             ),
                           }}

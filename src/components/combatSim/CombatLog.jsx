@@ -69,14 +69,14 @@ const SpanMarkdown = ({ children, ...props }) => {
       <ReactMarkdown
         {...props}
         components={{
-          p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-          strong: ({ ...props }) => (
+          p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+          strong: ({ _node, ...props }) => (
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
-          em: ({ ...props }) => (
+          em: ({ _node, ...props }) => (
             <em style={{ fontStyle: "italic" }} {...props} />
           ),
-          span: ({ ...props }) => <span {...props} />,
+          span: ({ _node, ...props }) => <span {...props} />,
         }}
       >
         {children}

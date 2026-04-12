@@ -14,7 +14,7 @@ import {
   Alert,
   AlertTitle,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
 import { useTranslate } from "../translation/translate";

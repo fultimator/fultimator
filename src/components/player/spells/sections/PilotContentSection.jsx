@@ -188,8 +188,8 @@ export default function PilotContentSection({ formState, setFormState, t }) {
   // Memoize ReactMarkdown components to prevent recreation on every render
   const markdownComponents = useMemo(
     () => ({
-      p: (props) => <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />,
-      strong: (props) => <strong style={{ fontWeight: "bold" }} {...props} />,
+      p: ({ _node, ...props }) => <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />,
+      strong: ({ _node, ...props }) => <strong style={{ fontWeight: "bold" }} {...props} />,
     }),
     []
   );

@@ -141,7 +141,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
                 {t(invocation.type)}
               </StyledTableCell>
               <StyledTableCell sx={{ width: "35%", fontSize: "0.75rem" }}>
-                <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+                <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                   {t(invocation.effect)}
                 </ReactMarkdown>
               </StyledTableCell>

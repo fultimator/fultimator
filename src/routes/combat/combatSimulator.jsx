@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router";
 import Layout from "../../components/Layout";
 import {
   Typography,
@@ -26,7 +26,7 @@ import CombatLog from "../../components/combatSim/CombatLog";
 import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import { SignIn } from "../../components/auth";

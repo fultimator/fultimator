@@ -357,7 +357,7 @@ const VehicleModule = memo(({
                 <div style={{ fontSize: "0.95em" }}>
                   <ReactMarkdown
                     components={{
-                      p: (props) => <p style={{ margin: 0 }} {...props} />,
+                      p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
                     }}
                   >
                     {t(module.description)}

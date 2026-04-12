@@ -42,7 +42,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
 
   const components = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   // Convert clock value to clock state array for Clock component

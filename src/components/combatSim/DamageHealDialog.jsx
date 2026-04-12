@@ -330,7 +330,7 @@ const DamageHealDialog = ({
                       }}
                     >
                       <ReactMarkdown
-                        components={{ p: (props) => <span {...props} /> }}
+                        components={{ p: ({ _node, ...props }) => <span {...props} /> }}
                       >
                         {(() => {
                           const calculated = calculateDamage(

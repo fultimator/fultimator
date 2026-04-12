@@ -9,7 +9,7 @@ import {
   Slide,
   Tooltip,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { ArrowBack, Search } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";

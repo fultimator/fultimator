@@ -120,7 +120,7 @@ export default function SpellMagiseed({ spell, setPlayer }) {
                   <strong>{t("magiseed_current_effect")} (T={growthClock}):</strong>
                 </Typography>
                 <Typography variant="caption">
-                  <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+                  <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                     {getSeedEffect(currentMagiseed, growthClock)}
                   </ReactMarkdown>
                 </Typography>
@@ -156,7 +156,7 @@ export default function SpellMagiseed({ spell, setPlayer }) {
                         T={clockVal}:
                       </Typography>
                       <Typography variant="caption">
-                        <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+                        <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                           {effect}
                         </ReactMarkdown>
                       </Typography>

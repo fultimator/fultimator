@@ -33,7 +33,7 @@ export default function ContentSection({
 }) {
   const items = formState[itemsArrayName] || [];
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   const handleAddItem = () => {

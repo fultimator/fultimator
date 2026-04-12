@@ -32,10 +32,7 @@ import { useTranslate, t } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useTheme } from "@mui/material/styles";
 
-function NpcPretty(
-  { npc, study, npcImage, collapse, onClick = () => {} },
-  ref
-) {
+function NpcPretty({ npc, study, npcImage, collapse, onClick = () => {}, ref }) {
   const { t } = useTranslate();
   const theme = useTheme();
 
@@ -131,13 +128,13 @@ function Header({ npc, npcImage }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -672,14 +669,14 @@ function Attacks({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -766,10 +763,10 @@ function Attacks({ npc }) {
                   <Typography component="span" key={i}>
                     <SpanMarkdown
                       components={{
-                        strong: (props) => (
+                        strong: ({ _node, ...props }) => (
                           <strong style={{ fontWeight: "bold" }} {...props} />
                         ),
-                        em: (props) => (
+                        em: ({ _node, ...props }) => (
                           <em style={{ fontStyle: "italic" }} {...props} />
                         ),
                       }}
@@ -818,7 +815,7 @@ function Attacks({ npc }) {
                   <span>
                     <SpanMarkdown
                       components={{
-                        strong: (props) => <strong {...props} />,
+                        strong: ({ _node, ...props }) => <strong {...props} />,
                       }}
                     >
                       {t(damageTypeLabels[attack.type || attack.weapon.type])}
@@ -829,7 +826,7 @@ function Attacks({ npc }) {
                     <span style={{ textTransform: "lowercase" }}>
                       <SpanMarkdown
                         components={{
-                          strong: (props) => <strong {...props} />,
+                          strong: ({ _node, ...props }) => <strong {...props} />,
                         }}
                       >
                         {t(damageTypeLabels[attack.type || attack.weapon.type])}
@@ -844,10 +841,10 @@ function Attacks({ npc }) {
                       -{" "}
                       <SpanMarkdown
                         components={{
-                          strong: (props) => (
+                          strong: ({ _node, ...props }) => (
                             <strong style={{ fontWeight: "bold" }} {...props} />
                           ),
-                          em: (props) => (
+                          em: ({ _node, ...props }) => (
                             <em style={{ fontStyle: "italic" }} {...props} />
                           ),
                         }}
@@ -882,13 +879,13 @@ function Spells({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -954,10 +951,10 @@ function Spells({ npc }) {
                 <Typography component="span" key={i}>
                   <StyledMarkdown
                     components={{
-                      strong: (props) => (
+                      strong: ({ _node, ...props }) => (
                         <strong style={{ fontWeight: "bold" }} {...props} />
                       ),
-                      em: (props) => (
+                      em: ({ _node, ...props }) => (
                         <em style={{ fontStyle: "italic" }} {...props} />
                       ),
                     }}
@@ -1034,14 +1031,14 @@ function Special({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -1083,10 +1080,10 @@ function Special({ npc }) {
                 </span>
                 <SpanMarkdown
                   components={{
-                    strong: (props) => (
+                    strong: ({ _node, ...props }) => (
                       <strong style={{ fontWeight: "bold" }} {...props} />
                     ),
-                    em: (props) => (
+                    em: ({ _node, ...props }) => (
                       <em style={{ fontStyle: "italic" }} {...props} />
                     ),
                   }}
@@ -1134,14 +1131,14 @@ function Actions({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -1186,10 +1183,10 @@ function Actions({ npc }) {
                 <strong>{actions.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
                   components={{
-                    strong: (props) => (
+                    strong: ({ _node, ...props }) => (
                       <strong style={{ fontWeight: "bold" }} {...props} />
                     ),
-                    em: (props) => (
+                    em: ({ _node, ...props }) => (
                       <em style={{ fontStyle: "italic" }} {...props} />
                     ),
                   }}
@@ -1237,14 +1234,14 @@ function Notes({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -1289,10 +1286,10 @@ function Notes({ npc }) {
                 <strong>{notes.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
                   components={{
-                    strong: (props) => (
+                    strong: ({ _node, ...props }) => (
                       <strong style={{ fontWeight: "bold" }} {...props} />
                     ),
-                    em: (props) => (
+                    em: ({ _node, ...props }) => (
                       <em style={{ fontStyle: "italic" }} {...props} />
                     ),
                   }}
@@ -1340,14 +1337,14 @@ function RareGear({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -1392,10 +1389,10 @@ function RareGear({ npc }) {
                 <strong>{raregear.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
                   components={{
-                    strong: (props) => (
+                    strong: ({ _node, ...props }) => (
                       <strong style={{ fontWeight: "bold" }} {...props} />
                     ),
-                    em: (props) => (
+                    em: ({ _node, ...props }) => (
                       <em style={{ fontStyle: "italic" }} {...props} />
                     ),
                   }}
@@ -1455,14 +1452,14 @@ function Equip({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-            strong: ({ ...props }) => (
+            p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ ...props }) => (
+            em: ({ _node, ...props }) => (
               <em style={{ fontStyle: "italic" }} {...props} />
             ),
-            span: ({ ...props }) => <span {...props} />,
+            span: ({ _node, ...props }) => <span {...props} />,
           }}
         >
           {children}
@@ -1520,7 +1517,7 @@ function Equip({ npc }) {
               <span>
                 <SpanMarkdown
                   components={{
-                    strong: (props) => <strong {...props} />,
+                    strong: ({ _node, ...props }) => <strong {...props} />,
                   }}
                 >
                   {t(damageTypeLabels[weapon.type])}
@@ -1531,7 +1528,7 @@ function Equip({ npc }) {
                 <span style={{ textTransform: "lowercase" }}>
                   <SpanMarkdown
                     components={{
-                      strong: (props) => <strong {...props} />,
+                      strong: ({ _node, ...props }) => <strong {...props} />,
                     }}
                   >
                     {t(damageTypeLabels[weapon.type])}
@@ -1621,6 +1618,6 @@ function RenderVillainPhase({ villain, phases, multipart }) {
   return <>{combinedString && <>{combinedString}</>}</>;
 }
 
-export default React.forwardRef(NpcPretty);
+export default NpcPretty;
 
 export { calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells };

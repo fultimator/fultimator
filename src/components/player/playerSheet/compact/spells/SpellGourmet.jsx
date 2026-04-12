@@ -45,7 +45,7 @@ export default function SpellGourmet({ spell }) {
       }
     });
     
-    return <ReactMarkdown components={{ p: props => <span {...props} /> }}>{displayText}</ReactMarkdown>;
+    return <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>{displayText}</ReactMarkdown>;
   };
 
   // Convert cookbook effects to array

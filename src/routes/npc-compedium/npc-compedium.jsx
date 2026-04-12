@@ -49,7 +49,7 @@ import {
   KeyboardArrowUp,
 } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import allToken from "../icons/All-token.webp";
 import beastToken from "../icons/Beast-token.webp";

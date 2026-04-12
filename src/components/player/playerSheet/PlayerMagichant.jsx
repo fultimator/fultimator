@@ -77,7 +77,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
   };
 
   const components = {
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   return (

@@ -2,7 +2,7 @@ import React from "react";
 import { Grid, Typography, Paper, Divider, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
+import { useNavigate } from "react-router"; // Use useNavigate instead of useHistory
 import Pretty from "../../npc/Pretty";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 

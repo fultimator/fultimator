@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Container } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import AppBar from "./appbar/AppBar";
 import CompactAppBar from "./appbar/CompactAppBar";
 import { useThemeContext } from "../ThemeContext";

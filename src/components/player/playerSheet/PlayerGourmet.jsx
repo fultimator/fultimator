@@ -115,7 +115,7 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
       }
     });
     
-    return <ReactMarkdown components={{ p: props => <span {...props} /> }}>{displayText}</ReactMarkdown>;
+    return <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>{displayText}</ReactMarkdown>;
   };
 
   return (
