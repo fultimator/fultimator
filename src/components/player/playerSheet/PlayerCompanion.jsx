@@ -105,7 +105,7 @@ export default function PlayerCompanion({
             )}
             <Grid container spacing={2} sx={{ padding: "0.7em" }}>
               {!isCharacterSheet && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Typography
                     variant="h3"
                     fontWeight={"bold"}
@@ -119,12 +119,16 @@ export default function PlayerCompanion({
                   </Typography>
                 </Grid>
               )}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Pretty npc={companion} collapse={true} />
               </Grid>
               {isEditMode && (
                 <>
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <Button
                       variant="contained"
                       color="primary"
@@ -140,7 +144,11 @@ export default function PlayerCompanion({
                       {t("View Companion")}
                     </Button>
                   </Grid>
-                  <Grid item xs={12} sm={8}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 8
+                    }}>
                     <Typography variant="body2" sx={{ marginTop: 2 }}>
                       {t(
                         "If you edit the Companion, remember to select it again in the corrisponding class page."

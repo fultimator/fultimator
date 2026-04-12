@@ -450,9 +450,9 @@ export default function PlayerEquipment({
 
     const content = (
       <Grid container spacing={2} sx={{ textAlign: "center" }}>
-        <Grid item xs={6}><Typography variant="h3">{t("Accuracy")}</Typography><Typography variant="h1">{acc}</Typography></Grid>
-        <Grid item xs={6}><Typography variant="h3">{t("Damage")}</Typography><Typography variant="h1">{dmg}</Typography><Typography variant="h6">{t(weapon.type)}</Typography></Grid>
-        <Grid item xs={12} sx={{ mt: 2 }}>
+        <Grid  size={6}><Typography variant="h3">{t("Accuracy")}</Typography><Typography variant="h1">{acc}</Typography></Grid>
+        <Grid  size={6}><Typography variant="h3">{t("Damage")}</Typography><Typography variant="h1">{dmg}</Typography><Typography variant="h6">{t(weapon.type)}</Typography></Grid>
+        <Grid  sx={{ mt: 2 }} size={12}>
           <Typography>{`${d1} [${attributes[weapon.att1].shortcaps}] + ${d2} [${attributes[weapon.att2].shortcaps}] ${weapon.prec !== 0 ? (weapon.prec > 0 ? "+" : "") + weapon.prec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : (precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : "")}`}</Typography>
           <Typography fontWeight="bold">{t("Damage")}: {`max(${d1}, ${d2}) + ${weapon.damage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : (damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : "")}`}</Typography>
         </Grid>

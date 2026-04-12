@@ -416,7 +416,6 @@ export default function PlayerClasses({
                         )}
                       </StyledTableCell>
                     </TableRow>
-
                     {/* NESTED CONTENT WITH VERTICAL CONNECTOR LINE */}
                     <TableRow>
                       <StyledTableCell colSpan={5} sx={{ p: 0, borderBottom: openRows.classes[classKey] ? '1px solid rgba(0,0,0,0.12)' : 'none' }}>
@@ -442,7 +441,7 @@ export default function PlayerClasses({
 
                             {/* Skills Section */}
                             <Grid container>
-                              <Grid item xs={12}>
+                              <Grid  size={12}>
                                 <Table size="small">
                                   <TableBody>
                                     {cls.skills
@@ -610,7 +609,6 @@ export default function PlayerClasses({
           </TableBody>
         </Table>
       </TableContainer>
-
       {/* Modals remain the same */}
       <CompendiumViewerModal
         open={heroicPickerClassIdx !== null}

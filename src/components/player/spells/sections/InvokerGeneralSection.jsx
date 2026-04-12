@@ -57,7 +57,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={3}>
       {/* Show in Player Sheet */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -68,9 +68,8 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           label={t("Show in Character Sheet")}
         />
       </Grid>
-
       {/* Skill Level */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Skill Level")}
         </Typography>
@@ -90,9 +89,8 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           {t("Skill level determines which invocation types are available")}
         </Typography>
       </Grid>
-
       {/* Inner Wellspring Toggle */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -106,10 +104,9 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           {t("When enabled, one wellspring is locked as the inner wellspring")}
         </Typography>
       </Grid>
-
       {/* Chosen Wellspring (if Inner Wellspring enabled) */}
       {innerWellspring && (
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <FormControl fullWidth>
             <InputLabel>{t("Inner Wellspring")}</InputLabel>
             <Select
@@ -126,9 +123,8 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           </FormControl>
         </Grid>
       )}
-
       {/* Available Invocations Preview */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Available Invocation Types")}
         </Typography>

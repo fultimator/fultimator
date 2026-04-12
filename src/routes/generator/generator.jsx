@@ -81,46 +81,54 @@ function RitualsProjects() {
     <ThemeProvider theme={theme}>
       <Layout spacing>
         <Grid container spacing={2} sx={{ marginBottom: 1, marginTop: 1 }}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Rituals />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Projects />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 3, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Weapons />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 3, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomWeapons />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 3, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ArmorShield />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 5, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Accessories />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 5, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Arcana />
           </Grid>
         </Grid>
 
         <Grid container spacing={1} sx={{ marginBottom: 5, marginTop: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Qualities />
           </Grid>
         </Grid>
@@ -172,7 +180,7 @@ function Rituals() {
         {/* Header */}
         <CustomHeaderAlt headerText={t("Rituals")} icon={<Spa fontSize="large" />} />
         <Grid container>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
               <RadioGroup
@@ -206,7 +214,7 @@ function Rituals() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Area")}</FormLabel>
               <RadioGroup
@@ -240,7 +248,7 @@ function Rituals() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Reductions")}</FormLabel>
 
@@ -285,17 +293,17 @@ function Rituals() {
         </Grid>
         <Divider />
         <Grid container sx={{ m: 1 }}>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold">
               {calcPM()} {t("MP")}
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold">
               {calcLD()} {t("DL")}
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold">
               {t("Clock")} {calcClock()}
             </Typography>
@@ -338,7 +346,7 @@ function Projects() {
         {/* Header */}
         <CustomHeaderAlt headerText={t("Projects")} icon={<Spa fontSize="large" />} />
         <Grid container>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Potency")}</FormLabel>
               <RadioGroup
@@ -372,7 +380,7 @@ function Projects() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Area")}</FormLabel>
               <RadioGroup
@@ -406,7 +414,7 @@ function Projects() {
               </RadioGroup>
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl component="fieldset">
               <FormLabel component="legend">{t("Uses")}</FormLabel>
               <RadioGroup
@@ -441,7 +449,7 @@ function Projects() {
         </Grid>
         <Divider sx={{ my: 1 }} />
         <Grid container spacing={1}>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="tinkerers"
@@ -459,7 +467,7 @@ function Projects() {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="helpers"
@@ -477,7 +485,7 @@ function Projects() {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <FormControl variant="standard" fullWidth>
               <TextField
                 id="visionary"
@@ -495,7 +503,7 @@ function Projects() {
               />
             </FormControl>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold">
               {cost} {t("Zenit")}
             </Typography>
@@ -505,12 +513,12 @@ function Projects() {
               </Typography>
             )}
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold">
               {progress} {t("Progress")}
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             {days < 1 && (
               <Typography fontWeight="bold">
                 {t("Number of days")} {Math.ceil(days)}

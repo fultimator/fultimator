@@ -48,10 +48,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
       </Accordion>
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -68,7 +66,6 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           )}
         </Grid>
       )}
-
       {/* SYMBOLS */}
       <div
         style={{
@@ -86,15 +83,13 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={3}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -107,7 +102,6 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           </Grid>
         </Grid>
       </div>
-
       {symbol.symbols.length === 0 ? (
         <Typography
           sx={{
@@ -135,15 +129,13 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs
                   flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size="grow">
                   <Typography
                     fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
@@ -156,15 +148,13 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               </Grid>
               {isEditMode && (
                 <Grid
-                  item
-                  xs
                   style={{
                     display: "flex",
                     alignItems: "center",
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                ></Grid>
+                  size="grow"></Grid>
               )}
             </div>
             <Grid
@@ -179,14 +169,12 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs={12}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={12}>
                   <ReactMarkdown components={components}>
                     {sym.name === "symbol_custom_name"
                       ? sym.effect

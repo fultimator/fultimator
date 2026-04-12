@@ -35,19 +35,19 @@ const NpcEditAppBar = ({
     <MuiAppBar position="fixed">
       <Container>
         <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item xs={3} textAlign="left">
+          <Grid  textAlign="left" size={3}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
           </Grid>
-          <Grid item xs={6} textAlign="center">
+          <Grid  textAlign="center" size={6}>
             <Grid container justifyContent="center">
               <ExplainSkillsSimplified npc={npcTemp} />
             </Grid>
           </Grid>
-          <Grid item xs={3} textAlign="right">
+          <Grid  textAlign="right" size={3}>
             <Grid container alignItems="center" justifyContent="flex-end">
               {showGoBackButton && !isPcEdit && (
                 <Tooltip title="Open Compendium">
@@ -94,19 +94,19 @@ const PcEditAppBar = ({
     <MuiAppBar position="fixed">
       <Container>
         <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item xs={3} textAlign="left">
+          <Grid  textAlign="left" size={3}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
           </Grid>
-          <Grid item xs={6} textAlign="center">
+          <Grid  textAlign="center" size={6}>
             <Grid container justifyContent="center">
               <span>{t("Character Designer")}</span>
             </Grid>
           </Grid>
-          <Grid item xs={3} textAlign="right">
+          <Grid  textAlign="right" size={3}>
             <Grid container alignItems="center" justifyContent="flex-end">
               {showGoBackButton && (
                 <Tooltip title="Open Compendium">

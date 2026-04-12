@@ -91,14 +91,14 @@ export default function PlayerDance({ player }) {
                 <React.Fragment key={dsIndex}>
                   {danceSpell.dances && danceSpell.dances.map((dance, dIndex) => (
                     <Grid
-                      item
                       container
-                      xs={12}
-                      md={6}
                       key={`${dsIndex}-${dIndex}`}
                       sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -118,11 +118,7 @@ export default function PlayerDance({ player }) {
                           {dance.name === "dance_custom_name" ? dance.customName : t(dance.name)}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{

@@ -123,12 +123,12 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
               {giftSpells.map((giftSpell, gsIndex) => (
                 <React.Fragment key={gsIndex}>
                   {/* Brainwave Clock Section */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("esper_brainwave_clock")} - {t(giftSpell.className)}
                     </Typography>
                     <Grid container alignItems="center" spacing={2}>
-                      <Grid item>
+                      <Grid >
                         <Clock
                           numSections={4}
                           size={60}
@@ -141,7 +141,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                           onReset={(isEditMode || setPlayer) ? () => handleClockChange(giftSpell, 0) : undefined}
                         />
                       </Grid>
-                      <Grid item xs>
+                      <Grid  size="grow">
                         <LinearProgress
                           variant="determinate"
                           value={getClockProgress(giftSpell.clock || 0)}
@@ -164,14 +164,14 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                   {/* Individual Gifts */}
                   {giftSpell.gifts && giftSpell.gifts.map((gift, gIndex) => (
                     <Grid
-                      item
                       container
-                      xs={12}
-                      md={6}
                       key={`${gsIndex}-${gIndex}`}
                       sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -191,11 +191,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                           {gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{

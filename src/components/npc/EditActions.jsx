@@ -54,12 +54,12 @@ export default function EditActions({ npc, setNpc }) {
       {npc.actions?.map((actions, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item sx={{ p: 0, m: 0 }}>
+            <Grid  sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeActions(i)}>
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -72,7 +72,7 @@ export default function EditActions({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="spCost"
@@ -85,7 +85,7 @@ export default function EditActions({ npc, setNpc }) {
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={actions.effect}
                   onChange={(e) => {

@@ -577,7 +577,7 @@ export default function PlayerEdit() {
         {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
-            <Grid item xs={isSmallScreen ? 10 : 6}>
+            <Grid  size={isSmallScreen ? 10 : 6}>
               <Button
                 variant="contained"
                 color="primary"
@@ -588,7 +588,7 @@ export default function PlayerEdit() {
                 {t("Download Character Sheet")}
               </Button>
             </Grid>
-            <Grid item xs={isSmallScreen ? 2 : 6}>
+            <Grid  size={isSmallScreen ? 2 : 6}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -626,7 +626,7 @@ export default function PlayerEdit() {
               sx={{ padding: 1 }}
               justifyContent={"center"}
             >
-              <Grid container item xs={12}>
+              <Grid container  size={12}>
                 <PlayerCardSheet
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
@@ -914,7 +914,7 @@ export default function PlayerEdit() {
             }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Settings")}
@@ -922,7 +922,7 @@ export default function PlayerEdit() {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Box sx={{ px: 2, pb: 2 }}>
                   <SettingRow
                     label={t("Default View")}
@@ -979,7 +979,6 @@ export default function PlayerEdit() {
         </Button>
         <Box sx={{ height: "15vh" }} />
       </Tabs>
-
       {/* Floating Action Buttons */}
       {isSmallScreen && (
         <Box
@@ -1001,7 +1000,6 @@ export default function PlayerEdit() {
           </Fab>
         </Box>
       )}
-
       <Box
         sx={{
           position: "fixed",
@@ -1062,7 +1060,6 @@ export default function PlayerEdit() {
           </Tooltip>
         )}
       </Box>
-
       <Dialog
         open={isSpecialSkillsModalOpen}
         onClose={() => setIsSpecialSkillsModalOpen(false)}
@@ -1107,7 +1104,6 @@ export default function PlayerEdit() {
           <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <Dialog
         open={isOptionalRulesModalOpen}
         onClose={() => setIsOptionalRulesModalOpen(false)}
@@ -1162,7 +1158,6 @@ export default function PlayerEdit() {
           <Button onClick={() => setIsOptionalRulesModalOpen(false)}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

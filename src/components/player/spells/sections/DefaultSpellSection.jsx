@@ -67,7 +67,11 @@ export default function DefaultSpellSection({
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} sm={7}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 7
+        }}>
         <TextField
           label={t("Spell Name")}
           variant="outlined"
@@ -77,7 +81,11 @@ export default function DefaultSpellSection({
           inputProps={{ maxLength: 50 }}
         />
       </Grid>
-      <Grid item xs={12} sm={1}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 1
+        }}>
         <FormControl
           variant="standard"
           fullWidth
@@ -98,7 +106,11 @@ export default function DefaultSpellSection({
           </ToggleButton>
         </FormControl>
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <TextField
           type="number"
           label={t("MP x Target")}
@@ -129,7 +141,11 @@ export default function DefaultSpellSection({
           }}
         />
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <TextField
           type="number"
           label={t("Max Targets")}
@@ -164,7 +180,11 @@ export default function DefaultSpellSection({
           }}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           id="target-autocomplete"
           options={target}
@@ -185,7 +205,11 @@ export default function DefaultSpellSection({
           )}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           id="duration-autocomplete"
           options={duration}
@@ -208,7 +232,11 @@ export default function DefaultSpellSection({
       </Grid>
       {formState.isOffensive ? (
         <>
-          <Grid item xs={6} sm={6}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 6
+            }}>
             <Select
               fullWidth
               value={formState.attr1 || "dexterity"}
@@ -228,7 +256,11 @@ export default function DefaultSpellSection({
               </MenuItem>
             </Select>
           </Grid>
-          <Grid item xs={6} sm={6}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 6
+            }}>
             <Select
               fullWidth
               value={formState.attr2 || "dexterity"}
@@ -250,7 +282,11 @@ export default function DefaultSpellSection({
           </Grid>
         </>
       ) : null}
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <CustomTextarea
           label={t("Description")}
           fullWidth
@@ -260,7 +296,11 @@ export default function DefaultSpellSection({
           maxLength={1500}
         />
       </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <FormControlLabel
           control={
             <Switch
@@ -277,7 +317,11 @@ export default function DefaultSpellSection({
           label={t("Show in Character Sheet")}
         />
       </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <FormControlLabel
           control={
             <Switch

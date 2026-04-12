@@ -111,7 +111,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Bonds")}
@@ -121,9 +121,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (
-          <Grid item xs={12} key={index}>
+          <Grid  key={index} size={12}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={4}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 4
+                }}>
                 <Box display="flex" alignItems="center">
                   {isEditMode ? <IconButton
                     aria-label="delete"
@@ -144,9 +148,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={8}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 8
+                }}>
                 <Grid container spacing={1}>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -162,7 +170,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -178,7 +186,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -194,7 +202,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -210,7 +218,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -226,7 +234,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -246,7 +254,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
               </Grid>
             </Grid>
             {index < player.info.bonds.length - 1 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
             )}

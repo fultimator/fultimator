@@ -129,7 +129,7 @@ export default function GenericRolls({ player }) {
         <DialogTitle variant="h3">{t("Choose Attributes to Roll")}</DialogTitle>
         <DialogContent >
           <Grid container spacing={2} sx={{marginTop: "10px"}}>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <FormControl fullWidth sx={{ marginBottom: "10px" }}>
                 <InputLabel>{t("Die 1")}</InputLabel>
                 <Select
@@ -145,7 +145,7 @@ export default function GenericRolls({ player }) {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <FormControl fullWidth>
                 <InputLabel>{t("Die 2")}</InputLabel>
                 <Select

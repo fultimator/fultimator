@@ -78,7 +78,11 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
         )}
 
         <Grid container spacing={2} sx={{ padding: "1em" }}>
-          <Grid item xs={12} md={12}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 12
+            }}>
             <Typography variant="h4">
               <span
                 style={{
@@ -99,7 +103,11 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
               </span>
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Typography variant="h4">
               <span
                 style={{
@@ -120,7 +128,11 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
               </span>
             </Typography>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Typography variant="h4">
               <span
                 style={{
@@ -143,10 +155,10 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
           </Grid>
           {player.info.description && (
             <>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Typography variant="h4">
                   <span
                     style={{

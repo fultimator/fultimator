@@ -24,14 +24,14 @@ export default function EditExtra({ npc, setNpc }) {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Stack spacing={1}>
             <Defenses npc={npc} setNpc={setNpc} />
             <SelectArmor npc={npc} setNpc={setNpc} />
             <SelectShield npc={npc} setNpc={setNpc} />
           </Stack>
         </Grid>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Stack spacing={1}>
             <Init npc={npc} setNpc={setNpc} />
             <Precision npc={npc} setNpc={setNpc} />
@@ -43,10 +43,10 @@ export default function EditExtra({ npc, setNpc }) {
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Immunities npc={npc} setNpc={setNpc} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Overrides npc={npc} setNpc={setNpc} />
         </Grid>
       </Grid>

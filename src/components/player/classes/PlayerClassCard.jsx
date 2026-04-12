@@ -361,7 +361,7 @@ export default function PlayerClassCard({
       }}
     >
       <Grid container spacing={1}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeaderClasses
             type="top"
             headerText={t(classItem.name)}
@@ -374,7 +374,7 @@ export default function PlayerClassCard({
           />
         </Grid>
         {warnings.map((warning, index) => (
-          <Grid item xs={12} key={index}>
+          <Grid  key={index} size={12}>
             <Alert variant="filled" severity="warning">
               {warning}
             </Alert>
@@ -382,7 +382,7 @@ export default function PlayerClassCard({
         ))}
         {classItem.benefits && (
           <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomHeader2
                 headerText={`${t(classItem.name)} ${t("Free Benefits")} `}
                 buttonText={t("Edit Benefits")}
@@ -390,7 +390,7 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
               />
             </Grid>
-            <Grid item xs={12} style={{ margin: "-20px 0 0 0" }}>
+            <Grid  style={{ margin: "-20px 0 0 0" }} size={12}>
               <ul>
                 {classItem.benefits.hpplus !== 0 && (
                   <li>
@@ -475,12 +475,12 @@ export default function PlayerClassCard({
                 )}
               </ul>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Divider />
             </Grid>
           </>
         )}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           {classItem.skills.length < 5 ? (
             <CustomHeader2
               headerText={t("Skills")}
@@ -494,7 +494,7 @@ export default function PlayerClassCard({
         </Grid>
         {classItem.skills &&
           classItem.skills.map((skill, index) => (
-            <Grid item xs={12} key={index}>
+            <Grid  key={index} size={12}>
               <CustomHeader3
                 headerText={isHomebrew ? skill.skillName : t(skill.skillName)}
                 currentLvl={skill.currentLvl}
@@ -520,10 +520,10 @@ export default function PlayerClassCard({
           ))}
         {classItem.lvl === 10 && (
           <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomHeader2
                 headerText={t("Heroic Skill")}
                 //buttonText={t("Edit Benefits")}
@@ -531,7 +531,7 @@ export default function PlayerClassCard({
                 isEditMode={false}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomHeader3
                 headerText={classItem.heroic.name}
                 currentLvl={0}
@@ -560,7 +560,7 @@ export default function PlayerClassCard({
         {faithfulCompanionSkills.length ===
         0 ? null : hasMultipleFaithfulCompanionSkills &&
           faithfulCompanionSkillsInClassItem.length > 0 ? (
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography>
               {t("Error: There are too many Faithful Companion skills")}
             </Typography>
@@ -568,10 +568,10 @@ export default function PlayerClassCard({
         ) : (
           hasSingleFaithfulCompanionSkill && (
             <>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader2
                   headerText={t("Faithful Companion")}
                   isEditMode={isEditMode}
@@ -608,7 +608,7 @@ export default function PlayerClassCard({
           )
         )}
         {isEditMode && (
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -634,7 +634,7 @@ export default function PlayerClassCard({
             </Box>
           </Grid>
         )}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Export name={classItem.name} dataType="class" data={classItem} />
         </Grid>
       </Grid>

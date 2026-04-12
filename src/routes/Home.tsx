@@ -145,7 +145,11 @@ function Home() {
         }}
       >
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -200,7 +204,11 @@ function Home() {
               </Button>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -258,7 +266,11 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -328,7 +340,11 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -399,7 +415,7 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Paper
               elevation={3}
               sx={{
@@ -453,7 +469,7 @@ function Home() {
               </Box>
             </Paper>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Divider sx={{ marginBottom: 3 }} />
             <Box
               sx={{

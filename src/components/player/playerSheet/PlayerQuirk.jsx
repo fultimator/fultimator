@@ -42,7 +42,7 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
 
             <Grid container>
               {player.quirk.description && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",
@@ -60,7 +60,7 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
                 </Grid>
               )}
               {player.quirk.effect && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",

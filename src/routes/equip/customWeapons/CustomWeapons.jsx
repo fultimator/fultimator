@@ -395,7 +395,11 @@ function CustomWeapons() {
   return (
     <Grid container spacing={2}>
       {/* Left side - Configuration Card */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -412,7 +416,7 @@ function CustomWeapons() {
           />
           {/* Action Buttons */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <Button
                 variant="outlined"
                 fullWidth
@@ -421,7 +425,7 @@ function CustomWeapons() {
                 Upload JSON
               </Button>
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <Button
                 variant="outlined"
                 fullWidth
@@ -458,13 +462,17 @@ function CustomWeapons() {
 
           {/* Primary Weapon Form */}
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography variant="h6" gutterBottom>
                 Primary Weapon
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label="Weapon Name"
@@ -473,28 +481,44 @@ function CustomWeapons() {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <ChangeCategory
                 value={selectedCategory}
                 onChange={handleCategoryChange}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <ChangeRange
                 value={selectedRange}
                 onChange={(e) => setSelectedRange(e.target.value)}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <ChangeAccuracyCheck
                 value={selectedAccuracyCheck}
                 onChange={setSelectedAccuracyCheck}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <ChangeType
                 value={overrideType ? customDamageType : selectedType}
                 onChange={(e) => {
@@ -519,7 +543,11 @@ function CustomWeapons() {
             />
 
             {/* Quality Selection */}
-            <Grid item xs={12} sm={5}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 5
+              }}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
@@ -532,7 +560,11 @@ function CustomWeapons() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} sm={1}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 1
+              }}>
               <Button
                 variant="outlined"
                 onClick={() => {
@@ -548,7 +580,7 @@ function CustomWeapons() {
             </Grid>
 
             {/* Quality Text Area */}
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -558,7 +590,7 @@ function CustomWeapons() {
             </Grid>
 
             {/* Advanced Overrides Section */}
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Accordion>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -570,7 +602,11 @@ function CustomWeapons() {
                 <AccordionDetails>
                   <Grid container spacing={2}>
                     {/* Accuracy Modifier */}
-                    <Grid item xs={12} sm={4}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 4
+                      }}>
                       <TextField
                         fullWidth
                         type="number"
@@ -582,7 +618,11 @@ function CustomWeapons() {
                     </Grid>
 
                     {/* Damage Modifier */}
-                    <Grid item xs={12} sm={4}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 4
+                      }}>
                       <TextField
                         fullWidth
                         type="number"
@@ -594,7 +634,11 @@ function CustomWeapons() {
                     </Grid>
 
                     {/* Override Type */}
-                    <Grid item xs={12} sm={4}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 4
+                      }}>
                       <FormControlLabel
                         control={
                           <Checkbox
@@ -623,7 +667,11 @@ function CustomWeapons() {
                     </Grid>
 
                     {/* DEF Modifier */}
-                    <Grid item xs={12} sm={6}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6
+                      }}>
                       <TextField
                         fullWidth
                         type="number"
@@ -635,7 +683,11 @@ function CustomWeapons() {
                     </Grid>
 
                     {/* MDEF Modifier */}
-                    <Grid item xs={12} sm={6}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6
+                      }}>
                       <TextField
                         fullWidth
                         type="number"
@@ -656,13 +708,17 @@ function CustomWeapons() {
             <>
               <Divider sx={{ my: 3 }} />
               <Grid container spacing={2}>
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Typography variant="h6" gutterBottom>
                     Transforming Form
                   </Typography>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <TextField
                     fullWidth
                     label="Second Form Name"
@@ -671,28 +727,44 @@ function CustomWeapons() {
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <ChangeCategory
                     value={secondSelectedCategory}
                     onChange={handleSecondCategoryChange}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <ChangeRange
                     value={secondSelectedRange}
                     onChange={(e) => setSecondSelectedRange(e.target.value)}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <ChangeAccuracyCheck
                     value={secondSelectedAccuracyCheck}
                     onChange={setSecondSelectedAccuracyCheck}
                   />
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <ChangeType
                     value={secondOverrideType ? secondCustomDamageType : secondSelectedType}
                     onChange={(e) => {
@@ -717,7 +789,7 @@ function CustomWeapons() {
                 />
 
                 {/* Advanced Overrides Section for Transforming Form */}
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Accordion>
                     <AccordionSummary
                       expandIcon={<ExpandMore />}
@@ -729,7 +801,11 @@ function CustomWeapons() {
                     <AccordionDetails>
                       <Grid container spacing={2}>
                         {/* Accuracy Modifier */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid
+                          size={{
+                            xs: 12,
+                            sm: 4
+                          }}>
                           <TextField
                             fullWidth
                             type="number"
@@ -741,7 +817,11 @@ function CustomWeapons() {
                         </Grid>
 
                         {/* Damage Modifier */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid
+                          size={{
+                            xs: 12,
+                            sm: 4
+                          }}>
                           <TextField
                             fullWidth
                             type="number"
@@ -753,7 +833,11 @@ function CustomWeapons() {
                         </Grid>
 
                         {/* Override Type */}
-                        <Grid item xs={12} sm={4}>
+                        <Grid
+                          size={{
+                            xs: 12,
+                            sm: 4
+                          }}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -782,7 +866,11 @@ function CustomWeapons() {
                         </Grid>
 
                         {/* Secondary DEF Modifier */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid
+                          size={{
+                            xs: 12,
+                            sm: 6
+                          }}>
                           <TextField
                             fullWidth
                             type="number"
@@ -794,7 +882,11 @@ function CustomWeapons() {
                         </Grid>
 
                         {/* Secondary MDEF Modifier */}
-                        <Grid item xs={12} sm={6}>
+                        <Grid
+                          size={{
+                            xs: 12,
+                            sm: 6
+                          }}>
                           <TextField
                             fullWidth
                             type="number"
@@ -814,9 +906,12 @@ function CustomWeapons() {
 
         </Paper>
       </Grid>
-
       {/* Right side - Weapon Preview */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Box>
           <Box ref={weaponCardsRef}>
             <Typography variant="h6" gutterBottom>
@@ -876,7 +971,7 @@ function CustomWeapons() {
 
           {hasTransforming && (
             /* Combined Download Actions for Transforming Weapons */
-            <Box sx={{ display: "flex", mt: 2 }}>
+            (<Box sx={{ display: "flex", mt: 2 }}>
               <Tooltip title={t("Download Combined as Image")}>
                 <IconButton onClick={downloadCombinedImage}>
                   <Download />
@@ -926,7 +1021,7 @@ function CustomWeapons() {
                   dataType: "weapon"
                 }}
               />
-            </Box>
+            </Box>)
           )}
         </Box>
       </Grid>

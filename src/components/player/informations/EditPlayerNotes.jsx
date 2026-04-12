@@ -123,7 +123,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Notes")}
@@ -155,13 +155,13 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             key={index}
           >
             {isEditMode && (
-              <Grid item sx={{ p: 0, m: 0 }}>
+              <Grid  sx={{ p: 0, m: 0 }}>
                 <IconButton onClick={removeItem(index)}>
                   <RemoveCircleOutline />
                 </IconButton>
               </Grid>
             )}
-            <Grid item xs={7}>
+            <Grid  size={7}>
               <TextField
                 id="name"
                 label={t("Note Name") + ":"}
@@ -173,7 +173,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea
                 id="description"
                 label={t("Description") + ":"}
@@ -185,7 +185,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
               />
             </Grid>
             {isEditMode && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Button
                   variant="contained"
                   onClick={() => handleAddClock(index)}
@@ -197,7 +197,13 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             )}
             {note.clocks &&
               note.clocks.map((clock, clockIndex) => (
-                <Grid item xs={12} sm={6} md={4} key={clockIndex}>
+                <Grid
+                  key={clockIndex}
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4
+                  }}>
                   <Grid
                     container
                     alignItems="center"
@@ -210,7 +216,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                       p: 1,
                     }}
                   >
-                    <Grid item xs={10}>
+                    <Grid  size={10}>
                       <Typography variant="body2">
                         <strong style={{ fontSize: "1.4em" }}>
                           {clock.name}
@@ -219,7 +225,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                       </Typography>
                     </Grid>
                     {isEditMode && (
-                      <Grid item xs={2}>
+                      <Grid  size={2}>
                         <IconButton
                           onClick={() => handleRemoveClock(index, clockIndex)}
                           sx={{
@@ -234,7 +240,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 </Grid>
               ))}
             {index !== player.notes.length - 1 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
             )}

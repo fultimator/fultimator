@@ -86,12 +86,21 @@ export default function MagiseedItem({
       <CardContent>
         <Grid container spacing={2}>
           {/* Header with name and delete button */}
-          <Grid item xs={12} sm={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8
+            }}>
             <Typography variant="h6" gutterBottom>
               {magiseed.customName || t(magiseed.name)}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={4} style={{ textAlign: "right" }}>
+          <Grid
+            style={{ textAlign: "right" }}
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <Button
                 onClick={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
@@ -114,7 +123,11 @@ export default function MagiseedItem({
           </Grid>
 
           {/* Magiseed Type Selection */}
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Magiseed Type")}</InputLabel>
               <Select
@@ -146,7 +159,11 @@ export default function MagiseedItem({
 
           {/* Custom Name (only for custom magiseeds) */}
           {isCustomMagiseed && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -158,7 +175,11 @@ export default function MagiseedItem({
 
           {/* Type Selection (for custom magiseeds) */}
           {isCustomMagiseed && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <FormControl fullWidth>
                 <InputLabel>{t("Type")}</InputLabel>
                 <Select
@@ -177,7 +198,7 @@ export default function MagiseedItem({
 
           {/* Custom Description (only for custom magiseeds) */}
           {isCustomMagiseed && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea
                 label={t("Description")}
                 value={magiseed.description || ""}
@@ -187,7 +208,11 @@ export default function MagiseedItem({
           )}
 
           {/* Effect Type Controls */}
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControlLabel
               control={
                 <Switch
@@ -199,7 +224,11 @@ export default function MagiseedItem({
               label={t("floralist_end_of_turn_effect")}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControlLabel
               control={
                 <Switch
@@ -213,7 +242,7 @@ export default function MagiseedItem({
           </Grid>
 
           {/* Effects by Growth Clock Section */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">
@@ -223,7 +252,7 @@ export default function MagiseedItem({
               <AccordionDetails>
                 <Grid container spacing={2}>
                   {[1, 2, 3, 4].map((section) => (
-                    <Grid item xs={12} key={section}>
+                    <Grid  key={section} size={12}>
                       <Typography variant="subtitle1" gutterBottom>
                         {t("floralist_section_effect", { section })} (T = {section})
                       </Typography>
@@ -259,7 +288,7 @@ export default function MagiseedItem({
 
           {/* Base Description (non-editable for presets) */}
           {!isCustomMagiseed && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography variant="subtitle2" gutterBottom>
                 {t("Description")}
               </Typography>

@@ -122,14 +122,12 @@ export default function PlayerCardShort({
       >
         <Grid container>
           <Grid
-            item
-            xs
             sx={{
               background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%);`,
               borderRight: "4px solid white",
               px: 2,
             }}
-          >
+            size="grow">
             <Typography
               color="#fff"
               fontFamily="Antonio"
@@ -141,15 +139,13 @@ export default function PlayerCardShort({
             </Typography>
           </Grid>
           <Grid
-            item
             sx={{
               px: 2,
               py: 0.5,
               borderLeft: `2px solid ${primary} `,
               borderBottom: `2px solid ${primary} `,
               borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
-            }}
-          >
+            }}>
             <Typography
               fontFamily="Antonio"
               fontSize="1.25rem"
@@ -166,7 +162,11 @@ export default function PlayerCardShort({
           </Grid>
         </Grid>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={3} sm={3}>
+          <Grid
+            size={{
+              xs: 3,
+              sm: 3
+            }}>
             <div style={{ position: "relative" }}>
               <img
                 src={
@@ -208,13 +208,8 @@ export default function PlayerCardShort({
               />
             </div>
           </Grid>
-          <Grid
-            container
-            item
-            xs={9}
-            sx={{ marginTop: "5px", marginX: "-5px" }}
-          >
-            <Grid item xs={12}>
+          <Grid container sx={{ marginTop: "5px", marginX: "-5px" }} size={9}>
+            <Grid  size={12}>
               <Paper
                 elevation={3}
                 sx={{
@@ -242,7 +237,11 @@ export default function PlayerCardShort({
                   {t("Traits")}
                 </Typography>
                 <Grid container spacing={1} sx={{ padding: "0.3rem" }}>
-                  <Grid item xs={12} md={12}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      md: 12
+                    }}>
                     <Typography variant="h4">
                       <span
                         style={{
@@ -265,7 +264,11 @@ export default function PlayerCardShort({
                       </span>
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      md: 6
+                    }}>
                     <Typography variant="h4">
                       <span
                         style={{
@@ -288,7 +291,11 @@ export default function PlayerCardShort({
                       </span>
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} md={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      md: 6
+                    }}>
                     <Typography variant="h4">
                       <span
                         style={{
@@ -316,8 +323,6 @@ export default function PlayerCardShort({
             </Grid>
             <Grid
               container
-              item
-              xs={12}
               sx={{
                 marginTop: "10px",
                 padding: "0.5rem",
@@ -327,71 +332,67 @@ export default function PlayerCardShort({
               }}
               justifyContent="center"
               alignItems="center"
-            >
-              <Grid container item xs={4} justifyContent="center">
+              size={12}>
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("HP") + ": " + player.stats.hp.max}
                 </Typography>
               </Grid>
-              <Grid container item xs={4} justifyContent="center">
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("MP") + ": " + player.stats.mp.max}
                 </Typography>
               </Grid>
-              <Grid container item xs={4} justifyContent="center">
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("IP") + ": " + player.stats.ip.max}
                 </Typography>
               </Grid>
               <Grid
                 container
-                item
-                xs={12}
                 justifyContent="center"
                 sx={{ marginTop: "5px", marginBottom: "5px" }}
-              >
+                size={12}>
                 <Divider sx={{ width: "100%" }} />
               </Grid>
-              <Grid container item xs={4} justifyContent="center">
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("DEF") + ": " + currDef}
                 </Typography>
               </Grid>
-              <Grid container item xs={4} justifyContent="center">
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("MDEF") + ": " + currMDef}
                 </Typography>
               </Grid>
-              <Grid container item xs={4} justifyContent="center">
+              <Grid container  justifyContent="center" size={4}>
                 <Typography variant="h2" align="center">
                   {t("INIT") + ": " + currInit}
                 </Typography>
               </Grid>
               <Grid
                 container
-                item
-                xs={12}
                 justifyContent="center"
                 sx={{ marginTop: "5px", marginBottom: "5px" }}
-              >
+                size={12}>
                 <Divider sx={{ width: "100%" }} />
               </Grid>
-              <Grid container item xs={3} justifyContent="center">
+              <Grid container  justifyContent="center" size={3}>
                 <Typography variant="h2" align="center">
                   {t("DEX") + ": d" + player.attributes.dexterity}
                 </Typography>
               </Grid>
-              <Grid container item xs={3} justifyContent="center">
+              <Grid container  justifyContent="center" size={3}>
                 <Typography variant="h2" align="center">
                   {t("INS") + ": d" + player.attributes.insight}
                 </Typography>
               </Grid>
-              <Grid container item xs={3} justifyContent="center">
+              <Grid container  justifyContent="center" size={3}>
                 <Typography variant="h2" align="center">
                   {t("MIG") + ": d" + player.attributes.might}
                 </Typography>
               </Grid>
-              <Grid container item xs={3} justifyContent="center">
+              <Grid container  justifyContent="center" size={3}>
                 <Typography variant="h2" align="center">
                   {t("WLP") + ": d" + player.attributes.willpower}
                 </Typography>
@@ -400,8 +401,6 @@ export default function PlayerCardShort({
             {equipmentText !== "" && (
               <Grid
                 container
-                item
-                xs={12}
                 sx={{
                   marginTop: "10px",
                   padding: "0.5rem",
@@ -409,8 +408,8 @@ export default function PlayerCardShort({
                   border: "2px solid",
                   borderColor: secondary,
                 }}
-              >
-                <Grid container item xs={12} alignItems="center">
+                size={12}>
+                <Grid container  alignItems="center" size={12}>
                   {" "}
                   <Typography variant="h3" fontWeight={"bolder"}>
                     <span>{t("Equipment") + ": "}&nbsp;</span>
@@ -424,8 +423,6 @@ export default function PlayerCardShort({
             {player.classes.length > 0 && (
               <Grid
                 container
-                item
-                xs={12}
                 sx={{
                   marginTop: "10px",
                   marginBottom: "10px",
@@ -434,14 +431,14 @@ export default function PlayerCardShort({
                   border: "2px solid",
                   borderColor: secondary,
                 }}
-              >
-                <Grid container item xs={12}>
+                size={12}>
+                <Grid container  size={12}>
                   <Typography variant="h3" fontWeight={"bolder"}>
                     {t("Classes") + ": "}
                   </Typography>
                 </Grid>
                 {player.classes.map((cl, i) => (
-                  <Grid container item xs={12} key={i}>
+                  <Grid container  key={i} size={12}>
                     <Typography variant="h4">
                       {t(cl.name) + " (" + t("LVL") + " " + cl.lvl + "):"}&nbsp;
                     </Typography>

@@ -139,7 +139,7 @@ export default function PlayerWeapons({
 
             return (
               <React.Fragment key={index}>
-                <Grid item xs={12} sx={{ mb: 2 }}>
+                <Grid  sx={{ mb: 2 }} size={12}>
                   <Box>
                     <PrettyWeapon weapon={weapon} />
                   </Box>

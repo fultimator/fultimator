@@ -50,7 +50,11 @@ export default function MagichantToneItem({
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("magichant_tone")}</InputLabel>
               <Select
@@ -67,7 +71,11 @@ export default function MagichantToneItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={7}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <TextField
               fullWidth
               label={t("magichant_name")}
@@ -77,7 +85,7 @@ export default function MagichantToneItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("magichant_tone_effect")}
               value={isCustom ? (item.effect || "") : t(item.effect || "")}
@@ -87,7 +95,7 @@ export default function MagichantToneItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth

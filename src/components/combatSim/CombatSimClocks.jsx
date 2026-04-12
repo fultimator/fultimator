@@ -137,7 +137,7 @@ export default function CombatSimClocks({
         <Grid container spacing={3}>
           {/* Add new clock section - Collapsible */}
           {!isMaxClocksReached && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Paper
                 sx={{
                   p: 2,
@@ -176,7 +176,7 @@ export default function CombatSimClocks({
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                   <Box sx={{ mt: 2 }}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <TextField
                           autoFocus={expanded}
                           fullWidth
@@ -186,7 +186,7 @@ export default function CombatSimClocks({
                           inputProps={{ maxLength: 30 }}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Typography variant="subtitle1" sx={{ mb: 1 }}>
                           {t("clocks_sections_title")}
                         </Typography>
@@ -209,7 +209,7 @@ export default function CombatSimClocks({
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Tooltip
                           title={t("clocks_name_required")}
                           disableHoverListener={!shouldShowTooltip}
@@ -237,13 +237,19 @@ export default function CombatSimClocks({
           )}
 
           {/* Existing clocks or Empty state */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {clocks.length > 0 ? (
               <>
                 <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
                   {clocks.map((clock, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Grid
+                      key={index}
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4
+                      }}>
                       <Paper
                         sx={{
                           p: 2,

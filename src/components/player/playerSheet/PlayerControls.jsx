@@ -347,7 +347,12 @@ export default function PlayerControls({ player, setPlayer }) {
 
     return (
       <Grid container spacing={1} alignItems="center" wrap="wrap">
-        <Grid item xs={12} sm={3} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 3,
+            md: 3
+          }}>
           <Typography
             variant="h3"
             sx={{ lineHeight: 1.2, width: "fit-content" }}
@@ -355,8 +360,11 @@ export default function PlayerControls({ player, setPlayer }) {
             {`${t(label)}【${player.stats[stat].current}/${player.stats[stat].max}】`}
           </Typography>
         </Grid>
-
-        <Grid item xs={12} sm>
+        <Grid
+          size={{
+            xs: 12,
+            sm: "grow"
+          }}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Button
               variant="outlined"
@@ -450,24 +458,33 @@ export default function PlayerControls({ player, setPlayer }) {
         </Typography>
 
         <Grid container spacing={1} sx={{ p: 1 }}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {renderStatControls("hp", "HP", "error")}
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {renderStatControls("mp", "MP", "info")}
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {renderStatControls("ip", "IP", "success")}
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Grid container spacing={1} alignItems="center">
-              <Grid item xs={12} sm={3} md={3}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 3,
+                  md: 3
+                }}>
                 <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
                   {`${t("Fabula Points")}【${player.info.fabulapoints}】`}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: "grow"
+                }}>
                 <ButtonGroup variant="outlined" size="small" color="primary">
                   <Button onClick={changeFabulaPoints(-1)}>-1</Button>
                   <Button onClick={changeFabulaPoints(1)}>+1</Button>
@@ -476,14 +493,23 @@ export default function PlayerControls({ player, setPlayer }) {
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Grid container spacing={1} alignItems="center">
-              <Grid item xs={12} sm={3} md={3}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 3,
+                  md: 3
+                }}>
                 <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
                   {`${t("Zenit")}【${player.info.zenit}】`}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: "grow"
+                }}>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
                   <ToggleButtonGroup
                     value={changeType}

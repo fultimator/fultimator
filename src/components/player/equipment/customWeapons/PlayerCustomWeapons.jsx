@@ -128,7 +128,7 @@ export default function PlayerCustomWeapons({
 
             return (
               <React.Fragment key={index}>
-                <Grid item xs={12} sx={{ mb: 2 }}>
+                <Grid  sx={{ mb: 2 }} size={12}>
                   {/* Primary Weapon */}
                   <Box sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
                     <PrettyCustomWeapon 
@@ -280,7 +280,7 @@ export default function PlayerCustomWeapons({
                     </Box>
                   </Box>
                 </Grid>
-            </React.Fragment>
+              </React.Fragment>
             );
           })}
         </Grid>

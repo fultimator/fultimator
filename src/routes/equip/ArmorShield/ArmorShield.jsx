@@ -102,7 +102,11 @@ function ArmorShield() {
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -119,7 +123,7 @@ function ArmorShield() {
           />
           <Grid container spacing={2} alignItems="center">
             {/* Change Base */}
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
@@ -132,10 +136,10 @@ function ArmorShield() {
                 }}
               />
             </Grid>
-            {/* <Grid item xs={2}>
+            {/* <Grid size={2}>
               <ChangeMartial martial={martial} setMartial={setMartial} />
             </Grid> */}
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
@@ -149,13 +153,13 @@ function ArmorShield() {
               />
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -164,7 +168,7 @@ function ArmorShield() {
               />
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Accordion
                 sx={{ width: "100%" }}
                 expanded={modifiersExpanded}
@@ -175,25 +179,53 @@ function ArmorShield() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"DEF Modifier"} value={defModifier} onChange={(e) => setDefModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"MDEF Modifier"} value={mDefModifier} onChange={(e) => setMDefModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"INIT Modifier"} value={initModifier} onChange={(e) => setInitModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Magic Modifier"} value={magicModifier} onChange={(e) => setMagicModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Precision Modifier"} value={precModifier} onChange={(e) => setPrecModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Damage (Melee) Modifier"} value={damageMeleeModifier} onChange={(e) => setDamageMeleeModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Damage (Ranged) Modifier"} value={damageRangedModifier} onChange={(e) => setDamageRangedModifier(e.target.value)} />
                     </Grid>
                   </Grid>
@@ -201,9 +233,9 @@ function ArmorShield() {
               </Accordion>
               <Divider />
             </Grid>
-            <Grid item xs={12} sx={{ py: 0 }}>
+            <Grid  sx={{ py: 0 }} size={12}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item>
+                <Grid >
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -211,13 +243,13 @@ function ArmorShield() {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid item>
+                <Grid >
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}
-                <Grid item xs>
+                <Grid  size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
               </Grid>
@@ -232,9 +264,12 @@ function ArmorShield() {
           </Grid>
         </Paper>
       </Grid>
-
       {/* Pretty */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Pretty
           base={base}
           custom={{

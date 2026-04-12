@@ -92,7 +92,11 @@ export default function GiftItem({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Gift Type")}</InputLabel>
               <Select
@@ -111,7 +115,11 @@ export default function GiftItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               fullWidth
               label={t("Event")}
@@ -130,7 +138,11 @@ export default function GiftItem({
           </Grid>
 
           {isCustom && (
-            <Grid item xs={12} sm={4}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 4
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -142,7 +154,7 @@ export default function GiftItem({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Gift Effect")}
               value={

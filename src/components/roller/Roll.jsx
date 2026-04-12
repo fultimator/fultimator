@@ -25,13 +25,11 @@ function RegularRoll({ roll }) {
           {roll.attempts[roll.attempts.length - 1].attempt.map((die, i) => {
             return (
               <Grid
-                item
                 key={i}
-                xs
                 sx={{
                   minWidth: 50,
                 }}
-              >
+                size="grow">
                 <Typography textAlign={"center"} fontSize="2rem">
                   {die}
                 </Typography>
@@ -134,7 +132,11 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
     <Card sx={{ width: "100%", p: 1 }}>
       <Stack>
         <Grid container sx={{ my: 1 }}>
-          <Grid item xs={5} sm={6}>
+          <Grid
+            size={{
+              xs: 5,
+              sm: 6
+            }}>
             <Typography textAlign={"center"} fontSize="2rem">
               {sum() + roll.modifier}
             </Typography>
@@ -142,14 +144,18 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               {t("Result")}
             </Typography>
           </Grid>
-          <Grid item xs={7} sm={6}>
+          <Grid
+            size={{
+              xs: 7,
+              sm: 6
+            }}>
             <Grid container alignItems="center" spacing={1}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography textAlign="right">
                   {t("roller_calculation")}:{" "}
                 </Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 {roll.modifier < 0 && (
                   <Typography textAlign="center" fontSize="1.2rem">
                     【{lastRoll[0]} + {lastRoll[1]} - {Math.abs(roll.modifier)}】
@@ -166,10 +172,10 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
                   </Typography>
                 )}
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography textAlign="right">{t("HR")}: </Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography
                   textAlign="center"
                   fontWeight="bold"
@@ -181,7 +187,7 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {crit() && (
               <Typography textAlign={"center"} fontSize="1.5rem">
                 🎉 {t("Critical Success")}! 🎉
@@ -200,27 +206,27 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
         {currentUser === roll.uid && (
           <>
             <Grid container sx={{ my: 1 }}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography textAlign={"center"} fontSize="1.5rem">
                   {lastRoll[0]}
                 </Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography textAlign={"center"} fontSize="1.5rem">
                   {lastRoll[1]}
                 </Typography>
               </Grid>
-              <Grid item xs={6} sx={{ px: 1 }}>
+              <Grid  sx={{ px: 1 }} size={6}>
                 <Button fullWidth variant="outlined" onClick={reRoll("first")}>
                   {t("roller_reroll")} {roll.dice[0]}
                 </Button>
               </Grid>
-              <Grid item xs={6} sx={{ px: 1 }}>
+              <Grid  sx={{ px: 1 }} size={6}>
                 <Button fullWidth variant="outlined" onClick={reRoll("second")}>
                   {t("roller_reroll")} {roll.dice[1]}
                 </Button>
               </Grid>
-              <Grid item xs={12} sx={{ px: 1, py: 1 }}>
+              <Grid  sx={{ px: 1, py: 1 }} size={12}>
                 <Button fullWidth variant="outlined" onClick={reRoll("both")}>
                   {t("roller_reroll_both")}
                 </Button>

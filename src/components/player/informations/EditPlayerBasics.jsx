@@ -121,7 +121,7 @@ export default function EditPlayerBasics({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Basic Information")}
@@ -130,7 +130,11 @@ export default function EditPlayerBasics({
             customTooltip="Console.log Player Object"
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="name"
@@ -144,7 +148,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="pronouns"
@@ -158,7 +166,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <EditPlayerLevel
             player={player}
             setPlayer={setPlayer}
@@ -166,7 +178,7 @@ export default function EditPlayerBasics({
             updateMaxStats={updateMaxStats}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <FormControl variant="standard" fullWidth>
             <CustomTextarea
               id="description"
@@ -179,7 +191,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="fabulapoints"
@@ -219,7 +235,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="exp"
@@ -258,7 +278,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="zenit"
@@ -289,7 +313,11 @@ export default function EditPlayerBasics({
         </Grid>
         {isEditMode ? (
           <>
-            <Grid item xs={12} sm={8}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 8
+              }}>
               <TextField
                 id="imgurl"
                 label={t("Image URL") + ":"}
@@ -306,7 +334,11 @@ export default function EditPlayerBasics({
                 }
               />
             </Grid>
-            <Grid item xs={6} sm={2}>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 2
+              }}>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -334,7 +366,11 @@ export default function EditPlayerBasics({
                 message={t("Image uploaded successfully!")}
               />
             </Grid>
-            <Grid item xs={6} sm={2}>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 2
+              }}>
               <Button
                 variant="outlined"
                 onClick={() => {

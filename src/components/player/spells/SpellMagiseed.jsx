@@ -129,13 +129,10 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           <ReactMarkdown>{t("magiseed_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -152,7 +149,6 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           )}
         </Grid>
       )}
-
       {/* GARDEN */}
       <div
         style={{
@@ -169,15 +165,13 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -189,15 +183,13 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -210,7 +202,6 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           </Grid>
         </Grid>
       </div>
-
       {/* Garden State and Growth Clock */}
       <div
         style={{
@@ -224,14 +215,12 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             {currentMagiseed ? (
               <div>
                 <Typography fontWeight="bold" style={{ marginBottom: "4px" }}>
@@ -245,15 +234,13 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
             )}
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "flex-start",
             }}
-          >
+            size={6}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               {/* Growth Clock Visual */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -314,7 +301,6 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           </Grid>
         </Grid>
       </div>
-
       {/* Current Effect */}
       {currentMagiseed && getCurrentEffect() && (
         <>
@@ -352,7 +338,6 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           </div>
         </>
       )}
-
       {/* Available Magiseeds */}
       {magiseed.magiseeds && magiseed.magiseeds.length > 0 && (
         <>
@@ -389,15 +374,15 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                   onClick={() => toggleMagiseedExpansion(index)}
                 >
                   <Grid container alignItems="center">
-                    <Grid item xs={1}>
+                    <Grid  size={1}>
                       {isExpanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </Grid>
-                    <Grid item xs={7}>
+                    <Grid  size={7}>
                       <Typography fontWeight={currentMagiseed && seed.name === currentMagiseed.name ? "bold" : "normal"}>
                         {seed.customName || t(seed.name)}
                       </Typography>
                     </Grid>
-                    <Grid item xs={4} style={{ textAlign: 'right' }}>
+                    <Grid  style={{ textAlign: 'right' }} size={4}>
                       {isEditMode && (
                         <Button
                           size="small"
@@ -430,7 +415,6 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                     </Grid>
                   </Grid>
                 </div>
-                
                 <Collapse in={isExpanded}>
                   <div
                     style={{

@@ -70,7 +70,11 @@ export default function SpellArcanistModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Arcana Name")}
               variant="outlined"
@@ -80,7 +84,11 @@ export default function SpellArcanistModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Domain")}
               variant="outlined"
@@ -90,7 +98,11 @@ export default function SpellArcanistModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Arcana Description")}
               variant="outlined"
@@ -100,7 +112,11 @@ export default function SpellArcanistModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Domain Description")}
               fullWidth
@@ -110,7 +126,11 @@ export default function SpellArcanistModal({
               maxLength={1500}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Merge Name")}
               variant="outlined"
@@ -120,7 +140,11 @@ export default function SpellArcanistModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Merge Description")}
               fullWidth
@@ -132,7 +156,11 @@ export default function SpellArcanistModal({
           </Grid>
           {isRework && (
             <>
-              <Grid item xs={12} sm={12}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 12
+                }}>
                 <TextField
                   label={t("Pulse Name")}
                   variant="outlined"
@@ -142,7 +170,11 @@ export default function SpellArcanistModal({
                   inputProps={{ maxLength: 50 }}
                 />
               </Grid>
-              <Grid item xs={12} sm={12}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 12
+                }}>
                 <CustomTextarea
                   label={t("Merge Description")}
                   fullWidth
@@ -154,7 +186,11 @@ export default function SpellArcanistModal({
               </Grid>
             </>
           )}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Dismiss Name")}
               variant="outlined"
@@ -164,7 +200,11 @@ export default function SpellArcanistModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Dismiss Description")}
               fullWidth
@@ -174,7 +214,11 @@ export default function SpellArcanistModal({
               maxLength={1500}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <FormControlLabel
               control={
                 <Switch

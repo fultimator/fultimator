@@ -570,7 +570,6 @@ export default function GeneralNotesDialog({
           <Close />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ pt: 3, pb: 1, mt: 1 }}>
         {notes.length > 0 ? (
           <>
@@ -690,7 +689,7 @@ export default function GeneralNotesDialog({
           </>
         ) : (
           // Empty state component when there are no notes
-          <Box
+          (<Box
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -721,10 +720,9 @@ export default function GeneralNotesDialog({
             >
               {t("notes_create_new")}
             </Button>
-          </Box>
+          </Box>)
         )}
       </DialogContent>
-
       <DialogActions
         sx={{
           px: 3,

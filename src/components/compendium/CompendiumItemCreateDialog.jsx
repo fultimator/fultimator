@@ -160,7 +160,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -170,7 +170,11 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
               autoFocus
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Range")}</InputLabel>
               <Select value={range} label={t("Range")} onChange={(e) => setRange(e.target.value)}>
@@ -179,7 +183,11 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 1")}</InputLabel>
               <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -187,7 +195,11 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 2")}</InputLabel>
               <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -195,7 +207,11 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Damage Type")}</InputLabel>
               <Select value={dmgType} label={t("Damage Type")} onChange={(e) => setDmgType(e.target.value)}>
@@ -206,7 +222,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Special")}
               value={special}
@@ -311,7 +327,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={10} sm={11}>
+          <Grid
+            size={{
+              xs: 10,
+              sm: 11
+            }}>
             <TextField
               label={t("Name")}
               value={name}
@@ -322,7 +342,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={2} sm={1}>
+          <Grid
+            size={{
+              xs: 2,
+              sm: 1
+            }}>
             <ToggleButton
               value="offensive"
               selected={isOffensive}
@@ -333,7 +357,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               <OffensiveSpellIcon />
             </ToggleButton>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <TextField
               label={t("MP x Target")}
               value={mp}
@@ -344,7 +372,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ min: 0 }}
             />
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <TextField
               label={t("Max Targets")}
               value={maxTargets}
@@ -355,7 +387,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ min: 0 }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Autocomplete
               freeSolo
               options={DURATION_OPTIONS.map(t)}
@@ -366,7 +402,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Autocomplete
               freeSolo
               options={TARGET_OPTIONS.map(t)}
@@ -377,7 +417,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Range")}</InputLabel>
               <Select value={range} label={t("Range")} onChange={(e) => setRange(e.target.value)}>
@@ -387,7 +431,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
             </FormControl>
           </Grid>
           {isOffensive && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Damage Type")}</InputLabel>
                 <Select value={dmgType} label={t("Damage Type")} onChange={(e) => setDmgType(e.target.value)}>
@@ -398,7 +446,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               </FormControl>
             </Grid>
           )}
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 1")}</InputLabel>
               <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -406,7 +458,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 2")}</InputLabel>
               <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -414,7 +470,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Special")}
               value={special}
@@ -489,7 +545,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -499,7 +555,11 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
               autoFocus
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               label={t("SP Cost")}
               value={spCost}
@@ -510,7 +570,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ min: 0 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Effect")}
               value={effect}
@@ -584,7 +644,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -594,7 +654,11 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
               autoFocus
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               label={t("SP Cost")}
               value={spCost}
@@ -605,7 +669,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ min: 0 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Effect")}
               value={effect}
@@ -892,7 +956,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Spell Type")}</InputLabel>
               <Select value={spellType} label={t("Spell Type")} onChange={(e) => setSpellType(e.target.value)}>
@@ -901,7 +969,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
             </FormControl>
           </Grid>
           {spellType === "default" && (
-            <Grid item xs={12} sm={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 7
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Class")}</InputLabel>
                 <Select value={spellClass} label={t("Class")} onChange={(e) => setSpellClass(e.target.value)}>
@@ -913,7 +985,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               </FormControl>
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -925,7 +997,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
           </Grid>
           {spellType === "default" ? (
             <>
-              <Grid item xs={2} sm={1}>
+              <Grid
+                size={{
+                  xs: 2,
+                  sm: 1
+                }}>
                 <ToggleButton
                   value="offensive"
                   selected={isOffensive}
@@ -936,7 +1012,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   <OffensiveSpellIcon />
                 </ToggleButton>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField
                   label={t("MP")}
                   value={mp}
@@ -947,7 +1027,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   inputProps={{ min: 0 }}
                 />
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField
                   label={t("Max Targets")}
                   value={maxTargets}
@@ -958,7 +1042,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   inputProps={{ min: 0 }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <Autocomplete
                   freeSolo
                   options={TARGET_OPTIONS.map(t)}
@@ -969,7 +1057,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <Autocomplete
                   freeSolo
                   options={DURATION_OPTIONS.map(t)}
@@ -980,7 +1072,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   )}
                 />
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Attr 1")}</InputLabel>
                   <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -988,7 +1084,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Attr 2")}</InputLabel>
                   <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -996,7 +1096,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea
                   label={t("Description")}
                   value={description}
@@ -1008,33 +1108,49 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
           ) : (
             <>
               {spellType === "gift" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Event / Trigger")} value={event} onChange={(e) => setEvent(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
               {spellType === "therioform" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Genoclepsis (optional)")} value={genoclepsis} onChange={(e) => setGenoclepsis(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
               {spellType === "magichant-key" && (
                 <>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("magichant_type")} value={keyType} onChange={(e) => setKeyType(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("magichant_status_effect")} value={keyStatus} onChange={(e) => setKeyStatus(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("magichant_attribute")} value={keyAttribute} onChange={(e) => setKeyAttribute(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("magichant_recovery")} value={keyRecovery} onChange={(e) => setKeyRecovery(e.target.value)} fullWidth size="small" />
                   </Grid>
                 </>
               )}
               {spellType === "dance" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Autocomplete
                     freeSolo
                     options={DURATION_OPTIONS.map(t)}
@@ -1046,7 +1162,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               )}
               {spellType === "invocation" && (
                 <>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <Autocomplete
                       options={WELLSPRINGS}
                       value={wellspring || null}
@@ -1054,7 +1174,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                       renderInput={(params) => <TextField {...params} label={t("Wellspring")} size="small" />}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <Autocomplete
                       options={INV_TYPES}
                       value={invType || null}
@@ -1066,50 +1190,70 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               )}
               {(spellType === "arcanist" || spellType === "arcanist-rework") && (
                 <>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("Domain name")} value={domain} onChange={(e) => setDomain(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Domain effect")} value={domainDesc} onChange={(e) => setDomainDesc(e.target.value)} helperText="" />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("Merge name")} value={merge} onChange={(e) => setMerge(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Merge effect")} value={mergeDesc} onChange={(e) => setMergeDesc(e.target.value)} helperText="" />
                   </Grid>
                   {spellType === "arcanist-rework" && (
                     <>
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         <TextField label={t("Pulse name")} value={pulse} onChange={(e) => setPulse(e.target.value)} fullWidth size="small" />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <CustomTextarea label={t("Pulse effect")} value={pulseDesc} onChange={(e) => setPulseDesc(e.target.value)} helperText="" />
                       </Grid>
                     </>
                   )}
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <TextField label={t("Dismiss name")} value={dismiss} onChange={(e) => setDismiss(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Dismiss effect")} value={dismissDesc} onChange={(e) => setDismissDesc(e.target.value)} helperText="" />
                   </Grid>
                 </>
               )}
               {spellType === "tinkerer-alchemy" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Category")} value={itemCategory} onChange={(e) => setItemCategory(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
               {spellType === "tinkerer-infusion" && (
-                <Grid item xs={12} sm={4}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 4
+                  }}>
                   <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 1, max: 3 }} />
                 </Grid>
               )}
               {spellType === "cooking" && (
                 <>
                   {cookingEffects.map((fx, i) => (
-                    <Grid item xs={12} key={i}>
+                    <Grid  key={i} size={12}>
                       <CustomTextarea
                         label={`${t("Roll")} ${i + 1}`}
                         value={fx}
@@ -1126,19 +1270,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               )}
               {spellType === "magiseed" && (
                 <>
-                  <Grid item xs={6}>
+                  <Grid  size={6}>
                     <TextField label={t("Range Start")} value={seedRangeStart} onChange={(e) => setSeedRangeStart(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 0, max: 4 }} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid  size={6}>
                     <TextField label={t("Range End")} value={seedRangeEnd} onChange={(e) => setSeedRangeEnd(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 1, max: 6 }} />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={seedDescription} onChange={(e) => setSeedDescription(e.target.value)} helperText="" />
                   </Grid>
                   {Array.from({ length: Math.max(0, Number(seedRangeEnd) - Number(seedRangeStart) + 1) }, (_, i) => {
                     const tick = Number(seedRangeStart) + i;
                     return (
-                      <Grid item xs={12} key={tick}>
+                      <Grid  key={tick} size={12}>
                         <CustomTextarea
                           label={`${t("Tick")} ${tick}`}
                           value={seedEffects[tick] ?? ""}
@@ -1152,7 +1296,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               )}
               {spellType === "pilot-vehicle" && (
                 <>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("Component Type")}</InputLabel>
                       <Select value={pilotSubtype} label={t("Component Type")} onChange={(e) => setPilotSubtype(e.target.value)}>
@@ -1163,7 +1307,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                     </FormControl>
                   </Grid>
                   {pilotSubtype === "frame" && (
-                    <Grid item xs={12}>
+                    <Grid  size={12}>
                       <FormControl fullWidth size="small">
                         <InputLabel>{t("Frame")}</InputLabel>
                         <Select value={vehicleFrame} label={t("Frame")} onChange={(e) => setVehicleFrame(e.target.value)}>
@@ -1177,34 +1321,42 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                     </Grid>
                   )}
                   {pilotSubtype !== "frame" && (
-                    <Grid item xs={6} sm={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        sm: 4
+                      }}>
                       <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
                         inputProps={{ min: 0 }} onChange={(e) => setModuleCost(e.target.value)} />
                     </Grid>
                   )}
                   {pilotSubtype === "armor" && (
                     <>
-                      <Grid item xs={4}>
+                      <Grid  size={4}>
                         <TextField label="DEF" value={moduleDef} type="number" fullWidth size="small"
                           onChange={(e) => setModuleDef(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4}>
+                      <Grid  size={4}>
                         <TextField label="MDEF" value={moduleMdef} type="number" fullWidth size="small"
                           onChange={(e) => setModuleMdef(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid  sx={{ display: "flex", alignItems: "center" }} size={4}>
                         <ToggleButton value="martial" selected={moduleMartial} onChange={() => setModuleMartial((v) => !v)} size="small" sx={{ width: "100%" }}>
                           {t("Martial")}
                         </ToggleButton>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <CustomTextarea label={t("Description (optional)")} value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
                       </Grid>
                     </>
                   )}
                   {pilotSubtype === "weapon" && (
                     <>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Category")}</InputLabel>
                           <Select value={weaponCategory} label={t("Category")} onChange={(e) => setWeaponCategory(e.target.value)}>
@@ -1212,7 +1364,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Damage Type")}</InputLabel>
                           <Select value={damageType} label={t("Damage Type")} onChange={(e) => setDamageType(e.target.value)}>
@@ -1220,7 +1376,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Range")}</InputLabel>
                           <Select value={moduleRange || "Melee"} label={t("Range")} onChange={(e) => setModuleRange(e.target.value)}>
@@ -1228,7 +1388,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 3
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Att 1")}</InputLabel>
                           <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
@@ -1236,7 +1400,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 3
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Att 2")}</InputLabel>
                           <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
@@ -1244,24 +1412,36 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label={t("Quality Cost")} value={pilotQualityCost} type="number" fullWidth size="small" onChange={(e) => setPilotQualityCost(e.target.value)} />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <CustomTextarea label={t("Quality")} value={pilotQuality} onChange={(e) => setPilotQuality(e.target.value)} helperText="" />
                       </Grid>
-                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid  sx={{ display: "flex", alignItems: "center" }} size={6}>
                         <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
                           {t("Cumbersome")}
                         </ToggleButton>
                       </Grid>
-                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid  sx={{ display: "flex", alignItems: "center" }} size={6}>
                         <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
                           {t("Shield")}
                         </ToggleButton>
@@ -1276,7 +1456,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                spellType !== "cooking" &&
                spellType !== "magichant-key" &&
                !(spellType === "pilot-vehicle" && (pilotSubtype === "armor" || pilotSubtype === "weapon")) && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <CustomTextarea
                     label={spellType === "therioform" || spellType === "pilot-vehicle" ? t("Description") : t("Effect")}
                     value={effect}
@@ -1377,7 +1557,11 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Name")}
               value={name}
@@ -1387,7 +1571,11 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
               autoFocus
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Category")}</InputLabel>
               <Select
@@ -1403,7 +1591,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Quality Effect")}
               value={quality}
@@ -1411,7 +1599,11 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
               helperText=""
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Cost")}
               value={cost}
@@ -1421,7 +1613,11 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
               type="number"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
               <Select
@@ -1528,7 +1724,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Name")}
               value={name}
@@ -1539,7 +1735,11 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Book")}</InputLabel>
               <Select
@@ -1556,7 +1756,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Autocomplete
               multiple
               options={CLASS_NAME_OPTIONS}
@@ -1578,7 +1778,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               )}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Quote")}
               value={quote}
@@ -1588,7 +1788,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               inputProps={{ maxLength: 200 }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Description")}
               value={description}
@@ -1710,44 +1910,51 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
 
           {/* Identity */}
-          <Grid item xs={8} sm={9}>
+          <Grid
+            size={{
+              xs: 8,
+              sm: 9
+            }}>
             <TextField label={t("Class Name")} value={name} onChange={(e) => setName(e.target.value)}
               fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
           </Grid>
-          <Grid item xs={4} sm={3}>
+          <Grid
+            size={{
+              xs: 4,
+              sm: 3
+            }}>
             <TextField label={t("Book")} value={book} onChange={(e) => setBook(e.target.value)}
               fullWidth size="small" placeholder="homebrew" />
           </Grid>
 
           {/* Free Benefits */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Free Benefits")}
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("HP+")} type="number" value={hpplus}
               onChange={(e) => setHpplus(Number(e.target.value))} fullWidth size="small"
               inputProps={{ min: 0, step: 5 }} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("MP+")} type="number" value={mpplus}
               onChange={(e) => setMpplus(Number(e.target.value))} fullWidth size="small"
               inputProps={{ min: 0, step: 5 }} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("IP+")} type="number" value={ipplus}
               onChange={(e) => setIpplus(Number(e.target.value))} fullWidth size="small"
               inputProps={{ min: 0, step: 2 }} />
           </Grid>
 
           {/* Martials + Ritualism */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {[
                 { key: "melee",   label: t("Martial Melee") },
@@ -1778,7 +1985,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
 
           {/* Custom benefits */}
           {customBenefits.map((cb, i) => (
-            <Grid item xs={12} key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Grid  key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }} size={12}>
               <TextField
                 label={`${t("Custom Benefit")} ${i + 1}`}
                 value={cb}
@@ -1790,14 +1997,14 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
               </IconButton>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={() => setCustomBenefits((arr) => [...arr, ""])}>
               + {t("Add Custom Benefit")}
             </Button>
           </Grid>
 
           {/* Spell Types */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Spell Types")}
             </Typography>
@@ -1821,17 +2028,21 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
           </Grid>
 
           {/* Skills */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
               {t("Skills")}
             </Typography>
           </Grid>
 
           {skills.map((skill, i) => (
-            <Grid item xs={12} key={i}>
+            <Grid  key={i} size={12}>
               <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
                 <Grid container spacing={1}>
-                  <Grid item xs={9} sm={10}>
+                  <Grid
+                    size={{
+                      xs: 9,
+                      sm: 10
+                    }}>
                     <TextField
                       label={`${t("Skill Name")} ${i + 1}`}
                       value={skill.skillName}
@@ -1840,7 +2051,11 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       inputProps={{ maxLength: 50 }}
                     />
                   </Grid>
-                  <Grid item xs={3} sm={2}>
+                  <Grid
+                    size={{
+                      xs: 3,
+                      sm: 2
+                    }}>
                     <TextField
                       label={t("Max Lvl")}
                       type="number"
@@ -1850,7 +2065,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       inputProps={{ min: 1, max: 10 }}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea
                       label={t("Description")}
                       value={skill.description}
@@ -1859,7 +2074,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       maxLength={1500}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("Special Skill Effect")}</InputLabel>
                       <Select
@@ -1885,7 +2100,6 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
           ))}
         </Grid>
       </DialogContent>
-
       <DialogActions>
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave} disabled={!name.trim() || saving}>
@@ -1992,10 +2206,18 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus inputProps={{ maxLength: 80 }} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Subtype")}</InputLabel>
               <Select value={subtype} label={t("Subtype")} onChange={(e) => setSubtype(e.target.value)}>
@@ -2005,16 +2227,16 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
           </Grid>
 
           {(subtype === "quirk" || subtype === "other") && <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
           {subtype === "camp-activities" && <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 freeSolo
                 options={campTargetOptions}
@@ -2032,22 +2254,26 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 size="small"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
           {(subtype === "zero-trigger" || subtype === "zero-effect") && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
           )}
 
           {subtype === "zero-power" && <>
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 options={zeroTriggerOptions}
                 getOptionLabel={(o) => o.name ?? ""}
@@ -2058,7 +2284,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 isOptionEqualToValue={(a, b) => a.name === b.name}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 options={zeroEffectOptions}
                 getOptionLabel={(o) => o.name ?? ""}
@@ -2073,7 +2299,11 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
 
           {subtype === "other" && (
             <>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Clock")}</InputLabel>
                   <Select value={showClock ? "yes" : "no"} label={t("Clock")} onChange={(e) => setShowClock(e.target.value === "yes")}>
@@ -2083,7 +2313,11 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 </FormControl>
               </Grid>
               {showClock && (
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
                 </Grid>
               )}

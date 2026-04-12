@@ -116,7 +116,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
   return (
     <Paper elevation={1} sx={{ p: 2, mx: "auto" }}>
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Card sx={{ p: 2, bgcolor: "background.default" }}>
             <Typography>
               {t("Left-click on a die to add it to your pool")}
@@ -128,7 +128,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
           </Card>
         </Grid>
         {/* Dice Row */}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Grid container justifyContent="space-around" spacing={2}>
             {[
               { icon: <D4Icon />, count: d4, set: setd4 },
@@ -138,7 +138,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
               { icon: <D12Icon />, count: d12, set: setd12 },
               { icon: <D20Icon />, count: d20, set: setd20 },
             ].map(({ icon, count, set }, index) => (
-              <Grid item key={index}>
+              <Grid  key={index}>
                 <IconButton
                   sx={{
                     fontSize: "3rem",
@@ -161,9 +161,9 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Modifiers */}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Grid container justifyContent="center" spacing={2}>
-            <Grid item>
+            <Grid >
               <IconButton
                 onClick={onRaise(setBonus)}
                 onContextMenu={onLower(setBonus)}
@@ -174,7 +174,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 </Badge>
               </IconButton>
             </Grid>
-            <Grid item>
+            <Grid >
               <IconButton
                 onClick={onRaise(setMalus)}
                 onContextMenu={onLower(setMalus)}
@@ -189,7 +189,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Label */}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <TextField
             fullWidth
             label={t("Description")}
@@ -200,9 +200,9 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Buttons */}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Grid container spacing={2} justifyContent="center" wrap="nowrap">
-            <Grid item>
+            <Grid >
               <Button
                 variant="contained"
                 startIcon={<SouthWest sx={{ display: { xs: "none", sm: "inline-flex" } }} />}
@@ -212,7 +212,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 {t("Roll")}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid >
               <Button
                 variant="outlined"
                 startIcon={<Close />}
@@ -222,7 +222,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 {t("Reset")}
               </Button>
             </Grid>
-            <Grid item>
+            <Grid >
               <Button
                 variant="outlined"
                 startIcon={<SouthEast sx={{ display: { xs: "none", sm: "inline-flex" } }} />}

@@ -63,14 +63,12 @@ function NpcPretty({ npc, study, npcImage, collapse, onClick = () => {}, ref }) 
             ) : (
               <Grid container>
                 <Grid
-                  item
-                  xs={12}
                   sx={{
                     padding: 1,
                     display: "flex",
                     justifyContent: "center",
                   }}
-                >
+                  size={12}>
                   <ArrowDropDown />
                   <Typography
                     color={theme.palette.text.primary}
@@ -155,14 +153,12 @@ function Header({ npc, npcImage }) {
     <Grid container alignItems="stretch">
       <Grid container>
         <Grid
-          item
-          xs
           sx={{
             background,
             borderRight,
             px: 2,
           }}
-        >
+          size="grow">
           <Typography
             color="white.main"
             fontFamily="Antonio"
@@ -174,15 +170,13 @@ function Header({ npc, npcImage }) {
           </Typography>
         </Grid>
         <Grid
-          item
           sx={{
             px: 2,
             py: 0.5,
             borderLeft: borderLeft,
             borderBottom: borderBottom,
             borderImage: borderImage,
-          }}
-        >
+          }}>
           <Typography
             fontFamily="Antonio"
             fontSize="1.25rem"
@@ -333,7 +327,6 @@ function Stats({ npc }) {
     >
       <Grid container>
         <Grid
-          item
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -342,12 +335,9 @@ function Stats({ npc }) {
             mr: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
-          }}
-        >
+          }}>
           <Grid container alignItems="stretch" justifyContent="space-between">
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1E2122" : "#efecf5",
                 borderRight:
@@ -356,12 +346,10 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {t("DEX")} d{npc.attributes?.dexterity}
             </Grid>
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1E2122" : "#f3f0f7",
                 borderRight:
@@ -370,12 +358,10 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {t("INS")} d{npc.attributes?.insight}
             </Grid>
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1D1F20" : "#f6f4f9",
                 borderRight:
@@ -384,23 +370,20 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {t("MIG")} d{npc.attributes?.might}
             </Grid>
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#f9f8fb",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {t("WLP")} d{npc.attributes?.will}
             </Grid>
           </Grid>
         </Grid>
         <Grid
-          item
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -409,45 +392,39 @@ function Stats({ npc }) {
             ml: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
-          }}
-        >
+          }}>
           <Grid container alignItems="stretch" justifyContent="space-between">
-            <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+            <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
               {t("HP")}
             </Grid>
             <Grid
-              item
               sx={{
                 py: 0.4,
                 px: isMobile ? 0.75 : 1.5,
                 color: "white.main",
                 bgcolor: "red.main",
-              }}
-            >
+              }}>
               {calcHP(npc)} <Diamond color="white.main" />{" "}
               {Math.floor(calcHP(npc) / 2)}
             </Grid>
-            <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+            <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
               {t("MP")}
             </Grid>
             <Grid
-              item
               sx={{
                 px: isMobile ? 0.75 : 1.5,
                 py: 0.4,
                 color: "white.main",
                 bgcolor: "cyan.main",
-              }}
-            >
+              }}>
               {calcMP(npc)}
             </Grid>
-            <Grid item xs sx={{ py: 0.4 }}>
+            <Grid  sx={{ py: 0.4 }} size="grow">
               {t("Init.")} {calcInit(npc)}
             </Grid>
           </Grid>
         </Grid>
         <Grid
-          item
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -455,12 +432,9 @@ function Stats({ npc }) {
             borderImage,
             mr: isMobile ? "1px" : "2px",
             flexBasis: "calc(25% - 2px)",
-          }}
-        >
+          }}>
           <Grid container justifyItems="space-between">
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
                 borderRight:
@@ -469,7 +443,7 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {npc.armor?.def > 0 || npc.extra?.defOverride ? (
                 <>
                   {t("DEF")} {calcDef(npc)}
@@ -481,13 +455,11 @@ function Stats({ npc }) {
               )}
             </Grid>
             <Grid
-              item
-              xs
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
                 py: 0.4,
               }}
-            >
+              size="grow">
               {npc.extra?.mDefOverride ? (
                 <>
                   {t("M.DEF")} {calcMDef(npc)}
@@ -501,8 +473,6 @@ function Stats({ npc }) {
           </Grid>
         </Grid>
         <Grid
-          item
-          xs
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
@@ -511,37 +481,37 @@ function Stats({ npc }) {
             ml: isMobile ? "1px" : "2px",
             mt: 0,
           }}
-        >
+          size="grow">
           {npc.affinities && (
             <Grid container>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #42484B" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #42484B" }} size="grow">
                 <TypeAffinity
                   type="physical"
                   affinity={npc.affinities.physical}
                 />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #604365" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #604365" }} size="grow">
                 <TypeAffinity type="wind" affinity={npc.affinities.wind} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #6f5375" }} size="grow">
                 <TypeAffinity type="bolt" affinity={npc.affinities.bolt} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #816687" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #816687" }} size="grow">
                 <TypeAffinity type="dark" affinity={npc.affinities.dark} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #957d9b" }} size="grow">
                 <TypeAffinity type="earth" affinity={npc.affinities.earth} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }} size="grow">
                 <TypeAffinity type="fire" affinity={npc.affinities.fire} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }} size="grow">
                 <TypeAffinity type="ice" affinity={npc.affinities.ice} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}>
+              <Grid  sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }} size="grow">
                 <TypeAffinity type="light" affinity={npc.affinities.light} />
               </Grid>
-              <Grid item xs sx={{ py: 0.4 }}>
+              <Grid  sx={{ py: 0.4 }} size="grow">
                 <TypeAffinity type="poison" affinity={npc.affinities.poison} />
               </Grid>
             </Grid>
@@ -589,16 +559,12 @@ function Immunities({ npc }) {
     <Grid
       container
       justifyContent="space-between"
-      item
       sx={{
         mt: 1,
         py: 0.1,
-      }}
-    >
+      }}>
       {/* Immunity Label */}
       <Grid
-        item
-        xs={2}
         sx={{
           textAlign: 'center',
           backgroundColor: backgroundColor,
@@ -606,7 +572,7 @@ function Immunities({ npc }) {
           display: 'flex',
           alignItems: 'center',
         }}
-      >
+        size={2}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -617,18 +583,15 @@ function Immunities({ npc }) {
           {t("Immunities")}
         </Typography>
       </Grid>
-
       {/* Immunities List */}
       <Grid
-        item
-        xs={10}
         sx={{
           px: 1,
           display: 'flex',
           alignItems: 'center',
           background: background,
         }}
-      >
+        size={10}>
         <Typography sx={{ fontWeight: "bold", margin: "auto 0" }}>
           {immunitiesList}
         </Typography>
@@ -688,15 +651,13 @@ function Attacks({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 1,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -707,17 +668,16 @@ function Attacks({ npc }) {
           {t("Basic Attacks")}
         </Typography>
       </Grid>
-
       {npc.attacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography component="div" textAlign="center">
                 {attack.range === "melee" && <MeleeIcon />}
                 {attack.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
@@ -780,17 +740,16 @@ function Attacks({ npc }) {
           </Fragment>
         );
       })}
-
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography component="div" textAlign="center">
                 {attack.weapon.range === "melee" && <MeleeIcon />}
                 {attack.weapon.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>
                   {attack.name} ({attack.weapon.name}){" "}
@@ -897,14 +856,12 @@ function Spells({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -915,16 +872,15 @@ function Spells({ npc }) {
           {t("Spells")}
         </Typography>
       </Grid>
-
       {npc.spells?.map((spell, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography component="div" textAlign="center">
                 <SpellIcon />
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{spell.name}</strong>{" "}
                 {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
@@ -1050,15 +1006,13 @@ function Special({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 0,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -1069,11 +1023,10 @@ function Special({ npc }) {
           {t("Special Rules")}
         </Typography>
       </Grid>
-
       {special?.map((special, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={12} sx={{ px: 3, py: 0.5 }}>
+            <Grid  sx={{ px: 3, py: 0.5 }} size={12}>
               <Typography component="div">
                 <span style={{ display: "inline" }}>
                   <strong>{special.name}</strong> <Diamond />{" "}
@@ -1150,15 +1103,13 @@ function Actions({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 0,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -1169,16 +1120,15 @@ function Actions({ npc }) {
           {t("Other Actions")}
         </Typography>
       </Grid>
-
       {actions?.map((actions, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography textAlign="center">
                 <ActionIcon />
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{actions.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1253,15 +1203,13 @@ function Notes({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 0,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -1272,16 +1220,15 @@ function Notes({ npc }) {
           {t("Notes")}
         </Typography>
       </Grid>
-
       {notes?.map((notes, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ pl: 2, py: 1 }}>
+            <Grid  sx={{ pl: 2, py: 1 }} size={1}>
               <Typography textAlign="center" style={{ width: 20, height: 20 }}>
                 <NotesIcon />
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ pl: 1, pr: 5, py: 1 }}>
+            <Grid  sx={{ pl: 1, pr: 5, py: 1 }} size={11}>
               <Typography component="div">
                 <strong>{notes.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1356,15 +1303,13 @@ function RareGear({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 0,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -1375,16 +1320,15 @@ function RareGear({ npc }) {
           {t("Rare Equipment")}
         </Typography>
       </Grid>
-
       {raregear?.map((raregear, i) => {
         return (
           <Fragment key={i}>
-            <Grid item xs={1} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography textAlign="center">
                 <RareItemIcon />
               </Typography>
             </Grid>
-            <Grid item xs={11} sx={{ px: 1, py: 0.5 }}>
+            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{raregear.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1475,15 +1419,13 @@ function Equip({ npc }) {
   return (
     <Grid container>
       <Grid
-        item
-        xs={12}
         sx={{
           mt: 0,
           px: 2,
           py: 0.3,
           background,
         }}
-      >
+        size={12}>
         <Typography
           color="white.main"
           fontFamily="Antonio"
@@ -1494,10 +1436,9 @@ function Equip({ npc }) {
           {t("Equipment")}
         </Typography>
       </Grid>
-
       {/* Weapons */}
       {weapons.map((weapon, i) => (
-        <Grid key={i} item xs={12} sx={{ px: 2, py: 0 }}>
+        <Grid key={i}  sx={{ px: 2, py: 0 }} size={12}>
           <Typography>
             <strong>{t("Weapon:")}</strong> {weapon.name}{" "}
             {weapon.martial && <Martial />} <Diamond />{" "}
@@ -1540,10 +1481,9 @@ function Equip({ npc }) {
           </Typography>
         </Grid>
       ))}
-
       {/* Armor */}
       {npc.armor && npc.armor.name !== "No Armor" && (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }} alignItems="center">
+        <Grid  sx={{ px: 2, py: 0 }} alignItems="center" size={12}>
           <strong>{t("Armor:")}</strong> {npc.armor.name}{" "}
           {npc.armor.martial && <Martial />}
           <Diamond />{" "}
@@ -1564,10 +1504,9 @@ function Equip({ npc }) {
           <strong>{npc.armor.cost}</strong> {t("zenit")}
         </Grid>
       )}
-
       {/* Shield */}
       {npc.shield && npc.shield.name !== "No Shield" && (
-        <Grid item xs={12} sx={{ px: 2, py: 0 }}>
+        <Grid  sx={{ px: 2, py: 0 }} size={12}>
           <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
           {npc.shield.martial && <Martial />}
           <Diamond />{" "}

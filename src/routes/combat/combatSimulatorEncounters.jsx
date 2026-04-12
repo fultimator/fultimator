@@ -304,7 +304,11 @@ const CombatSimEncounters = () => {
             {t("combat_sim_new_encounter")}
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 8
+              }}>
               <TextField
                 label={t("combat_sim_encounter_name")}
                 variant="outlined"
@@ -316,7 +320,11 @@ const CombatSimEncounters = () => {
                 disabled={dbMode === "cloud" && !cloudUser}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 4
+              }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -404,7 +412,6 @@ const CombatSimEncounters = () => {
           </Collapse>
         </div>
       </Paper>
-
       {dbMode === "cloud" && !cloudUser && (
         <Paper
           elevation={3}
@@ -417,18 +424,13 @@ const CombatSimEncounters = () => {
           <SignIn />
         </Paper>
       )}
-
       <Grid container spacing={3} sx={{ marginTop: 2 }}>
         {loading ? (
-          <Grid
-            item
-            xs={12}
-            sx={{ display: "flex", justifyContent: "center", py: 4 }}
-          >
+          <Grid sx={{ display: "flex", justifyContent: "center", py: 4 }} size={12}>
             <CircularProgress color="primary" />
           </Grid>
         ) : encounters.length === 0 ? (
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Paper
               sx={{
                 p: 3,
@@ -448,7 +450,13 @@ const CombatSimEncounters = () => {
           </Grid>
         ) : (
           encounters.map((encounter) => (
-            <Grid item xs={12} sm={6} md={4} key={encounter.id}>
+            <Grid
+              key={encounter.id}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 4
+              }}>
               <EncounterCard
                 encounter={encounter}
                 onDelete={handleDeleteEncounter}
@@ -461,7 +469,6 @@ const CombatSimEncounters = () => {
           ))
         )}
       </Grid>
-
       {/* Settings Dialog */}
       <SettingsDialog
         open={settingsOpen}
@@ -472,7 +479,6 @@ const CombatSimEncounters = () => {
         storeSettings={settingsStore.settings}
         resetToDefaults={settingsStore.resetToDefaults}
       />
-
       {/* Notifications */}
       <Snackbar
         open={notification.open}

@@ -292,7 +292,7 @@ export default function CharacterSheet() {
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
-        <Grid item xs={isMobile ? 8 : 10}>
+        <Grid  size={isMobile ? 8 : 10}>
           <Button
             variant="contained"
             color="primary"
@@ -303,7 +303,7 @@ export default function CharacterSheet() {
             {t("Download Character Sheet")}
           </Button>
         </Grid>
-        <Grid item xs={isMobile ? 4 : 2}>
+        <Grid  size={isMobile ? 4 : 2}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Button
               variant="outlined"
@@ -351,8 +351,14 @@ export default function CharacterSheet() {
       </Grid>
       {fullCharacterSheet ? (
         <Grid container spacing={2} sx={{ padding: 1 }} id="character-sheet">
-          <Grid container item xs={12} md={6} spacing={2}>
-            <Grid item xs={12}>
+          <Grid
+            container
+            spacing={2}
+            size={{
+              xs: 12,
+              md: 6
+            }}>
+            <Grid  size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerCard
                   player={player}
@@ -433,8 +439,14 @@ export default function CharacterSheet() {
               </Stack>
             </Grid>
           </Grid>
-          <Grid container item xs={12} md={6} spacing={2}>
-            <Grid item xs={12}>
+          <Grid
+            container
+            spacing={2}
+            size={{
+              xs: 12,
+              md: 6
+            }}>
+            <Grid  size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerClasses
                   player={player}
@@ -450,11 +462,11 @@ export default function CharacterSheet() {
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <PlayerCompanion player={player} setPlayer={handleSetPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
           </Grid>
-          <Grid container item xs={12}>
-            <Grid item xs={4}>
+          <Grid container  size={12}>
+            <Grid  size={4}>
               <img
                 src={powered_by_fu}
                 alt="Powered by Fu"
@@ -462,7 +474,7 @@ export default function CharacterSheet() {
                 onLoad={() => setImagesLoaded(true)}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant="h4" align="center">
                 <span
                   style={{
@@ -484,7 +496,7 @@ export default function CharacterSheet() {
           sx={{ padding: 1 }}
           justifyContent={"center"}
         >
-          <Grid container item xs={12}>
+          <Grid container  size={12}>
             <PlayerCardSheet
               player={player}
               setPlayer={handleSetPlayer}
@@ -498,7 +510,6 @@ export default function CharacterSheet() {
           </Grid>
         </Grid>
       )}
-
       {isOwner && (
         <Box
           sx={{

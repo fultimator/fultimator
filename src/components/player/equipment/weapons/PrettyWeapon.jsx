@@ -66,22 +66,22 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               },
             }}
           >
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" textAlign="left">
                 {t("Weapon")}
               </Typography>
             </Grid>
-            <Grid item xs={1}>
+            <Grid  size={1}>
               <Typography variant="h4" textAlign="center">
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant="h4" textAlign="center">
                 {t("Accuracy")}
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant="h4" textAlign="center">
                 {t("Damage")}
               </Typography>
@@ -89,12 +89,11 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column" item xs>
+          <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
               container
               justifyContent="space-between"
-              item
               sx={{
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
@@ -102,22 +101,17 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}
-            >
-              <Grid
-                item
-                xs={3}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
+              }}>
+              <Grid sx={{ display: "flex", alignItems: "center" }} size={3}>
                 <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
                   {t(weapon.name)}
                 </Typography>
                 {weapon.martial && <Martial />}
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography fontWeight="bold" textAlign="center">
                   <OpenBracket />
                   {`${attributes[weapon.att1].shortcaps} + ${
@@ -132,7 +126,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 </Typography>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography fontWeight="bold" textAlign="center">
                   <OpenBracket />
                   {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
@@ -155,24 +149,24 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 },
               }}
             >
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography fontWeight="bold">
                   {t(weapon.category)}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Diamond color={theme.primary} />
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography textAlign="center">
                   {weapon.hands === 1 && t("One-handed")}
                   {weapon.hands === 2 && t("Two-handed")}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Diamond color="{primary}" />
               </Grid>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography textAlign="center">
                   {weapon.melee && t("Melee")}
                   {weapon.ranged && t("Ranged")}

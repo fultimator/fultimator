@@ -388,8 +388,8 @@ export default function PlayerEquipment({
     const dialogContent = (
       <>
         <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -401,8 +401,8 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -420,7 +420,7 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={12} sx={{ marginTop: "20px" }}>
+          <Grid  sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
               {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${attributes[att2].shortcaps
                 }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${weapon.melee
@@ -576,14 +576,14 @@ export default function PlayerEquipment({
             <Grid container spacing={1} sx={{ padding: "1em" }}>
               {allEquippedWeapons.map((weapon, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -602,7 +602,7 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -638,14 +638,14 @@ export default function PlayerEquipment({
               ))}
               {equippedArmor.map((armor, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={`armor-${index}`}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -664,7 +664,7 @@ export default function PlayerEquipment({
                       {armor.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -687,14 +687,14 @@ export default function PlayerEquipment({
               ))}
               {equippedShields.map((shield, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={`shield-${index}`}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -713,7 +713,7 @@ export default function PlayerEquipment({
                       {shield.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -736,14 +736,14 @@ export default function PlayerEquipment({
               ))}
               {equippedAccessories.map((accessory, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={`accessory-${index}`}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -762,7 +762,7 @@ export default function PlayerEquipment({
                       {accessory.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -787,7 +787,7 @@ export default function PlayerEquipment({
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
                 damageRangedModifier !== 0) && (
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                       {t("Modifiers")}
                     </Typography>
@@ -857,7 +857,6 @@ export default function PlayerEquipment({
           </Paper>
         </>
       )}
-
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
         <DialogContent sx={{ p: 0 }}>
           <EditPlayerEquipment player={player} setPlayer={setPlayer} isEditMode={true} />
@@ -866,7 +865,6 @@ export default function PlayerEquipment({
           <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
         <DialogContent sx={{ p: 0 }}>
           {selectedItem && (

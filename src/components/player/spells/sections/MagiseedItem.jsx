@@ -119,7 +119,11 @@ export default function MagiseedItem({
       <CardContent>
         <Grid container spacing={2} alignItems="flex-start">
           {/* Magiseed Name Selector */}
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Magiseed")}</InputLabel>
               <Select
@@ -140,7 +144,11 @@ export default function MagiseedItem({
 
           {/* Custom Name (for custom magiseeds) */}
           {isCustom && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -154,7 +162,11 @@ export default function MagiseedItem({
           )}
 
           {/* Range Start and End */}
-          <Grid item xs={12} sm={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 3
+            }}>
             <TextField
               fullWidth
               label={t("Range Start")}
@@ -166,7 +178,11 @@ export default function MagiseedItem({
               inputProps={{ min: 0, max: 4 }}
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 3
+            }}>
             <TextField
               fullWidth
               label={t("Range End")}
@@ -180,7 +196,7 @@ export default function MagiseedItem({
           </Grid>
 
           {/* Description */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: "bold" }}>
               {t("Description")}
             </Typography>
@@ -196,7 +212,7 @@ export default function MagiseedItem({
           </Grid>
 
           {/* Effects (T=0, T=1, T=2, T=3) */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Accordion
               expanded={expandedEffects}
               onChange={() => setExpandedEffects(!expandedEffects)}
@@ -210,7 +226,7 @@ export default function MagiseedItem({
               <AccordionDetails>
                 <Grid container spacing={2} sx={{ width: "100%" }}>
                   {[0, 1, 2, 3].map((t_value) => (
-                    <Grid item xs={12} key={t_value}>
+                    <Grid  key={t_value} size={12}>
                       <CustomTextarea
                         label={t(`T = ${t_value}`)}
                         value={item.effects?.[t_value] || ""}

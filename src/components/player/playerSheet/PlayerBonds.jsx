@@ -155,7 +155,13 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
             <Grid container spacing={0.75} sx={{ p: 0.75 }}>
               {bonds && bonds.length > 0
                 ? bonds.map((bond, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Grid
+                    key={index}
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 4
+                    }}>
                     <Box
                       sx={{
                         border: "1px solid",
@@ -238,7 +244,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </Paper>
         </>
       )}
-
       {editBondIndex !== null && draftBond && (
         <Dialog open onClose={closeModal} fullWidth maxWidth="sm">
           <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
@@ -253,7 +258,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField
                   fullWidth
                   label={t("Bond Name")}
@@ -270,7 +275,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                 { key: "mistrust", label: t("Mistrust"), color: negativeColor },
                 { key: "hatred", label: t("Hatred"), color: negativeColor },
               ].map(({ key, label, color }) => (
-                <Grid item xs={4} key={key}>
+                <Grid  key={key} size={4}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -299,7 +304,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </DialogActions>
         </Dialog>
       )}
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

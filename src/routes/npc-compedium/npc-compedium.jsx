@@ -242,9 +242,6 @@ function Personal({ user }) {
     const isMobile = window.innerWidth < 900;
     return (
       <Grid
-        item
-        xs={4}
-        md={1.3}
         alignItems="center"
         justifyContent="center"
         sx={{
@@ -253,7 +250,10 @@ function Personal({ user }) {
           alignItems: "center",
           justifyContent: "center",
         }}
-      >
+        size={{
+          xs: 4,
+          md: 1.3
+        }}>
         <Avatar
           alt="icon"
           src={token}
@@ -354,14 +354,14 @@ function Personal({ user }) {
 
         <Grid container spacing={1} sx={{ py: 0 }} justifyContent="center">
           <Grid
-            item
-            xs={12}
-            md={3}
-            lg={4}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex" }}
-          >
+            size={{
+              xs: 12,
+              md: 3,
+              lg: 4
+            }}>
             <TextField
               id="outlined-basic"
               label={t("Adversary Name")}
@@ -376,13 +376,13 @@ function Personal({ user }) {
           </Grid>
 
           <Grid
-            item
-            xs={12}
-            md={3}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex", marginLeft: 5, marginRight: 5 }}
-          >
+            size={{
+              xs: 12,
+              md: 3
+            }}>
             <Slider
               getAriaLabel={() => "Level"}
               value={levels}
@@ -401,13 +401,13 @@ function Personal({ user }) {
             />
           </Grid>
           <Grid
-            item
-            xs={6}
-            md={2}
             alignItems="center"
             justifyContent="center"
             sx={{ display: "flex" }}
-          >
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel id="rank">{t("Rank:")}</InputLabel>
               <Select
@@ -434,7 +434,13 @@ function Personal({ user }) {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid
+            alignItems="center"
+            sx={{ display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel id="Language">{t("Language:")}</InputLabel>
               <Select
@@ -454,7 +460,13 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid
+            alignItems="center"
+            sx={{ display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <Button
               variant="outlined"
               fullWidth
@@ -466,13 +478,13 @@ function Personal({ user }) {
             </Button>
           </Grid>
           <Grid
-            item
-            xs={6}
-            md={2}
             sx={{}}
             alignItems="center"
             justifyContent="center"
-          >
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <Button
               fullWidth
               variant="contained"
@@ -494,7 +506,6 @@ function Personal({ user }) {
           </Grid>
         </Grid>
       </Paper>
-
       {isMobile ? (
         <div>
           {personalList?.map((npc, i) => {
@@ -558,7 +569,6 @@ function Personal({ user }) {
           </div>
         </div>
       )}
-
       <div
         style={{
           display: "flex",
@@ -628,7 +638,6 @@ function Personal({ user }) {
           <CircularProgress />
         )}
       </div>
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
@@ -665,7 +674,12 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const [collapse, setCollapse] = useState(false);
 
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
+    <Grid
+      sx={{ marginBottom: 3 }}
+      size={{
+        xs: 12,
+        md: 12
+      }}>
       <NpcPretty
         npc={npc}
         ref={ref}

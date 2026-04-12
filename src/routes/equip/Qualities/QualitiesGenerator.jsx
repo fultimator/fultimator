@@ -164,7 +164,11 @@ function QualitiesGenerator({ onGenerate }) {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           disablePortal
           fullWidth
@@ -180,7 +184,11 @@ function QualitiesGenerator({ onGenerate }) {
           renderInput={(params) => <TextField {...params} label="Damage Type" />}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           disablePortal
           fullWidth
@@ -195,7 +203,11 @@ function QualitiesGenerator({ onGenerate }) {
           renderInput={(params) => <TextField {...params} label="Species" />}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           disablePortal
           fullWidth
@@ -210,7 +222,11 @@ function QualitiesGenerator({ onGenerate }) {
           renderInput={(params) => <TextField {...params} label="Attributes" />}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Autocomplete
           disablePortal
           fullWidth
@@ -225,8 +241,7 @@ function QualitiesGenerator({ onGenerate }) {
           renderInput={(params) => <TextField {...params} label="Statuses" />}
         />
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Paper
           sx={{
             background,

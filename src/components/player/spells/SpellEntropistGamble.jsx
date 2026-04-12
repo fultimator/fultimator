@@ -32,7 +32,6 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
   return (
     <>
       {/* Row 1 */}
-
       <div
         style={{
           backgroundColor: theme.primary,
@@ -48,15 +47,13 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -66,43 +63,43 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 3,
+              sm: 2
+            }}>
             <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
               {t("MP x Dice")}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={4}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 3,
+              sm: 4
+            }}>
             <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
               {t("Max Throwable Dices")}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 3,
+              sm: 3
+            }}>
             <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
               {t("Attribute")}
             </Typography>
@@ -110,19 +107,16 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
             }}
-          >
+            size="grow">
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
       </div>
-
       {/* Row 2 */}
       <div
         style={{
@@ -136,15 +130,13 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -159,42 +151,40 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
               {gamble.mp}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={4}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 3,
+              sm: 4
+            }}>
             <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
               {gamble.maxTargets}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={4}
-            sm={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 4,
+              sm: 3
+            }}>
             <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
               {attributes[gamble.attr].shortcaps}
             </Typography>
@@ -202,10 +192,8 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             {!gamble.showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
                 <Icon>
@@ -219,7 +207,6 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           </Grid>
         )}
       </div>
-
       {/* Row 3 */}
       <Grid
         container
@@ -242,7 +229,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             }}
           >
             {/* Primary Effect */}
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 fontSize={{ xs: "0.8rem", sm: "1rem" }}
@@ -253,7 +240,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                   : `${target.rangeFrom} - ${target.rangeTo}`}
               </Typography>
             </Grid>
-            <Grid item xs={10} sx={{ mb: 1 }}>
+            <Grid  sx={{ mb: 1 }} size={10}>
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 fontSize={{ xs: "0.8rem", sm: "1rem" }}
@@ -265,14 +252,14 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             {/* Secondary Effects */}
             {target.secondRoll && target.secondEffects?.length > 0 && (
               <>
-                <Grid item xs={2}>
+                <Grid  size={2}>
                   {/* Leave to fill space */}
                 </Grid>
-                <Grid item xs={10}>
+                <Grid  size={10}>
                   <Grid container>
                     {target.secondEffects.map((effect, i) => (
                       <React.Fragment key={i}>
-                        <Grid item xs={1}>
+                        <Grid  size={1}>
                           <Typography
                             style={{ flexGrow: 1, marginRight: "5px" }}
                             fontSize={{ xs: "0.8rem", sm: "1rem" }}
@@ -282,7 +269,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                             {"."}
                           </Typography>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid  size={3}>
                           <Typography
                             style={{ flexGrow: 1, marginRight: "5px" }}
                             fontSize={{ xs: "0.8rem", sm: "1rem" }}
@@ -290,7 +277,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                             <ReactMarkdown components={components}>{effect.effect}</ReactMarkdown>
                           </Typography>
                         </Grid>
-                        {(i + 1) % 3 === 0 && <Grid item xs={12} />}
+                        {(i + 1) % 3 === 0 && <Grid  size={12} />}
                       </React.Fragment>
                     ))}
                   </Grid>

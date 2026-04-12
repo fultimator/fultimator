@@ -118,7 +118,7 @@ function AuthCombat({ user }: AuthCombatProps) {
 
   return (
     <Grid container direction="column" sx={{ mt: 2 }}>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Autocomplete
           size="small"
           disablePortal
@@ -131,8 +131,7 @@ function AuthCombat({ user }: AuthCombatProps) {
           )}
         />
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Stack direction="row" spacing={1} mb={2}>
           {personalList?.map((npc) => {
             // Only show buttons for NPCs that have been selected at least once
@@ -152,14 +151,12 @@ function AuthCombat({ user }: AuthCombatProps) {
           })}
         </Stack>
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         {npcs.map((npc, index) => (
           <Grid
             container
-            item
-            xs={12}
-            key={index} // Use index as key for duplicate handling
+            // Use index as key for duplicate handling
+            key={index}
             sx={{
               mb: 1,
               p: 1,
@@ -167,11 +164,11 @@ function AuthCombat({ user }: AuthCombatProps) {
               borderRadius: "4px",
               alignItems: "center",
             }}
-          >
-            <Grid item xs={9}>
+            size={12}>
+            <Grid  size={9}>
               <Typography variant="h3">{index + 1}</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <NpcCombatant npc={npc} />
             </Grid>
           </Grid>
@@ -304,7 +301,7 @@ function NpcCombatant({ npc }: NpcProps) {
     setSelectedStudy(event.target.value);
   };
 
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement>(null);
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
   /************ ATTACK ROLL ************/
@@ -461,7 +458,7 @@ function NpcCombatant({ npc }: NpcProps) {
 
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
-      <Grid item xs={6}>
+      <Grid  size={6}>
         <NpcPretty
           npc={npc}
           study={selectedStudy}
@@ -469,11 +466,11 @@ function NpcCombatant({ npc }: NpcProps) {
           ref={ref}
           collapse={true}
         />
-        <Grid item container xs={12} mt={5}>
-          <Grid item xs={2}>
+        <Grid  container mt={5} size={12}>
+          <Grid  size={2}>
             <Typography variant="h5">{t("Study Roll:")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Select
               labelId="study"
               id="study"
@@ -500,16 +497,16 @@ function NpcCombatant({ npc }: NpcProps) {
           </Button>
         </Grid>
       </Grid>
-      <Grid xs={6} item>
+      <Grid size={6} >
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
-          <Grid item xs={10} container alignItems="center">
-            <Grid item xs={2}>
+          <Grid  container alignItems="center" size={10}>
+            <Grid  size={2}>
               <Typography variant="h5" color="red">
                 {t("HP:")} {hp}
               </Typography>
               {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
             </Grid>
-            <Grid item xs={10}>
+            <Grid  size={10}>
               <PointBar
                 pt={hp}
                 maxPt={calcHP(npc)}
@@ -518,7 +515,7 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item xs={5}>
+          <Grid  size={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(-1)}>-1</Button>
               <Button onClick={changeHp(-2)}>-2</Button>
@@ -527,7 +524,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeHp(-20)}>-20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={5}>
+          <Grid  size={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(+1)}>+1</Button>
               <Button onClick={changeHp(+2)}>+2</Button>
@@ -536,13 +533,13 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeHp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={10} container alignItems="center">
-            <Grid item xs={2}>
+          <Grid  container alignItems="center" size={10}>
+            <Grid  size={2}>
               <Typography variant="h5" color="red">
                 {t("MP:")} {mp}
               </Typography>
             </Grid>
-            <Grid item xs={10}>
+            <Grid  size={10}>
               <PointBar
                 pt={mp}
                 maxPt={calcMP(npc)}
@@ -551,7 +548,7 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item xs={5}>
+          <Grid  size={5}>
             <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(-1)}>-1</Button>
               <Button onClick={changeMp(-2)}>-2</Button>
@@ -560,7 +557,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeMp(-20)}>-20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={5}>
+          <Grid  size={5}>
             <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(+1)}>+1</Button>
               <Button onClick={changeMp(+2)}>+2</Button>
@@ -569,31 +566,31 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeMp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item container xs={12}>
-            <Grid item xs>
+          <Grid  container size={12}>
+            <Grid  size="grow">
               <Typography variant="h5">
                 {t("DEX:")} d{attributes.dexterity}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <Typography variant="h5">
                 {t("INS:")} d{attributes.insight}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <Typography variant="h5">
                 {t("MIG:")} d{attributes.might}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <Typography variant="h5">
                 {t("WIL:")} d{attributes.will}
               </Typography>
             </Grid>
           </Grid>
 
-          <Grid item container xs={12}>
-            <Grid item xs>
+          <Grid  container size={12}>
+            <Grid  size="grow">
               <FormControlLabel
                 value="slow"
                 control={
@@ -609,7 +606,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControlLabel
                 value="dazed"
                 control={
@@ -625,7 +622,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControlLabel
                 value="weak"
                 control={
@@ -641,7 +638,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControlLabel
                 value="shaken"
                 control={
@@ -658,8 +655,8 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item container xs={12}>
-            <Grid item xs display="flex" justifyContent="center">
+          <Grid  container size={12}>
+            <Grid  display="flex" justifyContent="center" size="grow">
               <FormControlLabel
                 value="enraged"
                 control={
@@ -675,7 +672,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs display="flex" justifyContent="center">
+            <Grid  display="flex" justifyContent="center" size="grow">
               <FormControlLabel
                 value="poisoned"
                 control={
@@ -693,9 +690,9 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
           </Grid>
           {/**ATTACK ROLL SIMULATOR**/}
-          <Grid item flex="1">
+          <Grid  flex="1">
             {npc.attacks.map((attack, index) => (
-              <Grid item key={index}>
+              <Grid  key={index}>
                 <Button
                   variant="contained"
                   onClick={() => rollAttackDice(attack, "baseattack")}
@@ -711,7 +708,7 @@ function NpcCombatant({ npc }: NpcProps) {
               </Grid>
             ))}
             {npc.weaponattacks?.map((wattack, index) => (
-              <Grid item key={index}>
+              <Grid  key={index}>
                 <Button
                   variant="outlined"
                   onClick={() => rollAttackDice(wattack, "weapon")}
@@ -729,7 +726,7 @@ function NpcCombatant({ npc }: NpcProps) {
             {npc.spells
               ?.filter((spell) => spell.type === "offensive")
               .map((spell, index) => (
-                <Grid item key={index}>
+                <Grid  key={index}>
                   <Button
                     variant="contained"
                     color="info"
@@ -745,8 +742,8 @@ function NpcCombatant({ npc }: NpcProps) {
                   </Button>
                 </Grid>
               ))}
-            <Grid item container pb={1} mt={2} border={1} borderRadius={1}>
-              <Grid item xs={4} pt={1} pl={1}>
+            <Grid  container pb={1} mt={2} border={1} borderRadius={1}>
+              <Grid  pt={1} pl={1} size={4}>
                 <Typography variant="h6">{t("Dice Results")}</Typography>
                 <Typography variant="body1">
                   {t("Die 1")}: <b>{diceResults.attribute1}</b>
@@ -755,20 +752,20 @@ function NpcCombatant({ npc }: NpcProps) {
                   {t("Die 2")}: <b>{diceResults.attribute2}</b>
                 </Typography>
               </Grid>
-              <Grid item xs={4} pt={1} pl={1}>
+              <Grid  pt={1} pl={1} size={4}>
                 <Typography variant="h6">{t("Hit Throw Result")}</Typography>
                 <Typography variant="body1">
                   {t("Hit Score")}: <b>{hitThrowResult.totalHitScore}</b>
                 </Typography>
               </Grid>
-              <Grid item xs={4} pt={1} pl={1}>
+              <Grid  pt={1} pl={1} size={4}>
                 <Typography variant="h6">{t("Damage Result")}</Typography>
                 <Typography variant="body1">
                   {t("Damage")}: <b>{damageResult.damage}</b>
                 </Typography>
               </Grid>
               {isCriticalSuccess && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Typography
                     variant="h4"
                     color="green"
@@ -782,7 +779,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 </Grid>
               )}
               {isCriticalFailure && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Typography
                     variant="h4"
                     color="error"

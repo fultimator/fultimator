@@ -84,7 +84,11 @@ export default function AddSkillModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item sm={10} xs={12}>
+          <Grid
+            size={{
+              sm: 10,
+              xs: 12
+            }}>
             <TextField
               label={t("Skill Name")}
               fullWidth
@@ -93,7 +97,11 @@ export default function AddSkillModal({
               inputProps={{ maxLength: 50 }}
             />
           </Grid>
-          <Grid item sm={2} xs={12}>
+          <Grid
+            size={{
+              sm: 2,
+              xs: 12
+            }}>
             <TextField
               label={t("Max Level")}
               type="number"
@@ -125,7 +133,7 @@ export default function AddSkillModal({
               disabled={!!specialSkill} // Disable if a specialSkill is selected
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -135,7 +143,7 @@ export default function AddSkillModal({
               maxRows={10}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography>
               {t("Special Skill Effect")}
               <IconButton
@@ -177,7 +185,6 @@ export default function AddSkillModal({
           </Grid>
         </Grid>
       </DialogContent>
-
       <DialogActions>
         {editSkillIndex !== null && (
           <Button variant="contained" color="error" onClick={onDeleteSkill}>

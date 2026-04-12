@@ -943,8 +943,6 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
         <Grid container alignItems="stretch">
             <Grid container>
                 <Grid
-                    item
-                    xs
                     sx={{
                         background,
                         borderRight,
@@ -952,7 +950,7 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         display: "flex",
                         alignItems: "center",
                     }}
-                >
+                    size="grow">
                     {isEditMode ? (
                         <TextField
                             value={player.name}
@@ -986,7 +984,6 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                     )}
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         px: 1,
                         py: 0.5,
@@ -995,8 +992,7 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         borderImage: borderImage,
                         display: "flex",
                         alignItems: "center",
-                    }}
-                >
+                    }}>
                     {isEditMode ? (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
                             {player.info.pronouns && (
@@ -1151,16 +1147,16 @@ function RenderTraits({ player }) {
         <Grid container>
             {/* Iterate over traits */}
             {traits.map(({ label, value }) => value && (
-                <Grid item xs={12} key={label} sx={{ marginTop: 0.5 }}>
+                <Grid  key={label} sx={{ marginTop: 0.5 }} size={12}>
                     <Grid container alignItems="center" spacing={1}>
                         {/* Label */}
-                        <Grid item xs={3}>
+                        <Grid  size={3}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
                                 {label}:
                             </Typography>
                         </Grid>
                         {/* Value */}
-                        <Grid item xs={9}>
+                        <Grid  size={9}>
                             <Typography align="left">
                                 {value}
                             </Typography>
@@ -1206,7 +1202,6 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
         >
             <Grid container>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1215,8 +1210,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         mr: isMobile ? "1px" : "2px",
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
-                    }}
-                >
+                    }}>
                     <Grid container alignItems="stretch" justifyContent="space-between">
                         {[
                             { key: "dexterity", label: t("DEX"), curr: currDex, bg: { dark: '#1E2122', light: '#efecf5' }, border: true },
@@ -1226,14 +1220,12 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         ].map(({ key, label, curr, bg, border }) => (
                             <Grid
                                 key={key}
-                                item
-                                xs
                                 sx={{
                                     bgcolor: custom.mode === 'dark' ? bg.dark : bg.light,
                                     borderRight: border ? (custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff') : undefined,
                                     py: 0.4,
                                 }}
-                            >
+                                size="grow">
                                 {isEditMode ? (
                                     <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0 }}>
                                         <Typography component="span" style={{ fontFamily: "'Antonio', fantasy, sans-serif", fontSize: "0.875rem" }}>
@@ -1271,7 +1263,6 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                     </Grid>
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1280,45 +1271,39 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         ml: isMobile ? "1px" : "2px",
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
-                    }}
-                >
+                    }}>
                     <Grid container alignItems="stretch" justifyContent="space-between">
-                        <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+                        <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
                             {t("HP")}
                         </Grid>
                         <Grid
-                            item
                             sx={{
                                 py: 0.4,
                                 px: isMobile ? 0.75 : 1.5,
                                 color: "white.main",
                                 bgcolor: "red.main",
-                            }}
-                        >
+                            }}>
                             {player.stats?.hp.max} <Diamond color="white.main" />{" "}
                             {Math.floor(player.stats?.hp.max / 2)}
                         </Grid>
-                        <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+                        <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
                             {t("MP")}
                         </Grid>
                         <Grid
-                            item
                             sx={{
                                 px: isMobile ? 0.75 : 1.5,
                                 py: 0.4,
                                 color: "white.main",
                                 bgcolor: "cyan.main",
-                            }}
-                        >
+                            }}>
                             {player.stats?.mp.max}
                         </Grid>
-                        <Grid item xs sx={{ py: 0.4 }}>
+                        <Grid  sx={{ py: 0.4 }} size="grow">
                             {t("Init.")} {currInit}
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1326,18 +1311,15 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         borderImage,
                         mr: isMobile ? "1px" : "2px",
                         flexBasis: "calc(25% - 2px)",
-                    }}
-                >
+                    }}>
                     <Grid container justifyItems="space-between">
                         <Grid
-                            item
-                            xs
                             sx={{
                                 bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#efecf5',
                                 borderRight: custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                                 py: 0.4,
                             }}
-                        >
+                            size="grow">
                             <Typography
                                 component="span"
                                 variant="body2"
@@ -1350,13 +1332,11 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                             </Typography>
                         </Grid>
                         <Grid
-                            item
-                            xs
                             sx={{
                                 bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#efecf5',
                                 py: 0.4,
                             }}
-                        >
+                            size="grow">
                             <Typography
                                 component="span"
                                 variant="body2"
@@ -1370,7 +1350,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs>
+                <Grid  size="grow">
                     <AffinityGrid container>
                         {[
                             "physical",
@@ -1384,14 +1364,12 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                             "poison",
                         ].map((type) => (
                             <Grid
-                                item
-                                xs
                                 key={type}
                                 sx={{
                                     py: 0.4,
                                     borderRight: `1px solid ${theme.palette.divider}`,
                                 }}
-                            >
+                                size="grow">
                                 <TypeAffinity
                                     type={type}
                                     affinity={player.affinities?.[type] || ""}

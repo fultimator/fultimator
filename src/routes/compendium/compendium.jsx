@@ -1589,7 +1589,12 @@ function CompendiumViewer() {
             ) : (
               <Grid container spacing={2}>
                 {filteredItems.map((item, idx) => (
-                  <Grid item xs={12} lg={selectedType === "classes" ? 12 : 6} key={itemIds[idx]}>
+                  <Grid
+                    key={itemIds[idx]}
+                    size={{
+                      xs: 12,
+                      lg: selectedType === "classes" ? 12 : 6
+                    }}>
                     <Box
                       ref={idx === selectedIdx ? selectedCardRef : null}
                       sx={{
@@ -1661,13 +1666,11 @@ function CompendiumViewer() {
         onClose={() => setShareSnackOpen(false)}
         message={t("Copied to Clipboard!")}
       />
-
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
       />
-
       {/* Create item dialog */}
       {activePack && (
         <CompendiumItemCreateDialog
@@ -1677,7 +1680,6 @@ function CompendiumViewer() {
           packId={activePack.id}
         />
       )}
-
       {/* Edit class dialog */}
       {activePack && editClassItem && (
         <CompendiumItemCreateDialog
@@ -1689,7 +1691,6 @@ function CompendiumViewer() {
           editItemId={editClassItem.packItemId}
         />
       )}
-
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
@@ -1729,7 +1730,6 @@ function CompendiumViewer() {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Manage Pack dialog — rename, description, author, module meta, export */}
       <Dialog
         open={manageDialogOpen}
@@ -1861,7 +1861,6 @@ function CompendiumViewer() {
           </Box>
         </DialogActions>
       </Dialog>
-
       <ManageModulesModal
         open={manageModulesOpen}
         onClose={() => setManageModulesOpen(false)}

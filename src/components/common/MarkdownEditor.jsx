@@ -420,7 +420,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
             <Grid container spacing={1}>
               {/* Type Icons */}
               {typeList.map((type) => (
-                <Grid item key={type} xs={3}>
+                <Grid  key={type} size={3}>
                   <Tooltip
                     title={t(type).charAt(0).toUpperCase() + t(type).slice(1)}
                     enterDelay={500}
@@ -447,7 +447,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
 
               {/* Dice Icons */}
               {["d4", "d6", "d8", "d10", "d12", "d20"].map((dice) => (
-                <Grid item key={dice} xs={3}>
+                <Grid  key={dice} size={3}>
                   <Tooltip
                     title={dice.toUpperCase()}
                     enterDelay={500}
@@ -478,7 +478,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
               ))}
               {/* Other Icons */}
               {["melee", "ranged", "magic", "spell", "martial"].map((icon) => (
-                <Grid item key={icon} xs={3}>
+                <Grid  key={icon} size={3}>
                   <Tooltip
                     title={
                       icon === "melee"

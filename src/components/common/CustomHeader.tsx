@@ -36,7 +36,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
     const isMiddle = type === 'middle';
 
     return (
-        <Grid item xs={12} sx={{ width: '100%', margin: '15px' }}>
+        <Grid  sx={{ width: '100%', margin: '15px' }} size={12}>
             {isTop && (
                 <>
                     <Typography
@@ -113,7 +113,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                     />
                 </>
             )}
-
             {isMiddle && (
                 <>
                     <Divider

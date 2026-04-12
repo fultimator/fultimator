@@ -593,7 +593,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ display: "flex", p: 0, overflow: "hidden" }}>
         {/* Desktop sidebar */}
         {isDesktop && (
@@ -652,7 +651,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           ) : (
             <Grid container spacing={2}>
               {filteredItems.map((item, idx) => (
-                <Grid item xs={12} lg={selectedType === "classes" ? 12 : 6} key={itemIds[idx]}>
+                <Grid
+                  key={itemIds[idx]}
+                  size={{
+                    xs: 12,
+                    lg: selectedType === "classes" ? 12 : 6
+                  }}>
                   <Box
                     ref={idx === selectedIdx ? selectedCardRef : null}
                     sx={{
@@ -726,7 +730,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
         </Box>
       </DialogContent>
-
       {!viewOnly && (
         <>
           <Divider />
@@ -765,7 +768,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </DialogActions>
         </>
       )}
-
       {/* Manage Modules modal */}
       <ManageModulesModal
         open={manageModulesOpen}
@@ -775,14 +777,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           handleCompendiumChange(id);
         }}
       />
-
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
         lockedToViewerType={restrictToTypes?.length ? selectedType : undefined}
       />
-
       {/* Create item dialog */}
       {activePack && (
         <CompendiumItemCreateDialog
@@ -792,7 +792,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           packId={activePack.id}
         />
       )}
-
       {/* Edit pack item dialog */}
       {activePack && editPackItem && (
         <CompendiumItemCreateDialog
@@ -804,7 +803,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           editItemId={editPackItem.packItemId}
         />
       )}
-
       <DeleteConfirmationDialog
         open={Boolean(deletePackItem)}
         onClose={() => setDeletePackItem(null)}
@@ -826,7 +824,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           ) : null
         }
       />
-
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
@@ -874,7 +871,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Manage Pack dialog */}
       <Dialog
         open={manageDialogOpen}
@@ -1012,7 +1008,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </Box>
         </DialogActions>
       </Dialog>
-
       {/* Import Pack dialog */}
       <Dialog
         open={importDialogOpen}

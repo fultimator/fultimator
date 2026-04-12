@@ -35,7 +35,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
         <div style={{ background: `${backgroundColor}` }}>
           <Stack>
             <Grid container>
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 <Grid
                   container
                   justifyContent="space-between"
@@ -50,7 +50,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     },
                   }}
                 >
-                  <Grid item xs>
+                  <Grid  size="grow">
                     <Typography
                       variant="h1"
                       textAlign="left"
@@ -73,7 +73,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     flexGrow: 1,
                   }}
                 >
-                  <Grid item xs>
+                  <Grid  size="grow">
                     <Typography fontStyle="italic">
                       {!arcana.description ? (
                         t("No Description")
@@ -92,13 +92,11 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   </Grid>
                   {isEditMode && (
                     <Grid
-                      item
                       style={{
                         display: "flex",
                         alignItems: "center",
                         flexShrink: 0,
-                      }}
-                    >
+                      }}>
                       {!showInPlayerSheet && (
                         <Tooltip title={t("Arcana not shown in player sheet")}>
                           <Icon>
@@ -152,15 +150,11 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
               <Grid
                 container
                 justifyContent="space-between"
-                item
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
-                }}
-              >
+                }}>
                 {/* Merge Label */}
                 <Grid
-                  item
-                  xs={2}
                   sx={{
                     textAlign: "center",
                     backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
@@ -172,7 +166,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={2}>
                   <Typography
                     variant="h5"
                     fontWeight="bold"
@@ -184,15 +178,13 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* Arcana Merge Name */}
                 <Grid
-                  item
-                  xs={10}
                   sx={{
                     backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: 3,
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={10}>
                   <Typography
                     variant="h5"
                     sx={{
@@ -207,14 +199,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* Merge Benefit */}
                 <Grid
-                  item
-                  xs={12}
                   sx={{
                     mx: 4,
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={12}>
                   <Typography>
                     {!arcana.mergeDesc ? (
                       t("No Merge Benefit")
@@ -239,15 +229,11 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   <Grid
                     container
                     justifyContent="space-between"
-                    item
                     sx={{
                       borderTop: `1px solid ${theme.primary}`,
-                    }}
-                  >
+                    }}>
                     {/* Pulse Grid Item */}
                     <Grid
-                      item
-                      xs={2}
                       sx={{
                         textAlign: "center",
                         backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
@@ -259,7 +245,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                         display: "flex",
                         alignItems: "center",
                       }}
-                    >
+                      size={2}>
                       <Typography
                         variant="h5"
                         fontWeight="bold"
@@ -271,15 +257,13 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                     {/* Arcana Pulse Name */}
                     <Grid
-                      item
-                      xs={10}
                       sx={{
                         backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                         px: 3,
                         display: "flex",
                         alignItems: "center",
                       }}
-                    >
+                      size={10}>
                       <Typography
                         variant="h5"
                         sx={{
@@ -294,14 +278,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                     {/* Pulse Benefit */}
                     <Grid
-                      item
-                      xs={12}
                       sx={{
                         mx: 4,
                         display: "flex",
                         alignItems: "center",
                       }}
-                    >
+                      size={12}>
                       <Typography>
                         {!arcana.pulseDesc ? (
                           t("No Pulse Benefit")
@@ -326,15 +308,11 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
               <Grid
                 container
                 justifyContent="space-between"
-                item
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
-                }}
-              >
+                }}>
                 {/* Dismiss Label */}
                 <Grid
-                  item
-                  xs={2}
                   sx={{
                     textAlign: "center",
                     backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
@@ -346,7 +324,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={2}>
                   <Typography
                     variant="h5"
                     fontWeight="bold"
@@ -358,15 +336,13 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* Dismiss Name */}
                 <Grid
-                  item
-                  xs={10}
                   sx={{
                     backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: 3,
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={10}>
                   <Typography
                     variant="h5"
                     sx={{
@@ -381,14 +357,12 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* Dismiss Benefit */}
                 <Grid
-                  item
-                  xs={12}
                   sx={{
                     mx: 4,
                     display: "flex",
                     alignItems: "center",
                   }}
-                >
+                  size={12}>
                   <Typography>
                     {!arcana.dismissDesc ? (
                       t("No Dismiss Benefit")

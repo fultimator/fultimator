@@ -43,15 +43,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -62,10 +60,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             {!showInPlayerSheet && (
               <Tooltip title={t("Magitech not shown in player sheet")}>
                 <Icon>
@@ -96,15 +92,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -115,14 +109,12 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
               }}
-            >
+              size="grow">
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -163,15 +155,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -182,20 +172,17 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
               }}
-            >
+              size="grow">
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
         </div>
       )}
-
       {/* Row 2 Magicannon */}
       {magitech.rank >= 2 && (
         <Accordion sx={{ marginY: 1 }}>
@@ -236,15 +223,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -255,20 +240,17 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
               }}
-            >
+              size="grow">
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
         </div>
       )}
-
       {/* Row 2 Magispheres */}
       {magitech.rank >= 3 && (
         <Accordion sx={{ marginY: 1 }}>

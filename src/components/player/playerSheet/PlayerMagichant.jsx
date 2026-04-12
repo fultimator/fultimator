@@ -118,7 +118,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
               {magichantSpells.map((magichantSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* VOLUMES GRID */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <div
                       style={{
                         backgroundColor: primary,
@@ -133,17 +133,17 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                       }}
                     >
                       <Grid container style={{ flexGrow: 1 }}>
-                        <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }} size={3}>
                           <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_volume")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("MP")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={7} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={7}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("Target")}
                           </Typography>
@@ -153,15 +153,15 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                     {volumes.map((volume, i) => (
                       <Grid container justifyContent="flex-start" sx={{ background: "transparent", padding: "3px 17px", borderBottom: `1px solid ${secondary}` }} key={i}>
                         <Grid container style={{ flexGrow: 1 }}>
-                          <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
+                          <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "left" }} size={3}>
                             <Typography fontWeight="bold" style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                               {t(volume.name)}
                             </Typography>
                           </Grid>
-                          <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                             <ReactMarkdown components={components}>{volume.mp + ""}</ReactMarkdown>
                           </Grid>
-                          <Grid item xs={7} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={7}>
                             <ReactMarkdown components={components}>{t(volume.target)}</ReactMarkdown>
                           </Grid>
                         </Grid>
@@ -170,7 +170,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                   </Grid>
 
                   {/* KEYS GRID */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <div
                       style={{
                         backgroundColor: primary,
@@ -185,27 +185,37 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                       }}
                     >
                       <Grid container style={{ flexGrow: 1 }}>
-                        <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }} size={3}>
                           <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_key")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={2} sm={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                          size={{
+                            xs: 2,
+                            sm: 3
+                          }}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_type")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_status_effect")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={3} sm={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                          size={{
+                            xs: 3,
+                            sm: 2
+                          }}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_attribute")}
                           </Typography>
                         </Grid>
-                        <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                           <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                             {t("magichant_recovery")}
                           </Typography>
@@ -220,21 +230,31 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                       magichantSpell.keys.map((chantKey, i) => (
                         <Grid container justifyContent="flex-start" sx={{ background: "transparent", padding: "3px 17px", borderBottom: `1px solid ${secondary}` }} key={i}>
                           <Grid container style={{ flexGrow: 1 }}>
-                            <Grid item xs={3} style={{ display: "flex", alignItems: "center", justifyContent: "left" }}>
+                            <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "left" }} size={3}>
                               <Typography fontWeight="bold" style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
                                 {chantKey.name === "magichant_custom_name" ? chantKey.customName : t(chantKey.name)}
                               </Typography>
                             </Grid>
-                            <Grid item xs={2} sm={3} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Grid
+                              style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                              size={{
+                                xs: 2,
+                                sm: 3
+                              }}>
                               <ReactMarkdown components={components}>{chantKey.name === "magichant_custom_name" ? chantKey.type : t(chantKey.type)}</ReactMarkdown>
                             </Grid>
-                            <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                               <ReactMarkdown components={components}>{chantKey.name === "magichant_custom_name" ? chantKey.status : t(chantKey.status)}</ReactMarkdown>
                             </Grid>
-                            <Grid item xs={3} sm={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Grid
+                              style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                              size={{
+                                xs: 3,
+                                sm: 2
+                              }}>
                               <ReactMarkdown components={components}>{chantKey.name === "magichant_custom_name" ? chantKey.attribute : t(chantKey.attribute)}</ReactMarkdown>
                             </Grid>
-                            <Grid item xs={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Grid  style={{ display: "flex", alignItems: "center", justifyContent: "center" }} size={2}>
                               <ReactMarkdown components={components}>{chantKey.name === "magichant_custom_name" ? chantKey.recovery : t(chantKey.recovery)}</ReactMarkdown>
                             </Grid>
                           </Grid>
@@ -244,17 +264,17 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                   </Grid>
 
                   {/* TONES AS CARDS */}
-                  <Grid item container spacing={1} xs={12}>
+                  <Grid  container spacing={1} size={12}>
                     {magichantSpell.tones && magichantSpell.tones.map((tone, tIndex) => (
                       <Grid
-                        item
                         container
-                        xs={12}
-                        md={6}
                         key={`${msIndex}-${tIndex}`}
                         sx={{ display: "flex", alignItems: "stretch" }}
-                      >
-                        <Grid item xs={10} sx={{ display: "flex" }}>
+                        size={{
+                          xs: 12,
+                          md: 6
+                        }}>
+                        <Grid  sx={{ display: "flex" }} size={10}>
                           <Typography
                             id="spell-left-name"
                             variant="h2"
@@ -274,11 +294,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                             {tone.name === "magichant_custom_name" ? tone.customName : t(tone.name)}
                           </Typography>
                         </Grid>
-                        <Grid
-                          item
-                          xs={2}
-                          sx={{ display: "flex", alignItems: "stretch" }}
-                        >
+                        <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                           <div
                             id="spell-right-controls"
                             style={{

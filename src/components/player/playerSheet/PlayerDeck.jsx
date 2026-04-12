@@ -80,7 +80,7 @@ export default function PlayerDeck({ player, setPlayer, isEditMode }) {
 
             <Grid container spacing={1} sx={{ padding: "1em" }}>
               {deckSpells.map((deckSpell, index) => (
-                <Grid item xs={12} key={index}>
+                <Grid  key={index} size={12}>
                   {deckSpells.length > 1 && (
                     <Typography
                       variant="h3"

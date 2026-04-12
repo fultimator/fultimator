@@ -42,12 +42,20 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
 
     return (
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={1}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 1
+          }}>
           <Typography variant="h2" sx={{ minWidth: "50px" }}>
             {t(label)}
           </Typography>
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 2
+          }}>
           <TextField
             label={t("Max")}
             value={player.stats[stat].max}
@@ -56,7 +64,11 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
             fullWidth
           />
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 2
+          }}>
           <TextField
             label={t("Current")}
             value={player.stats[stat].current}
@@ -69,9 +81,17 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
           />
         </Grid>
         {isEditMode && (
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Grid container spacing={1} justifyContent="center">
-              <Grid item xs={12} sm="auto">
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: "auto"
+                }}>
                 <ButtonGroup
                   variant="outlined"
                   size="small"
@@ -85,7 +105,11 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
                   ))}
                 </ButtonGroup>
               </Grid>
-              <Grid item xs={12} sm="auto">
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: "auto"
+                }}>
                 <ButtonGroup
                   variant="outlined"
                   size="small"
@@ -100,7 +124,11 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
                 </ButtonGroup>
               </Grid>
               {stat === "hp" && (
-                <Grid item xs={12} sm="auto">
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: "auto"
+                  }}>
                   <Button
                     variant="contained"
                     color="warning"
@@ -114,7 +142,11 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
                   </Button>
                 </Grid>
               )}
-              <Grid item xs={12} sm="auto">
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: "auto"
+                }}>
                 <Button
                   variant="contained"
                   color={color}
@@ -128,7 +160,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
         )}
         {stat === "hp" &&
           player.stats.hp.current <= Math.floor(player.stats.hp.max / 2) && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography
                 variant="body1"
                 color="error"
@@ -153,14 +185,14 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Statistics")}
             showIconButton={false}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           {renderStatControls(
             "hp",
             "HP",
@@ -168,7 +200,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
             [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
           )}
         </Grid>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           {renderStatControls(
             "mp",
             "MP",
@@ -176,7 +208,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
             [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
           )}
         </Grid>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
         </Grid>
       </Grid>

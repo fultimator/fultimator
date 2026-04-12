@@ -95,7 +95,7 @@ export default function EditAffinities({ npc, setNpc }) {
 
           return (
             <Fragment key={i}>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <InputLabel
                   id={type}
                   sx={{ fontSize: "20px", fontWeight: 400 }}
@@ -103,7 +103,7 @@ export default function EditAffinities({ npc, setNpc }) {
                   <TypeIcon type={type} /> <TypeName type={type} />
                 </InputLabel>
               </Grid>
-              <Grid item xs={9}>
+              <Grid  size={9}>
                 <FormControl variant="standard" fullWidth>
                   <Slider
                     marks={marks}

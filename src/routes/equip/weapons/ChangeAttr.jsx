@@ -6,7 +6,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1}>
-      <Grid item xs={6}>
+      <Grid  size={6}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id="att1">{t("Change Attr 1")}</InputLabel>
           <Select
@@ -26,7 +26,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6}>
+      <Grid  size={6}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id="att2">{t("Change Attr 2")}</InputLabel>
           <Select

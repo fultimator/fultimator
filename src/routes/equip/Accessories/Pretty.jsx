@@ -73,13 +73,13 @@ function PrettySingle({ accessory, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={6}>
+              <Grid  size={1}></Grid>
+              <Grid  size={6}>
                 <Typography variant="h4" textAlign="left">
                   {t("Accessory")}
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid  size={2}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
@@ -87,33 +87,29 @@ function PrettySingle({ accessory, showActions }) {
             </Grid>
             <Grid container>
               <Grid
-                item
                 sx={{
                   flex: "0 0 70px",
                   minWidth: "70px",
                   minHeight: "70px",
                   background2,
-                }}
-              >
+                }}>
                 <EditableImage size={70} />
               </Grid>
 
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 {/* First Row */}
                 <Grid
                   container
                   justifyContent="space-between"
-                  item
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
-                  }}
-                >
-                  <Grid item xs={6}>
+                  }}>
+                  <Grid  size={6}>
                     <Typography fontWeight="bold">{accessory.name}</Typography>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid  size={2}>
                     <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
                   </Grid>
                 </Grid>

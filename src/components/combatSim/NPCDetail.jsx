@@ -814,7 +814,7 @@ const NPCDetail = ({
       <DialogActions sx={{ p: 0 }}>
         <Grid container spacing={0}>
           {tabIndex === 0 && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Box
                 sx={{
                   display: "flex",
@@ -872,7 +872,7 @@ const NPCDetail = ({
             </Grid>
           )}
           {tabIndex === 2 && !hideLogs && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <StandardRollsSection
                 selectedNPC={selectedNPC}
                 calcAttr={calcAttr}
@@ -880,7 +880,7 @@ const NPCDetail = ({
               />
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ width: "100%" }}>
               <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
             </Box>

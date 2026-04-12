@@ -140,7 +140,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <TextField
           label={t("Spell Name")}
           fullWidth
@@ -149,7 +149,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           inputProps={{ maxLength: 50 }}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <TextField
           type="number"
           label={t("MP x Dice")}
@@ -158,7 +162,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           onChange={(e) => updateField("mp", Math.max(0, Number(e.target.value) || 0))}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <TextField
           type="number"
           label={t("Max Throwable Dices")}
@@ -167,7 +175,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           onChange={(e) => updateField("maxTargets", Math.max(0, Number(e.target.value) || 0))}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <FormControl fullWidth>
           <InputLabel>{t("Attribute")}</InputLabel>
           <Select
@@ -183,16 +195,18 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Select>
         </FormControl>
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Divider />
       </Grid>
-
       {targets.map((target, targetIndex) => (
-        <Grid item xs={12} key={`target-${targetIndex}`}>
+        <Grid  key={`target-${targetIndex}`} size={12}>
           <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
             <Grid container spacing={1.5} alignItems="center">
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range From")}</InputLabel>
                   <Select
@@ -206,7 +220,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range To")}</InputLabel>
                   <Select
@@ -220,7 +238,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={5}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 5
+                }}>
                 <TextField
                   label={t("Effect")}
                   fullWidth
@@ -230,7 +252,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   inputProps={{ maxLength: 200 }}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -246,19 +272,27 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   label={t("Second Roll")}
                 />
               </Grid>
-              <Grid item xs={12} sm={1}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 1
+                }}>
                 <IconButton color="error" onClick={() => removeTarget(targetIndex)}>
                   <Delete />
                 </IconButton>
               </Grid>
 
               {target.secondRoll && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Grid container spacing={1}>
                     {(target.secondEffects || []).map((entry, effectIndex) => (
-                      <Grid item xs={12} key={`target-${targetIndex}-effect-${effectIndex}`}>
+                      <Grid  key={`target-${targetIndex}-effect-${effectIndex}`} size={12}>
                         <Grid container spacing={1} alignItems="center">
-                          <Grid item xs={4} sm={2}>
+                          <Grid
+                            size={{
+                              xs: 4,
+                              sm: 2
+                            }}>
                             <FormControl fullWidth size="small">
                               <InputLabel>{t("Die")}</InputLabel>
                               <Select
@@ -274,7 +308,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               </Select>
                             </FormControl>
                           </Grid>
-                          <Grid item xs={8} sm={9}>
+                          <Grid
+                            size={{
+                              xs: 8,
+                              sm: 9
+                            }}>
                             <TextField
                               label={t("Effect")}
                               fullWidth
@@ -286,7 +324,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               inputProps={{ maxLength: 200 }}
                             />
                           </Grid>
-                          <Grid item xs={12} sm={1}>
+                          <Grid
+                            size={{
+                              xs: 12,
+                              sm: 1
+                            }}>
                             <IconButton color="error" onClick={() => removeSecondEffect(targetIndex, effectIndex)}>
                               <Delete />
                             </IconButton>
@@ -295,7 +337,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                       </Grid>
                     ))}
                     {(target.secondEffects || []).length < 6 && (
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Button size="small" variant="outlined" onClick={() => addSecondEffect(targetIndex)}>
                           {t("Add Second Effect")}
                         </Button>
@@ -308,20 +350,17 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Box>
         </Grid>
       ))}
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Button variant="contained" onClick={addTarget}>
           {t("Add Target")}
         </Button>
       </Grid>
-
       {validationError ? (
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <FormHelperText error>{validationError}</FormHelperText>
         </Grid>
       ) : null}
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -332,7 +371,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           label={t("Show in Character Sheet")}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch

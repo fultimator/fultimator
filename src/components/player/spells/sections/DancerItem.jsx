@@ -56,7 +56,11 @@ export default function DancerItem({
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Dance")}</InputLabel>
               <Select
@@ -75,7 +79,11 @@ export default function DancerItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               fullWidth
               label={t("Duration")}
@@ -89,7 +97,11 @@ export default function DancerItem({
           </Grid>
 
           {isCustom && (
-            <Grid item xs={12} sm={4}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 4
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -101,7 +113,7 @@ export default function DancerItem({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Dance Effect")}
               value={
@@ -117,7 +129,7 @@ export default function DancerItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth

@@ -61,12 +61,12 @@ export default function SpellMagiseedMagiseed({
       <CardContent>
         <Grid container spacing={2}>
           {/* Header with name and delete button */}
-          <Grid item xs={10}>
+          <Grid  size={10}>
             <Typography variant="h6" gutterBottom>
               {magiseed.customName || t(magiseed.name)}
             </Typography>
           </Grid>
-          <Grid item xs={2} style={{ textAlign: "right" }}>
+          <Grid  style={{ textAlign: "right" }} size={2}>
             <Button
               onClick={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
               variant="outlined"
@@ -79,7 +79,11 @@ export default function SpellMagiseedMagiseed({
           </Grid>
 
           {/* Magiseed Type Selection */}
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("magiseed_type")}</InputLabel>
               <Select
@@ -108,7 +112,11 @@ export default function SpellMagiseedMagiseed({
 
           {/* Custom Name (only for custom magiseeds) */}
           {isCustomMagiseed && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label={t("magiseed_custom")}
@@ -121,7 +129,7 @@ export default function SpellMagiseedMagiseed({
 
           {/* Custom Description (only for custom magiseeds) */}
           {isCustomMagiseed && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea
                 label={t("Description")}
                 value={magiseed.description || ""}
@@ -133,7 +141,11 @@ export default function SpellMagiseedMagiseed({
           {/* Effect Range (only for custom magiseeds) */}
           {isCustomMagiseed && (
             <>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField
                   fullWidth
                   label={t("magiseed_effect_range_start")}
@@ -143,7 +155,11 @@ export default function SpellMagiseedMagiseed({
                   inputProps={{ min: 0, max: 4 }}
                 />
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField
                   fullWidth
                   label={t("magiseed_effect_range_end")}
@@ -158,7 +174,7 @@ export default function SpellMagiseedMagiseed({
 
 
           {/* Effects by Growth Clock Section */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography variant="h6">
@@ -176,7 +192,7 @@ export default function SpellMagiseedMagiseed({
                     }
                     return sections;
                   })().map((section) => (
-                    <Grid item xs={12} key={section}>
+                    <Grid  key={section} size={12}>
                       <Typography variant="subtitle1" gutterBottom>
                         {t("magiseed_details", { section })} (T = {section})
                       </Typography>
@@ -212,7 +228,7 @@ export default function SpellMagiseedMagiseed({
 
           {/* Base Description (non-editable for presets) */}
           {!isCustomMagiseed && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography variant="subtitle2" gutterBottom>
                 {t("Description")}
               </Typography>

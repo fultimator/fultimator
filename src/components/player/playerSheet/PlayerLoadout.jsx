@@ -444,7 +444,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       >
         {t('Loadout')}
       </Typography>
-
       <Box sx={{ p: 1.5, flexGrow: 1 }}>
 
         {/* Vehicle enter/exit + swap: shown when a pilot-vehicle spell exists */}
@@ -484,7 +483,14 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {/* 4-slot grid + aux hand */}
         <Grid container spacing={1}>
           {slotCards.map(({ slot, label, resolved, locked }) => (
-            <Grid item xs={6} sm={3} md={3} key={slot} sx={{ display: 'flex' }}>
+            <Grid
+              key={slot}
+              sx={{ display: 'flex' }}
+              size={{
+                xs: 6,
+                sm: 3,
+                md: 3
+              }}>
               <SlotCard
                 label={label}
                 resolved={resolved}
@@ -498,7 +504,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Grid>
           ))}
           {auxHandItem && (
-            <Grid item xs={6} sm={3} md={3} sx={{ display: 'flex' }}>
+            <Grid
+              sx={{ display: 'flex' }}
+              size={{
+                xs: 6,
+                sm: 3,
+                md: 3
+              }}>
               <SlotCard
                 label={t('Aux Hand')}
                 resolved={{ kind: 'playerItem', item: auxHandItem }}
@@ -546,7 +558,12 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Divider>
             <Grid container spacing={1}>
               {vehicleAccessoryModule && (
-                <Grid item xs={6} sm={3} md={3}>
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
                     label={t('Accessory')}
                     module={vehicleAccessoryModule}
@@ -555,7 +572,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 </Grid>
               )}
               {supportSlots.map((entry, i) => (
-                <Grid item xs={6} sm={3} md={3} key={i}>
+                <Grid
+                  key={i}
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
                     label={`${t('Support')} ${i + 1}`}
                     module={entry.module}
@@ -567,7 +590,12 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
               ))}
               {/* Add slot card when there are equipped-but-not-all-enabled support modules */}
               {isEditMode && equippedSupportModules.some(m => !m.enabled) && (
-                <Grid item xs={6} sm={3} md={3}>
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
                     label={`${t('Support')} ${supportSlots.length + 1}`}
                     module={null}
@@ -581,7 +609,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </>
         )}
       </Box>
-
       {/* Roll result dialog */}
       {rollDialog && (
         <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth
@@ -594,18 +621,18 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </DialogTitle>
           <DialogContent sx={{ mt: 1 }}>
             <Grid container spacing={2} sx={{ textAlign: 'center', pt: 1 }}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Accuracy')}</Typography>
                 <Typography variant="h1">{rollDialog.accuracy}</Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Damage')}</Typography>
                 <Typography variant="h1">{rollDialog.damageRoll}</Typography>
                 {rollDialog.type && (
                   <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>
                 )}
               </Grid>
-              <Grid item xs={12} sx={{ mt: 1 }}>
+              <Grid  sx={{ mt: 1 }} size={12}>
                 <Typography variant="body2" color="text.secondary">
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
@@ -624,7 +651,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </DialogActions>
         </Dialog>
       )}
-
       {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
@@ -644,7 +670,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           }
         />
       )}
-
       {/* Support module picker dialog */}
       <Dialog
         open={supportPickerOpen}
@@ -696,7 +721,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           <Button size="small" onClick={() => setSupportPickerOpen(false)}>{t('Done')}</Button>
         </DialogActions>
       </Dialog>
-
       {/* Vehicle swap modal */}
       {pilotSpellInfo && (
         <SpellPilotVehiclesModal

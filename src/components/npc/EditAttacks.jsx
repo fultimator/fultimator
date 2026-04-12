@@ -90,21 +90,29 @@ export default function EditAttacks({ npc, setNpc }) {
       {npc.attacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={12} md={6}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
                 removeAttack={removeAttack(i)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.attacks.length - 1 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
             )}
@@ -143,12 +151,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item sx={{ p: 0, m: 0 }}>
+      <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={10}>
+      <Grid  size={10}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -161,7 +169,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={6} md={4} lg={3}>
+      <Grid
+        size={{
+          xs: 6,
+          md: 4,
+          lg: 3
+        }}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr1label"}>
             {t("Attr 1:")}
@@ -183,7 +196,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6} md={4} lg={3}>
+      <Grid
+        size={{
+          xs: 6,
+          md: 4,
+          lg: 3
+        }}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr2label"}>
             {t("Attr 2:")}
@@ -205,7 +223,11 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={8} lg={3}>
+      <Grid
+        size={{
+          xs: 8,
+          lg: 3
+        }}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
@@ -276,7 +298,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={2}>
+      <Grid  size={2}>
         <FormControl variant="standard" fullWidth>
           <ToggleButtonGroup
             size="medium"
@@ -296,7 +318,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </ToggleButtonGroup>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid  size={3}>
         <FormControl variant="standard">
           <TextField
             id="flathit"
@@ -311,7 +333,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid  size={3}>
         <FormControl variant="standard">
           <TextField
             id="flatdmg"
@@ -326,7 +348,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs>
+      <Grid  size="grow">
         <FormGroup>
           <FormControlLabel
             control={
@@ -364,7 +386,7 @@ function EditAttackSpecial({ attack, setAttack }) {
 
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="special"

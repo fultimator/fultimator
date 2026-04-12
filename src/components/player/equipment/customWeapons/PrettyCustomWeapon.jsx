@@ -147,22 +147,22 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
               },
             }}
           >
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant={isCharacterSheet ? "h5" : "h4"} textAlign="left">
                 {t("Weapon")}
               </Typography>
             </Grid>
-            <Grid item xs={1}>
+            <Grid  size={1}>
               <Typography variant={isCharacterSheet ? "h5" : "h4"} textAlign="center">
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant={isCharacterSheet ? "h5" : "h4"} textAlign="center">
                 {t("Accuracy")}
               </Typography>
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant={isCharacterSheet ? "h5" : "h4"} textAlign="center">
                 {t("Damage")}
               </Typography>
@@ -172,23 +172,19 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
 
         <Grid container>
           {/* Main Content Row */}
-          <Grid container direction="column" item xs={12}>
+          <Grid container direction="column"  size={12}>
             {/* First Row - Weapon Info */}
             <Grid
               container
               justifyContent="space-between"
-              item
               sx={{
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
-              }}
-            >
+              }}>
               <Grid
-                item
-                xs={3}
                 sx={{ display: "flex", alignItems: "flex-start", gap: "4px", flexWrap: "wrap" }}
-              >
+                size={3}>
                 <Typography
                   fontWeight="bold"
                   sx={{
@@ -201,7 +197,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                 </Typography>
                 {stats.martial && <Martial />}
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Typography
                   textAlign="center"
                   sx={{ fontSize: isCharacterSheet ? "0.9rem" : "1rem" }}
@@ -209,7 +205,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                   {`${stats.cost}z`}
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography
                   fontWeight="bold"
                   textAlign="center"
@@ -222,7 +218,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                 </Typography>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography
                   fontWeight="bold"
                   textAlign="center"
@@ -246,7 +242,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                 padding: "2px 5px",
               }}
             >
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography
                   fontWeight="bold"
                   sx={{ fontSize: isCharacterSheet ? "0.8rem" : "0.9rem" }}
@@ -254,10 +250,10 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                   {t(weaponData.category)}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Diamond color={theme.primary} />
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography
                   textAlign="center"
                   sx={{ fontSize: isCharacterSheet ? "0.8rem" : "0.9rem" }}
@@ -265,10 +261,10 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
                   {t("Two-handed")}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Diamond color={theme.primary} />
               </Grid>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography
                   textAlign="center"
                   sx={{ fontSize: isCharacterSheet ? "0.8rem" : "0.9rem" }}
@@ -290,7 +286,7 @@ export default function PrettyCustomWeapon({ weaponData, isCharacterSheet = fals
               padding: "5px",
             }}
           >
-            <Grid item xs={12} sx={{ textAlign: "center" }}>
+            <Grid  sx={{ textAlign: "center" }} size={12}>
               <div style={{
                 display: "flex",
                 alignItems: "center",

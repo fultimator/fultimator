@@ -145,7 +145,7 @@ export default function PlayerShields({
 
             return (
               <React.Fragment key={index}>
-                <Grid item xs={12} sx={{ mb: 1 }}>
+                <Grid  sx={{ mb: 1 }} size={12}>
                   <Box>
                     <PrettyArmor armor={shield} />
                   </Box>

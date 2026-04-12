@@ -103,7 +103,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Camp Activities (Max 2)")}
@@ -115,7 +115,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         </Grid>
 
         {activities.length === 0 && (
-          <Grid item xs={12} sx={{ py: 2 }}>
+          <Grid  sx={{ py: 2 }} size={12}>
             <Typography variant="body2" color="text.secondary" textAlign="center">
               {t("No camp activities yet.")}
             </Typography>
@@ -125,12 +125,16 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         {activities.map((activity, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
             <Grid container spacing={1} sx={{ py: 1 }} alignItems="flex-start">
-              <Grid item xs={9} sm={10}>
+              <Grid
+                size={{
+                  xs: 9,
+                  sm: 10
+                }}>
                 <TextField
                   label={t("Name") + ":"}
                   value={activity.name ?? ""}
@@ -142,7 +146,12 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 />
               </Grid>
               {isEditMode && (
-                <Grid item xs={3} sm={2} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                <Grid
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
+                  size={{
+                    xs: 3,
+                    sm: 2
+                  }}>
                   <Tooltip title={t("Replace from Compendium")}>
                     <IconButton
                       size="small"
@@ -169,7 +178,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 </Grid>
               )}
 
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 {isEditMode ? (
                   <Autocomplete
                     freeSolo
@@ -197,7 +206,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 )}
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea
                   label={t("Effect") + ":"}
                   value={activity.effect ?? ""}
@@ -211,7 +220,6 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
           </React.Fragment>
         ))}
       </Grid>
-
       {isEditMode && replaceIndex !== null && (
         <CompendiumViewerModal
           open={replaceCompendiumOpen}

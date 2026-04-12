@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material/styles";
-import { Theme } from "@mui/material/styles/createTheme";
+import type { Theme } from "@mui/material/styles";
 
 // Define a CustomTheme interface to include all theme properties you need
 interface CustomTheme {

@@ -97,7 +97,11 @@ function Arcana() {
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -113,13 +117,13 @@ function Arcana() {
             icon={<AutoAwesome fontSize="large" />}
           />
           <Grid container spacing={1} alignItems="center">
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="effect"
@@ -129,7 +133,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="description"
@@ -140,7 +144,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="mergeName"
@@ -151,7 +155,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 <CustomTextarea
                   id="mergeBenefit"
@@ -165,7 +169,7 @@ function Arcana() {
             {/* Pulse fields */}
             {rework && (
               <>
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <FormControl variant="standard" fullWidth>
                     <TextField
                       id="pulseName"
@@ -176,7 +180,7 @@ function Arcana() {
                     />
                   </FormControl>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <FormControl variant="standard" fullWidth>
                     <CustomTextarea
                       id="pulseBenefit"
@@ -189,7 +193,7 @@ function Arcana() {
               </>
             )}
 
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="dismissName"
@@ -200,7 +204,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 <CustomTextarea
                   id="dismissBenefit"
@@ -211,9 +215,9 @@ function Arcana() {
               </FormControl>
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item>
+                <Grid >
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -221,12 +225,12 @@ function Arcana() {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid item>
+                <Grid >
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
-                <Grid item xs>
+                <Grid  size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
               </Grid>
@@ -251,9 +255,12 @@ function Arcana() {
           </Grid>
         </Paper>
       </Grid>
-
       {/* Pretty */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Pretty
           custom={{
             name: name,

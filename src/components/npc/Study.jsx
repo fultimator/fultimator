@@ -10,14 +10,12 @@ const Study = ({ npc, study }) => {
       {study >= 0 && (
         <Grid container alignItems="stretch">
           <Grid
-            item
-            xs
             sx={{
               background: "linear-gradient(90deg, #674168 0%, #b9a9be 100%);",
               borderRight: "4px solid white",
               px: 2,
             }}
-          >
+            size="grow">
             <Typography
               color="white.main"
               fontFamily="Antonio"
@@ -30,15 +28,13 @@ const Study = ({ npc, study }) => {
           </Grid>
 
           <Grid
-            item
             sx={{
               px: 2,
               py: 0.5,
               borderLeft: "2px solid #b9a9be",
               borderBottom: "2px solid #b9a9be",
               borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
-            }}
-          >
+            }}>
             <Typography
               fontFamily="Antonio"
               fontSize="1.25rem"
@@ -54,13 +50,11 @@ const Study = ({ npc, study }) => {
       {study >= 2 && (
         <>
           <Grid
-            item
-            xs={12}
             sx={{
               px: 2,
               py: 0.5,
             }}
-          >
+            size={12}>
             <Typography>
               <strong>{t("Typical Traits:")} </strong>
               {npc.traits}
@@ -93,8 +87,6 @@ function Love({ npc, study }) {
           <Stats npc={npc} study={study} />
         ) : (
           <Grid
-            item
-            xs={6}
             sx={{
               borderBottom: "1px solid #281127",
               borderTop: "1px solid #281127",
@@ -106,35 +98,31 @@ function Love({ npc, study }) {
               px: 0.2,
               py: 0.2,
             }}
-          >
+            size={6}>
             <Grid container alignItems="stretch">
-              <Grid item sx={{ px: 1.5, py: 0.4 }}>
+              <Grid  sx={{ px: 1.5, py: 0.4 }}>
                 {t("HP")}
               </Grid>
               <Grid
-                item
                 sx={{
                   py: 0.4,
                   px: 1.5,
                   color: "white.main",
                   bgcolor: "red.main",
-                }}
-              >
+                }}>
                 {calcHP(npc)} <Diamond color="white.main" />{" "}
                 {Math.floor(calcHP(npc) / 2)}
               </Grid>
-              <Grid item sx={{ px: 1.5, py: 0.4 }}>
+              <Grid  sx={{ px: 1.5, py: 0.4 }}>
                 {t("MP")}
               </Grid>
               <Grid
-                item
                 sx={{
                   py: 0.4,
                   px: 1.5,
                   color: "white.main",
                   bgcolor: "cyan.main",
-                }}
-              >
+                }}>
                 {calcMP(npc)}
               </Grid>
             </Grid>

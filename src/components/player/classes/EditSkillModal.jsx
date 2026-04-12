@@ -82,7 +82,11 @@ export default function EditSkillModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
-          <Grid item sm={10} xs={12}>
+          <Grid
+            size={{
+              sm: 10,
+              xs: 12
+            }}>
             <TextField
               label={t("Skill Name")}
               value={skill.skillName}
@@ -91,7 +95,11 @@ export default function EditSkillModal({
               inputProps={{ maxLength: 100 }}
             />
           </Grid>
-          <Grid item sm={2} xs={12}>
+          <Grid
+            size={{
+              sm: 2,
+              xs: 12
+            }}>
             <TextField
               label={t("Max Level")}
               type="number"
@@ -108,7 +116,7 @@ export default function EditSkillModal({
               }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -118,7 +126,7 @@ export default function EditSkillModal({
               maxRows={10}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography>
               {t("Special Skill Effect")}
               <IconButton

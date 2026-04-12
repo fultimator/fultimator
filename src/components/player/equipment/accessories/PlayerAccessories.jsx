@@ -96,7 +96,7 @@ export default function PlayerAccessories({
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {accessories.map((accessory, index) => (
             <React.Fragment key={index}>
-              <Grid item xs={12} sx={{ mb: 1 }}>
+              <Grid  sx={{ mb: 1 }} size={12}>
                 <Box>
                   <PrettyAccessory accessory={accessory} />
                 </Box>

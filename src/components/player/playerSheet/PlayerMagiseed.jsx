@@ -139,12 +139,12 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
               {magiseedSpells.map((magiseedSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* Growth Clock Section */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("magiseed_growth_clock")} - {t(magiseedSpell.className)}
                     </Typography>
                     <Grid container alignItems="center" spacing={2}>
-                      <Grid item>
+                      <Grid >
                         <Clock
                           numSections={4}
                           size={60}
@@ -157,7 +157,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           onReset={(isEditMode || setPlayer) ? () => handleClockChange(magiseedSpell, 0) : undefined}
                         />
                       </Grid>
-                      <Grid item xs>
+                      <Grid  size="grow">
                         <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
                           {magiseedSpell.currentMagiseed 
                             ? (magiseedSpell.currentMagiseed.customName || t(magiseedSpell.currentMagiseed.name))
@@ -184,7 +184,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
 
                   {/* Current Effect */}
                   {magiseedSpell.currentMagiseed && getCurrentEffect(magiseedSpell) && (
-                    <Grid item xs={12} sx={{ mb: 2 }}>
+                    <Grid  sx={{ mb: 2 }} size={12}>
                       <Box sx={{ 
                         p: 1.5, 
                         backgroundColor: ternary + "20", 
@@ -204,14 +204,14 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                   {/* Available Magiseeds */}
                   {magiseedSpell.magiseeds && magiseedSpell.magiseeds.map((seed, sIndex) => (
                     <Grid
-                      item
                       container
-                      xs={12}
-                      md={6}
                       key={`${msIndex}-${sIndex}`}
                       sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -236,11 +236,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           )}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{

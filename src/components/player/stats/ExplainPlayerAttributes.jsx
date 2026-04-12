@@ -17,7 +17,7 @@ export default function ExplainPlayerAttributes() {
     : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
 return (
-    <Grid item>
+    <Grid >
             <Card
               sx={{
                 p: 1.61,

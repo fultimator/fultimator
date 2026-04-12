@@ -126,10 +126,20 @@ function RollerScopedAuthenticated({ user }) {
   return (
     <Layout>
       <Grid container justifyContent="center" spacing={1}>
-        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+        <Grid
+          sx={{ order: 1 }}
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <ShareLink scope={scope} />
         </Grid>
-        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+        <Grid
+          sx={{ order: 1 }}
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Card sx={{ p: 2 }}>
             <Typography sx={{ marginBottom: "8px" }}>
               {t("Set name to display here:")}
@@ -147,17 +157,32 @@ function RollerScopedAuthenticated({ user }) {
           </Card>
         </Grid>        
 
-        <Grid item xs={12} sx={{ order: 3 }}>
+        <Grid  sx={{ order: 3 }} size={12}>
           <PrepareRoll
             savePreparedRoll={savePreparedRoll}
             createRoll={createRoll}
           />
         </Grid>
-        <Grid item xs={12} sm={5.5} sx={{ order: { xs: 6, sm: 5 } }}>
+        <Grid
+          sx={{ order: { xs: 6, sm: 5 } }}
+          size={{
+            xs: 12,
+            sm: 5.5
+          }}>
           <RollList scope={scope} saveRoll={saveRoll} user={user} />
         </Grid>
-        <Grid item xs={0} sm={1} sx={{ order: { xs: 6, sm: 5 } }} />
-        <Grid item xs={12} sm={5.5} sx={{ my: 1, order: { xs: 5, sm: 6 } }}>
+        <Grid
+          sx={{ order: { xs: 6, sm: 5 } }}
+          size={{
+            xs: 0,
+            sm: 1
+          }} />
+        <Grid
+          sx={{ my: 1, order: { xs: 5, sm: 6 } }}
+          size={{
+            xs: 12,
+            sm: 5.5
+          }}>
           <PreparedRolls user={user} scope={scope} createRoll={createRoll} />
         </Grid>
       </Grid>

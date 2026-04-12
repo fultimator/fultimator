@@ -107,7 +107,7 @@ export default function PlayerNoteModal({
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <TextField
                 fullWidth
                 label={t("Note Name")}
@@ -116,7 +116,7 @@ export default function PlayerNoteModal({
                 inputProps={{ maxLength: 50 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea
                 label={t("Description")}
                 value={description}
@@ -124,7 +124,7 @@ export default function PlayerNoteModal({
                 maxRows={10}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -135,7 +135,7 @@ export default function PlayerNoteModal({
                 label={t("Show in Character Sheet")}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                 <Typography variant="h6">{t("Clocks")}</Typography>
                 <Button
@@ -150,7 +150,7 @@ export default function PlayerNoteModal({
               </Box>
               <Grid container spacing={1}>
                 {clocks.map((clock, index) => (
-                  <Grid item xs={12} key={index}>
+                  <Grid  key={index} size={12}>
                     <Box
                       sx={{
                         display: "flex",
@@ -201,7 +201,6 @@ export default function PlayerNoteModal({
           </Box>
         </DialogActions>
       </Dialog>
-
       {/* Add Clock Dialog */}
       <Dialog open={clockDialogOpen} onClose={() => setClockDialogOpen(false)}>
         <DialogTitle variant="h3">{t("Add Clock")}</DialogTitle>
@@ -236,7 +235,6 @@ export default function PlayerNoteModal({
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Delete Confirmation */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}

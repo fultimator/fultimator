@@ -143,23 +143,23 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={3}>
+              <Grid  size={1}></Grid>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="left">
                   {t("Weapon")}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="center">
                   {t("Accuracy")}
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography variant="h4" textAlign="center">
                   {t("Damage")}
                 </Typography>
@@ -167,23 +167,20 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
             </Grid>
             <Grid container>
               <Grid
-                item
                 sx={{
                   flex: "0 0 60px",
                   minWidth: "60px",
                   minHeight: "60px",
                   background2,
-                }}
-              >
+                }}>
                 <EditableImage size={60} />
               </Grid>
 
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 {/* First Row */}
                 <Grid
                   container
                   justifyContent="space-between"
-                  item
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -191,13 +188,10 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                     "& .MuiTypography-root": {
                       fontSize: { xs: "0.7rem", sm: "1.0rem" },
                     },
-                  }}
-                >
+                  }}>
                   <Grid
-                    item
-                    xs={3}
                     sx={{ display: "flex", alignItems: "flex-start", gap: "4px", flexWrap: "wrap" }}
-                  >
+                    size={3}>
                     <Typography
                       fontWeight="bold"
                       sx={{
@@ -209,10 +203,10 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                     </Typography>
                     {stats.martial && <Martial />}
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Typography textAlign="center">{`${stats.cost}z`}</Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
                       {`${attrNoTranslation[weaponData.accuracyCheck?.att1]?.shortcaps || "DEX"} + ${attrNoTranslation[weaponData.accuracyCheck?.att2]?.shortcaps || "MIG"
@@ -222,7 +216,7 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
                       {t("HR +")} {stats.damage}
@@ -245,23 +239,23 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                     },
                   }}
                 >
-                  <Grid item xs={3}>
+                  <Grid  size={3}>
                     <Typography fontWeight="bold">
                       {t(weaponData.category)}
                     </Typography>
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography textAlign="center">
                       {t("Two-handed")}
                     </Typography>
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid  size={3}>
                     <Typography textAlign="center">
                       {t(weaponData.range)}
                     </Typography>
@@ -281,7 +275,7 @@ function PrettyCustomWeapon({ weaponData, showActions = true }) {
                 padding: "2px 5px",
               }}
             >
-              <Grid item xs={12} sx={{ textAlign: "center" }}>
+              <Grid  sx={{ textAlign: "center" }} size={12}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap", justifyContent: "center" }}>
                   {(() => {
                     const allItems = [];

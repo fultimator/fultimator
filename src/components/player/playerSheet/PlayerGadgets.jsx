@@ -353,14 +353,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             <Grid container spacing={1} sx={{ padding: "1em" }}>
               {alchemySpells.map((alchemy, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -385,11 +385,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(alchemy.className)}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -427,14 +423,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               ))}
               {infusionSpells.map((infusion, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -459,11 +455,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(infusion.className)}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -491,14 +483,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               ))}
               {magitechSpells.map((magitech, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   key={index}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -523,11 +515,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(magitech.className)}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -555,13 +543,13 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               ))}
               {magitechSpells.some((magitech) => magitech.rank >= 2) && (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
                   sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -581,11 +569,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                       {t("Magicannon")}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -666,7 +650,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   {t("Current IP") + ": " + player.stats.ip.current}
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={8}>
+                  <Grid  size={8}>
                     <FormControl fullWidth sx={{ mt: 3 }}>
                       <InputLabel id="rank-select-label">
                         {t("Select Rank")}
@@ -697,7 +681,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControl fullWidth sx={{ mt: 3 }}>
                       <FormControlLabel
                         control={

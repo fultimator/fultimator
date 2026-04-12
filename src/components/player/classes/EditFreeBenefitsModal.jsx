@@ -51,7 +51,7 @@ export default function EditFreeBenefitsModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("HP Modifier")}
               type="number"
@@ -62,7 +62,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("MP Modifier")}
               type="number"
@@ -73,7 +73,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("IP Modifier")}
               type="number"
@@ -84,7 +84,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -105,7 +105,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -122,7 +122,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -141,7 +141,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -160,7 +160,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -181,20 +181,22 @@ export default function EditFreeBenefitsModal({
         {benefits.custom.length > 0 && (
           <>
             <Grid
-              item
-              xs={12}
               sx={{ marginTop: "20px", fontWeight: "bold", fontSize: "1.2rem" }}
-            >
+              size={12}>
               {t("Custom Benefits")}
             </Grid>
             {benefits.custom.map((custombenefit, index) => (
               <Grid container sx={{ marginTop: "10px" }} key={index}>
-                <Grid item xs={2} sm={1}>
+                <Grid
+                  size={{
+                    xs: 2,
+                    sm: 1
+                  }}>
                   <IconButton onClick={() => onRemoveCustomBenefit(index)}>
                     <Delete />
                   </IconButton>
                 </Grid>
-                <Grid item xs={10} sx={11}>
+                <Grid  sx={11} size={10}>
                   <TextField
                     sx={{ width: "100%" }}
                     label={t("Custom Benefit") + " " + (index + 1)}

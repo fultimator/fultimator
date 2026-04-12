@@ -173,15 +173,14 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                 return (
                   <React.Fragment key={csIndex}>
                     {/* Spell Header */}
-                    <Grid item xs={12}>
+                    <Grid  size={12}>
                       <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Restaurant fontSize="small" /> {cookingSpell.spellName || t("Gourmet")} - {t(cookingSpell.className)}
                       </Typography>
                     </Grid>
-
                     {/* Available Delicacies */}
                     {cookbookEffectsArray.length === 0 ? (
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Typography sx={{ fontStyle: "italic", color: "text.secondary", mb: 2 }}>
                           {t("gourmet_combination_no_defined")}
                         </Typography>
@@ -189,14 +188,14 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                     ) : (
                       cookbookEffectsArray.map((effect, eIndex) => (
                         <Grid
-                          item
                           container
-                          xs={12}
-                          md={6}
                           key={`${csIndex}-${eIndex}`}
                           sx={{ display: "flex", alignItems: "stretch", mb: 1 }}
-                        >
-                          <Grid item xs={10} sx={{ display: "flex" }}>
+                          size={{
+                            xs: 12,
+                            md: 6
+                          }}>
+                          <Grid  sx={{ display: "flex" }} size={10}>
                             <Typography
                               id="delicacy-left-name"
                               variant="h2"
@@ -217,11 +216,7 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                               {effect.tasteCombination || t("gourmet_delicacy")}
                             </Typography>
                           </Grid>
-                          <Grid
-                            item
-                            xs={2}
-                            sx={{ display: "flex", alignItems: "stretch" }}
-                          >
+                          <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                             <div
                               id="delicacy-right-controls"
                               style={{
@@ -247,10 +242,9 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                         </Grid>
                       ))
                     )}
-                    
                     {/* Ingredient Inventory Summary */}
                     {cookingSpell.ingredientInventory && cookingSpell.ingredientInventory.length > 0 && (
-                      <Grid item xs={12} sx={{ mt: 1, mb: 2 }}>
+                      <Grid  sx={{ mt: 1, mb: 2 }} size={12}>
                         <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                           {t("gourmet_ingredient_inventory")}
                         </Typography>

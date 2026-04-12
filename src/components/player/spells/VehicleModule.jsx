@@ -66,7 +66,11 @@ const VehicleModule = memo(({
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Grid container spacing={2} alignItems="center" sx={{ width: '100%' }}>
-          <Grid item xs={12} sm={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 2
+            }}>
             <Button
               variant={module.equipped ? "contained" : "outlined"}
               color={module.equipped ? "success" : "primary"}
@@ -78,7 +82,11 @@ const VehicleModule = memo(({
             </Button>
           </Grid>
 
-          <Grid item xs={12} sm={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <Typography variant="h6">
               {isCustomModule
                 ? module.customName || t("pilot_custom")
@@ -95,7 +103,12 @@ const VehicleModule = memo(({
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={3} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Grid
+            sx={{ display: 'flex', justifyContent: 'flex-end' }}
+            size={{
+              xs: 12,
+              sm: 3
+            }}>
             {module.equipped && module.type === "pilot_module_weapon" && (
               module.isShield ? (
                 <ToggleButtonGroup
@@ -147,7 +160,12 @@ const VehicleModule = memo(({
             )}
           </Grid>
 
-          <Grid item xs={12} sm={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Grid
+            sx={{ display: 'flex', justifyContent: 'flex-end' }}
+            size={{
+              xs: 12,
+              sm: 2
+            }}>
             <div style={{ display: "flex", gap: 8 }}>
               <Button
                 onClick={handleDelete}
@@ -173,10 +191,13 @@ const VehicleModule = memo(({
           </Grid>
         </Grid>
       </AccordionSummary>
-      
       <AccordionDetails>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 3
+            }}>
             <ModuleDropdown
               value={module.name}
               onChange={handleModuleDropdownChange}
@@ -185,7 +206,11 @@ const VehicleModule = memo(({
 
           {isCustomModule && (
             <>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("pilot_custom")}
@@ -195,7 +220,11 @@ const VehicleModule = memo(({
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("Type")}</InputLabel>
                   <Select
@@ -217,7 +246,11 @@ const VehicleModule = memo(({
 
           {/* Equipment Slot Selection for Weapons */}
           {module.equipped && module.type === "pilot_module_weapon" && (
-            <Grid item xs={12} sm={2}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 2
+              }}>
               <div style={{ textAlign: 'center' }}>
                 <Typography variant="caption" display="block" sx={{ mb: 1 }}>
                   {t("Hand")}
@@ -250,7 +283,11 @@ const VehicleModule = memo(({
           {/* Weapon Module Checkboxes */}
           {module.type === "pilot_module_weapon" && (
             <>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -272,7 +309,11 @@ const VehicleModule = memo(({
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -300,7 +341,11 @@ const VehicleModule = memo(({
           {/* Support Module Checkboxes */}
           {module.type === "pilot_module_support" && (
             <>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -323,7 +368,11 @@ const VehicleModule = memo(({
                   }
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Cost")}
@@ -339,7 +388,7 @@ const VehicleModule = memo(({
           )}
 
           {/* Module Description */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {isCustomModule ? (
               <CustomTextarea
                 fullWidth
@@ -370,7 +419,11 @@ const VehicleModule = memo(({
           {/* Weapon Stats */}
           {module.type === "pilot_module_weapon" && (
             <>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("Category")}</InputLabel>
                   <Select
@@ -389,7 +442,11 @@ const VehicleModule = memo(({
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("First Attribute")}</InputLabel>
                   <Select
@@ -408,7 +465,11 @@ const VehicleModule = memo(({
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("Second Attribute")}</InputLabel>
                   <Select
@@ -427,7 +488,11 @@ const VehicleModule = memo(({
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Precision Modifier")}
@@ -440,7 +505,11 @@ const VehicleModule = memo(({
                 />
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Damage Modifier")}
@@ -453,7 +522,11 @@ const VehicleModule = memo(({
                 />
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("Range")}</InputLabel>
                   <Select
@@ -469,7 +542,11 @@ const VehicleModule = memo(({
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel>{t("Type")}</InputLabel>
                   <Select
@@ -492,7 +569,11 @@ const VehicleModule = memo(({
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Cost")}
@@ -505,7 +586,11 @@ const VehicleModule = memo(({
                 />
               </Grid>
               
-              <Grid item xs={12} sm={8}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 8
+                }}>
                 <CustomTextarea
                   fullWidth
                   label={t("Quality")}
@@ -516,7 +601,11 @@ const VehicleModule = memo(({
                   disabled={!isCustomModule}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 4
+                }}>
                 <TextField
                   fullWidth
                   label={t("Cost of Quality")}
@@ -534,7 +623,11 @@ const VehicleModule = memo(({
           {/* Armor Stats */}
           {module.type === "pilot_module_armor" && (
             <>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -548,7 +641,11 @@ const VehicleModule = memo(({
                   label={t("Martial")}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Defense")}
@@ -560,7 +657,11 @@ const VehicleModule = memo(({
                   disabled={!isCustomModule}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("M. Defense")}
@@ -572,7 +673,11 @@ const VehicleModule = memo(({
                   disabled={!isCustomModule}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <TextField
                   fullWidth
                   label={t("Cost")}

@@ -78,29 +78,29 @@ function PrettySingle({ armor, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={3}>
+              <Grid  size={1}></Grid>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="left">
                   {armor.category}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid  size={2}>
                 <Typography variant="h4" textAlign="center">
                   {t("Defense")}
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid  size={2}>
                 <Typography variant="h4" textAlign="center">
                   {t("M. Defense")}
                 </Typography>
               </Grid>
               {!armor.rework && (
-                <Grid item xs={2}>
+                <Grid  size={2}>
                   <Typography variant="h4" textAlign="center">
                     {t("Initiative")}
                   </Typography>
@@ -109,39 +109,35 @@ function PrettySingle({ armor, showActions }) {
             </Grid>
             <Grid container>
               <Grid
-                item
                 sx={{
                   flex: "0 0 70px",
                   minWidth: "70px",
                   minHeight: "70px",
                   background2,
-                }}
-              >
+                }}>
                 <EditableImage size={70} />
               </Grid>
 
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 {/* First Row */}
                 <Grid
                   container
                   justifyContent="space-between"
-                  item
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
-                  }}
-                >
-                  <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+                  }}>
+                  <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
                     <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
                       {armor.name}
                     </Typography>
                     {armor.martial && <Martial />}
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Typography textAlign="center">{`${armor.cost}z`}</Typography>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid  size={2}>
                     <Typography fontWeight="bold" textAlign="center">
                       {armor.category === t("Shield") ? "+" + armor.def : ""}
                       {armor.category === t("Armor") && armor.martial
@@ -154,7 +150,7 @@ function PrettySingle({ armor, showActions }) {
                         : ""}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid  size={2}>
                     <Typography fontWeight="bold" textAlign="center">
                       {armor.category === t("Shield") ? "+" + armor.mdef : ""}
 
@@ -166,7 +162,7 @@ function PrettySingle({ armor, showActions }) {
                     </Typography>
                   </Grid>
                   {!armor.rework && (
-                    <Grid item xs={2}>
+                    <Grid  size={2}>
                       <Typography fontWeight="bold" textAlign="center">
                         {armor.category === t("Armor") || armor.category === t("Shield")
                           ? armor.init === 0

@@ -148,7 +148,7 @@ const StyledMarkdown = ({ children, ...props }) => {
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
           {source === "official" && (
-            <Grid item xs>
+            <Grid  size="grow">
               <Select
                 value={selectedClass}
                 onChange={handleClassChange}
@@ -165,7 +165,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </Grid>
           )}
           {source === "packs" && (
-            <Grid item xs>
+            <Grid  size="grow">
               <Select
                 value={selectedPackId}
                 onChange={(e) => setSelectedPackId(e.target.value)}
@@ -180,7 +180,7 @@ const StyledMarkdown = ({ children, ...props }) => {
               </Select>
             </Grid>
           )}
-          <Grid item>
+          <Grid >
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -192,7 +192,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </IconButton>
           </Grid>
           {/* Source selector row */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Select
               value={source}
               onChange={(e) => setSource(e.target.value)}
@@ -211,7 +211,7 @@ const StyledMarkdown = ({ children, ...props }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
+          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
               <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
                 {source === "packs"
@@ -239,11 +239,7 @@ const StyledMarkdown = ({ children, ...props }) => {
               </List>
             )}
           </Grid>
-          <Grid
-            item
-            xs={8}
-            sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }}
-          >
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
             {selectedItem && selectedItem.spellType === "default" && (
               <div>
                 <Typography variant="h3">

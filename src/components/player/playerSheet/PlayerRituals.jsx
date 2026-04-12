@@ -168,7 +168,12 @@ export default function PlayerRituals({
         { checked: hasRitualism, label: "Ritualism" },
         { checked: hasSpiritism, label: "Spiritism" },
       ].map(({ checked, label }) => (
-        <Grid item xs={4} md={2} key={label}>
+        <Grid
+          key={label}
+          size={{
+            xs: 4,
+            md: 2
+          }}>
           <FormControlLabel
             sx={compact ? { margin: 0 } : undefined}
             control={
@@ -189,7 +194,11 @@ export default function PlayerRituals({
 
       {isEditMode && (
         <Grid container spacing={compact ? 1 : 2} sx={{ padding: compact ? "0.4em" : "1em" }}>
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8
+            }}>
             <RitualsCalculator
               compact={compact}
               power={power}
@@ -214,11 +223,11 @@ export default function PlayerRituals({
             container
             justifyContent="center"
             alignItems="center"
-            item
-            xs={12}
-            md={4}
             sx={{ textAlign: "center" }}
-          >
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <Clock
               numSections={clockSections}
               size={compact ? 140 : 200}
@@ -227,7 +236,11 @@ export default function PlayerRituals({
             />
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8
+            }}>
             <Button
               variant="contained"
               size={compact ? "small" : "medium"}
@@ -237,7 +250,11 @@ export default function PlayerRituals({
               {t("Set New Clock")}
             </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <Button
               variant="outlined"
               size={compact ? "small" : "medium"}
@@ -391,7 +408,7 @@ function RitualsCalculator({
       }}
     >
       <Grid container>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Potency")}
@@ -418,7 +435,7 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Area")}
@@ -445,7 +462,7 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Reductions")}
@@ -497,17 +514,17 @@ function RitualsCalculator({
       </Grid>
       <Divider />
       <Grid container sx={{ m: compact ? 0.5 : 1 }}>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
             {calcPM} {t("MP")}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
             {calcLD} {t("DL")}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
             {t("Clock")} {calcClock}
           </Typography>

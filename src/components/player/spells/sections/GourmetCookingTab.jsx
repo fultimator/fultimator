@@ -415,12 +415,11 @@ export default function GourmetCookingTab({
         <Tab label={t("gourmet_delicacy_effect_label")} />
         <Tab label={t("gourmet_ingredient_select_to_cook")} />
       </Tabs>
-
       {/* Tab 0: Effects Reference & Ingredient Rolling */}
       {activeTab === 0 && (
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Delicacy Effects Table */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               {t("gourmet_delicacy_effect_label")}
             </Typography>
@@ -463,7 +462,7 @@ export default function GourmetCookingTab({
           </Grid>
 
           {/* Ingredient Taste Rolling */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               {t("gourmet_details")}
             </Typography>
@@ -523,14 +522,18 @@ export default function GourmetCookingTab({
             </TableContainer>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Card sx={{ mt: 1 }}>
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   {t("Shop Buy Ingredients")}
                 </Typography>
                 <Grid container spacing={1} alignItems="center">
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <TextField
                       fullWidth
                       size="small"
@@ -539,7 +542,11 @@ export default function GourmetCookingTab({
                       onChange={(e) => setShopIngredientName(e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("gourmet_taste")}</InputLabel>
                       <Select
@@ -560,7 +567,11 @@ export default function GourmetCookingTab({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={2}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 2
+                    }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
                       <IconButton
                         size="small"
@@ -579,7 +590,11 @@ export default function GourmetCookingTab({
                       </IconButton>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={2}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 2
+                    }}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -596,13 +611,12 @@ export default function GourmetCookingTab({
           </Grid>
         </Grid>
       )}
-
       {/* Tab 1: Cooking */}
       {activeTab === 1 && (
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* All You Can Eat */}
           {allYouCanEat && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -621,7 +635,7 @@ export default function GourmetCookingTab({
           )}
 
           {/* Ingredient Selection */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h6" gutterBottom>
               {t("gourmet_ingredient_select_to_cook")}
             </Typography>
@@ -723,7 +737,7 @@ export default function GourmetCookingTab({
 
           {/* Cooking Preview */}
           {selectedTastesPreview.length > 0 && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Card sx={{ backgroundColor: "action.hover" }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -768,7 +782,7 @@ export default function GourmetCookingTab({
 
           {/* Roll for Effect Button */}
           {selectedTastesPreview.length >= 2 && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Button
                 variant="contained"
                 size="large"
@@ -782,7 +796,6 @@ export default function GourmetCookingTab({
           )}
         </Grid>
       )}
-
       {/* Roll Result Dialog */}
       <Dialog open={rollDialogOpen} onClose={() => setRollDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: "bold" }}>
@@ -951,20 +964,23 @@ export default function GourmetCookingTab({
           </Box>
         </DialogActions>
       </Dialog>
-
       <Dialog open={choiceDialogOpen} onClose={() => setChoiceDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t("Choose Taste Before Adding")}</DialogTitle>
         <DialogContent sx={{ mt: 1 }}>
           <Grid container spacing={2}>
             {choiceDialogRolls.map((roll, index) => (
-              <Grid item xs={12} key={`${roll.id}-${roll.key}`}>
+              <Grid  key={`${roll.id}-${roll.key}`} size={12}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="caption" color="text.secondary">
                       {t("Roll")} {roll.id}
                     </Typography>
                     <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         <TextField
                           fullWidth
                           size="small"
@@ -979,7 +995,11 @@ export default function GourmetCookingTab({
                           }
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("gourmet_taste")}</InputLabel>
                           <Select

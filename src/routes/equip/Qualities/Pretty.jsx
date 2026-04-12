@@ -70,13 +70,13 @@ export function PrettySingle({ quality, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={7}>
+              <Grid  size={1}></Grid>
+              <Grid  size={7}>
                 <Typography variant="h4" textAlign="left">
                   {t("Quality")}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
@@ -87,17 +87,15 @@ export function PrettySingle({ quality, showActions }) {
               <Grid
                 container
                 justifyContent="space-between"
-                item
                 sx={{
                   background,
                   borderBottom: `1px solid ${theme.secondary}`,
                   padding: "5px",
-                }}
-              >
-                <Grid item xs={8}>
+                }}>
+                <Grid  size={8}>
                   <Typography fontWeight="bold">{quality.name}</Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid  size={4}>
                   <Typography textAlign="center">{`${quality.cost}z`}</Typography>
                 </Grid>
               </Grid>
@@ -113,12 +111,12 @@ export function PrettySingle({ quality, showActions }) {
                   borderBottom: `1px solid ${theme.secondary}`,
                 }}
               >
-                <Grid item>
+                <Grid >
                    <Typography variant="body2" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
                     {t(quality.category)}
                   </Typography>
                 </Grid>
-                <Grid item>
+                <Grid >
                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
                     {quality.filter?.map((f) => (
                       <Chip key={f} label={t(f)} size="small" variant="outlined" />

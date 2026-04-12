@@ -581,7 +581,11 @@ function Personal() {
 
           {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
           <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} sm>
+            <Grid
+              size={{
+                xs: 12,
+                sm: "grow"
+              }}>
               <TextField
                 label={t("Search by Player Name")}
                 variant="outlined"
@@ -599,7 +603,12 @@ function Personal() {
                 inputProps={{ maxLength: 50 }}
               />
             </Grid>
-            <Grid item xs={12} sm="auto" sx={{ minWidth: 160 }}>
+            <Grid
+              sx={{ minWidth: 160 }}
+              size={{
+                xs: 12,
+                sm: "auto"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select
@@ -780,7 +789,6 @@ function Personal() {
 
         </Paper>
       </div>
-
       {!cloudUser && (
         <Paper
           elevation={dbMode === "cloud" ? 3 : 0}
@@ -796,7 +804,6 @@ function Personal() {
           <SignIn />
         </Paper>
       )}
-
       {loading && (dbMode !== "cloud" || cloudUser) && (
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
           <CircularProgress />
@@ -805,9 +812,6 @@ function Personal() {
       <Grid container spacing={1} sx={{ py: 1 }}>
         {filteredList.map((player) => (
           <Grid
-            item
-            xs={12}
-            md={6}
             alignItems="center"
             justifyContent="center"
             key={player.id}
@@ -821,7 +825,10 @@ function Personal() {
               } : {}),
             }}
             onClick={selectMode ? () => toggleSelectPlayer(player.id) : undefined}
-          >
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <PlayerGalleryCardActions
               player={player}
               t={t}
@@ -836,7 +843,7 @@ function Personal() {
             />
           </Grid>
         ))}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Button
             variant="outlined"
             startIcon={<BugReport />}
@@ -855,7 +862,6 @@ function Personal() {
         actorType="player"
         onMigrateAll={handleMigrateAllPlayers}
       />
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

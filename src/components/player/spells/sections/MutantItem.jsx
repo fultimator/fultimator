@@ -96,7 +96,11 @@ export default function MutantItem({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Therioform")}</InputLabel>
               <Select
@@ -116,7 +120,11 @@ export default function MutantItem({
           </Grid>
 
           {isCustom && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -128,7 +136,11 @@ export default function MutantItem({
             </Grid>
           )}
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Genoclepsis")}
               value={
@@ -141,7 +153,11 @@ export default function MutantItem({
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Description")}
               value={

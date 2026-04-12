@@ -110,12 +110,17 @@ export default function Probs() {
   return (
     <div>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader type="top" headerText={t("Attacks Chance Generator")} showIconButton={false}/>
         </Grid>
 
         {/* First die */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"firstdie"}>{t("Die 1")}</InputLabel>
             <Select
@@ -137,7 +142,12 @@ export default function Probs() {
         </Grid>
 
         {/* Second die */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"seconddie"}>{t("Die 2")}</InputLabel>
             <Select
@@ -159,7 +169,12 @@ export default function Probs() {
         </Grid>
 
         {/* Bonus */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="bonus"
@@ -199,7 +214,12 @@ export default function Probs() {
         </Grid>
 
         {/* Damage */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
@@ -238,7 +258,12 @@ export default function Probs() {
           </FormControl>
         </Grid>
         {/* LD */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
@@ -277,7 +302,12 @@ export default function Probs() {
           </FormControl>
         </Grid>
         {/* HP */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"

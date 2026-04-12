@@ -425,16 +425,19 @@ export default function PlayerCustomWeaponModal({
       >
         <Close />
       </IconButton>
-      
       <DialogContent>
         <Grid container spacing={3}>
           {/* Left side - Configuration */}
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Grid container spacing={2}>
               {/* Weapon Name and Equipped Status */}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
+                  <Grid  size={8}>
                     <TextField
                       fullWidth
                       label={t("weapon_name")}
@@ -442,7 +445,7 @@ export default function PlayerCustomWeaponModal({
                       onChange={(e) => setWeaponName(e.target.value)}
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -457,7 +460,11 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Category */}
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeCategory
                   value={selectedCategory}
                   onChange={handleCategoryChange}
@@ -465,7 +472,11 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Range */}
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeRange
                   value={selectedRange}
                   onChange={(e) => setSelectedRange(e.target.value)}
@@ -473,7 +484,11 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Accuracy Check */}
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeAccuracyCheck
                   value={selectedAccuracyCheck}
                   onChange={setSelectedAccuracyCheck}
@@ -481,7 +496,11 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Type */}
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeType
                   value={isDamageTypeEnabled() ? (overrideDamageType ? customDamageType : selectedType) : "physical"}
                   onChange={(e) => {
@@ -497,7 +516,7 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Customizations */}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <ChangeCustomizations
                   selectedCustomization={selectedCustomization}
                   setSelectedCustomization={setSelectedCustomization}
@@ -510,7 +529,11 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Quality Section */}
-              <Grid item xs={12} sm={8}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 8
+                }}>
                 <SelectQuality
                   quality={selectedQuality}
                   setQuality={(e) => {
@@ -523,7 +546,11 @@ export default function PlayerCustomWeaponModal({
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 4
+                }}>
                 <Button
                   variant="outlined"
                   onClick={() => {
@@ -538,7 +565,7 @@ export default function PlayerCustomWeaponModal({
                 </Button>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <ChangeQuality
                   quality={quality}
                   setQuality={(e) => setQuality(e.target.value)}
@@ -548,7 +575,7 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Modifiers Section */}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Accordion
                   sx={{ width: "100%" }}
                   expanded={modifiersExpanded}
@@ -563,35 +590,35 @@ export default function PlayerCustomWeaponModal({
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <ChangeModifiers
                           label={"Damage Modifier"}
                           value={damageModifier}
                           onChange={(e) => setDamageModifier(e.target.value)}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <ChangeModifiers
                           label={"Precision Modifier"}
                           value={precModifier}
                           onChange={(e) => setPrecModifier(e.target.value)}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <ChangeModifiers
                           label={"DEF Modifier"}
                           value={defModifier}
                           onChange={(e) => setDefModifier(e.target.value)}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <ChangeModifiers
                           label={"MDEF Modifier"}
                           value={mDefModifier}
                           onChange={(e) => setMDefModifier(e.target.value)}
                         />
                       </Grid>
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -603,7 +630,7 @@ export default function PlayerCustomWeaponModal({
                         />
                       </Grid>
                       {overrideDamageType && (
-                        <Grid item xs={6}>
+                        <Grid  size={6}>
                           <FormControl fullWidth size="small">
                             <InputLabel>{t("weapon_damage_type")}</InputLabel>
                             <Select
@@ -626,7 +653,7 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Upload JSON */}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider sx={{ my: 1 }} />
                 <Button
                   variant="outlined"
@@ -665,14 +692,14 @@ export default function PlayerCustomWeaponModal({
               <>
                 <Divider sx={{ my: 3 }} />
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Typography variant="h6" gutterBottom>
                       {t("weapon_customization_transforming_form")}
                     </Typography>
                   </Grid>
                   
                   {/* Secondary Weapon Name */}
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <TextField
                       fullWidth
                       label={t("weapon_customization_transforming_form_name")}
@@ -682,7 +709,11 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
 
                   {/* Secondary Category */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <ChangeCategory
                       value={secondSelectedCategory}
                       onChange={handleSecondCategoryChange}
@@ -690,7 +721,11 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
 
                   {/* Secondary Range */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <ChangeRange
                       value={secondSelectedRange}
                       onChange={(e) => setSecondSelectedRange(e.target.value)}
@@ -698,7 +733,11 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
 
                   {/* Secondary Accuracy Check */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <ChangeAccuracyCheck
                       value={secondSelectedAccuracyCheck}
                       onChange={setSecondSelectedAccuracyCheck}
@@ -706,7 +745,11 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
 
                   {/* Secondary Type */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <ChangeType
                       value={secondSelectedType}
                       onChange={(e) => setSecondSelectedType(e.target.value)}
@@ -716,7 +759,7 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
 
                   {/* Secondary Customizations */}
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <ChangeCustomizations
                       selectedCustomization={secondSelectedCustomization}
                       setSelectedCustomization={setSecondSelectedCustomization}
@@ -729,7 +772,7 @@ export default function PlayerCustomWeaponModal({
                   </Grid>
                   
                   {/* Secondary Modifiers Section */}
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Accordion
                       sx={{ width: "100%" }}
                       expanded={secondModifiersExpanded}
@@ -744,35 +787,35 @@ export default function PlayerCustomWeaponModal({
                       </AccordionSummary>
                       <AccordionDetails>
                         <Grid container spacing={2}>
-                          <Grid item xs={6}>
+                          <Grid  size={6}>
                             <ChangeModifiers
                               label={"Damage Modifier"}
                               value={secondDamageModifier}
                               onChange={(e) => setSecondDamageModifier(e.target.value)}
                             />
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid  size={6}>
                             <ChangeModifiers
                               label={"Precision Modifier"}
                               value={secondPrecModifier}
                               onChange={(e) => setSecondPrecModifier(e.target.value)}
                             />
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid  size={6}>
                             <ChangeModifiers
                               label={"DEF Modifier"}
                               value={secondDefModifier}
                               onChange={(e) => setSecondDefModifier(e.target.value)}
                             />
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid  size={6}>
                             <ChangeModifiers
                               label={"MDEF Modifier"}
                               value={secondMDefModifier}
                               onChange={(e) => setSecondMDefModifier(e.target.value)}
                             />
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid  size={6}>
                             <FormControlLabel
                               control={
                                 <Checkbox
@@ -800,7 +843,11 @@ export default function PlayerCustomWeaponModal({
           </Grid>
 
           {/* Right side - Preview */}
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Typography variant="h6" gutterBottom>
               {t("weapon_customization_transforming_form_preview")}
             </Typography>
@@ -858,7 +905,6 @@ export default function PlayerCustomWeaponModal({
           </Grid>
         </Grid>
       </DialogContent>
-
       <DialogActions>
         {editCustomWeaponIndex !== null && (
           <Button onClick={handleDelete} color="error" variant="contained">

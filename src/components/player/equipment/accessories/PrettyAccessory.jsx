@@ -59,12 +59,12 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
               },
             }}
           >
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <Typography variant="h4" textAlign="left">
                 {t("Accessory")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography variant="h4" textAlign="center">
                 {t("Cost")}
               </Typography>
@@ -72,12 +72,11 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column" item xs>
+          <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
               container
               justifyContent="space-between"
-              item
               sx={{
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
@@ -85,12 +84,11 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}
-            >
-              <Grid item xs={6}>
+              }}>
+              <Grid  size={6}>
                 <Typography fontWeight="bold">{accessory.name}</Typography>
               </Grid>
-              <Grid item xs={2}>
+              <Grid  size={2}>
                 <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
               </Grid>
             </Grid>

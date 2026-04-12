@@ -55,7 +55,11 @@ export default function MagichantKeyItem({
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("magichant_key")}</InputLabel>
               <Select
@@ -72,7 +76,11 @@ export default function MagichantKeyItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={7}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <TextField
               fullWidth
               label={t("magichant_name")}
@@ -82,7 +90,12 @@ export default function MagichantKeyItem({
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_type")}
@@ -91,7 +104,12 @@ export default function MagichantKeyItem({
               InputProps={{ readOnly: !isCustom }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_status_effect")}
@@ -100,7 +118,12 @@ export default function MagichantKeyItem({
               InputProps={{ readOnly: !isCustom }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_attribute")}
@@ -109,7 +132,12 @@ export default function MagichantKeyItem({
               InputProps={{ readOnly: !isCustom }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_recovery")}
@@ -119,7 +147,7 @@ export default function MagichantKeyItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth

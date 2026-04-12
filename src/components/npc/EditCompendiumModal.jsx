@@ -165,7 +165,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
         <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
-          <Grid item xs>
+          <Grid  size="grow">
             <Select
               value={selectedType}
               onChange={handleTypeChange}
@@ -177,7 +177,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               <MenuItem value="basic">{t("Basic Attacks")}</MenuItem>
             </Select>
           </Grid>
-          <Grid item>
+          <Grid >
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -189,9 +189,9 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             </IconButton>
           </Grid>
           {/* Source selector row */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Grid container spacing={1} alignItems="center">
-              <Grid item xs={source === "packs" ? 4 : 12}>
+              <Grid  size={source === "packs" ? 4 : 12}>
                 <Select
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
@@ -206,7 +206,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                 </Select>
               </Grid>
               {source === "packs" && (
-                <Grid item xs={8}>
+                <Grid  size={8}>
                   <Select
                     value={selectedPackId}
                     onChange={(e) => setSelectedPackId(e.target.value)}
@@ -229,7 +229,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
+          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
               <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
                 {source === "packs"
@@ -258,11 +258,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               </List>
             )}
           </Grid>
-          <Grid
-            item
-            xs={8}
-            sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }}
-          >
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
             {selectedItem && (
               <div>
                 <Typography variant="h3">
@@ -357,13 +353,23 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       <Divider />
       <DialogActions>
         <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item xs={12} sm="auto">
+          <Grid
+            size={{
+              xs: 12,
+              sm: "auto"
+            }}>
             <Typography variant="body2">
               <strong>Disclaimer:</strong> For personal use only; do not share
               exported data on official channels.
             </Typography>
           </Grid>
-          <Grid item xs={12} sm="auto" container justifyContent="flex-end">
+          <Grid
+            container
+            justifyContent="flex-end"
+            size={{
+              xs: 12,
+              sm: "auto"
+            }}>
             <Button
               disabled
               variant="contained"

@@ -96,7 +96,7 @@ export default function PlayerArmor({
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {armor.map((armorItem, index) => (
             <React.Fragment key={index}>
-              <Grid item xs={12} sx={{ mb: 2 }}>
+              <Grid  sx={{ mb: 2 }} size={12}>
                 <Box>
                   <PrettyArmor armor={armorItem} />
                 </Box>

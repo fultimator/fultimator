@@ -62,18 +62,16 @@ function PrettySingle({ arcana, showActions, rework }) {
           <Stack>
             <Grid container>
               <Grid
-                item
                 sx={{
                   flex: "0 0 128px",
                   minWidth: "128px",
                   minHeight: "128px",
                   background2,
-                }}
-              >
+                }}>
                 <EditableImage size={128} />
               </Grid>
 
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 <Grid
                   container
                   justifyContent="space-between"
@@ -88,7 +86,7 @@ function PrettySingle({ arcana, showActions, rework }) {
                     },
                   }}
                 >
-                  <Grid item xs>
+                  <Grid  size="grow">
                     <Typography variant="h1" textAlign="left" sx={{ lineHeight: 1.2 }}>
                       {arcana.name}
                     </Typography>
@@ -99,14 +97,12 @@ function PrettySingle({ arcana, showActions, rework }) {
                 <Grid
                   container
                   justifyContent="space-between"
-                  item
                   sx={{
                     background,
                     px: "10px",
                     py: "5px"
-                  }}
-                >
-                  <Grid item xs={12}>
+                  }}>
+                  <Grid  size={12}>
                     <Typography fontStyle="italic">
                       {!arcana.description ? t("No Description") : (
                         <div style={{ display: 'inline' }}>
@@ -149,43 +145,41 @@ function PrettySingle({ arcana, showActions, rework }) {
               <Grid
                 container
                 justifyContent="space-between"
-                item
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
-                }}
-              >
+                }}>
                 {/* Merge Label */}
-                <Grid item xs={2} sx={{
+                <Grid  sx={{
                   textAlign: 'center',
                   backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                   padding: "1px",
                   color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={2}>
                   <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
                     {t("MERGE")}
                   </Typography>
                 </Grid>
 
                 {/* Arcana Merge Name */}
-                <Grid item xs={10} sx={{
+                <Grid  sx={{
                   background,
                   px: 3,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={10}>
                   <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
                     {arcana.mergeName}
                   </Typography>
                 </Grid>
 
                 {/* Merge Benefit */}
-                <Grid item xs={12} sx={{
+                <Grid  sx={{
                   mx: 4,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={12}>
                   <Typography>
                     {!arcana.mergeBenefit ? t("No Merge Benefit") : (
                       <div style={{ display: 'inline' }}>
@@ -204,43 +198,41 @@ function PrettySingle({ arcana, showActions, rework }) {
                   <Grid
                     container
                     justifyContent="space-between"
-                    item
                     sx={{
                       borderTop: `1px solid ${theme.primary}`,
-                    }}
-                  >
+                    }}>
                     {/* Pulse Grid Item */}
-                    <Grid item xs={2} sx={{
+                    <Grid  sx={{
                       textAlign: 'center',
                       backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                       padding: "1px",
                       color: `${theme.white}`,
                       display: 'flex',
                       alignItems: 'center',
-                    }}>
+                    }} size={2}>
                       <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
                         {t("PULSE")}
                       </Typography>
                     </Grid>
 
                     {/* Arcana Pulse Name */}
-                    <Grid item xs={10} sx={{
+                    <Grid  sx={{
                       background,
                       px: 3,
                       display: 'flex',
                       alignItems: 'center',
-                    }}>
+                    }} size={10}>
                       <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
                         {arcana.pulseName}
                       </Typography>
                     </Grid>
 
                     {/* Pulse Benefit */}
-                    <Grid item xs={12} sx={{
+                    <Grid  sx={{
                       mx: 4,
                       display: 'flex',
                       alignItems: 'center',
-                    }}>
+                    }} size={12}>
                       <Typography>
                         {!arcana.pulseBenefit ? t("No Pulse Benefit") : (
                           <div style={{ display: 'inline' }}>
@@ -259,43 +251,41 @@ function PrettySingle({ arcana, showActions, rework }) {
               <Grid
                 container
                 justifyContent="space-between"
-                item
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
-                }}
-              >
+                }}>
                 {/* Dismiss Label */}
-                <Grid item xs={2} sx={{
+                <Grid  sx={{
                   textAlign: 'center',
                   backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
                   padding: "1px",
                   color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={2}>
                   <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
                     {t("DISMISS")}
                   </Typography>
                 </Grid>
 
                 {/* Dismiss Name */}
-                <Grid item xs={10} sx={{
+                <Grid  sx={{
                   background,
                   px: 3,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={10}>
                   <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
                     {arcana.dismissName}
                   </Typography>
                 </Grid>
 
                 {/* Dismiss Benefit */}
-                <Grid item xs={12} sx={{
+                <Grid  sx={{
                   mx: 4,
                   display: 'flex',
                   alignItems: 'center',
-                }}>
+                }} size={12}>
                   <Typography>
                     {!arcana.dismissBenefit ? t("No Dismiss Benefit") : (
                       <div style={{ display: 'inline' }}>

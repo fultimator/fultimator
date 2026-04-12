@@ -248,7 +248,6 @@ export default function CompactLoadout({
           </IconButton>
         )}
       </Box>
-
       {/* Main 4 slots + aux */}
       <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {allSlots.map(({ slot, resolved, locked, isAux }) => {
@@ -312,7 +311,6 @@ export default function CompactLoadout({
           );
         })}
       </Box>
-
       {/* Vehicle support slots */}
       {activeVehicle && supportSlots.length > 0 && (
         <>
@@ -365,14 +363,12 @@ export default function CompactLoadout({
           </Box>
         </>
       )}
-
       {/* Collapsible equipment list */}
       {withEquipment && (
         <Collapse in={equipOpen}>
           <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet isMainTab={isMainTab} searchQuery={searchQuery} />
         </Collapse>
       )}
-
       {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
@@ -392,7 +388,6 @@ export default function CompactLoadout({
           }
         />
       )}
-
       {/* Support module picker */}
       <Dialog open={supportPickerOpen} onClose={() => setSupportPickerOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -429,7 +424,6 @@ export default function CompactLoadout({
           <Button size="small" onClick={() => setSupportPickerOpen(false)}>{t('Done')}</Button>
         </DialogActions>
       </Dialog>
-
       {/* Roll result dialog */}
       {rollDialog && (
         <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { width: { xs: '90%', md: '30%' } } }}>
@@ -438,16 +432,16 @@ export default function CompactLoadout({
           </DialogTitle>
           <DialogContent sx={{ mt: 1 }}>
             <Grid container spacing={2} sx={{ textAlign: 'center', pt: 1 }}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Accuracy')}</Typography>
                 <Typography variant="h1">{rollDialog.accuracy}</Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Damage')}</Typography>
                 <Typography variant="h1">{rollDialog.damageRoll}</Typography>
                 {rollDialog.type && <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>}
               </Grid>
-              <Grid item xs={12} sx={{ mt: 1 }}>
+              <Grid  sx={{ mt: 1 }} size={12}>
                 <Typography variant="body2" color="text.secondary">
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
@@ -466,7 +460,6 @@ export default function CompactLoadout({
           </DialogActions>
         </Dialog>
       )}
-
       {/* Vehicle swap modal */}
       {vehicleModalOpen && pilotSpellInfo && (
         <SpellPilotVehiclesModal

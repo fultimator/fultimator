@@ -276,7 +276,7 @@ export default function SlotPickerDialog({
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
         {moduleOverrideOpen ? (
           /* Module override view */
-          <>
+          (<>
             <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
               <PrecisionManufacturingIcon color="success" fontSize="small" />
               {t('Slot - Module Override')}
@@ -372,10 +372,10 @@ export default function SlotPickerDialog({
                 </Button>
               </Box>
             </DialogActions>
-          </>
+          </>)
         ) : (
           /* Regular item picker view */
-          <>
+          (<>
             <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
               {t('Choose item for')}: {slotLabel}
               <IconButton
@@ -508,10 +508,9 @@ export default function SlotPickerDialog({
                 </Button>
               </Box>
             </DialogActions>
-          </>
+          </>)
         )}
       </Dialog>
-
       {/* Martial proficiency warning */}
       {martialWarning && (
         <Dialog open onClose={() => setMartialWarning(null)} maxWidth="xs" fullWidth>

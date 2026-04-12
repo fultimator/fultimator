@@ -69,15 +69,13 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
               <Grid container>
                 {hasClock && (
                   <Grid
-                    item
-                    xs={12}
                     sx={{
                       display: "flex",
                       justifyContent: "center",
                       pt: 1,
                       pb: 0.5,
                     }}
-                  >
+                    size={12}>
                     <Clock
                       numSections={sections}
                       size={180}
@@ -88,11 +86,7 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                 )}
 
                 {isEditMode && setPlayer && hasClock && (
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{ display: "flex", justifyContent: "center", pb: 1 }}
-                  >
+                  <Grid sx={{ display: "flex", justifyContent: "center", pb: 1 }} size={12}>
                     <Button
                       variant="outlined"
                       size="small"
@@ -105,8 +99,6 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
 
                 {other.description && (
                   <Grid
-                    item
-                    xs={12}
                     sx={{
                       background: `linear-gradient(to right, ${theme.ternary}, ${isDarkMode ? "#252525" : "white"})`,
                       borderTop: hasClock
@@ -115,7 +107,7 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                       px: "10px",
                       py: "5px",
                     }}
-                  >
+                    size={12}>
                     <div
                       style={{
                         whiteSpace: "pre-line",
@@ -131,14 +123,12 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
 
                 {other.effect && (
                   <Grid
-                    item
-                    xs={12}
                     sx={{
                       borderTop: `1px solid ${theme.secondary}`,
                       px: "10px",
                       py: "5px",
                     }}
-                  >
+                    size={12}>
                     <div
                       style={{
                         whiteSpace: "pre-line",

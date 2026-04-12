@@ -86,23 +86,23 @@ function PrettySingle({ weapon, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={3}>
+              <Grid  size={1}></Grid>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="left">
                   {t("Weapon")}
                 </Typography>
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Typography variant="h4" textAlign="center">
                   {t("Cost")}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
+              <Grid  size={3}>
                 <Typography variant="h4" textAlign="center">
                   {t("Accuracy")}
                 </Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid  size={4}>
                 <Typography variant="h4" textAlign="center">
                   {t("Damage")}
                 </Typography>
@@ -110,39 +110,35 @@ function PrettySingle({ weapon, showActions }) {
             </Grid>
             <Grid container>
               <Grid
-                item
                 sx={{
                   flex: "0 0 70px",
                   minWidth: "70px",
                   minHeight: "70px",
                   background2,
-                }}
-              >
+                }}>
                 <EditableImage size={70} />
               </Grid>
 
-              <Grid container direction="column" item xs>
+              <Grid container direction="column"  size="grow">
                 {/* First Row */}
                 <Grid
                   container
                   justifyContent="space-between"
-                  item
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
                     padding: "5px",
-                  }}
-                >
-                  <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+                  }}>
+                  <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
                     <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
                       {t(weapon.name)}
                     </Typography>
                     {weapon.martial && <Martial />}
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
                       {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps
@@ -152,7 +148,7 @@ function PrettySingle({ weapon, showActions }) {
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography fontWeight="bold" textAlign="center">
                       <OpenBracket />
                       {t("HR +")} {weapon.damage}
@@ -172,22 +168,22 @@ function PrettySingle({ weapon, showActions }) {
                     padding: "5px",
                   }}
                 >
-                  <Grid item xs={3}>
+                  <Grid  size={3}>
                     <Typography fontWeight="bold">{t(weapon.category)}</Typography>
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <Typography textAlign="center">
                       {weapon.hands === 1 && t("One-handed")}
                       {weapon.hands === 2 && t("Two-handed")}
                     </Typography>
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid  size={1}>
                     <Diamond color="{primary}" />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid  size={3}>
                     <Typography textAlign="center">
                       {weapon.melee && t("Melee")}
                       {weapon.ranged && t("Ranged")}

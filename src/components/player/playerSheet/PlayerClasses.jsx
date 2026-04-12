@@ -192,13 +192,13 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
               </Box>
               {c.benefits && (
                 <>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomHeader2
                       headerText={`${t("Free Benefits")}`}
                       isEditMode={false}
                     />
                   </Grid>
-                  <Grid item xs={12} style={{ margin: "-20px 0 0 0" }}>
+                  <Grid  style={{ margin: "-20px 0 0 0" }} size={12}>
                     <ul>
                       {c.benefits.hpplus !== 0 && (
                         <li>
@@ -325,7 +325,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                 ))}
               {c.lvl === 10 && (
                 <>
-                  <Grid item xs={12} sx={{ marginTop: "1em" }}>
+                  <Grid  sx={{ marginTop: "1em" }} size={12}>
                     <CustomHeader2
                       headerText={t("Heroic Skill")}
                       //buttonText={t("Edit Benefits")}
@@ -333,7 +333,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                       isEditMode={false}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomHeader3
                       headerText={c.heroic.name}
                       currentLvl={0}
@@ -373,7 +373,6 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
         restrictToTypes={["heroics"]}
         context="player"
       />
-
       {skillEditData !== null && (
         <EditSkillModal
           open={skillEditTarget !== null}
@@ -383,7 +382,6 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
           setSkill={setSkillEditData}
         />
       )}
-
       {heroicEditData !== null && (
         <EditHeroicSkillModal
           open={heroicEditClassIdx !== null}
@@ -393,7 +391,6 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
           setHeroic={setHeroicEditData}
         />
       )}
-
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
         <DialogContent sx={{ p: 0 }}>
           <EditPlayerClasses player={player} setPlayer={setPlayer} isEditMode={true} updateMaxStats={updateMaxStats} />

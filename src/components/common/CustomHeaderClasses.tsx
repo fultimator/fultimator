@@ -44,7 +44,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   const { t } = useTranslate();
 
   return (
-    <Grid item xs={12} sx={{ width: "100%", margin: "15px" }}>
+    <Grid  sx={{ width: "100%", margin: "15px" }} size={12}>
       <Typography
         variant="h2"
         component="legend"

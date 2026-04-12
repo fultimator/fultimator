@@ -75,10 +75,8 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
         <Grid container>
           {sections > 0 && (
             <Grid
-              item
-              xs={12}
               sx={{ display: "flex", justifyContent: "center", pt: 1, pb: 0.5 }}
-            >
+              size={12}>
               <Clock
                 numSections={sections}
                 size={180}
@@ -89,11 +87,7 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
           )}
 
           {isEditMode && setPlayer && (
-            <Grid
-              item
-              xs={12}
-              sx={{ display: "flex", justifyContent: "center", pb: 1 }}
-            >
+            <Grid sx={{ display: "flex", justifyContent: "center", pb: 1 }} size={12}>
               <Button variant="outlined" size="small" onClick={resetClock}>
                 {t("Reset Clock")}
               </Button>
@@ -102,15 +96,13 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
 
           {triggerName && (
             <Grid
-              item
-              xs={12}
               sx={{
                 background: `linear-gradient(to right, ${theme.ternary}, ${isDarkMode ? "#252525" : "white"})`,
                 borderTop: `1px solid ${theme.secondary}`,
                 px: "10px",
                 py: "5px",
               }}
-            >
+              size={12}>
               <Typography
                 sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
               >
@@ -133,14 +125,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
 
           {effectName && (
             <Grid
-              item
-              xs={12}
               sx={{
                 borderTop: `1px solid ${theme.secondary}`,
                 px: "10px",
                 py: "5px",
               }}
-            >
+              size={12}>
               <Typography
                 sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
               >

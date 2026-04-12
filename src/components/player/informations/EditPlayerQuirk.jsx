@@ -55,7 +55,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Quirk")}
@@ -63,7 +63,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           />
         </Grid>
         <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-          <Grid item xs={10} sm={11}>
+          <Grid
+            size={{
+              xs: 10,
+              sm: 11
+            }}>
             <TextField
               id="name"
               label={t("Quirk Name") + ":"}
@@ -77,7 +81,12 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
             />
           </Grid>
           {isEditMode && (
-            <Grid item xs={2} sm={1} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+            <Grid
+              sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
+              size={{
+                xs: 2,
+                sm: 1
+              }}>
               <Tooltip title={t("Replace from Compendium")}>
                 <IconButton size="small" onClick={() => setCompendiumOpen(true)}>
                   <SearchIcon fontSize="small" />
@@ -90,7 +99,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
               </Tooltip>
             </Grid>
           )}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               id="description"
               label={t("Description") + ":"}
@@ -101,7 +114,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
               readOnly={!isEditMode}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               id="effect"
               label={t("Effect") + ":"}
@@ -114,7 +131,6 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
-
       {isEditMode && (
         <CompendiumViewerModal
           open={compendiumOpen}

@@ -52,7 +52,11 @@ export default function SymbolistItem({
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Symbol")}</InputLabel>
               <Select
@@ -72,7 +76,11 @@ export default function SymbolistItem({
           </Grid>
 
           {isCustom && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -84,7 +92,7 @@ export default function SymbolistItem({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Symbol Effect")}
               value={
@@ -102,7 +110,7 @@ export default function SymbolistItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth

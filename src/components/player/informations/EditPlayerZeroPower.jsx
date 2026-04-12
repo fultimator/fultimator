@@ -133,7 +133,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Zero Power")}
@@ -142,7 +142,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
           />
         </Grid>
         <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-          <Grid item xs={12} sm={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8
+            }}>
             <TextField
               label={t("Zero Power Name") + ":"}
               value={zeroPower.name ?? ""}
@@ -152,7 +156,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               label={t("Clock Sections") + ":"}
               value={clockSections}
@@ -172,7 +180,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Trigger Name") + ":"}
               value={triggerName}
@@ -182,7 +194,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Trigger Description") + ":"}
               value={triggerDesc}
@@ -193,7 +209,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Effect Name") + ":"}
               value={effectName}
@@ -203,7 +223,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Effect Description") + ":"}
               value={effectDesc}
@@ -215,7 +239,6 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
-
       {isEditMode && (
         <CompendiumViewerModal
           open={compendiumOpen}

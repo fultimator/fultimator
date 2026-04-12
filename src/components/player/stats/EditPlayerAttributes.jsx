@@ -76,7 +76,7 @@ export default function EditPlayerAttributes({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Attributes")}
@@ -84,18 +84,15 @@ export default function EditPlayerAttributes({
           />
         </Grid>
         {/* Attributes control */}
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
             {attributeList.map((attribute, i) => (
-              <Grid
-                container
-                item
-                xs={12}
-                spacing={2}
-                key={i}
-                alignItems="center"
-              >
-                <Grid item xs={2}>
+              <Grid container spacing={2} key={i} alignItems="center" size={12}>
+                <Grid  size={2}>
                   <InputLabel
                     id={attribute.key}
                     sx={{ fontSize: "20px", fontWeight: 400 }}
@@ -103,7 +100,7 @@ export default function EditPlayerAttributes({
                     {attribute.label}
                   </InputLabel>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid  size={10}>
                   <FormControl variant="standard" fullWidth>
                     <Slider
                       marks={attribute.marks}
@@ -122,7 +119,11 @@ export default function EditPlayerAttributes({
           </Grid>
         </Grid>
         {/* Attributes Explanation Card */}
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <ExplainPlayerAttributes />
         </Grid>
       </Grid>

@@ -112,7 +112,7 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={2}>
       {/* Wellspring Selection */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Active Wellsprings")} (Max 2)
         </Typography>
@@ -168,9 +168,8 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           })}
         </Box>
       </Grid>
-
       {/* Available Invocations */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Available Invocations")} ({availableInvocations.length})
         </Typography>
@@ -181,7 +180,13 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
         ) : (
           <Grid container spacing={1}>
             {availableInvocations.map((inv, idx) => (
-              <Grid item xs={12} sm={6} md={4} key={idx}>
+              <Grid
+                key={idx}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4
+                }}>
                 <Card>
                   <CardContent>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>

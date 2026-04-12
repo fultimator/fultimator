@@ -108,17 +108,17 @@ export default function PlayerNotes({
               >
                 {note.clocks.map((clock, clockIndex) => (
                   <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    md={compact ? 3 : undefined}
                     key={clockIndex}
                     sx={
                       compact
                         ? { display: "flex", flexDirection: "column" }
                         : { textAlign: "center", py: 2 }
                     }
-                  >
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: compact ? 3 : undefined
+                    }}>
                     {compact ? (
                       <Stack alignItems="center" sx={{ position: "relative" }}>
                         <Typography

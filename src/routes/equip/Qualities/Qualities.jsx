@@ -97,7 +97,11 @@ function Qualities() {
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -127,16 +131,24 @@ function Qualities() {
 
           {tab === 0 && (
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <SelectBase value={selectedBase} onChange={handleBaseChange} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeName
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth variant="standard">
                   <InputLabel id="category-label">{t("Category")}</InputLabel>
                   <Select
@@ -154,7 +166,7 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <ChangeQuality
                   quality={quality}
                   setQuality={(e) => setQuality(e.target.value)}
@@ -162,7 +174,7 @@ function Qualities() {
                   setQualityCost={(e) => setCost(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <FormControl fullWidth>
                   <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
                   <Select
@@ -194,9 +206,9 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item>
+                  <Grid >
                     <Button
                       variant="outlined"
                       onClick={() => fileInputRef.current.click()}
@@ -204,7 +216,7 @@ function Qualities() {
                       {t("Upload JSON")}
                     </Button>
                   </Grid>
-                  <Grid item>
+                  <Grid >
                     <Button variant="outlined" onClick={handleClearFields}>
                       {t("Clear All Fields")}
                     </Button>
@@ -226,9 +238,12 @@ function Qualities() {
           )}
         </Paper>
       </Grid>
-
       {/* Pretty */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Pretty
           custom={{
             name,

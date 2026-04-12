@@ -58,7 +58,13 @@ export default function PlayerArcana({ player }) {
             </Typography>
             <Grid container spacing={1} sx={{ padding: "1em" }}>
               {arcana.map((spell, index) => (
-                <Grid item container xs={12} md={6} key={index}>
+                <Grid
+                  container
+                  key={index}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <SpellArcanist
                     arcana={spell}
                     isEditMode={false}

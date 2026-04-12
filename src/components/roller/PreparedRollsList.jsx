@@ -21,7 +21,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
             sx={{ my: 1 }}
             alignItems="center"
           >
-            <Grid item>
+            <Grid >
               <Button
                 variant="contained"
                 startIcon={
@@ -32,12 +32,12 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
                 {t("Roll")}
               </Button>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <Typography fontSize="1.1rem">
                 <Roll roll={roll} /> { roll.label && <Diamond />} {roll.label}
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid >
               <Button
                 variant="outlined"
                 color="red"

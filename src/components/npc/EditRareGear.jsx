@@ -51,12 +51,12 @@ export default function EditRareGear({ npc, setNpc }) {
       {npc.raregear?.map((raregear, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item sx={{ p: 0, m: 0 }}>
+            <Grid  sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeRareGear(i)}>
                 <RemoveCircleOutline />
               </IconButton>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -69,7 +69,7 @@ export default function EditRareGear({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} ={raregear.effect}
                   onChange={(e) => {

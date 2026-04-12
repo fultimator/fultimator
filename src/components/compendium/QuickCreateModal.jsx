@@ -137,10 +137,18 @@ function PanelLayout({ formContent, previewContent, data, itemName, addButton, e
   return (
     <Box sx={{ p: 2 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           {formContent}
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <Stack spacing={2}>
             <Box ref={previewRef}>
               {previewContent}
@@ -215,10 +223,14 @@ function NpcAttackPanel() {
       itemName={data.name || ""}
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Range")}</InputLabel>
               <Select value={range} label={t("Range")} onChange={(e) => setRange(e.target.value)}>
@@ -227,7 +239,11 @@ function NpcAttackPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 1")}</InputLabel>
               <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -235,7 +251,11 @@ function NpcAttackPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 2")}</InputLabel>
               <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -243,7 +263,11 @@ function NpcAttackPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Damage Type")}</InputLabel>
               <Select value={dmgType} label={t("Damage Type")} onChange={(e) => setDmgType(e.target.value)}>
@@ -252,18 +276,18 @@ function NpcAttackPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid  size={6}>
             <TextField label={t("Accuracy Bonus")} value={flathit} onChange={(e) => setFlathit(e.target.value)}
               fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid  size={6}>
             <TextField label={t("Damage Bonus")} value={flatdmg} onChange={(e) => setFlatdmg(e.target.value)}
               fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Optional special effect description")} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -325,35 +349,63 @@ function NpcSpellPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={10} sm={11}>
+          <Grid
+            size={{
+              xs: 10,
+              sm: 11
+            }}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)}
               fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
           </Grid>
-          <Grid item xs={2} sm={1}>
+          <Grid
+            size={{
+              xs: 2,
+              sm: 1
+            }}>
             <ToggleButton value="offensive" selected={isOffensive} onChange={() => setIsOffensive((v) => !v)}
               size="small" sx={{ width: "100%" }}>
               <OffensiveSpellIcon />
             </ToggleButton>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <TextField label={t("MP x Target")} value={mp} onChange={(e) => setMp(e.target.value)}
               fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <TextField label={t("Max Targets")} value={maxTargets} onChange={(e) => setMaxTargets(e.target.value)}
               fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Autocomplete freeSolo options={DURATION_OPTIONS.map(t)} inputValue={duration}
               onInputChange={(_, v) => setDuration(v)}
               renderInput={(params) => <TextField {...params} label={t("Duration")} size="small" />} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <Autocomplete freeSolo options={TARGET_OPTIONS.map(t)} inputValue={target}
               onInputChange={(_, v) => setTarget(v)}
               renderInput={(params) => <TextField {...params} label={t("Target")} size="small" />} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Range")}</InputLabel>
               <Select value={range} label={t("Range")} onChange={(e) => setRange(e.target.value)}>
@@ -363,7 +415,11 @@ function NpcSpellPanel() {
             </FormControl>
           </Grid>
           {isOffensive && (
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Damage Type")}</InputLabel>
                 <Select value={dmgType} label={t("Damage Type")} onChange={(e) => setDmgType(e.target.value)}>
@@ -373,12 +429,20 @@ function NpcSpellPanel() {
             </Grid>
           )}
           {isOffensive && (
-            <Grid item xs={6} sm={3}>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 3
+              }}>
               <TextField label={t("Damage")} value={damage} onChange={(e) => setDamage(e.target.value)}
                 fullWidth size="small" type="number" inputProps={{ min: 0 }} />
             </Grid>
           )}
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 1")}</InputLabel>
               <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -386,7 +450,11 @@ function NpcSpellPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Attr 2")}</InputLabel>
               <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -394,10 +462,10 @@ function NpcSpellPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Spell effect description")} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -435,16 +503,20 @@ function NpcSpecialPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -482,16 +554,20 @@ function NpcActionPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -777,7 +853,11 @@ function PlayerSpellPanel() {
       itemName={name.trim() || ""}
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Spell Type")}</InputLabel>
               <Select value={spellType} label={t("Spell Type")} onChange={(e) => setSpellType(e.target.value)}>
@@ -786,7 +866,11 @@ function PlayerSpellPanel() {
             </FormControl>
           </Grid>
           {spellType === "default" && (
-            <Grid item xs={12} sm={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 7
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Class")}</InputLabel>
                 <Select value={spellClass} label={t("Class")} onChange={(e) => setSpellClass(e.target.value)}>
@@ -798,20 +882,20 @@ function PlayerSpellPanel() {
           )}
           {spellType !== "default" ? (
             <Grid container spacing={2} alignItems="center" sx={{ mt: 0, ml: 0 }}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
               </Grid>
 
               {/* Gift */}
               {spellType === "gift" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Event / Trigger")} value={event} onChange={(e) => setEvent(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
 
               {/* Therioform */}
               {spellType === "therioform" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Genoclepsis (optional)")} value={genoclepsis} onChange={(e) => setGenoclepsis(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
@@ -819,7 +903,11 @@ function PlayerSpellPanel() {
               {/* Magichant Key */}
               {spellType === "magichant-key" && (
                 <>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("magichant_type")}</InputLabel>
                       <Select value={keyType} label={t("magichant_type")} onChange={(e) => setKeyType(e.target.value)}>
@@ -830,7 +918,11 @@ function PlayerSpellPanel() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("magichant_status_effect")}</InputLabel>
                       <Select value={keyStatus} label={t("magichant_status_effect")} onChange={(e) => setKeyStatus(e.target.value)}>
@@ -841,7 +933,11 @@ function PlayerSpellPanel() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("magichant_attribute")}</InputLabel>
                       <Select value={keyAttribute} label={t("magichant_attribute")} onChange={(e) => setKeyAttribute(e.target.value)}>
@@ -852,7 +948,11 @@ function PlayerSpellPanel() {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("magichant_recovery")}</InputLabel>
                       <Select value={keyRecovery} label={t("magichant_recovery")} onChange={(e) => setKeyRecovery(e.target.value)}>
@@ -868,7 +968,11 @@ function PlayerSpellPanel() {
 
               {/* Dance */}
               {spellType === "dance" && (
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <Autocomplete freeSolo options={DURATION_OPTIONS.map(t)} inputValue={duration} onInputChange={(_, v) => setDuration(v)}
                     renderInput={(params) => <TextField {...params} label={t("Duration")} size="small" />} />
                 </Grid>
@@ -877,12 +981,12 @@ function PlayerSpellPanel() {
               {/* Invocation */}
               {spellType === "invocation" && (
                 <>
-                  <Grid item xs={6}>
+                  <Grid  size={6}>
                     <Autocomplete options={WELLSPRINGS} value={wellspring || null}
                       onChange={(_, v) => setWellspring(v ?? "")}
                       renderInput={(params) => <TextField {...params} label={t("Wellspring")} size="small" />} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid  size={6}>
                     <Autocomplete options={INV_TYPES} value={invType || null}
                       onChange={(_, v) => setInvType(v ?? "")}
                       renderInput={(params) => <TextField {...params} label={t("Type")} size="small" />} />
@@ -893,32 +997,48 @@ function PlayerSpellPanel() {
               {/* Arcanum / Arcanum Rework */}
               {(spellType === "arcanist" || spellType === "arcanist-rework") && (
                 <>
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <TextField label={t("Domain name")} value={domain} onChange={(e) => setDomain(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Domain effect")} value={domainDesc} onChange={(e) => setDomainDesc(e.target.value)} helperText="" />
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <TextField label={t("Merge name")} value={merge} onChange={(e) => setMerge(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Merge effect")} value={mergeDesc} onChange={(e) => setMergeDesc(e.target.value)} helperText="" />
                   </Grid>
                   {spellType === "arcanist-rework" && (
                     <>
-                      <Grid item xs={12} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 4
+                        }}>
                         <TextField label={t("Pulse name")} value={pulse} onChange={(e) => setPulse(e.target.value)} fullWidth size="small" />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <CustomTextarea label={t("Pulse effect")} value={pulseDesc} onChange={(e) => setPulseDesc(e.target.value)} helperText="" />
                       </Grid>
                     </>
                   )}
-                  <Grid item xs={12} sm={4}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
                     <TextField label={t("Dismiss name")} value={dismiss} onChange={(e) => setDismiss(e.target.value)} fullWidth size="small" />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Dismiss effect")} value={dismissDesc} onChange={(e) => setDismissDesc(e.target.value)} helperText="" />
                   </Grid>
                 </>
@@ -926,14 +1046,18 @@ function PlayerSpellPanel() {
 
               {/* Tinkerer Alchemy */}
               {spellType === "tinkerer-alchemy" && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <TextField label={t("Category")} value={itemCategory} onChange={(e) => setItemCategory(e.target.value)} fullWidth size="small" />
                 </Grid>
               )}
 
               {/* Tinkerer Infusion */}
               {spellType === "tinkerer-infusion" && (
-                <Grid item xs={12} sm={4}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 4
+                  }}>
                   <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)}
                     fullWidth size="small" type="number" inputProps={{ min: 1, max: 3 }} />
                 </Grid>
@@ -943,7 +1067,7 @@ function PlayerSpellPanel() {
               {spellType === "cooking" && (
                 <>
                   {cookingEffects.map((fx, i) => (
-                    <Grid item xs={12} key={i}>
+                    <Grid  key={i} size={12}>
                       <CustomTextarea
                         label={`${t("Roll")} ${i + 1}`}
                         value={fx}
@@ -962,24 +1086,32 @@ function PlayerSpellPanel() {
               {/* Magiseed : description + per-tick effects */}
               {spellType === "magiseed" && (
                 <>
-                  <Grid item xs={6} sm={3}>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      sm: 3
+                    }}>
                     <TextField label={t("Range Start")} value={seedRangeStart} type="number"
                       inputProps={{ min: 0, max: 4 }} fullWidth size="small"
                       onChange={(e) => setSeedRangeStart(Number(e.target.value))} />
                   </Grid>
-                  <Grid item xs={6} sm={3}>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      sm: 3
+                    }}>
                     <TextField label={t("Range End")} value={seedRangeEnd} type="number"
                       inputProps={{ min: 1, max: 6 }} fullWidth size="small"
                       onChange={(e) => setSeedRangeEnd(Number(e.target.value))} />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={seedDescription}
                       onChange={(e) => setSeedDescription(e.target.value)} helperText="" />
                   </Grid>
                   {Array.from({ length: seedRangeEnd - seedRangeStart + 1 }, (_, i) => {
                     const tick = seedRangeStart + i;
                     return (
-                      <Grid item xs={12} key={tick}>
+                      <Grid  key={tick} size={12}>
                         <CustomTextarea
                           label={`${t("Tick")} ${tick}`}
                           value={seedEffects[tick] ?? ""}
@@ -995,7 +1127,7 @@ function PlayerSpellPanel() {
               {/* Pilot Vehicle */}
               {spellType === "pilot-vehicle" && (
                 <>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("Component Type")}</InputLabel>
                       <Select value={pilotSubtype} label={t("Component Type")} onChange={(e) => setPilotSubtype(e.target.value)}>
@@ -1008,7 +1140,7 @@ function PlayerSpellPanel() {
 
                   {/* Frame */}
                   {pilotSubtype === "frame" && (
-                    <Grid item xs={12}>
+                    <Grid  size={12}>
                       <FormControl fullWidth size="small">
                         <InputLabel>{t("Frame")}</InputLabel>
                         <Select value={vehicleFrame} label={t("Frame")} onChange={(e) => setVehicleFrame(e.target.value)}>
@@ -1024,7 +1156,11 @@ function PlayerSpellPanel() {
 
                   {/* Cost : shown for all module types */}
                   {pilotSubtype !== "frame" && (
-                    <Grid item xs={6} sm={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        sm: 4
+                      }}>
                       <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
                         inputProps={{ min: 0 }} onChange={(e) => setModuleCost(e.target.value)} />
                     </Grid>
@@ -1033,21 +1169,34 @@ function PlayerSpellPanel() {
                   {/* Armor Module */}
                   {pilotSubtype === "armor" && (
                     <>
-                      <Grid item xs={4} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 3
+                        }}>
                         <TextField label="DEF" value={moduleDef} type="number" fullWidth size="small"
                           onChange={(e) => setModuleDef(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 3
+                        }}>
                         <TextField label="MDEF" value={moduleMdef} type="number" fullWidth size="small"
                           onChange={(e) => setModuleMdef(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={2} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid
+                        sx={{ display: "flex", alignItems: "center" }}
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <ToggleButton value="martial" selected={moduleMartial} onChange={() => setModuleMartial((v) => !v)}
                           size="small" sx={{ width: "100%" }}>
                           {t("Martial")}
                         </ToggleButton>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <CustomTextarea label={t("Description (optional)")} value={moduleDescription}
                           onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
                       </Grid>
@@ -1057,7 +1206,11 @@ function PlayerSpellPanel() {
                   {/* Weapon Module */}
                   {pilotSubtype === "weapon" && (
                     <>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Category")}</InputLabel>
                           <Select value={weaponCategory} label={t("Category")} onChange={(e) => setWeaponCategory(e.target.value)}>
@@ -1065,7 +1218,11 @@ function PlayerSpellPanel() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Damage Type")}</InputLabel>
                           <Select value={damageType} label={t("Damage Type")} onChange={(e) => setDamageType(e.target.value)}>
@@ -1073,7 +1230,11 @@ function PlayerSpellPanel() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={4}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 4
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Range")}</InputLabel>
                           <Select value={moduleRange || "Melee"} label={t("Range")} onChange={(e) => setModuleRange(e.target.value)}>
@@ -1081,7 +1242,11 @@ function PlayerSpellPanel() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 3
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Att 1")}</InputLabel>
                           <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
@@ -1089,7 +1254,11 @@ function PlayerSpellPanel() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          sm: 3
+                        }}>
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("Att 2")}</InputLabel>
                           <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
@@ -1097,29 +1266,41 @@ function PlayerSpellPanel() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small"
                           onChange={(e) => setModuleDamage(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small"
                           onChange={(e) => setModulePrec(e.target.value)} />
                       </Grid>
-                      <Grid item xs={4} sm={2}>
+                      <Grid
+                        size={{
+                          xs: 4,
+                          sm: 2
+                        }}>
                         <TextField label={t("Quality Cost")} value={qualityCost} type="number" fullWidth size="small"
                           onChange={(e) => setQualityCost(e.target.value)} />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <TextField label={t("Quality")} value={quality} fullWidth size="small"
                           onChange={(e) => setQuality(e.target.value)} />
                       </Grid>
-                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid  sx={{ display: "flex", alignItems: "center" }} size={6}>
                         <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)}
                           size="small" sx={{ width: "100%" }}>
                           {t("Cumbersome")}
                         </ToggleButton>
                       </Grid>
-                      <Grid item xs={6} sx={{ display: "flex", alignItems: "center" }}>
+                      <Grid  sx={{ display: "flex", alignItems: "center" }} size={6}>
                         <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)}
                           size="small" sx={{ width: "100%" }}>
                           {t("Shield")}
@@ -1133,7 +1314,7 @@ function PlayerSpellPanel() {
               {/* Generic effect/description for types that use it */}
               {!(spellType === "arcanist" || spellType === "arcanist-rework" || spellType === "cooking" || spellType === "magiseed" || spellType === "magichant-key") &&
                !(spellType === "pilot-vehicle" && (pilotSubtype === "armor" || pilotSubtype === "weapon")) && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <CustomTextarea
                     label={spellType === "therioform" || spellType === "pilot-vehicle" ? t("Description") : t("Effect")}
                     value={effect}
@@ -1145,34 +1326,62 @@ function PlayerSpellPanel() {
             </Grid>
           ) : (
             <>
-              <Grid item xs={10} sm={6}>
+              <Grid
+                size={{
+                  xs: 10,
+                  sm: 6
+                }}>
                 <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
               </Grid>
-              <Grid item xs={2} sm={1}>
+              <Grid
+                size={{
+                  xs: 2,
+                  sm: 1
+                }}>
                 <ToggleButton value="offensive" selected={isOffensive} onChange={() => setIsOffensive((v) => !v)}
                   size="small" sx={{ width: "100%" }}>
                   <OffensiveSpellIcon />
                 </ToggleButton>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField label={t("MP")} value={mp} onChange={(e) => setMp(e.target.value)}
                   fullWidth size="small" type="number" inputProps={{ min: 0 }} />
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <TextField label={t("Max Targets")} value={maxTargets} onChange={(e) => setMaxTargets(e.target.value)}
                   fullWidth size="small" type="number" inputProps={{ min: 0 }} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <Autocomplete freeSolo options={TARGET_OPTIONS.map(t)} inputValue={targetDesc}
                   onInputChange={(_, v) => setTargetDesc(v)}
                   renderInput={(params) => <TextField {...params} label={t("Target")} size="small" />} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <Autocomplete freeSolo options={DURATION_OPTIONS.map(t)} inputValue={duration}
                   onInputChange={(_, v) => setDuration(v)}
                   renderInput={(params) => <TextField {...params} label={t("Duration")} size="small" />} />
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Attr 1")}</InputLabel>
                   <Select value={attr1} label={t("Attr 1")} onChange={(e) => setAttr1(e.target.value)}>
@@ -1180,7 +1389,11 @@ function PlayerSpellPanel() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 3
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Attr 2")}</InputLabel>
                   <Select value={attr2} label={t("Attr 2")} onChange={(e) => setAttr2(e.target.value)}>
@@ -1188,12 +1401,12 @@ function PlayerSpellPanel() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
               </Grid>
             </>
           )}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -1241,7 +1454,7 @@ function QualityPanel() {
           </Tabs>
           {qualityTab === 0 ? (
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Autocomplete
                   options={qualities}
                   getOptionLabel={(q) => q.name}
@@ -1255,10 +1468,18 @@ function QualityPanel() {
                   size="small"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Category")}</InputLabel>
                   <Select value={category} label={t("Category")} onChange={(e) => setCategory(e.target.value)}>
@@ -1266,14 +1487,22 @@ function QualityPanel() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea label={t("Quality Effect")} value={quality} onChange={(e) => setQuality(e.target.value)} helperText="" />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField label={t("Cost")} value={cost} onChange={(e) => setCost(e.target.value)}
                   fullWidth size="small" type="number" />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel id="qc-filter-label">{t("Applicable to")}</InputLabel>
                   <Select labelId="qc-filter-label" multiple value={filter}
@@ -1329,11 +1558,15 @@ function HeroicPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)}
               fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Book")}</InputLabel>
               <Select value={book} label={t("Book")} onChange={(e) => setBook(e.target.value)}>
@@ -1342,7 +1575,7 @@ function HeroicPanel() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Autocomplete multiple options={CLASS_NAME_OPTIONS} value={applicableTo}
               onChange={(_, v) => setApplicableTo(v)} freeSolo
               renderTags={(value, getTagProps) =>
@@ -1351,14 +1584,14 @@ function HeroicPanel() {
               renderInput={(params) => <TextField {...params} label={t("Applicable To")} size="small" placeholder={t("Select classes...")} />}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Quote")} value={quote} onChange={(e) => setQuote(e.target.value)}
               fullWidth size="small" inputProps={{ maxLength: 200 }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" maxLength={1500} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -1432,11 +1665,19 @@ function ClassPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={8} sm={9}>
+          <Grid
+            size={{
+              xs: 8,
+              sm: 9
+            }}>
             <TextField label={t("Class Name")} value={name} onChange={(e) => setName(e.target.value)}
               fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
           </Grid>
-          <Grid item xs={4} sm={3}>
+          <Grid
+            size={{
+              xs: 4,
+              sm: 3
+            }}>
             <Autocomplete
               freeSolo
               options={CLASS_BOOK_SUGGESTIONS}
@@ -1446,25 +1687,25 @@ function ClassPanel() {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Free Benefits")}
             </Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("HP+")} type="number" value={hpplus}
               onChange={(e) => setHpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 5 }} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("MP+")} type="number" value={mpplus}
               onChange={(e) => setMpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 5 }} />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField label={t("IP+")} type="number" value={ipplus}
               onChange={(e) => setIpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 2 }} />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {[
                 { key: "melee",   label: t("Martial Melee") },
@@ -1485,7 +1726,7 @@ function ClassPanel() {
           </Grid>
 
           {customBenefits.map((cb, i) => (
-            <Grid item xs={12} key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Grid  key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }} size={12}>
               <TextField label={`${t("Custom Benefit")} ${i + 1}`} value={cb}
                 onChange={(e) => setCustomBenefits((arr) => arr.map((v, j) => j === i ? e.target.value : v))}
                 fullWidth size="small" inputProps={{ maxLength: 500 }} />
@@ -1495,13 +1736,13 @@ function ClassPanel() {
               </IconButton>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={() => setCustomBenefits((arr) => [...arr, ""])}>
               + {t("Add Custom Benefit")}
             </Button>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Spell Types")}
             </Typography>
@@ -1517,31 +1758,39 @@ function ClassPanel() {
             </Box>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
               {t("Skills")}
             </Typography>
           </Grid>
           {skills.map((skill, i) => (
-            <Grid item xs={12} key={i}>
+            <Grid  key={i} size={12}>
               <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
                 <Grid container spacing={1}>
-                  <Grid item xs={9} sm={10}>
+                  <Grid
+                    size={{
+                      xs: 9,
+                      sm: 10
+                    }}>
                     <TextField label={`${t("Skill Name")} ${i + 1}`} value={skill.skillName}
                       onChange={(e) => updateSkillField(i, "skillName", e.target.value)}
                       fullWidth size="small" inputProps={{ maxLength: 50 }} />
                   </Grid>
-                  <Grid item xs={3} sm={2}>
+                  <Grid
+                    size={{
+                      xs: 3,
+                      sm: 2
+                    }}>
                     <TextField label={t("Max Lvl")} type="number" value={skill.maxLvl}
                       onChange={(e) => updateSkillField(i, "maxLvl", Math.max(1, Math.min(10, Number(e.target.value))))}
                       fullWidth size="small" inputProps={{ min: 1, max: 10 }} />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={skill.description}
                       onChange={(e) => updateSkillField(i, "description", e.target.value)}
                       helperText="" maxLength={1500} />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("Special Skill Effect")}</InputLabel>
                       <Select
@@ -1565,7 +1814,7 @@ function ClassPanel() {
               </Box>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -1673,7 +1922,11 @@ function WeaponPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={1} alignItems="center">
-          <Grid item xs={10} md={4}>
+          <Grid
+            size={{
+              xs: 10,
+              md: 4
+            }}>
             <ChangeWeaponBase value={base.name} onChange={(e) => {
               const b = weapons.find((el) => el.name === e.target.value);
               setBase(b); setName(t(b.name)); setCategory(b.category);
@@ -1681,41 +1934,57 @@ function WeaponPanel() {
               setMartial(b.martial); setDamageBonus(false); setDamageReworkBonus(false); setPrecBonus(false);
             }} />
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <ChangeMartial martial={martial} setMartial={setMartial} />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <ChangeName value={name} onChange={(e) => setName(e.target.value)} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <ChangeCategory value={category} onChange={(e) => {
               const cat = weaponCategories.find((el) => el === e.target.value);
               setCategory(cat);
             }} />
           </Grid>
-          <Grid item xs={6} md={4}>
+          <Grid
+            size={{
+              xs: 6,
+              md: 4
+            }}>
             <ChangeType value={type} onChange={(e) => setType(e.target.value)} />
           </Grid>
-          <Grid item xs={6} md={4}>
+          <Grid
+            size={{
+              xs: 6,
+              md: 4
+            }}>
             <ChangeHands value={hands} onChange={(e) => setHands(e.target.value)} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeAttr att1={att1} att2={att2}
               setAtt1={(e) => setAtt1(e.target.value)} setAtt2={(e) => setAtt2(e.target.value)} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid  size={6}>
             <SelectWeaponQuality quality={selectedQuality} setQuality={(e) => {
               const q = weaponQualities.find((el) => el.name === e.target.value);
               setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
             }} />
           </Grid>
-          <Grid item xs={6}>
+          <Grid  size={6}>
             <ChangeBonus basePrec={base.prec} precBonus={precBonus} damageBonus={damageBonus}
               damageReworkBonus={damageReworkBonus} setPrecBonus={setPrecBonus}
               setDamageBonus={setDamageBonus} setDamageReworkBonus={setDamageReworkBonus}
               rework={rework} totalBonus={totalBonus} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
               qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
           </Grid>
@@ -1732,14 +2001,14 @@ function WeaponPanel() {
                   { label: "DEF Modifier",       value: defModifier,      set: setDefModifier },
                   { label: "MDEF Modifier",      value: mDefModifier,     set: setMDefModifier },
                 ].map(({ label, value, set }) => (
-                  <Grid item xs={6} key={label}>
+                  <Grid  key={label} size={6}>
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
               <ApplyRework rework={rework} setRework={setRework} />
@@ -1801,22 +2070,34 @@ function ArmorPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <ChangeArmorBase value={base.name} onChange={(e) => {
               const b = armor.find((el) => el.name === e.target.value);
               setBase(b); setName(t(b.name)); setInit(b.init ?? 0);
             }} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <SelectArmorQuality quality={selectedQuality} setQuality={(e) => {
               const q = armorShieldQualities.find((el) => el.name === e.target.value);
               setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
             }} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <ChangeName value={name} onChange={(e) => setName(e.target.value)} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
               qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
           </Grid>
@@ -1836,14 +2117,19 @@ function ArmorPanel() {
                   { label: "Damage (Melee) Modifier",  value: damageMeleeModifier,  set: setDamageMeleeModifier },
                   { label: "Damage (Ranged) Modifier", value: damageRangedModifier, set: setDamageRangedModifier },
                 ].map(({ label, value, set }) => (
-                  <Grid item xs={6} md={4} key={label}>
+                  <Grid
+                    key={label}
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
               <ApplyRework rework={rework} setRework={setRework} />
@@ -1905,22 +2191,34 @@ function ShieldPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <ChangeShieldBase value={base.name} onChange={(e) => {
               const b = shields.find((el) => el.name === e.target.value);
               setBase(b); setName(t(b.name)); setInit(b.init ?? 0);
             }} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <SelectArmorQuality quality={selectedQuality} setQuality={(e) => {
               const q = armorShieldQualities.find((el) => el.name === e.target.value);
               setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
             }} />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <ChangeName value={name} onChange={(e) => setName(e.target.value)} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
               qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
           </Grid>
@@ -1940,14 +2238,19 @@ function ShieldPanel() {
                   { label: "Damage (Melee) Modifier",  value: damageMeleeModifier,  set: setDamageMeleeModifier },
                   { label: "Damage (Ranged) Modifier", value: damageRangedModifier, set: setDamageRangedModifier },
                 ].map(({ label, value, set }) => (
-                  <Grid item xs={6} md={4} key={label}>
+                  <Grid
+                    key={label}
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
               <ApplyRework rework={rework} setRework={setRework} />
@@ -2114,19 +2417,35 @@ function CustomWeaponPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <ChangeCWCategory value={category} onChange={handleCategoryChange} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <ChangeRange value={range} onChange={(e) => setRange(e.target.value)} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <ChangeAccuracyCheck value={accuracyCheck} onChange={(val) => setAccuracyCheck(val)} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <ChangeCWType
               value={isDamageTypeEnabled ? (overrideDamageType ? customDamageType : type) : "physical"}
               onChange={(e) => {
@@ -2139,7 +2458,7 @@ function CustomWeaponPanel() {
               disabled={!isDamageTypeEnabled}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeCustomizations
               selectedCustomization={selectedCustomization}
               setSelectedCustomization={setSelectedCustomization}
@@ -2152,11 +2471,11 @@ function CustomWeaponPanel() {
           </Grid>
           {hasTransforming && (
             <>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider sx={{ mt: 1, mb: 0.5 }} />
                 <Typography variant="h6">{t("weapon_customization_transforming_form")}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField
                   label={t("weapon_customization_transforming_form_name")}
                   value={secondWeaponName}
@@ -2165,23 +2484,39 @@ function CustomWeaponPanel() {
                   size="small"
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeCWCategory value={secondSelectedCategory} onChange={handleSecondCategoryChange} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeRange value={secondSelectedRange} onChange={(e) => setSecondSelectedRange(e.target.value)} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeAccuracyCheck value={secondSelectedAccuracyCheck} onChange={(val) => setSecondSelectedAccuracyCheck(val)} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeCWType
                   value={secondSelectedType}
                   onChange={(e) => setSecondSelectedType(e.target.value)}
                   disabled={!secondHasElementalCustomization}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <ChangeCustomizations
                   selectedCustomization={secondSelectedCustomization}
                   setSelectedCustomization={setSecondSelectedCustomization}
@@ -2192,7 +2527,7 @@ function CustomWeaponPanel() {
                   isSecondForm={true}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Accordion sx={{ width: "100%", marginLeft: "10px" }}
                   expanded={secondModifiersExpanded} onChange={() => setSecondModifiersExpanded(!secondModifiersExpanded)}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -2206,11 +2541,11 @@ function CustomWeaponPanel() {
                         { label: "DEF Modifier",       value: secondDefModifier,    set: setSecondDefModifier },
                         { label: "MDEF Modifier",      value: secondMDefModifier,   set: setSecondMDefModifier },
                       ].map(({ label, value, set }) => (
-                        <Grid item xs={6} key={label}>
+                        <Grid  key={label} size={6}>
                           <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                         </Grid>
                       ))}
-                      <Grid item xs={6}>
+                      <Grid  size={6}>
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -2234,13 +2569,13 @@ function CustomWeaponPanel() {
               </Grid>
             </>
           )}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <SelectWeaponQuality quality={selectedQuality} setQuality={(e) => {
               const q = weaponQualities.find((el) => el.name === e.target.value);
               setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
             }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
               qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
           </Grid>
@@ -2257,11 +2592,11 @@ function CustomWeaponPanel() {
                   { label: "DEF Modifier",       value: defModifier,    set: setDefModifier },
                   { label: "MDEF Modifier",      value: mDefModifier,   set: setMDefModifier },
                 ].map(({ label, value, set }) => (
-                  <Grid item xs={6} key={label}>
+                  <Grid  key={label} size={6}>
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
-                <Grid item xs={6}>
+                <Grid  size={6}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -2273,7 +2608,7 @@ function CustomWeaponPanel() {
                   />
                 </Grid>
                 {overrideDamageType && (
-                  <Grid item xs={6}>
+                  <Grid  size={6}>
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("weapon_damage_type")}</InputLabel>
                       <Select
@@ -2293,7 +2628,7 @@ function CustomWeaponPanel() {
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -2354,16 +2689,24 @@ function AccessoryPanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <SelectAccessoryQuality quality={selectedQuality} setQuality={(e) => {
               const q = accessoryQualities.find((el) => el.name === e.target.value);
               setSelectedQuality(q.name); setQuality(q.quality); setQualityCost(q.cost);
             }} />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <ChangeQuality quality={quality} setQuality={(e) => setQuality(e.target.value)}
               qualityCost={qualityCost} setQualityCost={(e) => setQualityCost(e.target.value)} />
           </Grid>
@@ -2383,14 +2726,19 @@ function AccessoryPanel() {
                   { label: "Damage (Melee) Modifier",  value: damageMeleeModifier,  set: setDamageMeleeModifier },
                   { label: "Damage (Ranged) Modifier", value: damageRangedModifier, set: setDamageRangedModifier },
                 ].map(({ label, value, set }) => (
-                  <Grid item xs={6} md={4} key={label}>
+                  <Grid
+                    key={label}
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
                     <ChangeModifiers label={label} value={value} onChange={(e) => set(e.target.value)} />
                   </Grid>
                 ))}
               </Grid>
             </AccordionDetails>
           </Accordion>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>
@@ -2477,10 +2825,18 @@ function OptionalPanel() {
       itemName={data.name || ""}
       formContent={
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Subtype")}</InputLabel>
               <Select value={subtype} label={t("Subtype")} onChange={(e) => setSubtype(e.target.value)}>
@@ -2490,16 +2846,16 @@ function OptionalPanel() {
           </Grid>
 
           {(subtype === "quirk") && <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
           {subtype === "camp-activities" && <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 freeSolo
                 options={campTargetOptions}
@@ -2517,22 +2873,26 @@ function OptionalPanel() {
                 size="small"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
           </>}
 
           {(subtype === "zero-trigger" || subtype === "zero-effect") && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
           )}
 
           {subtype === "zero-power" && <>
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 options={zeroTriggerOptions}
                 getOptionLabel={(o) => o.name ?? ""}
@@ -2543,7 +2903,7 @@ function OptionalPanel() {
                 isOptionEqualToValue={(a, b) => a.name === b.name}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Autocomplete
                 options={zeroEffectOptions}
                 getOptionLabel={(o) => o.name ?? ""}
@@ -2557,13 +2917,17 @@ function OptionalPanel() {
           </>}
 
           {subtype === "other" && <>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Clock")}</InputLabel>
                 <Select value={showClock ? "yes" : "no"} label={t("Clock")} onChange={(e) => setShowClock(e.target.value === "yes")}>
@@ -2573,12 +2937,16 @@ function OptionalPanel() {
               </FormControl>
             </Grid>
             {showClock && (
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
               </Grid>
             )}
           </>}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>{t("Clear All Fields")}</Button>
           </Grid>
         </Grid>

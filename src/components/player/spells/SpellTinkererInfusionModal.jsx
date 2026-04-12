@@ -78,7 +78,7 @@ export default function SpellTinkererInfusionModal({
       </Button>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormControl fullWidth>
               <InputLabel id="rank-select-label">{t("Select Rank")}</InputLabel>
               <Select
@@ -95,7 +95,11 @@ export default function SpellTinkererInfusionModal({
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <FormControlLabel
               control={
                 <Switch

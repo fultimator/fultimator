@@ -89,7 +89,7 @@ export default function EditSpells({ npc, setNpc }) {
       {npc.spells?.map((spell, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <EditSpell
                 spell={spell}
                 setSpell={onChangeSpells(i)}
@@ -97,7 +97,7 @@ export default function EditSpells({ npc, setNpc }) {
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1 }}>
+              <Grid  sx={{ py: 1 }} size={12}>
                 <Divider />
               </Grid>
             )}
@@ -179,12 +179,17 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
 
   return (
     <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item sx={{ p: 0, m: 0 }}>
+      <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeSpell}>
           <RemoveCircleOutline />
         </IconButton>
       </Grid>
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6,
+          md: 6
+        }}>
         <TextField
           label={t("Spell Name:")}
           variant="outlined"
@@ -195,7 +200,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           size="small"
         />
       </Grid>
-      <Grid item xs={12} sm={1} md={1}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 1,
+          md: 1
+        }}>
         <FormControl variant="standard" fullWidth style={{ height: "100%" }}>
           <ToggleButton
             selected={spell.type === "offensive"}
@@ -212,7 +222,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </ToggleButton>
         </FormControl>
       </Grid>
-      <Grid item xs={6} sm={3} md={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3,
+          md: 2
+        }}>
         <TextField
           id="mp"
           label={t("MP x Target")}
@@ -230,7 +245,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           size="small"
         />
       </Grid>
-      <Grid item xs={6} sm={4} md={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 4,
+          md: 2
+        }}>
         <TextField
           type="number"
           label={t("Max Targets")}
@@ -266,7 +286,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           }}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="target"
@@ -296,7 +320,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           />
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="duration"
@@ -327,7 +355,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </FormControl>
       </Grid>
       {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr1label"}>
               {t("Attr 1:")}
@@ -351,7 +383,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr2label"}>
               {t("Attr 2:")}
@@ -375,7 +411,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
             <Select
@@ -448,7 +488,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <TextField
             type="number"
             label={t("Damage")}
@@ -482,7 +526,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField id="effect" label={t("Effect:")} value={spell.effect}
             onChange={(e) => {

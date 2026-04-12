@@ -232,7 +232,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </TableBody>
         </Table>
       </TableContainer>
-
       {editBondIndex !== null && draftBond && (
         <Dialog open onClose={closeModal} fullWidth maxWidth="sm">
           <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
@@ -247,7 +246,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField
                   fullWidth
                   label={t("Bond Name")}
@@ -264,7 +263,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                 { key: "mistrust", label: t("Mistrust"), color: negativeColor },
                 { key: "hatred", label: t("Hatred"), color: negativeColor },
               ].map(({ key, label, color }) => (
-                <Grid item xs={4} key={key}>
+                <Grid  key={key} size={4}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -293,7 +292,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </DialogActions>
         </Dialog>
       )}
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

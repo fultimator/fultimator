@@ -110,20 +110,20 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             },
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>{t("Weapon")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Cost")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Accuracy")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Damage")}
             </Typography>
@@ -142,16 +142,16 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             py: "5px",
           }}
         >
-          <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+          <Grid  sx={{ display: "flex", alignItems: "center" }} size={4}>
             <Typography fontWeight="600" sx={{ mr: 0.5, fontSize: "0.9rem" }}>
               {t(weapon.name)}
             </Typography>
             {weapon.martial && <Martial />}
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
               <OpenBracket />
               {attr1?.shortcaps} + {attr2?.shortcaps}
@@ -159,7 +159,7 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
               {weapon.prec > 0 ? `+${weapon.prec}` : ""}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
               <OpenBracket />
               {t("HR +")} {weapon.damage}
@@ -179,21 +179,21 @@ export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderC
             py: "5px",
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>{t(weapon.category)}</Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid  size={1}>
             <Diamond color={customTheme.primary} />
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">
               {weapon.hands === 1 ? t("One-handed") : t("Two-handed")}
             </Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid  size={1}>
             <Diamond color={customTheme.primary} />
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">
               {weapon.melee ? t("Melee") : t("Ranged")}
             </Typography>
@@ -273,25 +273,25 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
             },
           }}
         >
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>{t(armor.category)}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Cost")}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Defense")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("M. Defense")}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
               {t("Init.")}
             </Typography>
@@ -310,26 +310,26 @@ export const ArmorCard = React.memo(function ArmorCard({ armor, id, onHeaderClic
             py: "5px",
           }}
         >
-          <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+          <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
             <Typography fontWeight="600" sx={{ mr: 0.5, fontSize: "0.9rem" }}>
               {t(armor.name)}
             </Typography>
             {armor.martial && <Martial />}
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography textAlign="center">{`${armor.cost}z`}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography fontWeight="bold" textAlign="center">
               {getArmorDefDisplay(armor, t)}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="bold" textAlign="center">
               {getArmorMDefDisplay(armor, t)}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography fontWeight="bold" textAlign="center">
               {armor.init === 0 ? " - " : armor.init}
             </Typography>
@@ -394,20 +394,20 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
             },
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography variant="h4">{t("Spell")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center">
               {t("MP")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">
               {t("Duration")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">
               {t("Target")}
             </Typography>
@@ -425,19 +425,19 @@ export const SpellCard = React.memo(function SpellCard({ spell, id, onHeaderClic
             py: "5px",
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold" sx={{ fontSize: "0.9rem", display: "flex", alignItems: "center", gap: 0.5 }}>
               {t(spell.name)}
               {spell.type === "offensive" && <OffensiveSpellIcon fontSize="small" />}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography textAlign="center">{spell.mp}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{spell.duration}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{t(targetText)}</Typography>
           </Grid>
         </Grid>
@@ -507,16 +507,16 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
             },
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography variant="h4">{t("Spell")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center">{t("MP")}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">{t("Duration")}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">{t("Target")}</Typography>
           </Grid>
         </Grid>
@@ -532,7 +532,7 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
             py: "5px",
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="bold" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {t(spell.name)}
               {spell.isOffensive && <OffensiveSpellIcon fontSize="small" />}
@@ -541,13 +541,13 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
               {spell.class}{attr1 && attr2 ? ` · ${attr1.shortcaps}+${attr2.shortcaps}` : ""}
             </Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography textAlign="center">{spell.mp}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{t(spell.duration)}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{t(spell.targetDesc)}</Typography>
           </Grid>
         </Grid>
@@ -563,7 +563,7 @@ export const PlayerSpellCard = React.memo(function PlayerSpellCard({ spell, id, 
               py: "4px",
             }}
           >
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography
                 variant="body2"
                 color="text.secondary"
@@ -946,20 +946,20 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
             },
           }}
         >
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4">{t(attack.category)}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">
               {t("Accuracy")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">
               {t("Damage")}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">
               {t("Range")}
             </Typography>
@@ -977,13 +977,13 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
             py: "5px",
           }}
         >
-          <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+          <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
             <Typography fontWeight="bold" sx={{ mr: 0.5 }}>
               {t(attack.name)}
             </Typography>
             {attack.martial && <Martial />}
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="bold" textAlign="center">
               {attr1 && attr2 ? (
                 <>
@@ -997,7 +997,7 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
               )}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="bold" textAlign="center">
               <OpenBracket />
               HR + {attack.flatdmg}
@@ -1005,7 +1005,7 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
               {dmgType?.long}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{t(attack.range)}</Typography>
           </Grid>
         </Grid>
@@ -1013,7 +1013,7 @@ export const AttackCard = React.memo(function AttackCard({ attack, id, onHeaderC
         {/* Special row */}
         {attack.special?.length > 0 && (
           <Grid container sx={{ px: 1, py: "4px" }}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography variant="body2">
                 <strong>{t("Special")}:</strong>{" "}
                 {attack.special.join("; ")}
@@ -1064,10 +1064,10 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
             },
           }}
         >
-          <Grid item xs={8}>
+          <Grid  size={8}>
             <Typography variant="h4">{t("Quality")}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography variant="h4" textAlign="center">
               {t("Cost")}
             </Typography>
@@ -1086,10 +1086,10 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
             py: "5px",
           }}
         >
-          <Grid item xs={8}>
+          <Grid  size={8}>
             <Typography fontWeight="bold">{t(quality.name)}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography textAlign="center">{`${quality.cost}z`}</Typography>
           </Grid>
         </Grid>
@@ -1106,12 +1106,12 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
             py: "5px",
           }}
         >
-          <Grid item>
+          <Grid >
             <Typography variant="body2" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
               {t(quality.category)}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid >
             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               {quality.filter?.map((f) => (
                 <Chip key={f} label={t(f)} size="small" variant="outlined" sx={{ height: 20, fontSize: '0.65rem' }} />
@@ -1569,7 +1569,7 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
               <AccordionDetails sx={{ p: 0 }}>
                 {hasCustomSpells ? (
                   /* Per-character spell types */
-                  cls.benefits.spellClasses.map((sc) => {
+                  (cls.benefits.spellClasses.map((sc) => {
                     const descKeys = SPELL_TYPE_DESC_KEYS[sc] ?? [];
                     const content = renderSpellTypeContent(sc, t, customTheme);
                     const hasContent = Array.isArray(content) ? content.length > 0 : content !== null;
@@ -1607,10 +1607,10 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
                         {content}
                       </Box>
                     );
-                  })
+                  }))
                 ) : (
                   /* Static spell list (default / gamble types) */
-                  classSpells.map((spell, i) => (
+                  (classSpells.map((spell, i) => (
                     <Box
                       key={i}
                       sx={{
@@ -1682,7 +1682,7 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
                         </Typography>
                       )}
                     </Box>
-                  ))
+                  )))
                 )}
               </AccordionDetails>
             </Accordion>
@@ -1887,16 +1887,16 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
             "& .MuiTypography-root": { fontSize: "0.9rem", textTransform: "uppercase" },
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography variant="h4">{t("Custom Weapon")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography variant="h4" textAlign="center">{t("Cost")}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">{t("Accuracy")}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">{t("Damage")}</Typography>
           </Grid>
         </Grid>
@@ -1913,14 +1913,14 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
             py: "5px",
           }}
         >
-          <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+          <Grid  sx={{ display: "flex", alignItems: "center" }} size={4}>
             <Typography fontWeight="bold" sx={{ mr: 0.5 }}>{weapon.name}</Typography>
             {weapon.martial && <Martial />}
           </Grid>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <Typography textAlign="center">{`${weapon.cost || 300}z`}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="bold" textAlign="center">
               <OpenBracket />
               {attr1?.shortcaps} + {attr2?.shortcaps}
@@ -1928,7 +1928,7 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
               {precision > 0 ? `+${precision}` : ""}
             </Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography fontWeight="bold" textAlign="center">
               <OpenBracket />
               {t("HR +")} {damage}
@@ -1948,21 +1948,21 @@ export const CustomWeaponCard = React.memo(function CustomWeaponCard({ weapon, i
             py: "5px",
           }}
         >
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>{t(weapon.category)}</Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid  size={1}>
             <Diamond color={customTheme.primary} />
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">
               {weapon.hands === 1 ? t("One-handed") : t("Two-handed")}
             </Typography>
           </Grid>
-          <Grid item xs={1}>
+          <Grid  size={1}>
             <Diamond color={customTheme.primary} />
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">
               {isRanged ? t("Ranged") : t("Melee")}
             </Typography>
@@ -2014,10 +2014,10 @@ export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, 
             "& .MuiTypography-root": { fontSize: "0.9rem", textTransform: "uppercase" },
           }}
         >
-          <Grid item xs={9}>
+          <Grid  size={9}>
             <Typography variant="h4">{t("Accessory")}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography variant="h4" textAlign="center">{t("Cost")}</Typography>
           </Grid>
         </Grid>
@@ -2034,10 +2034,10 @@ export const AccessoryCard = React.memo(function AccessoryCard({ accessory, id, 
             py: "5px",
           }}
         >
-          <Grid item xs={9}>
+          <Grid  size={9}>
             <Typography fontWeight="bold">{accessory.name}</Typography>
           </Grid>
-          <Grid item xs={3}>
+          <Grid  size={3}>
             <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
           </Grid>
         </Grid>
@@ -2102,17 +2102,17 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               },
             }}
           >
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Support Module")}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <Typography variant="h4" textAlign="right" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Type")}
               </Typography>
@@ -2131,15 +2131,15 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               py: "5px",
             }}
           >
-            <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
               <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
                 {getModuleName()}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <Typography textAlign="right" sx={{ fontSize: "0.9rem" }}>
                 {module.category ? t(module.category) : " - "}
               </Typography>
@@ -2197,27 +2197,27 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               },
             }}
           >
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Armor Module")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Defense")}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("M. Defense")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Type")}
               </Typography>
@@ -2236,25 +2236,25 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               py: "5px",
             }}
           >
-            <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid  sx={{ display: "flex", alignItems: "center" }} size={3}>
               <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
                 {getModuleName()}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography fontWeight="bold" textAlign="center">
                 {module.def ?? " - "}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography fontWeight="bold" textAlign="center">
                 {module.mdef ?? " - "}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography fontWeight="bold" textAlign="center">
                 {module.martial ? t("Martial") : " - "}
               </Typography>
@@ -2314,22 +2314,22 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               },
             }}
           >
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant="h4" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Weapon Module")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Accuracy")}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography variant="h4" textAlign="center" sx={{ fontSize: "0.85rem", fontWeight: 600, letterSpacing: "0.5px", lineHeight: 1.4 }}>
                 {t("Damage")}
               </Typography>
@@ -2348,15 +2348,15 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               py: "5px",
             }}
           >
-            <Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid  sx={{ display: "flex", alignItems: "center" }} size={4}>
               <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
                 {getModuleName()}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Typography textAlign="center">{module.cost ? `${module.cost}z` : " - "}</Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
                 <OpenBracket />
                 {attr1?.shortcaps || "?"} + {attr2?.shortcaps || "?"}
@@ -2364,7 +2364,7 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
                 {module.prec && module.prec > 0 ? `+${module.prec}` : ""}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography fontWeight="600" textAlign="center" sx={{ fontSize: "0.9rem", lineHeight: 1.4 }}>
                 <OpenBracket />
                 {t("HR +")} {module.damage ?? 0}
@@ -2384,23 +2384,23 @@ export const VehicleModuleCard = React.memo(function VehicleModuleCard({ module,
               py: "5px",
             }}
           >
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography fontWeight="600" sx={{ fontSize: "0.9rem" }}>
                 {module.category ? t(module.category) : " - "}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
+            <Grid  size={2}>
               <Diamond color={customTheme.primary} />
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <Typography textAlign="center">
                 {module.range ? t(module.range) : " - "}
               </Typography>
             </Grid>
-            <Grid item xs={1}>
+            <Grid  size={1}>
               <Diamond color={customTheme.primary} />
             </Grid>
-            <Grid item xs={2} sx={{ textAlign: "right" }}>
+            <Grid  sx={{ textAlign: "right" }} size={2}>
               <Typography>{module.martial ? t("Martial") : " - "}</Typography>
             </Grid>
           </Grid>

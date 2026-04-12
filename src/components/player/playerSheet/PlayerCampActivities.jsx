@@ -46,15 +46,13 @@ export default function PlayerCampActivities({ player }) {
             <Grid container>
               {activity.targetDescription && (
                 <Grid
-                  item
-                  xs={12}
                   sx={{
                     background: `linear-gradient(to right, ${theme.ternary}, ${isDarkMode ? "#252525" : "white"})`,
                     borderTop: `1px solid ${theme.secondary}`,
                     px: "10px",
                     py: "5px",
                   }}
-                >
+                  size={12}>
                   <Typography sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}>
                     <strong>{t("Target")}: </strong>
                     {activity.targetDescription}
@@ -64,14 +62,12 @@ export default function PlayerCampActivities({ player }) {
 
               {activity.effect && (
                 <Grid
-                  item
-                  xs={12}
                   sx={{
                     borderTop: `1px solid ${theme.secondary}`,
                     px: "10px",
                     py: "5px",
                   }}
-                >
+                  size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",

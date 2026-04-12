@@ -157,7 +157,7 @@ export default function GourmetInventoryTab({
   return (
     <Grid container spacing={2}>
       {/* Add Ingredient Button */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="contained"
@@ -175,9 +175,8 @@ export default function GourmetInventoryTab({
           </Button>
         </Box>
       </Grid>
-
       {/* Inventory Table */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("gourmet_ingredient_inventory")} ({ingredientInventory.length})
         </Typography>
@@ -262,7 +261,6 @@ export default function GourmetInventoryTab({
           </TableContainer>
         )}
       </Grid>
-
       {/* Add/Edit Dialog */}
       <Dialog
         open={addDialogOpen}
@@ -275,7 +273,7 @@ export default function GourmetInventoryTab({
         </DialogTitle>
         <DialogContent sx={{ pt: "16px !important" }}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <TextField
                 fullWidth
                 size="small"
@@ -287,7 +285,7 @@ export default function GourmetInventoryTab({
                 placeholder={t("e.g., Fresh Herb")}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("gourmet_taste")}</InputLabel>
                 <Select
@@ -311,7 +309,7 @@ export default function GourmetInventoryTab({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <TextField
                 fullWidth
                 size="small"

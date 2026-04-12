@@ -75,15 +75,13 @@ const AppBar: React.FC<AppBarProps> = ({
           <Container>
             <Grid container alignItems="center" justifyContent="space-between">
               <Grid
-                item
-                xs={2}
                 textAlign="left"
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
                 }}
-              >
+                size={2}>
                 {showGoBackButton && (
                   <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
@@ -93,8 +91,6 @@ const AppBar: React.FC<AppBarProps> = ({
 
               {!isNpcEdit && (
                 <Grid
-                  item
-                  xs={8}
                   textAlign="center"
                   sx={{
                     height: "60px",
@@ -103,7 +99,7 @@ const AppBar: React.FC<AppBarProps> = ({
                     justifyContent: "center",
                     margin: "4px 0 0",
                   }}
-                >
+                  size={8}>
                   <RouterLink
                     to="/"
                     style={{
@@ -129,7 +125,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 </Grid>
               )}
 
-              <Grid item xs={2} sx={{ textAlign: "right" }}>
+              <Grid  sx={{ textAlign: "right" }} size={2}>
                 <Grid
                   container
                   sx={{
@@ -158,6 +154,9 @@ const AppBar: React.FC<AppBarProps> = ({
       <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
+        onAddItem={() => {}}
+        context="appbar"
+        restrictToTypes={[]}
         viewOnly
       />
     </>

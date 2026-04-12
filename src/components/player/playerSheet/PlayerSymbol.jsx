@@ -93,14 +93,14 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
                   {symbolSpell.symbols &&
                     symbolSpell.symbols.map((sym, sIndex) => (
                       <Grid
-                        item
                         container
-                        xs={12}
-                        md={6}
                         key={`${ssIndex}-${sIndex}`}
                         sx={{ display: "flex", alignItems: "stretch" }}
-                      >
-                        <Grid item xs={10} sx={{ display: "flex" }}>
+                        size={{
+                          xs: 12,
+                          md: 6
+                        }}>
+                        <Grid  sx={{ display: "flex" }} size={10}>
                           <Typography
                             id="spell-left-name"
                             variant="h2"
@@ -122,11 +122,7 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
                               : t(sym.name)}
                           </Typography>
                         </Grid>
-                        <Grid
-                          item
-                          xs={2}
-                          sx={{ display: "flex", alignItems: "stretch" }}
-                        >
+                        <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                           <div
                             id="spell-right-controls"
                             style={{

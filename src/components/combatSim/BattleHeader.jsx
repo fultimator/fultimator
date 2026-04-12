@@ -127,7 +127,6 @@ export default function BattleHeader({
           </Box>
         )}
       </Box>
-
       {/* Center Section for Round - Always Centered */}
       <Box
         sx={{
@@ -172,7 +171,6 @@ export default function BattleHeader({
           </IconButton>
         </Tooltip>
       </Box>
-
       {/* Save Button & Status Section (Right) */}
       <Box
         sx={{
@@ -220,15 +218,13 @@ export default function BattleHeader({
             </>
           ) : (
             // Show manual save time only if autosave is OFF and it's been saved before
-            timeAgo !== "Not saved yet" && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                whiteSpace="nowrap"
-              >
-                {timeAgo}
-              </Typography>
-            )
+            (timeAgo !== "Not saved yet" && (<Typography
+              variant="caption"
+              color="text.secondary"
+              whiteSpace="nowrap"
+            >
+              {timeAgo}
+            </Typography>))
           )}
         </Box>
 

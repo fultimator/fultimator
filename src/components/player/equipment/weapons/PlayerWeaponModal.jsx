@@ -330,295 +330,323 @@ export default function PlayerWeaponModal({
 
   return (
     <>
-    <Dialog
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "lg",
-        },
-      }}
-    >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-        {t("Add Weapon")}
-      </DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
+      <Dialog
+        open={open}
+        onClose={onClose}
+        PaperProps={{
+          sx: {
+            width: "100%",
+            maxWidth: "lg",
+          },
         }}
       >
-        <Close />
-      </IconButton>
-      <DialogContent>
-        <Grid container spacing={1} alignItems="center">
-          {/* Change Base */}
-          <Grid item xs={10} md={4}>
-            <ChangeBase
-              value={base.name}
-              onChange={(e) => {
-                const base = weapons.find((el) => el.name === e.target.value);
-
-                setBase(base);
-                setName(t(base.name));
-                setCategory(base.category);
-                setType(base.type);
-                setHands(base.hands);
-                setDamageBonus(false);
-                setDamageReworkBonus(false);
-                setPrecBonus(false);
-                setAtt1(base.att1);
-                setAtt2(base.att2);
-                setMartial(base.martial);
-              }}
-            />
-          </Grid>
-          {/* Change Martial */}
-          <Grid item xs={2}>
-            <ChangeMartial martial={martial} setMartial={setMartial} />
-          </Grid>
-          {/* Change Name */}
-          <Grid item xs={12} md={6}>
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          {/* Change Category */}
-          <Grid item xs={12} md={4}>
-            <ChangeCategory
-              value={category}
-              onChange={(e) => {
-                const category = weaponCategories.find(
-                  (el) => el === e.target.value
-                );
-                setCategory(category);
-              }}
-            />
-          </Grid>
-          {/* Change Type */}
-          <Grid item xs={6} md={4}>
-            <ChangeType
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            />
-          </Grid>
-          {/* Change Hands */}
-          <Grid item xs={6} md={4}>
-            <ChangeHands
-              value={hands}
-              onChange={(e) => setHands(e.target.value)}
-            />
-          </Grid>
-          {/* Change Attributes */}
-          <Grid item xs={12} md={12}>
-            <ChangeAttr
-              att1={att1}
-              att2={att2}
-              setAtt1={(e) => setAtt1(e.target.value)}
-              setAtt2={(e) => setAtt2(e.target.value)}
-            />
-          </Grid>
-          {/* Change Quality */}
-          <Grid item xs={6}>
-            <SelectQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const quality = qualities.find(
-                  (el) => el.name === e.target.value
-                );
-                setSelectedQuality(quality.name);
-                setQuality(quality.quality);
-                setQualityCost(quality.cost);
-              }}
-            />
-          </Grid>
-          {/* Change Bonus */}
-          <Grid item xs={6}>
-            <ChangeBonus
-              basePrec={base.prec}
-              precBonus={precBonus}
-              damageBonus={damageBonus}
-              damageReworkBonus={damageReworkBonus}
-              setPrecBonus={setPrecBonus}
-              setDamageBonus={setDamageBonus}
-              setDamageReworkBonus={setDamageReworkBonus}
-              rework={rework}
-              totalBonus={totalBonus}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <ChangeModifiers
-                    label={"Damage Modifier"}
-                    value={damageModifier}
-                    onChange={(e) => setDamageModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <ChangeModifiers
-                    label={"Precision Modifier"}
-                    value={precModifier}
-                    onChange={(e) => setPrecModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <ChangeModifiers
-                    label={"DEF Modifier"}
-                    value={defModifier}
-                    onChange={(e) => setDefModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <ChangeModifiers
-                    label={"MDEF Modifier"}
-                    value={mDefModifier}
-                    onChange={(e) => setMDefModifier(e.target.value)}
-                  />
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container spacing={1} alignItems="center">
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  {t("Upload JSON")}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button variant="outlined" onClick={handleClearFields}>
-                  {t("Clear All Fields")}
-                </Button>
-              </Grid>
-              {/* Rework */}
-              <Grid item xs>
-                <ApplyRework rework={rework} setRework={setRework} />
-              </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
+        <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
+          {t("Add Weapon")}
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <Close />
+        </IconButton>
+        <DialogContent>
+          <Grid container spacing={1} alignItems="center">
+            {/* Change Base */}
+            <Grid
+              size={{
+                xs: 10,
+                md: 4
+              }}>
+              <ChangeBase
+                value={base.name}
                 onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const result = JSON.parse(reader.result);
-                      handleFileUpload(result);
-                    };
-                    reader.readAsText(file);
-                  }
+                  const base = weapons.find((el) => el.name === e.target.value);
+
+                  setBase(base);
+                  setName(t(base.name));
+                  setCategory(base.category);
+                  setType(base.type);
+                  setHands(base.hands);
+                  setDamageBonus(false);
+                  setDamageReworkBonus(false);
+                  setPrecBonus(false);
+                  setAtt1(base.att1);
+                  setAtt2(base.att2);
+                  setMartial(base.martial);
                 }}
-                style={{ display: "none" }}
               />
             </Grid>
+            {/* Change Martial */}
+            <Grid  size={2}>
+              <ChangeMartial martial={martial} setMartial={setMartial} />
+            </Grid>
+            {/* Change Name */}
+            <Grid
+              size={{
+                xs: 12,
+                md: 6
+              }}>
+              <ChangeName
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Grid>
+            {/* Change Category */}
+            <Grid
+              size={{
+                xs: 12,
+                md: 4
+              }}>
+              <ChangeCategory
+                value={category}
+                onChange={(e) => {
+                  const category = weaponCategories.find(
+                    (el) => el === e.target.value
+                  );
+                  setCategory(category);
+                }}
+              />
+            </Grid>
+            {/* Change Type */}
+            <Grid
+              size={{
+                xs: 6,
+                md: 4
+              }}>
+              <ChangeType
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              />
+            </Grid>
+            {/* Change Hands */}
+            <Grid
+              size={{
+                xs: 6,
+                md: 4
+              }}>
+              <ChangeHands
+                value={hands}
+                onChange={(e) => setHands(e.target.value)}
+              />
+            </Grid>
+            {/* Change Attributes */}
+            <Grid
+              size={{
+                xs: 12,
+                md: 12
+              }}>
+              <ChangeAttr
+                att1={att1}
+                att2={att2}
+                setAtt1={(e) => setAtt1(e.target.value)}
+                setAtt2={(e) => setAtt2(e.target.value)}
+              />
+            </Grid>
+            {/* Change Quality */}
+            <Grid  size={6}>
+              <SelectQuality
+                quality={selectedQuality}
+                setQuality={(e) => {
+                  const quality = qualities.find(
+                    (el) => el.name === e.target.value
+                  );
+                  setSelectedQuality(quality.name);
+                  setQuality(quality.quality);
+                  setQualityCost(quality.cost);
+                }}
+              />
+            </Grid>
+            {/* Change Bonus */}
+            <Grid  size={6}>
+              <ChangeBonus
+                basePrec={base.prec}
+                precBonus={precBonus}
+                damageBonus={damageBonus}
+                damageReworkBonus={damageReworkBonus}
+                setPrecBonus={setPrecBonus}
+                setDamageBonus={setDamageBonus}
+                setDamageReworkBonus={setDamageReworkBonus}
+                rework={rework}
+                totalBonus={totalBonus}
+              />
+            </Grid>
+            <Grid  size={12}>
+              <ChangeQuality
+                quality={quality}
+                setQuality={(e) => setQuality(e.target.value)}
+                qualityCost={qualityCost}
+                setQualityCost={(e) => setQualityCost(e.target.value)}
+              />
+            </Grid>
+            <Accordion
+              sx={{ width: "100%", marginLeft: "10px" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid  size={6}>
+                    <ChangeModifiers
+                      label={"Damage Modifier"}
+                      value={damageModifier}
+                      onChange={(e) => setDamageModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid  size={6}>
+                    <ChangeModifiers
+                      label={"Precision Modifier"}
+                      value={precModifier}
+                      onChange={(e) => setPrecModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid  size={6}>
+                    <ChangeModifiers
+                      label={"DEF Modifier"}
+                      value={defModifier}
+                      onChange={(e) => setDefModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid  size={6}>
+                    <ChangeModifiers
+                      label={"MDEF Modifier"}
+                      value={mDefModifier}
+                      onChange={(e) => setMDefModifier(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Grid  size={12}>
+              <Divider />
+            </Grid>
+            <Grid  size={12}>
+              <Grid container spacing={1} alignItems="center">
+                <Grid >
+                  <Button
+                    variant="outlined"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    {t("Upload JSON")}
+                  </Button>
+                </Grid>
+                <Grid >
+                  <Button variant="outlined" onClick={handleClearFields}>
+                    {t("Clear All Fields")}
+                  </Button>
+                </Grid>
+                {/* Rework */}
+                <Grid  size="grow">
+                  <ApplyRework rework={rework} setRework={setRework} />
+                </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const result = JSON.parse(reader.result);
+                        handleFileUpload(result);
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                  style={{ display: "none" }}
+                />
+              </Grid>
+            </Grid>
+            <Grid  size={12}>
+              <Divider sx={{ my: 2 }} />
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Divider sx={{ my: 2 }} />
-          </Grid>
-        </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <PrettyWeapon
-            weapon={{
-              base: base,
-              name: name,
-              att1: att1,
-              att2: att2,
-              martial: martial,
-              type: type,
-              hands: hands,
-              category: category,
-              melee: base.melee,
-              ranged: base.ranged,
-              cost: cost,
-              damage: damage,
-              prec: prec,
-              quality: quality,
-              qualityCost: qualityCost,
-              damageBonus: damageBonus,
-              damageReworkBonus: damageReworkBonus,
-              precBonus: precBonus,
-              rework: rework,
-            }}
-          />
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        {editWeaponIndex !== null && (
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
+            <PrettyWeapon
+              weapon={{
+                base: base,
+                name: name,
+                att1: att1,
+                att2: att2,
+                martial: martial,
+                type: type,
+                hands: hands,
+                category: category,
+                melee: base.melee,
+                ranged: base.ranged,
+                cost: cost,
+                damage: damage,
+                prec: prec,
+                quality: quality,
+                qualityCost: qualityCost,
+                damageBonus: damageBonus,
+                damageReworkBonus: damageReworkBonus,
+                precBonus: precBonus,
+                rework: rework,
+              }}
+            />
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          {editWeaponIndex !== null && (
+            <Button
+              onClick={handleDelete}
+              color="error"
+              variant="contained"
+            >
+              {t("Delete")}
+            </Button>
+          )}
           <Button
-            onClick={handleDelete}
-            color="error"
+            onClick={handleSave}
+            color="primary"
             variant="contained"
+            disabled={
+              /* disable if the weapon has a value "magitech" === true */ weapon?.magicannon
+            }
           >
-            {t("Delete")}
+            {t("Save Changes")}
           </Button>
-        )}
-        <Button
-          onClick={handleSave}
-          color="primary"
-          variant="contained"
-          disabled={
-            /* disable if the weapon has a value "magitech" === true */ weapon?.magicannon
+        </DialogActions>
+      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => {
+          if (editWeaponIndex !== null) {
+            onDeleteWeapon(editWeaponIndex);
           }
-        >
-          {t("Save Changes")}
-        </Button>
-      </DialogActions>
-    </Dialog>
-    <DeleteConfirmationDialog
-      open={deleteDialogOpen}
-      onClose={() => setDeleteDialogOpen(false)}
-      onConfirm={() => {
-        if (editWeaponIndex !== null) {
-          onDeleteWeapon(editWeaponIndex);
+          onClose();
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to delete this weapon?")}
+        itemPreview={
+          <Box>
+            <Typography variant="h4">{name}</Typography>
+            <Typography variant="body2">
+              {t(category)} - {cost} {t("zenit")}
+            </Typography>
+          </Box>
         }
-        onClose();
-      }}
-      title={t("Confirm Deletion")}
-      message={t("Are you sure you want to delete this weapon?")}
-      itemPreview={
-        <Box>
-          <Typography variant="h4">{name}</Typography>
-          <Typography variant="body2">
-            {t(category)} - {cost} {t("zenit")}
-          </Typography>
-        </Box>
-      }
-    />
+      />
     </>
   );
 }
