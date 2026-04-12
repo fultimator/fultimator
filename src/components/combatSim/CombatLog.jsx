@@ -621,9 +621,9 @@ export default function CombatLog({
                   }}
                 >
                   <Typography variant="caption" color="textSecondary">
-                    {isToday(log.timestamp)
+                    {log.timestamp && isToday(log.timestamp)
                       ? format(log.timestamp, "HH:mm:ss")
-                      : format(log.timestamp, "PP HH:mm:ss")}
+                      : log.timestamp ? format(log.timestamp, "PP HH:mm:ss") : "--:--:--"}
                   </Typography>
                   <Tooltip
                     title={t("combat_sim_copy_log_entry")}
