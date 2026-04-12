@@ -372,7 +372,7 @@ export default function CombatLog({
   // Improved function to convert formatted log text to plain text
   const getPlainTextLog = (text, value1, value2, value3, value4, value5) => {
     // Start with the original text template
-    let plainText = t(text);
+    let plainText = t(text) || "";
 
     // Handle special case for attack logs
     if (value1 === "--isAttack--") {
