@@ -81,7 +81,6 @@ export default function PlayerCardSheet({
     characterImage,
     id,
     updateMaxStats,
-    battleMode = false,
     onToggleEditMode,
     onAddClass,
     onAddFeature,
@@ -720,7 +719,7 @@ export default function PlayerCardSheet({
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={3}>
                     <CompactLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} isMainTab={false} searchQuery={searchQuery} />
-                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery} battleMode={battleMode}
+                    <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} isMainTab={false} searchQuery={searchQuery}
                         onAddWeapon={isEditMode ? openAddWeapon : undefined}
                         onEditWeapon={isEditMode ? (idx) => { const w = inv?.weapons?.[idx]; if (w) { setWeapon(w); setEditWeaponIndex(idx); setOpenNewWeapon(true); } } : undefined}
                         onAddCustomWeapon={isEditMode ? openAddCustomWeapon : undefined}
@@ -732,7 +731,7 @@ export default function PlayerCardSheet({
                         onAddAccessory={isEditMode ? openAddAccessory : undefined}
                         onEditAccessory={isEditMode ? (idx) => { const ac = inv?.accessories?.[idx]; if (ac) { setAccessory(ac); setEditAccessoryIndex(idx); setOpenNewAccessory(true); } } : undefined}
                     />
-                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} battleMode={battleMode} />
+                    <PlayerVehicle player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet={true} searchQuery={searchQuery} />
                     <PlayerCompanion player={player} isCharacterSheet={true} searchQuery={searchQuery} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={4}>

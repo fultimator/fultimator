@@ -55,7 +55,6 @@ import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEqu
 import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
-import BattleModeToggle from "../../components/player/playerSheet/BattleModeToggle";
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
@@ -139,7 +138,6 @@ export default function PlayerEdit() {
   const [playerTemp, setPlayerTemp] = useState(player);
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [battleMode, setBattleMode] = useState(false);
   const [compactView, setCompactView] = useState(false);
 
   const [ritualClockSections, setRitualClockSections] = useState(4);
@@ -685,7 +683,6 @@ export default function PlayerEdit() {
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
                   updateMaxStats={updateMaxStats}
-                  battleMode={battleMode}
                   onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
                   onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
@@ -704,153 +701,127 @@ export default function PlayerEdit() {
               <Divider sx={{ my: 1 }} />
               <PlayerNumbers player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
-              <Grid container spacing={1} sx={{ py: 1 }}>
-                <Grid item xs={9} sm={10} md={11}>
-                  <BattleModeToggle
-                    battleMode={battleMode}
-                    setBattleMode={setBattleMode}
-                  />
-                </Grid>
-                <Grid item xs={3} sm={2} md={1}>
-                  <GenericRolls player={playerTemp} isEditMode={isEditMode} />
-                </Grid>
-              </Grid>
-              {!battleMode && (
-                <>
-                  {/* <PlayerTraits player={playerTemp} isEditMode={isEditMode} /> */}
-                  <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
-                  <PlayerRituals
-                    player={playerTemp}
-                    isEditMode={isEditMode}
-                    clockSections={ritualClockSections}
-                    setClockSections={setRitualClockSections}
-                    clockState={ritualClockState}
-                    setClockState={setRitualClockState}
-                  />
-                  {optionalRules.quirks && (
-                    <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
-                  )}
-                  {optionalRules.campActivities && (
-                    <PlayerCampActivities
-                      player={playerTemp}
-                      setPlayer={setPlayerTemp}
-                      isEditMode={isEditMode}
-                    />
-                  )}
-                  <PlayerRituals
-                    player={playerTemp}
-                    isEditMode={isEditMode}
-                    clockSections={ritualClockSections}
-                    setClockSections={setRitualClockSections}
-                    clockState={ritualClockState}
-                    setClockState={setRitualClockState}
-                  />
-                  {optionalRules.zeroPower && (
-                    <PlayerZeroPower
-                      player={playerTemp}
-                      setPlayer={setPlayerTemp}
-                      isEditMode={isEditMode}
-                    />
-                  )}
-                  <PlayerOthers
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
-                  <PlayerNotes
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                </>
-              )}
-              {isOwner && battleMode ? (
-                <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
-              ) : null}
+              <GenericRolls player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
-              {battleMode && (
-                <>
-                  <PlayerLoadout
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerEquipment
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerVehicle
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerSkills
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerSpells
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerArcana
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerGadgets
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerMagichant
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerMagiseed
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerSymbol
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerDance
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerGift
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerTherioforms
-                    player={playerTemp}
-                  />
-                  <PlayerGourmet
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerInvoker
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                  <PlayerDeck
-                    player={playerTemp}
-                    setPlayer={setPlayerTemp}
-                    isEditMode={isEditMode}
-                  />
-                </>
+              <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
+              <PlayerNotes
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              {isOwner && (
+                <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
               )}
+              <Divider sx={{ my: 1 }} />
+              <PlayerLoadout
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerEquipment
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerVehicle
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerSkills
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerSpells
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerArcana
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerRituals
+                player={playerTemp}
+                isEditMode={isEditMode}
+                clockSections={ritualClockSections}
+                setClockSections={setRitualClockSections}
+                clockState={ritualClockState}
+                setClockState={setRitualClockState}
+              />
+              {optionalRules.quirks && (
+                <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
+              )}
+              {optionalRules.campActivities && (
+                <PlayerCampActivities
+                  player={playerTemp}
+                  setPlayer={setPlayerTemp}
+                  isEditMode={isEditMode}
+                />
+              )}
+              {optionalRules.zeroPower && (
+                <PlayerZeroPower
+                  player={playerTemp}
+                  setPlayer={setPlayerTemp}
+                  isEditMode={isEditMode}
+                />
+              )}
+              <PlayerGadgets
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerMagichant
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerMagiseed
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerSymbol
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerDance
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerGift
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerTherioforms
+                player={playerTemp}
+              />
+              <PlayerGourmet
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerInvoker
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerDeck
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerOthers
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
+              <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
             </div>
           )}
         </TabPanel>
