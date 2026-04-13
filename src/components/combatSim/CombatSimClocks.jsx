@@ -93,6 +93,26 @@ export default function CombatSimClocks({
     onUpdate(index, newState);
   };
 
+  const incrementClock = (index, clock) => {
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled < clock.sections) {
+      const newState = new Array(clock.sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      onUpdate(index, newState);
+    }
+  };
+
+  const decrementClock = (index, clock) => {
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clock.state];
+      newState[currentFilled - 1] = false;
+      onUpdate(index, newState);
+    }
+  };
+
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
@@ -262,14 +282,30 @@ export default function CombatSimClocks({
                           alignItems: "center",
                         }}
                       >
-                        <Box sx={{ position: "absolute", right: 8, top: 8 }}>
+                        <Box sx={{ position: "absolute", right: 8, top: 8, display: "flex", gap: 0.5 }}>
+                          <Tooltip title={t("Decrement")}>
+                            <IconButton
+                              size="small"
+                              onClick={() => decrementClock(index, clock)}
+                            >
+                              <RemoveCircleOutlined fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title={t("clocks_reset_tooltip")}>
                             <IconButton
                               size="small"
                               onClick={() => onReset(index)}
-                              sx={{ mr: 1 }}
+                              sx={{ mr: 0.5 }}
                             >
                               <RestartAlt fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t("Increment")}>
+                            <IconButton
+                              size="small"
+                              onClick={() => incrementClock(index, clock)}
+                            >
+                              <Add fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title={t("clocks_remove_tooltip")}>

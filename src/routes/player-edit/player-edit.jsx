@@ -653,7 +653,7 @@ export default function PlayerEdit() {
                 updateMaxStats={updateMaxStats}
               />
               <Divider sx={{ my: 1 }} />
-              <PlayerNumbers player={playerTemp} isEditMode={isEditMode} />
+              <PlayerNumbers player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} isOwner={isOwner} />
               <Divider sx={{ my: 1 }} />
               <GenericRolls player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />

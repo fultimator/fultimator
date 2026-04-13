@@ -125,10 +125,12 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
 
 const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
   whiteSpace: "pre-line",
+  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
   "& p": {
     margin: "4px 0",
     fontSize: "0.8rem",
     lineHeight: 1.45,
+    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     [theme.breakpoints.up("sm")]: {
       fontSize: "0.9rem",
     },

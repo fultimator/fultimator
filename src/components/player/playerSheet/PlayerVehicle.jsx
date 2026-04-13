@@ -372,11 +372,12 @@ export default function PlayerVehicle({
             {t("pilot_vehicle")}
           </Typography>
         )}
-        <Grid container spacing={1} sx={{ padding: "1em" }}>
+        <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
           {frame && (
             <Grid
               container
-              sx={{ display: "flex", alignItems: "stretch" }}
+              spacing={0}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
                 md: 6
@@ -400,7 +401,7 @@ export default function PlayerVehicle({
                   {t(frame.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -424,9 +425,10 @@ export default function PlayerVehicle({
 
           {armorModules.map((module, index) => (
             <Grid
-              container
-              key={`armor-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`armor-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
                 md: 6
@@ -452,7 +454,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -476,9 +478,10 @@ export default function PlayerVehicle({
 
           {weaponModules.map((module, index) => (
             <Grid
-              container
-              key={`weapon-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`weapon-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
                 md: 6
@@ -504,7 +507,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -538,9 +541,10 @@ export default function PlayerVehicle({
 
           {supportModules.map((module, index) => (
             <Grid
-              container
-              key={`support-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`support-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
                 md: 6
@@ -566,7 +570,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",

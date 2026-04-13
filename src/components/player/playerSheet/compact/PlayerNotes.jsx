@@ -95,19 +95,21 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
   };
 
   const increment = (noteIndex, clockIndex, clock) => {
-    const next = [...clock.state];
-    const i = next.indexOf(false);
-    if (i !== -1) {
-      next[i] = true;
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled < clock.sections) {
+      const next = new Array(clock.sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        next[i] = true;
+      }
       updateClock(noteIndex, clockIndex, next);
     }
   };
 
   const decrement = (noteIndex, clockIndex, clock) => {
-    const next = [...clock.state];
-    const i = next.lastIndexOf(true);
-    if (i !== -1) {
-      next[i] = false;
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const next = [...clock.state];
+      next[currentFilled - 1] = false;
       updateClock(noteIndex, clockIndex, next);
     }
   };

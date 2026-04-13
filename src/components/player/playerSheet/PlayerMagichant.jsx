@@ -114,7 +114,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
             >
               {t("Magichant")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {magichantSpells.map((magichantSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* VOLUMES GRID */}
@@ -267,9 +267,10 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                   <Grid  container spacing={1} size={12}>
                     {magichantSpell.tones && magichantSpell.tones.map((tone, tIndex) => (
                       <Grid
-                        container
-                        key={`${msIndex}-${tIndex}`}
-                        sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`${msIndex}-${tIndex}`}
+                        sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                         size={{
                           xs: 12,
                           md: 6
@@ -294,7 +295,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
                             {tone.name === "magichant_custom_name" ? tone.customName : t(tone.name)}
                           </Typography>
                         </Grid>
-                        <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                        <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                           <div
                             id="spell-right-controls"
                             sx={{

@@ -11,17 +11,15 @@ import {
   Button,
   Tooltip,
   Divider,
-  Card,
-  Stack,
   Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
 import { WeaponCard, ArmorCard, CustomWeaponCard, AccessoryCard } from "../../compendium/ItemCards";
-import { OpenBracket, CloseBracket } from "../../Bracket";
+// import { OpenBracket, CloseBracket } from "../../Bracket";
 import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
+// import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
@@ -130,30 +128,30 @@ export default function PlayerEquipment({
     : [];
 
   // Find all pilot-vehicle spells
-  const pilotSpells = (player.classes || [])
-    .flatMap((c) => c.spells || [])
-    .filter(
-      (spell) =>
-        spell &&
-        spell.spellType === "pilot-vehicle" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
-    );
+  // const pilotSpells = (player.classes || [])
+  //   .flatMap((c) => c.spells || [])
+  //   .filter(
+  //     (spell) =>
+  //       spell &&
+  //       spell.spellType === "pilot-vehicle" &&
+  //       (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+  //   );
 
   // Find the enabled vehicle
-  const activeVehicle = pilotSpells
-    .flatMap((s) => s.vehicles || [])
-    .find((v) => v.enabled);
+  // const activeVehicle = pilotSpells
+  //   .flatMap((s) => s.vehicles || [])
+  //   .find((v) => v.enabled);
 
-  const equippedModules = activeVehicle?.modules
-    ? activeVehicle.modules.filter((m) => m.equipped)
-    : [];
+  // const equippedModules = activeVehicle?.modules
+  //   ? activeVehicle.modules.filter((m) => m.equipped)
+  //   : [];
 
-  const hasArmorModule = equippedModules.some(
-    (m) => m.type === "pilot_module_armor"
-  );
-  const hasWeaponModule = equippedModules.some(
-    (m) => m.type === "pilot_module_weapon"
-  );
+  // const hasArmorModule = equippedModules.some(
+  //   (m) => m.type === "pilot_module_armor"
+  // );
+  // const hasWeaponModule = equippedModules.some(
+  //   (m) => m.type === "pilot_module_weapon"
+  // );
 
   // Helper function to format custom weapon for display
   const formatCustomWeaponForDisplay = (customWeapon) => {
@@ -545,40 +543,34 @@ export default function PlayerEquipment({
                 )}
               </Box>
             ) : (
-              <Box sx={{ backgroundColor: primary, display: "flex", flexDirection: "column", alignItems: "center", py: 1, position: "relative", borderRadius: "8px 0 0 8px" }}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    writingMode: "vertical-lr",
-                    textTransform: "uppercase",
-                    color: custom.white,
-                    transform: "rotate(180deg)",
-                    fontSize: "2em",
-                    minHeight: "100px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {t("Equipment")}
-                </Typography>
-                {isEditMode && (
-                  <IconButton
-                    size="small"
-                    onClick={() => setOpenEdit(true)}
-                    sx={{ mt: 1, color: custom.white }}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                )}
-              </Box>
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  paddingY: "10px",
+                  backgroundColor: primary,
+                  color: custom.white,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                }}
+                align="center"
+              >
+                {t("Equipment")}
+              </Typography>
             )}
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {allEquippedWeapons.map((weapon, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -639,8 +631,9 @@ export default function PlayerEquipment({
               {equippedArmor.map((armor, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={`armor-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -688,8 +681,9 @@ export default function PlayerEquipment({
               {equippedShields.map((shield, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={`shield-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -737,8 +731,9 @@ export default function PlayerEquipment({
               {equippedAccessories.map((accessory, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={`accessory-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6

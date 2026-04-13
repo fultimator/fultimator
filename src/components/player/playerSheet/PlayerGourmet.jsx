@@ -152,7 +152,7 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
             >
               {t("Gourmet")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {cookingSpells.map((cookingSpell, csIndex) => {
                 // Convert cookbook effects to array for display
                 let cookbookEffectsArray = [];
@@ -188,8 +188,9 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                     ) : (
                       cookbookEffectsArray.map((effect, eIndex) => (
                         <Grid
-                          container
-                          key={`${csIndex}-${eIndex}`}
+                  container
+                  spacing={0}
+                  key={`${csIndex}-${eIndex}`}
                           sx={{ display: "flex", alignItems: "stretch", mb: 1 }}
                           size={{
                             xs: 12,
@@ -216,7 +217,7 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                               {effect.tasteCombination || t("gourmet_delicacy")}
                             </Typography>
                           </Grid>
-                          <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                          <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                             <div
                               id="delicacy-right-controls"
                               style={{

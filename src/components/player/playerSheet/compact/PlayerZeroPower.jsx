@@ -77,15 +77,23 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
   };
 
   const increment = () => {
-    const next = [...clockState];
-    const i = next.indexOf(false);
-    if (i !== -1) { next[i] = true; updateClock(next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled < sections) {
+      const next = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        next[i] = true;
+      }
+      updateClock(next);
+    }
   };
 
   const decrement = () => {
-    const next = [...clockState];
-    const i = next.lastIndexOf(true);
-    if (i !== -1) { next[i] = false; updateClock(next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const next = [...clockState];
+      next[currentFilled - 1] = false;
+      updateClock(next);
+    }
   };
 
   const reset = () => updateClock(new Array(sections).fill(false));

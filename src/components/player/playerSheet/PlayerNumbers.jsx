@@ -114,8 +114,7 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
       <Grid
         container
         spacing={{ xs: 1, md: 2 }}
-        sx={{ padding: "1em", alignItems: "center", justifyContent: "center" }}
-        direction={{ xs: "row", md: "row" }}
+        sx={{ padding: "1em", alignItems: "center", width: "100%" }}
       >
         {/* Fabula Points */}
         <Grid

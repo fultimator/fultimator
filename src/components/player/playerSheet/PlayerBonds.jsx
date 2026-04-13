@@ -134,22 +134,26 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                 )}
               </Box>
             ) : (
-              <Box sx={{ backgroundColor: primary, display: "flex", flexDirection: "column", alignItems: "center", py: 1, position: "relative" }}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    writingMode: "vertical-lr",
-                    textTransform: "uppercase",
-                    color: custom.white,
-                    transform: "rotate(180deg)",
-                    fontSize: "2em",
-                    minHeight: "100px",
-                  }}
-                  align="center"
-                >
-                  {t("Bonds")}
-                </Typography>
-              </Box>
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  paddingY: "10px",
+                  backgroundColor: primary,
+                  color: custom.white,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                }}
+                align="center"
+              >
+                {t("Bonds")}
+              </Typography>
             )}
 
             <Grid container spacing={0.75} sx={{ p: 0.75 }}>
@@ -164,6 +168,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                     }}>
                     <Box
                       sx={{
+                        height: "100%",
                         border: "1px solid",
                         borderColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
                         borderRadius: 1,

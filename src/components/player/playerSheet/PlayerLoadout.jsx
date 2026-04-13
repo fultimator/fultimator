@@ -3,9 +3,9 @@ import {
   Paper, Grid, Typography, Card, CardActionArea, CardContent,
   Box, Chip, Divider, Tooltip, Button, Checkbox, IconButton,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText, Radio,
-  Badge,
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText
 } from '@mui/material';
+import ReactMarkdown from 'react-markdown';
 import LockIcon from '@mui/icons-material/Lock';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
@@ -16,7 +16,7 @@ import { SwapHoriz } from '@mui/icons-material';
 import { useTranslate } from '../../../translation/translate';
 import { useCustomTheme } from '../../../hooks/useCustomTheme';
 import attributes from '../../../libs/attributes';
-import { resolveEffectiveSlot, getActiveVehicle, isItemEquipped } from '../equipment/slots/equipmentSlots';
+import { resolveEffectiveSlot, getActiveVehicle } from '../equipment/slots/equipmentSlots';
 import { calculateAttribute, calculateCustomWeaponStats } from '../common/playerCalculations';
 import {
   getSlotLocks,
@@ -202,7 +202,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         opacity: locked ? 0.45 : 1,
         position: 'relative',
         height: '100%',
-        minWidth: isEmpty ? 120 : 0,
+        minWidth: '100%',
         border: isAux ? '1px dashed' : isVehicle ? '1px solid' : (hasModule && !isVehicle && !isEmpty) ? '1px dashed' : undefined,
         borderColor: isAux ? 'warning.main' : isVehicle ? 'success.main' : (hasModule && !isVehicle && !isEmpty) ? 'success.light' : undefined,
       }}
@@ -250,7 +250,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
 
 // VehicleSupportCard
 
-function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
+function VehicleSupportCard({ label, module, isEditMode, onClick }) {
   const { t } = useTranslate();
   const clickable = isEditMode && !!onClick;
   const content = (
@@ -283,6 +283,7 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
           {module.description && (
             <Typography
               variant="caption"
+              component="div"
               sx={{
                 color: "text.secondary",
                 fontSize: { xs: "0.72rem", sm: "0.76rem" },
@@ -292,7 +293,9 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
                 overflow: "hidden",
                 lineHeight: 1.2
               }}>
-              {(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 80)}
+              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                {(module.name === 'pilot_custom_support' ? module.description : t(module.description))}
+              </ReactMarkdown>
             </Typography>
           )}
         </>
@@ -321,6 +324,7 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
       sx={{
         height: '100%',
         minWidth: !module ? 120 : 0,
+        maxWidth: '100%',
         border: module ? '1px solid' : undefined,
         borderColor: module ? 'success.main' : undefined,
       }}
@@ -653,8 +657,8 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                   />
                 </Grid>
               ))}
-              {/* Add slot card when there are equipped-but-not-all-enabled support modules */}
-              {isEditMode && equippedSupportModules.some(m => !m.enabled) && (
+              {/* Add empty slot card when no support slots are enabled */}
+              {supportSlots.length === 0 && (
                 <Grid
                   size={{
                     xs: 6,
@@ -662,11 +666,11 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                     md: 3
                   }}>
                   <VehicleSupportCard
-                    label={`${t('Support')} ${supportSlots.length + 1}`}
+                    label={`${t('Support')} 1`}
                     module={null}
                     vehicle={activeVehicle}
                     isEditMode={canClickSlot}
-                    onClick={() => setSupportPickerOpen(true)}
+                    onClick={canClickSlot ? () => setSupportPickerOpen(true) : undefined}
                   />
                 </Grid>
               )}
@@ -785,9 +789,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                       </ListItemIcon>
                       <ListItemText
                         primary={m.customName || t(m.name)}
-                        secondary={m.isComplex ? `${t('Complex')} - ${(m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 40)}` : (m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 50)}
+                        secondary={
+                          <Box sx={{ color: "text.secondary", fontSize: "0.75rem" }}>
+                            {m.isComplex && (
+                              <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
+                                {t('Complex')} -{' '}
+                              </Typography>
+                            )}
+                            <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                              {m.name === 'pilot_custom_support' ? m.description : t(m.description || '')}
+                            </ReactMarkdown>
+                          </Box>
+                        }
                         primaryTypographyProps={{ variant: 'body2', fontWeight: m.enabled ? 700 : 400 }}
-                        secondaryTypographyProps={{ variant: 'caption' }}
+                        secondaryTypographyProps={{ component: 'div' }}
                       />
                     </ListItemButton>
                   </ListItem>

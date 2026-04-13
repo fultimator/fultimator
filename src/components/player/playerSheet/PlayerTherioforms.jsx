@@ -86,14 +86,15 @@ export default function PlayerTherioforms({ player }) {
             >
               {t("mutant_therioforms")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {therioformSpells.map((mutantSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {mutantSpell.therioforms && mutantSpell.therioforms.map((therioform, tIndex) => (
                     <Grid
-                      container
-                      key={`${msIndex}-${tIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`${msIndex}-${tIndex}`}
+                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                       size={{
                         xs: 12,
                         md: 6
@@ -118,7 +119,7 @@ export default function PlayerTherioforms({ player }) {
                           {therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name)}
                         </Typography>
                       </Grid>
-                      <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{

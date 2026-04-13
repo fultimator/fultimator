@@ -86,16 +86,17 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
             >
               {t("symbol_symbols")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {symbolSpells.map((symbolSpell, ssIndex) => (
                 <React.Fragment key={ssIndex}>
                   {/* Individual Symbols */}
                   {symbolSpell.symbols &&
                     symbolSpell.symbols.map((sym, sIndex) => (
                       <Grid
-                        container
-                        key={`${ssIndex}-${sIndex}`}
-                        sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`${ssIndex}-${sIndex}`}
+                        sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                         size={{
                           xs: 12,
                           md: 6
@@ -122,7 +123,7 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
                               : t(sym.name)}
                           </Typography>
                         </Grid>
-                        <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                        <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                           <div
                             id="spell-right-controls"
                             style={{

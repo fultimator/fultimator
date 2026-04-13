@@ -1140,7 +1140,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbM
       </MuiMenu>
       <Tooltip title={t("Edit")}>
         <RouterLink
-          to={`/npc-edit/${npc.id}${
+          to={`/npc-gallery/${npc.id}${
             filterParams
               ? filterParams.startsWith("?")
                 ? filterParams

@@ -17,12 +17,18 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Stack,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Clock from "./Clock";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
@@ -114,6 +120,26 @@ export default function PlayerRituals({
   const setNewClock = () => {
     setClockSections(calcClock());
     resetClock();
+  };
+
+  const incrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled < clockSections) {
+      const newState = new Array(clockSections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      setClockState(newState);
+    }
+  };
+
+  const decrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clockState];
+      newState[currentFilled - 1] = false;
+      setClockState(newState);
+    }
   };
 
   if (
@@ -251,15 +277,40 @@ export default function PlayerRituals({
             size={{
               xs: 12,
               md: 4
-            }}>
-            <Button
-              variant="outlined"
-              size={compact ? "small" : "medium"}
-              sx={{ width: "100%" }}
-              onClick={resetClock}
-            >
-              {t("Reset Clock")}
-            </Button>
+            }}
+            container
+            sx={{ justifyContent: "center", gap: compact ? 0.5 : 1 }}
+          >
+            <Tooltip title={t("Decrement")} arrow>
+              <IconButton
+                color="primary"
+                onClick={decrementClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <RemoveIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Reset")} arrow>
+              <IconButton
+                color="primary"
+                onClick={resetClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <RestartAltIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Increment")} arrow>
+              <IconButton
+                color="primary"
+                onClick={incrementClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       )}

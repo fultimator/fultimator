@@ -143,7 +143,7 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
             >
               {t("Invoker")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {invokerSpells.map((invokerSpell, isIndex) => {
                 const availableInvocations =
                   invokerSpell.availableInvocations && invokerSpell.availableInvocations.length > 0
@@ -214,9 +214,10 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                         })
                         .map((invocation, iIndex) => (
                           <Grid
-                            container
-                            key={`${isIndex}-${iIndex}`}
-                            sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`${isIndex}-${iIndex}`}
+                            sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                             size={{
                               xs: 12,
                               md: 6
@@ -242,7 +243,7 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
                                 {t(invocation.name)}
                               </Typography>
                             </Grid>
-                            <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                            <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                               <div
                                 id="spell-right-controls"
                                 style={{

@@ -21,9 +21,28 @@ const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onRe
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleClick = (index) => {
-    const updatedSections = [...state];
-    updatedSections[index] = !updatedSections[index];
+    const updatedSections = new Array(numSections).fill(false);
+    // Fill from 0 to index (inclusive)
+    for (let i = 0; i <= index; i++) {
+      updatedSections[i] = true;
+    }
     setState(updatedSections);
+  };
+
+  const handleIncrement = () => {
+    const currentFilled = state.filter(Boolean).length;
+    if (currentFilled < numSections) {
+      handleClick(currentFilled);
+    }
+  };
+
+  const handleDecrement = () => {
+    const currentFilled = state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const updatedSections = [...state];
+      updatedSections[currentFilled - 1] = false;
+      setState(updatedSections);
+    }
   };
 
   const handleRightClick = (e) => {

@@ -443,12 +443,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
             >
               {t("Spells")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {defaultSpells.map((spell, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -479,7 +480,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {spell.isOffensive && <OffensiveSpellIcon />}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -521,8 +522,9 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               {gambleSpells.map((gamble, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -552,7 +554,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {gamble.spellName}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{

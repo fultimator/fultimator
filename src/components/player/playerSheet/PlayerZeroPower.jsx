@@ -1,9 +1,12 @@
 import React from "react";
-import { Paper, Grid, Typography, Divider, Button } from "@mui/material";
+import { Paper, Grid, Typography, Divider, Button, Stack, IconButton, Tooltip } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import Clock from "./Clock";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -25,6 +28,26 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
   };
 
   const resetClock = () => setClockState(new Array(sections).fill(false));
+
+  const incrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled < sections) {
+      const newState = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      setClockState(newState);
+    }
+  };
+
+  const decrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clockState];
+      newState[currentFilled - 1] = false;
+      setClockState(newState);
+    }
+  };
 
   const triggerName =
     typeof zeroPower.zeroTrigger === "string"
@@ -87,10 +110,37 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
           )}
 
           {isEditMode && setPlayer && (
-            <Grid sx={{ display: "flex", justifyContent: "center", pb: 1 }} size={12}>
-              <Button variant="outlined" size="small" onClick={resetClock}>
-                {t("Reset Clock")}
-              </Button>
+            <Grid sx={{ display: "flex", justifyContent: "center", pb: 1, gap: 1 }} size={12}>
+              <Tooltip title={t("Decrement")} arrow>
+                <IconButton
+                  color="primary"
+                  onClick={decrementClock}
+                  size="small"
+                  variant="outlined"
+                >
+                  <RemoveIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Reset")} arrow>
+                <IconButton
+                  color="primary"
+                  onClick={resetClock}
+                  size="small"
+                  variant="outlined"
+                >
+                  <RestartAltIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Increment")} arrow>
+                <IconButton
+                  color="primary"
+                  onClick={incrementClock}
+                  size="small"
+                  variant="outlined"
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Grid>
           )}
 

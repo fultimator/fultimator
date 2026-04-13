@@ -12,6 +12,7 @@ import {
   DialogActions,
   LinearProgress,
   Box,
+  Stack,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -20,6 +21,9 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import Clock from "./Clock";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -62,6 +66,20 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
       });
       return { ...prevPlayer, classes: newClasses };
     });
+  };
+
+  const incrementMagiseedClock = (magiseedSpell) => {
+    const currentClock = magiseedSpell.growthClock || 0;
+    if (currentClock < 4) {
+      handleClockChange(magiseedSpell, currentClock + 1);
+    }
+  };
+
+  const decrementMagiseedClock = (magiseedSpell) => {
+    const currentClock = magiseedSpell.growthClock || 0;
+    if (currentClock > 0) {
+      handleClockChange(magiseedSpell, currentClock - 1);
+    }
   };
 
   /* All magiseed spells from all classes */
@@ -135,7 +153,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
             >
               {t("magiseed_garden")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {magiseedSpells.map((magiseedSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* Growth Clock Section */}
@@ -143,7 +161,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("magiseed_growth_clock")} - {t(magiseedSpell.className)}
                     </Typography>
-                    <Grid container sx={{ alignItems: "center" }} spacing={2}>
+                    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
                       <Grid >
                         <Clock
                           numSections={4}
@@ -156,10 +174,44 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           isCharacterSheet={!isEditMode && !setPlayer}
                           onReset={(isEditMode || setPlayer) ? () => handleClockChange(magiseedSpell, 0) : undefined}
                         />
+                        {(isEditMode || setPlayer) && (
+                          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+                            <Tooltip title={t("Decrement")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => decrementMagiseedClock(magiseedSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RemoveIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Reset")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => handleClockChange(magiseedSpell, 0)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RestartAltIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Increment")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => incrementMagiseedClock(magiseedSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        )}
                       </Grid>
                       <Grid  size="grow">
                         <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
-                          {magiseedSpell.currentMagiseed 
+                          {magiseedSpell.currentMagiseed
                             ? (magiseedSpell.currentMagiseed.customName || t(magiseedSpell.currentMagiseed.name))
                             : t("magiseed_no_magiseed")}
                         </Typography>
@@ -204,9 +256,10 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                   {/* Available Magiseeds */}
                   {magiseedSpell.magiseeds && magiseedSpell.magiseeds.map((seed, sIndex) => (
                     <Grid
-                      container
-                      key={`${msIndex}-${sIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch" }}
+                  container
+                  spacing={0}
+                  key={`${msIndex}-${sIndex}`}
+                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                       size={{
                         xs: 12,
                         md: 6
@@ -236,7 +289,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           )}
                         </Typography>
                       </Grid>
-                      <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{

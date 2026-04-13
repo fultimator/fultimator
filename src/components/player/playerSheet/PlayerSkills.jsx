@@ -98,12 +98,13 @@ export default function PlayerSkills({ player }) {
             >
               {t("Skills")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {allSkills.map((skill, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -128,7 +129,7 @@ export default function PlayerSkills({ player }) {
                       {skill.isHomebrew ? skill.skillName : t(skill.skillName)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="skill-right-controls"
                       style={{

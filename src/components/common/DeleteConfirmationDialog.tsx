@@ -34,10 +34,24 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
     onClose();
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      event.preventDefault();
+      handleConfirm();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onClose();
+    }
+  };
+
   return (
     <Dialog 
       open={open} 
       onClose={onClose} 
+      onKeyDown={handleKeyDown}
       fullWidth 
       maxWidth="xs"
       slotProps={{

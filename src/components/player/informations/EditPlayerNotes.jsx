@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Divider,
   Grid,
@@ -34,20 +34,26 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [noteToDeleteIndex, setNoteToDeleteIndex] = useState(null);
+  const isSubmittingRef = useRef(false);
+  const isAddingNoteRef = useRef(false);
 
   const handleNoteNameChange = (key) => (e) => {
+    const value = e.target.value;
     setPlayer((prevState) => {
-      const newState = { ...prevState };
-      newState.notes[key].name = e.target.value;
-      return newState;
+      const notes = prevState.notes.map((note, index) =>
+        index === key ? { ...note, name: value } : note
+      );
+      return { ...prevState, notes };
     });
   };
 
   const handleNoteDescriptionChange = (key) => (e) => {
+    const value = e.target.value;
     setPlayer((prevState) => {
-      const newState = { ...prevState };
-      newState.notes[key].description = e.target.value;
-      return newState;
+      const notes = prevState.notes.map((note, index) =>
+        index === key ? { ...note, description: value } : note
+      );
+      return { ...prevState, notes };
     });
   };
 
@@ -66,16 +72,22 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     setSelectedNoteIndex(null);
     setClockName("");
     setClockSections(4);
+    isSubmittingRef.current = false;
   };
 
   const handleConfirm = () => {
+    // Prevent double submissions using ref
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
+    // Validate inputs
     if (!clockName.trim()) {
       if (window.electron) {
         window.electron.alert(t("Clock name is required."));
       } else {
         alert(t("Clock name is required."));
       }
-
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -85,30 +97,41 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
       } else {
         alert(t("Sections must be between 2 and 30."));
       }
-
+      isSubmittingRef.current = false;
       return;
     }
 
+    // Add the clock
+    const newClock = {
+      name: clockName,
+      sections: clockSections,
+      state: new Array(clockSections).fill(false),
+    };
+
     setPlayer((prevState) => {
-      const newState = { ...prevState };
-      if (!newState.notes[selectedNoteIndex].clocks) {
-        newState.notes[selectedNoteIndex].clocks = [];
-      }
-      newState.notes[selectedNoteIndex].clocks.push({
-        name: clockName,
-        sections: clockSections,
-        state: new Array(clockSections).fill(false),
+      const notes = prevState.notes.map((note, index) => {
+        if (index !== selectedNoteIndex) return note;
+        return {
+          ...note,
+          clocks: [...(note.clocks || []), newClock],
+        };
       });
-      return newState;
+      return { ...prevState, notes };
     });
+
     handleClose();
   };
 
   const handleRemoveClock = (noteIndex, clockIndex) => {
     setPlayer((prevState) => {
-      const newState = { ...prevState };
-      newState.notes[noteIndex].clocks.splice(clockIndex, 1);
-      return newState;
+      const notes = prevState.notes.map((note, index) => {
+        if (index !== noteIndex) return note;
+        return {
+          ...note,
+          clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
+        };
+      });
+      return { ...prevState, notes };
     });
   };
 
@@ -122,23 +145,33 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         borderColor: secondary,
       }}
     >
-      <Grid container>
-        <Grid  size={12}>
+      <Grid container spacing={2}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Notes")}
             addItem={
               isEditMode
                 ? () => {
+                    if (isAddingNoteRef.current) return;
+                    isAddingNoteRef.current = true;
                     setPlayer((prevState) => {
-                      const newState = { ...prevState };
-                      newState.notes.push({
-                        name: "",
-                        description: "",
-                        clocks: [],
-                      });
-                      return newState;
+                      return {
+                        ...prevState,
+                        notes: [
+                          ...prevState.notes,
+                          {
+                            name: "",
+                            description: "",
+                            clocks: [],
+                          },
+                        ],
+                      };
                     });
+                    // Reset after a tick to allow React to process state update
+                    setTimeout(() => {
+                      isAddingNoteRef.current = false;
+                    }, 0);
                   }
                 : null
             }
@@ -149,99 +182,108 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         {player.notes.map((note, index) => (
           <Grid
             container
-            spacing={1}
-            sx={{ py: 1 }}
-            //alignItems="center"
+            size={12}
+            rowSpacing={1.5}
+            columnSpacing={2}
+            sx={{ py: 0.5 }}
             key={index}
           >
-            {isEditMode && (
-              <Grid  sx={{ p: 0, m: 0 }}>
-                <IconButton onClick={removeItem(index)}>
-                  <RemoveCircleOutlined />
-                </IconButton>
-              </Grid>
-            )}
-            <Grid  size={7}>
-              <TextField
-                id="name"
-                label={t("Note Name") + ":"}
-                value={note.name}
-                onChange={handleNoteNameChange(index)}
-                slotProps={{
-                  input: {
-                    readOnly: !isEditMode,
-                  },
-
-                  htmlInput: { maxLength: 50 }
-                }} />
-            </Grid>
-            <Grid  size={12}>
-              <CustomTextarea
-                id="description"
-                label={t("Description") + ":"}
-                value={note.description}
-                onChange={handleNoteDescriptionChange(index)}
-                maxLength={5000}
-                maxRows={10}
-                readOnly={!isEditMode}
-              />
-            </Grid>
-            {isEditMode && (
-              <Grid  size={12}>
-                <Button
-                  variant="contained"
-                  onClick={() => handleAddClock(index)}
-                  disabled={note.clocks && note.clocks.length >= 4}
-                >
-                  {t("Add Clock")}
-                </Button>
-              </Grid>
-            )}
-            {note.clocks &&
-              note.clocks.map((clock, clockIndex) => (
-                <Grid
-                  key={clockIndex}
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                    md: 4
-                  }}>
-                  <Grid
-                    container sx={{
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      py: 1,
-                      bgcolor: theme.palette.background.paper,
-                      border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: 1,
-                      p: 1,
+            <Grid size={12}>
+              <Grid container rowSpacing={1.5} columnSpacing={2}>
+                <Grid size={{ xs: 12, sm: isEditMode ? 11 : 12 }}>
+                  <TextField
+                    id="name"
+                    label={t("Note Name") + ":"}
+                    value={note.name}
+                    fullWidth
+                    onChange={handleNoteNameChange(index)}
+                    slotProps={{
+                      input: {
+                        readOnly: !isEditMode,
+                      },
+                      htmlInput: { maxLength: 50 },
                     }}
+                  />
+                </Grid>
+                {isEditMode && (
+                  <Grid
+                    size={{ xs: 12, sm: 1 }}
+                    sx={{ display: "flex", justifyContent: { xs: "flex-end", sm: "center" }, alignItems: "center" }}
                   >
-                    <Grid  size={10}>
-                      <Typography variant="body2">
-                        <strong style={{ fontSize: "1.4em" }}>
-                          {clock.name}
-                        </strong>{" "}
-                        ({t("Clock Sections")}: {clock.sections})
-                      </Typography>
-                    </Grid>
-                    {isEditMode && (
-                      <Grid  size={2}>
-                        <IconButton
-                          onClick={() => handleRemoveClock(index, clockIndex)}
+                    <IconButton onClick={removeItem(index)}>
+                      <RemoveCircleOutlined />
+                    </IconButton>
+                  </Grid>
+                )}
+                <Grid size={12}>
+                  <CustomTextarea
+                    id="description"
+                    label={t("Description") + ":"}
+                    value={note.description}
+                    onChange={handleNoteDescriptionChange(index)}
+                    maxLength={5000}
+                    maxRows={10}
+                    readOnly={!isEditMode}
+                  />
+                </Grid>
+                {isEditMode && (
+                  <Grid size={12} sx={{ display: "flex", justifyContent: "flex-start" }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleAddClock(index)}
+                      disabled={note.clocks && note.clocks.length >= 4}
+                    >
+                      {t("Add Clock")}
+                    </Button>
+                  </Grid>
+                )}
+                {note.clocks && note.clocks.length > 0 && (
+                  <Grid size={12}>
+                    <Grid container spacing={1}>
+                      {note.clocks.map((clock, clockIndex) => (
+                        <Grid
+                          key={clockIndex}
+                          size={{
+                            xs: 12,
+                            sm: 6,
+                            md: 4,
+                          }}
                           sx={{
-                            color: theme.palette.error.main,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            py: 0.75,
+                            bgcolor: theme.palette.background.paper,
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: 1,
+                            px: 1,
                           }}
                         >
-                          <RemoveCircleOutlined />
-                        </IconButton>
-                      </Grid>
-                    )}
+                          <Typography variant="body2">
+                            <strong style={{ fontSize: "1.4em" }}>
+                              {clock.name}
+                            </strong>{" "}
+                            ({t("Clock Sections")}: {clock.sections})
+                          </Typography>
+                          {isEditMode && (
+                            <IconButton
+                              onClick={() => handleRemoveClock(index, clockIndex)}
+                              sx={{
+                                color: theme.palette.error.main,
+                              }}
+                            >
+                              <RemoveCircleOutlined />
+                            </IconButton>
+                          )}
+                        </Grid>
+                      ))}
+                    </Grid>
                   </Grid>
-                </Grid>
-              ))}
+                )}
+              </Grid>
+            </Grid>
             {index !== player.notes.length - 1 && (
-              <Grid  size={12}>
+              <Grid size={12} sx={{ pt: 0.5 }}>
                 <Divider />
               </Grid>
             )}
@@ -264,6 +306,12 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             variant="outlined"
             value={clockName}
             onChange={(e) => setClockName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleConfirm();
+              }
+            }}
             slotProps={{
               htmlInput: { maxLength: 30 }
             }}
@@ -279,6 +327,12 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             onChange={(e) => {
               const value = parseInt(e.target.value, 10);
               setClockSections(value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleConfirm();
+              }
             }}
             slotProps={{
               htmlInput: { min: 2, max: 30 }
@@ -300,9 +354,10 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         onConfirm={() => {
           if (noteToDeleteIndex !== null) {
             setPlayer((prevState) => {
-              const newState = { ...prevState };
-              newState.notes.splice(noteToDeleteIndex, 1);
-              return newState;
+              return {
+                ...prevState,
+                notes: prevState.notes.filter((_, index) => index !== noteToDeleteIndex),
+              };
             });
           }
           setNoteToDeleteIndex(null);

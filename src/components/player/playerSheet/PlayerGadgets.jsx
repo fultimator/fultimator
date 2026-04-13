@@ -350,12 +350,13 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             >
               {t("Gadgets")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {alchemySpells.map((alchemy, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -385,7 +386,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(alchemy.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -424,8 +425,9 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               {infusionSpells.map((infusion, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -455,7 +457,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(infusion.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -484,8 +486,9 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               {magitechSpells.map((magitech, index) => (
                 <Grid
                   container
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -515,7 +518,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(magitech.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -544,7 +547,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               {magitechSpells.some((magitech) => magitech.rank >= 2) && (
                 <Grid
                   container
-                  sx={{ display: "flex", alignItems: "stretch" }}
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
                   size={{
                     xs: 12,
                     md: 6
@@ -569,7 +572,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                       {t("Magicannon")}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{

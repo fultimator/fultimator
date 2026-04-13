@@ -20,6 +20,8 @@ import { useTranslate } from "../../../translation/translate";
 import NotesMarkdown from "../../common/NotesMarkdown";
 import Clock from "./Clock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
@@ -63,6 +65,28 @@ export default function PlayerNotes({
     handleClockStateChange(originalNoteIndex, clockIndex, resetState);
   };
 
+  const incrementClockState = (originalNoteIndex, clockIndex) => {
+    const clock = player.notes[originalNoteIndex].clocks[clockIndex];
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled < clock.sections) {
+      const newState = new Array(clock.sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      handleClockStateChange(originalNoteIndex, clockIndex, newState);
+    }
+  };
+
+  const decrementClockState = (originalNoteIndex, clockIndex) => {
+    const clock = player.notes[originalNoteIndex].clocks[clockIndex];
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clock.state];
+      newState[currentFilled - 1] = false;
+      handleClockStateChange(originalNoteIndex, clockIndex, newState);
+    }
+  };
+
   if (visibleNotesWithIndices.length === 0) return null;
 
   const noteList = (
@@ -71,7 +95,7 @@ export default function PlayerNotes({
         <Fragment key={originalIndex}>
           <Box
             sx={{
-              mb: 4,
+              mb: 2,
               p: compact ? 2 : 0,
               borderRadius: compact ? 2 : 0,
               bgcolor: compact ? "background.paper" : "transparent",
@@ -91,102 +115,173 @@ export default function PlayerNotes({
               </Typography>
             )}
 
-            <NotesMarkdown
-              sx={{
-                fontFamily: "PT Sans Narrow",
-                fontSize: "1rem",
-                lineHeight: compact ? 1.6 : 1,
-                "& p": compact ? { mb: 1.5 } : { margin: 0 },
-              }}
-            >
-              {note.description}
-            </NotesMarkdown>
+            {compact ? (
+              <>
+                <NotesMarkdown
+                  sx={{
+                    fontFamily: "PT Sans Narrow",
+                    fontSize: "1rem",
+                    lineHeight: 1.6,
+                    "& p": { mb: 1.5 },
+                  }}
+                >
+                  {note.description}
+                </NotesMarkdown>
 
-            {note.clocks && (
-              <Grid
-                container
-                spacing={compact ? 3 : 2}
-                sx={{ mt: 2, justifyContent: "center" }}
-              >
-                {note.clocks.map((clock, clockIndex) => (
+                {note.clocks && (
                   <Grid
-                    key={clockIndex}
-                    sx={
-                      compact
-                        ? { display: "flex", flexDirection: "column" }
-                        : { textAlign: "center", py: 2 }
-                    }
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                      md: compact ? 3 : undefined
-                    }}>
-                    {compact ? (
-                      <Stack sx={{ alignItems: "center", position: "relative" }}>
+                    container
+                    spacing={3}
+                    sx={{ mt: 2, justifyContent: "center" }}
+                  >
+                    {note.clocks.map((clock, clockIndex) => (
+                      <Grid
+                        key={clockIndex}
+                        size={{ xs: 12, sm: 6, md: 3 }}
+                      >
+                        <Stack sx={{ alignItems: "center", position: "relative" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ mb: 1, textAlign: "center", fontWeight: "medium" }}
+                          >
+                            {clock.name}
+                          </Typography>
+                          <Clock
+                            isCharacterSheet={isCharacterSheet}
+                            numSections={clock.sections}
+                            size={isSmallScreen ? 140 : 180}
+                            state={clock.state}
+                            setState={(newState) =>
+                              handleClockStateChange(originalIndex, clockIndex, newState)
+                            }
+                          />
+                          {!isCharacterSheet && (
+                            <Stack direction="row" spacing={1} sx={{ mt: 1, justifyContent: "center" }}>
+                              <Tooltip title={`${t("Decrement")} ${clock.name}`} arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => decrementClockState(originalIndex, clockIndex)}
+                                  size="small"
+                                  sx={{ "&:hover": { bgcolor: "action.selected" } }}
+                                >
+                                  <RemoveIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={`${t("Reset")} ${clock.name}`} arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => resetClockState(originalIndex, clockIndex)}
+                                  size="small"
+                                  sx={{ "&:hover": { bgcolor: "action.selected" } }}
+                                >
+                                  <RestartAltIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={`${t("Increment")} ${clock.name}`} arrow>
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => incrementClockState(originalIndex, clockIndex)}
+                                  size="small"
+                                  sx={{ "&:hover": { bgcolor: "action.selected" } }}
+                                >
+                                  <AddIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          )}
+                        </Stack>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </>
+            ) : (
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 8 }}>
+                  <NotesMarkdown
+                    sx={{
+                      fontFamily: "PT Sans Narrow",
+                      fontSize: "1rem",
+                      lineHeight: 1,
+                      "& p": { margin: 0 },
+                    }}
+                  >
+                    {note.description}
+                  </NotesMarkdown>
+                </Grid>
+
+                {note.clocks && (
+                  <Grid
+                    size={{ xs: 12, md: 4 }}
+                    container
+                    spacing={2}
+                    sx={{ justifyContent: "center" }}
+                  >
+                    {note.clocks.map((clock, clockIndex) => (
+                      <Grid
+                        key={clockIndex}
+                        size={{ xs: 12 }}
+                        sx={{ textAlign: "center" }}
+                      >
                         <Typography
                           variant="body2"
-                          sx={{ mb: 1, textAlign: "center", fontWeight: "medium" }}
-                        >
-                          {clock.name}
-                        </Typography>
-                        <Clock
-                          isCharacterSheet={isCharacterSheet}
-                          numSections={clock.sections}
-                          size={isSmallScreen ? 140 : 180}
-                          state={clock.state}
-                          setState={(newState) =>
-                            handleClockStateChange(originalIndex, clockIndex, newState)
-                          }
-                        />
-                        {!isCharacterSheet && (
-                          <Tooltip title={`${t("Reset")} ${clock.name}`} arrow>
-                            <IconButton
-                              color="primary"
-                              onClick={() => resetClockState(originalIndex, clockIndex)}
-                              sx={{
-                                mt: 1,
-                                "&:hover": { bgcolor: "action.selected" },
-                              }}
-                            >
-                              <RestartAltIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Stack>
-                    ) : (
-                      <>
-                        <Typography
-                          variant="h4"
                           sx={{
-                            mb: 1,
                             fontWeight: "bold",
-                            fontSize: "1.2em",
+                            fontSize: "0.95em",
                             textTransform: "uppercase",
+                            mb: 1,
                           }}
                         >
                           {clock.name}
                         </Typography>
-                        <Clock
-                          numSections={clock.sections}
-                          size={200}
-                          state={clock.state}
-                          setState={(newState) =>
-                            handleClockStateChange(originalIndex, clockIndex, newState)
-                          }
-                        />
-                        <Grid container sx={{ justifyContent: "center" }}>
-                          <IconButton
-                            color="primary"
-                            onClick={() => resetClockState(originalIndex, clockIndex)}
-                            sx={{ mt: 1 }}
-                          >
-                            <RestartAltIcon />
-                          </IconButton>
-                        </Grid>
-                      </>
-                    )}
+                        <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
+                          <Clock
+                            numSections={clock.sections}
+                            size={120}
+                            state={clock.state}
+                            setState={(newState) =>
+                              handleClockStateChange(originalIndex, clockIndex, newState)
+                            }
+                          />
+                        </Box>
+                        {!isCharacterSheet && (
+                          <Stack direction="row" spacing={1} sx={{ justifyContent: "center" }}>
+                            <Tooltip title={`${t("Decrement")} ${clock.name}`} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => decrementClockState(originalIndex, clockIndex)}
+                                size="small"
+                                sx={{ p: 0.5 }}
+                              >
+                                <RemoveIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={`${t("Reset")} ${clock.name}`} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => resetClockState(originalIndex, clockIndex)}
+                                size="small"
+                                sx={{ p: 0.5 }}
+                              >
+                                <RestartAltIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={`${t("Increment")} ${clock.name}`} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => incrementClockState(originalIndex, clockIndex)}
+                                size="small"
+                                sx={{ p: 0.5 }}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        )}
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
+                )}
               </Grid>
             )}
           </Box>

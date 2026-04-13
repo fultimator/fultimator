@@ -1,9 +1,12 @@
 import React from "react";
-import { Paper, Grid, Typography, Divider, Button } from "@mui/material";
+import { Paper, Grid, Typography, Divider, Button, Stack, IconButton, Tooltip } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import Clock from "./Clock";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 export default function PlayerOthers({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -24,6 +27,26 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
 
   const resetClock = (index, sections) =>
     setClockState(index, new Array(sections).fill(false));
+
+  const incrementClock = (index, sections, currentState) => {
+    const currentFilled = currentState.filter(Boolean).length;
+    if (currentFilled < sections) {
+      const newState = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      setClockState(index, newState);
+    }
+  };
+
+  const decrementClock = (index, currentState) => {
+    const currentFilled = currentState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...currentState];
+      newState[currentFilled - 1] = false;
+      setClockState(index, newState);
+    }
+  };
 
   return (
     <>
@@ -86,14 +109,37 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                 )}
 
                 {isEditMode && setPlayer && hasClock && (
-                  <Grid sx={{ display: "flex", justifyContent: "center", pb: 1 }} size={12}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => resetClock(index, sections)}
-                    >
-                      {t("Reset Clock")}
-                    </Button>
+                  <Grid sx={{ display: "flex", justifyContent: "center", pb: 1, gap: 1 }} size={12}>
+                    <Tooltip title={t("Decrement")} arrow>
+                      <IconButton
+                        color="primary"
+                        onClick={() => decrementClock(index, clockState)}
+                        size="small"
+                        variant="outlined"
+                      >
+                        <RemoveIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("Reset")} arrow>
+                      <IconButton
+                        color="primary"
+                        onClick={() => resetClock(index, sections)}
+                        size="small"
+                        variant="outlined"
+                      >
+                        <RestartAltIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("Increment")} arrow>
+                      <IconButton
+                        color="primary"
+                        onClick={() => incrementClock(index, sections, clockState)}
+                        size="small"
+                        variant="outlined"
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </Grid>
                 )}
 

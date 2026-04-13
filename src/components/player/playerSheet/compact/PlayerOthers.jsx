@@ -81,15 +81,24 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
   };
 
   const increment = (index, clockState) => {
-    const next = [...clockState];
-    const i = next.indexOf(false);
-    if (i !== -1) { next[i] = true; updateClock(index, next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    const sections = clockState.length;
+    if (currentFilled < sections) {
+      const next = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        next[i] = true;
+      }
+      updateClock(index, next);
+    }
   };
 
   const decrement = (index, clockState) => {
-    const next = [...clockState];
-    const i = next.lastIndexOf(true);
-    if (i !== -1) { next[i] = false; updateClock(index, next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const next = [...clockState];
+      next[currentFilled - 1] = false;
+      updateClock(index, next);
+    }
   };
 
   const reset = (index, sections) =>
