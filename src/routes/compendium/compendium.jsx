@@ -290,8 +290,10 @@ const SidebarRow = React.memo(function SidebarRow({
       <TableCell sx={{ pl: isSelected ? "5px" : "8px" }}>
         <Typography
           variant="body2"
-          fontWeight={isSelected ? "bold" : "normal"}
           color={isSelected ? (customTheme.mode === "dark" ? "primary.light" : primaryColor) : "text.primary"}
+          sx={{
+            fontWeight: isSelected ? "bold" : "normal"
+          }}
         >
           {t(item.name)}
         </Typography>
@@ -374,7 +376,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
       >
         {t("Quick Create")}
       </Button>
-
       <Paper
         variant="outlined"
         sx={{
@@ -565,7 +566,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Book")} placeholder={t("Filters")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 return (
@@ -587,12 +588,14 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           placeholder={t("Search...")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }
           }}
         />
 
@@ -607,7 +610,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Applicable To")} placeholder={t("All classes")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 return <Chip key={key} label={t(option)} size="small" {...tagProps} />;
@@ -628,7 +631,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Subtype")} placeholder={t("All subtypes")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 const label = { "quirk": "Quirk", "camp-activities": "Camp Activities", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[option] ?? option;
@@ -652,7 +655,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 renderInput={(params) => (
                   <TextField {...params} label={t("Category")} placeholder={t("Filters")} />
                 )}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     return (
@@ -685,7 +688,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 renderInput={(params) => (
                   <TextField {...params} label={t("Applicable To")} placeholder={t("Filters")} />
                 )}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     return (
@@ -712,7 +715,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           {filteredItems.length} {t("items")}
         </Typography> */}
       </Paper>
-
       <TableContainer
         component={Paper}
         variant="outlined"
@@ -1522,12 +1524,14 @@ function CompendiumViewer() {
                   mb: 2,
                 }}
               >
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                   {t(
                     ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? ""
                   )}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   ({filteredItems.length})
                 </Typography>
               </Box>
@@ -1569,23 +1573,26 @@ function CompendiumViewer() {
 
             {/* Desktop section title */}
             {isDesktop && (
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
                 {t(
                   ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? ""
                 )}
                 <Typography
                   component="span"
                   variant="body2"
-                  color="text.secondary"
-                  sx={{ ml: 1 }}
-                >
+                  sx={{
+                    color: "text.secondary",
+                    ml: 1
+                  }}>
                   ({filteredItems.length} {t("items")})
                 </Typography>
               </Typography>
             )}
 
             {filteredItems.length === 0 ? (
-              <Typography color="text.secondary">{t("No items found.")}</Typography>
+              <Typography sx={{
+                color: "text.secondary"
+              }}>{t("No items found.")}</Typography>
             ) : (
               <Grid container spacing={2}>
                 {filteredItems.map((item, idx) => (
@@ -1777,7 +1784,13 @@ function CompendiumViewer() {
           />
 
           <Divider>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: 1
+              }}>
               {t("Module Export")}
             </Typography>
           </Divider>

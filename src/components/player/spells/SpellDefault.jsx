@@ -143,10 +143,11 @@ function ThemedSpellDefault({
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              fontSize={{ xs: "0.8rem", sm: "1rem" }}
-            >
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "0.8rem", sm: "1rem" }
+              }}>
               {isMagisphere && (
                 <Tooltip title={t("Magisphere")}>
                   <SettingsSuggest sx={{ fontSize: "1rem" }} />
@@ -162,7 +163,9 @@ function ThemedSpellDefault({
               justifyContent: "center",
             }}
             size={2}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {mp}
               {maxTargets !== 1 ? " × " + t("T") : ""}
             </Typography>
@@ -177,7 +180,9 @@ function ThemedSpellDefault({
               xs: 3,
               sm: 4
             }}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {targetDesc}
             </Typography>
           </Grid>
@@ -191,7 +196,9 @@ function ThemedSpellDefault({
               xs: 4,
               sm: 3
             }}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {duration}
             </Typography>
           </Grid>
@@ -215,9 +222,8 @@ function ThemedSpellDefault({
       </div>
       {/* Row 3 */}
       <Grid
-        container
-        justifyContent="flex-start"
-        sx={{
+        container sx={{
+          justifyContent: "flex-start",
           background: "transparent",
           padding: "3px 17px",
           marginBottom: "6px",

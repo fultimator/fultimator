@@ -49,7 +49,7 @@ export default function MagichantToneItem({
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           <Grid
             size={{
               xs: 12,
@@ -81,7 +81,9 @@ export default function MagichantToneItem({
               label={t("magichant_name")}
               value={isCustom ? (item.customName || "") : t(item.name || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "customName", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 

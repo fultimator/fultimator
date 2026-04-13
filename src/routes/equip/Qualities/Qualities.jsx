@@ -10,10 +10,8 @@ import {
   OutlinedInput,
   Box,
   Chip,
-  TextField,
   Tabs,
   Tab,
-  Divider,
 } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState, useRef } from "react";
@@ -123,14 +121,23 @@ function Qualities() {
             indicatorColor="primary"
             textColor="primary"
             variant="fullWidth"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              "& .MuiTab-root": {
+                color: theme.palette.mode === "dark" ? "rgba(255,255,255,0.7)" : undefined,
+              },
+              "& .MuiTab-root.Mui-selected": {
+                color: theme.palette.mode === "dark" ? "#ffffff" : undefined,
+                fontWeight: 700,
+              },
+            }}
           >
             <Tab label={t("Custom")} />
             <Tab label={t("Generator")} />
           </Tabs>
 
           {tab === 0 && (
-            <Grid container spacing={2} alignItems="center">
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
               <Grid  size={12}>
                 <SelectBase value={selectedBase} onChange={handleBaseChange} />
               </Grid>
@@ -207,7 +214,7 @@ function Qualities() {
                 </FormControl>
               </Grid>
               <Grid  size={12}>
-                <Grid container spacing={2} alignItems="center">
+                <Grid container spacing={2} sx={{ alignItems: "center" }}>
                   <Grid >
                     <Button
                       variant="outlined"

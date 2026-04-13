@@ -113,7 +113,11 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
             {armorModules.map((m, i) => (
               <TableRow key={`armor-${i}`}>
                 <StyledTableCell sx={{ fontWeight: 'bold', width: '30%' }}>
-                  <Box display="flex" alignItems="center">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center"
+                    }}>
                     {highlightMatch(m.name === "pilot_custom_armor" ? m.customName : t(m.name), searchQuery)}
                     {m.martial && <Martial sx={{ fontSize: '0.8rem', ml: 0.5 }} />}
                   </Box>
@@ -144,7 +148,11 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
               <React.Fragment key={`weapon-${i}`}>
                 <TableRow>
                   <StyledTableCell sx={{ fontWeight: 'bold' }}>
-                    <Box display="flex" alignItems="center">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center"
+                      }}>
                     {highlightMatch(m.name === "pilot_custom_weapon" ? m.customName : t(m.name), searchQuery)}
                       {m.martial && <Martial sx={{ fontSize: '0.8rem', ml: 0.5 }} />}
                     </Box>

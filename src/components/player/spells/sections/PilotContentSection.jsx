@@ -17,7 +17,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Add, ExpandMore, Delete, ErrorOutline, Search, ContentCopy } from "@mui/icons-material";
+import { Add, ExpandMore, Delete, ErrorOutlined, Search, ContentCopy } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import VehicleModule from "../VehicleModule";
@@ -652,7 +652,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                       xs: 12,
                       sm: 4
                     }}>
-                    <Box display="flex" gap={1}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 1
+                      }}>
                       <Button
                         onClick={() => handleDeleteVehicleClick(vehicleIndex)}
                         variant="outlined"
@@ -850,7 +854,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         ))
       ) : (
         <Grid  size={12}>
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No vehicles added")}
           </Typography>
         </Grid>
@@ -878,7 +886,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       {isAnyVehicleIllegal && (
         <Grid  size={12}>
           <Typography color="error" variant="caption" sx={{ display: "flex", alignItems: "center" }}>
-            <ErrorOutline sx={{ fontSize: 16, mr: 0.5 }} />
+            <ErrorOutlined sx={{ fontSize: 16, mr: 0.5 }} />
             {t("Illegal module configuration detected")}
           </Typography>
         </Grid>

@@ -29,11 +29,13 @@ export default function EditHeroicSkillModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
@@ -58,7 +60,9 @@ export default function EditHeroicSkillModal({
           onChange={(e) => setHeroic({ ...heroic, name: e.target.value })}
           fullWidth
           margin="normal"
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
         <TextField
           label={t("Quote")}
@@ -66,7 +70,9 @@ export default function EditHeroicSkillModal({
           onChange={(e) => setHeroic({ ...heroic, quote: e.target.value })}
           fullWidth
           margin="normal"
-          inputProps={{ maxLength: 200 }}
+          slotProps={{
+            htmlInput: { maxLength: 200 }
+          }}
         />
         <CustomTextarea
           label={t("Description")}

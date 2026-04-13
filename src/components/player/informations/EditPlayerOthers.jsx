@@ -113,7 +113,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
 
         {others.length === 0 && (
           <Grid  sx={{ py: 2 }} size={12}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <Typography sx={{ textAlign: "center" }}>
               {t("No optional entries yet.")}
             </Typography>
           </Grid>
@@ -126,7 +126,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1 }} alignItems="flex-start">
+            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
               <Grid
                 size={{
                   xs: 9,
@@ -136,11 +136,12 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   label={t("Name") + ":"}
                   value={other.name ?? ""}
                   onChange={(e) => onChangeOther(index, "name")(e.target.value)}
-                  inputProps={{ maxLength: 100 }}
-                  InputProps={{ readOnly: !isEditMode }}
                   fullWidth
                   size="small"
-                />
+                  slotProps={{
+                    input: { readOnly: !isEditMode },
+                    htmlInput: { maxLength: 100 }
+                  }} />
               </Grid>
               {isEditMode && (
                 <Grid
@@ -220,7 +221,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   />
                 ) : (
                   other.clock?.sections && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>
                       {t("Clock")}: {other.clock.sections}
                     </Typography>
                   )
@@ -243,11 +246,12 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                       });
                     }}
                     type="number"
-                    inputProps={{ min: 2, max: 12, readOnly: !isEditMode }}
-                    InputProps={{ readOnly: !isEditMode }}
                     fullWidth
                     size="small"
-                  />
+                    slotProps={{
+                      input: { readOnly: !isEditMode },
+                      htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
+                    }} />
                 </Grid>
               )}
             </Grid>

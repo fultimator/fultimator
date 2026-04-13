@@ -85,7 +85,12 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
             <MenuItem value={3}>{t("Skill Level 3 (All Types)")}</MenuItem>
           </Select>
         </FormControl>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mt: 1
+          }}>
           {t("Skill level determines which invocation types are available")}
         </Typography>
       </Grid>
@@ -100,7 +105,9 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           }
           label={t("Inner Wellspring")}
         />
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           {t("When enabled, one wellspring is locked as the inner wellspring")}
         </Typography>
       </Grid>

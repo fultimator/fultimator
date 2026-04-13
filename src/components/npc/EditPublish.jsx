@@ -219,7 +219,9 @@ export default function EditPublish({
               <Dialog
                 open={rulesDialogOpen}
                 onClose={handleDialogClose}
-                PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
+                slotProps={{
+                  paper: { sx: { width: "80%", maxWidth: "lg" } }
+                }}
               >
                 <DialogTitle variant="h3">
                   {t("submission_rule_title")}

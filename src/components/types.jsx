@@ -53,13 +53,15 @@ export function TypeAffinity({ type, affinity }) {
 
   return (
     <Typography
-      fontSize="inherit"
-      color="red.main"
-      fontWeight="bold"
-      fontFamily="inherit"
-      textAlign="left"
-      sx={{ textTransform: "uppercase", px: 0.2 }}
-    >
+      sx={{
+        fontSize: "inherit",
+        color: "red.main",
+        fontWeight: "bold",
+        fontFamily: "inherit",
+        textAlign: "left",
+        textTransform: "uppercase",
+        px: 0.2
+      }}>
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
       {/* Affinity */} {affinity}

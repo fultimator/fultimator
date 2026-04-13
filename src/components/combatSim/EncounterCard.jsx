@@ -114,14 +114,15 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
           sx={{ fontWeight: "bold", flexShrink: 0 }}
         />
       </Box>
-
       <CardContent sx={{ flexGrow: 1, pt: 2, pb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
           <CalendarTodayIcon
             fontSize="small"
             sx={{ color: theme.palette.text.secondary, mr: 1 }}
           />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {t("combat_sim_created")}: {formatDate(encounter.createdAt)}
           </Typography>
         </Box>
@@ -131,14 +132,14 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
             fontSize="small"
             sx={{ color: theme.palette.text.secondary, mr: 1 }}
           />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {t("combat_sim_last_updated")}: {formatDate(encounter.updatedAt)}
           </Typography>
         </Box>
       </CardContent>
-
       <Divider />
-
       <CardActions sx={{ justifyContent: "space-between", p: 1 }}>
         <Tooltip title={t("combat_sim_continue")}>
           <span>

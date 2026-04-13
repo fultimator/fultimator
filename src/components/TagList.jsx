@@ -87,21 +87,20 @@ const TagList = ({ npc, setNpc }) => {
     >
       {/* Label for the tag list */}
       <Typography
-        mb={1}
         sx={{
+          mb: 1,
           fontFamily: "Antonio",
           textTransform: "uppercase",
           fontSize: "1.3rem",
           color: theme.white,
           background: theme.primary,
           padding: "2px 10px",
-          borderRadius: "4px",
-        }}
-      >
+          borderRadius: "4px"
+        }}>
         {t("Personal Tags")}
       </Typography>
       {/* Stack for input field and add button */}
-      <Stack direction="row" spacing={1} alignItems="flex-start">
+      <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
         {/* Text field for adding tags */}
         <TextField
           value={inputValue}
@@ -112,8 +111,10 @@ const TagList = ({ npc, setNpc }) => {
           size="small"
           fullWidth
           disabled={isInputDisabled}
-          inputProps={{ maxLength: maxTagLength }} // Limit input to maxTagLength characters
           sx={{ height: "40px" }} // Set fixed height for the TextField
+          slotProps={{
+            htmlInput: { maxLength: maxTagLength }
+          }}
         />
         {/* Button to add tags */}
         <Button

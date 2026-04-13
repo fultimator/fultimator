@@ -142,8 +142,10 @@ function ThemedSpellTinkererAlchemy({
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {ranks[alchemy.rank - 1]}
             </Typography>
@@ -261,8 +263,10 @@ function ThemedSpellTinkererAlchemy({
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {t("Die")}
             </Typography>
@@ -290,9 +294,8 @@ function ThemedSpellTinkererAlchemy({
       {/* TARGETS Row 3 */}
       {alchemy.targets.map((target, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -310,8 +313,10 @@ function ThemedSpellTinkererAlchemy({
               }}
               size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {target.rangeFrom + " - " + target.rangeTo}
               </Typography>
@@ -393,8 +398,10 @@ function ThemedSpellTinkererAlchemy({
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {t("Die")}
             </Typography>
@@ -424,9 +431,8 @@ function ThemedSpellTinkererAlchemy({
       {/* EFFECTS Row 3 */}
       {alchemy.effects.map((effect, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -444,8 +450,10 @@ function ThemedSpellTinkererAlchemy({
               }}
               size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {effect.dieValue === 0 ? t("Any") : effect.dieValue}
               </Typography>

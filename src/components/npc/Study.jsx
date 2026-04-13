@@ -8,7 +8,7 @@ const Study = ({ npc, study }) => {
   return (
     <>
       {study >= 0 && (
-        <Grid container alignItems="stretch">
+        <Grid container sx={{ alignItems: "stretch" }}>
           <Grid
             sx={{
               background: "linear-gradient(90deg, #674168 0%, #b9a9be 100%);",
@@ -17,12 +17,13 @@ const Study = ({ npc, study }) => {
             }}
             size="grow">
             <Typography
-              color="white.main"
-              fontFamily="Antonio"
-              fontSize="1.5rem"
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
+              sx={{
+                color: "white.main",
+                fontFamily: "Antonio",
+                fontSize: "1.5rem",
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {npc.name}
             </Typography>
           </Grid>
@@ -36,11 +37,12 @@ const Study = ({ npc, study }) => {
               borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
             }}>
             <Typography
-              fontFamily="Antonio"
-              fontSize="1.25rem"
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
+              sx={{
+                fontFamily: "Antonio",
+                fontSize: "1.25rem",
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
             </Typography>
           </Grid>
@@ -77,11 +79,12 @@ function Love({ npc, study }) {
   return (
     <Typography
       component="div"
-      fontFamily="Antonio"
-      fontWeight="bold"
-      textAlign="center"
-      fontSize="0.9rem"
-    >
+      sx={{
+        fontFamily: "Antonio",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: "0.9rem"
+      }}>
       <Grid container>
         {study >= 2 ? (
           <Stats npc={npc} study={study} />
@@ -99,7 +102,7 @@ function Love({ npc, study }) {
               py: 0.2,
             }}
             size={6}>
-            <Grid container alignItems="stretch">
+            <Grid container sx={{ alignItems: "stretch" }}>
               <Grid  sx={{ px: 1.5, py: 0.4 }}>
                 {t("HP")}
               </Grid>

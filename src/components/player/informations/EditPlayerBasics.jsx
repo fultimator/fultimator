@@ -141,11 +141,13 @@ export default function EditPlayerBasics({
               label={t("Name") + ":"}
               value={player.name}
               onChange={onChange("name")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 50 }} // Set the maximum length to 50 characters
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </FormControl>
         </Grid>
         <Grid
@@ -159,11 +161,13 @@ export default function EditPlayerBasics({
               label={t("Pronouns") + ":"}
               value={player.info.pronouns}
               onChange={(e) => onChangeInfo("pronouns")(e.target.value)}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 15 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 15 }
+              }} />
           </FormControl>
         </Grid>
         <Grid
@@ -222,15 +226,17 @@ export default function EditPlayerBasics({
                 onChangeInfo("fabulapoints")(value);
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <FabulaIcon style={{ width: "28px", height: "28px" }} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton>
+                        <FabulaIcon style={{ width: "28px", height: "28px" }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -262,18 +268,20 @@ export default function EditPlayerBasics({
                 onChangeInfo("exp")(value);
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <ExpAdornment
-                    exp={player.info.exp}
-                    isEditMode={isEditMode}
-                    player={player}
-                    setPlayer={setPlayer}
-                    onLevelUp={handleLevelUp}
-                    onCloseLevelUp={handleCloseLevelUp}
-                  />
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <ExpAdornment
+                      exp={player.info.exp}
+                      isEditMode={isEditMode}
+                      player={player}
+                      setPlayer={setPlayer}
+                      onLevelUp={handleLevelUp}
+                      onCloseLevelUp={handleCloseLevelUp}
+                    />
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -298,15 +306,17 @@ export default function EditPlayerBasics({
                 }
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <ZenitIcon style={{ width: "28px", height: "28px" }} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton>
+                        <ZenitIcon style={{ width: "28px", height: "28px" }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -422,28 +432,30 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
         label={t("Level") + ":"}
         sx={{ width: "100%" }}
         value={player.lvl}
-        InputProps={{
-          readOnly: true,
-          startAdornment: (
-            <IconButton
-              aria-label="decrease level"
-              edge="start"
-              onClick={onLowerLevel}
-              disabled={!isEditMode}
-            >
-              <Remove />
-            </IconButton>
-          ),
-          endAdornment: (
-            <IconButton
-              aria-label="increase level"
-              edge="end"
-              onClick={onRaiseLevel}
-              disabled={!isEditMode}
-            >
-              <Add />
-            </IconButton>
-          ),
+        slotProps={{
+          input: {
+            readOnly: true,
+            startAdornment: (
+              <IconButton
+                aria-label="decrease level"
+                edge="start"
+                onClick={onLowerLevel}
+                disabled={!isEditMode}
+              >
+                <Remove />
+              </IconButton>
+            ),
+            endAdornment: (
+              <IconButton
+                aria-label="increase level"
+                edge="end"
+                onClick={onRaiseLevel}
+                disabled={!isEditMode}
+              >
+                <Add />
+              </IconButton>
+            ),
+          }
         }}
       />
     </FormControl>
@@ -523,11 +535,13 @@ function ExpAdornment({
       <Dialog
         open={levelUpDialogOpen}
         onClose={handleClose}
-        PaperProps={{
-          sx: {
-            width: "80%",
-            maxWidth: "md",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "80%",
+              maxWidth: "md",
+            },
+          }
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -544,11 +558,13 @@ function ExpAdornment({
       <Dialog
         open={levelUpCelebrationOpen}
         onClose={handleClose}
-        PaperProps={{
-          sx: {
-            width: "80%",
-            maxWidth: "lg",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "80%",
+              maxWidth: "lg",
+            },
+          }
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>

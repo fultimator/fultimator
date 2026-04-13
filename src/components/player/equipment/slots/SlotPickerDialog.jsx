@@ -293,29 +293,40 @@ export default function SlotPickerDialog({
               <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewModule ? (
                   <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
-                    <Typography variant="body2" fontWeight={700} noWrap>{previewModule.customName || t(previewModule.name)}</Typography>
-                    <Typography variant="caption" color="text.secondary" display="block" noWrap>{moduleStatLine(previewModule)}</Typography>
+                    <Typography variant="body2" noWrap sx={{
+                      fontWeight: 700
+                    }}>{previewModule.customName || t(previewModule.name)}</Typography>
+                    <Typography
+                      variant="caption"
+                      noWrap
+                      sx={{
+                        color: "text.secondary",
+                        display: "block"
+                      }}>{moduleStatLine(previewModule)}</Typography>
                     {previewModule.description && (
                       <Typography
                         variant="caption"
-                        color="text.primary"
-                        display="block"
                         sx={{
+                          color: "text.primary",
+                          display: "block",
                           mt: 0.5,
                           fontStyle: 'italic',
-                          display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
+                          overflow: 'hidden'
+                        }}>
                         {t(previewModule.description)}
                       </Typography>
                     )}
                   </Box>
                 ) : (
                   <Box sx={{ p: 1, display: 'flex', alignItems: 'center', height: '100%' }}>
-                    <Typography variant="caption" color="text.disabled" fontStyle="italic">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.disabled",
+                        fontStyle: "italic"
+                      }}>
                       {t('Hover a module to preview')}
                     </Typography>
                   </Box>
@@ -391,36 +402,52 @@ export default function SlotPickerDialog({
               <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewCandidate ? (
                   <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      <Typography variant="body2" fontWeight={700} noWrap>{previewCandidate.label}</Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 0.5,
+                        alignItems: "center"
+                      }}>
+                      <Typography variant="body2" noWrap sx={{
+                        fontWeight: 700
+                      }}>{previewCandidate.label}</Typography>
                       {!checkMartialProficiency(previewCandidate) && (
                         <Tooltip title={t('Not proficient with this martial item')}>
                           <WarningAmberIcon sx={{ fontSize: 14, color: 'warning.main' }} />
                         </Tooltip>
                       )}
                     </Box>
-                    <Typography variant="caption" color="text.secondary" display="block" noWrap>{previewCandidate.sub}</Typography>
+                    <Typography
+                      variant="caption"
+                      noWrap
+                      sx={{
+                        color: "text.secondary",
+                        display: "block"
+                      }}>{previewCandidate.sub}</Typography>
                     {previewCandidate.item?.quality && previewCandidate.item.quality !== previewCandidate.sub && (
                       <Typography
                         variant="caption"
-                        color="text.primary"
-                        display="block"
                         sx={{
+                          color: "text.primary",
+                          display: "block",
                           mt: 0.5,
                           fontStyle: 'italic',
-                          display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
-                      >
+                          overflow: 'hidden'
+                        }}>
                         {previewCandidate.item.quality}
                       </Typography>
                     )}
                   </Box>
                 ) : (
                   <Box sx={{ p: 1, display: 'flex', alignItems: 'center', height: '100%' }}>
-                    <Typography variant="caption" color="text.disabled" fontStyle="italic">
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.disabled",
+                        fontStyle: "italic"
+                      }}>
                       {t('Hover an item to preview')}
                     </Typography>
                   </Box>
@@ -463,10 +490,18 @@ export default function SlotPickerDialog({
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Box component="span" display="flex" alignItems="center" gap={0.5}>
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "flex",
+                                  gap: 0.5,
+                                  alignItems: "center"
+                                }}>
                                 <span>{c.label}</span>
                                 {(c.inCurrentSlot || c.inOtherSlot) && (
-                                  <Typography component="span" variant="caption" color="text.secondary">
+                                  <Typography component="span" variant="caption" sx={{
+                                    color: "text.secondary"
+                                  }}>
                                     ({t('Equipped')})
                                   </Typography>
                                 )}

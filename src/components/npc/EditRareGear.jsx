@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 
 import {
   Grid,
@@ -53,7 +53,7 @@ export default function EditRareGear({ npc, setNpc }) {
           <Grid container key={i} spacing={1}>
             <Grid  sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeRareGear(i)}>
-                <RemoveCircleOutline />
+                <RemoveCircleOutlined />
               </IconButton>
             </Grid>
             <Grid  size="grow">

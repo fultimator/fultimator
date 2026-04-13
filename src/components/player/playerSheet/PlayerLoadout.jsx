@@ -122,8 +122,21 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
 
   const cardInner = (
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
-      <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-        <Typography variant="caption" color="text.secondary" fontWeight={800} letterSpacing={0.4} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 0.5,
+          mb: 0.5,
+          alignItems: "center"
+        }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 800,
+            letterSpacing: 0.4,
+            fontSize: { xs: "0.68rem", sm: "0.72rem" }
+          }}>
           {label}
         </Typography>
         {isAux && (
@@ -143,27 +156,37 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         )}
       </Box>
       {isEmpty ? (
-        <Typography variant="body2" color="text.disabled" fontStyle="italic">
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.disabled",
+            fontStyle: "italic"
+          }}>
           {t('- Empty -')}
         </Typography>
       ) : (
         <>
-          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "0.84rem", sm: "0.9rem" }
+            }}>
             {itemName}
           </Typography>
           {statLine && (
             <Typography
               variant="caption"
-              color="text.secondary"
               sx={{
+                color: "text.secondary",
                 fontSize: { xs: "0.72rem", sm: "0.76rem" },
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2,
-              }}
-            >
+                lineHeight: 1.2
+              }}>
               {statLine}
             </Typography>
           )}
@@ -212,7 +235,12 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         )}
       </Box>
       {locked && (
-        <Box position="absolute" top={4} right={4}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 4,
+            right: 4
+          }}>
           <LockIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
         </Box>
       )}
@@ -229,32 +257,59 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
       {module ? (
         <>
-          <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-            <Typography variant="caption" color="text.secondary" fontWeight={800} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>{label}</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              mb: 0.5,
+              alignItems: "center"
+            }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                fontWeight: 800,
+                fontSize: { xs: "0.68rem", sm: "0.72rem" }
+              }}>{label}</Typography>
             <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
           </Box>
-          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>{module.customName || t(module.name)}</Typography>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "0.84rem", sm: "0.9rem" }
+            }}>{module.customName || t(module.name)}</Typography>
           {module.description && (
             <Typography
               variant="caption"
-              color="text.secondary"
               sx={{
+                color: "text.secondary",
                 fontSize: { xs: "0.72rem", sm: "0.76rem" },
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2,
-              }}
-            >
+                lineHeight: 1.2
+              }}>
               {(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 80)}
             </Typography>
           )}
         </>
       ) : (
         <>
-          <Typography variant="caption" color="text.secondary" fontWeight={700}>{label}</Typography>
-          <Typography variant="body2" color="text.disabled" fontStyle="italic">{t('- Empty -')}</Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 700
+            }}>{label}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.disabled",
+              fontStyle: "italic"
+            }}>{t('- Empty -')}</Typography>
         </>
       )}
     </CardContent>
@@ -450,12 +505,22 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {(isOwner || isEditMode) && pilotSpellInfo && (
           
           <>
-            <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mb: 1.5,
+                alignItems: "center"
+              }}>
               <PrecisionManufacturingIcon sx={{ fontSize: 16, color: activeVehicle ? 'success.main' : 'text.disabled' }} />
-              <Typography variant="caption" fontWeight={700} color={activeVehicle ? 'success.main' : 'text.secondary'}>
+              <Typography variant="caption" color={activeVehicle ? 'success.main' : 'text.secondary'} sx={{
+                fontWeight: 700
+              }}>
                 {activeVehicle ? (activeVehicle.customName || t('Vehicle')) : t('No vehicle active')}
               </Typography>
-              <Box flex={1} />
+              <Box sx={{
+                flex: 1
+              }} />
               <Button
                 size="small"
                 variant={activeVehicle ? 'outlined' : 'contained'}
@@ -612,7 +677,9 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       {/* Roll result dialog */}
       {rollDialog && (
         <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth
-          PaperProps={{ sx: { width: { xs: '90%', md: '30%' } } }}
+          slotProps={{
+            paper: { sx: { width: { xs: '90%', md: '30%' } } }
+          }}
         >
           <DialogTitle variant="h3" sx={{
             backgroundColor: rollDialog.isCritFail ? '#bb2124' : rollDialog.isCritSuccess ? '#22bb33' : '#aaaaaa',
@@ -633,13 +700,17 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 )}
               </Grid>
               <Grid  sx={{ mt: 1 }} size={12}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
                   {rollDialog.r2} [{attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
                   {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ''}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {t('Damage')}: {Math.max(rollDialog.r1, rollDialog.r2)} + {rollDialog.damage}
                 </Typography>
               </Grid>
@@ -683,12 +754,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         </DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
           {equippedSupportModules.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               {t('No support modules installed on this vehicle.')}
             </Typography>
           ) : (
             <>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block"
+                }}>
                 {t('Enable or disable support modules:')}
               </Typography>
               <List dense>

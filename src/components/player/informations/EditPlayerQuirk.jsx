@@ -62,7 +62,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
             showIconButton={false}
           />
         </Grid>
-        <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+        <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
           <Grid
             size={{
               xs: 10,
@@ -73,12 +73,14 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
               label={t("Quirk Name") + ":"}
               value={player.quirk?.name || ""}
               onChange={(e) => onChangeQuirk("name")(e.target.value)}
-              inputProps={{ maxLength: 50 }}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
               fullWidth
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </Grid>
           {isEditMode && (
             <Grid

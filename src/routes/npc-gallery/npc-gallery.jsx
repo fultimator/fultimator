@@ -545,7 +545,7 @@ function Personal() {
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
           {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
-          <Grid container spacing={1} alignItems="center">
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={{
                 xs: 12,
@@ -740,7 +740,9 @@ function Personal() {
               </IconButton>
             </Tooltip>
             <Divider orientation="vertical" flexItem />
-            <Typography variant="body1" fontWeight={600}>
+            <Typography variant="body1" sx={{
+              fontWeight: 600
+            }}>
               {t("filtered_npc_count") + " " + filteredList?.length}
             </Typography>
             {staleNpcs.length > 0 && (
@@ -771,7 +773,9 @@ function Personal() {
           {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -1136,7 +1140,7 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbM
       </MuiMenu>
       <Tooltip title={t("Edit")}>
         <RouterLink
-          to={`/npc-gallery/${npc.id}${
+          to={`/npc-edit/${npc.id}${
             filterParams
               ? filterParams.startsWith("?")
                 ? filterParams

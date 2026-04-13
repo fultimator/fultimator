@@ -392,7 +392,11 @@ const SettingsDialog = ({
           px: 3,
         }}
       >
-        <Box display="flex" alignItems="center">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center"
+          }}>
           <SaveIcon
             sx={{
               mr: 1.5,
@@ -401,7 +405,7 @@ const SettingsDialog = ({
                 : theme.palette.primary.main,
             }}
           />
-          <Typography variant="h3" fontWeight="bold">
+          <Typography variant="h3" sx={{ fontWeight: "bold" }}>
             {t("combat_sim_settings")}
           </Typography>
         </Box>
@@ -409,7 +413,6 @@ const SettingsDialog = ({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ p: 0 }}>
         <Box
           sx={{
@@ -448,7 +451,7 @@ const SettingsDialog = ({
                 }}
                 onClick={() => toggleCategory(category.key)}
               >
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                   {category.title}
                 </Typography>
                 <IconButton
@@ -599,8 +602,12 @@ const SettingsDialog = ({
                 }}
                 onClick={() => toggleCategory("logVisibility")}
               >
-                <Box display="flex" alignItems="center">
-                  <Typography variant="subtitle1" fontWeight="bold">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center"
+                  }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     {t("combat_sim_settings_log_visibility")}
                   </Typography>
                 </Box>
@@ -636,9 +643,10 @@ const SettingsDialog = ({
                   >
                     <Typography
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
+                      sx={{
+                        color: "text.secondary",
+                        mb: 1
+                      }}>
                       {t("combat_sim_settings_log_visibility_desc")}
                     </Typography>
 
@@ -702,7 +710,6 @@ const SettingsDialog = ({
           )}
         </Box>
       </DialogContent>
-
       <DialogActions
         sx={{
           flexDirection: "row",

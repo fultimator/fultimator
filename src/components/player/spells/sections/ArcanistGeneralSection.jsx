@@ -25,7 +25,9 @@ export default function ArcanistGeneralSection({
           fullWidth
           value={formState.name || ""}
           onChange={(e) => handleChange("name", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -39,7 +41,9 @@ export default function ArcanistGeneralSection({
           fullWidth
           value={formState.domain || ""}
           onChange={(e) => handleChange("domain", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -53,7 +57,9 @@ export default function ArcanistGeneralSection({
           fullWidth
           value={formState.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -81,7 +87,9 @@ export default function ArcanistGeneralSection({
           fullWidth
           value={formState.merge || ""}
           onChange={(e) => handleChange("merge", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -111,7 +119,9 @@ export default function ArcanistGeneralSection({
               fullWidth
               value={formState.pulse || ""}
               onChange={(e) => handleChange("pulse", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -141,7 +151,9 @@ export default function ArcanistGeneralSection({
           fullWidth
           value={formState.dismiss || ""}
           onChange={(e) => handleChange("dismiss", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid

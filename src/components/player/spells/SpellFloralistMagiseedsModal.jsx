@@ -121,7 +121,9 @@ export default function SpellFloralistMagiseedsModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "90%", maxWidth: "xl" } }}
+      slotProps={{
+        paper: { sx: { width: "90%", maxWidth: "xl" } }
+      }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("magiseed_edit_magiseed")}

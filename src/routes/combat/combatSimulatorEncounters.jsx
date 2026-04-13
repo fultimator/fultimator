@@ -300,7 +300,9 @@ const CombatSimEncounters = () => {
         />
 
         <div style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
+          <Typography variant="h6" gutterBottom sx={{
+            color: "text.primary"
+          }}>
             {t("combat_sim_new_encounter")}
           </Typography>
           <Grid container spacing={2}>
@@ -316,8 +318,10 @@ const CombatSimEncounters = () => {
                 value={encounterName}
                 onKeyDown={handleKeyDown}
                 onChange={handleEncounterNameChange}
-                inputProps={{ maxLength: 200 }}
                 disabled={dbMode === "cloud" && !cloudUser}
+                slotProps={{
+                  htmlInput: { maxLength: 200 }
+                }}
               />
             </Grid>
             <Grid
@@ -339,12 +343,11 @@ const CombatSimEncounters = () => {
           </Grid>
           <Box
             sx={{
+              mt: 2,
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
-            }}
-            mt={2}
-          >
+              alignItems: "center"
+            }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ToggleButtonGroup
                 value={dbMode}
@@ -362,7 +365,9 @@ const CombatSimEncounters = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
               {dbMode === "local" && <DriveSync />}
-              <Typography variant="h5" color="text.primary">
+              <Typography variant="h5" sx={{
+                color: "text.primary"
+              }}>
                 {t("combat_sim_saved_encounters")}{" "}
                 {dbMode === "cloud"
                   ? `(${encounters.length}/${MAX_ENCOUNTERS})`
@@ -394,7 +399,9 @@ const CombatSimEncounters = () => {
           {/* Select mode action bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -418,7 +425,13 @@ const CombatSimEncounters = () => {
           sx={{ p: 2, mt: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
         >
           <CloudIcon color="primary" />
-          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200
+            }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -440,10 +453,14 @@ const CombatSimEncounters = () => {
                 border: `1px dashed ${theme.palette.divider}`,
               }}
             >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{
+                color: "text.secondary"
+              }}>
                 {t("combat_sim_no_encounters")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("combat_sim_create_first_encounter")}
               </Typography>
             </Paper>

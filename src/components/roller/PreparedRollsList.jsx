@@ -18,8 +18,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
             container
             spacing={1}
             rowSpacing={1}
-            sx={{ my: 1 }}
-            alignItems="center"
+            sx={{ my: 1, alignItems: "center" }}
           >
             <Grid >
               <Button
@@ -33,7 +32,9 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
               </Button>
             </Grid>
             <Grid  size="grow">
-              <Typography fontSize="1.1rem">
+              <Typography sx={{
+                fontSize: "1.1rem"
+              }}>
                 <Roll roll={roll} /> { roll.label && <Diamond />} {roll.label}
               </Typography>
             </Grid>
@@ -58,7 +59,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
 
 function Roll({ roll }) {
   return (
-    <Typography component="span" fontWeight="bold">
+    <Typography component="span" sx={{ fontWeight: "bold" }}>
       {diceList(roll.dice, roll.modifier)}
     </Typography>
   );

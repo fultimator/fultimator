@@ -29,7 +29,7 @@ import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
-import { syncSlots, deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
+import { deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -585,10 +585,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid container justifyContent="center" spacing={2}>
+              <Grid container sx={{ justifyContent: "center" }} spacing={2}>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: 2.4
@@ -603,8 +602,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: 2.4
@@ -619,8 +617,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: 2.4
@@ -636,8 +633,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: 2.4
@@ -653,8 +649,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: 2.4
@@ -672,8 +667,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: "auto"
@@ -688,8 +682,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
                 <Grid
-                  container
-                  justifyContent="center"
+                  container sx={{ justifyContent: "center" }}
                   size={{
                     xs: 6,
                     sm: "auto"

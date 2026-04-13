@@ -81,7 +81,7 @@ function AuthCombat({ user }: AuthCombatProps) {
       .then((docs) => setPersonalList((docs as TypeNpc[]) ?? []))
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
@@ -117,7 +117,7 @@ function AuthCombat({ user }: AuthCombatProps) {
   console.debug(npcs);
 
   return (
-    <Grid container direction="column" sx={{ mt: 2 }}>
+    <Grid container sx={{ flexDirection: "column", mt: 2 }}>
       <Grid  size={12}>
         <Autocomplete
           size="small"
@@ -132,7 +132,7 @@ function AuthCombat({ user }: AuthCombatProps) {
         />
       </Grid>
       <Grid  size={12}>
-        <Stack direction="row" spacing={1} mb={2}>
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           {personalList?.map((npc) => {
             // Only show buttons for NPCs that have been selected at least once
             if (npcCounts[npc.id]) {
@@ -214,7 +214,7 @@ function NpcCombatant({ npc }: NpcProps) {
   };
 
   useEffect(() => {
-    let { slow, dazed, weak, shaken, enraged, poisoned } = statusEffects;
+    const { slow, dazed, weak, shaken, enraged, poisoned } = statusEffects;
 
     setAttributes({
       dexterity:
@@ -320,7 +320,7 @@ function NpcCombatant({ npc }: NpcProps) {
     let attribute1, attribute2, extraDamage, extraPrecision, type;
 
     // Get +1 accuracy every 10 levels
-    let accuracyLevelBonus = Math.floor(npc.lvl / 10);
+    const accuracyLevelBonus = Math.floor(npc.lvl / 10);
 
     if (attackType === "weapon") {
       // For weapon attacks
@@ -390,7 +390,7 @@ function NpcCombatant({ npc }: NpcProps) {
 
     // Calculate results
     const totalHitScore = roll1 + roll2 + extraPrecision;
-    let baseDamage = Math.max(roll1, roll2);
+    const baseDamage = Math.max(roll1, roll2);
 
     let damage = 0;
     if (type !== "nodmg") {
@@ -466,7 +466,7 @@ function NpcCombatant({ npc }: NpcProps) {
           ref={ref}
           collapse={true}
         />
-        <Grid  container mt={5} size={12}>
+        <Grid container size={12} sx={{ mt: 5 }}>
           <Grid  size={2}>
             <Typography variant="h5">{t("Study Roll:")}</Typography>
           </Grid>
@@ -499,7 +499,7 @@ function NpcCombatant({ npc }: NpcProps) {
       </Grid>
       <Grid size={6} >
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
-          <Grid  container alignItems="center" size={10}>
+          <Grid container size={10} sx={{ alignItems: "center" }}>
             <Grid  size={2}>
               <Typography variant="h5" color="red">
                 {t("HP:")} {hp}
@@ -533,7 +533,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeHp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid  container alignItems="center" size={10}>
+          <Grid container size={10} sx={{ alignItems: "center" }}>
             <Grid  size={2}>
               <Typography variant="h5" color="red">
                 {t("MP:")} {mp}
@@ -656,7 +656,7 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
           </Grid>
           <Grid  container size={12}>
-            <Grid  display="flex" justifyContent="center" size="grow">
+            <Grid size="grow" sx={{ display: "flex", justifyContent: "center" }}>
               <FormControlLabel
                 value="enraged"
                 control={
@@ -672,7 +672,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid  display="flex" justifyContent="center" size="grow">
+            <Grid size="grow" sx={{ display: "flex", justifyContent: "center" }}>
               <FormControlLabel
                 value="poisoned"
                 control={
@@ -690,7 +690,7 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
           </Grid>
           {/**ATTACK ROLL SIMULATOR**/}
-          <Grid  flex="1">
+          <Grid  sx={{ flex: 1 }}>
             {npc.attacks.map((attack, index) => (
               <Grid  key={index}>
                 <Button
@@ -742,8 +742,8 @@ function NpcCombatant({ npc }: NpcProps) {
                   </Button>
                 </Grid>
               ))}
-            <Grid  container pb={1} mt={2} border={1} borderRadius={1}>
-              <Grid  pt={1} pl={1} size={4}>
+            <Grid container sx={{ pb: 1, mt: 2, border: 1, borderRadius: 1 }}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Dice Results")}</Typography>
                 <Typography variant="body1">
                   {t("Die 1")}: <b>{diceResults.attribute1}</b>
@@ -752,13 +752,13 @@ function NpcCombatant({ npc }: NpcProps) {
                   {t("Die 2")}: <b>{diceResults.attribute2}</b>
                 </Typography>
               </Grid>
-              <Grid  pt={1} pl={1} size={4}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Hit Throw Result")}</Typography>
                 <Typography variant="body1">
                   {t("Hit Score")}: <b>{hitThrowResult.totalHitScore}</b>
                 </Typography>
               </Grid>
-              <Grid  pt={1} pl={1} size={4}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Damage Result")}</Typography>
                 <Typography variant="body1">
                   {t("Damage")}: <b>{damageResult.damage}</b>

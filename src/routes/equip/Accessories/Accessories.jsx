@@ -100,7 +100,7 @@ function Accessories() {
             headerText={t("Accessories")}
             icon={<AutoAwesome fontSize="large" />}
           />
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
             <Grid  size={6}>
               <ChangeName
                 value={name}
@@ -195,7 +195,7 @@ function Accessories() {
               <Divider />
             </Grid>
             <Grid  size={12}>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

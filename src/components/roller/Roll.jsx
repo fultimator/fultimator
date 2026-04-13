@@ -30,10 +30,18 @@ function RegularRoll({ roll }) {
                   minWidth: 50,
                 }}
                 size="grow">
-                <Typography textAlign={"center"} fontSize="2rem">
+                <Typography
+                  sx={{
+                    fontSize: "2rem",
+                    textAlign: "center"
+                  }}>
                   {die}
                 </Typography>
-                <Typography textAlign={"center"} fontSize="1rem">
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    textAlign: "center"
+                  }}>
                   {roll.dice[i]}
                 </Typography>
               </Grid>
@@ -42,10 +50,10 @@ function RegularRoll({ roll }) {
         </Grid>
         <Divider />
         <Stack>
-          <Typography textAlign="center" fontSize="1.5rem">
+          <Typography sx={{ textAlign: "center" }}>
             {roll.label}
           </Typography>
-          <Typography textAlign="center">
+          <Typography sx={{ textAlign: "center" }}>
             {roll.username} -{" "}
             {format(roll.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}
           </Typography>
@@ -137,10 +145,19 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               xs: 5,
               sm: 6
             }}>
-            <Typography textAlign={"center"} fontSize="2rem">
+            <Typography
+              sx={{
+                fontSize: "2rem",
+                textAlign: "center"
+              }}>
               {sum() + roll.modifier}
             </Typography>
-            <Typography fontWeight="bold" textAlign={"center"} fontSize="1rem">
+            <Typography
+              sx={{
+                fontSize: "1rem",
+                fontWeight: "bold",
+                textAlign: "center"
+              }}>
               {t("Result")}
             </Typography>
           </Grid>
@@ -149,38 +166,39 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               xs: 7,
               sm: 6
             }}>
-            <Grid container alignItems="center" spacing={1}>
+            <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid  size={6}>
-                <Typography textAlign="right">
+                <Typography sx={{ textAlign: "right" }}>
                   {t("roller_calculation")}:{" "}
                 </Typography>
               </Grid>
               <Grid  size={6}>
                 {roll.modifier < 0 && (
-                  <Typography textAlign="center" fontSize="1.2rem">
+                  <Typography sx={{ textAlign: "center" }}>
                     【{lastRoll[0]} + {lastRoll[1]} - {Math.abs(roll.modifier)}】
                   </Typography>
                 )}
                 {roll.modifier === 0 && (
-                  <Typography textAlign="center" fontSize="1.2rem">
+                  <Typography sx={{ textAlign: "center" }}>
                     【{lastRoll[0]} + {lastRoll[1]}】
                   </Typography>
                 )}
                 {roll.modifier > 0 && (
-                  <Typography textAlign="center" fontSize="1.2rem">
+                  <Typography sx={{ textAlign: "center" }}>
                     【{lastRoll[0]} + {lastRoll[1]} + {Math.abs(roll.modifier)}】
                   </Typography>
                 )}
               </Grid>
               <Grid  size={6}>
-                <Typography textAlign="right">{t("HR")}: </Typography>
+                <Typography sx={{ textAlign: "right" }}>{t("HR")}: </Typography>
               </Grid>
               <Grid  size={6}>
                 <Typography
-                  textAlign="center"
-                  fontWeight="bold"
-                  fontSize="1.5rem"
-                >
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.5rem",
+                    textAlign: "center"
+                  }}>
                   {hr()}
                 </Typography>
               </Grid>
@@ -189,12 +207,20 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
 
           <Grid  size={12}>
             {crit() && (
-              <Typography textAlign={"center"} fontSize="1.5rem">
+              <Typography
+                sx={{
+                  fontSize: "1.5rem",
+                  textAlign: "center"
+                }}>
                 🎉 {t("Critical Success")}! 🎉
               </Typography>
             )}
             {fumble() && (
-              <Typography textAlign={"center"} fontSize="1.5rem">
+              <Typography
+                sx={{
+                  fontSize: "1.5rem",
+                  textAlign: "center"
+                }}>
                 😭 {t("Critical Failure")}! 😭
               </Typography>
             )}
@@ -207,12 +233,20 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
           <>
             <Grid container sx={{ my: 1 }}>
               <Grid  size={6}>
-                <Typography textAlign={"center"} fontSize="1.5rem">
+                <Typography
+                  sx={{
+                    fontSize: "1.5rem",
+                    textAlign: "center"
+                  }}>
                   {lastRoll[0]}
                 </Typography>
               </Grid>
               <Grid  size={6}>
-                <Typography textAlign={"center"} fontSize="1.5rem">
+                <Typography
+                  sx={{
+                    fontSize: "1.5rem",
+                    textAlign: "center"
+                  }}>
                   {lastRoll[1]}
                 </Typography>
               </Grid>
@@ -236,13 +270,13 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
           </>
         )}
         <Stack>
-          <Typography textAlign="center" fontSize="1.5rem">
+          <Typography sx={{ textAlign: "center" }}>
             {roll.label} {diceList(roll.dice, roll.modifier)}
           </Typography>
 
           {roll.attempts.map((attempt, i) => {
             return (
-              <Typography textAlign="center" key={i} fontSize="0.9rem">
+              <Typography key={i} sx={{ textAlign: "center" }}>
                 {roll.username} <Diamond /> {attempt.attempt[0]} ({roll.dice[0]}
                 ) <Diamond /> {attempt.attempt[1]} ({roll.dice[1]}) <Diamond />{" "}
                 {format(attempt.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}

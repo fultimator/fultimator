@@ -130,8 +130,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               }}
               size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Basic Infusions")}
               </Typography>
@@ -161,9 +163,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 1)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -181,8 +182,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>
@@ -223,8 +226,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               }}
               size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Advanced Infusions")}
               </Typography>
@@ -248,9 +253,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 2)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -268,8 +272,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>
@@ -310,8 +316,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               }}
               size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Superior Infusions")}
               </Typography>
@@ -335,9 +343,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 3)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -355,8 +362,10 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>

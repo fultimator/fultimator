@@ -223,7 +223,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
             size={6}>
             {currentMagiseed ? (
               <div>
-                <Typography fontWeight="bold" style={{ marginBottom: "4px" }}>
+                <Typography sx={{ fontWeight: "bold" }} style={{ marginBottom: "4px" }}>
                   {currentMagiseed.customName || t(currentMagiseed.name)}
                 </Typography>
               </div>
@@ -327,7 +327,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
               borderLeft: `4px solid ${theme.primary}`,
             }}
           >
-            <Typography fontWeight="bold" sx={{ marginBottom: 1 }}>
+            <Typography sx={{ fontWeight: "bold", marginBottom: 1 }}>
               {currentMagiseed.customName || t(currentMagiseed.name)}
             </Typography>
             <div style={{ fontSize: "0.95em" }}>
@@ -373,12 +373,14 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                   }}
                   onClick={() => toggleMagiseedExpansion(index)}
                 >
-                  <Grid container alignItems="center">
+                  <Grid container sx={{ alignItems: "center" }}>
                     <Grid  size={1}>
                       {isExpanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </Grid>
                     <Grid  size={7}>
-                      <Typography fontWeight={currentMagiseed && seed.name === currentMagiseed.name ? "bold" : "normal"}>
+                      <Typography sx={{
+                        fontWeight: currentMagiseed && seed.name === currentMagiseed.name ? "bold" : "normal"
+                      }}>
                         {seed.customName || t(seed.name)}
                       </Typography>
                     </Grid>
@@ -431,7 +433,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                     {/* Effect Range */}
                     {seed.rangeStart !== undefined && seed.rangeEnd !== undefined && (
                       <>
-                        <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 0.5 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 0.5 }}>
                           {t("magiseed_effect_range")}:
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 2 }}>
@@ -443,7 +445,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                     <Divider sx={{ my: 2 }} />
                     
                     {/* Effects by growth clock section */}
-                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
                       {t("magiseed_effect_by_growth_clock")}
                     </Typography>
                     
@@ -461,7 +463,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                       
                       return (
                         <Box key={section} sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" fontWeight="bold" sx={{ color: theme.primary }}>
+                          <Typography variant="caption" sx={{ fontWeight: "bold", color: theme.primary }}>
                             T = {section}:
                           </Typography>
                           <Box sx={{ ml: 2, mt: 0.5 }}>

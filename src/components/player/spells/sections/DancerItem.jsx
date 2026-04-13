@@ -55,7 +55,7 @@ export default function DancerItem({
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           <Grid
             size={{
               xs: 12,

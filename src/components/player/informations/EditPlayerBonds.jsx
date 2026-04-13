@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
+import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
@@ -122,30 +122,36 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
         </Grid>
         {player.info.bonds.map((bond, index) => (
           <Grid  key={index} size={12}>
-            <Grid container spacing={2} alignItems="center">
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
                   md: 4
                 }}>
-                <Box display="flex" alignItems="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center"
+                  }}>
                   {isEditMode ? <IconButton
                     aria-label="delete"
                     onClick={() => deleteBond(index)}
                     sx={{ ml: 1 }}
                   >
-                    <RemoveCircleOutline />
+                    <RemoveCircleOutlined />
                   </IconButton> : null}
                   <TextField
                     fullWidth
                     label={t("Bond Name")}
                     value={bond.name}
                     onChange={handleBondNameChange(index)}
-                    InputProps={{
-                      readOnly: !isEditMode,
-                    }}
-                    inputProps={{ maxLength: 50 }}
-                  />
+                    slotProps={{
+                      input: {
+                        readOnly: !isEditMode,
+                      },
+
+                      htmlInput: { maxLength: 50 }
+                    }} />
                 </Box>
               </Grid>
               <Grid

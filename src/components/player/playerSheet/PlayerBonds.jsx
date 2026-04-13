@@ -231,7 +231,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                             </Typography>
                           ))
                         ) : (
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{
+                            color: "text.secondary"
+                          }}>
                             {"-"}
                           </Typography>
                         )}
@@ -264,7 +266,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                   label={t("Bond Name")}
                   value={draftBond.name}
                   onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
               {[

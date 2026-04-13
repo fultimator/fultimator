@@ -146,7 +146,9 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           fullWidth
           value={formState.spellName || ""}
           onChange={(e) => updateField("spellName", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -201,7 +203,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
       {targets.map((target, targetIndex) => (
         <Grid  key={`target-${targetIndex}`} size={12}>
           <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
-            <Grid container spacing={1.5} alignItems="center">
+            <Grid container spacing={1.5} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
@@ -249,7 +251,9 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   size="small"
                   value={target.effect || ""}
                   onChange={(e) => updateTarget(targetIndex, { effect: e.target.value })}
-                  inputProps={{ maxLength: 200 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 200 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -287,7 +291,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   <Grid container spacing={1}>
                     {(target.secondEffects || []).map((entry, effectIndex) => (
                       <Grid  key={`target-${targetIndex}-effect-${effectIndex}`} size={12}>
-                        <Grid container spacing={1} alignItems="center">
+                        <Grid container spacing={1} sx={{ alignItems: "center" }}>
                           <Grid
                             size={{
                               xs: 4,
@@ -321,7 +325,9 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               onChange={(e) =>
                                 updateSecondEffect(targetIndex, effectIndex, { effect: e.target.value })
                               }
-                              inputProps={{ maxLength: 200 }}
+                              slotProps={{
+                                htmlInput: { maxLength: 200 }
+                              }}
                             />
                           </Grid>
                           <Grid

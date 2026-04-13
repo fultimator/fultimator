@@ -91,8 +91,10 @@ export default function BattleHeader({
                 ? t("combat_sim_empty_name_warning")
                 : ""
             }
-            inputProps={{ maxLength: 100 }}
             sx={{ width: "100%" }}
+            slotProps={{
+              htmlInput: { maxLength: 100 }
+            }}
           />
         ) : (
           <Box
@@ -209,9 +211,10 @@ export default function BattleHeader({
               {autoSaveTimeText && (
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  whiteSpace="nowrap"
-                >
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "nowrap"
+                  }}>
                   {autoSaveTimeText}
                 </Typography>
               )}
@@ -219,10 +222,11 @@ export default function BattleHeader({
           ) : (
             // Show manual save time only if autosave is OFF and it's been saved before
             (timeAgo !== "Not saved yet" && (<Typography
-              variant="caption"
-              color="text.secondary"
-              whiteSpace="nowrap"
-            >
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              whiteSpace: "nowrap"
+            }}>
               {timeAgo}
             </Typography>))
           )}

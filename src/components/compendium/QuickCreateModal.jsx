@@ -156,7 +156,9 @@ function PanelLayout({ formContent, previewContent, data, itemName, addButton, e
             <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5 }}>
               <Tooltip title={t("Share URL")}>
                 <IconButton size="small" onClick={handleCopyShareUrl}>
-                  <LinkIcon fontSize="small" />
+                  <LinkIcon sx={{
+                    fontSize: "small"
+                  }} />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t("Download as Image")}>
@@ -278,11 +280,15 @@ function NpcAttackPanel() {
           </Grid>
           <Grid  size={6}>
             <TextField label={t("Accuracy Bonus")} value={flathit} onChange={(e) => setFlathit(e.target.value)}
-              fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+              fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid  size={6}>
             <TextField label={t("Damage Bonus")} value={flatdmg} onChange={(e) => setFlatdmg(e.target.value)}
-              fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+              fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid  size={12}>
             <CustomTextarea label={t("Special")} value={special} onChange={(e) => setSpecial(e.target.value)} helperText="" placeholder={t("Optional special effect description")} />
@@ -348,14 +354,16 @@ function NpcSpellPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 10,
               sm: 11
             }}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)}
-              fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
+              fullWidth size="small" autoFocus slotProps={{
+              htmlInput: { maxLength: 50 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -373,7 +381,9 @@ function NpcSpellPanel() {
               sm: 3
             }}>
             <TextField label={t("MP x Target")} value={mp} onChange={(e) => setMp(e.target.value)}
-              fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+              fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -381,7 +391,9 @@ function NpcSpellPanel() {
               sm: 3
             }}>
             <TextField label={t("Max Targets")} value={maxTargets} onChange={(e) => setMaxTargets(e.target.value)}
-              fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+              fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -435,7 +447,9 @@ function NpcSpellPanel() {
                 sm: 3
               }}>
               <TextField label={t("Damage")} value={damage} onChange={(e) => setDamage(e.target.value)}
-                fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+                fullWidth size="small" type="number" slotProps={{
+                htmlInput: { min: 0 }
+              }} />
             </Grid>
           )}
           <Grid
@@ -511,7 +525,9 @@ function NpcSpecialPanel() {
               xs: 12,
               sm: 4
             }}>
-            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid  size={12}>
             <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
@@ -562,7 +578,9 @@ function NpcActionPanel() {
               xs: 12,
               sm: 4
             }}>
-            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+            <TextField label={t("SP Cost")} value={spCost} onChange={(e) => setSpCost(e.target.value)} fullWidth size="small" type="number" slotProps={{
+              htmlInput: { min: 0 }
+            }} />
           </Grid>
           <Grid  size={12}>
             <CustomTextarea label={t("Effect")} value={effect} onChange={(e) => setEffect(e.target.value)} helperText="" />
@@ -852,7 +870,7 @@ function PlayerSpellPanel() {
       data={spellType === "default" ? data : nonStaticData}
       itemName={name.trim() || ""}
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -881,7 +899,7 @@ function PlayerSpellPanel() {
             </Grid>
           )}
           {spellType !== "default" ? (
-            <Grid container spacing={2} alignItems="center" sx={{ mt: 0, ml: 0 }}>
+            <Grid container spacing={2} sx={{ alignItems: "center", mt: 0, ml: 0 }}>
               <Grid  size={12}>
                 <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
               </Grid>
@@ -1059,7 +1077,9 @@ function PlayerSpellPanel() {
                     sm: 4
                   }}>
                   <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)}
-                    fullWidth size="small" type="number" inputProps={{ min: 1, max: 3 }} />
+                    fullWidth size="small" type="number" slotProps={{
+                    htmlInput: { min: 1, max: 3 }
+                  }} />
                 </Grid>
               )}
 
@@ -1092,8 +1112,10 @@ function PlayerSpellPanel() {
                       sm: 3
                     }}>
                     <TextField label={t("Range Start")} value={seedRangeStart} type="number"
-                      inputProps={{ min: 0, max: 4 }} fullWidth size="small"
-                      onChange={(e) => setSeedRangeStart(Number(e.target.value))} />
+                      fullWidth size="small" onChange={(e) => setSeedRangeStart(Number(e.target.value))}
+                      slotProps={{
+                        htmlInput: { min: 0, max: 4 }
+                      }} />
                   </Grid>
                   <Grid
                     size={{
@@ -1101,8 +1123,10 @@ function PlayerSpellPanel() {
                       sm: 3
                     }}>
                     <TextField label={t("Range End")} value={seedRangeEnd} type="number"
-                      inputProps={{ min: 1, max: 6 }} fullWidth size="small"
-                      onChange={(e) => setSeedRangeEnd(Number(e.target.value))} />
+                      fullWidth size="small" onChange={(e) => setSeedRangeEnd(Number(e.target.value))}
+                      slotProps={{
+                        htmlInput: { min: 1, max: 6 }
+                      }} />
                   </Grid>
                   <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={seedDescription}
@@ -1162,7 +1186,9 @@ function PlayerSpellPanel() {
                         sm: 4
                       }}>
                       <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
-                        inputProps={{ min: 0 }} onChange={(e) => setModuleCost(e.target.value)} />
+                        onChange={(e) => setModuleCost(e.target.value)} slotProps={{
+                        htmlInput: { min: 0 }
+                      }} />
                     </Grid>
                   )}
 
@@ -1349,7 +1375,9 @@ function PlayerSpellPanel() {
                   sm: 3
                 }}>
                 <TextField label={t("MP")} value={mp} onChange={(e) => setMp(e.target.value)}
-                  fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+                  fullWidth size="small" type="number" slotProps={{
+                  htmlInput: { min: 0 }
+                }} />
               </Grid>
               <Grid
                 size={{
@@ -1357,7 +1385,9 @@ function PlayerSpellPanel() {
                   sm: 3
                 }}>
                 <TextField label={t("Max Targets")} value={maxTargets} onChange={(e) => setMaxTargets(e.target.value)}
-                  fullWidth size="small" type="number" inputProps={{ min: 0 }} />
+                  fullWidth size="small" type="number" slotProps={{
+                  htmlInput: { min: 0 }
+                }} />
               </Grid>
               <Grid
                 size={{
@@ -1527,7 +1557,9 @@ function QualityPanel() {
           </Box>
         </Box>
       }
-      previewContent={data.name ? <QualityCard quality={data} /> : <Box sx={{ p: 2 }}><Typography color="text.secondary">Fill in the form to see a preview</Typography></Box>}
+      previewContent={data.name ? <QualityCard quality={data} /> : <Box sx={{ p: 2 }}><Typography sx={{
+        color: "text.secondary"
+      }}>Fill in the form to see a preview</Typography></Box>}
       addButton={<AddToCompendiumButton itemType="quality" data={data} />}
       exportDataType="qualities"
     />
@@ -1560,7 +1592,9 @@ function HeroicPanel() {
         <Grid container spacing={2}>
           <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)}
-              fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
+              fullWidth size="small" autoFocus slotProps={{
+              htmlInput: { maxLength: 50 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -1578,7 +1612,7 @@ function HeroicPanel() {
           <Grid  size={12}>
             <Autocomplete multiple options={CLASS_NAME_OPTIONS} value={applicableTo}
               onChange={(_, v) => setApplicableTo(v)} freeSolo
-              renderTags={(value, getTagProps) =>
+              renderValue={(value, getTagProps) =>
                 value.map((option, index) => <Chip key={option} label={option} size="small" {...getTagProps({ index })} />)
               }
               renderInput={(params) => <TextField {...params} label={t("Applicable To")} size="small" placeholder={t("Select classes...")} />}
@@ -1586,7 +1620,9 @@ function HeroicPanel() {
           </Grid>
           <Grid  size={12}>
             <TextField label={t("Quote")} value={quote} onChange={(e) => setQuote(e.target.value)}
-              fullWidth size="small" inputProps={{ maxLength: 200 }} />
+              fullWidth size="small" slotProps={{
+              htmlInput: { maxLength: 200 }
+            }} />
           </Grid>
           <Grid  size={12}>
             <CustomTextarea label={t("Description")} value={description} onChange={(e) => setDescription(e.target.value)} helperText="" maxLength={1500} />
@@ -1671,7 +1707,9 @@ function ClassPanel() {
               sm: 9
             }}>
             <TextField label={t("Class Name")} value={name} onChange={(e) => setName(e.target.value)}
-              fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
+              fullWidth size="small" autoFocus slotProps={{
+              htmlInput: { maxLength: 50 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -1688,21 +1726,27 @@ function ClassPanel() {
           </Grid>
 
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Free Benefits")}
             </Typography>
           </Grid>
           <Grid  size={4}>
             <TextField label={t("HP+")} type="number" value={hpplus}
-              onChange={(e) => setHpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 5 }} />
+              onChange={(e) => setHpplus(Number(e.target.value))} fullWidth size="small" slotProps={{
+              htmlInput: { min: 0, step: 5 }
+            }} />
           </Grid>
           <Grid  size={4}>
             <TextField label={t("MP+")} type="number" value={mpplus}
-              onChange={(e) => setMpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 5 }} />
+              onChange={(e) => setMpplus(Number(e.target.value))} fullWidth size="small" slotProps={{
+              htmlInput: { min: 0, step: 5 }
+            }} />
           </Grid>
           <Grid  size={4}>
             <TextField label={t("IP+")} type="number" value={ipplus}
-              onChange={(e) => setIpplus(Number(e.target.value))} fullWidth size="small" inputProps={{ min: 0, step: 2 }} />
+              onChange={(e) => setIpplus(Number(e.target.value))} fullWidth size="small" slotProps={{
+              htmlInput: { min: 0, step: 2 }
+            }} />
           </Grid>
 
           <Grid  size={12}>
@@ -1729,7 +1773,9 @@ function ClassPanel() {
             <Grid  key={i} sx={{ display: "flex", gap: 1, alignItems: "center" }} size={12}>
               <TextField label={`${t("Custom Benefit")} ${i + 1}`} value={cb}
                 onChange={(e) => setCustomBenefits((arr) => arr.map((v, j) => j === i ? e.target.value : v))}
-                fullWidth size="small" inputProps={{ maxLength: 500 }} />
+                fullWidth size="small" slotProps={{
+                htmlInput: { maxLength: 500 }
+              }} />
               <IconButton size="small" color="error"
                 onClick={() => setCustomBenefits((arr) => arr.filter((_, j) => j !== i))}>
                 <DeleteIcon fontSize="small" />
@@ -1743,7 +1789,7 @@ function ClassPanel() {
           </Grid>
 
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Spell Types")}
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -1759,7 +1805,7 @@ function ClassPanel() {
           </Grid>
 
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
               {t("Skills")}
             </Typography>
           </Grid>
@@ -1774,7 +1820,9 @@ function ClassPanel() {
                     }}>
                     <TextField label={`${t("Skill Name")} ${i + 1}`} value={skill.skillName}
                       onChange={(e) => updateSkillField(i, "skillName", e.target.value)}
-                      fullWidth size="small" inputProps={{ maxLength: 50 }} />
+                      fullWidth size="small" slotProps={{
+                      htmlInput: { maxLength: 50 }
+                    }} />
                   </Grid>
                   <Grid
                     size={{
@@ -1783,7 +1831,9 @@ function ClassPanel() {
                     }}>
                     <TextField label={t("Max Lvl")} type="number" value={skill.maxLvl}
                       onChange={(e) => updateSkillField(i, "maxLvl", Math.max(1, Math.min(10, Number(e.target.value))))}
-                      fullWidth size="small" inputProps={{ min: 1, max: 10 }} />
+                      fullWidth size="small" slotProps={{
+                      htmlInput: { min: 1, max: 10 }
+                    }} />
                   </Grid>
                   <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={skill.description}
@@ -1921,7 +1971,7 @@ function WeaponPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1} alignItems="center">
+        <Grid container spacing={1} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 10,
@@ -2069,7 +2119,7 @@ function ArmorPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -2190,7 +2240,7 @@ function ShieldPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -2416,7 +2466,7 @@ function CustomWeaponPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid  size={12}>
             <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus />
           </Grid>
@@ -2688,7 +2738,7 @@ function AccessoryPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -2890,7 +2940,9 @@ function OptionalPanel() {
                 xs: 12,
                 sm: 6
               }}>
-              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" slotProps={{
+                htmlInput: { min: 2, max: 12 }
+              }} />
             </Grid>
             <Grid  size={12}>
               <Autocomplete
@@ -2942,7 +2994,9 @@ function OptionalPanel() {
                   xs: 12,
                   sm: 6
                 }}>
-                <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+                <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" slotProps={{
+                  htmlInput: { min: 2, max: 12 }
+                }} />
               </Grid>
             )}
           </>}
@@ -2951,7 +3005,9 @@ function OptionalPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={data.name ? <OptionalCard optional={data} /> : <Box sx={{ p: 2 }}><Typography color="text.secondary">{t("Fill in the form to see a preview")}</Typography></Box>}
+      previewContent={data.name ? <OptionalCard optional={data} /> : <Box sx={{ p: 2 }}><Typography sx={{
+        color: "text.secondary"
+      }}>{t("Fill in the form to see a preview")}</Typography></Box>}
       addButton={<AddToCompendiumButton itemType="optional" data={data} />}
       exportDataType="optionals"
     />
@@ -3013,7 +3069,9 @@ export default function QuickCreateModal({ open, onClose, lockedToViewerType }) 
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
-      PaperProps={{ sx: { height: "90vh", display: "flex", flexDirection: "column" } }}>
+      slotProps={{
+        paper: { sx: { height: "90vh", display: "flex", flexDirection: "column" } }
+      }}>
       <DialogTitle sx={{ pb: 0 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <AutoFixHigh fontSize="small" />
@@ -3023,7 +3081,6 @@ export default function QuickCreateModal({ open, onClose, lockedToViewerType }) 
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
-
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto">
           {TABS.map((item, idx) => (
@@ -3035,7 +3092,6 @@ export default function QuickCreateModal({ open, onClose, lockedToViewerType }) 
           ))}
         </Tabs>
       </Box>
-
       <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
         {TABS.map(({ key, Panel }, idx) => (
           <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>

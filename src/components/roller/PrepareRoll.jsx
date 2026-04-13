@@ -9,9 +9,9 @@ import {
   Card,
 } from "@mui/material";
 import {
-  AddCircleOutline,
+  AddCircleOutlined,
   Close,
-  RemoveCircleOutline,
+  RemoveCircleOutlined,
   SouthEast,
   SouthWest,
 } from "@mui/icons-material";
@@ -115,7 +115,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
 
   return (
     <Paper elevation={1} sx={{ p: 2, mx: "auto" }}>
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={2} sx={{ justifyContent: "center" }}>
         <Grid  size={12}>
           <Card sx={{ p: 2, bgcolor: "background.default" }}>
             <Typography>
@@ -129,7 +129,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
         {/* Dice Row */}
         <Grid  size={12}>
-          <Grid container justifyContent="space-around" spacing={2}>
+          <Grid container spacing={2} sx={{ justifyContent: "space-around" }}>
             {[
               { icon: <D4Icon />, count: d4, set: setd4 },
               { icon: <D6Icon />, count: d6, set: setd6 },
@@ -162,7 +162,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
 
         {/* Modifiers */}
         <Grid  size={12}>
-          <Grid container justifyContent="center" spacing={2}>
+          <Grid container spacing={2} sx={{ justifyContent: "center" }}>
             <Grid >
               <IconButton
                 onClick={onRaise(setBonus)}
@@ -170,7 +170,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 sx={{ color: isDarkMode ? "#fff" : "#333" }}
               >
                 <Badge badgeContent={bonus} color="success">
-                  <AddCircleOutline sx={{ fontSize: "3rem" }} />
+                  <AddCircleOutlined sx={{ fontSize: "3rem" }} />
                 </Badge>
               </IconButton>
             </Grid>
@@ -181,7 +181,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 sx={{ color: isDarkMode ? "#fff" : "#333" }}
               >
                 <Badge badgeContent={malus} color="error">
-                  <RemoveCircleOutline sx={{ fontSize: "3rem" }} />
+                  <RemoveCircleOutlined sx={{ fontSize: "3rem" }} />
                 </Badge>
               </IconButton>
             </Grid>
@@ -201,7 +201,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
 
         {/* Buttons */}
         <Grid  size={12}>
-          <Grid container spacing={2} justifyContent="center" wrap="nowrap">
+          <Grid container spacing={2} sx={{ justifyContent: "center", flexWrap: "nowrap" }}>
             <Grid >
               <Button
                 variant="contained"

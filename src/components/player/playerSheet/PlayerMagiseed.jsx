@@ -143,7 +143,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("magiseed_growth_clock")} - {t(magiseedSpell.className)}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={2}>
                       <Grid >
                         <Clock
                           numSections={4}
@@ -158,7 +158,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                         />
                       </Grid>
                       <Grid  size="grow">
-                        <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
+                        <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
                           {magiseedSpell.currentMagiseed 
                             ? (magiseedSpell.currentMagiseed.customName || t(magiseedSpell.currentMagiseed.name))
                             : t("magiseed_no_magiseed")}
@@ -268,7 +268,9 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSeed && (() => {

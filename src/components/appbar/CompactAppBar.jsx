@@ -34,21 +34,21 @@ const NpcEditAppBar = ({
   return (
     <MuiAppBar position="fixed">
       <Container>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid  textAlign="left" size={3}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Grid size={3} sx={{ textAlign: "left" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
           </Grid>
-          <Grid  textAlign="center" size={6}>
-            <Grid container justifyContent="center">
+          <Grid size={6} sx={{ textAlign: "center" }}>
+            <Grid container sx={{ justifyContent: "center" }}>
               <ExplainSkillsSimplified npc={npcTemp} />
             </Grid>
           </Grid>
-          <Grid  textAlign="right" size={3}>
-            <Grid container alignItems="center" justifyContent="flex-end">
+          <Grid size={3} sx={{ textAlign: "right" }}>
+            <Grid container sx={{ alignItems: "center", justifyContent: "flex-end" }}>
               {showGoBackButton && !isPcEdit && (
                 <Tooltip title="Open Compendium">
                   <IconButton color="inherit" onClick={openCompendiumModal}>
@@ -93,21 +93,21 @@ const PcEditAppBar = ({
   return (
     <MuiAppBar position="fixed">
       <Container>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid  textAlign="left" size={3}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Grid size={3} sx={{ textAlign: "left" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
           </Grid>
-          <Grid  textAlign="center" size={6}>
-            <Grid container justifyContent="center">
+          <Grid size={6} sx={{ textAlign: "center" }}>
+            <Grid container sx={{ justifyContent: "center" }}>
               <span>{t("Character Designer")}</span>
             </Grid>
           </Grid>
-          <Grid  textAlign="right" size={3}>
-            <Grid container alignItems="center" justifyContent="flex-end">
+          <Grid size={3} sx={{ textAlign: "right" }}>
+            <Grid container sx={{ alignItems: "center", justifyContent: "flex-end" }}>
               {showGoBackButton && (
                 <Tooltip title="Open Compendium">
                   <IconButton color="inherit" onClick={openCompendiumModal}>

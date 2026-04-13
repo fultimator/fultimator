@@ -285,7 +285,9 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent>
                 {selectedEffect && (
@@ -294,7 +296,12 @@ export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
                       {selectedEffect.tasteCombination || t("gourmet_delicacy")}
                     </Typography>
                     
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        color: "text.secondary",
+                        mb: 2
+                      }}>
                       {selectedCookingSpell && selectedCookingSpell.spellName}
                     </Typography>
 

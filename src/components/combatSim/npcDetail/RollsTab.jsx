@@ -180,7 +180,7 @@ const RollsTab = ({
           </Box>
           <Divider orientation="vertical" flexItem sx={{ mx: 1, my: -1 }} />
           <Box sx={{ flexGrow: 1, px: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
               {data.name}{" "}
               {type === "Spell" && data.type === "offensive" && (
                 <OffensiveSpellIcon />
@@ -238,10 +238,12 @@ const RollsTab = ({
               <Box sx={{ maxWidth: "80%", overflowWrap: "break-word" }}>
                 <Typography
                   variant="body2"
-                  color="text.secondary"
                   component="div"
-                  sx={{ whiteSpace: "pre-wrap", my: -1 }}
-                >
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "pre-wrap",
+                    my: -1
+                  }}>
                   <StyledMarkdown>{extra}</StyledMarkdown>
                 </Typography>
               </Box>

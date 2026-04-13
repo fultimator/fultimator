@@ -326,7 +326,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 10,
@@ -339,7 +339,9 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               autoFocus
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -369,7 +371,9 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               type="number"
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: { min: 0 }
+              }}
             />
           </Grid>
           <Grid
@@ -384,7 +388,9 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               type="number"
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: { min: 0 }
+              }}
             />
           </Grid>
           <Grid
@@ -567,7 +573,9 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               type="number"
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: { min: 0 }
+              }}
             />
           </Grid>
           <Grid  size={12}>
@@ -666,7 +674,9 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               type="number"
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: { min: 0 }
+              }}
             />
           </Grid>
           <Grid  size={12}>
@@ -955,7 +965,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -1024,7 +1034,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   fullWidth
                   size="small"
                   type="number"
-                  inputProps={{ min: 0 }}
+                  slotProps={{
+                    htmlInput: { min: 0 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -1039,7 +1051,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   fullWidth
                   size="small"
                   type="number"
-                  inputProps={{ min: 0 }}
+                  slotProps={{
+                    htmlInput: { min: 0 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -1247,7 +1261,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                     xs: 12,
                     sm: 4
                   }}>
-                  <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 1, max: 3 }} />
+                  <TextField label={t("Rank")} value={infusionRank} onChange={(e) => setInfusionRank(e.target.value)} fullWidth size="small" type="number" slotProps={{
+                    htmlInput: { min: 1, max: 3 }
+                  }} />
                 </Grid>
               )}
               {spellType === "cooking" && (
@@ -1271,10 +1287,14 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
               {spellType === "magiseed" && (
                 <>
                   <Grid  size={6}>
-                    <TextField label={t("Range Start")} value={seedRangeStart} onChange={(e) => setSeedRangeStart(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 0, max: 4 }} />
+                    <TextField label={t("Range Start")} value={seedRangeStart} onChange={(e) => setSeedRangeStart(Number(e.target.value))} fullWidth size="small" type="number" slotProps={{
+                      htmlInput: { min: 0, max: 4 }
+                    }} />
                   </Grid>
                   <Grid  size={6}>
-                    <TextField label={t("Range End")} value={seedRangeEnd} onChange={(e) => setSeedRangeEnd(Number(e.target.value))} fullWidth size="small" type="number" inputProps={{ min: 1, max: 6 }} />
+                    <TextField label={t("Range End")} value={seedRangeEnd} onChange={(e) => setSeedRangeEnd(Number(e.target.value))} fullWidth size="small" type="number" slotProps={{
+                      htmlInput: { min: 1, max: 6 }
+                    }} />
                   </Grid>
                   <Grid  size={12}>
                     <CustomTextarea label={t("Description")} value={seedDescription} onChange={(e) => setSeedDescription(e.target.value)} helperText="" />
@@ -1327,7 +1347,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                         sm: 4
                       }}>
                       <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small"
-                        inputProps={{ min: 0 }} onChange={(e) => setModuleCost(e.target.value)} />
+                        onChange={(e) => setModuleCost(e.target.value)} slotProps={{
+                        htmlInput: { min: 0 }
+                      }} />
                     </Grid>
                   )}
                   {pilotSubtype === "armor" && (
@@ -1732,7 +1754,9 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               fullWidth
               size="small"
               autoFocus
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -1763,7 +1787,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               value={applicableTo}
               onChange={(_, newValue) => setApplicableTo(newValue)}
               freeSolo
-              renderTags={(value, getTagProps) =>
+              renderValue={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip key={option} label={option} size="small" {...getTagProps({ index })} />
                 ))
@@ -1785,7 +1809,9 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
               onChange={(e) => setQuote(e.target.value)}
               fullWidth
               size="small"
-              inputProps={{ maxLength: 200 }}
+              slotProps={{
+                htmlInput: { maxLength: 200 }
+              }}
             />
           </Grid>
           <Grid  size={12}>
@@ -1920,7 +1946,9 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
               sm: 9
             }}>
             <TextField label={t("Class Name")} value={name} onChange={(e) => setName(e.target.value)}
-              fullWidth size="small" autoFocus inputProps={{ maxLength: 50 }} />
+              fullWidth size="small" autoFocus slotProps={{
+              htmlInput: { maxLength: 50 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -1933,24 +1961,30 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
 
           {/* Free Benefits */}
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Free Benefits")}
             </Typography>
           </Grid>
           <Grid  size={4}>
             <TextField label={t("HP+")} type="number" value={hpplus}
               onChange={(e) => setHpplus(Number(e.target.value))} fullWidth size="small"
-              inputProps={{ min: 0, step: 5 }} />
+              slotProps={{
+                htmlInput: { min: 0, step: 5 }
+              }} />
           </Grid>
           <Grid  size={4}>
             <TextField label={t("MP+")} type="number" value={mpplus}
               onChange={(e) => setMpplus(Number(e.target.value))} fullWidth size="small"
-              inputProps={{ min: 0, step: 5 }} />
+              slotProps={{
+                htmlInput: { min: 0, step: 5 }
+              }} />
           </Grid>
           <Grid  size={4}>
             <TextField label={t("IP+")} type="number" value={ipplus}
               onChange={(e) => setIpplus(Number(e.target.value))} fullWidth size="small"
-              inputProps={{ min: 0, step: 2 }} />
+              slotProps={{
+                htmlInput: { min: 0, step: 2 }
+              }} />
           </Grid>
 
           {/* Martials + Ritualism */}
@@ -1990,7 +2024,9 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                 label={`${t("Custom Benefit")} ${i + 1}`}
                 value={cb}
                 onChange={(e) => setCustomBenefits((arr) => arr.map((v, j) => j === i ? e.target.value : v))}
-                fullWidth size="small" inputProps={{ maxLength: 500 }}
+                fullWidth size="small" slotProps={{
+                htmlInput: { maxLength: 500 }
+              }}
               />
               <IconButton size="small" color="error" onClick={() => setCustomBenefits((arr) => arr.filter((_, j) => j !== i))}>
                 <DeleteIcon fontSize="small" />
@@ -2005,7 +2041,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
 
           {/* Spell Types */}
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em", mb: 0.5 }}>
               {t("Spell Types")}
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -2029,7 +2065,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
 
           {/* Skills */}
           <Grid  size={12}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
               {t("Skills")}
             </Typography>
           </Grid>
@@ -2048,7 +2084,9 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       value={skill.skillName}
                       onChange={(e) => updateSkillField(i, "skillName", e.target.value)}
                       fullWidth size="small"
-                      inputProps={{ maxLength: 50 }}
+                      slotProps={{
+                        htmlInput: { maxLength: 50 }
+                      }}
                     />
                   </Grid>
                   <Grid
@@ -2062,7 +2100,9 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                       value={skill.maxLvl}
                       onChange={(e) => updateSkillField(i, "maxLvl", Math.max(1, Math.min(10, Number(e.target.value))))}
                       fullWidth size="small"
-                      inputProps={{ min: 1, max: 10 }}
+                      slotProps={{
+                        htmlInput: { min: 1, max: 10 }
+                      }}
                     />
                   </Grid>
                   <Grid  size={12}>
@@ -2211,7 +2251,9 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
               xs: 12,
               sm: 6
             }}>
-            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus inputProps={{ maxLength: 80 }} />
+            <TextField label={t("Name")} value={name} onChange={(e) => setName(e.target.value)} fullWidth size="small" autoFocus slotProps={{
+              htmlInput: { maxLength: 80 }
+            }} />
           </Grid>
           <Grid
             size={{
@@ -2271,7 +2313,9 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 xs: 12,
                 sm: 6
               }}>
-              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+              <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" slotProps={{
+                htmlInput: { min: 2, max: 12 }
+              }} />
             </Grid>
             <Grid  size={12}>
               <Autocomplete
@@ -2318,7 +2362,9 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                     xs: 12,
                     sm: 6
                   }}>
-                  <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" inputProps={{ min: 2, max: 12 }} />
+                  <TextField label={t("Clock Sections")} value={clockSections} onChange={(e) => setClockSections(e.target.value)} fullWidth size="small" type="number" slotProps={{
+                    htmlInput: { min: 2, max: 12 }
+                  }} />
                 </Grid>
               )}
             </>

@@ -138,15 +138,17 @@ const StyledMarkdown = ({ children, ...props }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
           {source === "official" && (
             <Grid  size="grow">
               <Select
@@ -250,7 +252,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   {selectedItem.mp}{" "}
                   {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                   {t("MP")}
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -259,7 +263,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -284,7 +290,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {t("Up to")} {selectedItem.mp * selectedItem.maxTargets} {t("MP")}
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -293,7 +301,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown

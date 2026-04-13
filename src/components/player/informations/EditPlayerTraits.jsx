@@ -91,11 +91,13 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
               label={t("Identity") + ":"}
               value={player.info.identity}
               onChange={onChangeInfo("identity")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 300 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 300 }
+              }} />
           </FormControl>
         </Grid>
         <Grid
@@ -116,7 +118,9 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                 {...params}
                 label={t("Theme") + ":"}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 50 }
+                }}
               />
             )}
           />
@@ -132,11 +136,13 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
               label={t("Origin") + ":"}
               value={player.info.origin}
               onChange={onChangeInfo("origin")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 50 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </FormControl>
         </Grid>
       </Grid>

@@ -418,14 +418,16 @@ To approve this resource, accept it through moderate submissions dialog or manua
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "md",
-        },
-      }}
       maxWidth="md"
       fullScreen={isMobile}
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: "md",
+          },
+        }
+      }}
     >
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
@@ -446,12 +448,14 @@ To approve this resource, accept it through moderate submissions dialog or manua
             required
             value={formData.resourceName}
             onChange={(e) => handleInputChange("resourceName", e.target.value)}
-            inputProps={{
-              maxLength: 200,
-            }}
             helperText={t(
               "resources_resource_name_helper"
             )}
+            slotProps={{
+              htmlInput: {
+                maxLength: 200,
+              }
+            }}
           />
 
           <TextField
@@ -461,10 +465,12 @@ To approve this resource, accept it through moderate submissions dialog or manua
             required
             value={formData.resourceUrl}
             onChange={(e) => handleInputChange("resourceUrl", e.target.value)}
-            inputProps={{
-              maxLength: 500,
-            }}
             helperText={t("resources_resource_url_helper")}
+            slotProps={{
+              htmlInput: {
+                maxLength: 500,
+              }
+            }}
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -523,12 +529,14 @@ To approve this resource, accept it through moderate submissions dialog or manua
             required
             value={formData.author}
             onChange={(e) => handleInputChange("author", e.target.value)}
-            inputProps={{
-              maxLength: 100,
-            }}
             helperText={t(
               "resources_author_helper"
             )}
+            slotProps={{
+              htmlInput: {
+                maxLength: 100,
+              }
+            }}
           />
 
           <TextField
@@ -539,12 +547,14 @@ To approve this resource, accept it through moderate submissions dialog or manua
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
-            inputProps={{
-              maxLength: 1000,
-            }}
             helperText={t(
               "resources_description_helper"
             )}
+            slotProps={{
+              htmlInput: {
+                maxLength: 1000,
+              }
+            }}
           />
 
           <TextField
@@ -555,12 +565,14 @@ To approve this resource, accept it through moderate submissions dialog or manua
             onChange={(e) =>
               handleInputChange("discordAccount", e.target.value)
             }
-            inputProps={{
-              maxLength: 100,
-            }}
             helperText={t(
               "resources_discord_username_helper"
             )}
+            slotProps={{
+              htmlInput: {
+                maxLength: 100,
+              }
+            }}
           />
 
           <TextField
@@ -572,12 +584,14 @@ To approve this resource, accept it through moderate submissions dialog or manua
             onChange={(e) =>
               handleInputChange("additionalNotes", e.target.value)
             }
-            inputProps={{
-              maxLength: 500,
-            }}
             helperText={t(
               "resources_additional_notes_helper"
             )}
+            slotProps={{
+              htmlInput: {
+                maxLength: 500,
+              }
+            }}
           />
 
           <FormControlLabel

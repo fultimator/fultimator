@@ -58,11 +58,13 @@ export default function EditSkillModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
@@ -92,7 +94,9 @@ export default function EditSkillModal({
               value={skill.skillName}
               onChange={(e) => setSkill({ ...skill, skillName: e.target.value })}
               fullWidth
-              inputProps={{ maxLength: 100 }}
+              slotProps={{
+                htmlInput: { maxLength: 100 }
+              }}
             />
           </Grid>
           <Grid
@@ -103,15 +107,17 @@ export default function EditSkillModal({
             <TextField
               label={t("Max Level")}
               type="number"
-              InputProps={{
-                inputProps: { min: 1, max: 10 },
-              }}
               fullWidth
               value={(skill.maxLvl ?? 1).toString()}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "" || (/^\d+$/.test(value) && +value >= 1 && +value <= 10)) {
                   setSkill({ ...skill, maxLvl: value === "" ? 1 : parseInt(value, 10) });
+                }
+              }}
+              slotProps={{
+                input: {
+                  inputProps: { min: 1, max: 10 },
                 }
               }}
             />

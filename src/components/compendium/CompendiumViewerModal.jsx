@@ -568,7 +568,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       maxWidth="xl"
       fullWidth
       fullScreen={!isDesktop}
-      PaperProps={{ sx: isDesktop ? { height: "90vh" } : {} }}
+      slotProps={{
+        paper: { sx: isDesktop ? { height: "90vh" } : {} }
+      }}
     >
       <DialogTitle
         sx={{
@@ -638,16 +640,20 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           {/* Mobile type label */}
           {!isDesktop && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-              <Typography variant="subtitle1" fontWeight="bold">
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 ({filteredItems.length})
               </Typography>
             </Box>
           )}
           {filteredItems.length === 0 ? (
-            <Typography color="text.secondary">{t("No items found.")}</Typography>
+            <Typography sx={{
+              color: "text.secondary"
+            }}>{t("No items found.")}</Typography>
           ) : (
             <Grid container spacing={2}>
               {filteredItems.map((item, idx) => (
@@ -678,7 +684,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
                       <Tooltip title={t("Share URL")}>
                         <IconButton size="small" onClick={handleShareUrl}>
-                          <LinkIcon fontSize="small" />
+                          <LinkIcon sx={{
+                            fontSize: "small"
+                          }} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t("Download as Image")}>
@@ -743,7 +751,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               gap: { xs: 1, sm: 0 },
             }}
           >
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               <strong>{t("Disclaimer")}:</strong>{" "}
               {t("For personal use only; do not share exported data on official channels.")}
             </Typography>
@@ -817,7 +827,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           deletePackItem?.item ? (
             <Box>
               <Typography variant="h4">{deletePackItem.item.name}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t(selectedType)}
               </Typography>
             </Box>
@@ -830,13 +842,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         onClose={() => setNewPackDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -877,13 +891,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         onClose={() => !exporting && setManageDialogOpen(false)}
         maxWidth="sm"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -925,7 +941,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
             size="small"
           />
           <Divider>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: 1
+              }}>
               {t("Module Export")}
             </Typography>
           </Divider>
@@ -1014,13 +1036,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         onClose={() => !importing && setImportDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -1038,11 +1062,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         <DialogContent sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: 2 }}>
           <Tabs value={importTab} onChange={(_, v) => { setImportTab(v); setImportError(""); }}>
             <Tab label={t("Upload .fcp file")} />
-            <Tab label={t("From URL")} icon={<LinkIcon fontSize="small" />} iconPosition="end" />
+            <Tab label={t("From URL")} icon={<LinkIcon sx={{
+              fontSize: "small"
+            }} />} iconPosition="end" />
           </Tabs>
           {importTab === 0 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("Select a .fcp file exported from Fultimator.")}
               </Typography>
               <Button
@@ -1074,7 +1102,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
           {importTab === 1 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("Paste a manifest.json URL to download and import the pack.")}
               </Typography>
               <TextField

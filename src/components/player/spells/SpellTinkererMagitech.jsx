@@ -51,8 +51,10 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {t("Current Rank") + ": " + t(ranks[magitech.rank-1])}
             </Typography>

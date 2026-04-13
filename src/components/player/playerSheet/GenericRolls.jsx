@@ -120,11 +120,13 @@ export default function GenericRolls({ player }) {
       >
         {t("Roll")}
       </Button>
-      <Dialog open={open} onClose={handleClose} PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      <Dialog open={open} onClose={handleClose} slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}>
         <DialogTitle variant="h3">{t("Choose Attributes to Roll")}</DialogTitle>
         <DialogContent >

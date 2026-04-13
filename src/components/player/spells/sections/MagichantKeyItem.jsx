@@ -54,7 +54,7 @@ export default function MagichantKeyItem({
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           <Grid
             size={{
               xs: 12,
@@ -86,7 +86,9 @@ export default function MagichantKeyItem({
               label={t("magichant_name")}
               value={isCustom ? (item.customName || "") : t(item.name || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "customName", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 
@@ -101,7 +103,9 @@ export default function MagichantKeyItem({
               label={t("magichant_type")}
               value={isCustom ? (item.type || "") : t(item.type || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "type", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
           <Grid
@@ -115,7 +119,9 @@ export default function MagichantKeyItem({
               label={t("magichant_status_effect")}
               value={isCustom ? (item.status || "") : t(item.status || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "status", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
           <Grid
@@ -129,7 +135,9 @@ export default function MagichantKeyItem({
               label={t("magichant_attribute")}
               value={isCustom ? (item.attribute || "") : t(item.attribute || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "attribute", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
           <Grid
@@ -143,7 +151,9 @@ export default function MagichantKeyItem({
               label={t("magichant_recovery")}
               value={isCustom ? (item.recovery || "") : t(item.recovery || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "recovery", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 

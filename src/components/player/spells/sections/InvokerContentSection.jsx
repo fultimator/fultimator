@@ -174,7 +174,11 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           {t("Available Invocations")} ({availableInvocations.length})
         </Typography>
         {availableInvocations.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("Select wellsprings to see available invocations")}
           </Typography>
         ) : (
@@ -192,7 +196,9 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       {t(inv.name)}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{
+                      color: "text.secondary"
+                    }}>
                       {inv.type} • {t(inv.wellspring)}
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1 }}>

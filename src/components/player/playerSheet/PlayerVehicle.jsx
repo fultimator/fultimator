@@ -591,7 +591,9 @@ export default function PlayerVehicle({
         <Dialog
           open={dialogOpen}
           onClose={handleDialogClose}
-          PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+          slotProps={{
+            paper: { sx: { width: { xs: "90%", md: "30%" } } }
+          }}
         >
           <DialogTitle
             variant="h3"

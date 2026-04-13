@@ -164,9 +164,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
             >
               <Typography
                 variant="body2"
-                fontWeight="bold"
-                sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word"
+                }}>
                 {highlightMatch(zeroPower.name, searchQuery)}
               </Typography>
             </StyledTableCell>
@@ -192,7 +195,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ width: 80, textAlign: "center" }}>
-              <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.8rem",
+                  fontWeight: "bold"
+                }}>
                 {filled}/{sections}
               </Typography>
             </StyledTableCell>

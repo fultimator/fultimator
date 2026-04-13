@@ -267,8 +267,10 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                   size={6}>
                   <div>
                     <Typography
-                      fontWeight="bold"
                       style={{ flexGrow: 1, marginRight: "5px" }}
+                      sx={{
+                        fontWeight: "bold"
+                      }}
                     >
                       {vehicle.customName || t("Vehicle")}
                     </Typography>
@@ -477,7 +479,11 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                         >
                           <Grid container>
                             <Grid  size={4}>
-                              <Typography fontWeight={module.enabled ? "bold" : "normal"} sx={{ fontSize: "1em" }}>
+                              <Typography
+                                sx={{
+                                  fontWeight: module.enabled ? "bold" : "normal",
+                                  fontSize: "1em"
+                                }}>
                                 {(module.name === "pilot_custom_armor" || module.name === "pilot_custom_weapon" || module.name === "pilot_custom_support")
                                   ? module.customName
                                   : t(module.name)}

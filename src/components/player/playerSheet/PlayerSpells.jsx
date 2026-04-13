@@ -632,7 +632,9 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               onClose={handleDialogClose}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { width: { xs: "90%", md: "50%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "50%" } } }
+              }}
             >
               <DialogTitle
                 variant="h3"
@@ -651,7 +653,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               <DialogContent sx={{ marginTop: "10px" }}>
                 <DialogContent id="alert-dialog-description">
                   {!isRolling ? (
-                    <Grid container alignItems="center" spacing={1}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={1}>
                       <Grid  size={12}>
                         <Typography variant="body1">
                           {selectedSpell?.spellType === "default" && t("Select number of targets from 1 to")}

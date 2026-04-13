@@ -80,7 +80,7 @@ function PackRow({ pack, onSetActive, onDelete }: {
 
         {/* Name */}
         <TableCell>
-          <Typography variant="body2" fontWeight={600}>{pack.name}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>{pack.name}</Typography>
           {pack.type === "supplement" && (
             <Chip label="supplement" size="small" color="secondary" sx={{ mt: 0.25, fontSize: "0.65rem", height: 16 }} />
           )}
@@ -88,12 +88,16 @@ function PackRow({ pack, onSetActive, onDelete }: {
 
         {/* Author */}
         <TableCell>
-          <Typography variant="body2" color="text.secondary">{pack.author ?? "—"}</Typography>
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>{pack.author ?? "—"}</Typography>
         </TableCell>
 
         {/* Version */}
         <TableCell>
-          <Typography variant="body2" color="text.secondary">{pack.version ?? "—"}</Typography>
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>{pack.version ?? "—"}</Typography>
         </TableCell>
 
         {/* Actions */}
@@ -119,7 +123,6 @@ function PackRow({ pack, onSetActive, onDelete }: {
           </Box>
         </TableCell>
       </TableRow>
-
       {/* Expanded metadata row */}
       <TableRow>
         <TableCell colSpan={6} sx={{ p: 0 }}>
@@ -128,11 +131,15 @@ function PackRow({ pack, onSetActive, onDelete }: {
               {pack.description && (
                 <Typography variant="body2">{pack.description}</Typography>
               )}
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 <strong>{t("Items")}:</strong> {itemCountSummary(pack)}
               </Typography>
               {(pack as any).fultimatorMinVersion && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   <strong>{t("Min version")}:</strong> {(pack as any).fultimatorMinVersion}
                 </Typography>
               )}
@@ -150,7 +157,9 @@ function PackRow({ pack, onSetActive, onDelete }: {
                   </a>
                 </Typography>
               )}
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 <strong>{t("Added")}:</strong> {formatDate(pack.createdAt)}
                 {" · "}
                 <strong>{t("Updated")}:</strong> {formatDate(pack.updatedAt)}
@@ -159,7 +168,6 @@ function PackRow({ pack, onSetActive, onDelete }: {
           </Collapse>
         </TableCell>
       </TableRow>
-
       {/* Delete confirmation */}
       <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>{t("Delete module")}</DialogTitle>
@@ -194,7 +202,9 @@ export default function ContentPacksTab({ packs, onSetActive, onDelete }: Conten
   if (managedPacks.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: "center" }}>
-        <Typography color="text.secondary">{t("No modules installed. Use the Install Content tab to add one.")}</Typography>
+        <Typography sx={{
+          color: "text.secondary"
+        }}>{t("No modules installed. Use the Install Content tab to add one.")}</Typography>
       </Box>
     );
   }

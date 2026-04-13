@@ -154,7 +154,9 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSymbol && (

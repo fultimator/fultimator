@@ -30,12 +30,15 @@ function PointBar({ pt, maxPt, color1, color2 }) {
     };
 
     return (
-        <Box width="100%" sx={boxStyle}>
-                <LinearProgress
-                    variant="determinate"
-                    value={normalise(pt)}
-                    sx={barStyle}
-                />
+        <Box
+            sx={[{
+                width: "100%"
+            }, ...(Array.isArray(boxStyle) ? boxStyle : [boxStyle])]}>
+            <LinearProgress
+                variant="determinate"
+                value={normalise(pt)}
+                sx={barStyle}
+            />
         </Box>
     );
 }

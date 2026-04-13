@@ -40,9 +40,11 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       onClose={onClose} 
       fullWidth 
       maxWidth="xs"
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 2,
+          }
         }
       }}
     >

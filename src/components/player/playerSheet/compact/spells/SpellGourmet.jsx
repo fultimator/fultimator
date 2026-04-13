@@ -89,7 +89,13 @@ export default function SpellGourmet({ spell }) {
         {spell.ingredientInventory && spell.ingredientInventory.some(i => i.quantity > 0) && (
           <TableRow>
             <StyledTableCell colSpan={2} sx={{ pt: 1 }}>
-              <Typography variant="caption" fontWeight="bold" display="block" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  fontWeight: "bold",
+                  mb: 0.5
+                }}>
                 {t("gourmet_ingredient_inventory")}:
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

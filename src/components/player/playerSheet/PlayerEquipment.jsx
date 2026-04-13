@@ -819,7 +819,9 @@ export default function PlayerEquipment({
               onClose={handleDialogClose}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "30%" } } }
+              }}
             >
               <DialogTitle
                 id="alert-dialog-title"

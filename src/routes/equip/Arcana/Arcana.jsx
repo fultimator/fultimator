@@ -116,7 +116,7 @@ function Arcana() {
             headerText={t("Arcana")}
             icon={<AutoAwesome fontSize="large" />}
           />
-          <Grid container spacing={1} alignItems="center">
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid  size={6}>
               <ChangeName
                 value={name}
@@ -216,7 +216,7 @@ function Arcana() {
               <Divider />
             </Grid>
             <Grid  size={12}>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

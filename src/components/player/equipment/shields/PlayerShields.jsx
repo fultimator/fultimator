@@ -131,7 +131,7 @@ export default function PlayerShields({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {shields.map((shield, index) => {
             const equippedSlot = getShieldSlot(shield, index);
             const twoHandedBlocked = !shield.isEquipped && isTwoHandedEquipped(player);

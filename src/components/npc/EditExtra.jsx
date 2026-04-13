@@ -310,10 +310,12 @@ const HP = React.memo(({ npc, setNpc }) => {
       <TextField
         id="HP"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
         label={t("Extra HP:")}
         value={npc.extra?.hp || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+        }}
       ></TextField>
     </FormControl>
   );
@@ -333,10 +335,12 @@ const MP = React.memo(({ npc, setNpc }) => {
       <TextField
         id="mp"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
         label={t("Extra MP:")}
         value={npc.extra?.mp || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+        }}
       ></TextField>
     </FormControl>
   );
@@ -376,10 +380,12 @@ const ExtraInit = React.memo(({ npc, setNpc }) => {
       <TextField
         id="extrainit"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         label={t("Extra Init:")}
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+        }}
       ></TextField>
     </FormControl>
   );

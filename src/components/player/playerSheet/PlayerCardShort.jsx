@@ -129,12 +129,13 @@ export default function PlayerCardShort({
             }}
             size="grow">
             <Typography
-              color="#fff"
-              fontFamily="Antonio"
-              fontSize="1.5rem"
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
+              sx={{
+                color: "#fff",
+                fontFamily: "Antonio",
+                fontSize: "1.5rem",
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {player.name}
             </Typography>
           </Grid>
@@ -147,11 +148,12 @@ export default function PlayerCardShort({
               borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
             }}>
             <Typography
-              fontFamily="Antonio"
-              fontSize="1.25rem"
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
+              sx={{
+                fontFamily: "Antonio",
+                fontSize: "1.25rem",
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {player.info.pronouns && (
                 <>
                   {player.info.pronouns} <Diamond color={primary} />{" "}
@@ -161,7 +163,7 @@ export default function PlayerCardShort({
             </Typography>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           <Grid
             size={{
               xs: 3,
@@ -329,70 +331,66 @@ export default function PlayerCardShort({
                 borderRadius: "8px",
                 border: "2px solid",
                 borderColor: secondary,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              justifyContent="center"
-              alignItems="center"
               size={12}>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("HP") + ": " + player.stats.hp.max}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("MP") + ": " + player.stats.mp.max}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("IP") + ": " + player.stats.ip.max}
                 </Typography>
               </Grid>
               <Grid
-                container
-                justifyContent="center"
-                sx={{ marginTop: "5px", marginBottom: "5px" }}
+                container sx={{ justifyContent: "center", marginTop: "5px", marginBottom: "5px" }}
                 size={12}>
                 <Divider sx={{ width: "100%" }} />
               </Grid>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("DEF") + ": " + currDef}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("MDEF") + ": " + currMDef}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={4}>
+              <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("INIT") + ": " + currInit}
                 </Typography>
               </Grid>
               <Grid
-                container
-                justifyContent="center"
-                sx={{ marginTop: "5px", marginBottom: "5px" }}
+                container sx={{ justifyContent: "center", marginTop: "5px", marginBottom: "5px" }}
                 size={12}>
                 <Divider sx={{ width: "100%" }} />
               </Grid>
-              <Grid container  justifyContent="center" size={3}>
+              <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
                   {t("DEX") + ": d" + player.attributes.dexterity}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={3}>
+              <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
                   {t("INS") + ": d" + player.attributes.insight}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={3}>
+              <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
                   {t("MIG") + ": d" + player.attributes.might}
                 </Typography>
               </Grid>
-              <Grid container  justifyContent="center" size={3}>
+              <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
                   {t("WLP") + ": d" + player.attributes.willpower}
                 </Typography>
@@ -409,9 +407,11 @@ export default function PlayerCardShort({
                   borderColor: secondary,
                 }}
                 size={12}>
-                <Grid container  alignItems="center" size={12}>
+                <Grid container sx={{ alignItems: "center" }} size={12}>
                   {" "}
-                  <Typography variant="h3" fontWeight={"bolder"}>
+                  <Typography variant="h3" sx={{
+                    fontWeight: "bolder"
+                  }}>
                     <span>{t("Equipment") + ": "}&nbsp;</span>
                   </Typography>
                   <Typography variant="h4">
@@ -433,7 +433,9 @@ export default function PlayerCardShort({
                 }}
                 size={12}>
                 <Grid container  size={12}>
-                  <Typography variant="h3" fontWeight={"bolder"}>
+                  <Typography variant="h3" sx={{
+                    fontWeight: "bolder"
+                  }}>
                     {t("Classes") + ": "}
                   </Typography>
                 </Grid>

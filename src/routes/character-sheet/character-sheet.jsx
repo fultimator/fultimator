@@ -304,7 +304,7 @@ export default function CharacterSheet() {
           </Button>
         </Grid>
         <Grid  size={isMobile ? 4 : 2}>
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <Button
               variant="outlined"
               color="primary"
@@ -332,7 +332,7 @@ export default function CharacterSheet() {
             )}
 
             {isOwner && (
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 {isUpdated && (
                   <Tooltip title={t("Save Changes")}>
                     <IconButton
@@ -493,9 +493,10 @@ export default function CharacterSheet() {
       ) : (
         <Grid
           container
-          sx={{ padding: 1 }}
-          justifyContent={"center"}
-        >
+          sx={{
+            justifyContent: "center",
+            padding: 1
+          }}>
           <Grid container  size={12}>
             <PlayerCardSheet
               player={player}

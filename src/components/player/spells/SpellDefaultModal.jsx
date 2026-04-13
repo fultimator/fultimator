@@ -97,11 +97,13 @@ export default function SpellDefaultModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -132,7 +134,9 @@ export default function SpellDefaultModal({
               fullWidth
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -259,7 +263,9 @@ export default function SpellDefaultModal({
                   {...params}
                   label={t("Target Description")}
                   fullWidth
-                  inputProps={{ ...params.inputProps, maxLength: 100 }}
+                  slotProps={{
+                    htmlInput: { ...params.inputProps, maxLength: 100 }
+                  }}
                 />
               )}
             />
@@ -289,7 +295,9 @@ export default function SpellDefaultModal({
                   {...params}
                   label={t("Duration")}
                   fullWidth
-                  inputProps={{ ...params.inputProps, maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { ...params.inputProps, maxLength: 50 }
+                  }}
                 />
               )}
             />

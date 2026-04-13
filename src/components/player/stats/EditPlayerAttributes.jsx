@@ -91,7 +91,7 @@ export default function EditPlayerAttributes({
           }}>
           <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
             {attributeList.map((attribute, i) => (
-              <Grid container spacing={2} key={i} alignItems="center" size={12}>
+              <Grid container spacing={2} key={i} sx={{ alignItems: "center" }} size={12}>
                 <Grid  size={2}>
                   <InputLabel
                     id={attribute.key}

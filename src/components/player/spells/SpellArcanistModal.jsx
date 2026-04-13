@@ -46,11 +46,13 @@ export default function SpellArcanistModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -81,7 +83,9 @@ export default function SpellArcanistModal({
               fullWidth
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -95,7 +99,9 @@ export default function SpellArcanistModal({
               fullWidth
               value={editedSpell.domain || ""}
               onChange={(e) => handleChange("domain", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -109,7 +115,9 @@ export default function SpellArcanistModal({
               fullWidth
               value={editedSpell.description || ""}
               onChange={(e) => handleChange("description", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -137,7 +145,9 @@ export default function SpellArcanistModal({
               fullWidth
               value={editedSpell.merge || ""}
               onChange={(e) => handleChange("merge", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -167,7 +177,9 @@ export default function SpellArcanistModal({
                   fullWidth
                   value={editedSpell.pulse || ""}
                   onChange={(e) => handleChange("pulse", e.target.value)}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -197,7 +209,9 @@ export default function SpellArcanistModal({
               fullWidth
               value={editedSpell.dismiss || ""}
               onChange={(e) => handleChange("dismiss", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid

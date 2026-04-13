@@ -162,8 +162,10 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
                 const value = Number.parseInt(e.target.value, 10);
                 setUpgradeAmount(Number.isNaN(value) ? "" : Math.max(1, value));
               }}
-              inputProps={{ min: 1 }}
               sx={{ mt: 1 }}
+              slotProps={{
+                htmlInput: { min: 1 }
+              }}
             />
           )}
           {upgradeDowngrade !== null && !hasOverride && (
@@ -178,10 +180,21 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
           <Typography variant="h6" sx={{ mb: 1 }}>
             {t("Override")}
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              mb: 1
+            }}>
             {t("Set a specific value that overrides both base and upgrade/downgrade")}
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              display: "block",
+              mb: 1
+            }}>
             {t("Final")} = {t("Override")}
           </Typography>
           <TextField
@@ -190,8 +203,10 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
             value={overrideValue}
             onChange={handleOverrideChange}
             placeholder={t("Enter override value")}
-            inputProps={{ min: 0 }}
             size="small"
+            slotProps={{
+              htmlInput: { min: 0 }
+            }}
           />
         </Box>
 

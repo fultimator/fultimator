@@ -856,7 +856,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, 
                           </StyledTableCell>
                           <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('spells', spellKey); }} sx={{ cursor: "pointer", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
                             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0.5 }}>
-                              <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' }, wordBreak: "break-word", overflowWrap: "break-word" }}>
+                              <Typography variant="body2" sx={{ fontWeight: "bold", mr: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' }, wordBreak: "break-word", overflowWrap: "break-word" }}>
                                 {highlightMatch(spellName, searchQuery)}
                               </Typography>
                               <Tooltip title={t("Spell")}>

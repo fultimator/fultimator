@@ -55,10 +55,9 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
       <Stack>
         {showHeader && (
           <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
+            container sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
               p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
@@ -69,28 +68,28 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
             }}
           >
             <Grid  size={3}>
-              <Typography variant="h4" textAlign="left">
+              <Typography sx={{ textAlign: "left" }}>
                 {t(category)}
               </Typography>
             </Grid>
             <Grid  size={1}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Cost")}
               </Typography>
             </Grid>
             <Grid  size={2}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Defense")}
               </Typography>
             </Grid>
             <Grid  size={2}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("M. Defense")}
               </Typography>
             </Grid>
             {!armor.rework && (
               <Grid  size={2}>
-                <Typography variant="h4" textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   {t("Initiative")}
                 </Typography>
               </Grid>
@@ -101,9 +100,8 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
           <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
-              container
-              justifyContent="space-between"
-              sx={{
+              container sx={{
+                justifyContent: "space-between",
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
@@ -112,16 +110,16 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
                 },
               }}>
               <Grid sx={{ display: "flex", alignItems: "center" }} size={3}>
-                <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
+                <Typography sx={{ fontWeight: "bold", marginRight: "4px" }}>
                   {t(armor.name)}
                 </Typography>
                 {armor.martial && <Martial />}
               </Grid>
               <Grid  size={1}>
-                <Typography textAlign="center">{`${armor.cost}z`}</Typography>
+                <Typography sx={{ textAlign: "center" }}>{`${armor.cost}z`}</Typography>
               </Grid>
               <Grid  size={2}>
-                <Typography fontWeight="bold" textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   {category === "Shield"
                     ? "+" + parseInt(def + (armor.defModifier || 0))
                     : ""}
@@ -136,7 +134,7 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
                 </Typography>
               </Grid>
               <Grid  size={2}>
-                <Typography fontWeight="bold" textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   {category === "Shield"
                     ? "+" + parseInt(mdef + (armor.mDefModifier || 0))
                     : ""}
@@ -149,7 +147,7 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
               </Grid>
               {!armor.rework && (
                 <Grid  size={2}>
-                  <Typography fontWeight="bold" textAlign="center">
+                  <Typography sx={{ textAlign: "center" }}>
                     {category === "Armor" || category === "Shield"
                       ? armor.init + (armor.initModifier || 0) === 0
                         ? "-"

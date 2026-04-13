@@ -127,7 +127,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("esper_brainwave_clock")} - {t(giftSpell.className)}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={2}>
                       <Grid >
                         <Clock
                           numSections={4}
@@ -223,7 +223,9 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedGift && (

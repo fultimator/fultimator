@@ -152,7 +152,9 @@ export default function SpellMagiseedMagiseed({
                   type="number"
                   value={magiseed.rangeStart ?? 0}
                   onChange={(e) => handleFieldChange("rangeStart", parseInt(e.target.value) || 0)}
-                  inputProps={{ min: 0, max: 4 }}
+                  slotProps={{
+                    htmlInput: { min: 0, max: 4 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -166,7 +168,9 @@ export default function SpellMagiseedMagiseed({
                   type="number"
                   value={magiseed.rangeEnd ?? 3}
                   onChange={(e) => handleFieldChange("rangeEnd", parseInt(e.target.value) || 3)}
-                  inputProps={{ min: 0, max: 4 }}
+                  slotProps={{
+                    htmlInput: { min: 0, max: 4 }
+                  }}
                 />
               </Grid>
             </>

@@ -307,9 +307,8 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                       isHeroicSkill={false}
                     />
                     <Typography
-                      variant="body1"
-                      justifyContent="flex-start"
-                      sx={{
+                      variant="body1" sx={{
+                        justifyContent: "flex-start",
                         background: "transparent",
                         padding: "0 17px",
                       }}
@@ -344,9 +343,8 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                       onEdit={isEditMode && setPlayer ? () => openHeroicEdit(index) : undefined}
                     />
                     <Typography
-                      variant="body1"
-                      justifyContent="flex-start"
-                      sx={{
+                      variant="body1" sx={{
+                        justifyContent: "flex-start",
                         background: "transparent",
                         padding: "0 17px",
                       }}

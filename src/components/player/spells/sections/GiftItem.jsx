@@ -91,7 +91,7 @@ export default function GiftItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           <Grid
             size={{
               xs: 12,

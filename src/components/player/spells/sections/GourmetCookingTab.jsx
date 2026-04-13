@@ -466,7 +466,12 @@ export default function GourmetCookingTab({
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               {t("gourmet_details")}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mb: 2
+              }}>
               {t("gourmet_details_1")}
             </Typography>
 
@@ -483,10 +488,12 @@ export default function GourmetCookingTab({
                 <TextField
                   size="small"
                   type="number"
-                  inputProps={{ min: 1, max: 10 }}
                   value={bulkRollCount}
                   onChange={(e) => setBulkRollCount(Math.min(10, parseInt(e.target.value) || 1))}
                   sx={{ width: "80px" }}
+                  slotProps={{
+                    htmlInput: { min: 1, max: 10 }
+                  }}
                 />
                 <Button
                   variant="outlined"
@@ -528,7 +535,7 @@ export default function GourmetCookingTab({
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                   {t("Shop Buy Ingredients")}
                 </Typography>
-                <Grid container spacing={1} alignItems="center">
+                <Grid container spacing={1} sx={{ alignItems: "center" }}>
                   <Grid
                     size={{
                       xs: 12,
@@ -641,7 +648,11 @@ export default function GourmetCookingTab({
             </Typography>
 
             {availableIngredients.length === 0 ? (
-              <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  fontStyle: "italic"
+                }}>
                 {t("gourmet_no_ingredients_available")}
               </Typography>
             ) : (
@@ -804,7 +815,9 @@ export default function GourmetCookingTab({
         <DialogContent sx={{ mt: 2 }}>
           {rollResult?.type === "effect" && rollResult.data && (
             <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" gutterBottom sx={{
+                color: "text.secondary"
+              }}>
                 {t("Effect")} #{rollResult.data.id}:
               </Typography>
               <Box sx={{ p: 2, backgroundColor: "action.hover", borderRadius: 1, mb: 2 }}>
@@ -972,7 +985,9 @@ export default function GourmetCookingTab({
               <Grid  key={`${roll.id}-${roll.key}`} size={12}>
                 <Card variant="outlined">
                   <CardContent>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{
+                      color: "text.secondary"
+                    }}>
                       {t("Roll")} {roll.id}
                     </Typography>
                     <Grid container spacing={1} sx={{ mt: 0.5 }}>

@@ -68,7 +68,7 @@ export default function SpellMagiseed({ spell, setPlayer }) {
         <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
           <StyledTableCell colSpan={2}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-              <Typography variant="caption" fontWeight="bold">
+              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("magiseed_growth_clock")}: {growthClock}/4
               </Typography>
               <Box sx={{ flexGrow: 1 }}>
@@ -111,12 +111,14 @@ export default function SpellMagiseed({ spell, setPlayer }) {
         {/* Current Seed Row */}
         <TableRow>
           <StyledTableCell colSpan={2}>
-            <Typography variant="caption" fontWeight="bold">
+            <Typography variant="caption" sx={{ fontWeight: "bold" }}>
               {t("magiseed_current_effect")}: {currentMagiseed ? (currentMagiseed.customName || t(currentMagiseed.name)) : t("magiseed_no_magiseed")}
             </Typography>
             {currentMagiseed && getSeedEffect(currentMagiseed, growthClock) && (
               <Box sx={{ mt: 0.5, p: 0.5, bgcolor: theme.ternary + "20", borderLeft: `3px solid ${theme.primary}` }}>
-                <Typography variant="caption" display="block">
+                <Typography variant="caption" sx={{
+                  display: "block"
+                }}>
                   <strong>{t("magiseed_current_effect")} (T={growthClock}):</strong>
                 </Typography>
                 <Typography variant="caption">

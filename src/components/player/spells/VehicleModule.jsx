@@ -65,7 +65,7 @@ const VehicleModule = memo(({
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
-        <Grid container spacing={2} alignItems="center" sx={{ width: '100%' }}>
+        <Grid container spacing={2} sx={{ alignItems: "center", width: '100%' }}>
           <Grid
             size={{
               xs: 12,
@@ -252,7 +252,12 @@ const VehicleModule = memo(({
                 sm: 2
               }}>
               <div style={{ textAlign: 'center' }}>
-                <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    mb: 1
+                  }}>
                   {t("Hand")}
                 </Typography>
                 <ToggleButtonGroup
@@ -273,7 +278,13 @@ const VehicleModule = memo(({
                     {t("o_abbr")}
                   </ToggleButton>
                 </ToggleButtonGroup>
-                <Typography variant="caption" display="block" sx={{ mt: 0.5, color: "text.secondary" }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    mt: 0.5,
+                    color: "text.secondary"
+                  }}>
                   {module.equippedSlot === "off" ? t("off_hand") : t("main_hand")}
                 </Typography>
               </div>
@@ -302,7 +313,13 @@ const VehicleModule = memo(({
                       <Typography component="span">
                         {t("pilot_shield")}
                       </Typography>
-                      <Typography variant="body2" display="block" sx={{ color: "text.secondary", fontSize: "0.875rem" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "block",
+                          color: "text.secondary",
+                          fontSize: "0.875rem"
+                        }}>
                         {t("pilot_defensive_equipment")}
                       </Typography>
                     </div>
@@ -328,7 +345,13 @@ const VehicleModule = memo(({
                       <Typography component="span">
                         {t("pilot_cumbersome")}
                       </Typography>
-                      <Typography variant="body2" display="block" sx={{ color: "text.secondary", fontSize: "0.875rem" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "block",
+                          color: "text.secondary",
+                          fontSize: "0.875rem"
+                        }}>
                         {t("pilot_prevents_other_weapons")}
                       </Typography>
                     </div>
@@ -361,7 +384,13 @@ const VehicleModule = memo(({
                       <Typography component="span">
                         {t("pilot_complex")}
                       </Typography>
-                      <Typography variant="body2" display="block" sx={{ color: "text.secondary", fontSize: "0.875rem" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "block",
+                          color: "text.secondary",
+                          fontSize: "0.875rem"
+                        }}>
                         {t("pilot_takes_two_slots")}
                       </Typography>
                     </div>

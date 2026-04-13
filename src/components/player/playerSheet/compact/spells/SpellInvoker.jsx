@@ -79,7 +79,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
         {/* Active Wellsprings */}
         <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
           <StyledTableCell colSpan={4}>
-            <Typography variant="caption" fontWeight="bold">
+            <Typography variant="caption" sx={{ fontWeight: "bold" }}>
               {t("invoker_invocation_active_wellspring")}: 
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>

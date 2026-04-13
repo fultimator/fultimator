@@ -396,10 +396,18 @@ export default function CompactLoadout({
         </DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
           {equippedSupportModules.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">{t('No support modules installed on this vehicle.')}</Typography>
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>{t('No support modules installed on this vehicle.')}</Typography>
           ) : (
             <>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">{t('Enable or disable support modules:')}</Typography>
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block"
+                }}>{t('Enable or disable support modules:')}</Typography>
               <List dense>
                 {equippedSupportModules.map((m) => (
                   <ListItem key={m.originalIndex} disablePadding>
@@ -426,7 +434,9 @@ export default function CompactLoadout({
       </Dialog>
       {/* Roll result dialog */}
       {rollDialog && (
-        <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { width: { xs: '90%', md: '30%' } } }}>
+        <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth slotProps={{
+          paper: { sx: { width: { xs: '90%', md: '30%' } } }
+        }}>
           <DialogTitle variant="h3" sx={{ backgroundColor: rollDialog.isCritFail ? '#bb2124' : rollDialog.isCritSuccess ? '#22bb33' : '#aaaaaa' }}>
             {rollDialog.isCritFail ? t('Critical Failure!') : rollDialog.isCritSuccess ? t('Critical Success!') : t('Result')}
           </DialogTitle>
@@ -442,13 +452,17 @@ export default function CompactLoadout({
                 {rollDialog.type && <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>}
               </Grid>
               <Grid  sx={{ mt: 1 }} size={12}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
                   {rollDialog.r2} [{attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
                   {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ''}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {t('Damage')}: {Math.max(rollDialog.r1, rollDialog.r2)} + {rollDialog.damage}
                 </Typography>
               </Grid>

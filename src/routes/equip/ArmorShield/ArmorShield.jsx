@@ -121,7 +121,7 @@ function ArmorShield() {
             headerText={t("Armor and Shield")}
             icon={<AutoAwesome fontSize="large" />}
           />
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
             {/* Change Base */}
             <Grid  size={4}>
               <ChangeBase
@@ -234,7 +234,7 @@ function ArmorShield() {
               <Divider />
             </Grid>
             <Grid  sx={{ py: 0 }} size={12}>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

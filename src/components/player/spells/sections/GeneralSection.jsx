@@ -104,7 +104,13 @@ export default function GeneralSection({
                   rows={field.rows || 3}
                 />
                 {field.helpText && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }} component="div">
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                      color: "text.secondary",
+                      mt: 1
+                    }}>
                     <ReactMarkdown components={markdownComponents}>
                       {t(field.helpText)}
                     </ReactMarkdown>

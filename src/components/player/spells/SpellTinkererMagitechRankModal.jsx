@@ -59,11 +59,13 @@ export default function SpellTinkererMagitechRankModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -87,8 +89,10 @@ export default function SpellTinkererMagitechRankModal({
           label={t("Magitech Name")}
           value={spellName}
           onChange={(e) => setSpellName(e.target.value)}
-          inputProps={{ maxLength: 50 }}
           margin="normal"
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
         <FormControl fullWidth sx={{ mt: 2 }}>
           <InputLabel>{t("Select Rank")}</InputLabel>

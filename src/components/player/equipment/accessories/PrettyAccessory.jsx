@@ -46,10 +46,9 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
       <Stack>
         {showHeader && (
           <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
+            container sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
               p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
@@ -60,12 +59,12 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
             }}
           >
             <Grid  size={6}>
-              <Typography variant="h4" textAlign="left">
+              <Typography sx={{ textAlign: "left" }}>
                 {t("Accessory")}
               </Typography>
             </Grid>
             <Grid  size={2}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Cost")}
               </Typography>
             </Grid>
@@ -76,8 +75,8 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
             {/* First Row */}
             <Grid
               container
-              justifyContent="space-between"
               sx={{
+                justifyContent: `space-between`,
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
@@ -86,10 +85,10 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
                 },
               }}>
               <Grid  size={6}>
-                <Typography fontWeight="bold">{accessory.name}</Typography>
+                <Typography sx={{ fontWeight: "bold" }}>{accessory.name}</Typography>
               </Grid>
               <Grid  size={2}>
-                <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
+                <Typography sx={{ textAlign: "center" }}>{`${accessory.cost}z`}</Typography>
               </Grid>
             </Grid>
 

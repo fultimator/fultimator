@@ -580,7 +580,7 @@ function Personal() {
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
           {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
-          <Grid container spacing={1} alignItems="center">
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={{
                 xs: 12,
@@ -593,15 +593,17 @@ function Personal() {
                 fullWidth
                 value={name}
                 onChange={(evt) => { setName(evt.target.value); }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                inputProps={{ maxLength: 50 }}
-              />
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { maxLength: 50 }
+                }} />
             </Grid>
             <Grid
               sx={{ minWidth: 160 }}
@@ -681,7 +683,9 @@ function Personal() {
               style={{ display: "none" }}
             />
             <Divider orientation="vertical" flexItem />
-            <Typography variant="body1" fontWeight={600}>
+            <Typography variant="body1" sx={{
+              fontWeight: 600
+            }}>
               {filteredList?.length ?? 0} {t("Players")}
             </Typography>
             {stalePlayers.length > 0 && (
@@ -712,7 +716,9 @@ function Personal() {
           {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -812,10 +818,10 @@ function Personal() {
       <Grid container spacing={1} sx={{ py: 1 }}>
         {filteredList.map((player) => (
           <Grid
-            alignItems="center"
-            justifyContent="center"
             key={player.id}
             sx={{
+              alignItems: "center",
+              justifyContent: "center",
               marginBottom: "20px",
               ...(selectMode ? {
                 cursor: "pointer",
@@ -973,7 +979,7 @@ function PlayerGalleryCardActions({
           </IconButton>
         </Tooltip>
         <Tooltip title={t("Edit")}>
-          <IconButton onClick={() => handleNavigation(`/pc-gallery/${player.id}`)}>
+          <IconButton onClick={() => handleNavigation(`/player-edit/${player.id}`)}>
             <Edit />
           </IconButton>
         </Tooltip>

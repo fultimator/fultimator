@@ -186,9 +186,13 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   <StyledTableCell sx={{ minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
-                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word", fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                      }}>
                       {highlightMatch(bond.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -215,7 +219,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 0.5 }}>
                       {strength > 0 && (
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                           ★{strength}
                         </Typography>
                       )}
@@ -252,7 +256,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   label={t("Bond Name")}
                   value={draftBond.name}
                   onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
               {[

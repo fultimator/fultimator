@@ -119,7 +119,7 @@ export default function PlayerCustomWeapons({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {customWeapons.map((customWeapon, index) => {
             // Check if weapon has transforming customization
             const hasTransforming = customWeapon.customizations && customWeapon.customizations.some(

@@ -28,7 +28,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Mix")}: {ranks[spell.rank - 1]} ({t("IP Cost")}: {spell.rank + 2})
           </Typography>
         </StyledTableCell>
@@ -76,7 +76,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
           </Typography>
         </StyledTableCell>
@@ -100,7 +100,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
           </Typography>
         </StyledTableCell>

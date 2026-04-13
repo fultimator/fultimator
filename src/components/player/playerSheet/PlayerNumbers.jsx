@@ -114,9 +114,7 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
       <Grid
         container
         spacing={{ xs: 1, md: 2 }}
-        sx={{ padding: "1em" }}
-        alignItems="center"
-        justifyContent="center"
+        sx={{ padding: "1em", alignItems: "center", justifyContent: "center" }}
         direction={{ xs: "row", md: "row" }}
       >
         {/* Fabula Points */}
@@ -140,7 +138,9 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
                   onChange={(e) => handleUpdate("fabulapoints", parseInt(e.target.value, 10) || 0)}
                   size="small"
                   variant="standard"
-                  inputProps={{ style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }}
+                  slotProps={{
+                    htmlInput: { style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }
+                  }}
                 />
                 <IconButton size="small" onClick={() => handleIncrement("fabulapoints", 1)}><Add fontSize="small" /></IconButton>
               </Box>
@@ -171,7 +171,9 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
                   onChange={(e) => handleUpdate("exp", parseInt(e.target.value, 10) || 0)}
                   size="small"
                   variant="standard"
-                  inputProps={{ style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }}
+                  slotProps={{
+                    htmlInput: { style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }
+                  }}
                 />
                 <IconButton size="small" onClick={() => handleIncrement("exp", 1)}><Add fontSize="small" /></IconButton>
               </Box>

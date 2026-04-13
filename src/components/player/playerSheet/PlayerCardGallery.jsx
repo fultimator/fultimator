@@ -416,12 +416,13 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           }}
         >
           <Typography
-            color="#fff"
-            fontFamily="Antonio"
-            fontSize={{ xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" }}
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
+            sx={{
+              color: "#fff",
+              fontFamily: "Antonio",
+              fontSize: { xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" },
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {player.name}
           </Typography>
         </Box>
@@ -435,13 +436,18 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             alignItems: "center",
           }}
         >
-          <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
+          <Typography
+            sx={{
+              fontFamily: "Antonio",
+              fontSize: { xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" },
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
             {t("Lvl")} {player.lvl}
           </Typography>
         </Box>
       </Box>
-
       {/* ── Body ── */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
 
@@ -622,7 +628,6 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         </Box>
 
       </Box>
-
       {isExpanded && (
         <Box
           sx={{
@@ -719,7 +724,6 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           </Box>
         </Box>
       )}
-
       {/* ── Affinity Strip ── */}
       <AffinityStrip>
         {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (

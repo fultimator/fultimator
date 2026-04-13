@@ -86,16 +86,8 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             {rightHeaderText}
           </div>
           <TextField
-            InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
-              style: {
-                color: color,
-                fontFamily: "inherit",
-                fontSize: "inherit",
-                backgroundColor: background,
-              },
-            }}
-            value={editableNumber.toString()} // Ensure the value is a string
+            // Ensure the value is a string
+            value={editableNumber.toString()}
             onChange={(e) => {
               const value = e.target.value;
               // Allow empty input for user convenience
@@ -123,18 +115,20 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
               marginRight: "4px",
               fontFamily: "inherit",
             }}
+            slotProps={{
+              input: {
+                inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
+                style: {
+                  color: color,
+                  fontFamily: "inherit",
+                  fontSize: "inherit",
+                  backgroundColor: background,
+                },
+              }
+            }}
           />
           {" / "}
           <TextField
-            InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
-              style: {
-                color: color,
-                fontFamily: "inherit",
-                fontSize: "inherit",
-                backgroundColor: background,
-              },
-            }}
             value={readOnlyNumber}
             variant="outlined"
             size="small"
@@ -143,6 +137,17 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
               textAlign: "center",
               border: "none",
               fontFamily: "inherit",
+            }}
+            slotProps={{
+              input: {
+                inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
+                style: {
+                  color: color,
+                  fontFamily: "inherit",
+                  fontSize: "inherit",
+                  backgroundColor: background,
+                },
+              }
             }}
           />
         </div>

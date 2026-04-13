@@ -31,6 +31,7 @@ import ChangeCustomizations from "./ChangeCustomizations";
 import PrettyCustomWeapon from "./PrettyCustomWeapon";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import SelectQuality from "../weapons/SelectQuality";
 import ChangeQuality from "../common/ChangeQuality";
 import qualities from "../weapons/qualities";
@@ -65,6 +66,7 @@ function CustomWeapons() {
   const [secondSelectedType, setSecondSelectedType] = useState(types[0]);
   const [secondCurrentCustomizations, setSecondCurrentCustomizations] = useState([]);
   const [secondSelectedCustomization, setSecondSelectedCustomization] = useState("");
+  const [showImageOnBoth, setShowImageOnBoth] = useState(false);
 
   // Override states for manual adjustments
   const [overrideType, setOverrideType] = useState(false);
@@ -214,6 +216,7 @@ function CustomWeapons() {
     setSecondSelectedType(types[0]);
     setSecondCurrentCustomizations([]);
     setSecondSelectedCustomization("");
+    setShowImageOnBoth(false);
 
     // Reset override states
     setOverrideType(false);
@@ -937,6 +940,7 @@ function CustomWeapons() {
                 customDamageType: customDamageType
               }}
               showActions={!hasTransforming}
+              showImageOverride={hasTransforming ? showImageOnBoth : undefined}
             />
 
             {hasTransforming && (
@@ -964,6 +968,7 @@ function CustomWeapons() {
                     customDamageType: secondCustomDamageType
                   }}
                   showActions={false}
+                  showImageOverride={showImageOnBoth}
                 />
               </>
             )}
@@ -971,7 +976,7 @@ function CustomWeapons() {
 
           {hasTransforming && (
             /* Combined Download Actions for Transforming Weapons */
-            (<Box sx={{ display: "flex", mt: 2 }}>
+            (<Box sx={{ display: "flex", mt: 2, alignItems: "center", gap: 1, flexWrap: "wrap" }}>
               <Tooltip title={t("Download Combined as Image")}>
                 <IconButton onClick={downloadCombinedImage}>
                   <Download />
@@ -1020,6 +1025,52 @@ function CustomWeapons() {
                   
                   dataType: "weapon"
                 }}
+              />
+              <AddToCompendiumButton
+                itemType="custom-weapon"
+                data={{
+                  name: weaponName,
+                  category: selectedCategory,
+                  range: selectedRange,
+                  martial: martial,
+                  accuracyCheck: selectedAccuracyCheck,
+                  type: selectedType,
+                  customizations: currentCustomizations,
+                  selectedQuality: selectedQuality,
+                  quality: quality,
+                  qualityCost: qualityCost,
+                  cost: calculateWeaponCost(),
+                  hands: 2,
+                  isEquipped: false,
+                  damageModifier: customDamageMod,
+                  precModifier: customAccuracyMod,
+                  defModifier: defModifier,
+                  mDefModifier: mDefModifier,
+                  overrideDamageType: overrideType,
+                  customDamageType: customDamageType,
+                  secondWeaponName: secondWeaponName,
+                  secondSelectedCategory: secondSelectedCategory,
+                  secondSelectedRange: secondSelectedRange,
+                  secondMartial: secondMartial,
+                  secondSelectedAccuracyCheck: secondSelectedAccuracyCheck,
+                  secondSelectedType: secondSelectedType,
+                  secondCurrentCustomizations: secondCurrentCustomizations,
+                  secondDamageModifier: secondCustomDamageMod,
+                  secondPrecModifier: secondCustomAccuracyMod,
+                  secondDefModifier: secondDefModifier,
+                  secondMDefModifier: secondMDefModifier,
+                  secondOverrideDamageType: secondOverrideType,
+                  secondCustomDamageType: secondCustomDamageType,
+                }}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showImageOnBoth}
+                    onChange={(e) => setShowImageOnBoth(e.target.checked)}
+                  />
+                }
+                label={t("Add Image")}
               />
             </Box>)
           )}

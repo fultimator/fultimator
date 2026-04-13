@@ -1,6 +1,6 @@
 import { useState } from "react";
 import types from "../../libs/types";
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -178,10 +178,10 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
   };
 
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
       <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeSpell}>
-          <RemoveCircleOutline />
+          <RemoveCircleOutlined />
         </IconButton>
       </Grid>
       <Grid
@@ -196,8 +196,10 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           fullWidth
           value={spell.name}
           onChange={(e) => setSpell("name", e.target.value)}
-          inputProps={{ maxLength: 50 }}
           size="small"
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -314,7 +316,9 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 {...params}
                 label={t("Target Description")}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 100 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 100 }
+                }}
               />
             )}
           />
@@ -348,7 +352,9 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 {...params}
                 label={t("Duration")}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 50 }
+                }}
               />
             )}
           />

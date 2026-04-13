@@ -37,10 +37,9 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
             <Grid container>
               <Grid container direction="column"  size="grow">
                 <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{
+                  container sx={{
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     px: 2,
                     py: 1,
                     background: `${theme.primary}`,
@@ -53,9 +52,10 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   <Grid  size="grow">
                     <Typography
                       variant="h1"
-                      textAlign="left"
-                      sx={{ lineHeight: 1.2 }}
-                    >
+                      sx={{
+                        textAlign: "left",
+                        lineHeight: 1.2
+                      }}>
                       {arcana.name}
                     </Typography>
                   </Grid>
@@ -63,9 +63,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* First Row */}
                 <Grid
-                  container
-                  justifyContent="space-between"
-                  alignItems="center"
+                  container sx={{ justifyContent: "space-between", alignItems: "center" }}
                   sx={{
                     background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: "10px",
@@ -74,7 +72,9 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   }}
                 >
                   <Grid  size="grow">
-                    <Typography fontStyle="italic">
+                    <Typography sx={{
+                      fontStyle: "italic"
+                    }}>
                       {!arcana.description ? (
                         t("No Description")
                       ) : (
@@ -112,9 +112,8 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 </Grid>
                 {/* Second Row */}
                 <Grid
-                  container
-                  justifyContent="flex-start"
-                  sx={{
+                  container sx={{
+                    justifyContent: "flex-start",
                     background: "transparent",
                     px: "10px",
                     py: "8px",
@@ -148,9 +147,8 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
             <Grid container>
               {/* Merge Benefit */}
               <Grid
-                container
-                justifyContent="space-between"
-                sx={{
+                container sx={{
+                  justifyContent: "space-between",
                   borderTop: `1px solid ${theme.primary}`,
                 }}>
                 {/* Merge Label */}
@@ -169,9 +167,10 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   size={2}>
                   <Typography
                     variant="h5"
-                    fontWeight="bold"
-                    sx={{ margin: "auto" }}
-                  >
+                    sx={{
+                      fontWeight: "bold",
+                      margin: "auto"
+                    }}>
                     {t("MERGE")}
                   </Typography>
                 </Grid>
@@ -227,8 +226,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 <>
                   {/* Pulse Benefit */}
                   <Grid
-                    container
-                    justifyContent="space-between"
+                    container sx={{ justifyContent: "space-between" }}
                     sx={{
                       borderTop: `1px solid ${theme.primary}`,
                     }}>
@@ -248,9 +246,10 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                       size={2}>
                       <Typography
                         variant="h5"
-                        fontWeight="bold"
-                        sx={{ margin: "auto" }}
-                      >
+                        sx={{
+                          fontWeight: "bold",
+                          margin: "auto"
+                        }}>
                         {t("PULSE")}
                       </Typography>
                     </Grid>
@@ -306,9 +305,8 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
               {/* Dismiss Benefit */}
               <Grid
-                container
-                justifyContent="space-between"
-                sx={{
+                container sx={{
+                  justifyContent: "space-between",
                   borderTop: `1px solid ${theme.primary}`,
                 }}>
                 {/* Dismiss Label */}
@@ -327,9 +325,10 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   size={2}>
                   <Typography
                     variant="h5"
-                    fontWeight="bold"
-                    sx={{ margin: "auto" }}
-                  >
+                    sx={{
+                      fontWeight: "bold",
+                      margin: "auto"
+                    }}>
                     {t("DISMISS")}
                   </Typography>
                 </Grid>

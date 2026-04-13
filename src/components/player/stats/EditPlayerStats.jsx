@@ -41,7 +41,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
     const positiveIncrements = increments.filter((val) => val > 0);
 
     return (
-      <Grid container spacing={2} alignItems="center">
+      <Grid container spacing={2} sx={{ alignItems: "center" }}>
         <Grid
           size={{
             xs: 12,
@@ -60,8 +60,10 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
             label={t("Max")}
             value={player.stats[stat].max}
             variant="outlined"
-            InputProps={{ readOnly: true }}
             fullWidth
+            slotProps={{
+              input: { readOnly: true }
+            }}
           />
         </Grid>
         <Grid
@@ -86,7 +88,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
               xs: 12,
               sm: 6
             }}>
-            <Grid container spacing={1} justifyContent="center">
+            <Grid container spacing={1} sx={{ justifyContent: "center" }}>
               <Grid
                 size={{
                   xs: 12,

@@ -54,9 +54,9 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
         {showHeader && (
           <Grid
             container
-            justifyContent="space-between"
-            alignItems="center"
             sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
               p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
@@ -67,22 +67,22 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
             }}
           >
             <Grid  size={3}>
-              <Typography variant="h4" textAlign="left">
+              <Typography sx={{ textAlign: "left" }}>
                 {t("Weapon")}
               </Typography>
             </Grid>
             <Grid  size={1}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Cost")}
               </Typography>
             </Grid>
             <Grid  size={4}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Accuracy")}
               </Typography>
             </Grid>
             <Grid  size={4}>
-              <Typography variant="h4" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Damage")}
               </Typography>
             </Grid>
@@ -92,9 +92,8 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
           <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
-              container
-              justifyContent="space-between"
-              sx={{
+              container sx={{
+                justifyContent: "space-between",
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
@@ -103,16 +102,16 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 },
               }}>
               <Grid sx={{ display: "flex", alignItems: "center" }} size={3}>
-                <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
+                <Typography sx={{ fontWeight: "bold", marginRight: "4px" }}>
                   {t(weapon.name)}
                 </Typography>
                 {weapon.martial && <Martial />}
               </Grid>
               <Grid  size={1}>
-                <Typography textAlign="center">{`${weapon.cost}z`}</Typography>
+                <Typography sx={{ textAlign: "center" }}>{`${weapon.cost}z`}</Typography>
               </Grid>
               <Grid  size={4}>
-                <Typography fontWeight="bold" textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   <OpenBracket />
                   {`${attributes[weapon.att1].shortcaps} + ${
                     attributes[weapon.att2].shortcaps
@@ -127,7 +126,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               </Grid>
 
               <Grid  size={4}>
-                <Typography fontWeight="bold" textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   <OpenBracket />
                   {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
                   <CloseBracket />
@@ -138,9 +137,8 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
 
             {/* Second Row */}
             <Grid
-              container
-              justifyContent="flex-end"
-              sx={{
+              container sx={{
+                justifyContent: "flex-end",
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
@@ -150,7 +148,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               }}
             >
               <Grid  size={3}>
-                <Typography fontWeight="bold">
+                <Typography sx={{ fontWeight: "bold" }}>
                   {t(weapon.category)}
                 </Typography>
               </Grid>
@@ -158,7 +156,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 <Diamond color={theme.primary} />
               </Grid>
               <Grid  size={4}>
-                <Typography textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   {weapon.hands === 1 && t("One-handed")}
                   {weapon.hands === 2 && t("Two-handed")}
                 </Typography>
@@ -167,7 +165,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 <Diamond color="{primary}" />
               </Grid>
               <Grid  size={3}>
-                <Typography textAlign="center">
+                <Typography sx={{ textAlign: "center" }}>
                   {weapon.melee && t("Melee")}
                   {weapon.ranged && t("Ranged")}
                 </Typography>
@@ -176,6 +174,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
           </Grid>
         </Grid>
         <Typography
+          component="div"
           sx={{
             background: "transparent",
             borderBottom: `1px solid ${theme.secondary}`,

@@ -108,9 +108,12 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
             >
               <Typography
                 variant="body2"
-                fontWeight="bold"
-                sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word"
+                }}>
                 {highlightMatch(quirk.name, searchQuery)}
               </Typography>
             </StyledTableCell>

@@ -155,8 +155,10 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                   }}
                   size={6}>
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {therioform.name === "mutant_therioform_custom_name"
                       ? therioform.customName
@@ -189,9 +191,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",

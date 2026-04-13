@@ -64,7 +64,6 @@ function ThemedSpellInvoker({ invoker, isEditMode, onEdit, onWellspringToggle })
           <ReactMarkdown>{t("invoker_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-
       {/* Wellspring Selection */}
       <Box sx={{ padding: 2, backgroundColor: theme.ternary, marginBottom: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box sx={{ flexGrow: 1 }}>
@@ -149,7 +148,6 @@ function ThemedSpellInvoker({ invoker, isEditMode, onEdit, onWellspringToggle })
           </Box>
         )}
       </Box>
-
       {/* INVOCATIONS */}
       <div
         style={{
@@ -238,7 +236,6 @@ function ThemedSpellInvoker({ invoker, isEditMode, onEdit, onWellspringToggle })
           </Box>
         </Box>
       </div>
-
       {availableInvocations.length === 0 ? (
         <Typography
           sx={{
@@ -287,13 +284,12 @@ function ThemedSpellInvoker({ invoker, isEditMode, onEdit, onWellspringToggle })
                     justifyContent: "flex-start" 
                   }}>
                     <Typography
-                      fontWeight="bold"
-                      sx={{ 
-                        flexGrow: 1, 
+                      sx={{
+                        fontWeight: "bold",
+                        flexGrow: 1,
                         marginRight: "5px",
                         fontSize: { xs: "0.8rem", sm: "1rem" }
-                      }}
-                    >
+                      }}>
                       {t(invocation.name)}
                     </Typography>
                   </Box>

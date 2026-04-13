@@ -179,7 +179,9 @@ export default function UnifiedSpellModal({
       <Dialog
         open={open}
         onClose={onClose}
-        PaperProps={{ sx: { width: "85%", maxWidth: "lg" } }}
+        slotProps={{
+          paper: { sx: { width: "85%", maxWidth: "lg" } }
+        }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
           {getResolvedTitle()}
@@ -247,7 +249,6 @@ export default function UnifiedSpellModal({
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Delete Confirmation Dialog */}
       {onDelete && (
         <DeleteConfirmationDialog

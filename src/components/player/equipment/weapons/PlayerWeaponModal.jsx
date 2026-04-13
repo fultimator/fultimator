@@ -333,11 +333,13 @@ export default function PlayerWeaponModal({
       <Dialog
         open={open}
         onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: "100%",
-            maxWidth: "lg",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "100%",
+              maxWidth: "lg",
+            },
+          }
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -356,7 +358,7 @@ export default function PlayerWeaponModal({
           <Close />
         </IconButton>
         <DialogContent>
-          <Grid container spacing={1} alignItems="center">
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             {/* Change Base */}
             <Grid
               size={{
@@ -533,7 +535,7 @@ export default function PlayerWeaponModal({
               <Divider />
             </Grid>
             <Grid  size={12}>
-              <Grid container spacing={1} alignItems="center">
+              <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

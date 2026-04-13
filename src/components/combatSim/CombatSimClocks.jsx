@@ -17,7 +17,7 @@ import {
   Collapse,
 } from "@mui/material";
 import {
-  RemoveCircleOutline,
+  RemoveCircleOutlined,
   RestartAlt,
   Close,
   Add,
@@ -183,7 +183,9 @@ export default function CombatSimClocks({
                           label={t("clocks_name_label")}
                           value={clockName}
                           onChange={handleClockNameChange}
-                          inputProps={{ maxLength: 30 }}
+                          slotProps={{
+                            htmlInput: { maxLength: 30 }
+                          }}
                         />
                       </Grid>
                       <Grid  size={12}>
@@ -276,7 +278,7 @@ export default function CombatSimClocks({
                               onClick={() => onRemove(index)}
                               color="error"
                             >
-                              <RemoveCircleOutline fontSize="small" />
+                              <RemoveCircleOutlined fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </Box>

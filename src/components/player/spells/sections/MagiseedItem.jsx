@@ -90,7 +90,9 @@ export default function MagiseedItem({
           </Typography>
           <Box sx={{ display: "flex", gap: 0.5 }}>
             {item.rangeStart !== undefined && item.rangeEnd !== undefined && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 T:{item.rangeStart}-{item.rangeEnd}
               </Typography>
             )}
@@ -117,7 +119,7 @@ export default function MagiseedItem({
       <AccordionDetails>
         <Card sx={{ mb: 0 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
           {/* Magiseed Name Selector */}
           <Grid
             size={{
@@ -175,7 +177,9 @@ export default function MagiseedItem({
               onChange={(e) =>
                 onItemChange(itemIndex, "rangeStart", parseInt(e.target.value) || 0)
               }
-              inputProps={{ min: 0, max: 4 }}
+              slotProps={{
+                htmlInput: { min: 0, max: 4 }
+              }}
             />
           </Grid>
           <Grid
@@ -191,7 +195,9 @@ export default function MagiseedItem({
               onChange={(e) =>
                 onItemChange(itemIndex, "rangeEnd", parseInt(e.target.value) || 3)
               }
-              inputProps={{ min: 0, max: 4 }}
+              slotProps={{
+                htmlInput: { min: 0, max: 4 }
+              }}
             />
           </Grid>
 

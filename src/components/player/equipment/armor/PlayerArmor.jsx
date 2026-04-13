@@ -92,7 +92,7 @@ export default function PlayerArmor({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {armor.map((armorItem, index) => (
             <React.Fragment key={index}>

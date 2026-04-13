@@ -158,9 +158,12 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                   >
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
-                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word"
+                      }}>
                       {highlightMatch(other.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -168,7 +171,6 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                   <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
                   <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
                 </TableRow>
-
                 {/* Clock row */}
                 {hasClock && (
                   <TableRow sx={{ bgcolor: "action.hover" }}>
@@ -187,7 +189,12 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                       </Typography>
                     </StyledTableCell>
                     <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
-                      <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "0.8rem",
+                          fontWeight: "bold"
+                        }}>
                         {filled}/{sections}
                       </Typography>
                     </StyledTableCell>
@@ -223,7 +230,6 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                     </StyledTableCell>
                   </TableRow>
                 )}
-
                 {/* Collapsible description + effect */}
                 {hasDetails && (
                   <TableRow>

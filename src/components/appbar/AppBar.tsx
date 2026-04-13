@@ -73,15 +73,15 @@ const AppBar: React.FC<AppBarProps> = ({
           })}
         >
           <Container>
-            <Grid container alignItems="center" justifyContent="space-between">
+            <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
               <Grid
-                textAlign="left"
+                size={2}
                 sx={{
+                  textAlign: "left",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                }}
-                size={2}>
+                }}>
                 {showGoBackButton && (
                   <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
@@ -91,15 +91,15 @@ const AppBar: React.FC<AppBarProps> = ({
 
               {!isNpcEdit && (
                 <Grid
-                  textAlign="center"
+                  size={8}
                   sx={{
+                    textAlign: "center",
                     height: "60px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "4px 0 0",
-                  }}
-                  size={8}>
+                  }}>
                   <RouterLink
                     to="/"
                     style={{
@@ -108,7 +108,7 @@ const AppBar: React.FC<AppBarProps> = ({
                       textAlign: "center",
                     }}
                   >
-                    <Typography textAlign="center">
+                    <Typography sx={{ textAlign: "center" }}>
                       <img
                         style={{ height: "100%", maxHeight: "60px" }}
                         src={isSmallViewport ? logo929 : undefined}

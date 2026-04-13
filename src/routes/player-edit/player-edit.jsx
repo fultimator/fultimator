@@ -623,9 +623,10 @@ export default function PlayerEdit() {
           {compactView ? (
             <Grid
               container
-              sx={{ padding: 1 }}
-              justifyContent={"center"}
-            >
+              sx={{
+                justifyContent: "center",
+                padding: 1
+              }}>
               <Grid container  size={12}>
                 <PlayerCardSheet
                   player={playerTemp}
@@ -991,7 +992,7 @@ export default function PlayerEdit() {
           }}
         >
           <Fab onClick={toggleDrawer(true)} color="primary" size="medium">
-            <Stack direction="column" alignItems="center" spacing={0.5}>
+            <Stack direction="column" sx={{ alignItems: "center" }} spacing={0.5}>
               <MenuBookIcon fontSize="medium" />
               <Typography variant="caption" sx={{ fontSize: "10px" }}>
                 {t("Menu")}
@@ -1094,7 +1095,9 @@ export default function PlayerEdit() {
                 );
               })
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("No special skills found in class definitions.")}
               </Typography>
             )}

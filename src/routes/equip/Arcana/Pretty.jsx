@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Card,
   Grid,
@@ -7,7 +7,9 @@ import {
   ThemeProvider,
   Tooltip,
   IconButton,
-  darken
+  darken,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +17,7 @@ import { styled } from "@mui/system";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -32,14 +35,13 @@ function Pretty({ custom, rework }) {
 function PrettySingle({ arcana, showActions, rework }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const [showImage, setShowImage] = useState(false);
 
   const background = theme.mode === 'dark'
   ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
   : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
 
-  const background2 = theme.mode === 'dark'
-  ? `black`
-  : `white`;
+  const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
   const cardBackground = theme.mode === 'dark'
   ? `backgroundColor: "#181a1b", background: "#181a1b"`
@@ -66,18 +68,18 @@ function PrettySingle({ arcana, showActions, rework }) {
                   flex: "0 0 128px",
                   minWidth: "128px",
                   minHeight: "128px",
-                  background2,
+                  background: imageBackground,
                 }}>
-                <EditableImage size={128} />
+                {showImage && <EditableImage size={128} />}
               </Grid>
 
               <Grid container direction="column"  size="grow">
                 <Grid
                   container
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{
-                    px: 2,
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                    pl: 1,
                     py: 1,
                     background: `${theme.primary}`,
                     color: "#ffffff",
@@ -87,8 +89,8 @@ function PrettySingle({ arcana, showActions, rework }) {
                   }}
                 >
                   <Grid  size="grow">
-                    <Typography variant="h1" textAlign="left" sx={{ lineHeight: 1.2 }}>
-                      {arcana.name}
+                    <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1.5rem", fontWeight: 700 }}>
+                      {arcana.name || t("No Name")}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -96,14 +98,13 @@ function PrettySingle({ arcana, showActions, rework }) {
                 {/* First Row */}
                 <Grid
                   container
-                  justifyContent="space-between"
                   sx={{
+                    justifyContent: "space-between",
                     background,
-                    px: "10px",
-                    py: "5px"
+                    p: "5px"
                   }}>
                   <Grid  size={12}>
-                    <Typography fontStyle="italic">
+                    <Typography>
                       {!arcana.description ? t("No Description") : (
                         <div style={{ display: 'inline' }}>
                           <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
@@ -117,69 +118,79 @@ function PrettySingle({ arcana, showActions, rework }) {
                 {/* Second Row */}
                 <Grid
                   container
-                  justifyContent="flex-start"
                   sx={{
                     background: "transparent",
-                    px: "10px",
-                    py: "8px"
+                    p: "5px",
+                    alignItems: "center",
                   }}
                 >
-                  <Typography>
-                    {!arcana.domain ? t("No Domain") : (
-                      <div style={{ display: 'inline' }}>
-                        <Typography variant="inherit" style={{ fontWeight: 'bold', display: 'inline' }}>
-                          {t("Domains: ")}
-                        </Typography>
+                  <Grid size={12}>
+                    <Typography sx={{ lineHeight: 1.2 }}>
+                      <strong>{t("Domains:")}</strong>{" "}
+                      {!arcana.domain ? t("No Domain") : (
                         <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true} style={{ display: 'inline' }}>
                           {arcana.domain}
                         </ReactMarkdown>
-                      </div>
-                    )}
-                  </Typography>
+                      )}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-
             <Grid container>
               {/* Merge Benefit */}
               <Grid
                 container
-                justifyContent="space-between"
+                size={12}
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
                 }}>
-                {/* Merge Label */}
+                {/* Merge Label and Name Row */}
                 <Grid  sx={{
-                  textAlign: 'center',
-                  backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
-                  padding: "1px",
-                  color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
-                }} size={2}>
-                  <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                    {t("MERGE")}
-                  </Typography>
+                  width: '100%',
+                }}>
+                  <Grid  sx={{
+                    textAlign: 'center',
+                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
+                    px: 2,
+                    py: 0.5,
+                    color: `${theme.white}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minWidth: 'fit-content',
+                  }}>
+                    <Typography sx={{ fontWeight: "bold", margin: 0, fontSize: "0.75rem", color: "inherit" }}>
+                      {t("MERGE")}
+                    </Typography>
+                  </Grid>
+
+                  {/* Arcana Merge Name */}
+                  <Grid  sx={{
+                    background,
+                    px: 2,
+                    py: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    minHeight: '28px',
+                  }}>
+                    {arcana.mergeName && (
+                      <Typography sx={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                        {arcana.mergeName}
+                      </Typography>
+                    )}
+                  </Grid>
                 </Grid>
 
-                {/* Arcana Merge Name */}
+                {/* Merge Benefit - Full Width */}
                 <Grid  sx={{
-                  background,
-                  px: 3,
+                  p: "5px",
+                  width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                }} size={10}>
-                  <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
-                    {arcana.mergeName}
-                  </Typography>
-                </Grid>
-
-                {/* Merge Benefit */}
-                <Grid  sx={{
-                  mx: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                }} size={12}>
+                }}>
                   <Typography>
                     {!arcana.mergeBenefit ? t("No Merge Benefit") : (
                       <div style={{ display: 'inline' }}>
@@ -197,42 +208,55 @@ function PrettySingle({ arcana, showActions, rework }) {
                   {/* Pulse Benefit */}
                   <Grid
                     container
-                    justifyContent="space-between"
+                    size={12}
                     sx={{
                       borderTop: `1px solid ${theme.primary}`,
                     }}>
-                    {/* Pulse Grid Item */}
+                    {/* Pulse Label and Name Row */}
                     <Grid  sx={{
-                      textAlign: 'center',
-                      backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
-                      padding: "1px",
-                      color: `${theme.white}`,
                       display: 'flex',
                       alignItems: 'center',
-                    }} size={2}>
-                      <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                        {t("PULSE")}
-                      </Typography>
+                      width: '100%',
+                    }}>
+                      <Grid  sx={{
+                        textAlign: 'center',
+                        backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
+                        padding: "8px 16px",
+                        color: `${theme.white}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        minWidth: 'fit-content',
+                      }}>
+                        <Typography sx={{ fontWeight: "bold", margin: 0, fontSize: "0.75rem", color: "inherit" }}>
+                          {t("PULSE")}
+                        </Typography>
+                      </Grid>
+
+                      {/* Arcana Pulse Name */}
+                      <Grid  sx={{
+                        background,
+                        px: 2,
+                        py: 0.5,
+                        display: 'flex',
+                        alignItems: 'center',
+                        flex: 1,
+                        minHeight: '28px',
+                      }}>
+                        {arcana.pulseName && (
+                          <Typography sx={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                            {arcana.pulseName}
+                          </Typography>
+                        )}
+                      </Grid>
                     </Grid>
 
-                    {/* Arcana Pulse Name */}
+                    {/* Pulse Benefit - Full Width */}
                     <Grid  sx={{
-                      background,
-                      px: 3,
+                      p: "5px",
+                      width: '100%',
                       display: 'flex',
                       alignItems: 'center',
-                    }} size={10}>
-                      <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
-                        {arcana.pulseName}
-                      </Typography>
-                    </Grid>
-
-                    {/* Pulse Benefit */}
-                    <Grid  sx={{
-                      mx: 4,
-                      display: 'flex',
-                      alignItems: 'center',
-                    }} size={12}>
+                    }}>
                       <Typography>
                         {!arcana.pulseBenefit ? t("No Pulse Benefit") : (
                           <div style={{ display: 'inline' }}>
@@ -250,42 +274,56 @@ function PrettySingle({ arcana, showActions, rework }) {
               {/* Dismiss Benefit */}
               <Grid
                 container
-                justifyContent="space-between"
+                size={12}
                 sx={{
                   borderTop: `1px solid ${theme.primary}`,
                 }}>
-                {/* Dismiss Label */}
+                {/* Dismiss Label and Name Row */}
                 <Grid  sx={{
-                  textAlign: 'center',
-                  backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
-                  padding: "1px",
-                  color: `${theme.white}`,
                   display: 'flex',
                   alignItems: 'center',
-                }} size={2}>
-                  <Typography variant="h5" fontWeight="bold" sx={{ margin: "auto" }}>
-                    {t("DISMISS")}
-                  </Typography>
+                  width: '100%',
+                }}>
+                  <Grid  sx={{
+                    textAlign: 'center',
+                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(theme.secondary, 0.3)})`,
+                    px: 2,
+                    py: 0.5,
+                    color: `${theme.white}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    minWidth: 'fit-content',
+                  }}>
+                    <Typography sx={{ fontWeight: "bold", margin: 0, fontSize: "0.75rem", color: "inherit" }}>
+                      {t("DISMISS")}
+                    </Typography>
+                  </Grid>
+
+                  {/* Dismiss Name */}
+                  <Grid  sx={{
+                    background,
+                    px: 2,
+                    py: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    minHeight: '28px',
+                  }}>
+                    {arcana.dismissName && (
+                      <Typography sx={{ fontWeight: "bold", fontSize: "0.95rem" }}>
+                        {arcana.dismissName}
+                      </Typography>
+                    )}
+                  </Grid>
                 </Grid>
 
-                {/* Dismiss Name */}
+                {/* Dismiss Benefit - Full Width */}
                 <Grid  sx={{
-                  background,
-                  px: 3,
+                  p: "5px",
+                  width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                }} size={10}>
-                  <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", margin: "auto 0" }}>
-                    {arcana.dismissName}
-                  </Typography>
-                </Grid>
-
-                {/* Dismiss Benefit */}
-                <Grid  sx={{
-                  mx: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                }} size={12}>
+                }}>
                   <Typography>
                     {!arcana.dismissBenefit ? t("No Dismiss Benefit") : (
                       <div style={{ display: 'inline' }}>
@@ -302,13 +340,20 @@ function PrettySingle({ arcana, showActions, rework }) {
         </div>
       </Card>
       {showActions && (
-        <div style={{ display: "flex" }}>
-          <Tooltip title={t("Download as Image")}>
-            <IconButton onClick={downloadImage}>
-              <Download />
-            </IconButton>
-          </Tooltip>
-          <Export name={`${arcana.name}`} dataType="arcana" data={arcana} />
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export name={`${arcana.name}`} dataType="arcana" data={arcana} />
+            <AddToCompendiumButton itemType="player-spell" data={arcana} />
+          </div>
+          <FormControlLabel
+            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            label={t("Add Image")}
+          />
         </div>
       )}
     </>

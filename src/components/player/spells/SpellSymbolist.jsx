@@ -137,8 +137,10 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                   }}
                   size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {sym.name === "symbol_custom_name"
                       ? sym.customName
@@ -158,9 +160,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",

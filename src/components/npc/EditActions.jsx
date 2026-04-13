@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 
 import {
   Grid,
@@ -56,7 +56,7 @@ export default function EditActions({ npc, setNpc }) {
           <Grid container key={i} spacing={1}>
             <Grid  sx={{ p: 0, m: 0 }}>
               <IconButton onClick={removeActions(i)}>
-                <RemoveCircleOutline />
+                <RemoveCircleOutlined />
               </IconButton>
             </Grid>
             <Grid  size="grow">
@@ -78,10 +78,12 @@ export default function EditActions({ npc, setNpc }) {
                   id="spCost"
                   label={t("SP Cost:")}
                   type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   value={actions?.spCost ?? 1}
                   onChange={(e) => onChangeActions(i, "spCost", e.target.value)}
                   size="small"
+                  slotProps={{
+                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+                  }}
                 />
               </FormControl>
             </Grid>

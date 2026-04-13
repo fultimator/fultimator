@@ -30,11 +30,13 @@ export default function EditClassNameModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: { xs: "80%", md: "40%" },
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: { xs: "80%", md: "40%" },
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold"}}>
@@ -58,7 +60,9 @@ export default function EditClassNameModal({
           label={t("Class Name")}
           value={className}
           onChange={(e) => setClassName(e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </DialogContent>
       <DialogActions>

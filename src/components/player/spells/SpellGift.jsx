@@ -351,8 +351,10 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   }}
                   size={8}>
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {gft.name === "esper_gift_custom_name"
                       ? gft.customName
@@ -387,9 +389,8 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",

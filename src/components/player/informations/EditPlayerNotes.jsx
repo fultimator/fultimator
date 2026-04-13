@@ -18,7 +18,7 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
+import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
@@ -157,7 +157,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             {isEditMode && (
               <Grid  sx={{ p: 0, m: 0 }}>
                 <IconButton onClick={removeItem(index)}>
-                  <RemoveCircleOutline />
+                  <RemoveCircleOutlined />
                 </IconButton>
               </Grid>
             )}
@@ -167,11 +167,13 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 label={t("Note Name") + ":"}
                 value={note.name}
                 onChange={handleNoteNameChange(index)}
-                inputProps={{ maxLength: 50 }}
-                InputProps={{
-                  readOnly: !isEditMode,
-                }}
-              />
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                  },
+
+                  htmlInput: { maxLength: 50 }
+                }} />
             </Grid>
             <Grid  size={12}>
               <CustomTextarea
@@ -205,10 +207,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                     md: 4
                   }}>
                   <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{
+                    container sx={{
+                      alignItems: "center",
+                      justifyContent: "space-between",
                       py: 1,
                       bgcolor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
@@ -232,7 +233,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                             color: theme.palette.error.main,
                           }}
                         >
-                          <RemoveCircleOutline />
+                          <RemoveCircleOutlined />
                         </IconButton>
                       </Grid>
                     )}
@@ -263,7 +264,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             variant="outlined"
             value={clockName}
             onChange={(e) => setClockName(e.target.value)}
-            inputProps={{ maxLength: 30 }}
+            slotProps={{
+              htmlInput: { maxLength: 30 }
+            }}
           />
           <TextField
             margin="dense"
@@ -277,7 +280,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
               const value = parseInt(e.target.value, 10);
               setClockSections(value);
             }}
-            inputProps={{ min: 2, max: 30 }}
+            slotProps={{
+              htmlInput: { min: 2, max: 30 }
+            }}
           />
         </DialogContent>
         <DialogActions>

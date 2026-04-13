@@ -154,8 +154,10 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                   }}
                   size={8}>
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {dan.name === "dance_custom_name"
                       ? dan.customName
@@ -170,8 +172,10 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                   }}
                   size={4}>
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {dan.name === "dance_custom_name"
                       ? dan.duration
@@ -191,9 +195,8 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",

@@ -150,7 +150,9 @@ export default function PlayerTherioforms({ player }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedTherioform && (

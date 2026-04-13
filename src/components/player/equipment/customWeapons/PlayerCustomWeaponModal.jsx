@@ -404,10 +404,12 @@ export default function PlayerCustomWeaponModal({
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '90vh',
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            maxHeight: '90vh',
+          },
+        }
       }}
     >
       <DialogTitle variant="h4" sx={{ fontWeight: "bold" }}>
@@ -436,7 +438,7 @@ export default function PlayerCustomWeaponModal({
             <Grid container spacing={2}>
               {/* Weapon Name and Equipped Status */}
               <Grid  size={12}>
-                <Grid container spacing={2} alignItems="center">
+                <Grid container spacing={2} sx={{ alignItems: "center" }}>
                   <Grid  size={8}>
                     <TextField
                       fullWidth

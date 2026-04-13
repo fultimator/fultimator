@@ -32,7 +32,13 @@ export default function SpellTherioform({ spell }) {
             <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
               {form.name === "mutant_therioform_custom_name" ? form.customName : t(form.name)}
               {form.genoclepsis && (
-                <Typography variant="caption" display="block" fontStyle="italic" color="text.secondary">
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    fontStyle: "italic",
+                    color: "text.secondary"
+                  }}>
                   {form.name === "mutant_therioform_custom_name" ? form.genoclepsis : t(form.genoclepsis)}
                 </Typography>
               )}

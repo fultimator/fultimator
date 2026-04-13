@@ -60,11 +60,13 @@ export default function AddSkillModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%", // Adjust width as needed
-          maxWidth: "lg", // Adjust maximum width as needed
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%", // Adjust width as needed
+            maxWidth: "lg", // Adjust maximum width as needed
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -94,7 +96,9 @@ export default function AddSkillModal({
               fullWidth
               value={skillName}
               onChange={(e) => setSkillName(e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -105,12 +109,9 @@ export default function AddSkillModal({
             <TextField
               label={t("Max Level")}
               type="number"
-              InputProps={{
-                inputProps: { min: 1, max: 10 },
-                readOnly: !!specialSkill,
-              }}
               fullWidth
-              value={maxLevel.toString()} // Ensure the value is a string
+              // Ensure the value is a string
+              value={maxLevel.toString()}
               onChange={(e) => {
                 const value = e.target.value;
                 // Allow empty input for user convenience
@@ -130,7 +131,14 @@ export default function AddSkillModal({
                 }
                 setMaxLevel(value);
               }}
-              disabled={!!specialSkill} // Disable if a specialSkill is selected
+              // Disable if a specialSkill is selected
+              disabled={!!specialSkill}
+              slotProps={{
+                input: {
+                  inputProps: { min: 1, max: 10 },
+                  readOnly: !!specialSkill,
+                }
+              }}
             />
           </Grid>
           <Grid  size={12}>

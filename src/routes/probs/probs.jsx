@@ -184,30 +184,32 @@ export default function Probs() {
               max={60}
               value={bonus}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setBonus(bonus - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setBonus(bonus + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={(e) => {
+                        setBonus(bonus - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={(e) => {
+                        setBonus(bonus + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -229,30 +231,32 @@ export default function Probs() {
               max={60}
               value={damage}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setDamage(damage - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setDamage(damage + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={(e) => {
+                        setDamage(damage - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={(e) => {
+                        setDamage(damage + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -273,30 +277,32 @@ export default function Probs() {
               max={20}
               value={dl}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setDl(dl - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setDl(dl + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={(e) => {
+                        setDl(dl - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={(e) => {
+                        setDl(dl + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
@@ -317,30 +323,32 @@ export default function Probs() {
               max={300}
               value={hp}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setHp(hp - 5);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setHp(hp + 5);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={(e) => {
+                        setHp(hp - 5);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={(e) => {
+                        setHp(hp + 5);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>

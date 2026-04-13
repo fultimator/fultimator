@@ -108,9 +108,10 @@ export default function PlayerCompanion({
                 <Grid  size={12}>
                   <Typography
                     variant="h3"
-                    fontWeight={"bold"}
-                    sx={{ textTransform: "uppercase" }}
-                  >
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase"
+                    }}>
                     {t("Faithful Companion") +
                       " - " +
                       t("SL") +

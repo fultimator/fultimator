@@ -195,7 +195,11 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
       action: (event) =>
         handlePopoverOpen(
           event,
-          <Box p={2} sx={{ width: 300 }}>
+          <Box
+            sx={{
+              p: 2,
+              width: 300
+            }}>
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_table_title")}
             </Typography>
@@ -276,8 +280,10 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                   type="number"
                   size="small"
                   defaultValue={3}
-                  inputProps={{ min: 1, max: 10 }}
                   sx={{ width: 90, mr: 1 }}
+                  slotProps={{
+                    htmlInput: { min: 1, max: 10 }
+                  }}
                 />
                 <Typography>×</Typography>
                 <TextField
@@ -286,8 +292,10 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                   type="number"
                   size="small"
                   defaultValue={3}
-                  inputProps={{ min: 1, max: 20 }}
                   sx={{ width: 90, ml: 1 }}
+                  slotProps={{
+                    htmlInput: { min: 1, max: 20 }
+                  }}
                 />
               </Box>
               <Button
@@ -376,7 +384,11 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
       action: (event) =>
         handlePopoverOpen(
           event,
-          <Box p={2} sx={{ maxWidth: 300 }}>
+          <Box
+            sx={{
+              p: 2,
+              maxWidth: 300
+            }}>
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_callout_title")}
             </Typography>
@@ -413,7 +425,11 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
       action: (event) =>
         handlePopoverOpen(
           event,
-          <Box p={2} sx={{ maxWidth: 320 }}>
+          <Box
+            sx={{
+              p: 2,
+              maxWidth: 320
+            }}>
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_tooltip_icon")}
             </Typography>
@@ -545,8 +561,9 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
         <Tab value="preview" label={t("mkeditor_tab_preview")} />
         {!isMobile && <Tab value="split" label={t("mkeditor_tab_split")} />}
       </Tabs>
-
-      <Box p={2}>
+      <Box sx={{
+        p: 2
+      }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", mb: 1 }}>
           {buttons.map((btn, idx) => (
             <Tooltip key={idx} title={btn.tooltip}>
@@ -582,8 +599,10 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                   fontFamily: "monospace",
                 },
               }}
-              inputProps={{
-                maxLength: 5000,
+              slotProps={{
+                htmlInput: {
+                  maxLength: 5000,
+                }
               }}
             />
           )}
@@ -604,7 +623,6 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
           )}
         </Box>
       </Box>
-
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}

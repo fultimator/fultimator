@@ -182,9 +182,8 @@ function ThemedSpellChanter({
       </div>
       {volumes.map((volume, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -201,12 +200,11 @@ function ThemedSpellChanter({
               }}
               size={3}>
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                }}
-              >
+                  fontWeight: "bold",
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
+                }}>
                 {t(volume.name)}
               </Typography>
             </Grid>
@@ -356,9 +354,8 @@ function ThemedSpellChanter({
       ) : (
         magichant.keys.map((chantKey, i) => (
           <Grid
-            container
-            justifyContent="flex-start"
-            sx={{
+            container sx={{
+              justifyContent: "flex-start",
               background: "transparent",
               padding: "3px 17px",
               marginBottom: "6px",
@@ -375,12 +372,11 @@ function ThemedSpellChanter({
                 }}
                 size={3}>
                 <Typography
-                  fontWeight="bold"
                   style={{ flexGrow: 1, marginRight: "5px" }}
                   sx={{
-                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                  }}
-                >
+                    fontWeight: "bold",
+                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
+                  }}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.customName
                     : t(chantKey.name)}
@@ -519,8 +515,10 @@ function ThemedSpellChanter({
                   }}
                   size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {tone.name === "magichant_custom_name"
                       ? tone.customName
@@ -540,9 +538,8 @@ function ThemedSpellChanter({
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",

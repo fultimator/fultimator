@@ -610,10 +610,10 @@ export default function PlayerClassCard({
         {isEditMode && (
           <Grid  size={12}>
             <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+              sx={{
+                display: "flex",
+                justifyContent: "space-between"
+              }}>
               <Button
                 variant="contained"
                 color="secondary"

@@ -206,7 +206,7 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
         </Box>
         {isEditMode && (
           <Box sx={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Stack direction="row" spacing={0.5} alignItems="center">
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
               {!spellData.showInPlayerSheet && (
                 <Tooltip title={t("Spell not shown in player sheet")}>
                   <VisibilityOff sx={{ fontSize: "1rem", color: "text.secondary" }} />

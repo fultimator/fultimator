@@ -940,8 +940,8 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
     };
 
     return (
-        <Grid container alignItems="stretch">
-            <Grid container>
+        <Grid container sx={{ alignItems: "stretch" }}>
+            <Grid container size={12}>
                 <Grid
                     sx={{
                         background,
@@ -955,7 +955,6 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         <TextField
                             value={player.name}
                             onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
-                            inputProps={{ maxLength: 50 }}
                             variant="standard"
                             size="small"
                             sx={{
@@ -970,15 +969,19 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                                 "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
                                 "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
                             }}
+                            slotProps={{
+                                htmlInput: { maxLength: 50 }
+                            }}
                         />
                     ) : (
                         <Typography
-                            color="white.main"
-                            fontFamily="Antonio"
-                            fontSize="1.5rem"
-                            fontWeight="medium"
-                            sx={{ textTransform: "uppercase" }}
-                        >
+                            sx={{
+                                color: "white.main",
+                                fontFamily: "Antonio",
+                                fontSize: "1.5rem",
+                                fontWeight: "medium",
+                                textTransform: "uppercase"
+                            }}>
                             {player.name}
                         </Typography>
                     )}
@@ -996,14 +999,27 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                     {isEditMode ? (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
                             {player.info.pronouns && (
-                                <Typography fontFamily="Antonio" fontSize="1rem" sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Antonio",
+                                        fontSize: "1rem",
+                                        textTransform: "uppercase",
+                                        mr: 0.5
+                                    }}>
                                     {player.info.pronouns} <Diamond />
                                 </Typography>
                             )}
                             <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); if (updateMaxStats) updateMaxStats(); }}>
                                 <Remove fontSize="small" />
                             </IconButton>
-                            <Typography fontFamily="Antonio" fontSize="1.1rem" fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.25 }}>
+                            <Typography
+                                sx={{
+                                    fontFamily: "Antonio",
+                                    fontSize: "1.1rem",
+                                    fontWeight: "medium",
+                                    textTransform: "uppercase",
+                                    mx: 0.25
+                                }}>
                                 {t("Lvl")} {player.lvl}
                             </Typography>
                             <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); if (updateMaxStats) updateMaxStats(); }}>
@@ -1012,11 +1028,12 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         </Box>
                     ) : (
                         <Typography
-                            fontFamily="Antonio"
-                            fontSize="1.25rem"
-                            fontWeight="medium"
-                            sx={{ textTransform: "uppercase" }}
-                        >
+                            sx={{
+                                fontFamily: "Antonio",
+                                fontSize: "1.25rem",
+                                fontWeight: "medium",
+                                textTransform: "uppercase"
+                            }}>
                             {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}
                         </Typography>
                     )}
@@ -1121,9 +1138,10 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                             }}
                         >
                             <Typography
-                                fontFamily="body1"
-                                fontSize="0.80rem"
-                            >
+                                sx={{
+                                    fontFamily: "body1",
+                                    fontSize: "0.80rem"
+                                }}>
                                 <RenderTraits player={player} />
                             </Typography>
                         </Box>
@@ -1148,7 +1166,7 @@ function RenderTraits({ player }) {
             {/* Iterate over traits */}
             {traits.map(({ label, value }) => value && (
                 <Grid  key={label} sx={{ marginTop: 0.5 }} size={12}>
-                    <Grid container alignItems="center" spacing={1}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={1}>
                         {/* Label */}
                         <Grid  size={3}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
@@ -1195,11 +1213,12 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
     return (
         <Typography
             component="div"
-            fontFamily="Antonio"
-            fontWeight="bold"
-            textAlign="center"
-            fontSize={isMobile ? "0.74rem" : "0.9rem"}
-        >
+            sx={{
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                textAlign: "center",
+                fontSize: isMobile ? "0.74rem" : "0.9rem"
+            }}>
             <Grid container>
                 <Grid
                     sx={{
@@ -1211,7 +1230,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
                     }}>
-                    <Grid container alignItems="stretch" justifyContent="space-between">
+                    <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
                         {[
                             { key: "dexterity", label: t("DEX"), curr: currDex, bg: { dark: '#1E2122', light: '#efecf5' }, border: true },
                             { key: "insight",   label: t("INS"), curr: currInsight, bg: { dark: '#1E2122', light: '#f3f0f7' }, border: true },
@@ -1272,7 +1291,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
                     }}>
-                    <Grid container alignItems="stretch" justifyContent="space-between">
+                    <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
                         <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
                             {t("HP")}
                         </Grid>
@@ -1312,7 +1331,9 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         mr: isMobile ? "1px" : "2px",
                         flexBasis: "calc(25% - 2px)",
                     }}>
-                    <Grid container justifyItems="space-between">
+                    <Grid container sx={{
+                        justifyItems: "space-between"
+                    }}>
                         <Grid
                             sx={{
                                 bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#efecf5',

@@ -331,7 +331,7 @@ export default function PlayerClasses({
               </StyledTableCellHeader>
               <StyledTableCellHeader sx={{ width: { xs: 70, sm: 80 } }} />
               <StyledTableCellHeader sx={{ width: { xs: 80, sm: 90 }, textAlign: "center" }}>
-                <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Level")}</Typography>
+                <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Level")}</Typography>
               </StyledTableCellHeader>
               <StyledTableCellHeader sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 0.5 }}>
@@ -353,7 +353,7 @@ export default function PlayerClasses({
                       )}
                     </>
                   )}
-                  {/* {!isEditMode && <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>} */}
+                  {/* {!isEditMode && <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>} */}
                 </Box>
               </StyledTableCellHeader>
             </TableRow>
@@ -385,7 +385,7 @@ export default function PlayerClasses({
                       </StyledTableCell>
                       <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('classes', classKey); }} sx={{ cursor: "pointer" }}>
                         <Box sx={{ display: "flex", flexDirection: "column", py: 0.5 }}>
-                          <Typography variant="body2" fontWeight="bold">
+                          <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                             {highlightMatch(t(cls.name), searchQuery)}
                           </Typography>
                         </Box>
@@ -397,7 +397,7 @@ export default function PlayerClasses({
                             <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.max(1, cls.lvl - 1))} sx={{ p: 0 }} disabled={cls.lvl <= 1}>
                               <Remove fontSize="small" />
                             </IconButton>
-                            <Typography variant="body2" fontWeight="bold" sx={{ mx: 0.25, minWidth: 32, textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ fontWeight: "bold", mx: 0.25, minWidth: 32, textAlign: 'center' }}>
                               {cls.lvl}/10
                             </Typography>
                             <IconButton size="small" onClick={() => onLevelChange(classIdx, Math.min(10, cls.lvl + 1))} sx={{ p: 0 }} disabled={cls.lvl >= 10}>
@@ -405,7 +405,7 @@ export default function PlayerClasses({
                             </IconButton>
                           </Box>
                         ) : (
-                          <Typography variant="body2" fontWeight="bold" textAlign="center">{cls.lvl}/10</Typography>
+                          <Typography sx={{ textAlign: "center" }}>{cls.lvl}/10</Typography>
                         )}
                       </StyledTableCell>
                       <StyledTableCell sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}>
@@ -430,7 +430,7 @@ export default function PlayerClasses({
                             {/* Benefits Section */}
                             {!isEditMode && cls.benefits && (
                               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                <Typography variant="caption" fontWeight="bold" sx={{ opacity: 0.7, textTransform: 'uppercase', fontSize: '0.65rem', whiteSpace: 'nowrap' }}>
+                                <Typography variant="caption" sx={{ fontWeight: "bold", opacity: 0.7, textTransform: 'uppercase', fontSize: '0.65rem', whiteSpace: 'nowrap' }}>
                                   {t("Benefits")}:
                                 </Typography>
                                 <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
@@ -464,7 +464,7 @@ export default function PlayerClasses({
                                             </StyledTableCell>
                                             <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('classes', skillKey); }} sx={{ cursor: "pointer" }}>
                                               <Box sx={{ display: "flex", alignItems: "center" }}>
-                                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: "bold", mr: 0.5 }}>
                                                   {highlightMatch(t(skill.skillName), searchQuery)}
                                                 </Typography>
                                                 <MoreVert sx={{ fontSize: '1rem', opacity: 0.6 }} />
@@ -495,7 +495,7 @@ export default function PlayerClasses({
                                                   </IconButton>
                                                 </Box>
                                               ) : (
-                                                <Typography variant="body2" textAlign="center">{skill.currentLvl}/{skill.maxLvl}</Typography>
+                                                <Typography sx={{ textAlign: "center" }}>{skill.currentLvl}/{skill.maxLvl}</Typography>
                                               )}
                                             </StyledTableCell>
                                             <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
@@ -530,7 +530,7 @@ export default function PlayerClasses({
                                           </StyledTableCell>
                                           <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('classes', `heroic-${classIdx}`); }} sx={{ cursor: "pointer" }}>
                                             <Box sx={{ display: "flex", alignItems: "center" }}>
-                                              <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5, color: theme.secondary }}>
+                                              <Typography variant="body2" sx={{ fontWeight: "bold", mr: 0.5, color: theme.secondary }}>
                                                 {cls.heroic?.name ? highlightMatch(t(cls.heroic.name), searchQuery) : <em>{t("No Heroic Skill")}</em>}
                                               </Typography>
                                               <Star sx={{ color: theme.secondary, fontSize: '1rem' }} />
@@ -570,7 +570,7 @@ export default function PlayerClasses({
                                             </StyledTableCell>
                                             <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('classes', spellKey); }} sx={{ cursor: "pointer" }}>
                                               <Box sx={{ display: "flex", alignItems: "center" }}>
-                                                <Typography variant="body2" fontWeight="bold" sx={{ mr: 0.5 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: "bold", mr: 0.5 }}>
                                                   {highlightMatch(getSpellName(spell, t), searchQuery)}
                                                 </Typography>
                                                 <AutoFixHigh sx={{ color: theme.secondary, fontSize: '1rem' }} />

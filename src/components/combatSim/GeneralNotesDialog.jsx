@@ -260,8 +260,10 @@ const NoteItem = ({
           placeholder={t("notes_note_title")}
           value={note.title}
           onChange={handleTitleChange}
-          inputProps={{ maxLength: 100 }}
           sx={{ mr: 1 }}
+          slotProps={{
+            htmlInput: { maxLength: 100 }
+          }}
         />
 
         <Box sx={{ display: "flex", gap: 0.5 }}>
@@ -276,7 +278,6 @@ const NoteItem = ({
           </Tooltip>
         </Box>
       </Box>
-
       {expanded && (
         <>
           <TextField
@@ -293,10 +294,12 @@ const NoteItem = ({
             value={note.body}
             onChange={handleBodyChange}
             variant="outlined"
-            inputProps={{
-              maxLength: maxNoteLength || undefined,
-            }}
             sx={{ mb: 1 }}
+            slotProps={{
+              htmlInput: {
+                maxLength: maxNoteLength || undefined,
+              }
+            }}
           />
 
           <Box
@@ -708,7 +711,9 @@ export default function GeneralNotesDialog({
                 opacity: 0.6,
               }}
             />
-            <Typography variant="h5" color="text.secondary" gutterBottom>
+            <Typography variant="h5" gutterBottom sx={{
+              color: "text.secondary"
+            }}>
               {t("notes_empty_state")}
             </Typography>
             <Button

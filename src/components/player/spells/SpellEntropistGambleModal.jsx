@@ -234,11 +234,13 @@ export default function SpellEntropistGambleModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -265,7 +267,9 @@ export default function SpellEntropistGambleModal({
               fullWidth
               value={editedGamble.spellName}
               onChange={(e) => handleChange("spellName", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
           <Grid
@@ -438,7 +442,9 @@ export default function SpellEntropistGambleModal({
                     handleTargetChange(index, "effect", e.target.value)
                   }
                   fullWidth
-                  inputProps={{ maxLength: 200 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 200 }
+                  }}
                 />
               </Grid>
               <Grid
@@ -530,7 +536,9 @@ export default function SpellEntropistGambleModal({
                             )
                           }
                           fullWidth
-                          inputProps={{ maxLength: 200 }}
+                          slotProps={{
+                            htmlInput: { maxLength: 200 }
+                          }}
                         />
                       </Grid>
                       <Grid

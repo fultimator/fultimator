@@ -126,7 +126,9 @@ class ErrorBoundary extends Component {
 
       return (
         <Container>
-          <Box mt={2}>
+          <Box sx={{
+            mt: 2
+          }}>
             <Typography variant="h2" gutterBottom color={"error"}>
               Something went wrong. Please report the error below or contact us
               in the Discord server #support channel.
@@ -134,10 +136,13 @@ class ErrorBoundary extends Component {
 
             <ReturnHomeButton />
             <Box
-              mt={2}
-              p={2}
-              sx={{ background: "white", borderRadius: 1, boxShadow: 1 }}
-            >
+              sx={{
+                mt: 2,
+                p: 2,
+                background: "white",
+                borderRadius: 1,
+                boxShadow: 1
+              }}>
               <Typography variant="h6" gutterBottom>
                 Error Details:
               </Typography>
@@ -154,7 +159,9 @@ class ErrorBoundary extends Component {
                 ))}
               </List>
             </Box>
-            <Box mt={2}>
+            <Box sx={{
+              mt: 2
+            }}>
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 Please provide as much information as possible to help us
                 diagnose the issue.
@@ -175,8 +182,10 @@ class ErrorBoundary extends Component {
                 fullWidth
                 value={this.state.message}
                 onChange={this.handleMessageChange}
-                inputProps={{ maxLength: 2000 }}
                 sx={{ mb: 2, background: "white" }}
+                slotProps={{
+                  htmlInput: { maxLength: 2000 }
+                }}
               />
               <Button
                 variant="contained"

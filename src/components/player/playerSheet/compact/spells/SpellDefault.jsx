@@ -71,11 +71,17 @@ export default function SpellDefault({
           }}
         >
           <StyledTableCell sx={{ width: "40%" }}>
-            <Box display="flex" alignItems="center" gap={0.5}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 0.5,
+                alignItems: "center"
+              }}>
               <Typography
-                fontWeight="bold"
-                sx={{ fontSize: "0.85rem" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "0.85rem"
+                }}>
                 {spellName}
               </Typography>
               {isOffensive && <OffensiveSpellIcon sx={{ fontSize: "0.85rem" }} />}

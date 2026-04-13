@@ -599,11 +599,13 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{
-                sx: {
-                  width: "80%",
-                  maxWidth: "lg",
-                },
+              slotProps={{
+                paper: {
+                  sx: {
+                    width: "80%",
+                    maxWidth: "lg",
+                  },
+                }
               }}
             >
               <DialogContent>
@@ -635,11 +637,13 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openRollAlchemyModal}
               onClose={handleCloseRollAlchemyModal}
-              PaperProps={{
-                sx: {
-                  width: "80%",
-                  maxWidth: "lg",
-                },
+              slotProps={{
+                paper: {
+                  sx: {
+                    width: "80%",
+                    maxWidth: "lg",
+                  },
+                }
               }}
             >
               <DialogContent>
@@ -787,11 +791,13 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openMagicannonModal}
               onClose={handleCloseModal}
-              PaperProps={{
-                sx: {
-                  width: "80%",
-                  maxWidth: "lg",
-                },
+              slotProps={{
+                paper: {
+                  sx: {
+                    width: "80%",
+                    maxWidth: "lg",
+                  },
+                }
               }}
             >
               <DialogContent>

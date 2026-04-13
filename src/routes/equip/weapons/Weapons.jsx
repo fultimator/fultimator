@@ -251,7 +251,7 @@ function Weapons() {
             headerText={t("Rare Weapons")}
             icon={<AutoAwesome fontSize="large" />}
           />
-          <Grid container spacing={1} alignItems="center">
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             {/* Change Base */}
             <Grid  size={4}>
               <ChangeBase
@@ -379,7 +379,7 @@ function Weapons() {
               <Divider />
             </Grid>
             <Grid  size={12}>
-              <Grid container spacing={1} alignItems="center">
+              <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

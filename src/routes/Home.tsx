@@ -378,7 +378,7 @@ function Home() {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {t("feedback_description")}
               </Typography>
-              <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
                 <Button
                   variant="outlined"
                   href="mailto:fultimator@gmail.com"

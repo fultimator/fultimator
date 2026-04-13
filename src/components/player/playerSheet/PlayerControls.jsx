@@ -346,7 +346,7 @@ export default function PlayerControls({ player, setPlayer }) {
     const positiveIncrements = increments.filter((val) => val > 0);
 
     return (
-      <Grid container spacing={1} alignItems="center" wrap="wrap">
+      <Grid container spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
         <Grid
           size={{
             xs: 12,
@@ -365,7 +365,7 @@ export default function PlayerControls({ player, setPlayer }) {
             xs: 12,
             sm: "grow"
           }}>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
             <Button
               variant="outlined"
               color={color}
@@ -469,7 +469,7 @@ export default function PlayerControls({ player, setPlayer }) {
           </Grid>
 
           <Grid  size={12}>
-            <Grid container spacing={1} alignItems="center">
+            <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
@@ -494,7 +494,7 @@ export default function PlayerControls({ player, setPlayer }) {
           </Grid>
 
           <Grid  size={12}>
-            <Grid container spacing={1} alignItems="center">
+            <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
@@ -510,7 +510,14 @@ export default function PlayerControls({ player, setPlayer }) {
                   xs: 12,
                   sm: "grow"
                 }}>
-                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  useFlexGap
+                  sx={{
+                    flexWrap: "wrap",
+                    alignItems: "center"
+                  }}>
                   <ToggleButtonGroup
                     value={changeType}
                     exclusive
@@ -533,8 +540,10 @@ export default function PlayerControls({ player, setPlayer }) {
                     size="small"
                     value={zenitChange}
                     onChange={handleZenitChangeInput}
-                    inputProps={{ min: 0 }}
                     sx={{ width: 90 }}
+                    slotProps={{
+                      htmlInput: { min: 0 }
+                    }}
                   />
 
                   <Button

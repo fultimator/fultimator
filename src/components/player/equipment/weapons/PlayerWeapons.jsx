@@ -127,7 +127,7 @@ export default function PlayerWeapons({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {weapons.map((weapon, index) => {
             const equippedSlot = getWeaponSlot(weapon, index);
             const isTwoHand = weapon.hands === 2 || weapon.isTwoHand;

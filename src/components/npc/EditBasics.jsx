@@ -637,26 +637,28 @@ function EditLevel({ npc, setnpc }) {
         min={5}
         max={60}
         value={npc.lvl}
-        InputProps={{
-          readOnly: true,
-          startAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="start"
-              onClick={onLowerLevel}
-            >
-              <Remove />
-            </IconButton>
-          ),
-          endAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="end"
-              onClick={onRaiseLevel}
-            >
-              <Add />
-            </IconButton>
-          ),
+        slotProps={{
+          input: {
+            readOnly: true,
+            startAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                edge="start"
+                onClick={onLowerLevel}
+              >
+                <Remove />
+              </IconButton>
+            ),
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                edge="end"
+                onClick={onRaiseLevel}
+              >
+                <Add />
+              </IconButton>
+            ),
+          }
         }}
       />
     </FormControl>

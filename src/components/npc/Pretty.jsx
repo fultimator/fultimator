@@ -72,9 +72,10 @@ function NpcPretty({ npc, study, npcImage, collapse, onClick = () => {}, ref }) 
                   <ArrowDropDown />
                   <Typography
                     color={theme.palette.text.primary}
-                    fontSize="1.1rem"
-                    fontWeight="medium"
-                  >
+                    sx={{
+                      fontSize: "1.1rem",
+                      fontWeight: "medium"
+                    }}>
                     {t("Expand")}
                   </Typography>
                   <ArrowDropDown />
@@ -150,8 +151,8 @@ function Header({ npc, npcImage }) {
     setOpen(false);
   };
   return (
-    <Grid container alignItems="stretch">
-      <Grid container>
+    <Grid container sx={{ alignItems: "stretch" }}>
+      <Grid container sx={{ width: 1 }}>
         <Grid
           sx={{
             background,
@@ -160,12 +161,13 @@ function Header({ npc, npcImage }) {
           }}
           size="grow">
           <Typography
-            color="white.main"
-            fontFamily="Antonio"
-            fontSize="1.5rem"
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
+            sx={{
+              color: "white.main",
+              fontFamily: "Antonio",
+              fontSize: "1.5rem",
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {npc.name}
           </Typography>
         </Grid>
@@ -178,11 +180,12 @@ function Header({ npc, npcImage }) {
             borderImage: borderImage,
           }}>
           <Typography
-            fontFamily="Antonio"
-            fontSize="1.25rem"
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              fontSize: "1.25rem",
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
           </Typography>
         </Grid>
@@ -242,10 +245,11 @@ function Header({ npc, npcImage }) {
               }}
             >
               <Typography
-                fontFamily="Antonio"
-                fontSize="1.25rem"
-                sx={{ textTransform: "uppercase" }}
-              >
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "1.25rem",
+                  textTransform: "uppercase"
+                }}>
                 {RenderVillainPhase(npc)}
               </Typography>
             </Box>
@@ -320,11 +324,12 @@ function Stats({ npc }) {
   return (
     <Typography
       component="div"
-      fontFamily="Antonio"
-      fontWeight="bold"
-      textAlign="center"
-      fontSize={isMobile ? "0.74rem" : "0.9rem"}
-    >
+      sx={{
+        fontFamily: "Antonio",
+        fontWeight: "bold",
+        textAlign: "center",
+        fontSize: isMobile ? "0.74rem" : "0.9rem"
+      }}>
       <Grid container>
         <Grid
           sx={{
@@ -336,7 +341,7 @@ function Stats({ npc }) {
             my: "2px",
             flexBasis: "calc(50% - 2px)",
           }}>
-          <Grid container alignItems="stretch" justifyContent="space-between">
+          <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
             <Grid
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1E2122" : "#efecf5",
@@ -393,7 +398,7 @@ function Stats({ npc }) {
             my: "2px",
             flexBasis: "calc(50% - 2px)",
           }}>
-          <Grid container alignItems="stretch" justifyContent="space-between">
+          <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
             <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
               {t("HP")}
             </Grid>
@@ -433,7 +438,9 @@ function Stats({ npc }) {
             mr: isMobile ? "1px" : "2px",
             flexBasis: "calc(25% - 2px)",
           }}>
-          <Grid container justifyItems="space-between">
+          <Grid container sx={{
+            justifyItems: "space-between"
+          }}>
             <Grid
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
@@ -557,9 +564,8 @@ function Immunities({ npc }) {
 
   return (
     <Grid
-      container
-      justifyContent="space-between"
-      sx={{
+      container sx={{
+        justifyContent: "space-between",
         mt: 1,
         py: 0.1,
       }}>
@@ -574,12 +580,14 @@ function Immunities({ npc }) {
         }}
         size={2}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase", margin: "auto" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase",
+            margin: "auto"
+          }}>
           {t("Immunities")}
         </Typography>
       </Grid>
@@ -659,12 +667,13 @@ function Attacks({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Basic Attacks")}
         </Typography>
       </Grid>
@@ -672,7 +681,7 @@ function Attacks({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
-              <Typography component="div" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {attack.range === "melee" && <MeleeIcon />}
                 {attack.range === "distance" && <DistanceIcon />}
               </Typography>
@@ -744,7 +753,7 @@ function Attacks({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
-              <Typography component="div" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 {attack.weapon.range === "melee" && <MeleeIcon />}
                 {attack.weapon.range === "distance" && <DistanceIcon />}
               </Typography>
@@ -863,12 +872,13 @@ function Spells({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Spells")}
         </Typography>
       </Grid>
@@ -876,7 +886,7 @@ function Spells({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
-              <Typography component="div" textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 <SpellIcon />
               </Typography>
             </Grid>
@@ -1014,12 +1024,13 @@ function Special({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Special Rules")}
         </Typography>
       </Grid>
@@ -1111,12 +1122,13 @@ function Actions({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Other Actions")}
         </Typography>
       </Grid>
@@ -1124,7 +1136,7 @@ function Actions({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
-              <Typography textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 <ActionIcon />
               </Typography>
             </Grid>
@@ -1211,12 +1223,13 @@ function Notes({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Notes")}
         </Typography>
       </Grid>
@@ -1224,7 +1237,7 @@ function Notes({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ pl: 2, py: 1 }} size={1}>
-              <Typography textAlign="center" style={{ width: 20, height: 20 }}>
+              <Typography sx={{ textAlign: "center" }}>
                 <NotesIcon />
               </Typography>
             </Grid>
@@ -1311,12 +1324,13 @@ function RareGear({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Rare Equipment")}
         </Typography>
       </Grid>
@@ -1324,7 +1338,7 @@ function RareGear({ npc }) {
         return (
           <Fragment key={i}>
             <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
-              <Typography textAlign="center">
+              <Typography sx={{ textAlign: "center" }}>
                 <RareItemIcon />
               </Typography>
             </Grid>
@@ -1427,12 +1441,13 @@ function Equip({ npc }) {
         }}
         size={12}>
         <Typography
-          color="white.main"
-          fontFamily="Antonio"
-          fontSize="1.1rem"
-          fontWeight="medium"
-          sx={{ textTransform: "uppercase" }}
-        >
+          sx={{
+            color: "white.main",
+            fontFamily: "Antonio",
+            fontSize: "1.1rem",
+            fontWeight: "medium",
+            textTransform: "uppercase"
+          }}>
           {t("Equipment")}
         </Typography>
       </Grid>
@@ -1483,7 +1498,7 @@ function Equip({ npc }) {
       ))}
       {/* Armor */}
       {npc.armor && npc.armor.name !== "No Armor" && (
-        <Grid  sx={{ px: 2, py: 0 }} alignItems="center" size={12}>
+        <Grid sx={{ px: 2, py: 0, alignItems: "center" }} size={12}>
           <strong>{t("Armor:")}</strong> {npc.armor.name}{" "}
           {npc.armor.martial && <Martial />}
           <Diamond />{" "}

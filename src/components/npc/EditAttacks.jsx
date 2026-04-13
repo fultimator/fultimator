@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -150,10 +150,10 @@ export default function EditAttacks({ npc, setNpc }) {
 function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
       <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
-          <RemoveCircleOutline />
+          <RemoveCircleOutlined />
         </IconButton>
       </Grid>
       <Grid  size={10}>
@@ -323,13 +323,15 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <TextField
             id="flathit"
             type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
             label={t("Acc.")}
             value={attack.flathit || 0}
             onChange={(e) => {
               return setAttack("flathit", e.target.value);
             }}
             size="small"
+            slotProps={{
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+            }}
           ></TextField>
         </FormControl>
       </Grid>
@@ -338,13 +340,15 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           <TextField
             id="flatdmg"
             type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
             label={t("Dmg.")}
             value={attack.flatdmg || 0}
             onChange={(e) => {
               return setAttack("flatdmg", e.target.value);
             }}
             size="small"
+            slotProps={{
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+            }}
           ></TextField>
         </FormControl>
       </Grid>
@@ -385,7 +389,7 @@ function EditAttackSpecial({ attack, setAttack }) {
   };
 
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
       <Grid  size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField

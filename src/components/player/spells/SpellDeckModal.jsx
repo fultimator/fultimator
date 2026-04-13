@@ -224,7 +224,9 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
               <Typography variant="h6" gutterBottom>
                 {t("ace_suit_configuration")}
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body2" gutterBottom sx={{
+                color: "text.secondary"
+              }}>
                 {t("ace_suit_configuration_hint")}
               </Typography>
             </Grid>

@@ -53,7 +53,7 @@ export default function SpellGift({ spell, setPlayer }) {
         <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
           <StyledTableCell colSpan={3}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}>
-              <Typography variant="caption" fontWeight="bold">
+              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("esper_brainwave_clock")}: {clock}/4
               </Typography>
               <Box sx={{ flexGrow: 1 }}>

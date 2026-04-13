@@ -188,11 +188,13 @@ export default function PlayerShieldModal({
       <Dialog
         open={open}
         onClose={onClose}
-        PaperProps={{
-          sx: {
-            width: "100%",
-            maxWidth: "lg",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "100%",
+              maxWidth: "lg",
+            },
+          }
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -211,7 +213,7 @@ export default function PlayerShieldModal({
           <Close />
         </IconButton>
         <DialogContent>
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
             {/* Form */}
 
             {/* Change Base */}
@@ -369,7 +371,7 @@ export default function PlayerShieldModal({
               <Divider />
             </Grid>
             <Grid  sx={{ py: 0 }} size={12}>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
                 <Grid >
                   <Button
                     variant="outlined"

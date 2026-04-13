@@ -220,10 +220,7 @@ export default function PlayerRituals({
           </Grid>
 
           <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            sx={{ textAlign: "center" }}
+            container sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}
             size={{
               xs: 12,
               md: 4
@@ -515,17 +512,29 @@ function RitualsCalculator({
       <Divider />
       <Grid container sx={{ m: compact ? 0.5 : 1 }}>
         <Grid  size={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {calcPM} {t("MP")}
           </Typography>
         </Grid>
         <Grid  size={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {calcLD} {t("DL")}
           </Typography>
         </Grid>
         <Grid  size={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {t("Clock")} {calcClock}
           </Typography>
         </Grid>

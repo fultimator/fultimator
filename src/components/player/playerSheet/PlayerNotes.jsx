@@ -81,9 +81,11 @@ export default function PlayerNotes({
             {note.name && (
               <Typography
                 variant={compact ? "subtitle1" : "h2"}
-                fontWeight="bold"
-                sx={{ mb: compact ? 2 : 0, textTransform: "uppercase" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  mb: compact ? 2 : 0,
+                  textTransform: "uppercase"
+                }}>
                 {note.name}
                 {!compact && ": "}
               </Typography>
@@ -120,7 +122,7 @@ export default function PlayerNotes({
                       md: compact ? 3 : undefined
                     }}>
                     {compact ? (
-                      <Stack alignItems="center" sx={{ position: "relative" }}>
+                      <Stack sx={{ alignItems: "center", position: "relative" }}>
                         <Typography
                           variant="body2"
                           sx={{ mb: 1, textAlign: "center", fontWeight: "medium" }}
@@ -172,7 +174,7 @@ export default function PlayerNotes({
                             handleClockStateChange(originalIndex, clockIndex, newState)
                           }
                         />
-                        <Grid container justifyContent="center">
+                        <Grid container sx={{ justifyContent: "center" }}>
                           <IconButton
                             color="primary"
                             onClick={() => resetClockState(originalIndex, clockIndex)}

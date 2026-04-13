@@ -14,7 +14,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { Close, Add, RemoveCircleOutline } from "@mui/icons-material";
+import { Close, Add, RemoveCircleOutlined } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
@@ -113,7 +113,9 @@ export default function PlayerNoteModal({
                 label={t("Note Name")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                inputProps={{ maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { maxLength: 50 }
+                }}
               />
             </Grid>
             <Grid  size={12}>
@@ -170,7 +172,7 @@ export default function PlayerNoteModal({
                         color="error"
                         onClick={() => handleRemoveClock(index)}
                       >
-                        <RemoveCircleOutline fontSize="small" />
+                        <RemoveCircleOutlined fontSize="small" />
                       </IconButton>
                     </Box>
                   </Grid>
@@ -213,7 +215,9 @@ export default function PlayerNoteModal({
             variant="outlined"
             value={clockName}
             onChange={(e) => setClockName(e.target.value)}
-            inputProps={{ maxLength: 30 }}
+            slotProps={{
+              htmlInput: { maxLength: 30 }
+            }}
           />
           <TextField
             margin="dense"
@@ -223,7 +227,9 @@ export default function PlayerNoteModal({
             variant="outlined"
             value={clockSections}
             onChange={(e) => setClockSections(parseInt(e.target.value, 10))}
-            inputProps={{ min: 2, max: 30 }}
+            slotProps={{
+              htmlInput: { min: 2, max: 30 }
+            }}
           />
         </DialogContent>
         <DialogActions>

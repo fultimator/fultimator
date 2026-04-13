@@ -191,7 +191,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
             size={6}>
             {currentMagiseed ? (
               <div>
-                <Typography fontWeight="bold" style={{ marginBottom: "4px" }}>
+                <Typography sx={{ fontWeight: "bold" }} style={{ marginBottom: "4px" }}>
                   {currentMagiseed.customName || t(currentMagiseed.name)}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.75em" }}>
@@ -285,7 +285,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               borderLeft: `4px solid ${theme.primary}`,
             }}
           >
-            <Typography fontWeight="bold" sx={{ marginBottom: 1 }}>
+            <Typography sx={{ fontWeight: "bold", marginBottom: 1 }}>
               {currentMagiseed.customName || t(currentMagiseed.name)}
             </Typography>
             <div style={{ fontSize: "0.95em" }}>
@@ -336,9 +336,11 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
                 borderLeft: magiseed === currentMagiseed ? `4px solid ${theme.primary}` : "none",
               }}
             >
-              <Grid container alignItems="center">
+              <Grid container sx={{ alignItems: "center" }}>
                 <Grid  size={8}>
-                  <Typography fontWeight={magiseed === currentMagiseed ? "bold" : "normal"}>
+                  <Typography sx={{
+                    fontWeight: magiseed === currentMagiseed ? "bold" : "normal"
+                  }}>
                     {magiseed.customName || t(magiseed.name)}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "text.secondary" }}>

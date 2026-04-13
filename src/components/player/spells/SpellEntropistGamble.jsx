@@ -57,7 +57,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              fontSize={{ xs: "0.7rem", sm: "1.1rem" }}
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "1.1rem" }
+              }}
             >
               {t("Spell")}
             </Typography>
@@ -72,7 +74,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               xs: 3,
               sm: 2
             }}>
-            <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
+            <Typography variant="h3" sx={{
+              fontSize: { xs: "0.7rem", sm: "1.1rem" }
+            }}>
               {t("MP x Dice")}
             </Typography>
           </Grid>
@@ -86,7 +90,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               xs: 3,
               sm: 4
             }}>
-            <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
+            <Typography variant="h3" sx={{
+              fontSize: { xs: "0.7rem", sm: "1.1rem" }
+            }}>
               {t("Max Throwable Dices")}
             </Typography>
           </Grid>
@@ -100,7 +106,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               xs: 3,
               sm: 3
             }}>
-            <Typography variant="h3" fontSize={{ xs: "0.7rem", sm: "1.1rem" }}>
+            <Typography variant="h3" sx={{
+              fontSize: { xs: "0.7rem", sm: "1.1rem" }
+            }}>
               {t("Attribute")}
             </Typography>
           </Grid>
@@ -138,10 +146,11 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             }}
             size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              fontSize={{ xs: "0.8rem", sm: "1rem" }}
-            >
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "0.8rem", sm: "1rem" }
+              }}>
               {gamble.isMagisphere && (
                 <Tooltip title={t("Magisphere")}>
                   <SettingsSuggest sx={{ fontSize: "1rem" }} />
@@ -157,7 +166,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               justifyContent: "center",
             }}
             size={2}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {gamble.mp}
             </Typography>
           </Grid>
@@ -171,7 +182,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               xs: 3,
               sm: 4
             }}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {gamble.maxTargets}
             </Typography>
           </Grid>
@@ -185,7 +198,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               xs: 4,
               sm: 3
             }}>
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {attributes[gamble.attr].shortcaps}
             </Typography>
           </Grid>
@@ -209,9 +224,8 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       </div>
       {/* Row 3 */}
       <Grid
-        container
-        justifyContent="flex-start"
-        sx={{
+        container sx={{
+          justifyContent: "flex-start",
           background: "transparent",
           marginBottom: "6px",
           borderBottom: `1px solid ${theme.secondary}`,
@@ -232,9 +246,10 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             <Grid  size={2}>
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
-                fontSize={{ xs: "0.8rem", sm: "1rem" }}
-                fontWeight={"bold"}
-              >
+                sx={{
+                  fontSize: { xs: "0.8rem", sm: "1rem" },
+                  fontWeight: "bold"
+                }}>
                 {target.rangeFrom === target.rangeTo
                   ? target.rangeFrom
                   : `${target.rangeFrom} - ${target.rangeTo}`}
@@ -243,7 +258,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             <Grid  sx={{ mb: 1 }} size={10}>
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
-                fontSize={{ xs: "0.8rem", sm: "1rem" }}
+                sx={{
+                  fontSize: { xs: "0.8rem", sm: "1rem" }
+                }}
               >
                 <ReactMarkdown components={components}>{target.effect}</ReactMarkdown>
               </Typography>
@@ -262,9 +279,10 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                         <Grid  size={1}>
                           <Typography
                             style={{ flexGrow: 1, marginRight: "5px" }}
-                            fontSize={{ xs: "0.8rem", sm: "1rem" }}
-                            fontWeight={"bold"}
-                          >
+                            sx={{
+                              fontSize: { xs: "0.8rem", sm: "1rem" },
+                              fontWeight: "bold"
+                            }}>
                             {effect.dieValue}
                             {"."}
                           </Typography>
@@ -272,7 +290,9 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                         <Grid  size={3}>
                           <Typography
                             style={{ flexGrow: 1, marginRight: "5px" }}
-                            fontSize={{ xs: "0.8rem", sm: "1rem" }}
+                            sx={{
+                              fontSize: { xs: "0.8rem", sm: "1rem" }
+                            }}
                           >
                             <ReactMarkdown components={components}>{effect.effect}</ReactMarkdown>
                           </Typography>

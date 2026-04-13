@@ -36,7 +36,7 @@ const TYPE_TO_PACK_TYPE = {
 
 const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   const { t } = useTranslate();
-  const { packs, loading: packsLoading } = useCompendiumPacks();
+  const { packs } = useCompendiumPacks();
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [type, setType] = useState([]);
@@ -98,7 +98,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       setSource("official");
       setSelectedPackId(packs.length > 0 ? packs[0].id : "");
     }
-  }, [open, typeName]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, typeName]);
 
   // Set default pack when packs load
   useEffect(() => {
@@ -156,15 +156,17 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
           <Grid  size="grow">
             <Select
               value={selectedType}
@@ -190,7 +192,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
           </Grid>
           {/* Source selector row */}
           <Grid  size={12}>
-            <Grid container spacing={1} alignItems="center">
+            <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid  size={source === "packs" ? 4 : 12}>
                 <Select
                   value={source}
@@ -269,13 +271,17 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       {t(selectedItem.category)}
-                      <Box component="span" mx={1}>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}>
                         <Diamond />
                       </Box>
                       {selectedItem.hands === 1
                         ? t("One-handed")
                         : t("Two-handed")}
-                      <Box component="span" mx={1}>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}>
                         <Diamond />
                       </Box>
                       {selectedItem.melee ? t("Melee") : t("Ranged")}
@@ -290,7 +296,9 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                           attributes[selectedItem.attr2]?.shortcaps}
                         <CloseBracket />
                       </strong>
-                      <Box component="span" mx={1}>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}>
                         <Diamond />
                       </Box>
                       <strong>
@@ -318,7 +326,9 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       {selectedItem.mp}{" "}
                       {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                       {t("MP")}
-                      <Box component="span" mx={1}>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}>
                         <Diamond />
                       </Box>
                       <StyledMarkdown
@@ -327,7 +337,9 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       >
                         {selectedItem.target}
                       </StyledMarkdown>
-                      <Box component="span" mx={1}>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}>
                         <Diamond />
                       </Box>
                       <StyledMarkdown
@@ -352,7 +364,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       </DialogContent>
       <Divider />
       <DialogActions>
-        <Grid container alignItems="center" justifyContent="space-between">
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
           <Grid
             size={{
               xs: 12,
@@ -364,8 +376,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             </Typography>
           </Grid>
           <Grid
-            container
-            justifyContent="flex-end"
+            container sx={{ justifyContent: "flex-end" }}
             size={{
               xs: 12,
               sm: "auto"

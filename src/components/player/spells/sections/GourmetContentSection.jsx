@@ -170,7 +170,11 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           {t("Cookbook Effects")} ({cookbookEffects.length})
         </Typography>
         {cookbookEffects.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No cookbook effects yet")}
           </Typography>
         ) : (
@@ -232,7 +236,11 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           {t("Ingredient Inventory")} ({ingredientInventory.length})
         </Typography>
         {ingredientInventory.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No ingredients in inventory")}
           </Typography>
         ) : (

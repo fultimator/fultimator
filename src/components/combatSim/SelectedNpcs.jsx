@@ -183,7 +183,9 @@ export default function SelectedNpcs({
                 {selectedNPCs.length > 0 && (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1, my: 1 }}>
                     <Divider sx={{ flex: 1 }} />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{
+                      color: "text.secondary"
+                    }}>
                       PCs
                     </Typography>
                     <Divider sx={{ flex: 1 }} />

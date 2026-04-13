@@ -73,20 +73,24 @@ export default function NpcCompedium() {
   return (
     <Layout>
       {loading && <Skeleton />}
-
       {!loading && !user && (
         <Paper
           elevation={3}
           sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
         >
           <CloudIcon color="primary" />
-          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200
+            }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
         </Paper>
       )}
-
       {user && <Personal user={user} />}
     </Layout>
   );
@@ -241,14 +245,11 @@ function Personal({ user }) {
   const enemyType = (token, name, label) => {
     const isMobile = window.innerWidth < 900;
     return (
-      <Grid
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
+      <Grid sx={{
           alignItems: "center",
           justifyContent: "center",
+          display: "flex",
+          flexDirection: "column",
         }}
         size={{
           xs: 4,
@@ -340,7 +341,7 @@ function Personal({ user }) {
   return (
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+        <Grid container spacing={1} sx={{ py: 1, justifyContent: "center" }}>
           {enemyType(allToken, "All", t("All"))}
           {enemyType(beastToken, "Beast", t("Beast"))}
           {enemyType(constructToken, "Construct", t("Construct"))}
@@ -352,11 +353,8 @@ function Personal({ user }) {
           {enemyType(undeadToken, "Undead", t("Undead"))}
         </Grid>
 
-        <Grid container spacing={1} sx={{ py: 0 }} justifyContent="center">
-          <Grid
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
+        <Grid container spacing={1} sx={{ py: 0, justifyContent: "center" }}>
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
             size={{
               xs: 12,
               md: 3,
@@ -375,10 +373,7 @@ function Personal({ user }) {
             />
           </Grid>
 
-          <Grid
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex", marginLeft: 5, marginRight: 5 }}
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex", marginLeft: 5, marginRight: 5 }}
             size={{
               xs: 12,
               md: 3
@@ -400,10 +395,7 @@ function Personal({ user }) {
               }}
             />
           </Grid>
-          <Grid
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
             size={{
               xs: 6,
               md: 2
@@ -434,9 +426,7 @@ function Personal({ user }) {
             </FormControl>
           </Grid>
 
-          <Grid
-            alignItems="center"
-            sx={{ display: "flex" }}
+          <Grid sx={{ alignItems: "center", display: "flex" }}
             size={{
               xs: 6,
               md: 2
@@ -460,9 +450,7 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid
-            alignItems="center"
-            sx={{ display: "flex" }}
+          <Grid sx={{ alignItems: "center", display: "flex" }}
             size={{
               xs: 6,
               md: 2
@@ -478,9 +466,7 @@ function Personal({ user }) {
             </Button>
           </Grid>
           <Grid
-            sx={{}}
-            alignItems="center"
-            justifyContent="center"
+            sx={{ alignItems: "center", justifyContent: "center" }}
             size={{
               xs: 6,
               md: 2
@@ -605,7 +591,11 @@ function Personal({ user }) {
               </>
             ) : (
               <div style={{ textAlign: "center" }}>
-                <Typography fontWeight={700} marginBottom={4}>
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    marginBottom: 4
+                  }}>
                   {t(" No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (

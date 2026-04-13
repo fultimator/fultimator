@@ -78,7 +78,9 @@ export default function DefaultSpellSection({
           fullWidth
           value={formState.name || ""}
           onChange={(e) => handleChange("name", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
       <Grid
@@ -200,7 +202,9 @@ export default function DefaultSpellSection({
               {...params}
               label={t("Target Description")}
               fullWidth
-              inputProps={{ ...params.inputProps, maxLength: 100 }}
+              slotProps={{
+                htmlInput: { ...params.inputProps, maxLength: 100 }
+              }}
             />
           )}
         />
@@ -225,7 +229,9 @@ export default function DefaultSpellSection({
               {...params}
               label={t("Duration")}
               fullWidth
-              inputProps={{ ...params.inputProps, maxLength: 50 }}
+              slotProps={{
+                htmlInput: { ...params.inputProps, maxLength: 50 }
+              }}
             />
           )}
         />

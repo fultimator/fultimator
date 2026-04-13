@@ -116,7 +116,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
 
         {activities.length === 0 && (
           <Grid  sx={{ py: 2 }} size={12}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <Typography sx={{ textAlign: "center" }}>
               {t("No camp activities yet.")}
             </Typography>
           </Grid>
@@ -129,7 +129,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1 }} alignItems="flex-start">
+            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
               <Grid
                 size={{
                   xs: 9,
@@ -139,11 +139,12 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                   label={t("Name") + ":"}
                   value={activity.name ?? ""}
                   onChange={(e) => onChangeActivity(index, "name")(e.target.value)}
-                  inputProps={{ maxLength: 100 }}
-                  InputProps={{ readOnly: !isEditMode }}
                   fullWidth
                   size="small"
-                />
+                  slotProps={{
+                    input: { readOnly: !isEditMode },
+                    htmlInput: { maxLength: 100 }
+                  }} />
               </Grid>
               {isEditMode && (
                 <Grid
@@ -199,9 +200,11 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                   <TextField
                     label={t("Target") + ":"}
                     value={activity.targetDescription ?? ""}
-                    InputProps={{ readOnly: true }}
                     fullWidth
                     size="small"
+                    slotProps={{
+                      input: { readOnly: true }
+                    }}
                   />
                 )}
               </Grid>

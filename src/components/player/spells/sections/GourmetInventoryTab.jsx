@@ -182,7 +182,11 @@ export default function GourmetInventoryTab({
         </Typography>
 
         {ingredientInventory.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("gourmet_no_ingredients_available")}
           </Typography>
         ) : (
@@ -322,7 +326,9 @@ export default function GourmetInventoryTab({
                     quantity: parseInt(e.target.value) || 0,
                   }))
                 }
-                inputProps={{ min: 0 }}
+                slotProps={{
+                  htmlInput: { min: 0 }
+                }}
               />
             </Grid>
           </Grid>

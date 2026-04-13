@@ -69,6 +69,7 @@ export function calcMP(npc) {
 }
 
 export function calcInit(npc) {
+  if (!npc || !npc.attributes) return 0;
   let init = (npc.attributes.dexterity + npc.attributes.insight) / 2;
 
   // Skill Extra Init

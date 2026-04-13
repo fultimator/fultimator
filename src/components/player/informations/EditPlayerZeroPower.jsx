@@ -141,7 +141,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
             openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
           />
         </Grid>
-        <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
+        <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
@@ -151,10 +151,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               label={t("Zero Power Name") + ":"}
               value={zeroPower.name ?? ""}
               onChange={(e) => onChangePower("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
           <Grid
             size={{
@@ -174,10 +175,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
                 }))
               }
               type="number"
-              inputProps={{ min: 2, max: 12, readOnly: !isEditMode }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
+              }} />
           </Grid>
 
           <Grid
@@ -189,10 +191,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               label={t("Trigger Name") + ":"}
               value={triggerName}
               onChange={(e) => onChangeTrigger("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
           <Grid
             size={{
@@ -218,10 +221,11 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               label={t("Effect Name") + ":"}
               value={effectName}
               onChange={(e) => onChangeEffect("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
           <Grid
             size={{

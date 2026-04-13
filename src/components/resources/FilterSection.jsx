@@ -44,7 +44,7 @@ export default function FilterSection({
         borderRadius: "16px",
       }}
     >
-      <Grid container spacing={3} alignItems="center">
+      <Grid container spacing={3} sx={{ alignItems: "center" }}>
         <Grid
           size={{
             xs: 12,
@@ -56,17 +56,19 @@ export default function FilterSection({
             placeholder={t("resources_search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: "12px",
               },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              }
             }}
           />
         </Grid>
