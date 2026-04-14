@@ -14,6 +14,8 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellArcanistModal({
   open,
@@ -25,6 +27,9 @@ export default function SpellArcanistModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   useEffect(() => {
     setEditedSpell(spell || {});
@@ -37,12 +42,7 @@ export default function SpellArcanistModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-
-  const handleDelete = () => {
-    onDelete(spell.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -259,6 +259,13 @@ export default function SpellArcanistModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(spell.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this arcana?")}
+      />
     </Dialog>
   );
 }

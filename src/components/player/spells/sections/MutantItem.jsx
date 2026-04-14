@@ -16,6 +16,8 @@ import {
 import { Delete, ContentCopy, ExpandMore } from "@mui/icons-material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import { availableTherioforms } from "../spellOptionData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function MutantItem({
   item,
@@ -41,6 +43,9 @@ export default function MutantItem({
     item.name === "mutant_therioform_custom_name" ||
     !availableTherioforms.find((t) => t.name === item.name);
   const [expanded, setExpanded] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -60,7 +65,7 @@ export default function MutantItem({
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
-    onDeleteItem(itemIndex);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloneClick = (e) => {
@@ -68,12 +73,15 @@ export default function MutantItem({
     handleCloneToCustom();
   };
 
+  const itemDisplayName = item.customName || t(item.name || "mutant_therioform_custom_name");
+
   return (
+    <>
     <Accordion expanded={expanded} onChange={() => setExpanded((prev) => !prev)} sx={{ mb: 2 }}>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box sx={{ width: "100%", display: "flex", alignItems: "center", gap: 1 }}>
           <Typography sx={{ flex: 1, fontWeight: "bold" }}>
-            {item.customName || t(item.name || "mutant_therioform_custom_name")}
+            {itemDisplayName}
           </Typography>
           <Button
             size="small"
@@ -173,5 +181,14 @@ export default function MutantItem({
         </Grid>
       </AccordionDetails>
     </Accordion>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this item?")}
+      itemPreview={<Typography variant="h4">{itemDisplayName}</Typography>}
+    />
+    </>
   );
 }

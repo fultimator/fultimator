@@ -25,6 +25,7 @@ import PrettyAccessory from "./PrettyAccessory";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerAccessoryModal({
@@ -60,7 +61,14 @@ export default function PlayerAccessoryModal({
 
   const fileInputRef = useRef(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (editAccIndex !== null) {
+            onDeleteAccessory(editAccIndex);
+          }
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setName(accessory?.name || "");
@@ -132,12 +140,7 @@ export default function PlayerAccessoryModal({
 
     onAddAccessory(updatedAccessory);
   };
-
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  return (
+return (
     <>
       <Dialog
         open={open}
@@ -356,7 +359,7 @@ export default function PlayerAccessoryModal({
       </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           if (editAccIndex !== null) {
             onDeleteAccessory(editAccIndex);

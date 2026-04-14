@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import {
   Grid,
   Accordion,
@@ -24,6 +24,8 @@ import attributes from "../../../libs/attributes";
 import weaponCategories from "../../../libs/weaponCategories";
 import { moduleTypes } from "../../../libs/pilotVehicleData";
 import ModuleDropdown from "./ModuleDropdown";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const VehicleModule = memo(({ 
   module, 
@@ -36,16 +38,15 @@ const VehicleModule = memo(({
   vehicle
 }) => {
   const { t } = useTranslate();
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleEquipToggle = (e) => {
     e.stopPropagation();
     onModuleChange(vehicleIndex, moduleIndex, "equipped", !module.equipped);
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    onDeleteModule(vehicleIndex, moduleIndex);
-  };
 
   const handleClone = (e) => {
     e.stopPropagation();
@@ -62,7 +63,12 @@ const VehicleModule = memo(({
                         module.name === "pilot_custom_weapon" || 
                         module.name === "pilot_custom_support";
 
+  const moduleDisplayName = isCustomModule
+    ? module.customName || t("pilot_custom")
+    : t(module.name);
+
   return (
+    <>
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Grid container spacing={2} sx={{ alignItems: "center", width: '100%' }}>
@@ -88,9 +94,7 @@ const VehicleModule = memo(({
               sm: 5
             }}>
             <Typography variant="h6">
-              {isCustomModule
-                ? module.customName || t("pilot_custom")
-                : t(module.name)}
+              {moduleDisplayName}
               {module.cumbersome && " ⚠"}
               {module.isShield && " 🛡"}
               {module.isComplex && " ⚙⚙"}
@@ -724,6 +728,15 @@ const VehicleModule = memo(({
         </Grid>
       </AccordionDetails>
     </Accordion>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteModule(vehicleIndex, moduleIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this module?")}
+      itemPreview={<Typography variant="h4">{moduleDisplayName}</Typography>}
+    />
+    </>
   );
 });
 

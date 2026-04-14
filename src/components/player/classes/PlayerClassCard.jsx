@@ -24,6 +24,7 @@ import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
 import { firestore, query, orderBy, collection, where, getDocs } from "@platform/db";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
@@ -70,7 +71,9 @@ export default function PlayerClassCard({
   const [specialSkill, setSpecialSkill] = useState("");
   const [warnings, setWarnings] = useState([]);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: onRemove,
+  });;
 
   const [heroic, setHeroic] = useState({
     name: classItem.heroic ? classItem.heroic.name : "",
@@ -626,7 +629,7 @@ export default function PlayerClassCard({
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => setDeleteDialogOpen(true)}
+                onClick={handleDelete}
                 sx={{ marginTop: "30px", fontSize: "0.9em" }}
               >
                 {t("Remove Class")}
@@ -727,7 +730,7 @@ export default function PlayerClassCard({
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={onRemove}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to remove this class?")}

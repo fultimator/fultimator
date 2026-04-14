@@ -28,6 +28,7 @@ import ChangeModifiers from "../ChangeModifiers";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerShieldModal({
@@ -67,7 +68,14 @@ export default function PlayerShieldModal({
 
   const fileInputRef = useRef(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (editShieldIndex !== null) {
+            onDeleteShield(editShieldIndex);
+          }
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setBase(shield?.base || shields[0]);
@@ -178,12 +186,7 @@ export default function PlayerShieldModal({
 
     onAddShield(updatedShield);
   };
-
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  return (
+return (
     <>
       <Dialog
         open={open}
@@ -442,7 +445,7 @@ export default function PlayerShieldModal({
       </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           if (editShieldIndex !== null) {
             onDeleteShield(editShieldIndex);

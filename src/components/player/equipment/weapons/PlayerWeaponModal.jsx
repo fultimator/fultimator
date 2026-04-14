@@ -34,6 +34,7 @@ import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PrettyWeapon from "./PrettyWeapon";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerWeaponModal({
@@ -79,7 +80,14 @@ export default function PlayerWeaponModal({
   } = useEquipmentForm(weapon);
   const fileInputRef = useRef(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (editWeaponIndex !== null) {
+            onDeleteWeapon(editWeaponIndex);
+          }
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
@@ -293,12 +301,7 @@ export default function PlayerWeaponModal({
     };
     onAddWeapon(updatedWeapon);
   };
-
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleClearFields = () => {
+const handleClearFields = () => {
     setBase(weapons[0]);
     setName(weapons[0].name);
     setCategory(weapons[0].category);
@@ -631,7 +634,7 @@ export default function PlayerWeaponModal({
       </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           if (editWeaponIndex !== null) {
             onDeleteWeapon(editWeaponIndex);

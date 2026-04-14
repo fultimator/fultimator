@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Grid,
   TextField,
@@ -17,12 +17,14 @@ import {
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import attributes from "../../../../libs/attributes";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 const SECOND_EFFECT_DICE = [1, 2, 3, 4, 5, 6];
 const TARGET_DICE = Array.from({ length: 12 }, (_, i) => i + 1);
 
 export default function GambleGeneralSection({ formState, setFormState, t }) {
   const targets = Array.isArray(formState.targets) ? formState.targets : [];
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   const validationError = useMemo(() => {
     if (targets.length < 2) return t("At least two targets are required.");
@@ -136,6 +138,16 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
       nextTargets[targetIndex] = { ...nextTargets[targetIndex], secondEffects };
       return { ...prev, targets: nextTargets };
     });
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    if (pendingDelete.type === "target") {
+      removeTarget(pendingDelete.targetIndex);
+    } else if (pendingDelete.type === "secondEffect") {
+      removeSecondEffect(pendingDelete.targetIndex, pendingDelete.effectIndex);
+    }
+    setPendingDelete(null);
   };
 
   return (
@@ -281,7 +293,10 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   xs: 12,
                   sm: 1
                 }}>
-                <IconButton color="error" onClick={() => removeTarget(targetIndex)}>
+                <IconButton
+                  color="error"
+                  onClick={() => setPendingDelete({ type: "target", targetIndex })}
+                >
                   <Delete />
                 </IconButton>
               </Grid>
@@ -335,7 +350,16 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               xs: 12,
                               sm: 1
                             }}>
-                            <IconButton color="error" onClick={() => removeSecondEffect(targetIndex, effectIndex)}>
+                            <IconButton
+                              color="error"
+                              onClick={() =>
+                                setPendingDelete({
+                                  type: "secondEffect",
+                                  targetIndex,
+                                  effectIndex,
+                                })
+                              }
+                            >
                               <Delete />
                             </IconButton>
                           </Grid>
@@ -388,6 +412,13 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           label={t("Is a Magisphere?")}
         />
       </Grid>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this entry?")}
+      />
     </Grid>
   );
 }

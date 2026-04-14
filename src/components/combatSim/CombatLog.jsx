@@ -25,6 +25,7 @@ import { t } from "../../translation/translate";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Define the mapping of tags to components
 const tagMap = {
@@ -304,6 +305,7 @@ export default function CombatLog({
 
   const [open, setOpen] = useState(controlledOpen);
   const [height, setHeight] = useState(isSmallScreen ? 150 : 200);
+  const [isClearLogsDialogOpen, setIsClearLogsDialogOpen] = useState(false);
   const logContainerRef = useRef(null);
   const isResizing = useRef(false);
   const startY = useRef(0);
@@ -530,7 +532,7 @@ export default function CombatLog({
         {open && (
           <Tooltip title={t("combat_sim_log_clear")} placement="top">
             <Button
-              onClick={clearLogs}
+              onClick={() => setIsClearLogsDialogOpen(true)}
               size="small"
               sx={{
                 minWidth: "auto",
@@ -672,6 +674,16 @@ export default function CombatLog({
           )}
         </Paper>
       </Collapse>
+      <DeleteConfirmationDialog
+        open={isClearLogsDialogOpen}
+        onClose={() => setIsClearLogsDialogOpen(false)}
+        onConfirm={() => {
+          clearLogs();
+          setIsClearLogsDialogOpen(false);
+        }}
+        title={t("combat_sim_log_clear")}
+        message={t("Are you sure you want to delete?")}
+      />
     </Box>
   );
 }

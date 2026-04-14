@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -19,6 +19,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close, Info } from "@mui/icons-material";
 import skills from "../../../libs/skills";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function AddSkillModal({
   open,
@@ -36,6 +38,9 @@ export default function AddSkillModal({
   onDeleteSkill,
 }) {
   const { t } = useTranslate();
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: onDeleteSkill,
+  });;
 
   // Group skills by class
   const groupedSkills = skills.reduce((acc, skill) => {
@@ -195,7 +200,7 @@ export default function AddSkillModal({
       </DialogContent>
       <DialogActions>
         {editSkillIndex !== null && (
-          <Button variant="contained" color="error" onClick={onDeleteSkill}>
+          <Button variant="contained" color="error" onClick={handleDelete}>
             {t("Delete")}
           </Button>
         )}
@@ -203,6 +208,18 @@ export default function AddSkillModal({
           {editSkillIndex !== null ? t("Save Changes") : t("Add")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={onDeleteSkill}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this skill?")}
+        itemPreview={
+          <Typography variant="h4">
+            {skillName || t("Untitled Skill")}
+          </Typography>
+        }
+      />
     </Dialog>
   );
 }

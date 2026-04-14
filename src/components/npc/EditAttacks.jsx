@@ -25,11 +25,14 @@ import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingAttackIndex, setPendingAttackIndex] = useState(null);
 
   const openCompendiumModal = () => {
     setModalOpen(true);
@@ -50,12 +53,11 @@ export default function EditAttacks({ npc, setNpc }) {
   };
 
   const addAttack = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.attacks) {
-        newState.attacks = [];
-      }
-      newState.attacks.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      attacks: [
+        ...(prevState.attacks || []),
+        {
         itemType: "basic",
         name: "",
         range: "melee",
@@ -63,19 +65,21 @@ export default function EditAttacks({ npc, setNpc }) {
         attr2: "dexterity",
         type: "physical",
         special: [],
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeAttack = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.attacks.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      attacks: (prevState.attacks || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingAttackIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -98,7 +102,7 @@ export default function EditAttacks({ npc, setNpc }) {
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
-                removeAttack={removeAttack(i)}
+                removeAttack={() => openDeleteDialog(i)}
               />
             </Grid>
             <Grid
@@ -125,10 +129,11 @@ export default function EditAttacks({ npc, setNpc }) {
         context="npc"
         initialType="attacks"
         onAddItem={(item) => {
-          setNpc((prev) => {
-            const newState = { ...prev };
-            if (!newState.attacks) newState.attacks = [];
-            newState.attacks.push({
+          setNpc((prev) => ({
+            ...prev,
+            attacks: [
+              ...(prev.attacks || []),
+              {
               itemType: "basic",
               name: item.name,
               range: item.ranged === true ? "distance" : "melee",
@@ -138,10 +143,30 @@ export default function EditAttacks({ npc, setNpc }) {
               flathit: item.flathit,
               flatdmg: item.flatdmg,
               special: [],
-            });
-            return newState;
-          });
+              },
+            ],
+          }));
         }}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingAttackIndex === null) return;
+          removeAttack(pendingAttackIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingAttackIndex !== null
+            ? npc.attacks?.[pendingAttackIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );

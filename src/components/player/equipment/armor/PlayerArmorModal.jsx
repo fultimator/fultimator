@@ -28,6 +28,7 @@ import PrettyArmor from "./PrettyArmor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerArmorModal({
@@ -67,7 +68,14 @@ export default function PlayerArmorModal({
 
   const fileInputRef = useRef(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpenFalse, handleDelete: handleDeleteWithConfirm } = useDeleteConfirmation({
+    onConfirm: () => {
+      if (editArmorIndex !== null) {
+        onDeleteArmor(editArmorIndex);
+      }
+      onClose();
+    },
+  });
 
   useEffect(() => {
     setBase(armorPlayer?.base || armor[0]);
@@ -179,9 +187,7 @@ export default function PlayerArmorModal({
     onAddArmor(updatedArmor);
   };
 
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
+  const handleDelete = handleDeleteWithConfirm;
 
   return (
     <>
@@ -442,7 +448,7 @@ export default function PlayerArmorModal({
       </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpenFalse}
         onConfirm={() => {
           if (editArmorIndex !== null) {
             onDeleteArmor(editArmorIndex);

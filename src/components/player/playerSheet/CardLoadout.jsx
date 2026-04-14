@@ -49,7 +49,6 @@ export default function CardLoadout({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const custom = useCustomTheme();
   const [pickerSlot, setPickerSlot] = useState(null);
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
 
@@ -58,7 +57,7 @@ export default function CardLoadout({
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
-  const supportModules = getEquippedSupportModules(player);
+  const supportModules = getEquippedSupportModules(player).filter(m => m.enabled);
   const hasSupportColumn = showSupportColumn && supportModules.length > 0;
 
   const mainHandResolved = resolveEffectiveSlot(player, "mainHand");

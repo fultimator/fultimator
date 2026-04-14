@@ -138,8 +138,12 @@ export default function CharacterSheet() {
   const updateMaxStats = useCallback(() => {
     if (player) {
       setPlayer((prevPlayer) => {
-        const baseMaxHP = prevPlayer.lvl + (prevPlayer.attributes?.might || 0) * 5;
-        const baseMaxMP = prevPlayer.lvl + (prevPlayer.attributes?.willpower || 0) * 5;
+        const lvl = Number(prevPlayer.lvl) || 0;
+        const might = Number(prevPlayer.attributes?.might) || 0;
+        const willpower = Number(prevPlayer.attributes?.will) || 0;
+
+        const baseMaxHP = lvl + might * 5;
+        const baseMaxMP = lvl + willpower * 5;
 
         let hpBonus = 0;
         let mpBonus = 0;
@@ -162,13 +166,13 @@ export default function CharacterSheet() {
         const fortressBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Fortress")
-          .reduce((acc, skill) => acc + (skill.currentLvl * 3), 0);
+          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
         hpBonus += fortressBonus;
 
         const focusedBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Focused")
-          .reduce((acc, skill) => acc + (skill.currentLvl * 3), 0);
+          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
         mpBonus += focusedBonus;
 
         const maxHP = baseMaxHP + hpBonus;

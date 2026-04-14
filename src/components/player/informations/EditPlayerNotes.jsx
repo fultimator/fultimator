@@ -20,7 +20,14 @@ import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import Clock from "../playerSheet/Clock";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import EditIcon from "@mui/icons-material/Edit";
+import { Tooltip, Stack } from "@mui/material";
 
 export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -29,11 +36,59 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
 
   const [open, setOpen] = useState(false);
   const [selectedNoteIndex, setSelectedNoteIndex] = useState(null);
+  const [selectedClockIndex, setSelectedClockIndex] = useState(null);
   const [clockName, setClockName] = useState("");
   const [clockSections, setClockSections] = useState(4);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const noteToDeleteIndexRef = useRef(null);
+  const clockToDeleteRef = useRef({ noteIndex: null, clockIndex: null });
+
+  const {
+    isOpen: deleteNoteDialogOpen,
+    closeDialog: closeDeleteNoteDialog,
+    handleDelete: handleDeleteNoteAction,
+  } = useDeleteConfirmation({
+    onConfirm: () => {
+      const idx = noteToDeleteIndexRef.current;
+      if (idx !== null) {
+        setPlayer((prevState) => {
+          return {
+            ...prevState,
+            notes: prevState.notes.filter((_, index) => index !== idx),
+          };
+        });
+      }
+      noteToDeleteIndexRef.current = null;
+      setNoteToDeleteIndex(null);
+    },
+  });
+
+  const {
+    isOpen: deleteClockDialogOpen,
+    closeDialog: closeDeleteClockDialog,
+    handleDelete: handleDeleteClockAction,
+  } = useDeleteConfirmation({
+    onConfirm: () => {
+      const { noteIndex, clockIndex } = clockToDeleteRef.current;
+      if (noteIndex !== null && clockIndex !== null) {
+        setPlayer((prevState) => {
+          const notes = prevState.notes.map((note, index) => {
+            if (index !== noteIndex) return note;
+            return {
+              ...note,
+              clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
+            };
+          });
+          return { ...prevState, notes };
+        });
+      }
+      clockToDeleteRef.current = { noteIndex: null, clockIndex: null };
+      setClockToDelete({ noteIndex: null, clockIndex: null });
+    },
+  });
+
   const [noteToDeleteIndex, setNoteToDeleteIndex] = useState(null);
+  const [clockToDelete, setClockToDelete] = useState({ noteIndex: null, clockIndex: null });
   const isSubmittingRef = useRef(false);
   const isAddingNoteRef = useRef(false);
 
@@ -57,19 +112,33 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     });
   };
 
-  const removeItem = (key) => async () => {
+  const removeItem = (key) => (e) => {
+    noteToDeleteIndexRef.current = key;
     setNoteToDeleteIndex(key);
-    setDeleteDialogOpen(true);
+    handleDeleteNoteAction(e);
   };
 
   const handleAddClock = (index) => {
     setSelectedNoteIndex(index);
+    setSelectedClockIndex(null);
+    setClockName("");
+    setClockSections(4);
+    setOpen(true);
+  };
+
+  const handleEditClock = (noteIndex, clockIndex) => {
+    const clock = player.notes[noteIndex].clocks[clockIndex];
+    setSelectedNoteIndex(noteIndex);
+    setSelectedClockIndex(clockIndex);
+    setClockName(clock.name);
+    setClockSections(clock.sections);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
     setSelectedNoteIndex(null);
+    setSelectedClockIndex(null);
     setClockName("");
     setClockSections(4);
     isSubmittingRef.current = false;
@@ -91,7 +160,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
       return;
     }
 
-    if (clockSections < 2 || clockSections > 30) {
+    if (isNaN(clockSections) || clockSections < 2 || clockSections > 30) {
       if (window.electron) {
         window.electron.alert(t("Sections must be between 2 and 30."));
       } else {
@@ -101,19 +170,46 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
       return;
     }
 
-    // Add the clock
-    const newClock = {
-      name: clockName,
-      sections: clockSections,
-      state: new Array(clockSections).fill(false),
-    };
-
     setPlayer((prevState) => {
       const notes = prevState.notes.map((note, index) => {
         if (index !== selectedNoteIndex) return note;
+
+        let updatedClocks;
+        if (selectedClockIndex !== null) {
+          // Editing existing clock
+          updatedClocks = note.clocks.map((clock, cIdx) => {
+            if (cIdx !== selectedClockIndex) return clock;
+
+            // If sections changed, we need to adjust the state array
+            let newState = clock.state;
+            if (clockSections !== clock.sections) {
+              newState = new Array(clockSections).fill(false);
+              // Copy over old state as much as possible
+              for (let i = 0; i < Math.min(clock.sections, clockSections); i++) {
+                newState[i] = clock.state[i];
+              }
+            }
+
+            return {
+              ...clock,
+              name: clockName,
+              sections: clockSections,
+              state: newState,
+            };
+          });
+        } else {
+          // Adding new clock
+          const newClock = {
+            name: clockName,
+            sections: clockSections,
+            state: new Array(clockSections).fill(false),
+          };
+          updatedClocks = [...(note.clocks || []), newClock];
+        }
+
         return {
           ...note,
-          clocks: [...(note.clocks || []), newClock],
+          clocks: updatedClocks,
         };
       });
       return { ...prevState, notes };
@@ -122,17 +218,57 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     handleClose();
   };
 
-  const handleRemoveClock = (noteIndex, clockIndex) => {
-    setPlayer((prevState) => {
-      const notes = prevState.notes.map((note, index) => {
-        if (index !== noteIndex) return note;
-        return {
-          ...note,
-          clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
-        };
+  const removeClock = (noteIndex, clockIndex) => (e) => {
+    clockToDeleteRef.current = { noteIndex, clockIndex };
+    setClockToDelete({ noteIndex, clockIndex });
+    handleDeleteClockAction(e);
+  };
+
+  const handleClockStateChange = (noteIndex, clockIndex, newState) => {
+    setPlayer((prevPlayer) => {
+      const updatedNotes = prevPlayer.notes.map((note, index) => {
+        if (index === noteIndex) {
+          const updatedClocks = note.clocks.map((clock, cIndex) => {
+            if (cIndex === clockIndex) {
+              return { ...clock, state: newState };
+            }
+            return clock;
+          });
+          return { ...note, clocks: updatedClocks };
+        }
+        return note;
       });
-      return { ...prevState, notes };
+      return { ...prevPlayer, notes: updatedNotes };
     });
+  };
+
+  const resetClockState = (noteIndex, clockIndex) => {
+    const resetState = new Array(
+      player.notes[noteIndex].clocks[clockIndex].sections
+    ).fill(false);
+    handleClockStateChange(noteIndex, clockIndex, resetState);
+  };
+
+  const incrementClockState = (noteIndex, clockIndex) => {
+    const clock = player.notes[noteIndex].clocks[clockIndex];
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled < clock.sections) {
+      const newState = new Array(clock.sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      handleClockStateChange(noteIndex, clockIndex, newState);
+    }
+  };
+
+  const decrementClockState = (noteIndex, clockIndex) => {
+    const clock = player.notes[noteIndex].clocks[clockIndex];
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clock.state];
+      newState[currentFilled - 1] = false;
+      handleClockStateChange(noteIndex, clockIndex, newState);
+    }
   };
 
   return (
@@ -248,33 +384,97 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                             sm: 6,
                             md: 4,
                           }}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            py: 0.75,
-                            bgcolor: theme.palette.background.paper,
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: 1,
-                            px: 1,
-                          }}
                         >
-                          <Typography variant="body2">
-                            <strong style={{ fontSize: "1.4em" }}>
-                              {clock.name}
-                            </strong>{" "}
-                            ({t("Clock Sections")}: {clock.sections})
-                          </Typography>
-                          {isEditMode && (
-                            <IconButton
-                              onClick={() => handleRemoveClock(index, clockIndex)}
+                          <Paper
+                            elevation={1}
+                            sx={{
+                              p: 1.5,
+                              bgcolor: theme.palette.background.paper,
+                              border: `1px solid ${theme.palette.divider}`,
+                              borderRadius: 1,
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              position: "relative",
+                            }}
+                          >
+                            <Box
                               sx={{
-                                color: theme.palette.error.main,
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 1,
                               }}
                             >
-                              <RemoveCircleOutlined />
-                            </IconButton>
-                          )}
+                              <Typography
+                                variant="body2"
+                                sx={{ fontWeight: "bold", fontSize: "1.1em" }}
+                              >
+                                {clock.name}
+                              </Typography>
+                              {isEditMode && (
+                                <Box>
+                                  <IconButton
+                                    onClick={() => handleEditClock(index, clockIndex)}
+                                    size="small"
+                                    sx={{
+                                      p: 0,
+                                      mr: 1,
+                                    }}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                  <IconButton
+                                    onClick={removeClock(index, clockIndex)}
+                                    size="small"
+                                    sx={{
+                                      color: theme.palette.error.main,
+                                      p: 0,
+                                    }}
+                                  >
+                                    <RemoveCircleOutlined fontSize="small" />
+                                  </IconButton>
+                                </Box>
+                              )}
+                            </Box>
+
+                            <Clock
+                              numSections={clock.sections}
+                              size={100}
+                              state={clock.state}
+                              setState={(newState) =>
+                                handleClockStateChange(index, clockIndex, newState)
+                              }
+                            />
+
+                            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                              <Tooltip title={t("Decrement")}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => decrementClockState(index, clockIndex)}
+                                >
+                                  <RemoveIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t("Reset")}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => resetClockState(index, clockIndex)}
+                                >
+                                  <RestartAltIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title={t("Increment")}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => incrementClockState(index, clockIndex)}
+                                >
+                                  <AddIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          </Paper>
                         </Grid>
                       ))}
                     </Grid>
@@ -282,16 +482,11 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 )}
               </Grid>
             </Grid>
-            {index !== player.notes.length - 1 && (
-              <Grid size={12} sx={{ pt: 0.5 }}>
-                <Divider />
-              </Grid>
-            )}
           </Grid>
         ))}
       </Grid>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle variant="h3">{t("Add Clock")}</DialogTitle>
+        <DialogTitle variant="h3">{selectedClockIndex !== null ? t("Edit Clock") : t("Add Clock")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t("Enter the clock details below:")}
@@ -326,7 +521,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             value={clockSections}
             onChange={(e) => {
               const value = parseInt(e.target.value, 10);
-              setClockSections(value);
+              setClockSections(isNaN(value) ? "" : value);
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -344,23 +539,26 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             {t("Cancel")}
           </Button>
           <Button onClick={handleConfirm} color="primary" variant="contained">
-            {t("Add")}
+            {selectedClockIndex !== null ? t("Save") : t("Add")}
           </Button>
         </DialogActions>
       </Dialog>
       <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        open={deleteNoteDialogOpen}
+        onClose={closeDeleteNoteDialog}
         onConfirm={() => {
-          if (noteToDeleteIndex !== null) {
+          const idx = noteToDeleteIndexRef.current;
+          if (idx !== null) {
             setPlayer((prevState) => {
               return {
                 ...prevState,
-                notes: prevState.notes.filter((_, index) => index !== noteToDeleteIndex),
+                notes: prevState.notes.filter((_, index) => index !== idx),
               };
             });
           }
+          noteToDeleteIndexRef.current = null;
           setNoteToDeleteIndex(null);
+          closeDeleteNoteDialog();
         }}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to delete this note?")}
@@ -369,6 +567,39 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             <Box>
               <Typography variant="h4">
                 {player.notes[noteToDeleteIndex].name || t("Untitled Note")}
+              </Typography>
+            </Box>
+          )
+        }
+      />
+      <DeleteConfirmationDialog
+        open={deleteClockDialogOpen}
+        onClose={closeDeleteClockDialog}
+        onConfirm={() => {
+          const { noteIndex, clockIndex } = clockToDeleteRef.current;
+          if (noteIndex !== null && clockIndex !== null) {
+            setPlayer((prevState) => {
+              const notes = prevState.notes.map((note, index) => {
+                if (index !== noteIndex) return note;
+                return {
+                  ...note,
+                  clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
+                };
+              });
+              return { ...prevState, notes };
+            });
+          }
+          clockToDeleteRef.current = { noteIndex: null, clockIndex: null };
+          setClockToDelete({ noteIndex: null, clockIndex: null });
+          closeDeleteClockDialog();
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to delete this clock?")}
+        itemPreview={
+          clockToDelete.noteIndex !== null && clockToDelete.clockIndex !== null && (
+            <Box>
+              <Typography variant="h4">
+                {player.notes[clockToDelete.noteIndex].clocks[clockToDelete.clockIndex].name || t("Untitled Clock")}
               </Typography>
             </Box>
           )

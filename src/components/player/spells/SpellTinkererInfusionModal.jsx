@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellTinkererInfusionModal({
   open,
@@ -30,6 +32,9 @@ export default function SpellTinkererInfusionModal({
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
     infusion ? !!infusion.showInPlayerSheet : true
   );
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   // Update showInPlayerSheet state if alchemy prop changes
   useEffect(() => {
@@ -45,12 +50,7 @@ export default function SpellTinkererInfusionModal({
       showInPlayerSheet: showInPlayerSheet,
     });
   };
-
-  const handleDelete = () => {
-    onDelete(infusion.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -122,6 +122,13 @@ export default function SpellTinkererInfusionModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(infusion.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this infusion entry?")}
+      />
     </Dialog>
   );
 }

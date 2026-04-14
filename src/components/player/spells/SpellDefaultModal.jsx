@@ -21,6 +21,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { OffensiveSpellIcon } from "../../icons";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellDefaultModal({
   open,
@@ -31,6 +33,9 @@ export default function SpellDefaultModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
   const [inputDuration, setInputDuration] = useState(
     editedSpell.duration || ""
   );
@@ -68,12 +73,7 @@ export default function SpellDefaultModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-
-  const handleDelete = () => {
-    onDelete(spell.index);
-  };
-
-  const handleDurationChange = (event, newValue) => {
+const handleDurationChange = (event, newValue) => {
     setInputDuration(newValue);
     handleChange("duration", newValue);
   };
@@ -416,6 +416,13 @@ export default function SpellDefaultModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(spell.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this spell?")}
+      />
     </Dialog>
   );
 }

@@ -10,9 +10,13 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { useState } from "react";
 
 export default function EditRareGear({ npc, setNpc }) {
   const { t } = useTranslate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingGearIndex, setPendingGearIndex] = useState(null);
   const onChangeRareGear = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -22,27 +26,28 @@ export default function EditRareGear({ npc, setNpc }) {
   };
 
   const addRareGear = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.raregear) {
-        newState.raregear = [];
-      }
-      newState.raregear.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      raregear: [
+        ...(prevState.raregear || []),
+        {
         name: "",
         effect: "",
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeRareGear = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.raregear.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      raregear: (prevState.raregear || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingGearIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -52,7 +57,7 @@ export default function EditRareGear({ npc, setNpc }) {
         return (
           <Grid container key={i} spacing={1}>
             <Grid  sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={removeRareGear(i)}>
+              <IconButton onClick={() => openDeleteDialog(i)}>
                 <RemoveCircleOutlined />
               </IconButton>
             </Grid>
@@ -92,6 +97,26 @@ export default function EditRareGear({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingGearIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingGearIndex === null) return;
+          removeRareGear(pendingGearIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingGearIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingGearIndex !== null
+            ? npc.raregear?.[pendingGearIndex]?.name || ""
+            : ""
+        }
+      />
     </>
   );
 }

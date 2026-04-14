@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { Add, Remove, Shuffle } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }) {
@@ -59,7 +60,12 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
     ]
   });
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          onDelete(deck?.index || 0);
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     if (deck) {
@@ -78,12 +84,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
   const handleSave = () => {
     onSave(deck?.index || 0, editedDeck);
   };
-
-  const handleDelete = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleSuitConfigChange = (suit, damageType) => {
+const handleSuitConfigChange = (suit, damageType) => {
     setEditedDeck(prev => ({
       ...prev,
       suitConfiguration: {
@@ -378,7 +379,7 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
       </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           onDelete(deck?.index || 0);
           onClose();

@@ -22,11 +22,14 @@ import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingSpellIndex, setPendingSpellIndex] = useState(null);
 
   const openCompendiumModal = () => {
     setModalOpen(true);
@@ -47,12 +50,11 @@ export default function EditSpells({ npc, setNpc }) {
   };
 
   const addSpell = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.spells) {
-        newState.spells = [];
-      }
-      newState.spells.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      spells: [
+        ...(prevState.spells || []),
+        {
         itemType: "spell",
         name: "",
         range: "melee",
@@ -62,19 +64,21 @@ export default function EditSpells({ npc, setNpc }) {
         damagetype: "physical",
         damage: 0,
         special: [],
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeSpell = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.spells.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      spells: (prevState.spells || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingSpellIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -93,7 +97,7 @@ export default function EditSpells({ npc, setNpc }) {
               <EditSpell
                 spell={spell}
                 setSpell={onChangeSpells(i)}
-                removeSpell={removeSpell(i)}
+                removeSpell={() => openDeleteDialog(i)}
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
@@ -111,28 +115,51 @@ export default function EditSpells({ npc, setNpc }) {
         initialType="spells"
         onAddItem={(item, sourceType) => {
           setNpc((prev) => {
-            const newState = { ...prev };
-            if (!newState.spells) newState.spells = [];
             // player-spells have a different shape than npc spells
             const isPlayerSpell = sourceType === "player-spells";
-            newState.spells.push({
-              itemType: "spell",
-              name: item.name,
-              attr1: item.attr1 || "insight",
-              attr2: item.attr2 || "will",
-              type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
-              damagetype: item.damagetype || "physical",
-              damage: item.damage || 0,
-              mp: String(item.mp ?? ""),
-              maxTargets: item.maxTargets || 0,
-              target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
-              duration: isPlayerSpell ? staticT(item.duration || "") : (item.duration || ""),
-              effect: isPlayerSpell ? staticT(item.description || "") : (item.effect || ""),
-              special: item.special || [],
-            });
-            return newState;
+            return {
+              ...prev,
+              spells: [
+                ...(prev.spells || []),
+                {
+                  itemType: "spell",
+                  name: item.name,
+                  attr1: item.attr1 || "insight",
+                  attr2: item.attr2 || "will",
+                  type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
+                  damagetype: item.damagetype || "physical",
+                  damage: item.damage || 0,
+                  mp: String(item.mp ?? ""),
+                  maxTargets: item.maxTargets || 0,
+                  target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
+                  duration: isPlayerSpell ? staticT(item.duration || "") : (item.duration || ""),
+                  effect: isPlayerSpell ? staticT(item.description || "") : (item.effect || ""),
+                  special: item.special || [],
+                },
+              ],
+            };
           });
         }}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingSpellIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingSpellIndex === null) return;
+          removeSpell(pendingSpellIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingSpellIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingSpellIndex !== null
+            ? npc.spells?.[pendingSpellIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );

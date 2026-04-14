@@ -18,6 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const OTHER_SUBTYPES = ["other"];
@@ -32,7 +33,11 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (deleteIndex !== null) handleRemove(deleteIndex);
+        },
+  });;
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const others = player.others ?? [];

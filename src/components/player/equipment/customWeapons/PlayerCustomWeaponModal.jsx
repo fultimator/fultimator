@@ -22,7 +22,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import { Close, ExpandMore } from "@mui/icons-material";
-import { globalConfirm } from "../../../../utility/globalConfirm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import PrettyCustomWeapon from "../../../../routes/equip/customWeapons/PrettyCustomWeapon";
 import ChangeCategory from "../../../../routes/equip/customWeapons/ChangeCategory";
 import ChangeRange from "../../../../routes/equip/customWeapons/ChangeRange";
@@ -92,6 +93,14 @@ export default function PlayerCustomWeaponModal({
   // Secondary weapon override states
   const [secondOverrideDamageType, setSecondOverrideDamageType] = useState(customWeapon?.secondOverrideDamageType || false);
   const [secondCustomDamageType, setSecondCustomDamageType] = useState(customWeapon?.secondCustomDamageType || "physical");
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (editCustomWeaponIndex !== null) {
+            onDeleteCustomWeapon(editCustomWeaponIndex);
+            onClose();
+          }
+        },
+  });;
 
   // Check if weapon has transforming customization
   const hasTransforming = currentCustomizations.some(
@@ -288,17 +297,6 @@ export default function PlayerCustomWeaponModal({
     onClose();
   };
 
-  const handleDelete = async () => {
-    if (editCustomWeaponIndex !== null) {
-      const confirmDelete = await globalConfirm(
-        "Are you sure you want to delete?"
-      );
-      if (confirmDelete) {
-        onDeleteCustomWeapon(editCustomWeaponIndex);
-        onClose();
-      }
-    }
-  };
 
   const handleFileUpload = (data) => {
     if (data && data.dataType === "weapon") {
@@ -920,6 +918,23 @@ export default function PlayerCustomWeaponModal({
           {t("Save")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => {
+          if (editCustomWeaponIndex !== null) {
+            onDeleteCustomWeapon(editCustomWeaponIndex);
+            onClose();
+          }
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this custom weapon?")}
+        itemPreview={
+          <Typography variant="h4">
+            {weaponName || t("weapon_name")}
+          </Typography>
+        }
+      />
     </Dialog>
   );
 }

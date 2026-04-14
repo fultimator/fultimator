@@ -18,6 +18,8 @@ import {
 import { Delete, ExpandMore, ContentCopy } from "@mui/icons-material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import { magiseeds } from "../../../../libs/floralistMagiseedData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function MagiseedItem({
   item,
@@ -29,6 +31,9 @@ export default function MagiseedItem({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [expandedEffects, setExpandedEffects] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleNameChange = (value) => {
     const preset = magiseeds.find((m) => m.name === value);
@@ -69,7 +74,7 @@ export default function MagiseedItem({
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
-    onDeleteItem(itemIndex);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloneClick = (e) => {
@@ -78,6 +83,7 @@ export default function MagiseedItem({
   };
 
   return (
+    <>
     <Accordion
       expanded={expanded}
       onChange={() => setExpanded(!expanded)}
@@ -254,5 +260,14 @@ export default function MagiseedItem({
         </Card>
       </AccordionDetails>
     </Accordion>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this magiseed?")}
+      itemPreview={<Typography variant="h4">{magiseedName}</Typography>}
+    />
+    </>
   );
 }

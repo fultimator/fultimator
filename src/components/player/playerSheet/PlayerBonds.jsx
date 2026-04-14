@@ -6,6 +6,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const POSITIVE_SENTIMENTS = ["admiration", "loyality", "affection"];
@@ -22,7 +23,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [draftBond, setDraftBond] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const bonds = player.info?.bonds ?? [];
 
@@ -302,7 +305,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
             <Button
               variant="contained"
               color="error"
-              onClick={() => setDeleteDialogOpen(true)}
+              onClick={handleDelete}
             >
               {t("Delete")}
             </Button>
@@ -315,7 +318,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
       )}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => deleteBond(editBondIndex)}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to remove this bond?")}

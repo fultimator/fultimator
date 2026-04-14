@@ -6,6 +6,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const QUIRK_SUBTYPES = ["quirk"];
@@ -15,7 +16,14 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          setPlayer((prev) => ({
+            ...prev,
+            quirk: { name: "", description: "", effect: "" },
+          }));
+        },
+  });;
 
   const onChangeQuirk = useCallback(
     (key) => (value) => {
@@ -95,7 +103,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                 </IconButton>
               </Tooltip>
               <Tooltip title={t("Remove")}>
-                <IconButton size="small" color="error" onClick={() => setDeleteDialogOpen(true)}>
+                <IconButton size="small" color="error" onClick={handleDelete}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -145,7 +153,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
       )}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           setPlayer((prev) => ({
             ...prev,

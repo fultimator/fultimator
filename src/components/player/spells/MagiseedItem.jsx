@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -22,6 +22,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 import { magiseeds, magiseedTypes } from "../../../libs/floralistMagiseedData";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function MagiseedItem({
   magiseed,
@@ -31,6 +33,9 @@ export default function MagiseedItem({
   onCloneMagiseed,
 }) {
   const { t } = useTranslate();
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleFieldChange = (field, value) => {
     if (onMagiseedChange) {
@@ -81,7 +86,10 @@ export default function MagiseedItem({
     onCloneMagiseed(magiseedIndex, clone);
   };
 
+  const magiseedDisplayName = magiseed.customName || t(magiseed.name);
+
   return (
+    <>
     <Card variant="outlined" sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2}>
@@ -92,7 +100,7 @@ export default function MagiseedItem({
               sm: 8
             }}>
             <Typography variant="h6" gutterBottom>
-              {magiseed.customName || t(magiseed.name)}
+              {magiseedDisplayName}
             </Typography>
           </Grid>
           <Grid
@@ -103,7 +111,7 @@ export default function MagiseedItem({
             }}>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
               <Button
-                onClick={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
+                onClick={handleDelete}
                 variant="outlined"
                 color="error"
                 size="small"
@@ -309,5 +317,14 @@ export default function MagiseedItem({
         </Grid>
       </CardContent>
     </Card>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteMagiseed && onDeleteMagiseed(magiseedIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this magiseed?")}
+      itemPreview={<Typography variant="h4">{magiseedDisplayName}</Typography>}
+    />
+    </>
   );
 }

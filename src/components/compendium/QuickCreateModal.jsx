@@ -55,6 +55,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
 import CustomTextarea from "../common/CustomTextarea";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { availableFrames } from "../../libs/pilotVehicleData";
 import { availableMagichantKeys } from "../player/spells/spellOptionData";
 
@@ -220,6 +221,7 @@ function NpcAttackPanel() {
   };
 
   return (
+    <>
     <PanelLayout
       data={data}
       itemName={data.name || ""}
@@ -302,6 +304,7 @@ function NpcAttackPanel() {
       addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
       exportDataType="attacks"
     />
+    </>
   );
 }
 
@@ -1662,6 +1665,7 @@ function ClassPanel() {
   const [martials,       setMartials]       = useState({ armor: false, shields: false, melee: false, ranged: false });
   const [ritualism,      setRitualism]      = useState(false);
   const [customBenefits, setCustomBenefits] = useState([]);
+  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
   const [spellClassesSelected, setSpellClassesSelected] = useState([]);
   const [skills,         setSkills]         = useState(Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })));
 
@@ -1693,11 +1697,13 @@ function ClassPanel() {
     setMartials({ armor: false, shields: false, melee: false, ranged: false });
     setRitualism(false);
     setCustomBenefits([]);
+    setCustomBenefitToDelete(null);
     setSpellClassesSelected([]);
     setSkills(Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })));
   };
 
   return (
+    <>
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
@@ -1777,7 +1783,7 @@ function ClassPanel() {
                 htmlInput: { maxLength: 500 }
               }} />
               <IconButton size="small" color="error"
-                onClick={() => setCustomBenefits((arr) => arr.filter((_, j) => j !== i))}>
+                onClick={() => setCustomBenefitToDelete(i)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Grid>
@@ -1875,6 +1881,25 @@ function ClassPanel() {
       itemName={classData.name || ""}
       exportDataType="classes"
     />
+    <DeleteConfirmationDialog
+      open={customBenefitToDelete !== null}
+      onClose={() => setCustomBenefitToDelete(null)}
+      onConfirm={() => {
+        if (customBenefitToDelete !== null) {
+          setCustomBenefits((arr) => arr.filter((_, j) => j !== customBenefitToDelete));
+        }
+      }}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this custom benefit?")}
+      itemPreview={
+        customBenefitToDelete !== null ? (
+          <Typography variant="h4">
+            {customBenefits[customBenefitToDelete] || t("Custom Benefit")}
+          </Typography>
+        ) : null
+      }
+    />
+    </>
   );
 }
 

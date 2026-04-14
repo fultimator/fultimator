@@ -58,6 +58,8 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { NoteAlt } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Available note colors
 const NOTE_COLORS = {
@@ -428,6 +430,7 @@ export default function GeneralNotesDialog({
   const [viewMode, setViewMode] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
   const [originalNotes, setOriginalNotes] = useState([...initialNotes]);
+  const [noteToDeleteId, setNoteToDeleteId] = useState(null);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -492,6 +495,10 @@ export default function GeneralNotesDialog({
 
   const deleteNote = (id) => {
     setNotes(notes.filter((note) => note.id !== id));
+  };
+
+  const requestDeleteNote = (id) => {
+    setNoteToDeleteId(id);
   };
 
   const moveNote = (id, direction) => {
@@ -674,7 +681,7 @@ export default function GeneralNotesDialog({
                       id={note.id}
                       note={note}
                       updateNote={updateNote}
-                      deleteNote={deleteNote}
+                      deleteNote={requestDeleteNote}
                       moveNote={moveNote}
                       index={index}
                       totalNotes={notes.length}
@@ -757,6 +764,24 @@ export default function GeneralNotesDialog({
           {t("mkeditor_save_note")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={noteToDeleteId !== null}
+        onClose={() => setNoteToDeleteId(null)}
+        onConfirm={() => {
+          if (noteToDeleteId !== null) {
+            deleteNote(noteToDeleteId);
+          }
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this note?")}
+        itemPreview={
+          noteToDeleteId !== null ? (
+            <Typography variant="h4">
+              {notes.find((note) => note.id === noteToDeleteId)?.title || t("notes_unnamed")}
+            </Typography>
+          ) : null
+        }
+      />
     </Dialog>
   );
 }

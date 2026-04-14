@@ -16,6 +16,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellTinkererMagitechRankModal({
   open,
@@ -32,6 +34,9 @@ export default function SpellTinkererMagitechRankModal({
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
     magitech?.showInPlayerSheet !== false
   );
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   // Update state if magitech prop changes
   useEffect(() => {
@@ -50,12 +55,7 @@ export default function SpellTinkererMagitechRankModal({
       showInPlayerSheet: showInPlayerSheet,
     });
   };
-
-  const handleDelete = () => {
-    onDelete(magitech.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -125,6 +125,13 @@ export default function SpellTinkererMagitechRankModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(magitech.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this magitech entry?")}
+      />
     </Dialog>
   );
 }

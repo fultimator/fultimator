@@ -36,19 +36,18 @@ export default function EditManualStats({
     setPlayer((prevPlayer) => ({
       ...prevPlayer,
       modifiers: {
-        hp: parseInt(hpModifier),
-        mp: parseInt(mpModifier),
-        ip: parseInt(ipModifier),
-        def: parseInt(defModifier),
-        mdef: parseInt(mdefModifier),
-        init: parseInt(initModifier),
-        meleePrec: parseInt(meleePrecModifier),
-        rangedPrec: parseInt(rangedPrecModifier),
-        magicPrec: parseInt(magicPrecModifier),
+        hp: parseInt(hpModifier) || 0,
+        mp: parseInt(mpModifier) || 0,
+        ip: parseInt(ipModifier) || 0,
+        def: parseInt(defModifier) || 0,
+        mdef: parseInt(mdefModifier) || 0,
+        init: parseInt(initModifier) || 0,
+        meleePrec: parseInt(meleePrecModifier) || 0,
+        rangedPrec: parseInt(rangedPrecModifier) || 0,
+        magicPrec: parseInt(magicPrecModifier) || 0,
       },
     }));
     updateMaxStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     hpModifier,
     mpModifier,

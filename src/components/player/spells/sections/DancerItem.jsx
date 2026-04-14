@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Grid,
   TextField,
@@ -13,6 +14,8 @@ import {
 import { Delete, ContentCopy } from "@mui/icons-material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import { availableDances } from "../spellOptionData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function DancerItem({
   item,
@@ -37,6 +40,9 @@ export default function DancerItem({
   const isCustom =
     item.name === "dance_custom_name" ||
     !availableDances.find((d) => d.name === item.name);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -52,7 +58,10 @@ export default function DancerItem({
     onCloneItem(itemIndex, clone);
   };
 
+  const itemDisplayName = item.customName || t(item.name || "dance_custom_name");
+
   return (
+    <>
     <Card sx={{ mb: 2 }}>
       <CardContent>
         <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
@@ -133,7 +142,7 @@ export default function DancerItem({
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth
-                onClick={() => onDeleteItem(itemIndex)}
+                onClick={handleDelete}
                 variant="outlined"
                 color="error"
                 startIcon={<Delete />}
@@ -153,5 +162,14 @@ export default function DancerItem({
         </Grid>
       </CardContent>
     </Card>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this item?")}
+      itemPreview={<Box sx={{ fontWeight: "bold" }}>{itemDisplayName}</Box>}
+    />
+    </>
   );
 }

@@ -1,11 +1,34 @@
+import React, { useState } from "react";
 import { Button, Grid, Typography } from "@mui/material";
 import { ArrowBack, Delete } from "@mui/icons-material";
 import { diceList } from "../../libs/rolls";
 import Diamond from "../Diamond";
 import { useTranslate } from "../../translation/translate";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
   const {t} = useTranslate();
+  const [rollToDelete, setRollToDelete] = useState(null);
+
+  const openDeleteDialog = (event, roll) => {
+    event.stopPropagation();
+    setRollToDelete(roll);
+  };
+
+  const closeDeleteDialog = () => {
+    setRollToDelete(null);
+  };
+
+  const confirmDelete = () => {
+    if (!rollToDelete) return;
+    const maybeHandler = handleDelete(rollToDelete.id);
+    if (typeof maybeHandler === "function") {
+      maybeHandler();
+    } else {
+      handleDelete(rollToDelete.id);
+    }
+  };
+
   if (!rolls) {
     return null;
   }
@@ -45,7 +68,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
                 startIcon={
                   <Delete sx={{ display: { xs: "none", sm: "inline" } }} />
                 }
-                onClick={handleDelete(roll.id)}
+                onClick={(e) => openDeleteDialog(e, roll)}
               >
                 {t("Remove")}
               </Button>
@@ -53,6 +76,21 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
           </Grid>
         );
       })}
+      <DeleteConfirmationDialog
+        open={Boolean(rollToDelete)}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDelete}
+        title={t("Delete")}
+        message={t("Are you sure you want to remove this prepared roll?")}
+        itemPreview={
+          rollToDelete && (
+            <Typography variant="h4">
+              {diceList(rollToDelete.dice, rollToDelete.modifier)}
+              {rollToDelete.label ? ` ${rollToDelete.label}` : ""}
+            </Typography>
+          )
+        }
+      />
     </>
   );
 }

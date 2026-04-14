@@ -29,6 +29,7 @@ import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompact
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { useTheme } from "@mui/material/styles";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../../components/common/DeleteConfirmationDialog";
 
 const StyledTableCellHeader = styled(TableCell)({
@@ -72,7 +73,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [draftBond, setDraftBond] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const bonds = player.info?.bonds ?? [];
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -287,7 +290,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
             <Button
               variant="contained"
               color="error"
-              onClick={() => setDeleteDialogOpen(true)}
+              onClick={handleDelete}
             >
               {t("Delete")}
             </Button>
@@ -300,7 +303,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
       )}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => deleteBond(editBondIndex)}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to remove this bond?")}

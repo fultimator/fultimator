@@ -17,6 +17,7 @@ import {
 import { Close, Add, RemoveCircleOutlined } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function PlayerNoteModal({
@@ -38,7 +39,13 @@ export default function PlayerNoteModal({
   const [clockName, setClockName] = useState("");
   const [clockSections, setClockSections] = useState(4);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          onDeleteNote(editNoteIndex);
+          setDeleteDialogOpen(false);
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setName(note?.name || "");
@@ -187,7 +194,7 @@ export default function PlayerNoteModal({
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => setDeleteDialogOpen(true)}
+                onClick={handleDelete}
               >
                 {t("Delete")}
               </Button>
@@ -244,7 +251,7 @@ export default function PlayerNoteModal({
       {/* Delete Confirmation */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           onDeleteNote(editNoteIndex);
           setDeleteDialogOpen(false);

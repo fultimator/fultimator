@@ -17,6 +17,7 @@ interface DeleteConfirmationDialogProps {
   title: string;
   message: string;
   itemPreview?: React.ReactNode;
+  enableCtrlBypass?: boolean;
 }
 
 const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
@@ -26,6 +27,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   title,
   message,
   itemPreview,
+  enableCtrlBypass = true,
 }) => {
   const { t } = useTranslate();
 
@@ -33,6 +35,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
     onConfirm();
     onClose();
   };
+
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
@@ -104,7 +107,8 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           variant="contained"
           color="error"
           fullWidth
-          sx={{ 
+          title={enableCtrlBypass ? "Ctrl+Click on the initial delete button to skip this dialog" : undefined}
+          sx={{
             fontWeight: "bold",
             "&:hover": {
               bgcolor: "error.dark",

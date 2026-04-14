@@ -267,13 +267,12 @@ export default function PlayerEdit() {
   const updateMaxStats = () => {
     if (playerTemp) {
       setPlayerTemp((prevPlayer) => {
-        const dex = prevPlayer.attributes.dexterity;
-        const ins = prevPlayer.attributes.insight;
-        const mig = prevPlayer.attributes.might;
-        const wil = prevPlayer.attributes.will;
+        const mig = Number(prevPlayer.attributes?.might) || 0;
+        const wil = Number(prevPlayer.attributes?.will) || 0;
+        const lvl = Number(prevPlayer.lvl) || 0;
 
-        const baseMaxHP = mig * 5 + prevPlayer.lvl;
-        const baseMaxMP = wil * 5 + prevPlayer.lvl;
+        const baseMaxHP = mig * 5 + lvl;
+        const baseMaxMP = wil * 5 + lvl;
 
         let hpBonus = 0;
         let mpBonus = 0;
@@ -281,33 +280,33 @@ export default function PlayerEdit() {
 
         prevPlayer.classes.forEach((cls) => {
           if (cls.benefits) {
-            hpBonus += cls.benefits.hpplus || 0;
-            mpBonus += cls.benefits.mpplus || 0;
-            ipBonus += cls.benefits.ipplus || 0;
+            hpBonus += Number(cls.benefits.hpplus) || 0;
+            mpBonus += Number(cls.benefits.mpplus) || 0;
+            ipBonus += Number(cls.benefits.ipplus) || 0;
           }
         });
 
         if (prevPlayer.modifiers) {
-          hpBonus += prevPlayer.modifiers.hp || 0;
-          mpBonus += prevPlayer.modifiers.mp || 0;
-          ipBonus += prevPlayer.modifiers.ip || 0;
+          hpBonus += Number(prevPlayer.modifiers.hp) || 0;
+          mpBonus += Number(prevPlayer.modifiers.mp) || 0;
+          ipBonus += Number(prevPlayer.modifiers.ip) || 0;
         }
 
         // Guardian: Fortress Skill Bonus
         const fortressBonus = prevPlayer.classes
-          .map((cls) => cls.skills)
+          .map((cls) => cls.skills || [])
           .flat()
           .filter((skill) => skill.specialSkill === "Fortress")
-          .map((skill) => skill.currentLvl * 3)
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
           .reduce((a, b) => a + b, 0);
         hpBonus += fortressBonus;
 
         // Loremaster: Focused Skill Bonus
         const focusedBonus = prevPlayer.classes
-          .map((cls) => cls.skills)
+          .map((cls) => cls.skills || [])
           .flat()
           .filter((skill) => skill.specialSkill === "Focused")
-          .map((skill) => skill.currentLvl * 3)
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
           .reduce((a, b) => a + b, 0);
         mpBonus += focusedBonus;
 
@@ -321,17 +320,17 @@ export default function PlayerEdit() {
             hp: {
               ...prevPlayer.stats.hp,
               max: maxHP,
-              current: Math.min(prevPlayer.stats.hp.current, maxHP),
+              current: Math.min(Number(prevPlayer.stats.hp.current) || 0, maxHP),
             },
             mp: {
               ...prevPlayer.stats.mp,
               max: maxMP,
-              current: Math.min(prevPlayer.stats.mp.current, maxMP),
+              current: Math.min(Number(prevPlayer.stats.mp.current) || 0, maxMP),
             },
             ip: {
               ...prevPlayer.stats.ip,
               max: maxIP,
-              current: Math.min(prevPlayer.stats.ip.current, maxIP),
+              current: Math.min(Number(prevPlayer.stats.ip.current) || 0, maxIP),
             },
           },
         };

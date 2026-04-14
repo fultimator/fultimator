@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { buildInvokerAvailableInvocations } from "../invokerUtils";
 import { availableFrames } from "../../../../libs/pilotVehicleData";
@@ -119,7 +120,21 @@ export default function UnifiedSpellModal({
 
   const [activeSectionId, setActiveSectionId] = useState(resolveInitialSectionId(sections));
   const [formState, setFormState] = useState(spell || {});
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (onDelete && spell) {
+      onDelete(spell.index);
+    }
+    setDeleteConfirmOpen(false);
+  };
+
+  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: handleDeleteConfirm,
+  });
 
   useEffect(() => {
     if (spell) {
@@ -156,16 +171,6 @@ export default function UnifiedSpellModal({
     }
   };
 
-  const handleDeleteClick = () => {
-    setDeleteConfirmOpen(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (onDelete && spell) {
-      onDelete(spell.index);
-    }
-    setDeleteConfirmOpen(false);
-  };
 
   const activeSection = sections?.find(s => s.id === activeSectionId);
   const saveDisabled = spellType === "pilot" && isPilotConfigurationIllegal(formState);
@@ -253,7 +258,7 @@ export default function UnifiedSpellModal({
       {onDelete && (
         <DeleteConfirmationDialog
           open={deleteConfirmOpen}
-          onClose={() => setDeleteConfirmOpen(false)}
+        onClose={setDeleteConfirmOpen}
           onConfirm={handleDeleteConfirm}
           title={t("Delete")}
           message={

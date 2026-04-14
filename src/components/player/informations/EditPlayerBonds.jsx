@@ -14,11 +14,15 @@ import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
+import { useState } from "react";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingBondIndex, setPendingBondIndex] = useState(null);
 
   const handleBondChange = (index, key) => (event) => {
     const updatedBonds = player.info.bonds.map((bond, i) => {
@@ -100,6 +104,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
     }));
   };
 
+  const openDeleteDialog = (index) => {
+    setPendingBondIndex(index);
+    setIsDeleteDialogOpen(true);
+  };
+
   return (
     <Paper
       elevation={3}
@@ -135,7 +144,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                   }}>
                   {isEditMode ? <IconButton
                     aria-label="delete"
-                    onClick={() => deleteBond(index)}
+                    onClick={() => openDeleteDialog(index)}
                     sx={{ ml: 1 }}
                   >
                     <RemoveCircleOutlined />
@@ -267,6 +276,26 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
           </Grid>
         ))}
       </Grid>
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingBondIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingBondIndex === null) return;
+          deleteBond(pendingBondIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingBondIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingBondIndex !== null
+            ? player.info.bonds?.[pendingBondIndex]?.name || ""
+            : ""
+        }
+      />
     </Paper>
   );
 }

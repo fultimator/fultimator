@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Delete, Close } from "@mui/icons-material";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function EditFreeBenefitsModal({
   open,
@@ -28,6 +29,8 @@ export default function EditFreeBenefitsModal({
   onRemoveCustomBenefit,
   t,
 }) {
+  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
+
   return (
     <Dialog
       open={open}
@@ -194,7 +197,7 @@ export default function EditFreeBenefitsModal({
                     xs: 2,
                     sm: 1
                   }}>
-                  <IconButton onClick={() => onRemoveCustomBenefit(index)}>
+                  <IconButton onClick={() => setCustomBenefitToDelete(index)}>
                     <Delete />
                   </IconButton>
                 </Grid>
@@ -228,6 +231,24 @@ export default function EditFreeBenefitsModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={customBenefitToDelete !== null}
+        onClose={() => setCustomBenefitToDelete(null)}
+        onConfirm={() => {
+          if (customBenefitToDelete !== null) {
+            onRemoveCustomBenefit(customBenefitToDelete);
+          }
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this custom benefit?")}
+        itemPreview={
+          customBenefitToDelete !== null ? (
+            <Typography variant="h4">
+              {benefits.custom[customBenefitToDelete] || t("Custom Benefit")}
+            </Typography>
+          ) : null
+        }
+      />
     </Dialog>
   );
 }

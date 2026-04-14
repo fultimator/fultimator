@@ -10,9 +10,13 @@ import { useTranslate } from "../../translation/translate";
 import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { useState } from "react";
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingNoteIndex, setPendingNoteIndex] = useState(null);
   const onChangeNotes = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -22,27 +26,28 @@ export default function EditNotes({ npc, setNpc }) {
   };
 
   const addNotes = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.notes) {
-        newState.notes = [];
-      }
-      newState.notes.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      notes: [
+        ...(prevState.notes || []),
+        {
         name: "",
         effect: "",
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeNotes = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.notes.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      notes: (prevState.notes || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingNoteIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -52,7 +57,7 @@ export default function EditNotes({ npc, setNpc }) {
         return (
           <Grid container key={i} spacing={1}>
             <Grid  sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={removeNotes(i)}>
+              <IconButton onClick={() => openDeleteDialog(i)}>
                 <RemoveCircleOutlined />
               </IconButton>
             </Grid>
@@ -94,6 +99,26 @@ export default function EditNotes({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingNoteIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingNoteIndex === null) return;
+          removeNotes(pendingNoteIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingNoteIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingNoteIndex !== null
+            ? npc.notes?.[pendingNoteIndex]?.name || ""
+            : ""
+        }
+      />
     </>
   );
 }

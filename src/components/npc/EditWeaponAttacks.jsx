@@ -25,9 +25,12 @@ import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import { TypeIcon } from "../types";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingAttackIndex, setPendingAttackIndex] = useState(null);
 
   const onChangeAttacks = (i) => {
     return (key, value) => {
@@ -40,29 +43,30 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   };
 
   const addAttack = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.weaponattacks) {
-        newState.weaponattacks = [];
-      }
-      newState.weaponattacks.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      weaponattacks: [
+        ...(prevState.weaponattacks || []),
+        {
         name: "",
         weapon: baseWeapons[0],
         type: "physical",
         special: [],
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeAttack = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.weaponattacks.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      weaponattacks: (prevState.weaponattacks || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingAttackIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -84,7 +88,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
-                removeAttack={removeAttack(i)}
+                removeAttack={() => openDeleteDialog(i)}
               />
             </Grid>
             <Grid
@@ -105,6 +109,26 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
           </Grid>
         );
       })}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingAttackIndex === null) return;
+          removeAttack(pendingAttackIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingAttackIndex !== null
+            ? npc.weaponattacks?.[pendingAttackIndex]?.name || ""
+            : ""
+        }
+      />
     </>
   );
 }

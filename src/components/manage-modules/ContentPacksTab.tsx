@@ -14,11 +14,6 @@ import {
   Collapse,
   Typography,
   Chip,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -27,6 +22,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { CompendiumPack } from "../../types/CompendiumPack";
 import { useTranslate } from "../../translation/translate";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 interface ContentPacksTabProps {
   packs: CompendiumPack[];
@@ -56,7 +53,11 @@ function PackRow({ pack, onSetActive, onDelete }: {
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const { isOpen: confirmDeleteOpen, closeDialog: setConfirmDeleteOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: async () => {
+      await onDelete(pack.id);
+    },
+  });
   const isActive = pack.active !== false;
 
   return (
@@ -107,7 +108,7 @@ function PackRow({ pack, onSetActive, onDelete }: {
               <IconButton
                 size="small"
                 color="error"
-                onClick={() => setConfirmDeleteOpen(true)}
+                onClick={handleDelete}
                 disabled={pack.isPersonal || pack.locked}
               >
                 <DeleteIcon fontSize="small" />
@@ -168,29 +169,16 @@ function PackRow({ pack, onSetActive, onDelete }: {
           </Collapse>
         </TableCell>
       </TableRow>
-      {/* Delete confirmation */}
-      <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{t("Delete module")}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t("Delete")} <strong>{pack.name}</strong>?{" "}
-            {t("This cannot be undone.")}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDeleteOpen(false)}>{t("Cancel")}</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={async () => {
-              await onDelete(pack.id);
-              setConfirmDeleteOpen(false);
-            }}
-          >
-            {t("Delete")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteConfirmationDialog
+        open={confirmDeleteOpen}
+        onClose={setConfirmDeleteOpen}
+        onConfirm={async () => {
+          await onDelete(pack.id);
+        }}
+        title={t("Delete module")}
+        message={t("This cannot be undone.")}
+        itemPreview={<Typography variant="h4">{pack.name}</Typography>}
+      />
     </>
   );
 }

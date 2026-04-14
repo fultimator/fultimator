@@ -40,6 +40,7 @@ import PlayerShieldModal from "../player/equipment/shields/PlayerShieldModal";
 import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCustomWeaponModal";
 import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
 import CustomTextarea from "../common/CustomTextarea";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Shared attribute options
 const ATTRS = [
@@ -1874,6 +1875,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
   });
   const [ritualism, setRitualism] = useState(initBenefits.rituals?.ritualism ?? false);
   const [customBenefits, setCustomBenefits] = useState(initBenefits.custom ?? []);
+  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
   const [spellClasses, setSpellClasses] = useState(initBenefits.spellClasses ?? []);
   const BLANK_SKILL = { skillName: "", maxLvl: 1, description: "", specialSkill: "", currentLvl: 0 };
   const initSkills = Array.from({ length: 5 }, (_, i) => editData?.skills?.[i] ?? { ...BLANK_SKILL });
@@ -2028,7 +2030,7 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
                 htmlInput: { maxLength: 500 }
               }}
               />
-              <IconButton size="small" color="error" onClick={() => setCustomBenefits((arr) => arr.filter((_, j) => j !== i))}>
+              <IconButton size="small" color="error" onClick={() => setCustomBenefitToDelete(i)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Grid>
@@ -2146,6 +2148,24 @@ export function ClassForm({ open, packId, onClose, editData, editItemId, onItemC
           {isEditing ? t("Save Changes") : t("Add")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={customBenefitToDelete !== null}
+        onClose={() => setCustomBenefitToDelete(null)}
+        onConfirm={() => {
+          if (customBenefitToDelete !== null) {
+            setCustomBenefits((arr) => arr.filter((_, j) => j !== customBenefitToDelete));
+          }
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this custom benefit?")}
+        itemPreview={
+          customBenefitToDelete !== null ? (
+            <Typography variant="h4">
+              {customBenefits[customBenefitToDelete] || t("Custom Benefit")}
+            </Typography>
+          ) : null
+        }
+      />
     </Dialog>
   );
 }

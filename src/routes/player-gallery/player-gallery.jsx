@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
 import { playerNeedsMigration, applyPreSaveTransforms, applyPostLoadTransforms } from "../../components/player/playerTransforms";
@@ -84,7 +85,31 @@ function Personal() {
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
 
   // Deletion confirmation states
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const playerToDeleteRef = useRef(null);
+  const isBulkDeleteRef = useRef(false);
+
+  const performDelete = async () => {
+    if (isBulkDeleteRef.current) {
+      for (const id of selectedIds) {
+        await db.deleteDoc(db.doc("player-personal", id));
+      }
+      setSelectedIds(new Set());
+    } else if (playerToDeleteRef.current) {
+      await db.deleteDoc(db.doc("player-personal", playerToDeleteRef.current.id));
+      playerToDeleteRef.current = null;
+      setPlayerToDelete(null);
+    }
+    closeDeleteDialog();
+  };
+
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: closeDeleteDialog,
+    handleDelete,
+  } = useDeleteConfirmation({
+    onConfirm: performDelete,
+  });
+
   const [playerToDelete, setPlayerToDelete] = useState(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
 
@@ -397,9 +422,10 @@ function Personal() {
     });
   };
 
-  const deleteSelected = async () => {
+  const deleteSelected = (e) => {
+    isBulkDeleteRef.current = true;
     setIsBulkDelete(true);
-    setDeleteDialogOpen(true);
+    handleDelete(e);
   };
 
   const copySelectedToLocal = async () => {
@@ -544,12 +570,12 @@ function Personal() {
     } catch { notify(t("Failed to move to Cloud")); }
   };
 
-  const deletePlayer = function (player) {
-    return function () {
-      setPlayerToDelete(player);
-      setIsBulkDelete(false);
-      setDeleteDialogOpen(true);
-    };
+  const deletePlayer = (player) => (e) => {
+    playerToDeleteRef.current = player;
+    setPlayerToDelete(player);
+    isBulkDeleteRef.current = false;
+    setIsBulkDelete(false);
+    handleDelete(e);
   };
 
   const handleClose = () => {
@@ -870,18 +896,8 @@ function Personal() {
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={async () => {
-          if (isBulkDelete) {
-            for (const id of selectedIds) {
-              await db.deleteDoc(db.doc("player-personal", id));
-            }
-            setSelectedIds(new Set());
-          } else if (playerToDelete) {
-            await db.deleteDoc(db.doc("player-personal", playerToDelete.id));
-            setPlayerToDelete(null);
-          }
-        }}
+        onClose={closeDeleteDialog}
+        onConfirm={performDelete}
         title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
         message={
           isBulkDelete

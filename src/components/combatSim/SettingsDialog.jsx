@@ -32,7 +32,6 @@ import {
   DragIndicator as UseDragAndDropIcon,
   SaveAs as AutosaveIcon,
   History as AutoOpenLogsIcon,
-  Timer as AutosaveIntervalIcon,
   Notifications as ShowSaveSnackbarIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -56,7 +55,7 @@ import {
   getDefaultSettings,
   SETTINGS_CONFIG,
 } from "../../utility/combatSimSettings";
-import { globalConfirm } from "../../utility/globalConfirm";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 const SettingsDialog = ({
   open,
@@ -76,6 +75,7 @@ const SettingsDialog = ({
     interface: true,
     logVisibility: true,
   });
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const toggleCategory = (category) => {
     setExpandedCategories((prev) => ({
@@ -342,13 +342,7 @@ const SettingsDialog = ({
     },
   ];
 
-  const handleResetDefaults = async () => {
-    const confirmReset = await globalConfirm(
-      t("combat_sim_settings_reset_defaults_confirm")
-    );
-
-    if (!confirmReset) return;
-
+  const handleResetDefaults = () => {
     // Reset the settings store to defaults
     resetToDefaults();
 
@@ -359,6 +353,8 @@ const SettingsDialog = ({
     Object.entries(defaultSettings).forEach(([name, value]) => {
       onSettingChange(name, value);
     });
+
+    setIsResetConfirmOpen(false);
   };
 
   // Check if all log types are selected or none are selected
@@ -734,14 +730,14 @@ const SettingsDialog = ({
             <Button
               color="inherit"
               variant="outlined"
-              onClick={handleResetDefaults}
+              onClick={() => setIsResetConfirmOpen(true)}
               sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
             >
               <ResetDefaultsIcon />
             </Button>
           ) : (
             <Button
-              onClick={handleResetDefaults}
+              onClick={() => setIsResetConfirmOpen(true)}
               color="inherit"
               variant="outlined"
               sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
@@ -782,6 +778,13 @@ const SettingsDialog = ({
           </Button>
         </Box>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirm={handleResetDefaults}
+        title={t("combat_sim_settings_reset_defaults")}
+        message={t("combat_sim_settings_reset_defaults_confirm")}
+      />
     </Dialog>
   );
 };

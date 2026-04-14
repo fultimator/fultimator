@@ -17,6 +17,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
@@ -31,7 +32,11 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (deleteIndex !== null) handleRemove(deleteIndex);
+        },
+  });;
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const activities = player.campActivities ?? [];

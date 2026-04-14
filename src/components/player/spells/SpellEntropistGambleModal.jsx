@@ -20,6 +20,8 @@ import {
 import { Close, Delete } from "@mui/icons-material"; // Import Delete icon
 import { useTranslate } from "../../../translation/translate";
 import attributes from "../../../libs/attributes";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const secondEffectsOptions = [
   { dieValue: 1, effect: "Wind" },
@@ -41,6 +43,9 @@ export default function SpellEntropistGambleModal({
   const [editedGamble, setEditedGamble] = useState(gamble || {});
   const [targets, setTargets] = useState(gamble?.targets || []);
   const [validationError, setValidationError] = useState("");
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   useEffect(() => {
     if (gamble) {
@@ -225,12 +230,7 @@ export default function SpellEntropistGambleModal({
       onSave(editedGamble.index, { ...editedGamble, targets: sortedTargets });
     }
   };
-
-  const handleDelete = () => {
-    onDelete(editedGamble.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -632,6 +632,13 @@ export default function SpellEntropistGambleModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(editedGamble.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this spell?")}
+      />
     </Dialog>
   );
 }
