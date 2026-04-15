@@ -32,7 +32,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedGift, setSelectedGift] = useState(null);
-  const [selectedGiftSpell, setSelectedGiftSpell] = useState(null);
+  const [_selectedGiftSpell, setSelectedGiftSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (giftSpell, gift) => {

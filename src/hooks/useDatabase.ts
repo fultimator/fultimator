@@ -3,7 +3,7 @@
 // auto-inject uid on user-scoped collections so components never handle it manually.
 
 import { useMemo } from "react";
-import { useDatabaseContext } from "../context/DatabaseContext";
+import { useDatabaseContext } from "../context/useDatabaseContext";
 import { USER_SCOPED_COLLECTIONS, type DatabaseAdapter, type DbMode } from "../types/Database";
 
 function buildUidProxy(adapter: DatabaseAdapter, uid: string): DatabaseAdapter {
@@ -65,7 +65,6 @@ export function useDatabase(mode?: DbMode): DatabaseAdapter {
     if (isCloudAdapter && uid) {
       return buildUidProxy(adapter, uid);
     }
-    return adapter;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return adapter; 
   }, [adapter, isCloudAdapter, uid]);
 }

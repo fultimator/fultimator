@@ -1,6 +1,6 @@
 // Desktop platform adapter - IndexedDB-backed implementation of the Firestore-compatible API.
 // Imported via the @platform alias when building for Electron.
-
+// Reference types
 import { useState, useEffect } from "react";
 import {
   GoogleAuthProvider,
@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 // Import from firebase.js so initializeApp() runs before getAuth() is called
 import { auth as _initializedAuth } from "../../firebase";
-
+// Firestore-compatible API
 import {
   getDb,
   STORES,
@@ -21,18 +21,17 @@ import {
   clearPendingSync,
   usePendingSync,
 } from "../idb";
-
+// Filter/sort helpers
 // Re-export for consumers that import getDb/STORES directly (e.g. DriveSync)
 export { getDb, STORES, notifyListeners, notifyAllListeners, usePendingSync };
-
-// ── Reference types ────────────────────────────────────────────────────────────
-
+// React hooks
+// Auth - real Firebase auth
 export interface CollectionRef {
   _type: "collection";
   path: string;
   storeName: string;
 }
-
+// Auto-bootstrap: silently sign into Firebase if Drive tokens already exist
 export interface DocRef {
   _type: "doc";
   path: string;
@@ -70,7 +69,6 @@ export interface QueryRef {
   constraints: (WhereConstraint | OrderByConstraint | LimitConstraint | StartAfterConstraint)[];
 }
 
-// ── Firestore-compatible API ───────────────────────────────────────────────────
 
 export function collection(_db: unknown, ...pathSegments: string[]): CollectionRef {
   const path = pathSegments.join("/");
@@ -178,8 +176,7 @@ export async function getDocs(
   };
 }
 
-// ── Filter/sort helpers ────────────────────────────────────────────────────────
-
+// Filter/sort helpers
 function applyWhere(
   records: Record<string, unknown>[],
   constraint: WhereConstraint
@@ -216,8 +213,7 @@ function applyOrderBy(
   });
 }
 
-// ── React hooks ────────────────────────────────────────────────────────────────
-
+// React hooks
 export function useCollectionData(
   ref: CollectionRef | QueryRef | null | undefined
 ): [unknown[], boolean, Error | undefined] {
@@ -318,8 +314,7 @@ export function useDocumentData(
   return [data, loading, error];
 }
 
-// ── Auth - real Firebase auth ─────────────────────────────────────────────────
-
+// Auth - real Firebase auth
 export const auth = _initializedAuth;
 export const googleAuthProvider = new GoogleAuthProvider();
 export function getAuth() { return _initializedAuth; }
@@ -358,7 +353,6 @@ export async function signOut(): Promise<void> {
 
 export { onAuthStateChanged };
 
-// ── Auto-bootstrap: silently sign into Firebase if Drive tokens already exist ──
 
 if (typeof window !== "undefined") {
   const ipc = (window as Window & { ipcRenderer?: { invoke: (ch: string) => Promise<unknown> } }).ipcRenderer;
@@ -376,14 +370,13 @@ if (typeof window !== "undefined") {
   }
 }
 
-// ── firestore stub - first arg to collection()/doc(), ignored on desktop ───────
+// firestore stub - first arg to collection()/doc(), ignored on desktop
 export const firestore = null;
 
-// ── Web Drive token stub (no-op on desktop - token management is handled via IPC) ──
+// Web Drive token stub (no-op on desktop - token management is handled via IPC)
 export function storeAccessToken(_token: string): void {}
 
-// ── Drive sync ────────────────────────────────────────────────────────────────
-
+// Drive sync
 export async function syncToDrive(): Promise<void> {
   const ipc = (window as Window & { ipcRenderer?: { invoke: (ch: string, ...a: unknown[]) => Promise<unknown> } }).ipcRenderer;
   if (!ipc) throw new Error("IPC not available");

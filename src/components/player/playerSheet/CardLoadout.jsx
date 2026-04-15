@@ -4,7 +4,6 @@ import LockIcon from "@mui/icons-material/Lock";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import { useTranslate } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
@@ -53,7 +52,7 @@ export default function CardLoadout({
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);

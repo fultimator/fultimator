@@ -137,23 +137,23 @@ function PackRow({ pack, onSetActive, onDelete }: {
               }}>
                 <strong>{t("Items")}:</strong> {itemCountSummary(pack)}
               </Typography>
-              {(pack as any).fultimatorMinVersion && (
+              {pack.fultimatorMinVersion && (
                 <Typography variant="caption" sx={{
                   color: "text.secondary"
                 }}>
-                  <strong>{t("Min version")}:</strong> {(pack as any).fultimatorMinVersion}
+                  <strong>{t("Min version")}:</strong> {pack.fultimatorMinVersion}
                 </Typography>
               )}
-              {(pack as any).homepageUrl && (
+              {pack.homepageUrl && (
                 <Typography variant="caption">
                   <strong>{t("Homepage")}:</strong>{" "}
                   <a
-                    href={(pack as any).homepageUrl}
+                    href={pack.homepageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ display: "inline-flex", alignItems: "center", gap: 2 }}
                   >
-                    {(pack as any).homepageUrl}
+                    {pack.homepageUrl}
                     <OpenInNewIcon sx={{ fontSize: 12, ml: 0.25 }} />
                   </a>
                 </Typography>

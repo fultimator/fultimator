@@ -98,7 +98,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       setSource("official");
       setSelectedPackId(packs.length > 0 ? packs[0].id : "");
     }
-  }, [open, typeName]);
+  }, [open, typeName, packs]);
 
   // Set default pack when packs load
   useEffect(() => {

@@ -354,7 +354,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   const [rollDialog, setRollDialog] = useState(null);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   // Shared selectors
   const auxHandItem = getAuxHandItem(player);

@@ -191,7 +191,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="start"
-                      onClick={(e) => {
+                      onClick={() => {
                         setBonus(bonus - 1);
                       }}
                     >
@@ -202,7 +202,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="end"
-                      onClick={(e) => {
+                      onClick={() => {
                         setBonus(bonus + 1);
                       }}
                     >
@@ -238,7 +238,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="start"
-                      onClick={(e) => {
+                      onClick={() => {
                         setDamage(damage - 1);
                       }}
                     >
@@ -249,7 +249,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="end"
-                      onClick={(e) => {
+                      onClick={() => {
                         setDamage(damage + 1);
                       }}
                     >
@@ -284,7 +284,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="start"
-                      onClick={(e) => {
+                      onClick={() => {
                         setDl(dl - 1);
                       }}
                     >
@@ -295,7 +295,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="end"
-                      onClick={(e) => {
+                      onClick={() => {
                         setDl(dl + 1);
                       }}
                     >
@@ -330,7 +330,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="start"
-                      onClick={(e) => {
+                      onClick={() => {
                         setHp(hp - 5);
                       }}
                     >
@@ -341,7 +341,7 @@ export default function Probs() {
                     <IconButton
                       aria-label="toggle password visibility"
                       edge="end"
-                      onClick={(e) => {
+                      onClick={() => {
                         setHp(hp + 5);
                       }}
                     >

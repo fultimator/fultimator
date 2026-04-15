@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import SymbolistItem from "./SymbolistItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableSymbols } from "../spellOptionData";
 
 export default function SymbolistContentSection({ formState, setFormState, t }) {
-  const currentSymbols = formState.symbols || [];
+  const currentSymbols = useMemo(() => formState.symbols || [], [formState.symbols]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankSymbol = useCallback(() => {

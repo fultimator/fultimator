@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
@@ -112,15 +111,15 @@ export default function EditPlayerClasses({
     fileInputRef.current.value = null;
   });
 
-  const handleAddClass = () => {
-    if (selectedClass) {
-      if (selectedClass.name === "Blank Class") {
-        setDialogOpen(true);
-      } else {
-        addClassToPlayer(selectedClass.name, false);
-      }
-    }
-  };
+  // const handleAddClass = () => {
+  //   if (selectedClass) {
+  //     if (selectedClass.name === "Blank Class") {
+  //       setDialogOpen(true);
+  //     } else {
+  //       addClassToPlayer(selectedClass.name, false);
+  //     }
+  //   }
+  // };
 
   const addClassToPlayer = (name, isHomebrew) => {
     // Check if the selected class type already exists in player's classes
@@ -425,7 +424,7 @@ export default function EditPlayerClasses({
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-  const filteredClasses = selectedBook
+  const _filteredClasses = selectedBook
     ? classList.filter((cls) => cls.book === selectedBook)
     : classList;
 

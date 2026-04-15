@@ -17,11 +17,11 @@ import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
-import { Casino, RadioButtonUnchecked, RadioButtonChecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import { Casino, RadioButtonChecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
-import { isItemEquipped, validateSlots, deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
+import {   deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: "4px 8px", color: "#fff" });
@@ -78,7 +78,7 @@ export default function PlayerEquipment({
   searchQuery = '',
   onAddWeapon,
   onEditWeapon,
-  onAddCustomWeapon,
+  _onAddCustomWeapon,
   onEditCustomWeapon,
   onAddArmor,
   onEditArmor,
@@ -115,7 +115,7 @@ export default function PlayerEquipment({
     )
   );
 
-  const twinShields = {
+  const twinShields = useMemo(() => ({
     base: {
       category: "Brawling",
       name: "Twin Shields",
@@ -155,7 +155,7 @@ export default function PlayerEquipment({
     defModifier: 0,
     mDefModifier: 0,
     isEquipped: true,
-  };
+  }), [defensiveMasteryBonus, t]);
 
   const inv = player.equipment?.[0];
 
@@ -207,7 +207,7 @@ export default function PlayerEquipment({
     (inv.accessories || []).forEach((acc, i) => items.push({ ...acc, equipType: 'accessory', originalIndex: i }));
 
     return items;
-  }, [inv, player.classes]);
+  }, [inv]);
 
   const equippedShields = useMemo(() => allEquipment.filter(it => it.equipType === 'shield' && it.isEquipped), [allEquipment]);
 
@@ -229,7 +229,7 @@ export default function PlayerEquipment({
       });
     }
     return items;
-  }, [allEquipment, isMainTab, searchQuery, hasDualShieldBearer, equippedShields, t]);
+  }, [allEquipment, isMainTab, searchQuery, hasDualShieldBearer, equippedShields, twinShields, t]);
 
   const groupedItems = useMemo(() => {
     const groups = [

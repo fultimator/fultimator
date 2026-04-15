@@ -55,7 +55,7 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQuery = "" }) {
+export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -167,7 +167,7 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
               ) : null}
             </StyledTableCell>
             <StyledTableCell
-              onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('zeroPower', zeroPowerKey); }}
+              onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('zeroPower', zeroPowerKey); }}
               sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
             >
               <Typography

@@ -55,7 +55,7 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuery = "" }) {
+export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -162,7 +162,7 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('others', otherKey); }}
+                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('others', otherKey); }}
                     sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
                   >
                     <Typography

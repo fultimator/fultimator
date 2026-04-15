@@ -1,11 +1,9 @@
 import { TypeNpc } from '../../types/Npcs';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
+// Types
+// Pre-save transforms
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
-
-// ─── Pre-save transforms ──────────────────────────────────────────────────────
-
+// Post-load transforms
+// Migration detection
 const PRE_SAVE_TRANSFORMS: NpcTransform[] = [
   // No transforms yet - placeholder for future cleanup passes.
 ];
@@ -14,8 +12,7 @@ export function applyNpcPreSaveTransforms(npc: TypeNpc): TypeNpc {
   return PRE_SAVE_TRANSFORMS.reduce((n, fn) => fn(n), npc);
 }
 
-// ─── Post-load transforms ─────────────────────────────────────────────────────
-
+// Post-load transforms
 const POST_LOAD_TRANSFORMS: NpcTransform[] = [
   // No transforms yet - placeholder for future schema migrations.
 ];
@@ -24,8 +21,7 @@ export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
   return POST_LOAD_TRANSFORMS.reduce((n, fn) => fn(n), npc);
 }
 
-// ─── Migration detection ──────────────────────────────────────────────────────
-
+// Migration detection
 /**
  * Returns true if the NPC would be changed by applyNpcPostLoadTransforms.
  * Used by the gallery to detect actors that need a migration pass.

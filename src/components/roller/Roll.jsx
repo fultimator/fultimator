@@ -55,7 +55,7 @@ function RegularRoll({ roll }) {
           </Typography>
           <Typography sx={{ textAlign: "center" }}>
             {roll.username} -{" "}
-            {format(roll.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}
+            {format(roll.timestamp instanceof Date ? roll.timestamp : roll.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}
           </Typography>
         </Stack>
       </Stack>
@@ -279,7 +279,7 @@ function FabulaRoll({ roll, saveRoll, currentUser }) {
               <Typography key={i} sx={{ textAlign: "center" }}>
                 {roll.username} <Diamond /> {attempt.attempt[0]} ({roll.dice[0]}
                 ) <Diamond /> {attempt.attempt[1]} ({roll.dice[1]}) <Diamond />{" "}
-                {format(attempt.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}
+                {format(attempt.timestamp instanceof Date ? attempt.timestamp : attempt.timestamp.toDate(), "dd/MM/yyyy hh:mm:ss")}
               </Typography>
             );
           })}

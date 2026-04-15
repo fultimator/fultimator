@@ -18,7 +18,7 @@ import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
+export default function PlayerMagichant({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -27,7 +27,7 @@ export default function PlayerMagichant({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedTone, setSelectedTone] = useState(null);
-  const [selectedMagichantSpell, setSelectedMagichantSpell] = useState(null);
+  const [_selectedMagichantSpell, setSelectedMagichantSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (magichantSpell, tone) => {

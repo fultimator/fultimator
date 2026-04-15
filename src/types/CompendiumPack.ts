@@ -33,6 +33,8 @@ export interface CompendiumPack {
   active?: boolean;                    // absent or true = visible in viewer; false = hidden
   isPersonal: boolean;                 // cannot be deleted
   locked?: boolean;                    // when true, destructive actions are hidden
+  fultimatorMinVersion?: string;       // minimum Fultimator version required
+  homepageUrl?: string;                // URL to pack's homepage or repository
   createdAt: number;
   updatedAt: number;
   items: CompendiumItem[];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useLocation } from "react-router";
+import { useParams } from "react-router";
 import Layout from "../../components/Layout";
 import {
   Typography,
@@ -30,7 +30,7 @@ import { useNavigate } from "react-router";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import { SignIn } from "../../components/auth";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
 export default function CombatSimulator() {

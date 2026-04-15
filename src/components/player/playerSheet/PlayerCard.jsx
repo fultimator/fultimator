@@ -1,6 +1,5 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
 import {
-  Grid,
   Typography,
   LinearProgress,
   FormControlLabel,
@@ -21,7 +20,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
-import { Add, Remove, Casino, SwapHoriz, Edit } from "@mui/icons-material";
+import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
@@ -886,7 +885,7 @@ export default function PlayerCard({
           </Box>
         </Box>
       </Box>
-      {/* ── Affinity Strip ── */}
+      {/* Affinity Strip */}
       <AffinityStrip>
         {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
           <AffinityCell key={type}>

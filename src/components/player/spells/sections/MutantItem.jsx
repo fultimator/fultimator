@@ -43,7 +43,7 @@ export default function MutantItem({
     item.name === "mutant_therioform_custom_name" ||
     !availableTherioforms.find((t) => t.name === item.name);
   const [expanded, setExpanded] = useState(false);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
     onConfirm: () => {},
   });;
 

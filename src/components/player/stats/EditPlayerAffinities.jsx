@@ -11,12 +11,12 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-import { TypeIcon, typeList, TypeName } from "../../types";
+import { TypeIcon, TypeName } from "../../types";
+import { typeList } from "../../typeConstants";
 
 export default function EditPlayerAffinities({
   player,
-  setPlayer,
-  isEditMode,
+  setPlayer
 }) {
   const { t } = useTranslate();
   const theme = useTheme();

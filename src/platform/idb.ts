@@ -47,23 +47,36 @@ export function getDb(): Promise<IDBPDatabase> {
   return dbPromise;
 }
 
-// ── Pending sync flag - set on any write, cleared after a successful Drive sync ─
+// Pending sync flag - set on any write, cleared after a successful Drive sync
 
 const PENDING_SYNC_KEY = "fultimator_pending_sync";
 const PENDING_SYNC_EVENT = "fultimator:sync-pending-changed";
 
 export function markPendingSync(): void {
-  try { localStorage.setItem(PENDING_SYNC_KEY, "1"); } catch {}
+  try {
+    localStorage.setItem(PENDING_SYNC_KEY, "1");
+  } catch {
+    // localStorage not available
+  }
   window.dispatchEvent(new Event(PENDING_SYNC_EVENT));
 }
 
 export function clearPendingSync(): void {
-  try { localStorage.removeItem(PENDING_SYNC_KEY); } catch {}
+  try {
+    localStorage.removeItem(PENDING_SYNC_KEY);
+  } catch {
+    // localStorage not available
+  }
   window.dispatchEvent(new Event(PENDING_SYNC_EVENT));
 }
 
 export function hasPendingSync(): boolean {
-  try { return localStorage.getItem(PENDING_SYNC_KEY) === "1"; } catch { return false; }
+  try {
+    return localStorage.getItem(PENDING_SYNC_KEY) === "1";
+  } catch {
+    // localStorage not available
+    return false;
+  }
 }
 
 export function usePendingSync(): boolean {
@@ -76,8 +89,7 @@ export function usePendingSync(): boolean {
   return pending;
 }
 
-// ── Pub/sub - write operations notify subscribers so hooks re-fetch ────────────
-
+// Pub/sub - write operations notify subscribers so hooks re-fetch
 type Listener = () => void;
 const storeListeners = new Map<string, Set<Listener>>();
 

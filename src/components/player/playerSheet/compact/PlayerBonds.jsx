@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Paper,
   Typography,
@@ -25,7 +25,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { useTheme } from "@mui/material/styles";
@@ -77,14 +76,14 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
     onConfirm: () => {},
   });;
 
-  const bonds = player.info?.bonds ?? [];
+  const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (editBondIndex !== null && bonds[editBondIndex]) {
       setDraftBond({ ...bonds[editBondIndex] });
     }
-  }, [editBondIndex]);
+  }, [editBondIndex, bonds]);
 
   const closeModal = () => {
     setEditBondIndex(null);

@@ -41,7 +41,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   };
 
   const components = {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 

@@ -16,7 +16,7 @@ import React from "react";
     isExpanded = true,
     //handleAccordionChange,
     headerText = "",
-    showIconButton = false,
+    // showIconButton = false,
     icon = null,
     addItem = null,
     openCompendium = null,

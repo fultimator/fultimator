@@ -3,7 +3,6 @@ import {
   Box, Card, Stack, Grid, Typography, Chip,
   Accordion, AccordionSummary, AccordionDetails, Divider,
 } from "@mui/material";
-import Clock from "../player/playerSheet/Clock";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -3287,7 +3286,7 @@ export const HeroicCard = React.memo(function HeroicCard({ heroic, id, onHeaderC
 // OptionalCard (dispatcher → QuirkCard | ZeroPowerCard | GenericOptionalCard)
 // 
 
-function QuirkCard({ item, customTheme, t }) {
+function QuirkCard({ item, customTheme, _t }) {
   const background =
     customTheme.mode === "dark"
       ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
@@ -3354,7 +3353,7 @@ function CampActivitiesCard({ item, customTheme, t }) {
   );
 }
 
-function ZeroTriggerCard({ item, customTheme, t }) {
+function ZeroTriggerCard({ item, customTheme, _t }) {
   const background =
     customTheme.mode === "dark"
       ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
@@ -3378,7 +3377,7 @@ function ZeroTriggerCard({ item, customTheme, t }) {
   );
 }
 
-function ZeroEffectCard({ item, customTheme, t }) {
+function ZeroEffectCard({ item, customTheme, _t }) {
   const background =
     customTheme.mode === "dark"
       ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
@@ -3408,7 +3407,7 @@ function ZeroPowerCard({ item, customTheme, t }) {
       ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`
       : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`;
 
-  const sections = item.clock?.sections ?? 6;
+  const _sections = item.clock?.sections ?? 6;
   const triggerName = typeof item.zeroTrigger === "string" ? item.zeroTrigger : item.zeroTrigger?.name ?? "";
   const triggerDesc = typeof item.zeroTrigger === "object" ? item.zeroTrigger?.description ?? "" : "";
   const effectName = typeof item.zeroEffect === "string" ? item.zeroEffect : item.zeroEffect?.name ?? "";
@@ -3452,7 +3451,7 @@ function ZeroPowerCard({ item, customTheme, t }) {
   );
 }
 
-function GenericOptionalCard({ item, customTheme, t }) {
+function GenericOptionalCard({ item, customTheme, _t }) {
   const background =
     customTheme.mode === "dark"
       ? `linear-gradient(90deg, ${customTheme.ternary}, rgba(24, 26, 27, 0) 100%)`

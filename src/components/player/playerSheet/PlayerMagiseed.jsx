@@ -24,6 +24,7 @@ import { magiseeds } from "../../../libs/floralistMagiseedData";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import ReactMarkdown from "react-markdown";
 
 export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -34,7 +35,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedSeed, setSelectedSeed] = useState(null);
-  const [selectedMagiseedSpell, setSelectedMagiseedSpell] = useState(null);
+  const [_selectedMagiseedSpell, setSelectedMagiseedSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (magiseedSpell, seed) => {

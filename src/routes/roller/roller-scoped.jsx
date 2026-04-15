@@ -214,7 +214,7 @@ function PreparedRolls({ user, scope, createRoll }) {
     };
   };
 
-  const [rolls, success, err] = useCollectionData(preparedRollsQuery, {
+  const [rolls, _success, _err] = useCollectionData(preparedRollsQuery, {
     idField: "id",
   });
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
@@ -21,13 +21,11 @@ import {
   Checkbox,
   Select,
   MenuItem,
-  TextField,
   FormControl,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Fade,
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -53,7 +51,7 @@ import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
-import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
+import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
@@ -99,7 +97,6 @@ import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
 import PlayerDance from "../../components/player/playerSheet/PlayerDance";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 import { fixVerticalLabels } from "../../utility/screenshotFix";
-import { isItemEquipped } from '../../components/player/equipment/slots/equipmentSlots';
 import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
 import classList from "../../libs/classes";
 import PlayerLoadout from '../../components/player/playerSheet/PlayerLoadout';
@@ -158,7 +155,7 @@ export default function PlayerEdit() {
   const isUsingLocalDb = resolvedMode === "local";
   const db = isUsingLocalDb ? localDb : cloudDb;
   const ref = isUsingLocalDb ? localRef : cloudRef;
-  const activeSetDoc = (r, data) => db.setDoc(r, data);
+  const activeSetDoc = useCallback((r, data) => db.setDoc(r, data), [db]);
   const player = isUsingLocalDb ? localPlayer : cloudPlayer;
   const playerLoading = isUsingLocalDb ? localLoading : cloudLoading;
   const playerError = isUsingLocalDb ? localError : cloudError;
@@ -198,7 +195,7 @@ export default function PlayerEdit() {
         activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
       }
     },
-    [ref, playerTemp, compactView, isOwner]
+    [ref, playerTemp, compactView, isOwner, activeSetDoc]
   );
 
   useEffect(() => {
@@ -338,39 +335,39 @@ export default function PlayerEdit() {
     }
   };
 
-  const checkEquipment = () => {
-    if (playerTemp) {
-      const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
-        playerClass.skills.some(
-          (skill) =>
-            skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-        )
-      );
+  // const checkEquipment = () => {
+  //   if (playerTemp) {
+  //     const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
+  //       playerClass.skills.some(
+  //         (skill) =>
+  //           skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
+  //       )
+  //     );
       
-      const inv = playerTemp.equipment?.[0];
-      const equippedShields =
-        inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
+  //     const inv = playerTemp.equipment?.[0];
+  //     const equippedShields =
+  //       inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
 
-      if (!hasDualShieldBearer && equippedShields.length > 1) {
-        // Unequip all shields but the first one
-        setPlayerTemp((prevPlayer) => {
-          const inv = prevPlayer.equipment?.[0];
-          if (!inv) return prevPlayer;
-          const newShields = inv.shields.map((shield, index) => ({
-            ...shield,
-            isEquipped:
-              index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
-          }));
+  //     if (!hasDualShieldBearer && equippedShields.length > 1) {
+  //       // Unequip all shields but the first one
+  //       setPlayerTemp((prevPlayer) => {
+  //         const inv = prevPlayer.equipment?.[0];
+  //         if (!inv) return prevPlayer;
+  //         const newShields = inv.shields.map((shield, index) => ({
+  //           ...shield,
+  //           isEquipped:
+  //             index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
+  //         }));
 
-          const updatedInv = { ...inv, shields: newShields };
-          return {
-            ...prevPlayer,
-            equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
-          };
-        });
-      }
-    }
-  };
+  //         const updatedInv = { ...inv, shields: newShields };
+  //         return {
+  //           ...prevPlayer,
+  //           equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
+  //         };
+  //       });
+  //     }
+  //   }
+  // };
 
   const handleBugDialogClose = () => {
     setIsBugDialogOpen(false);
@@ -1206,14 +1203,14 @@ const Tab = styled(BaseTab)(({ theme }) => ({
   },
 }));
 
-const TabPanel = styled(BaseTabPanel)(({ theme }) => ({
+const TabPanel = styled(BaseTabPanel)(() => ({
   width: "100%",
   fontFamily: "IBM Plex Sans, sans-serif",
   fontSize: "0.875rem",
 }));
 
 const TabsList = styled(BaseTabsList)(
-  ({ primary, secondary, ternary }) => `
+  ({ primary, _secondary, _ternary }) => `
     min-width: 400px;
     background-color: ${primary};
     border-radius: 12px;

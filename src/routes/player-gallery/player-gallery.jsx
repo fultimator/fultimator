@@ -60,7 +60,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { validateCharacter } from "../../utility/validateJson";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
@@ -134,13 +134,26 @@ function Personal() {
     db.query(db.collection("player-personal"))
   );
 
+  const [snackMsg, setSnackMsg] = useState(null);
+
+  // Migration
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+
+  // Select mode
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [copyAnchor, setCopyAnchor] = useState(null);
+  const [moveAnchor, setMoveAnchor] = useState(null);
+
   if (err?.code === "quota-exceeded") {
     return (
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
-        )}
-      </Paper>
+      <Layout>
+        <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+          {t(
+            "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+          )}
+        </Paper>
+      </Layout>
     );
   }
 
@@ -313,7 +326,6 @@ function Personal() {
     }
   };
 
-  const [snackMsg, setSnackMsg] = useState(null);
   const notify = (msg) => setSnackMsg(msg);
 
   const uniqueName = (name, existingNames) => {
@@ -389,8 +401,6 @@ function Personal() {
     } catch { notify(t("Failed to move to Cloud")); }
   };
 
-  // ── Migration ────────────────────────────────────────────────────────────────
-  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
   const stalePlayers = (personalList ?? []).filter(playerNeedsMigration);
 
   const handleMigrateAllPlayers = async (actors) => {
@@ -400,12 +410,6 @@ function Personal() {
       await db.setDoc(ref, applyPreSaveTransforms(migrated));
     }
   };
-
-  // ── Select mode ──────────────────────────────────────────────────────────────
-  const [selectMode, setSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState(new Set());
-  const [copyAnchor, setCopyAnchor] = useState(null);
-  const [moveAnchor, setMoveAnchor] = useState(null);
 
   const toggleSelectMode = () => {
     setSelectMode((prev) => {
@@ -605,7 +609,7 @@ function Personal() {
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
-          {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
+          {/* Zone 1: Filters */}
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={{
@@ -655,7 +659,7 @@ function Personal() {
 
           <Divider sx={{ my: 0.75 }} />
 
-          {/* ── Actions + Status (single row) ───────────────────────────────── */}
+          {/* Actions + Status (single row) */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
             <Button variant="contained" startIcon={<HistoryEdu />} onClick={addPlayer} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create Player")}
@@ -739,7 +743,7 @@ function Personal() {
             </Tooltip>
           </Box>
 
-          {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
+          {/* Select mode sub-bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
               <Typography variant="body2" sx={{

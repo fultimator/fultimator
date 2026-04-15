@@ -58,7 +58,6 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { NoteAlt } from "@mui/icons-material";
-import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Available note colors

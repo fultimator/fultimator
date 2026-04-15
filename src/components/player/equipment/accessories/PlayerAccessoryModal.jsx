@@ -52,7 +52,7 @@ export default function PlayerAccessoryModal({
     precModifier, setPrecModifier,
     damageMeleeModifier, setDamageMeleeModifier,
     damageRangedModifier, setDamageRangedModifier,
-    isEquipped, setIsEquipped,
+    _isEquipped, _setIsEquipped,
     modifiersExpanded, setModifiersExpanded,
     expandModifiers,
     modifiers,

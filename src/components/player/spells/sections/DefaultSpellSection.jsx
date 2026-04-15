@@ -14,17 +14,17 @@ import { OffensiveSpellIcon } from "../../../icons";
 import CustomTextarea from "../../../common/CustomTextarea";
 import attributes from "../../../../libs/attributes";
 
-const DURATION_OPTIONS = ["Scene", "Instantaneous", "Special"];
-const TARGET_OPTIONS = [
-  "Self",
-  "One creature",
-  "Up to two creatures",
-  "Up to three creatures",
-  "Up to four creatures",
-  "Up to five creatures",
-  "One equipped weapon",
-  "Special",
-];
+// const DURATION_OPTIONS = ["Scene", "Instantaneous", "Special"];
+// const TARGET_OPTIONS = [
+//   "Self",
+//   "One creature",
+//   "Up to two creatures",
+//   "Up to three creatures",
+//   "Up to four creatures",
+//   "Up to five creatures",
+//   "One equipped weapon",
+//   "Special",
+// ];
 
 export default function DefaultSpellSection({
   formState,

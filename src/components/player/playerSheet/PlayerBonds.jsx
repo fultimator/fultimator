@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Paper, Grid, Typography, Divider, Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Checkbox, FormControlLabel } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -27,7 +27,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
     onConfirm: () => {},
   });;
 
-  const bonds = player.info?.bonds ?? [];
+  const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
 
   useEffect(() => {
     if (editBondIndex !== null && bonds[editBondIndex]) {

@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import MagichantToneItem from "./MagichantToneItem";
 import { availableMagichantTones } from "../spellOptionData";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 
 export default function MagichantTonesContentSection({ formState, setFormState, t }) {
-  const currentTones = formState.tones || [];
+  const currentTones = useMemo(() => formState.tones || [], [formState.tones]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankTone = useCallback(() => {

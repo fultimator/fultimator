@@ -37,7 +37,6 @@ import { OffensiveSpellIcon } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import { useTranslate } from "../../translation/translate";
-import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useEquipmentForm } from "../player/common/hooks/useEquipmentForm";
 import types from "../../libs/types";
@@ -1646,12 +1645,12 @@ function HeroicPanel() {
 
 // Class panel (inline form)
 
-const BLANK_BENEFITS = {
-  hpplus: 0, mpplus: 0, ipplus: 0, isCustomBenefit: false,
-  martials: { armor: false, shields: false, melee: false, ranged: false },
-  rituals: { ritualism: false },
-  custom: [], spellClasses: [],
-};
+// const BLANK_BENEFITS = {
+//   hpplus: 0, mpplus: 0, ipplus: 0, isCustomBenefit: false,
+//   martials: { armor: false, shields: false, melee: false, ranged: false },
+//   rituals: { ritualism: false },
+//   custom: [], spellClasses: [],
+// };
 
 const BLANK_SKILL = { skillName: "", maxLvl: 1, description: "", specialSkill: "", currentLvl: 0 };
 
@@ -2734,7 +2733,7 @@ function AccessoryPanel() {
     damageMeleeModifier, setDamageMeleeModifier,
     damageRangedModifier, setDamageRangedModifier,
     modifiersExpanded, setModifiersExpanded,
-    modifiers,
+    _modifiers,
     clearModifiers,
   } = useEquipmentForm(null);
 

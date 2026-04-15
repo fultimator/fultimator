@@ -9,19 +9,19 @@ import {
   Armor,
   Shields,
   Accessories,
+  Spells,
 } from '../../../../types/Players';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
+// Types
+// Vehicle helpers
 export type AnyEquipmentItem =
   | Weapons
   | CustomWeapons
   | Armor
   | Shields
   | Accessories;
-
+// deriveVehicleSlots
 export type ResolvedPlayerItem = AnyEquipmentItem;
-
+// deriveEquippedSlots
 export type ResolvedVehicleModule = {
   name: string;
   type: string;
@@ -42,35 +42,34 @@ export type ResolvedVehicleModule = {
   description?: string;
   isComplex?: boolean;
 };
-
+// isItemEquipped
 export type ResolvedVehicle = {
   customName: string;
   enabled: boolean;
   modules: ResolvedVehicleModule[];
 };
-
+// isTwoHandedEquipped
 export type ResolvedSlot =
   | { kind: 'playerItem'; item: ResolvedPlayerItem }
   | { kind: 'vehicleModule'; module: ResolvedVehicleModule; vehicle: ResolvedVehicle };
-
-// ─── Vehicle helpers ──────────────────────────────────────────────────────────
-
+// validateSlots
+// resolveEffectiveSlot
 /** Find the pilot spell, if any. */
-function findPilotSpell(player: TypePlayer): { vehicles: ResolvedVehicle[] } | null {
+function findPilotSpell(player: TypePlayer): Spells | null {
   for (const cls of player.classes ?? []) {
     for (const spell of cls.spells ?? []) {
-      if ((spell as any).spellType === 'pilot-vehicle') return spell as any;
+      if (spell.spellType === 'pilot-vehicle') return spell;
     }
   }
   return null;
 }
-
-function getPilotVehicles(pilotSpell: any): ResolvedVehicle[] {
+// rehydrateIsEquipped
+function getPilotVehicles(pilotSpell: Spells | null): ResolvedVehicle[] {
   if (!pilotSpell) return [];
   const vehicles = pilotSpell.vehicles ?? pilotSpell.currentVehicles ?? [];
-  return Array.isArray(vehicles) ? vehicles : [];
+  return Array.isArray(vehicles) ? (vehicles as ResolvedVehicle[]) : [];
 }
-
+// syncSlots
 /** Return the currently enabled vehicle, or null. */
 export function getActiveVehicle(player: TypePlayer): ResolvedVehicle | null {
   const pilot = findPilotSpell(player);
@@ -78,7 +77,6 @@ export function getActiveVehicle(player: TypePlayer): ResolvedVehicle | null {
   return getPilotVehicles(pilot).find(v => v.enabled) ?? null;
 }
 
-// ─── deriveVehicleSlots ───────────────────────────────────────────────────────
 
 /**
  * Build VehicleSlots from the active vehicle's module state.
@@ -128,7 +126,6 @@ export function deriveVehicleSlots(player: TypePlayer): VehicleSlots {
   return slots;
 }
 
-// ─── deriveEquippedSlots ──────────────────────────────────────────────────────
 
 /**
  * Build EquippedSlots by scanning `isEquipped` flags on the player's item
@@ -145,7 +142,7 @@ export function deriveVehicleSlots(player: TypePlayer): VehicleSlots {
 export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
   const hasDualShieldBearer = player.classes?.some(cls =>
     cls.skills?.some(
-      sk => (sk as any).specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1
+      sk => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1
     )
   ) ?? false;
 
@@ -220,7 +217,6 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
   return slots;
 }
 
-// ─── isItemEquipped ───────────────────────────────────────────────────────────
 
 /**
  * Compatibility shim — use this instead of reading item.isEquipped directly
@@ -239,16 +235,16 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
  */
 export function isItemEquipped(player: TypePlayer, item: AnyEquipmentItem): boolean {
   const slots = player.equippedSlots;
-  if (!slots) return (item as any).isEquipped ?? false;
+  if (!slots) return item.isEquipped ?? false;
 
-  const name = (item as any).name as string;
+  const name = item.name;
   const inv  = player.equipment?.[0];
 
   const matchesRef = (ref: SlotRef | null | undefined): boolean => {
     if (!ref || ref.name !== name) return false;
     if (ref.index !== undefined) {
       // Index-aware match: only the item at that exact position qualifies
-      const arr = (inv as any)?.[ref.source] as AnyEquipmentItem[] | undefined;
+      const arr = inv?.[ref.source as keyof typeof inv] as AnyEquipmentItem[] | undefined;
       return arr?.[ref.index] === item;
     }
     // Legacy: name-only (backward compat for refs without an index)
@@ -263,7 +259,6 @@ export function isItemEquipped(player: TypePlayer, item: AnyEquipmentItem): bool
   );
 }
 
-// ─── isTwoHandedEquipped ──────────────────────────────────────────────────────
 
 /**
  * Returns true when Main Hand holds a two-handed weapon OR any customWeapon.
@@ -280,7 +275,6 @@ export function isTwoHandedEquipped(player: TypePlayer): boolean {
   return w?.isTwoHand || false;
 }
 
-// ─── validateSlots ────────────────────────────────────────────────────────────
 
 /**
  * Reconcile equippedSlots against the current inventory.
@@ -296,7 +290,7 @@ export function validateSlots(player: TypePlayer): TypePlayer {
 
   const hasDualShieldBearer = player.classes?.some(cls =>
     cls.skills?.some(
-      sk => (sk as any).specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1
+      sk => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1
     )
   ) ?? false;
 
@@ -307,10 +301,10 @@ export function validateSlots(player: TypePlayer): TypePlayer {
   // Returns false if the item referenced by ref no longer exists in inventory
   const isValid = (ref: SlotRef | null | undefined): boolean => {
     if (!ref) return true;
-    const arr = (inv as any)?.[ref.source] as AnyEquipmentItem[] | undefined;
+    const arr = inv?.[ref.source as keyof typeof inv] as AnyEquipmentItem[] | undefined;
     if (!arr) return false;
     if (ref.index !== undefined) return !!arr[ref.index];
-    return arr.some((it: any) => it.name === ref.name);
+    return arr.some((it: AnyEquipmentItem) => it.name === ref.name);
   };
 
   if (!isValid(slots.mainHand))  slots.mainHand  = null;
@@ -337,7 +331,6 @@ export function validateSlots(player: TypePlayer): TypePlayer {
   return { ...player, equippedSlots: slots };
 }
 
-// ─── resolveEffectiveSlot ─────────────────────────────────────────────────────
 
 /**
  * Return what is *effectively* occupying a slot right now.
@@ -374,16 +367,15 @@ export function resolveEffectiveSlot(
   if (!ref) return null;
 
   const inv = player.equipment?.[0];
-  const arr = (inv as any)?.[ref.source] as ResolvedPlayerItem[] | undefined;
+  const arr = inv?.[ref.source as keyof typeof inv] as ResolvedPlayerItem[] | undefined;
   const item = ref.index !== undefined
     ? arr?.[ref.index]
-    : arr?.find((it: any) => it.name === ref.name);
+    : arr?.find((it: ResolvedPlayerItem) => it.name === ref.name);
   if (!item) return null;
 
   return { kind: 'playerItem', item };
 }
 
-// ─── rehydrateIsEquipped ─────────────────────────────────────────────────────
 
 /**
  * Re-stamps `isEquipped` on all inventory items using `equippedSlots` as the
@@ -423,7 +415,6 @@ export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
   return { ...player, equipment };
 }
 
-// ─── syncSlots ────────────────────────────────────────────────────────────────
 
 /**
  * After any equip change, call this to re-derive both slot caches and

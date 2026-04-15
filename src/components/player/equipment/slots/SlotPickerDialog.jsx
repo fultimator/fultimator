@@ -66,7 +66,7 @@ export default function SlotPickerDialog({
       setHoveredModule(null);
       setPendingModule(null);
     }
-  }, [open]);
+  }, [open, openModuleOverride]);
 
   const hasDualShieldBearer = player?.classes?.some(cls =>
     cls.skills?.some(
@@ -174,7 +174,7 @@ export default function SlotPickerDialog({
         if (mainHandHasTwoHanded) return [];
         const oneHanded = (inv.weapons ?? [])
           .filter(w => !(w.hands === 2 || w.isTwoHand))
-          .map((w, _, arr) => {
+          .map((w, _, _arr) => {
             const i = (inv.weapons ?? []).indexOf(w);
             return { label: w.name, sub: formatWeapon(w), source: 'weapons', item: w, index: i };
           });

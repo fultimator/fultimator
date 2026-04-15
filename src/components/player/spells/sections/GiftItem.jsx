@@ -41,7 +41,7 @@ export default function GiftItem({
 
   const isCustom = item.name === "esper_gift_custom_name";
   const [expanded, setExpanded] = useState(false);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
     onConfirm: () => {},
   });;
 

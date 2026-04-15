@@ -63,8 +63,9 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
 
                 {/* First Row */}
                 <Grid
-                  container sx={{ justifyContent: "space-between", alignItems: "center" }}
-                  sx={{
+                  container sx={{
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                     px: "10px",
                     py: "5px",
@@ -226,8 +227,8 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 <>
                   {/* Pulse Benefit */}
                   <Grid
-                    container sx={{ justifyContent: "space-between" }}
-                    sx={{
+                    container sx={{
+                      justifyContent: "space-between",
                       borderTop: `1px solid ${theme.primary}`,
                     }}>
                     {/* Pulse Grid Item */}

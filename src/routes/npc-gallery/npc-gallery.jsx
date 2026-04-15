@@ -63,7 +63,7 @@ import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
@@ -244,7 +244,7 @@ function Personal() {
       const docRef = await db.addDoc(db.collection("npc-personal"), data);
       notify(t("NPC copied"));
       setTimeout(() => { window.location.href = `/npc-gallery/${docRef.id}`; }, 800);
-    } catch (e) {
+    } catch {
       notify(t("Failed to copy NPC"));
     }
   };
@@ -285,8 +285,7 @@ function Personal() {
   const [moveAnchor, setMoveAnchor] = useState(null);
   const [exportAnchor, setExportAnchor] = useState(null);
 
-  // ── Bulk cross-DB copy / move ────────────────────────────────────────────────
-
+  // Bulk cross-DB copy / move
   const bulkCopyToDb = async (npcs, targetDb) => {
     for (const npc of npcs) {
       const data = { ...npc, published: false };
@@ -481,7 +480,6 @@ function Personal() {
 
           return true;
         })
-        // eslint-disable-next-line array-callback-return
         .sort((item1, item2) => {
           if (direction === "ascending") {
             if (sort === "name") return item1.name.localeCompare(item2.name);
@@ -544,7 +542,7 @@ function Personal() {
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
-          {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
+          {/* Zone 1: Filters */}
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={{
@@ -676,7 +674,7 @@ function Personal() {
 
           <Divider sx={{ my: 0.75 }} />
 
-          {/* ── Actions + Status (single row) ───────────────────────────────── */}
+          {/* Actions + Status (single row) */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
             <Button variant="contained" startIcon={<HistoryEdu />} onClick={addNpc} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create NPC")}
@@ -770,7 +768,7 @@ function Personal() {
             </Tooltip>
           </Box>
 
-          {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
+          {/* Select mode sub-bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
               <Typography variant="body2" sx={{
@@ -1058,7 +1056,7 @@ function Personal() {
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbMode, selectMode, isSelected, onToggleSelect, onRegisterDownload, copyNpcToLocal, copyNpcToCloud, moveNpcToLocal, moveNpcToCloud }) {
+function Npc({ npc, _copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbMode, selectMode, isSelected, onToggleSelect, onRegisterDownload, copyNpcToLocal, copyNpcToCloud, moveNpcToLocal, moveNpcToCloud }) {
   const { t } = useTranslate();
   const { cloudUser } = useDatabaseContext();
   const ref = useRef();

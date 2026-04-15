@@ -25,7 +25,7 @@ function validateCredentials() {
 // Spins up a temporary local HTTP server so the redirect_uri is
 // http://127.0.0.1:<random-port> - Google allows any port on 127.0.0.1
 // for "Desktop app" OAuth clients without registering each port.
-export async function loginGoogle(): Promise<any> {
+export async function loginGoogle() {
   validateCredentials();
   return new Promise((resolve, reject) => {
     const server = http.createServer();
@@ -81,7 +81,7 @@ export async function loginGoogle(): Promise<any> {
           OAuth2.setCredentials(tokens);
           store.set("googleTokens", tokens);
           resolve(tokens);
-        } catch (e) {
+        } catch (e: unknown) {
           reject(e);
         }
       });
@@ -105,15 +105,17 @@ export async function checkAuth() {
 
   // Check if the token is expired
   const now = new Date().getTime();
-  const expiryDate = (tokens as any).expiry_date || 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const expiryDate = ((tokens as any).expiry_date as number) || 0;
 
   if (now >= expiryDate) {
     console.log("Token expired, refreshing...");
     try {
       const { credentials } = await OAuth2.refreshAccessToken();
-      store.set("googleTokens", credentials);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      store.set("googleTokens", credentials as any);
       return { isAuthenticated: true, tokens: credentials };
-    } catch (error) {
+    } catch {
       store.delete("googleTokens");
       return { isAuthenticated: false };
     }
@@ -244,7 +246,7 @@ export async function listGoogleDriveFiles() {
   }
 }
 
-// ── Token accessors (used by IPC handler to pass id_token to renderer) ────────
+// Token accessors (used by IPC handler to pass id_token to renderer)
 
 export function getStoredIdToken(): string | null {
   const tokens = store.get("googleTokens") as Record<string, string> | undefined;

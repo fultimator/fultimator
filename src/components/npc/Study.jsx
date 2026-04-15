@@ -1,6 +1,7 @@
 import React from "react";
 import { Grid, Typography } from "@mui/material";
-import { calcHP, calcMP, Rank, Stats, Attacks, Spells } from "./Pretty";
+import { Rank, Stats, Attacks, Spells } from "./Pretty";
+import { calcHP, calcMP } from "../../libs/npcs";
 import Diamond from "../Diamond";
 import { useTranslate } from "../../translation/translate";
 const Study = ({ npc, study }) => {

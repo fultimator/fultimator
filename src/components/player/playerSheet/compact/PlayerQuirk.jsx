@@ -103,7 +103,7 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
             </StyledTableCell>
             <StyledTableCell
               colSpan={4}
-              onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('quirk', quirkKey); }}
+              onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('quirk', quirkKey); }}
               sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
             >
               <Typography

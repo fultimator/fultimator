@@ -27,32 +27,32 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
     setFormState((prev) => ({ ...prev, showInPlayerSheet: e.target.checked }));
   };
 
-  const getAvailableInvocations = (level) => {
-    const availableTypes = [];
-    switch (level) {
-      case 1:
-        availableTypes.push("Blast");
-        break;
-      case 2:
-        availableTypes.push("Blast", "Hex");
-        break;
-      case 3:
-        availableTypes.push("Blast", "Hex", "Utility");
-        break;
-      default:
-        return [];
-    }
+  // const getAvailableInvocations = (level) => {
+  //   const availableTypes = [];
+  //   switch (level) {
+  //     case 1:
+  //       availableTypes.push("Blast");
+  //       break;
+  //     case 2:
+  //       availableTypes.push("Blast", "Hex");
+  //       break;
+  //     case 3:
+  //       availableTypes.push("Blast", "Hex", "Utility");
+  //       break;
+  //     default:
+  //       return [];
+  //   }
 
-    const invocations = [];
-    Object.entries(invocationsByWellspring).forEach(([wellspring, invs]) => {
-      invs.forEach((inv) => {
-        if (availableTypes.includes(inv.type)) {
-          invocations.push({ ...inv, wellspring });
-        }
-      });
-    });
-    return invocations;
-  };
+  //   const invocations = [];
+  //   Object.entries(invocationsByWellspring).forEach(([wellspring, invs]) => {
+  //     invs.forEach((inv) => {
+  //       if (availableTypes.includes(inv.type)) {
+  //         invocations.push({ ...inv, wellspring });
+  //       }
+  //     });
+  //   });
+  //   return invocations;
+  // };
 
   return (
     <Grid container spacing={3}>
@@ -137,7 +137,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
         </Typography>
         <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
           {(() => {
-            const availableTypes = [];
+            const _availableTypes = [];
             switch (skillLevel) {
               case 1:
                 return <Typography>{t("Blast")}</Typography>;

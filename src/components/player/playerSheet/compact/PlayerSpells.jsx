@@ -214,15 +214,11 @@ function collectStringValues(value, bag = []) {
   return bag;
 }
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function highlightMarkdownText(text, query) {
-  if (!text || !query) return text;
-  const pattern = new RegExp(`(${escapeRegExp(query)})`, "ig");
-  return String(text).replace(pattern, "<mark>$1</mark>");
-}
+// function highlightMarkdownText(text, query) {
+//   if (!text || !query) return text;
+//   const pattern = new RegExp(`(${escapeRegExp(query)})`, "ig");
+//   return String(text).replace(pattern, "<mark>$1</mark>");
+// }
 
 function getSpellModalSections(spellType) {
   const sectionMap = {
@@ -349,13 +345,13 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
   }
 }
 
-export default function PlayerSpellsFull({ player, setPlayer, isCharacterSheet, searchQuery = '' }) {
+export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
 
   const [editingSpell, setEditingSpell] = useState(null);
-  const [editingSpellIndex, setEditingSpellIndex] = useState(null);
+  const [_editingSpellIndex, setEditingSpellIndex] = useState(null);
   const [editingSpellClassIndex, setEditingSpellClassIndex] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [magitechModalOpen, setMagitechModalOpen] = useState(false);

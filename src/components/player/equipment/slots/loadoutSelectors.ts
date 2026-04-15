@@ -1,4 +1,4 @@
-import { TypePlayer } from '../../../../types/Players';
+import { TypePlayer, PlayerClass, Spells, Skills } from '../../../../types/Players';
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
@@ -12,7 +12,7 @@ import { getModuleTypeForLimits } from '../../spells/vehicleReducer';
 // Types
 
 export type PilotSpellInfo = {
-  spell: any;
+  spell: Spells;
   classIndex: number;
   spellIndex: number;
 };
@@ -43,8 +43,8 @@ export type AuxHandItem = {
  */
 export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
   for (const [ci, cls] of (player.classes ?? []).entries()) {
-    for (const [si, spell] of ((cls as any).spells ?? []).entries()) {
-      if ((spell as any).spellType === 'pilot-vehicle') {
+    for (const [si, spell] of (cls.spells ?? []).entries()) {
+      if (spell.spellType === 'pilot-vehicle') {
         return { spell, classIndex: ci, spellIndex: si };
       }
     }
@@ -79,15 +79,15 @@ export function getEquippedModuleForSlot(player: TypePlayer, slot: string): Inde
   const activeMods = mods.filter(m => m.enabled || m.equipped);
   return (
     activeMods.find(m => {
-      if (slot === 'armor') return (m as any).equippedSlot === 'armor';
+      if (slot === 'armor') return m.equippedSlot === 'armor';
       if (slot === 'mainHand')
-        return (m as any).equippedSlot === 'main'
-          || (m as any).equippedSlot === 'mainHand'
-          || (m as any).equippedSlot === 'both';
+        return m.equippedSlot === 'main'
+          || m.equippedSlot === 'mainHand'
+          || m.equippedSlot === 'both';
       if (slot === 'offHand')
-        return (m as any).equippedSlot === 'off'
-          || (m as any).equippedSlot === 'offHand'
-          || (m as any).equippedSlot === 'both';
+        return m.equippedSlot === 'off'
+          || m.equippedSlot === 'offHand'
+          || m.equippedSlot === 'both';
       return false;
     }) ??
     activeMods[0] ??
@@ -140,8 +140,8 @@ export function getVehicleModuleUsage(
   if (!vehicle) return null;
 
   const frame =
-    availableFrames.find((f: any) => f.name === (vehicle as any).frame) ??
-    ({ limits: { weapon: 2, armor: 1, support: -1 } } as any);
+    availableFrames.find((f: Record<string, unknown>) => f.name === ('frame' in vehicle ? (vehicle as Record<string, unknown>).frame : undefined)) ??
+    ({ limits: { weapon: 2, armor: 1, support: -1 } } as Record<string, unknown>);
 
   const counts: Record<string, number> = { weapon: 0, armor: 0, support: 0 };
   for (const m of vehicle.modules) {
@@ -150,7 +150,7 @@ export function getVehicleModuleUsage(
     if (type === 'custom') continue;
     counts[type] += type === 'support' && m.isComplex ? 2 : 1;
   }
-  return { counts, limits: (frame as any).limits };
+  return { counts, limits: (frame as Record<string, unknown>).limits as Record<string, number> };
 }
 
 // Support modules
@@ -197,9 +197,9 @@ export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
  * is active and 2 shields are equipped.  Returns null otherwise.
  */
 export function getAuxHandItem(player: TypePlayer): AuxHandItem | null {
-  const hasDualShieldBearer = (player.classes ?? []).some((cls: any) =>
+  const hasDualShieldBearer = (player.classes ?? []).some((cls: PlayerClass) =>
     (cls.skills ?? []).some(
-      (sk: any) => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1,
+      (sk: Skills) => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1,
     ),
   );
   if (!hasDualShieldBearer) return null;
@@ -209,9 +209,9 @@ export function getAuxHandItem(player: TypePlayer): AuxHandItem | null {
   if (equippedShieldsCount < 2) return null;
 
   const defensiveMasteryBonus = (player.classes ?? [])
-    .flatMap((cls: any) => cls.skills ?? [])
-    .filter((sk: any) => sk.specialSkill === 'Defensive Mastery')
-    .reduce((sum: number, sk: any) => sum + (sk.currentLvl ?? 0), 0);
+    .flatMap((cls: PlayerClass) => cls.skills ?? [])
+    .filter((sk: Skills) => sk.specialSkill === 'Defensive Mastery')
+    .reduce((sum: number, sk: Skills) => sum + (sk.currentLvl ?? 0), 0);
 
   return {
     name: 'Twin Shields',

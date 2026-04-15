@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
+import { useCallback } from "react";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { buildInvokerAvailableInvocations } from "../invokerUtils";
@@ -105,7 +106,7 @@ export default function UnifiedSpellModal({
       spellType
     );
   };
-  const resolveInitialSectionId = (sectionList) => {
+  const resolveInitialSectionId = useCallback((sectionList) => {
     if (!sectionList || sectionList.length === 0) return "general";
     if (initialSectionId && sectionList.some((section) => section.id === initialSectionId)) {
       return initialSectionId;
@@ -116,7 +117,7 @@ export default function UnifiedSpellModal({
     }
     // Otherwise, default to the first defined section (e.g. cookbook for gourmet).
     return sectionList[0].id;
-  };
+  }, [initialSectionId]);
 
   const [activeSectionId, setActiveSectionId] = useState(resolveInitialSectionId(sections));
   const [formState, setFormState] = useState(spell || {});
@@ -132,7 +133,7 @@ export default function UnifiedSpellModal({
     setDeleteConfirmOpen(false);
   };
 
-  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen } = useDeleteConfirmation({
     onConfirm: handleDeleteConfirm,
   });
 
@@ -147,7 +148,7 @@ export default function UnifiedSpellModal({
     if (open && sections?.length > 0) {
       setActiveSectionId(resolveInitialSectionId(sections));
     }
-  }, [open, sections, initialSectionId]);
+  }, [open, sections, initialSectionId, resolveInitialSectionId]);
 
   const handleSave = () => {
     if (!onSave || !spell) return;

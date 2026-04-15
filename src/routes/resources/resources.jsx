@@ -8,7 +8,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import HeaderSection from "../../components/resources/HeaderSection";
@@ -25,7 +25,7 @@ import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
 
 function Resources() {
-  const [user, loadingUser] = useAuthState(auth);
+  const [user, _loadingUser] = useAuthState(auth);
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
@@ -42,7 +42,7 @@ function Resources() {
   // Check if user is moderator
   const isModerator = user && moderators.includes(user.uid);
 
-  const fetchResources = async () => {
+  const fetchResources = useCallback(async () => {
     try {
       setLoading(true);
       let { data: resources, error } = await supabase
@@ -61,7 +61,7 @@ function Resources() {
       setError("Unexpected error occurred");
       return [];
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     const loadResources = async () => {
@@ -70,7 +70,7 @@ function Resources() {
       setLoading(false);
     };
     loadResources();
-  }, []);
+  }, [fetchResources]);
 
   const muiTheme = useTheme();
   const { t } = useTranslate();
@@ -116,7 +116,7 @@ function Resources() {
     return 4;
   };
 
-  const sortResourcesWithinLanguage = (resources) => {
+  const sortResourcesWithinLanguage = useCallback((resources) => {
     return resources.sort((a, b) => {
       // 1. Sort by collection priority (rulebook first, then website, etc.)
       const collectionDiff = getCollectionPriority(a.collection) - getCollectionPriority(b.collection);
@@ -145,7 +145,7 @@ function Resources() {
       // 3. Final sort by title alphabetically
       return a.name.localeCompare(b.name);
     });
-  };
+  }, []);
 
   // Process resources from Supabase data
   const allResources = useMemo(() => {
@@ -288,7 +288,7 @@ function Resources() {
       });
 
     return orderedGrouped;
-  }, [filteredResources, activeTab, selectedLanguage]);
+  }, [filteredResources, activeTab, selectedLanguage, sortResourcesWithinLanguage]);
 
   // Show loading state
   if (loading) {

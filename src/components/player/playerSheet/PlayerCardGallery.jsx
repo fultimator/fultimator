@@ -16,9 +16,8 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import CardLoadout from "./CardLoadout";
-
-// ─── Styled Components ────────────────────────────────────────────────────────
-
+// Styled Components
+// Sub-components
 const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }) => ({
   height: 18,
   [theme.breakpoints.down("sm")]: {
@@ -35,7 +34,7 @@ const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }
     transition: "width 1s ease-in-out",
   },
 }));
-
+// Main Component
 const StatBarWrapper = styled(Box)(({ theme }) => ({
   position: "relative",
   "& .stat-label": {
@@ -107,8 +106,7 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   flex: 1,
 }));
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
+// Sub-components
 function StatBar({ label, value, max, color1, color2, trackColor }) {
   return (
     <StatBarWrapper sx={{ background: trackColor }}>
@@ -161,8 +159,7 @@ function CombatStat({ icon, label, value, theme }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
+// Main Component
 export default function PlayerCardGallery({ player, setPlayer, isExpanded = false }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -403,7 +400,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         overflow: "hidden",
       }}
     >
-      {/* ── Header ── */}
+      {/* Header */}
       <Box sx={{ display: "flex", alignItems: "stretch" }}>
         <Box
           sx={{
@@ -448,7 +445,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           </Typography>
         </Box>
       </Box>
-      {/* ── Body ── */}
+      {/* Body */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
 
         {/* Avatar + Stat Bars */}
@@ -724,7 +721,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           </Box>
         </Box>
       )}
-      {/* ── Affinity Strip ── */}
+      {/* Affinity Strip */}
       <AffinityStrip>
         {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
           <AffinityCell key={type}>

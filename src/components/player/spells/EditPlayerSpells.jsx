@@ -54,7 +54,7 @@ import SpellDeck from "./SpellDeck";
 import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
-import { syncSlots, deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
+import { deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {

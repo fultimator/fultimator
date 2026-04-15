@@ -77,7 +77,7 @@ function CustomWeapons() {
   // Additional modifiers (matching player equipment)
   const [defModifier, setDefModifier] = useState(0);
   const [mDefModifier, setMDefModifier] = useState(0);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const [_modifiersExpanded, setModifiersExpanded] = useState(false);
 
   // Secondary weapon overrides
   const [secondOverrideType, setSecondOverrideType] = useState(false);
@@ -88,7 +88,7 @@ function CustomWeapons() {
   // Additional secondary modifiers (matching player equipment)
   const [secondDefModifier, setSecondDefModifier] = useState(0);
   const [secondMDefModifier, setSecondMDefModifier] = useState(0);
-  const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
+  const [_secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
 
   // Check if weapon has transforming customization
   const hasTransforming = currentCustomizations.some(

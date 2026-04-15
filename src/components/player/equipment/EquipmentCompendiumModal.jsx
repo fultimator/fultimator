@@ -58,7 +58,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
       setSelectedPackId(packs[0].id);
       setSelectedEquipType("weapon");
     }
-  }, [open]);
+  }, [open, packs]);
 
   // Set default pack when packs first load
   useEffect(() => {

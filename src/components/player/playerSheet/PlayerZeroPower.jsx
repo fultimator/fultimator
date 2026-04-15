@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Grid, Typography, Divider, Button, Stack, IconButton, Tooltip } from "@mui/material";
+import { Paper, Grid, Typography, Divider, IconButton, Tooltip } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";

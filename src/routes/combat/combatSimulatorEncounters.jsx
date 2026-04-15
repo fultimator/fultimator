@@ -38,7 +38,7 @@ import EncounterCard from "../../components/combatSim/EncounterCard";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { SignIn } from "../../components/auth";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
 const MAX_ENCOUNTERS = 3;

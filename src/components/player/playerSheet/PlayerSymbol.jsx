@@ -17,7 +17,7 @@ import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 
-export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
+export default function PlayerSymbol({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -26,7 +26,7 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedSymbol, setSelectedSymbol] = useState(null);
-  const [selectedSymbolSpell, setSelectedSymbolSpell] = useState(null);
+  const [_selectedSymbolSpell, setSelectedSymbolSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (symbolSpell, sym) => {

@@ -2236,7 +2236,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
     const effectMatch = zeroEffectOptions.find((o) => o.name === (editData?.zeroEffect ?? ""));
     setZeroTrigger(triggerMatch ?? null);
     setZeroEffect(effectMatch ?? null);
-  }, [editData, packs]);
+  }, [editData, packs, zeroTriggerOptions, zeroEffectOptions]);
 
   const buildData = () => {
     if (subtype === "quirk") return { subtype, name: name.trim(), description: description.trim(), effect: effect.trim() };

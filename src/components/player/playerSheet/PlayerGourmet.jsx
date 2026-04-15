@@ -26,7 +26,7 @@ import {
   getAttributes,
 } from "../../../libs/gourmetCookingData";
 
-export default function PlayerGourmet({ player, setPlayer, isEditMode }) {
+export default function PlayerGourmet({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();

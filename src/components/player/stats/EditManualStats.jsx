@@ -58,6 +58,8 @@ export default function EditManualStats({
     meleePrecModifier,
     rangedPrecModifier,
     magicPrecModifier,
+    setPlayer,
+    updateMaxStats,
   ]);
 
   return (

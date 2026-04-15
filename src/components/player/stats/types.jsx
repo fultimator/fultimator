@@ -11,6 +11,7 @@ import {
   WindIcon,
 } from "../../icons"
 import { useTranslate } from "../../../translation/translate";
+// import { typeList } from "../../typeConstants";
 
 export function TypeName({ type }) {
   const { t } = useTranslate();
@@ -68,15 +69,3 @@ export function TypeAffinity({ type, affinity }) {
     </Typography>
   );
 }
-
-export const typeList = [
-  "physical",
-  "wind",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];

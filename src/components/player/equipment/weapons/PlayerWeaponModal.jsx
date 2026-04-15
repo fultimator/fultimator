@@ -72,7 +72,7 @@ export default function PlayerWeaponModal({
     damageModifier, setDamageModifier,
     defModifier, setDefModifier,
     mDefModifier, setMDefModifier,
-    isEquipped, setIsEquipped,
+    isEquipped, _setIsEquipped,
     modifiersExpanded, setModifiersExpanded,
     expandModifiers,
     modifiers,

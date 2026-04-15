@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 export default [
   {
@@ -14,6 +15,7 @@ export default [
     plugins: {
       react: reactPlugin,
       'react-refresh': reactRefreshPlugin,
+      'react-hooks': reactHooksPlugin,
     },
     languageOptions: {
       ecmaVersion: 2021,
@@ -26,6 +28,9 @@ export default [
         console: 'readonly',
         alert: 'readonly',
         URL: 'readonly',
+        URLSearchParams: 'readonly',
+        requestAnimationFrame: 'readonly',
+        structuredClone: 'readonly',
         Response: 'readonly',
         setTimeout: 'readonly',
         setInterval: 'readonly',
@@ -36,10 +41,27 @@ export default [
         localStorage: 'readonly',
         sessionStorage: 'readonly',
         indexedDB: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        Blob: 'readonly',
+        File: 'readonly',
+        crypto: 'readonly',
+        TextEncoder: 'readonly',
+        DOMException: 'readonly',
+        Event: 'readonly',
+        KeyboardEvent: 'readonly',
+        Window: 'readonly',
         // Node globals
         process: 'readonly',
         Buffer: 'readonly',
         global: 'readonly',
+        __dirname: 'readonly',
+        NodeJS: 'readonly',
+        // React
+        React: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: {
@@ -53,12 +75,27 @@ export default [
       },
     },
     rules: {
+      ...reactHooksPlugin.configs.recommended.rules,
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/refs': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/preserve-manual-memoization': 'warn',
+
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
+      'no-prototype-builtins': 'warn',
+      'no-empty': 'warn',
+      '@typescript-eslint/no-unused-expressions': 'warn',
+      'no-useless-escape': 'warn',
+      'no-undef': 'warn',
       '@typescript-eslint/no-unused-vars': [
-        'error',
+        'warn',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',

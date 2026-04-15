@@ -26,7 +26,7 @@ export default function PlayerTherioforms({ player }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedTherioform, setSelectedTherioform] = useState(null);
-  const [selectedMutantSpell, setSelectedMutantSpell] = useState(null);
+  const [_selectedMutantSpell, setSelectedMutantSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (mutantSpell, therioform) => {

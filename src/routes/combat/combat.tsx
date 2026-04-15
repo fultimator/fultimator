@@ -18,7 +18,7 @@ import {
 import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
 import { useRef, useState } from "react";
 import type { User } from "firebase/auth";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
@@ -64,7 +64,7 @@ interface AuthCombatProps {
   user: User;
 }
 
-function AuthCombat({ user }: AuthCombatProps) {
+function AuthCombat({ _user }: AuthCombatProps) {
   const { t } = useTranslate();
   const db = useDatabase("cloud");
 
@@ -81,7 +81,7 @@ function AuthCombat({ user }: AuthCombatProps) {
       .then((docs) => setPersonalList((docs as TypeNpc[]) ?? []))
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
-  }, []);
+  }, [db]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
@@ -89,13 +89,13 @@ function AuthCombat({ user }: AuthCombatProps) {
     return null;
   }
 
-  const addNpc = (e: any, newValue: any) => {
+  const addNpc = (e: unknown, newValue: unknown) => {
     if (newValue) {
       setNpcs((prevState) => [...prevState, newValue as TypeNpc]);
     }
   };
 
-  const addDuplicateNpc = (npc: any) => {
+  const addDuplicateNpc = (npc: TypeNpc) => {
     setNpcs((prevState) => [...prevState, npc]);
   };
 

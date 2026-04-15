@@ -17,7 +17,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Stack,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -433,7 +432,6 @@ function RitualsCalculator({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const custom = useCustomTheme();
   const secondary = theme.palette.secondary.main;
 
   const labelFontSize = compact

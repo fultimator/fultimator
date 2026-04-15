@@ -1,15 +1,5 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
-
-interface ThemeContextProps {
-  selectedTheme: ThemeValue;
-  isDarkMode: boolean;
-  setTheme: (theme: ThemeValue) => void;
-  toggleDarkMode: () => void;
-}
-
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
-
-const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+import React, { ReactNode, useState } from 'react';
+import { ThemeContext, type ThemeValue } from './ThemeContextSetup';
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
@@ -44,12 +34,4 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useThemeContext = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('Oops! It seems like useThemeContext is not wrapped in a ThemeProvider.');
-  }
-  return context;
 };

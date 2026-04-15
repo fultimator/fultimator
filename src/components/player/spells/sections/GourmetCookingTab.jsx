@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Grid,
@@ -69,7 +69,7 @@ export default function GourmetCookingTab({
   const [choiceDialogOpen, setChoiceDialogOpen] = useState(false);
   const [choiceDialogRolls, setChoiceDialogRolls] = useState([]);
 
-  const ingredientInventory = formState.ingredientInventory || [];
+  const ingredientInventory = useMemo(() => formState.ingredientInventory || [], [formState.ingredientInventory]);
   const cookbookEffects = formState.cookbookEffects || {};
   const allYouCanEat = formState.allYouCanEat || false;
   const usedAllYouCanEat = formState.usedAllYouCanEat || false;

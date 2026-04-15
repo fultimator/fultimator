@@ -186,7 +186,7 @@ export default function PlayerCustomWeaponModal({
       
       setSecondModifiersExpanded(false);
     }
-  }, [customWeapon]);
+  }, [customWeapon, clearModifiers, setModifiersExpanded]);
 
   // Initialize second form with transforming customization when needed
   useEffect(() => {

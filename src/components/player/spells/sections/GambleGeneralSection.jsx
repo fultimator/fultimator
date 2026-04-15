@@ -6,7 +6,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Typography,
   Button,
   IconButton,
   FormControlLabel,
@@ -22,53 +21,70 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 const SECOND_EFFECT_DICE = [1, 2, 3, 4, 5, 6];
 const TARGET_DICE = Array.from({ length: 12 }, (_, i) => i + 1);
 
+const ERROR_MESSAGES = {
+  INSUFFICIENT_TARGETS: "At least two targets are required.",
+  INVALID_RANGE: "Each target range must be valid.",
+  OVERLAPPING_RANGES: "Ranges cannot overlap.",
+  INCOMPLETE_COVERAGE: "All 12 die faces must be covered without overlap.",
+  MISSING_EFFECT: "All target effect fields must be filled out.",
+  INCOMPLETE_SECOND_EFFECTS: "All 6 die values for second effects must be covered.",
+  MISSING_SECOND_EFFECT: "All second effect fields must be filled out.",
+};
+
+const validateTargets = (targets) => {
+  if (targets.length < 2) return "INSUFFICIENT_TARGETS";
+
+  const normalized = targets
+    .map((target) => ({
+      from: Number(target?.rangeFrom),
+      to: Number(target?.rangeTo),
+      effect: String(target?.effect || "").trim(),
+    }))
+    .sort((a, b) => a.from - b.from);
+
+  if (normalized.some((target) => !target.from || !target.to || target.from > target.to)) {
+    return "INVALID_RANGE";
+  }
+
+  for (let i = 0; i < normalized.length - 1; i += 1) {
+    if (normalized[i].to >= normalized[i + 1].from) {
+      return "OVERLAPPING_RANGES";
+    }
+  }
+
+  const covered = new Set();
+  normalized.forEach((target) => {
+    for (let value = target.from; value <= target.to; value += 1) covered.add(value);
+  });
+  if (covered.size !== 12) return "INCOMPLETE_COVERAGE";
+  if (normalized.some((target) => !target.effect)) return "MISSING_EFFECT";
+
+  for (const target of targets) {
+    if (!target?.secondRoll) continue;
+    const secondEffects = Array.isArray(target.secondEffects) ? target.secondEffects : [];
+    if (secondEffects.length !== 6) return "INCOMPLETE_SECOND_EFFECTS";
+    const secondCovered = new Set(secondEffects.map((entry) => Number(entry?.dieValue)));
+    if (secondCovered.size !== 6 || SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))) {
+      return "INCOMPLETE_SECOND_EFFECTS";
+    }
+    if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
+      return "MISSING_SECOND_EFFECT";
+    }
+  }
+
+  return null;
+};
+
 export default function GambleGeneralSection({ formState, setFormState, t }) {
-  const targets = Array.isArray(formState.targets) ? formState.targets : [];
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const validationError = useMemo(() => {
-    if (targets.length < 2) return t("At least two targets are required.");
+  const targets = useMemo(
+    () => (Array.isArray(formState.targets) ? formState.targets : []),
+    [formState.targets]
+  );
 
-    const normalized = targets
-      .map((target) => ({
-        from: Number(target?.rangeFrom),
-        to: Number(target?.rangeTo),
-        effect: String(target?.effect || "").trim(),
-      }))
-      .sort((a, b) => a.from - b.from);
-
-    if (normalized.some((target) => !target.from || !target.to || target.from > target.to)) {
-      return t("Each target range must be valid.");
-    }
-
-    for (let i = 0; i < normalized.length - 1; i += 1) {
-      if (normalized[i].to >= normalized[i + 1].from) {
-        return t("Ranges cannot overlap.");
-      }
-    }
-
-    const covered = new Set();
-    normalized.forEach((target) => {
-      for (let value = target.from; value <= target.to; value += 1) covered.add(value);
-    });
-    if (covered.size !== 12) return t("All 12 die faces must be covered without overlap.");
-    if (normalized.some((target) => !target.effect)) return t("All target effect fields must be filled out.");
-
-    for (const target of targets) {
-      if (!target?.secondRoll) continue;
-      const secondEffects = Array.isArray(target.secondEffects) ? target.secondEffects : [];
-      if (secondEffects.length !== 6) return t("All 6 die values for second effects must be covered.");
-      const secondCovered = new Set(secondEffects.map((entry) => Number(entry?.dieValue)));
-      if (secondCovered.size !== 6 || SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))) {
-        return t("All 6 die values for second effects must be covered.");
-      }
-      if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
-        return t("All second effect fields must be filled out.");
-      }
-    }
-
-    return "";
-  }, [targets, t]);
+  const validationErrorKey = useMemo(() => validateTargets(targets), [targets]);
+  const validationError = validationErrorKey ? t(ERROR_MESSAGES[validationErrorKey]) : "";
 
   const updateField = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));

@@ -106,7 +106,7 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('campActivities', activityKey); }}
+                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('campActivities', activityKey); }}
                     sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
                   >
                     <Typography

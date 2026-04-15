@@ -16,7 +16,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             label="Change Type"
             onChange={setAtt1}
           >
-            {Object.entries(attributes).map((key, i) => {
+            {Object.entries(attributes).map((key, _i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
                   {key[1].shortcaps}
@@ -36,7 +36,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             label="Change Type"
             onChange={setAtt2}
           >
-            {Object.entries(attributes).map((key, i) => {
+            {Object.entries(attributes).map((key, _i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
                   {key[1].shortcaps}

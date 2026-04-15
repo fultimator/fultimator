@@ -31,7 +31,7 @@ export default function MagiseedItem({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [expandedEffects, setExpandedEffects] = useState(false);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
     onConfirm: () => {},
   });;
 

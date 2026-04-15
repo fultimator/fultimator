@@ -122,21 +122,18 @@ export const LocalAdapter: DatabaseAdapter = {
   },
 
   useCollectionData(queryRef: unknown) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return normalizeCollectionResult(
       idbUseCollectionData(queryRef as Parameters<typeof idbUseCollectionData>[0])
     );
   },
 
   useDocumentData(ref: unknown) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return normalizeDocumentResult(
       idbUseDocumentData(ref as Parameters<typeof idbUseDocumentData>[0])
     );
   },
 
   usePendingSync() {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     return usePendingSync();
   },
 

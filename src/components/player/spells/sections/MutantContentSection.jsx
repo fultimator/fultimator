@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import MutantItem from "./MutantItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableTherioforms } from "../spellOptionData";
 
 export default function MutantContentSection({ formState, setFormState, t }) {
-  const currentTherioforms = formState.therioforms || [];
+  const currentTherioforms = useMemo(() => formState.therioforms || [], [formState.therioforms]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankTherioform = useCallback(() => {

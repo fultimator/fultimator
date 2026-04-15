@@ -33,7 +33,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
     onConfirm: () => {
           if (deleteIndex !== null) handleRemove(deleteIndex);
         },

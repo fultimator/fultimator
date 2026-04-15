@@ -27,7 +27,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
-export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
+export default function PlayerInvoker({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -36,7 +36,7 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedInvocation, setSelectedInvocation] = useState(null);
-  const [selectedInvokerSpell, setSelectedInvokerSpell] = useState(null);
+  const [_selectedInvokerSpell, setSelectedInvokerSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (invokerSpell, invocation) => {

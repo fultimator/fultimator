@@ -1,8 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-
-const NpcContext = createContext();
-
-export const useNpc = () => useContext(NpcContext);
+import { useState, useEffect } from "react";
+import { NpcContext } from "./NpcContextValue";
 
 export const NpcProvider = ({ children, npcData }) => {
   const [npcTemp, setNpcTemp] = useState(npcData);
@@ -17,3 +14,5 @@ export const NpcProvider = ({ children, npcData }) => {
     </NpcContext.Provider>
   );
 };
+
+export { NpcContext };

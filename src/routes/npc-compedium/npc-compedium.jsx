@@ -407,7 +407,7 @@ function Personal({ user }) {
                 id="select-rank"
                 value={rank}
                 label={t("Rank:")}
-                onChange={(evt, val2) => {
+                onChange={(evt, _val2) => {
                   setRank(evt.target.value);
                 }}
               >

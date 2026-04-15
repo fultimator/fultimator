@@ -6,7 +6,6 @@ import {
   Paper,
   Stack,
   Tooltip,
-  Button,
 } from "@mui/material";
 import { Edit, VisibilityOff } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";

@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
   CardActions,
   Typography,
+  Button,
   IconButton,
   Box,
   Tooltip,
   Chip,
   Divider,
   useTheme,
-  Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -25,7 +25,7 @@ import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSelected = false, onToggleSelect }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete: _handleDelete } = useDeleteConfirmation({
     onConfirm: () => {},
   });;
 

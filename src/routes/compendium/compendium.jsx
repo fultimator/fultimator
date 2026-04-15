@@ -27,7 +27,6 @@ import {
   ThemeProvider,
   Snackbar,
   Autocomplete,
-  Menu,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -51,11 +50,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  ListItemIcon,
-  Alert,
   CircularProgress,
-  Tabs,
-  Tab,
 } from "@mui/material";
 
 import Layout from "../../components/Layout";
@@ -69,163 +64,25 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
-import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
+import {  WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
 
-import weapons from "../../libs/weapons";
-import heroics from "../../libs/heroics";
-import qualities from "../../libs/qualities";
-import { baseArmors, baseShields } from "../../libs/equip";
-import { npcSpells } from "../../libs/npcSpells";
-import { npcAttacks } from "../../libs/npcAttacks";
-import classList, { spellList, tinkererAlchemy, tinkererInfusion, arcanumList } from "../../libs/classes";
-import attributes from "../../libs/attributes";
-import types from "../../libs/types";
-import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
-import { magiseeds } from "../../libs/floralistMagiseedData";
+import classList, { spellList } from "../../libs/classes";
+import _attributes from "../../libs/attributes";
+import _types from "../../libs/types";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-import { availableGifts } from "../../components/player/spells/spellOptionData";
-import { availableDances } from "../../components/player/spells/spellOptionData";
-import { availableTherioforms } from "../../components/player/spells/spellOptionData";
-import { availableMagichantKeys, availableMagichantTones } from "../../components/player/spells/spellOptionData";
-import { availableSymbols } from "../../components/player/spells/spellOptionData";
-import { invocationsByWellspring } from "../../components/player/spells/spellOptionData";
-
-export const CLASS_BOOK_OPTIONS = [
-  { label: "Core", value: "core" },
-  { label: "Rework", value: "rework" },
-  { label: "Bonus", value: "bonus" },
-  { label: "High Fantasy", value: "high" },
-  { label: "Techno Fantasy", value: "techno" },
-  { label: "Natural Fantasy", value: "natural" },
-];
-
-export const QUALITY_FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
-
-export const QUALITY_CATEGORY_OPTIONS = [
-  { label: "Defensive", value: "Defensive" },
-  { label: "Offensive", value: "Offensive" },
-  { label: "Enhancement", value: "Enhancement" },
-];
-
-// ---------------------------------------------------------------------------
-// Data preparation
-// ---------------------------------------------------------------------------
-
-const armors = baseArmors
-  .filter((a) => a.name !== "No Armor")
-  .map((a) => ({ ...a, category: "Armor" }));
-
-const shields = baseShields
-  .filter((s) => s.name !== "No Shield")
-  .map((s) => ({ ...s, category: "Shield" }));
-
-export const ITEM_TYPES = [
-  { key: "weapons",        label: "Weapons",        context: "player" },
-  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
-  { key: "shields",        label: "Shields",        context: "player" },
-  { key: "armor",          label: "Armor",          context: "player" },
-  { key: "accessories",    label: "Accessories",    context: "player" },
-  { key: "spells",         label: "NPC Spells",     context: "npc" },
-  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
-  { key: "special",        label: "Special Rules",  context: "npc" },
-  { key: "actions",        label: "Other Actions",  context: "npc" },
-  { key: "classes",        label: "Classes",        context: "player" },
-  { key: "player-spells",  label: "Spells",         context: "both" },
-  { key: "qualities",      label: "Qualities",      context: "player" },
-  { key: "heroics",        label: "Heroic Skills",  context: "player" },
-  { key: "optionals",      label: "Optionals",      context: "player" },
-];
-
-// Item types available when browsing a pack (no classes / non-standard types)
-export const PACK_ITEM_TYPES = [
-  { key: "weapons",        label: "Weapons",        context: "player" },
-  { key: "armor",          label: "Armor",          context: "player" },
-  { key: "shields",        label: "Shields",        context: "player" },
-  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
-  { key: "accessories",    label: "Accessories",    context: "player" },
-  { key: "spells",         label: "NPC Spells",     context: "npc" },
-  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
-  { key: "special",        label: "Special Rules",  context: "npc" },
-  { key: "actions",        label: "Other Actions",  context: "npc" },
-  { key: "player-spells",  label: "Spells",         context: "both" },
-  { key: "qualities",      label: "Qualities",      context: "player" },
-  { key: "classes",        label: "Classes",        context: "player" },
-  { key: "heroics",        label: "Heroic Skills",  context: "player" },
-  { key: "optionals",      label: "Optionals",      context: "player" },
-];
-
-// viewer key → CompendiumItemType
-export const VIEWER_TO_PACK_TYPE = {
-  weapons:          "weapon",
-  armor:            "armor",
-  shields:          "shield",
-  "custom-weapons": "custom-weapon",
-  accessories:      "accessory",
-  spells:           "npc-spell",
-  attacks:          "npc-attack",
-  special:          "npc-special",
-  actions:          "npc-action",
-  "player-spells":  "player-spell",
-  qualities:        "quality",
-  classes:          "class",
-  heroics:          "heroic",
-  optionals:        "optional",
-};
-
-export function getItems(type) {
-  switch (type) {
-    case "weapons":
-      return weapons;
-    case "armor":
-      return armors;
-    case "shields":
-      return shields;
-    case "spells":
-      return npcSpells;
-    case "attacks":
-      return npcAttacks;
-    case "classes":
-      return classList;
-    case "player-spells":
-      return spellList;
-    case "qualities":
-      return qualities;
-    case "heroics":
-      return heroics;
-    case "special":
-    case "actions":
-    case "custom-weapons":
-    case "accessories":
-    case "optionals":
-      return []; // pack-only, no official data
-    default:
-      return [];
-  }
-}
-
-export function getItemSearchText(item) {
-  const skillNames = item.skills
-    ? item.skills.map((s) => s.skillName).join(" ")
-    : "";
-  return [item.name, item.category, item.type, item.range, item.book, skillNames, item.quality, item.subtype, item.description, item.effect, item.targetDescription]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-}
-
-export function makeId(name, idx) {
-  return `compendium-item-${name.replace(/[^a-zA-Z0-9]/g, "-")}-${idx}`;
-}
-
-function toSlug(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
+import {
+  CLASS_BOOK_OPTIONS,
+  QUALITY_FILTER_OPTIONS,
+  QUALITY_CATEGORY_OPTIONS,
+  ITEM_TYPES,
+  PACK_ITEM_TYPES,
+  VIEWER_TO_PACK_TYPE,
+  getItems,
+  getItemSearchText,
+  toSlug,
+  makeId,
+  getNonStaticSpellItems,
+} from "../../libs/compendium";
 
 // ---------------------------------------------------------------------------
 // Sidebar table columns per type
@@ -759,83 +616,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 });
 
 // ---------------------------------------------------------------------------
-// Per-character spell-type item builder
-// ---------------------------------------------------------------------------
-
-export function getNonStaticSpellItems(sc) {
-  switch (sc) {
-    case "gift":
-      return availableGifts
-        .filter(g => !g.name.includes("_custom_"))
-        .map(g => ({ ...g, spellType: "gift" }));
-    case "dance":
-      return availableDances
-        .filter(d => !d.name.includes("_custom_"))
-        .map(d => ({ ...d, spellType: "dance" }));
-    case "therioform":
-      return availableTherioforms
-        .filter(tf => !tf.name.includes("_custom_"))
-        .map(tf => ({ ...tf, spellType: "therioform" }));
-    case "magichant":
-      return [
-        ...availableMagichantKeys
-          .filter((key) => !key.name.includes("_custom_"))
-          .map((key) => ({ ...key, spellType: "magichant", magichantSubtype: "key" })),
-        ...availableMagichantTones
-          .filter((tone) => !tone.name.includes("_custom_"))
-          .map((tone) => ({ ...tone, spellType: "magichant", magichantSubtype: "tone" })),
-      ];
-    case "symbol":
-      return availableSymbols
-        .filter(s => !s.name.includes("_custom_"))
-        .map(s => ({ ...s, spellType: "symbol" }));
-    case "invocation":
-      return Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) =>
-        invocations.map(inv => ({ ...inv, spellType: "invocation", wellspring }))
-      );
-    case "magiseed":
-      return magiseeds.map(ms => ({ ...ms, spellType: "magiseed" }));
-    case "arcanist":
-    case "arcanist-rework":
-      return arcanumList.map(arc => ({ ...arc, spellType: sc }));
-    case "tinkerer-alchemy":
-      return [
-        ...tinkererAlchemy.targets.map(t => ({
-          name: t.rangeFrom === t.rangeTo ? `${t.rangeFrom}` : `${t.rangeFrom}–${t.rangeTo}`,
-          spellType: "tinkerer-alchemy",
-          category: "Target",
-          effect: t.effect,
-        })),
-        ...tinkererAlchemy.effects.map(e => ({
-          name: `Die: ${e.dieValue}`,
-          spellType: "tinkerer-alchemy",
-          category: "Effect",
-          effect: e.effect,
-        })),
-      ];
-    case "tinkerer-infusion":
-      return tinkererInfusion.effects.map(e => ({
-        name: `Rank ${e.infusionRank}: ${e.name ?? ""}`.trim().replace(/: $/, ""),
-        spellType: "tinkerer-infusion",
-        ...e,
-      }));
-    case "pilot-vehicle":
-      return [
-        ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame", pilotSubtype: "frame" })),
-        ...availableModules.armor
-          .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module", pilotSubtype: "armor" })),
-        ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module", pilotSubtype: "weapon" })),
-        ...availableModules.support
-          .filter(m => m.name !== "pilot_custom_support")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module", pilotSubtype: "support" })),
-      ];
-    default:
-      return null;
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Card dispatcher
 // ---------------------------------------------------------------------------
 
@@ -894,7 +674,7 @@ function CompendiumViewer() {
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
 
   // Pack state
-  const { packs, loading: packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule } = useCompendiumPacks();
+  const { packs, loading: _packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule } = useCompendiumPacks();
   const [newPackDialogOpen, setNewPackDialogOpen] = useState(false);
   const [newPackName, setNewPackName] = useState("");
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
@@ -910,7 +690,7 @@ function CompendiumViewer() {
   const [exporting, setExporting] = useState(false);
 
   const [manageModulesOpen, setManageModulesOpen] = useState(false);
-  const [pendingNavPackId, setPendingNavPackId] = useState(null);
+  const [_pendingNavPackId, setPendingNavPackId] = useState(null);
 
   // Always ensure the personal pack exists so it shows in the dropdown
   useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
@@ -1030,7 +810,7 @@ function CompendiumViewer() {
   }, [selectedType, selectedSpellClass]);
 
   const filteredItems = useMemo(() => {
-    // ── Pack mode ────────────────────────────────────────────────────────────
+    // Pack mode
     if (activePack) {
       const packType = VIEWER_TO_PACK_TYPE[selectedType];
       let items = activePack.items
@@ -1094,7 +874,7 @@ function CompendiumViewer() {
       return items;
     }
 
-    // ── Official mode ─────────────────────────────────────────────────────
+    // Official mode
     if (selectedType !== "player-spells") {
       let items = getItems(selectedType);
 
@@ -1827,7 +1607,7 @@ function CompendiumViewer() {
             onChange={(e) => setExportMeta((m) => ({ ...m, downloadUrl: e.target.value }))}
             fullWidth
             size="small"
-            placeholder="https://.../pack.fcp"
+            placeholder="https://.../compendium.zip"
           />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between" }}>

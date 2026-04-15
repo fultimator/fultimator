@@ -11,8 +11,6 @@ import {
   Button,
   Tooltip,
   Divider,
-  Stack,
-  Card,
   Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -20,12 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Casino, Info } from "@mui/icons-material";
 import { VehicleModuleCard } from "../../compendium/ItemCards";
 import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
-import { Martial } from "../../icons";
-import { OpenBracket, CloseBracket } from "../../Bracket";
-import Diamond from "../../Diamond";
 import { availableFrames } from "../../../libs/pilotVehicleData";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 import { calculateAttribute } from "../common/playerCalculations";
@@ -33,7 +26,6 @@ import { calculateAttribute } from "../common/playerCalculations";
 export default function PlayerVehicle({
   player,
   setPlayer,
-  isEditMode,
   isCharacterSheet,
 }) {
   const { t } = useTranslate();
@@ -49,11 +41,6 @@ export default function PlayerVehicle({
   const [openEditModal, setOpenEditModal] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
-
-  const background =
-    custom.mode === "dark"
-      ? `linear-gradient(90deg, ${custom.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${custom.ternary} 0%, #ffffff 100%)`;
 
   // Find all pilot-vehicle spells
   const pilotSpells = (player.classes || [])
@@ -269,27 +256,6 @@ export default function PlayerVehicle({
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-  };
-
-  const StyledMarkdown = ({ children, ...props }) => {
-    return (
-      <div style={{ whiteSpace: "pre-line", margin: 0, padding: 0 }}>
-        <ReactMarkdown
-          {...props}
-          components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
-              <strong style={{ fontWeight: "bold" }} {...props} />
-            ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
-          }}
-        >
-          {children}
-        </ReactMarkdown>
-      </div>
-    );
   };
 
   const handleSaveVehicles = (spellIndex, updatedPilot) => {

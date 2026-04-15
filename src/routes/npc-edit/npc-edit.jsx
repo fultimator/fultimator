@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import {
   Grid,
   Divider,
@@ -13,7 +13,6 @@ import {
   useMediaQuery,
   Alert,
   Snackbar,
-  Fade,
 } from "@mui/material";
 import {
   Download,
@@ -78,9 +77,9 @@ export default function NpcEdit() {
   const db = isLocalNpc ? localDb : cloudDb;
 
   const ref = db.doc("npc-personal", params.npcId);
-  const activeSetDoc = (r, data) => db.setDoc(r, data);
+  const activeSetDoc = useCallback((r, data) => db.setDoc(r, data), [db]);
   const activeAddDoc = (r, data) => db.addDoc(r, data);
-  const activeCollection = (_, path) => db.collection(path);
+  const _activeCollection = (_, path) => db.collection(path);
 
   const { cloudUser: user } = useDatabaseContext();
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -149,7 +148,7 @@ export default function NpcEdit() {
         activeSetDoc(ref, npcTemp);
       }
     },
-    [ref, npcTemp]
+    [ref, npcTemp, activeSetDoc]
   );
 
   // Effect for scroll and keyboard shortcuts

@@ -29,7 +29,8 @@ import {
 } from "@mui/icons-material";
 import NotesMarkdown from "./NotesMarkdown"; // Using your existing component for preview
 import { useTheme } from "@mui/material/styles";
-import { TypeIcon, typeList } from "../types"; // Import TypeIcon and typeList
+import { TypeIcon } from "../types"; // Import TypeIcon
+import { typeList } from "../typeConstants";
 import {
   D4Icon,
   D6Icon,

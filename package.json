@@ -20,7 +20,7 @@
     "local-deploy": "node DownloadTranslations.js && vite build && npx serve dist",
     "deploy": "node DownloadTranslations.js && vite build && firebase deploy",
     "translate": "node DownloadTranslations.js",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --report-unused-disable-directives-severity warn"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

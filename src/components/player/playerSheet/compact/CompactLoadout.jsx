@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, ButtonBase, Collapse, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid,
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText,
-  Radio, Checkbox, Chip, Divider,
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText, Checkbox, Chip, Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -36,7 +35,7 @@ import SlotPickerDialog from '../../equipment/slots/SlotPickerDialog';
 import SpellPilotVehiclesModal from '../../spells/SpellPilotVehiclesModal';
 import PlayerEquipment from './PlayerEquipment';
 
-const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
+// const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -83,20 +82,20 @@ function hasTransforming(resolved) {
   return resolved.item?.customizations?.some(c => c.name === 'weapon_customization_transforming') ?? false;
 }
 
-function moduleStatLine(module) {
-  if (!module) return '-';
-  if (module.type === 'pilot_module_weapon') {
-    if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
-    const hands = module.cumbersome ? '2H' : '1H';
-    return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
-  }
-  if (module.type === 'pilot_module_armor') {
-    return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-  }
-  return module.description ? module.description.slice(0, 40) : '-';
-}
+// function moduleStatLine(module) {
+//   if (!module) return '-';
+//   if (module.type === 'pilot_module_weapon') {
+//     if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+//     const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
+//     const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
+//     const hands = module.cumbersome ? '2H' : '1H';
+//     return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
+//   }
+//   if (module.type === 'pilot_module_armor') {
+//     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+//   }
+//   return module.description ? module.description.slice(0, 40) : '-';
+// }
 
 export default function CompactLoadout({
   player,
@@ -116,7 +115,7 @@ export default function CompactLoadout({
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   // Attributes
   const getAttrDie = (key) => {
@@ -133,7 +132,7 @@ export default function CompactLoadout({
 
   // Vehicle / selectors
   const activeVehicle = getActiveVehicle(player);
-  const vs = player?.vehicleSlots;
+  // const vs = player?.vehicleSlots;
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
   const pilotSpellInfo = getPilotSpellInfo(player);

@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Paper, Typography, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Collapse, IconButton, Grid, Box,
-  Chip, Tooltip, ClickAwayListener, Alert,
-  Button, TextField,
+  Chip, Tooltip, ClickAwayListener, Alert
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, MoreVert, Star, AutoFixHigh, Add, Remove, Edit, Search } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -266,13 +265,13 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
 export default function PlayerClasses({
   player,
   setPlayer = null,
-  isMainTab,
+  _isMainTab,
   searchQuery = '',
   isEditMode = false,
   onAddBlankClass,
   onAddFromCompendium,
   onEditClass,
-  onAddSkill,
+  _onAddSkill,
   onEditSkill,
   onEditSpell,
   onLevelChange,
@@ -284,9 +283,9 @@ export default function PlayerClasses({
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
 
   const [heroicPickerClassIdx, setHeroicPickerClassIdx] = useState(null);
-  const [blankClassDialogOpen, setBlankClassDialogOpen] = useState(false);
-  const [newBlankClassName, setNewBlankClassName] = useState("");
-  const [classCompendiumOpen, setClassCompendiumOpen] = useState(false);
+  const [_blankClassDialogOpen, setBlankClassDialogOpen] = useState(false);
+  const [_newBlankClassName, _setNewBlankClassName] = useState("");
+  const [_classCompendiumOpen, setClassCompendiumOpen] = useState(false);
 
   const warnings = useMemo(() => {
     const w = [];

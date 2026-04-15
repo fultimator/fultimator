@@ -9,7 +9,6 @@ import {
 import { RestartAltOutlined } from "@mui/icons-material";
 import { useMemo, useState, useEffect } from "react";
 import randomQualities from "../../generator/randomqualities.json";
-import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import CopyToClipboard from "../../../components/common/CopyToClipboard";
 
@@ -41,7 +40,6 @@ const attributes = ["dexterity", "insight", "strength", "willpower"];
 const statuses = ["dazed", "weak", "slow", "shaken", "poisoned", "enraged"];
 
 function QualitiesGenerator({ onGenerate }) {
-  const { t } = useTranslate();
   const theme = useCustomTheme();
   const background =
     theme.mode === "dark"

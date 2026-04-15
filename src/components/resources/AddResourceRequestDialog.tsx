@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -96,7 +96,7 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
     { value: "other", label: "resources_pricing_other" },
   ];
 
-  const checkUser = async () => {
+  const checkUser = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -126,11 +126,11 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
     } catch (error) {
       console.error("Error checking user:", error);
     }
-  };
+  }, [user, supabase, t]);
 
   useEffect(() => {
     checkUser();
-  }, [user]);
+  }, [user, checkUser]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -207,7 +207,7 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
 
     try {
       // Save submission to submissions table
-      const { data, error } = await supabase
+      const { _data, error } = await supabase
         .from("submissions")
         .insert([
           {

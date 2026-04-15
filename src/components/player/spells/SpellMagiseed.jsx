@@ -393,7 +393,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                           onClick={(e) => {
                             e.stopPropagation();
                             const isCurrentSeed = currentMagiseed && seed.name === currentMagiseed.name;
-                            onMagiseedChange && onMagiseedChange(isCurrentSeed ? null : seed);
+                            if (onMagiseedChange) onMagiseedChange(isCurrentSeed ? null : seed);
                           }}
                         >
                           {currentMagiseed && seed.name === currentMagiseed.name

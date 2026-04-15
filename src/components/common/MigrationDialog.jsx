@@ -22,7 +22,7 @@ export default function MigrationDialog({ open, onClose, actors, actorType, onMi
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
 
-  const label = actorType === 'npc' ? t('NPC') : t('Player');
+  // const label = actorType === 'npc' ? t('NPC') : t('Player');
   const labelPlural = actorType === 'npc' ? t('NPCs') : t('Players');
 
   const handleMigrateAll = async () => {

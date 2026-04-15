@@ -26,7 +26,7 @@ export default function PlayerDance({ player }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedDance, setSelectedDance] = useState(null);
-  const [selectedDanceSpell, setSelectedDanceSpell] = useState(null);
+  const [_selectedDanceSpell, setSelectedDanceSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (danceSpell, dance) => {

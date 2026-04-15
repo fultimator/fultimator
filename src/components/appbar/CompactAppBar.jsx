@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, Search } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
-import { useNpc } from "../npc/NpcContext";
+import { useNpc } from "../npc/useNpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { t } from "../../translation/translate";

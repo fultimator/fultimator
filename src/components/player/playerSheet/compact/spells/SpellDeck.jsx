@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Typography,
   Table,
@@ -18,7 +18,6 @@ import {
   Shuffle,
   Refresh,
   Delete,
-  Layers,
   NewReleases,
   Air,
   Terrain,
@@ -40,7 +39,7 @@ const StyledTableCell = styled(TableCell)({
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
-export default function SpellDeck({ spell, setPlayer, isEditMode }) {
+export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";

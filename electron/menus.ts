@@ -108,6 +108,7 @@ export function createAppMenu(mainWindow: BrowserWindow) {
     },
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const menu = Menu.buildFromTemplate(template as any);
   Menu.setApplicationMenu(menu);
 }
@@ -160,12 +161,13 @@ export function checkForUpdates(mainWindow: BrowserWindow) {
           const releases = JSON.parse(data);
 
           // Filter releases to exclude drafts, and pick the latest one
-          const latestRelease = releases
-            .filter((r: any) => !r.draft) // Ignore drafts
-            .sort((a: any, b: any) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const latestRelease = (releases as any[])
+            .filter((r: Record<string, unknown>) => !r.draft) // Ignore drafts
+            .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
               semver.rcompare(
-                a.tag_name.replace(/^v/, ""),
-                b.tag_name.replace(/^v/, "")
+                String(a.tag_name).replace(/^v/, ""),
+                String(b.tag_name).replace(/^v/, "")
               )
             )[0]; // Sort newest first
 

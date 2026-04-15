@@ -1,12 +1,11 @@
-import React, { Fragment, useState } from "react";
-import { Paper, Grid, Typography, Divider, Card, Box, Dialog, DialogTitle, DialogContent, ButtonGroup, Button, Tabs, Tab, TextField, TableHead, TableRow, InputBase, IconButton, TableCell, Select, MenuItem, Tooltip, Menu } from "@mui/material";
+import {  useState } from "react";
+import {  Grid, Typography, Card, Box, Dialog, DialogTitle, DialogContent, Tabs, Tab, TextField, InputBase, IconButton, Select, MenuItem, Tooltip, Menu } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import avatar_image from "../../../avatar.jpg";
 import Diamond from "../../../Diamond";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { ArrowDropDown, Search, Clear, Add, Remove, Lock, LockOpen } from "@mui/icons-material";
+import {  Search, Clear, Add, Remove, Lock, LockOpen } from "@mui/icons-material";
 import PlayerWeaponModal from "../../equipment/weapons/PlayerWeaponModal";
 import PlayerCustomWeaponModal from "../../equipment/customWeapons/PlayerCustomWeaponModal";
 import PlayerArmorModal from "../../equipment/armor/PlayerArmorModal";
@@ -40,7 +39,7 @@ import MagichantKeysContentSection from "../../spells/sections/MagichantKeysCont
 import MagichantTonesContentSection from "../../spells/sections/MagichantTonesContentSection";
 import PlayerNoteModal from "../../informations/PlayerNoteModal";
 import ReactMarkdown from "react-markdown";
-import { fontSize, styled, width } from "@mui/system";
+import {  styled } from "@mui/system";
 import { TypeAffinity } from "../../../types";
 import PlayerEquipment from "./PlayerEquipment";
 import PlayerClasses from "./PlayerClasses";
@@ -59,8 +58,8 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { calculateAttribute } from "../../common/playerCalculations";
 
 // Styled Components
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0 });
+// const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
+// const StyledTableCell = styled(TableCell)({ padding: 0 });
 
 const AffinityGrid = styled(Grid)(({ theme }) => ({
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -74,25 +73,25 @@ const AffinityGrid = styled(Grid)(({ theme }) => ({
 export default function PlayerCardSheet({
     player,
     setPlayer,
-    isMainTab,
+    _isMainTab,
     isEditMode,
-    isCharacterSheet,
+    _isCharacterSheet,
     optionalRules = { quirks: false, campActivities: false, zeroPower: false, technospheres: false },
     characterImage,
     id,
     updateMaxStats,
     onToggleEditMode,
-    onAddClass,
-    onAddFeature,
+    _onAddClass,
+    _onAddFeature,
 }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
     const muiTheme = useTheme();
-    const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+    const _isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
     const [value, setValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // ── Equipment modal state ──────────────────────────────────────────────
+    // Equipment modal state
     const [openNewWeapon, setOpenNewWeapon] = useState(false);
     const [editWeaponIndex, setEditWeaponIndex] = useState(null);
     const [weapon, setWeapon] = useState(null);
@@ -119,7 +118,7 @@ export default function PlayerCardSheet({
 
     const [equipMenuAnchor, setEquipMenuAnchor] = useState(null);
 
-    // ── Equipment helpers (mirrors EditPlayerEquipment) ────────────────────
+    // Equipment helpers (mirrors EditPlayerEquipment)
     const patchInv = (p, source, updater) => {
         const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
         const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
@@ -216,7 +215,7 @@ export default function PlayerCardSheet({
         setOpenNoteModal(true);
     };
 
-    // ── Class management ──────────────────────────────────────────────────────
+    // Class management
     const [editClassIndex, setEditClassIndex] = useState(null);
     const [openClassCard, setOpenClassCard] = useState(false);
 
@@ -291,7 +290,7 @@ export default function PlayerCardSheet({
         setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, companion } : c) }));
     };
 
-    // ── Skill modal (standalone, from compact classes view) ──────────────────
+    // Skill modal (standalone, from compact classes view)
     const [openSkillModal, setOpenSkillModal] = useState(false);
     const [editSkillClassIdx, setEditSkillClassIdx] = useState(null);
     const [editSkillIdx, setEditSkillIdx] = useState(null);
@@ -329,7 +328,7 @@ export default function PlayerCardSheet({
         setOpenSkillModal(false);
     };
 
-    // ── Spell modals ─────────────────────────────────────────────────────────
+    // Spell modals
     const { isOpen: isSpellOpen, openModal: openSpellModal, closeModal: closeSpellModal, spellBeingEdited, editingSpellClass, editingSpellIndex } = useSpellModals();
 
     const handleEditSpell = (classIdx, spellIdx, spell) => {

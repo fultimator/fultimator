@@ -1,6 +1,7 @@
 import { FormControl, Grid, InputLabel, Slider } from "@mui/material";
 import { Fragment } from "react";
-import { TypeIcon, typeList, TypeName } from "../../components/types";
+import { TypeIcon, TypeName } from "../../components/types";
+import { typeList } from "../../components/typeConstants";
 import { useTranslate } from "../../translation/translate";
 
 export default function EditAffinities({ npc, setNpc }) {

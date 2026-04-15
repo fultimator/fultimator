@@ -1573,5 +1573,4 @@ function RenderVillainPhase({ villain, phases, multipart }) {
 }
 
 export default NpcPretty;
-
-export { calcHP, calcMP, calcInit, Rank, Stats, Attacks, Spells };
+export { Rank, Stats, Attacks, Spells };

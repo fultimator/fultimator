@@ -132,14 +132,14 @@ const Immunities = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
 
   // List of all immunities from NpcImmunities
-  const allImmunities = {
+  const allImmunities = useMemo(() => ({
     slow: false,
     dazed: false,
     weak: false,
     shaken: false,
     enraged: false,
     poisoned: false,
-  };
+  }), []);
 
   const freeImmunities = useMemo(() => {
     const free = { ...allImmunities };
@@ -152,7 +152,7 @@ const Immunities = React.memo(({ npc, setNpc }) => {
       free.enraged = true;
     }
     return free;
-  }, [npc.species]);
+  }, [npc.species, allImmunities]);
 
   const immunities = { ...allImmunities, ...(npc.immunities || {}) };
 

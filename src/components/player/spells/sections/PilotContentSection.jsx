@@ -30,7 +30,10 @@ import ReactMarkdown from "react-markdown";
  * Manages vehicles/modules directly from shared UnifiedSpellModal form state.
  */
 export default function PilotContentSection({ formState, setFormState, t }) {
-  const vehicles = formState?.vehicles || formState?.currentVehicles || [];
+  const vehicles = useMemo(
+    () => formState?.vehicles || formState?.currentVehicles || [],
+    [formState?.vehicles, formState?.currentVehicles]
+  );
 
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     open: false,
@@ -559,7 +562,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
   );
 
   const handleCompendiumVehicleImport = useCallback(
-    (item) => {
+    () => {
       handleAddVehicle();
       setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }));
     },
@@ -908,7 +911,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             : handleConfirmDeleteModule
         }
         title={t("Delete")}
-        message={`${t("Are you sure you want to delete")} \"${deleteConfirmation.name}\"?`}
+        message={`${t("Are you sure you want to delete")} "${deleteConfirmation.name}"?`}
         itemPreview={deleteConfirmation.name}
       />
       <CompendiumViewerModal

@@ -59,7 +59,7 @@ export default function PlayerArmorModal({
     precModifier, setPrecModifier,
     damageMeleeModifier, setDamageMeleeModifier,
     damageRangedModifier, setDamageRangedModifier,
-    isEquipped, setIsEquipped,
+    isEquipped, _setIsEquipped,
     modifiersExpanded, setModifiersExpanded,
     expandModifiers,
     modifiers,

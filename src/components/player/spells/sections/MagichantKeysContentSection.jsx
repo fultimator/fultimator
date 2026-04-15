@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import MagichantKeyItem from "./MagichantKeyItem";
 import { availableMagichantKeys } from "../spellOptionData";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 
 export default function MagichantKeysContentSection({ formState, setFormState, t }) {
-  const currentKeys = formState.keys || [];
+  const currentKeys = useMemo(() => formState.keys || [], [formState.keys]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankKey = useCallback(() => {

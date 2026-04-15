@@ -120,7 +120,6 @@ export const CloudAdapter: DatabaseAdapter = {
   },
 
   useCollectionData(queryRef: unknown) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [data, loading, err] = useCollectionDataFirestore(
       queryRef as Query | null | undefined,
       { idField: "id" }
@@ -130,7 +129,6 @@ export const CloudAdapter: DatabaseAdapter = {
   },
 
   useDocumentData(ref: unknown) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [data, loading, err] = useDocumentDataFirestore(
       ref as DocumentReference | null | undefined,
       { idField: "id" }

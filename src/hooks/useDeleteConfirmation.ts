@@ -92,10 +92,9 @@ export function useDeleteConfirmation({
         isCtrl = event.ctrlKey || event.metaKey;
 
         // Try native event
-        if (!isCtrl && (event as any).nativeEvent) {
-          isCtrl =
-            (event.nativeEvent as any).ctrlKey ||
-            (event.nativeEvent as any).metaKey;
+        if (!isCtrl && (event as React.MouseEvent<HTMLElement>).nativeEvent) {
+          const nativeEvent = (event as React.MouseEvent<HTMLElement>).nativeEvent;
+          isCtrl = nativeEvent.ctrlKey || nativeEvent.metaKey;
         }
       }
 

@@ -34,13 +34,16 @@ import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import {
   CompendiumSidebar,
   ItemCard,
+} from "../../routes/compendium/compendium";
+import {
   ITEM_TYPES,
   VIEWER_TO_PACK_TYPE,
   getItems,
   getItemSearchText,
+  toSlug,
   makeId,
   getNonStaticSpellItems,
-} from "../../routes/compendium/compendium";
+} from "../../libs/compendium";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
@@ -51,8 +54,8 @@ import classList, { spellList } from "../../libs/classes";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 import useDownloadImage from "../../hooks/useDownloadImage";
 
-const NPC_TYPES    = ["spells", "attacks", "special", "actions"];
-const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
+const _NPC_TYPES    = ["spells", "attacks", "special", "actions"];
+const _PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
 
 const SIDEBAR_WIDTH = 300;
 
@@ -331,14 +334,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
 
   const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
   const [downloadSelectedImage] = useDownloadImage(selectedItem?.name ?? "item", selectedCardRef);
-
-  const toSlug = (value = "") =>
-    value
-      .toString()
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
 
   const handleShareUrl = useCallback(async () => {
     const url = new URL(window.location.href);

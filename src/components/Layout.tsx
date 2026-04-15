@@ -3,7 +3,7 @@ import { Container } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import AppBar from "./appbar/AppBar";
 import CompactAppBar from "./appbar/CompactAppBar";
-import { useThemeContext } from "../ThemeContext";
+import { useThemeContext } from "../hooks/useThemeContext";
 import { globalConfirm } from "../utility/globalConfirm";
 import { useTranslate } from "../translation/translate";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -70,7 +70,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   // Check if user is moderator
   const isModerator = user && moderators.includes(user.uid);
 
-  const fetchPendingSubmissions = async () => {
+  const fetchPendingSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -90,13 +90,13 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     if (open && isModerator) {
       fetchPendingSubmissions();
     }
-  }, [open, isModerator]);
+  }, [open, isModerator, fetchPendingSubmissions]);
 
   const approveSubmission = async (submission: PendingSubmission) => {
     if (!isModerator) return;

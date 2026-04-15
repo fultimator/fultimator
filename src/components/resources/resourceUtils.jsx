@@ -64,32 +64,34 @@ export const getTypeColor = ({type, isDarkMode = false}) => {
   }
 };
 
-export const getTypeLabel = (type) => {
+export const useTypeLabel = () => {
   const { t } = useTranslate();
-  switch (type) {
-    case "pdf":
-      return t("resources_pdf_download");
-    case "physical":
-      return t("resources_physical_book");
-    case "both":
-      return t("resources_book_pdf");
-    case "free":
-      return t("resources_free_resource");
-    case "website":
-      return t("resources_website");
-    case "coming_soon":
-      return t("resources_coming_soon");
-    case "tools":
-      return t("resources_tools");
-    case "content":
-      return t("resources_content");
-    case "crowdfunding":
-      return t("resources_crowdfunding");
-    case "social_media":
-      return t("resources_social_media");
-    default:
-      return t("resources_resource");
-  }
+  return (type) => {
+    switch (type) {
+      case "pdf":
+        return t("resources_pdf_download");
+      case "physical":
+        return t("resources_physical_book");
+      case "both":
+        return t("resources_book_pdf");
+      case "free":
+        return t("resources_free_resource");
+      case "website":
+        return t("resources_website");
+      case "coming_soon":
+        return t("resources_coming_soon");
+      case "tools":
+        return t("resources_tools");
+      case "content":
+        return t("resources_content");
+      case "crowdfunding":
+        return t("resources_crowdfunding");
+      case "social_media":
+        return t("resources_social_media");
+      default:
+        return t("resources_resource");
+    }
+  };
 };
 
 export const languages = {

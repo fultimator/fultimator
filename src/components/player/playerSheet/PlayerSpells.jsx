@@ -15,14 +15,12 @@ import {
   Checkbox,
   Tooltip,
   Divider,
-  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, Info, SettingsSuggest } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
-import { OpenBracket, CloseBracket } from "../../Bracket";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";

@@ -186,7 +186,7 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                       </Tooltip>
                     )}
                   </StyledTableCell>
-                  <StyledTableCell onClick={(e) => { e.stopPropagation(); note.description && toggleRow('notes', noteKey); }} sx={{ cursor: note.description ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
+                  <StyledTableCell onClick={(e) => { e.stopPropagation(); if (note.description) toggleRow('notes', noteKey); }} sx={{ cursor: note.description ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
                       <Typography
                         variant="body2"
