@@ -1969,6 +1969,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
 export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick }) {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
+  const [expandedSpellAccordion, setExpandedSpellAccordion] = React.useState(null);
 
   const background =
     customTheme.mode === "dark"
@@ -2080,6 +2081,8 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
             return null;
           return (
             <Accordion disableGutters elevation={0} square
+              expanded={expandedSpellAccordion === cls.name}
+              onChange={(_, isExpanded) => setExpandedSpellAccordion(isExpanded ? cls.name : null)}
               sx={{ borderTop: `1px solid ${customTheme.secondary}`, "&:before": { display: "none" } }}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 40, "& .MuiAccordionSummary-content": { my: 0.5 } }}>
@@ -2101,12 +2104,14 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
                 </Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0 }}>
-                {hasCustomSpells ? (
-                  /* Per-character spell types */
-                  (cls.benefits.spellClasses.map((sc) => {
-                    const descKeys = SPELL_TYPE_DESC_KEYS[sc] ?? [];
-                    const content = renderSpellTypeContent(sc, t, customTheme);
-                    const hasContent = Array.isArray(content) ? content.length > 0 : content !== null;
+                {expandedSpellAccordion === cls.name && (
+                  <>
+                    {hasCustomSpells ? (
+                      /* Per-character spell types */
+                      (cls.benefits.spellClasses.map((sc) => {
+                        const descKeys = SPELL_TYPE_DESC_KEYS[sc] ?? [];
+                        const content = renderSpellTypeContent(sc, t, customTheme);
+                        const hasContent = Array.isArray(content) ? content.length > 0 : content !== null;
                     return (
                       <Box key={sc} sx={{ borderTop: `1px solid ${customTheme.secondary}` }}>
                         {/* Header: chip + optional desc keys */}
@@ -2263,6 +2268,8 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
                       )}
                     </Box>
                   )))
+                )}
+                  </>
                 )}
               </AccordionDetails>
             </Accordion>

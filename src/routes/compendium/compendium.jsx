@@ -1398,11 +1398,11 @@ function CompendiumViewer() {
                     <Box
                       ref={idx === selectedIdx ? selectedCardRef : null}
                       sx={{
-                        borderRadius: 1,
-                        outline: idx === selectedIdx
+                        borderRadius: 2,
+                        border: idx === selectedIdx
                           ? `2px solid ${customTheme.primary}`
                           : "2px solid transparent",
-                        transition: "outline 0.15s ease",
+                        transition: "border-color 0.15s ease",
                         contain: "content",
                       }}
                     >
