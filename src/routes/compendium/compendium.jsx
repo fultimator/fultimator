@@ -1058,9 +1058,13 @@ function CompendiumViewer() {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
-    setSearchParams({ ...base, type: selectedType, ...(books.length > 0 ? { book: books.join(",") } : {}) });
+    const heroicClasses = searchParams.get("heroicClasses");
+    const newParams = { ...base, type: selectedType };
+    if (books.length > 0) newParams.book = books.join(",");
+    if (heroicClasses) newParams.heroicClasses = heroicClasses;
+    setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleQualityFiltersChange = useCallback((filters) => {
     setSearchQuery("");
@@ -1090,21 +1094,25 @@ function CompendiumViewer() {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const book = searchParams.get("book");
     const newParams = { ...base, type: selectedType };
     if (classes.length > 0) newParams.heroicClasses = classes.join(",");
+    if (book) newParams.book = book;
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleOptionalSubtypesChange = useCallback((subtypes) => {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const book = searchParams.get("book");
     const newParams = { ...base, type: selectedType };
     if (subtypes.length > 0) newParams.optionalSubtypes = subtypes.join(",");
+    if (book) newParams.book = book;
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleCompendiumChange = useCallback((compendium) => {
     if (compendium === "__manage_modules__") {
@@ -1155,6 +1163,11 @@ function CompendiumViewer() {
         ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
         ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
         ...(selectedMagichantSubtype ? { magichantSubtype: selectedMagichantSubtype } : {}),
+        ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
+        ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
+        ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
+        ...(selectedHeroicClasses.length > 0 ? { heroicClasses: selectedHeroicClasses.join(",") } : {}),
+        ...(selectedOptionalSubtypes.length > 0 ? { optionalSubtypes: selectedOptionalSubtypes.join(",") } : {}),
         item: toSlug(item.name),
       });
       const id = itemIds[idx];
@@ -1173,7 +1186,7 @@ function CompendiumViewer() {
         requestAnimationFrame(scrollToItem);
       }
     },
-    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, setSearchParams]
+    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, selectedBook, selectedQualityFilters, selectedQualityCategories, selectedHeroicClasses, selectedOptionalSubtypes, setSearchParams]
   );
 
   // Memoize click handlers per item to prevent ItemCard re-renders from stale closures
