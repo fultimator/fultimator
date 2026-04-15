@@ -34,12 +34,12 @@ export default function PlayerVehicle({ player, searchQuery = "" }) {
 
   // Find all pilot-vehicle spells
   const pilotSpells = (player.classes || [])
-    .flatMap((c) => (c.spells || []).map(s => ({ ...s, className: c.name })))
+    .flatMap((c) => (c.spells || []).map((s) => ({ ...s, className: c.name })))
     .filter(
       (spell) =>
         spell &&
         spell.spellType === "pilot-vehicle" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     );
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -47,7 +47,10 @@ export default function PlayerVehicle({ player, searchQuery = "" }) {
     if (!normalizedQuery) return true;
     const rawStrings = collectStringValues(spell, []);
     const translatedStrings = rawStrings.map((text) => t(text));
-    return [...rawStrings, ...translatedStrings].join(" ").toLowerCase().includes(normalizedQuery);
+    return [...rawStrings, ...translatedStrings]
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery);
   });
 
   if (visiblePilotSpells.length === 0) return null;
@@ -67,7 +70,9 @@ export default function PlayerVehicle({ player, searchQuery = "" }) {
           >
             <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader>
-              <Typography variant="h4" sx={{ color: 'white' }}>{t("pilot_vehicle")}</Typography>
+              <Typography variant="h4" sx={{ color: "white" }}>
+                {t("pilot_vehicle")}
+              </Typography>
             </StyledTableCellHeader>
           </TableRow>
         </TableHead>

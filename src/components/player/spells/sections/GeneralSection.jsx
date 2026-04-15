@@ -1,4 +1,11 @@
-import { Grid, FormControlLabel, Switch, Typography, Box, Slider } from "@mui/material";
+import {
+  Grid,
+  FormControlLabel,
+  Switch,
+  Typography,
+  Box,
+  Slider,
+} from "@mui/material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 
@@ -29,7 +36,7 @@ export default function GeneralSection({
   return (
     <Grid container spacing={3}>
       {/* Show in Player Sheet */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -45,7 +52,7 @@ export default function GeneralSection({
         const value = formState[field.name];
 
         return (
-          <Grid  key={field.name} size={12}>
+          <Grid key={field.name} size={12}>
             {field.type === "toggle" && (
               <FormControlLabel
                 control={
@@ -109,8 +116,9 @@ export default function GeneralSection({
                     component="div"
                     sx={{
                       color: "text.secondary",
-                      mt: 1
-                    }}>
+                      mt: 1,
+                    }}
+                  >
                     <ReactMarkdown components={markdownComponents}>
                       {t(field.helpText)}
                     </ReactMarkdown>

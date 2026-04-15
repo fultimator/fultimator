@@ -155,7 +155,7 @@ const SettingsDialog = ({
     autoOpenLogs,
     npcReorderingMethod,
     noteReorderingMethod,
-    autosaveEnabled,    
+    autosaveEnabled,
     showSaveSnackbar,
     hideLogs,
     showBaseAttackEffect,
@@ -337,7 +337,7 @@ const SettingsDialog = ({
               label: t("combat_sim_settings_study_values_playtest"),
             },
           ],
-        }
+        },
       ],
     },
   ];
@@ -391,8 +391,9 @@ const SettingsDialog = ({
         <Box
           sx={{
             display: "flex",
-            alignItems: "center"
-          }}>
+            alignItems: "center",
+          }}
+        >
           <SaveIcon
             sx={{
               mr: 1.5,
@@ -601,8 +602,9 @@ const SettingsDialog = ({
                 <Box
                   sx={{
                     display: "flex",
-                    alignItems: "center"
-                  }}>
+                    alignItems: "center",
+                  }}
+                >
                   <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     {t("combat_sim_settings_log_visibility")}
                   </Typography>
@@ -641,8 +643,9 @@ const SettingsDialog = ({
                       variant="body2"
                       sx={{
                         color: "text.secondary",
-                        mb: 1
-                      }}>
+                        mb: 1,
+                      }}
+                    >
                       {t("combat_sim_settings_log_visibility_desc")}
                     </Typography>
 

@@ -133,13 +133,21 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -162,12 +170,16 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
-          <Grid  size="grow">
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+          spacing={1}
+        >
+          <Grid size="grow">
             <Select
               value={selectedType}
               onChange={handleTypeChange}
@@ -179,7 +191,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               <MenuItem value="basic">{t("Basic Attacks")}</MenuItem>
             </Select>
           </Grid>
-          <Grid >
+          <Grid>
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -191,9 +203,9 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             </IconButton>
           </Grid>
           {/* Source selector row */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Grid container spacing={1} sx={{ alignItems: "center" }}>
-              <Grid  size={source === "packs" ? 4 : 12}>
+              <Grid size={source === "packs" ? 4 : 12}>
                 <Select
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
@@ -208,7 +220,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                 </Select>
               </Grid>
               {source === "packs" && (
-                <Grid  size={8}>
+                <Grid size={8}>
                   <Select
                     value={selectedPackId}
                     onChange={(e) => setSelectedPackId(e.target.value)}
@@ -231,9 +243,12 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
-              <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
+              <Typography
+                variant="body2"
+                sx={{ p: 1, color: "text.secondary" }}
+              >
                 {source === "packs"
                   ? t("No items in this pack for the selected type.")
                   : t("No items available.")}
@@ -271,17 +286,23 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       {t(selectedItem.category)}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
                         <Diamond />
                       </Box>
                       {selectedItem.hands === 1
                         ? t("One-handed")
                         : t("Two-handed")}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
                         <Diamond />
                       </Box>
                       {selectedItem.melee ? t("Melee") : t("Ranged")}
@@ -296,9 +317,12 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                           attributes[selectedItem.attr2]?.shortcaps}
                         <CloseBracket />
                       </strong>
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
                         <Diamond />
                       </Box>
                       <strong>
@@ -326,9 +350,12 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       {selectedItem.mp}{" "}
                       {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                       {t("MP")}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
                         <Diamond />
                       </Box>
                       <StyledMarkdown
@@ -337,9 +364,12 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       >
                         {selectedItem.target}
                       </StyledMarkdown>
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
                         <Diamond />
                       </Box>
                       <StyledMarkdown
@@ -364,23 +394,29 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       </DialogContent>
       <Divider />
       <DialogActions>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
           <Grid
             size={{
               xs: 12,
-              sm: "auto"
-            }}>
+              sm: "auto",
+            }}
+          >
             <Typography variant="body2">
               <strong>Disclaimer:</strong> For personal use only; do not share
               exported data on official channels.
             </Typography>
           </Grid>
           <Grid
-            container sx={{ justifyContent: "flex-end" }}
+            container
+            sx={{ justifyContent: "flex-end" }}
             size={{
               xs: 12,
-              sm: "auto"
-            }}>
+              sm: "auto",
+            }}
+          >
             <Button
               disabled
               variant="contained"

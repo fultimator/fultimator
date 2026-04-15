@@ -41,7 +41,12 @@ import GeneralSection from "../spells/sections/GeneralSection";
 import MagichantKeysContentSection from "../spells/sections/MagichantKeysContentSection";
 import MagichantTonesContentSection from "../spells/sections/MagichantTonesContentSection";
 
-export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isCharacterSheet }) {
+export default function PlayerSpellsFull({
+  player,
+  setPlayer,
+  isEditMode,
+  isCharacterSheet,
+}) {
   const { t } = useTranslate();
   const custom = useCustomTheme();
   const primary = custom.primary;
@@ -61,7 +66,8 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
     if (!canEdit) return;
     const spellType = spell.spellType;
     let modalName = "default";
-    if (spellType === "arcanist" || spellType === "arcanist-rework") modalName = "arcanist";
+    if (spellType === "arcanist" || spellType === "arcanist-rework")
+      modalName = "arcanist";
     else if (spellType === "gamble") modalName = "gamble";
     else if (spellType === "magichant") modalName = "chanter";
     else if (spellType === "symbol") modalName = "symbolist";
@@ -72,9 +78,12 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
     else if (spellType === "magiseed") modalName = "magiseed";
     else if (spellType === "cooking") modalName = "gourmet";
     else if (spellType === "invocation") modalName = "invoker";
-    else if (spellType?.startsWith("tinkerer-alchemy")) modalName = "tinkerer-alchemy";
-    else if (spellType?.startsWith("tinkerer-infusion")) modalName = "tinkerer-infusion";
-    else if (spellType?.startsWith("tinkerer-magitech")) modalName = "tinkerer-magitech";
+    else if (spellType?.startsWith("tinkerer-alchemy"))
+      modalName = "tinkerer-alchemy";
+    else if (spellType?.startsWith("tinkerer-infusion"))
+      modalName = "tinkerer-infusion";
+    else if (spellType?.startsWith("tinkerer-magitech"))
+      modalName = "tinkerer-magitech";
     else if (spellType === "deck") modalName = "deck";
     openModal(modalName, spell, classIdx, spellIdx);
   };
@@ -85,9 +94,12 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
   };
 
   const saveSpell = (maybeIndexOrSpell, maybeSpell) => {
-    if (!setPlayer || editingSpellClass === null || editingSpellIndex === null) return;
-    const targetIndex = maybeSpell !== undefined ? maybeIndexOrSpell : editingSpellIndex;
-    const updatedSpell = maybeSpell !== undefined ? maybeSpell : maybeIndexOrSpell;
+    if (!setPlayer || editingSpellClass === null || editingSpellIndex === null)
+      return;
+    const targetIndex =
+      maybeSpell !== undefined ? maybeIndexOrSpell : editingSpellIndex;
+    const updatedSpell =
+      maybeSpell !== undefined ? maybeSpell : maybeIndexOrSpell;
     if (typeof targetIndex !== "number" || !updatedSpell) return;
 
     setPlayer((prev) => ({
@@ -97,10 +109,10 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
           ? {
               ...cls,
               spells: cls.spells.map((spell, spellIdx) =>
-                spellIdx === targetIndex ? updatedSpell : spell
+                spellIdx === targetIndex ? updatedSpell : spell,
               ),
             }
-          : cls
+          : cls,
       ),
     }));
     closeModal();
@@ -108,15 +120,19 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
 
   const deleteSpell = (spellIndex) => {
     if (!setPlayer || editingSpellClass === null) return;
-    const targetIndex = typeof spellIndex === "number" ? spellIndex : editingSpellIndex;
+    const targetIndex =
+      typeof spellIndex === "number" ? spellIndex : editingSpellIndex;
     if (typeof targetIndex !== "number") return;
 
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls, i) =>
         i === editingSpellClass
-          ? { ...cls, spells: cls.spells.filter((_, idx) => idx !== targetIndex) }
-          : cls
+          ? {
+              ...cls,
+              spells: cls.spells.filter((_, idx) => idx !== targetIndex),
+            }
+          : cls,
       ),
     }));
     closeModal();
@@ -129,7 +145,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
           {player.classes
             .filter((c) => c.spells && c.spells.length > 0)
             .map((c, classIndex) => (
-              <Grid  key={classIndex} size={12}>
+              <Grid key={classIndex} size={12}>
                 <Paper
                   elevation={3}
                   sx={
@@ -172,7 +188,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
                     .filter(
                       (spell) =>
                         spell.showInPlayerSheet ||
-                        spell.showInPlayerSheet === undefined
+                        spell.showInPlayerSheet === undefined,
                     )
                     .map((spell, spellIndex) => (
                       <React.Fragment key={spellIndex}>
@@ -192,7 +208,9 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
                             attr2={spell.attr2}
                             showInPlayerSheet={spell.showInPlayerSheet}
                             index={spellIndex}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "gamble" && (
@@ -200,7 +218,9 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
                             key={spellIndex}
                             gamble={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {(spell.spellType === "arcanist" ||
@@ -210,7 +230,9 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
                               arcana={spell}
                               isEditMode={isEditMode}
                               rework={spell.spellType === "arcanist-rework"}
-                              onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                              onEdit={() =>
+                                handleEditSpell(classIndex, spellIndex, spell)
+                              }
                             />
                           </div>
                         )}
@@ -218,95 +240,149 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
                           <SpellTinkererAlchemy
                             alchemy={spell}
                             isEditMode={isEditMode}
-                            onEditRank={() => handleEditSpell(classIndex, spellIndex, spell)}
-                            onEditTargets={() => handleOpenSpellSubModal("alchemyTarget", classIndex, spellIndex, spell)}
-                            onEditEffects={() => handleOpenSpellSubModal("alchemyEffects", classIndex, spellIndex, spell)}
+                            onEditRank={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
+                            onEditTargets={() =>
+                              handleOpenSpellSubModal(
+                                "alchemyTarget",
+                                classIndex,
+                                spellIndex,
+                                spell,
+                              )
+                            }
+                            onEditEffects={() =>
+                              handleOpenSpellSubModal(
+                                "alchemyEffects",
+                                classIndex,
+                                spellIndex,
+                                spell,
+                              )
+                            }
                           />
                         )}
                         {spell.spellType === "tinkerer-infusion" && (
                           <SpellTinkererInfusion
                             infusion={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "tinkerer-magitech" && (
                           <SpellTinkererMagitech
                             magitech={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "magichant" && (
                           <SpellChanter
                             magichant={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
-                            onEditKeys={() => handleOpenSpellSubModal("chantKey", classIndex, spellIndex, spell)}
-                            onEditTones={() => handleOpenSpellSubModal("chantTone", classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
+                            onEditKeys={() =>
+                              handleOpenSpellSubModal(
+                                "chantKey",
+                                classIndex,
+                                spellIndex,
+                                spell,
+                              )
+                            }
+                            onEditTones={() =>
+                              handleOpenSpellSubModal(
+                                "chantTone",
+                                classIndex,
+                                spellIndex,
+                                spell,
+                              )
+                            }
                           />
                         )}
                         {spell.spellType === "symbol" && (
                           <SpellSymbolist
                             symbol={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "dance" && (
                           <SpellDancer
                             dance={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "gift" && (
                           <SpellGift
                             gift={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "therioform" && (
                           <SpellMutant
                             mutant={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "pilot-vehicle" && (
                           <SpellPilot
                             pilot={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "magiseed" && (
                           <SpellMagiseed
                             magiseed={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "cooking" && (
                           <SpellGourmet
                             spell={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "invocation" && (
                           <SpellInvoker
                             invoker={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                         {spell.spellType === "deck" && (
                           <SpellDeck
                             deck={spell}
                             isEditMode={isEditMode}
-                            onEdit={() => handleEditSpell(classIndex, spellIndex, spell)}
+                            onEdit={() =>
+                              handleEditSpell(classIndex, spellIndex, spell)
+                            }
                           />
                         )}
                       </React.Fragment>

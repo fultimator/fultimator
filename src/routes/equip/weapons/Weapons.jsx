@@ -115,10 +115,22 @@ function Weapons() {
       if (rework) {
         setRework(rework);
       }
-      if (data.damageModifier) { setDamageModifier(data.damageModifier); setModifiersExpanded(true); }
-      if (data.precModifier) { setPrecModifier(data.precModifier); setModifiersExpanded(true); }
-      if (data.defModifier) { setDefModifier(data.defModifier); setModifiersExpanded(true); }
-      if (data.mDefModifier) { setMDefModifier(data.mDefModifier); setModifiersExpanded(true); }
+      if (data.damageModifier) {
+        setDamageModifier(data.damageModifier);
+        setModifiersExpanded(true);
+      }
+      if (data.precModifier) {
+        setPrecModifier(data.precModifier);
+        setModifiersExpanded(true);
+      }
+      if (data.defModifier) {
+        setDefModifier(data.defModifier);
+        setModifiersExpanded(true);
+      }
+      if (data.mDefModifier) {
+        setMDefModifier(data.mDefModifier);
+        setModifiersExpanded(true);
+      }
     }
   };
 
@@ -235,8 +247,9 @@ function Weapons() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -253,12 +266,12 @@ function Weapons() {
           />
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
             {/* Change Base */}
-            <Grid  size={4}>
+            <Grid size={4}>
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
                   const selectedBase = weapons.find(
-                    (el) => el.name === e.target.value
+                    (el) => el.name === e.target.value,
                   );
 
                   setBase(selectedBase);
@@ -276,11 +289,11 @@ function Weapons() {
               />
             </Grid>
             {/* Change Martial */}
-            <Grid  size={2}>
+            <Grid size={2}>
               <ChangeMartial martial={martial} setMartial={setMartial} />
             </Grid>
             {/* Change Name */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeName
                 value={isLoaded ? name : t(name)}
                 onChange={(e) =>
@@ -291,21 +304,21 @@ function Weapons() {
               />
             </Grid>
             {/* Change Type */}
-            <Grid  size={3}>
+            <Grid size={3}>
               <ChangeType
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               />
             </Grid>
             {/* Change Hands */}
-            <Grid  size={3}>
+            <Grid size={3}>
               <ChangeHands
                 value={hands}
                 onChange={(e) => setHands(e.target.value)}
               />
             </Grid>
             {/* Change Attributes */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeAttr
                 att1={att1}
                 att2={att2}
@@ -314,12 +327,12 @@ function Weapons() {
               />
             </Grid>
             {/* Change Quality */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
                   const quality = qualities.find(
-                    (el) => el.name === e.target.value
+                    (el) => el.name === e.target.value,
                   );
                   setSelectedQuality(quality.name);
                   setQuality(quality.quality);
@@ -328,7 +341,7 @@ function Weapons() {
               />
             </Grid>
             {/* Change Bonus */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeBonus
                 basePrec={base.prec}
                 precBonus={precBonus}
@@ -341,7 +354,7 @@ function Weapons() {
                 totalBonus={totalBonus}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -350,7 +363,7 @@ function Weapons() {
               />
               <Divider />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Accordion
                 sx={{ width: "100%" }}
                 expanded={modifiersExpanded}
@@ -361,26 +374,42 @@ function Weapons() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
-                    <Grid  size={6}>
-                      <ChangeModifiers label={"Damage Modifier"} value={damageModifier} onChange={(e) => setDamageModifier(e.target.value)} />
+                    <Grid size={6}>
+                      <ChangeModifiers
+                        label={"Damage Modifier"}
+                        value={damageModifier}
+                        onChange={(e) => setDamageModifier(e.target.value)}
+                      />
                     </Grid>
-                    <Grid  size={6}>
-                      <ChangeModifiers label={"Precision Modifier"} value={precModifier} onChange={(e) => setPrecModifier(e.target.value)} />
+                    <Grid size={6}>
+                      <ChangeModifiers
+                        label={"Precision Modifier"}
+                        value={precModifier}
+                        onChange={(e) => setPrecModifier(e.target.value)}
+                      />
                     </Grid>
-                    <Grid  size={6}>
-                      <ChangeModifiers label={"DEF Modifier"} value={defModifier} onChange={(e) => setDefModifier(e.target.value)} />
+                    <Grid size={6}>
+                      <ChangeModifiers
+                        label={"DEF Modifier"}
+                        value={defModifier}
+                        onChange={(e) => setDefModifier(e.target.value)}
+                      />
                     </Grid>
-                    <Grid  size={6}>
-                      <ChangeModifiers label={"MDEF Modifier"} value={mDefModifier} onChange={(e) => setMDefModifier(e.target.value)} />
+                    <Grid size={6}>
+                      <ChangeModifiers
+                        label={"MDEF Modifier"}
+                        value={mDefModifier}
+                        onChange={(e) => setMDefModifier(e.target.value)}
+                      />
                     </Grid>
                   </Grid>
                 </AccordionDetails>
               </Accordion>
               <Divider />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Grid container spacing={1} sx={{ alignItems: "center" }}>
-                <Grid >
+                <Grid>
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -388,13 +417,13 @@ function Weapons() {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid >
+                <Grid>
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}
-                <Grid  size="grow">
+                <Grid size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
               </Grid>
@@ -423,8 +452,9 @@ function Weapons() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Pretty
           base={base}
           custom={{

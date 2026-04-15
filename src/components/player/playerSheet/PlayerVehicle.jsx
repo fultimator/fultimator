@@ -23,11 +23,7 @@ import { availableFrames } from "../../../libs/pilotVehicleData";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 import { calculateAttribute } from "../common/playerCalculations";
 
-export default function PlayerVehicle({
-  player,
-  setPlayer,
-  isCharacterSheet,
-}) {
+export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -49,32 +45,34 @@ export default function PlayerVehicle({
         ...s,
         classIndex,
         spellIndex,
-      }))
+      })),
     )
     .filter(
       (spell) =>
         spell &&
         spell.spellType === "pilot-vehicle" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     );
 
   // Find the spell with enabled vehicle (for display), or use first pilot spell (for editing)
-  const activePilotSpell = pilotSpells.find((s) =>
-    (s.vehicles || []).some((v) => v.enabled)
-  ) || pilotSpells[0];
+  const activePilotSpell =
+    pilotSpells.find((s) => (s.vehicles || []).some((v) => v.enabled)) ||
+    pilotSpells[0];
 
   if (!activePilotSpell) {
     return null;
   }
 
-  const activeVehicle = activePilotSpell.vehicles.find((v) => v.enabled) || activePilotSpell.vehicles?.[0];
+  const activeVehicle =
+    activePilotSpell.vehicles.find((v) => v.enabled) ||
+    activePilotSpell.vehicles?.[0];
 
   if (!activeVehicle) {
     return null;
   }
 
   const frame = availableFrames.find(
-    (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton")
+    (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton"),
   );
 
   const equippedModules = activeVehicle.modules
@@ -82,13 +80,13 @@ export default function PlayerVehicle({
     : [];
 
   const armorModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_armor"
+    (m) => m.type === "pilot_module_armor",
   );
   const weaponModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_weapon"
+    (m) => m.type === "pilot_module_weapon",
   );
   const supportModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_support"
+    (m) => m.type === "pilot_module_support",
   );
 
   const currDex = calculateAttribute(
@@ -97,7 +95,7 @@ export default function PlayerVehicle({
     ["slow", "enraged"],
     ["dexUp"],
     6,
-    12
+    12,
   );
   const currInsight = calculateAttribute(
     player,
@@ -105,7 +103,7 @@ export default function PlayerVehicle({
     ["dazed", "enraged"],
     ["insUp"],
     6,
-    12
+    12,
   );
   const currMight = calculateAttribute(
     player,
@@ -113,7 +111,7 @@ export default function PlayerVehicle({
     ["weak", "poisoned"],
     ["migUp"],
     6,
-    12
+    12,
   );
   const currWillpower = calculateAttribute(
     player,
@@ -121,7 +119,7 @@ export default function PlayerVehicle({
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
-    12
+    12,
   );
 
   const attributeMap = {
@@ -159,8 +157,8 @@ export default function PlayerVehicle({
     const dialogContent = (
       <>
         <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid  container size={6}>
-            <Grid  size={12}>
+          <Grid container size={6}>
+            <Grid size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -172,8 +170,8 @@ export default function PlayerVehicle({
               </Typography>
             </Grid>
           </Grid>
-          <Grid  container size={6}>
-            <Grid  size={12}>
+          <Grid container size={6}>
+            <Grid size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -191,7 +189,7 @@ export default function PlayerVehicle({
               </Typography>
             </Grid>
           </Grid>
-          <Grid  sx={{ marginTop: "20px" }} size={12}>
+          <Grid sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
               {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
                 attributes[att2].shortcaps
@@ -230,7 +228,7 @@ export default function PlayerVehicle({
             <br />
           </Typography>
           {dialogContent}
-        </>
+        </>,
       );
     } else if (isCriticalSuccess) {
       setDialogSeverity("success");
@@ -244,7 +242,7 @@ export default function PlayerVehicle({
             <br />
           </Typography>
           {dialogContent}
-        </>
+        </>,
       );
     } else {
       setDialogSeverity("info");
@@ -338,7 +336,11 @@ export default function PlayerVehicle({
             {t("pilot_vehicle")}
           </Typography>
         )}
-        <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+        <Grid
+          container
+          spacing={1}
+          sx={{ padding: "1em", flex: 1, width: "100%" }}
+        >
           {frame && (
             <Grid
               container
@@ -346,9 +348,10 @@ export default function PlayerVehicle({
               sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
-                md: 6
-              }}>
-              <Grid  sx={{ display: "flex" }} size={10}>
+                md: 6,
+              }}
+            >
+              <Grid sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -367,7 +370,14 @@ export default function PlayerVehicle({
                   {t(frame.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+              <Grid
+                sx={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  maxHeight: "40px",
+                }}
+                size={2}
+              >
                 <Box
                   sx={{
                     padding: "5px",
@@ -380,7 +390,14 @@ export default function PlayerVehicle({
                   }}
                 >
                   <Tooltip title={t("Info")}>
-                    <IconButton size="small" onClick={() => { setSelectedModule(frame); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedModule(frame);
+                        setInfoModalOpen(true);
+                      }}
+                      sx={{ p: 0.5 }}
+                    >
                       <Info fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -391,15 +408,16 @@ export default function PlayerVehicle({
 
           {armorModules.map((module, index) => (
             <Grid
-                  container
-                  spacing={0}
-                  key={`armor-${index}`}
+              container
+              spacing={0}
+              key={`armor-${index}`}
               sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
-                md: 6
-              }}>
-              <Grid  sx={{ display: "flex" }} size={10}>
+                md: 6,
+              }}
+            >
+              <Grid sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -420,7 +438,14 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+              <Grid
+                sx={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  maxHeight: "40px",
+                }}
+                size={2}
+              >
                 <Box
                   sx={{
                     padding: "5px",
@@ -433,7 +458,14 @@ export default function PlayerVehicle({
                   }}
                 >
                   <Tooltip title={t("Info")}>
-                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedModule(module);
+                        setInfoModalOpen(true);
+                      }}
+                      sx={{ p: 0.5 }}
+                    >
                       <Info fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -444,15 +476,16 @@ export default function PlayerVehicle({
 
           {weaponModules.map((module, index) => (
             <Grid
-                  container
-                  spacing={0}
-                  key={`weapon-${index}`}
+              container
+              spacing={0}
+              key={`weapon-${index}`}
               sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
-                md: 6
-              }}>
-              <Grid  sx={{ display: "flex" }} size={10}>
+                md: 6,
+              }}
+            >
+              <Grid sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -473,7 +506,14 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+              <Grid
+                sx={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  maxHeight: "40px",
+                }}
+                size={2}
+              >
                 <Box
                   sx={{
                     padding: "5px",
@@ -487,7 +527,14 @@ export default function PlayerVehicle({
                   }}
                 >
                   <Tooltip title={t("Info")}>
-                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedModule(module);
+                        setInfoModalOpen(true);
+                      }}
+                      sx={{ p: 0.5 }}
+                    >
                       <Info fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -507,15 +554,16 @@ export default function PlayerVehicle({
 
           {supportModules.map((module, index) => (
             <Grid
-                  container
-                  spacing={0}
-                  key={`support-${index}`}
+              container
+              spacing={0}
+              key={`support-${index}`}
               sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
               size={{
                 xs: 12,
-                md: 6
-              }}>
-              <Grid  sx={{ display: "flex" }} size={10}>
+                md: 6,
+              }}
+            >
+              <Grid sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -536,7 +584,14 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+              <Grid
+                sx={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  maxHeight: "40px",
+                }}
+                size={2}
+              >
                 <Box
                   sx={{
                     padding: "5px",
@@ -549,7 +604,14 @@ export default function PlayerVehicle({
                   }}
                 >
                   <Tooltip title={t("Info")}>
-                    <IconButton size="small" onClick={() => { setSelectedModule(module); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        setSelectedModule(module);
+                        setInfoModalOpen(true);
+                      }}
+                      sx={{ p: 0.5 }}
+                    >
                       <Info fontSize="small" />
                     </IconButton>
                   </Tooltip>
@@ -562,7 +624,7 @@ export default function PlayerVehicle({
           open={dialogOpen}
           onClose={handleDialogClose}
           slotProps={{
-            paper: { sx: { width: { xs: "90%", md: "30%" } } }
+            paper: { sx: { width: { xs: "90%", md: "30%" } } },
           }}
         >
           <DialogTitle
@@ -572,8 +634,8 @@ export default function PlayerVehicle({
                 dialogSeverity === "error"
                   ? "#bb2124"
                   : dialogSeverity === "success"
-                  ? "#22bb33"
-                  : "#aaaaaa",
+                    ? "#22bb33"
+                    : "#aaaaaa",
             }}
           >
             {t("Result")}
@@ -607,12 +669,23 @@ export default function PlayerVehicle({
           onSave={handleSaveVehicles}
           pilot={activePilotSpell}
         />
-        <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
+        <Dialog
+          open={infoModalOpen}
+          onClose={() => setInfoModalOpen(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogContent sx={{ p: 0 }}>
             {selectedModule && <VehicleModuleCard module={selectedModule} />}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setInfoModalOpen(false)} variant="contained" color="primary">{t("Close")}</Button>
+            <Button
+              onClick={() => setInfoModalOpen(false)}
+              variant="contained"
+              color="primary"
+            >
+              {t("Close")}
+            </Button>
           </DialogActions>
         </Dialog>
       </Paper>

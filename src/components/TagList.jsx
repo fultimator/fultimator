@@ -56,7 +56,7 @@ const TagList = ({ npc, setNpc }) => {
       trimmedValue &&
       (npc.tags?.length < maxTags || !npc.tags) &&
       !npc.tags?.some(
-        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase()
+        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase(),
       )
     ) {
       setNpc((prevState) => {
@@ -95,8 +95,9 @@ const TagList = ({ npc, setNpc }) => {
           color: theme.white,
           background: theme.primary,
           padding: "2px 10px",
-          borderRadius: "4px"
-        }}>
+          borderRadius: "4px",
+        }}
+      >
         {t("Personal Tags")}
       </Typography>
       {/* Stack for input field and add button */}
@@ -113,7 +114,7 @@ const TagList = ({ npc, setNpc }) => {
           disabled={isInputDisabled}
           sx={{ height: "40px" }} // Set fixed height for the TextField
           slotProps={{
-            htmlInput: { maxLength: maxTagLength }
+            htmlInput: { maxLength: maxTagLength },
           }}
         />
         {/* Button to add tags */}

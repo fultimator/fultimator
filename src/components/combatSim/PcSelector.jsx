@@ -11,12 +11,17 @@ import {
 } from "@mui/material";
 import { t } from "../../translation/translate";
 
-export default function PcSelector({ playerList = [], handleSelectPC, loading }) {
+export default function PcSelector({
+  playerList = [],
+  handleSelectPC,
+  loading,
+}) {
   const [filterText, setFilterText] = useState("");
 
-  const filteredList = playerList.filter((player) =>
-    !filterText ||
-    (player.name || "").toLowerCase().includes(filterText.toLowerCase())
+  const filteredList = playerList.filter(
+    (player) =>
+      !filterText ||
+      (player.name || "").toLowerCase().includes(filterText.toLowerCase()),
   );
 
   return (
@@ -30,7 +35,7 @@ export default function PcSelector({ playerList = [], handleSelectPC, loading })
           onChange={(e) => setFilterText(e.target.value)}
           fullWidth
           slotProps={{
-            htmlInput: { maxLength: 100 }
+            htmlInput: { maxLength: 100 },
           }}
         />
       </Box>
@@ -42,7 +47,10 @@ export default function PcSelector({ playerList = [], handleSelectPC, loading })
             </Box>
           )}
           {!loading && filteredList.length === 0 && (
-            <Typography variant="body2" sx={{ padding: 2, color: "text.secondary" }}>
+            <Typography
+              variant="body2"
+              sx={{ padding: 2, color: "text.secondary" }}
+            >
               {t("No players found")}.
             </Typography>
           )}
@@ -65,8 +73,9 @@ export default function PcSelector({ playerList = [], handleSelectPC, loading })
                       component="span"
                       sx={{
                         color: "text.secondary",
-                        fontFamily: "Antonio"
-                      }}>
+                        fontFamily: "Antonio",
+                      }}
+                    >
                       {t("Level")}: {player.lvl ?? "?"}
                     </Typography>
                   }

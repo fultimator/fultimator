@@ -83,7 +83,8 @@ function ThemedSpellChanter({
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -135,7 +136,8 @@ function ThemedSpellChanter({
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={3}>
+            size={3}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -152,7 +154,8 @@ function ThemedSpellChanter({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
+            size={2}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -168,7 +171,8 @@ function ThemedSpellChanter({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={7}>
+            size={7}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -182,7 +186,8 @@ function ThemedSpellChanter({
       </div>
       {volumes.map((volume, i) => (
         <Grid
-          container sx={{
+          container
+          sx={{
             justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
@@ -198,13 +203,15 @@ function ThemedSpellChanter({
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size={3}>
+              size={3}
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
                   fontWeight: "bold",
-                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
-                }}>
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+                }}
+              >
                 {t(volume.name)}
               </Typography>
             </Grid>
@@ -214,7 +221,8 @@ function ThemedSpellChanter({
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              size={2}>
+              size={2}
+            >
               <ReactMarkdown components={components}>
                 {volume.mp + ""}
               </ReactMarkdown>
@@ -225,7 +233,8 @@ function ThemedSpellChanter({
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              size={7}>
+              size={7}
+            >
               <ReactMarkdown components={components}>
                 {t(volume.target)}
               </ReactMarkdown>
@@ -256,7 +265,8 @@ function ThemedSpellChanter({
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={3}>
+            size={3}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -275,8 +285,9 @@ function ThemedSpellChanter({
             }}
             size={{
               xs: 2,
-              sm: 3
-            }}>
+              sm: 3,
+            }}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -292,7 +303,8 @@ function ThemedSpellChanter({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
+            size={2}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -310,8 +322,9 @@ function ThemedSpellChanter({
             }}
             size={{
               xs: 3,
-              sm: 2
-            }}>
+              sm: 2,
+            }}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -327,7 +340,8 @@ function ThemedSpellChanter({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
+            size={2}
+          >
             <Typography
               variant="h3"
               sx={{
@@ -354,7 +368,8 @@ function ThemedSpellChanter({
       ) : (
         magichant.keys.map((chantKey, i) => (
           <Grid
-            container sx={{
+            container
+            sx={{
               justifyContent: "flex-start",
               background: "transparent",
               padding: "3px 17px",
@@ -370,13 +385,15 @@ function ThemedSpellChanter({
                   alignItems: "center",
                   justifyContent: "left",
                 }}
-                size={3}>
+                size={3}
+              >
                 <Typography
                   style={{ flexGrow: 1, marginRight: "5px" }}
                   sx={{
                     fontWeight: "bold",
-                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
-                  }}>
+                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+                  }}
+                >
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.customName
                     : t(chantKey.name)}
@@ -390,8 +407,9 @@ function ThemedSpellChanter({
                 }}
                 size={{
                   xs: 2,
-                  sm: 3
-                }}>
+                  sm: 3,
+                }}
+              >
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.type
@@ -404,7 +422,8 @@ function ThemedSpellChanter({
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                size={2}>
+                size={2}
+              >
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.status
@@ -419,8 +438,9 @@ function ThemedSpellChanter({
                 }}
                 size={{
                   xs: 3,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.attribute
@@ -433,7 +453,8 @@ function ThemedSpellChanter({
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-                size={2}>
+                size={2}
+              >
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.recovery
@@ -467,7 +488,8 @@ function ThemedSpellChanter({
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={3}>
+            size={3}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -513,11 +535,12 @@ function ThemedSpellChanter({
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size="grow">
+                  size="grow"
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {tone.name === "magichant_custom_name"
@@ -534,11 +557,13 @@ function ThemedSpellChanter({
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                  size="grow"></Grid>
+                  size="grow"
+                ></Grid>
               )}
             </div>
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -553,7 +578,8 @@ function ThemedSpellChanter({
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <ReactMarkdown components={components}>
                     {tone.name === "magichant_custom_name"
                       ? tone.effect

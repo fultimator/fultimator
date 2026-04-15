@@ -92,200 +92,187 @@ function replaceTagsWithComponents(
   value2,
   value3,
   value4,
-  value5
+  value5,
 ) {
   if (value1 === "--isAttack--") {
-    return (t(text) || "")
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{attack-name}}") {
+        return <b>{value2.attackName}</b>; // Return attackName wrapped in <b> tags
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{prec}}") {
+        return <b>{value2.prec}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
+      if (part === "{{hr}}") {
+        return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
+      }
+      if (part === "{{extra-damage}}") {
+        return <b>{value2.extraDamage}</b>; // Return extra damage wrapped in <b> tags
+      }
+      if (part === "{{damage}}") {
+        return <b>{value2.damage}</b>; // Return damage wrapped in <b> tags
+      }
+      if (part === "{{attack-range-icon}}") {
+        if (value2.range === "melee") {
+          return <MeleeIcon sx={{ verticalAlign: "middle" }} />;
+        } else {
+          return <DistanceIcon sx={{ verticalAlign: "middle" }} />;
         }
-        if (part === "{{attack-name}}") {
-          return <b>{value2.attackName}</b>; // Return attackName wrapped in <b> tags
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{prec}}") {
-          return <b>{value2.prec}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
-        if (part === "{{hr}}") {
-          return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
-        }
-        if (part === "{{extra-damage}}") {
-          return <b>{value2.extraDamage}</b>; // Return extra damage wrapped in <b> tags
-        }
-        if (part === "{{damage}}") {
-          return <b>{value2.damage}</b>; // Return damage wrapped in <b> tags
-        }
-        if (part === "{{attack-range-icon}}") {
-          if (value2.range === "melee") {
-            return <MeleeIcon sx={{ verticalAlign: "middle" }} />;
-          } else {
-            return <DistanceIcon sx={{ verticalAlign: "middle" }} />;
-          }
-        }
-        if (part === "{{damage-type-icon}}") {
-          return (
-            <TypeIcon
-              type={value2.damageType}
-              sx={{ verticalAlign: "middle" }}
-            />
-          );
-        }
-        if (part === "{{damage-type}}") {
-          return <b>{t(value2.damageType)}</b>;
-        }
-        if (part === "{{effect}}") {
-          return (
-            <SpanMarkdown>
-              {typeof value2.effect === "string" ? value2.effect : ""}
-            </SpanMarkdown>
-          );
-        }
+      }
+      if (part === "{{damage-type-icon}}") {
+        return (
+          <TypeIcon type={value2.damageType} sx={{ verticalAlign: "middle" }} />
+        );
+      }
+      if (part === "{{damage-type}}") {
+        return <b>{t(value2.damageType)}</b>;
+      }
+      if (part === "{{effect}}") {
+        return (
+          <SpanMarkdown>
+            {typeof value2.effect === "string" ? value2.effect : ""}
+          </SpanMarkdown>
+        );
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isSpell--") {
-    return (t(text) || "")
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
-        }
-        if (part === "{{spell-name}}") {
-          return <b>{value2.spellName}</b>;
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{extra-magic}}") {
-          return <b>{value2.extraMagic}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
-        if (part === "{{hr}}") {
-          return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
-        }
-        if (part === "{{offensive-spell-icon}}") {
-          return <OffensiveSpellIcon sx={{ verticalAlign: "middle" }} />;
-        }
-        if (part === "{{targets}}") {
-          return <b>{value2.targets}</b>;
-        }
-        if (part === "{{effect}}") {
-          return (
-            <SpanMarkdown>
-              {typeof value2.effect === "string" ? value2.effect : ""}
-            </SpanMarkdown>
-          );
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{spell-name}}") {
+        return <b>{value2.spellName}</b>;
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{extra-magic}}") {
+        return <b>{value2.extraMagic}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
+      if (part === "{{hr}}") {
+        return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
+      }
+      if (part === "{{offensive-spell-icon}}") {
+        return <OffensiveSpellIcon sx={{ verticalAlign: "middle" }} />;
+      }
+      if (part === "{{targets}}") {
+        return <b>{value2.targets}</b>;
+      }
+      if (part === "{{effect}}") {
+        return (
+          <SpanMarkdown>
+            {typeof value2.effect === "string" ? value2.effect : ""}
+          </SpanMarkdown>
+        );
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isStandardRoll--") {
-    return (t(text) || "")
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{dice1-label}}") {
-          return <b>{t(value2.dice1Label)}</b>;
-        }
-        if (part === "{{dice2-label}}") {
-          return <b>{t(value2.dice2Label)}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{dice1-label}}") {
+        return <b>{t(value2.dice1Label)}</b>;
+      }
+      if (part === "{{dice2-label}}") {
+        return <b>{t(value2.dice2Label)}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isClock--") {
-    return (t(text) || "")
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        // If the part matches the value placeholders, replace with actual values
-        if (part === "{{name}}") {
-          return <b>{value2.name}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{current}}") {
-          return <b>{value2.current}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{max}}") {
-          return <b>{value2.max}</b>; // Return value2 wrapped in <b> tags
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      // If the part matches the value placeholders, replace with actual values
+      if (part === "{{name}}") {
+        return <b>{value2.name}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{current}}") {
+        return <b>{value2.current}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{max}}") {
+        return <b>{value2.max}</b>; // Return value2 wrapped in <b> tags
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else {
     // Use a regular expression to replace tags with the corresponding component
-    return (t(text) || "")
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        // If the part matches the value placeholders, replace with actual values
-        if (part === "{{value1}}") {
-          return <b>{value1}</b>; // Return value1 wrapped in <b> tags
-        }
-        if (part === "{{value2}}") {
-          return <b>{value2}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{value3}}") {
-          return <b>{t(value3)}</b>; // Return translated value3 wrapped in <b> tags
-        }
-        if (part === "{{value4}}") {
-          // if value4 is object and markdown is true, render it as a markdown component
-          if (typeof value4 === "object" && value4.markdown) {
-            return (
-              <SpanMarkdown>
-                {typeof value4.effect === "string" ? value4.effect : ""}
-              </SpanMarkdown>
-            );
-          }
-
-          return <b>{value4}</b>; // Return value4 wrapped in <b> tags
-        }
-        if (part === "{{value5}}") {
-          return <b>{value5}</b>; // Return value5 wrapped in <b> tags
-        }
-        if (part === "{{attack-range-icon}}" && value2) {
-          return <TypeIcon type={value2} sx={{ verticalAlign: "middle" }} />;
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      // If the part matches the value placeholders, replace with actual values
+      if (part === "{{value1}}") {
+        return <b>{value1}</b>; // Return value1 wrapped in <b> tags
+      }
+      if (part === "{{value2}}") {
+        return <b>{value2}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{value3}}") {
+        return <b>{t(value3)}</b>; // Return translated value3 wrapped in <b> tags
+      }
+      if (part === "{{value4}}") {
+        // if value4 is object and markdown is true, render it as a markdown component
+        if (typeof value4 === "object" && value4.markdown) {
+          return (
+            <SpanMarkdown>
+              {typeof value4.effect === "string" ? value4.effect : ""}
+            </SpanMarkdown>
+          );
         }
 
-        if (part === "{{attack-type-icon}}" && value3) {
-          return <TypeIcon type={value3} sx={{ verticalAlign: "middle" }} />;
-        }
+        return <b>{value4}</b>; // Return value4 wrapped in <b> tags
+      }
+      if (part === "{{value5}}") {
+        return <b>{value5}</b>; // Return value5 wrapped in <b> tags
+      }
+      if (part === "{{attack-range-icon}}" && value2) {
+        return <TypeIcon type={value2} sx={{ verticalAlign: "middle" }} />;
+      }
 
-        // Otherwise, check if it's a tag that maps to an icon or other component
-        if (tagMap[part]) {
-          return tagMap[part]; // Replace with the corresponding component if tag matches
-        }
+      if (part === "{{attack-type-icon}}" && value3) {
+        return <TypeIcon type={value3} sx={{ verticalAlign: "middle" }} />;
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Otherwise, check if it's a tag that maps to an icon or other component
+      if (tagMap[part]) {
+        return tagMap[part]; // Replace with the corresponding component if tag matches
+      }
+
+      // Return the part as it is if no match
+      return part;
+    });
   }
 }
 
@@ -337,7 +324,7 @@ export default function CombatLog({
     const deltaY = e.clientY - startY.current;
     const newHeight = Math.max(
       100,
-      Math.min(400, startHeight.current - deltaY)
+      Math.min(400, startHeight.current - deltaY),
     );
     setHeight(newHeight);
   };
@@ -386,23 +373,23 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{prec\}\}/g, value2.prec);
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
       plainText = plainText.replace(/\{\{hr\}\}/g, value2.hr);
       plainText = plainText.replace(
         /\{\{extra-damage\}\}/g,
-        value2.extraDamage
+        value2.extraDamage,
       );
       plainText = plainText.replace(/\{\{damage\}\}/g, value2.damage);
       plainText = plainText.replace(
         /\{\{damage-type\}\}/g,
-        t(value2.damageType)
+        t(value2.damageType),
       );
 
       // Replace icons with text descriptions
       plainText = plainText.replace(
         /\{\{attack-range-icon\}\}/g,
-        value2.range === "melee" ? "" : ""
+        value2.range === "melee" ? "" : "",
       );
       plainText = plainText.replace(/\{\{damage-type-icon\}\}/g, "");
 
@@ -419,7 +406,7 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{extra-magic\}\}/g, value2.extraMagic);
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
       plainText = plainText.replace(/\{\{hr\}\}/g, value2.hr);
       plainText = plainText.replace(/\{\{targets\}\}/g, value2.targets);
@@ -437,15 +424,15 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{dice2\}\}/g, value2.dice2);
       plainText = plainText.replace(
         /\{\{dice1-label\}\}/g,
-        t(value2.dice1Label)
+        t(value2.dice1Label),
       );
       plainText = plainText.replace(
         /\{\{dice2-label\}\}/g,
-        t(value2.dice2Label)
+        t(value2.dice2Label),
       );
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
     }
     // Handle special case for clock logs
@@ -476,12 +463,12 @@ export default function CombatLog({
       if (value2)
         plainText = plainText.replace(
           /\{\{attack-range-icon\}\}/g,
-          `[${value2}]`
+          `[${value2}]`,
         );
       if (value3)
         plainText = plainText.replace(
           /\{\{attack-type-icon\}\}/g,
-          `[${t(value3)}]`
+          `[${t(value3)}]`,
         );
     }
 
@@ -502,11 +489,11 @@ export default function CombatLog({
     plainText = plainText.replace(/\{\{fainted-icon\}\}/g, "");
     plainText = plainText.replace(
       /\{\{crit-failure\}\}/g,
-      t("Critical Failure")
+      t("Critical Failure"),
     );
     plainText = plainText.replace(
       /\{\{crit-success\}\}/g,
-      t("Critical Success")
+      t("Critical Success"),
     );
 
     // Replace any remaining markdown syntax or double asterisks with appropriate text formatting
@@ -597,7 +584,7 @@ export default function CombatLog({
               log.value2,
               log.value3,
               log.value4,
-              log.value5
+              log.value5,
             );
 
             return (
@@ -655,13 +642,13 @@ export default function CombatLog({
                     log.value2,
                     log.value3,
                     log.value4,
-                    log.value5
+                    log.value5,
                   ).map((part, idx) =>
                     typeof part === "string" ? (
                       <span key={idx}>{part}</span>
                     ) : (
                       <span key={idx}>{part}</span>
-                    )
+                    ),
                   )}
                 </Typography>
               </Box>

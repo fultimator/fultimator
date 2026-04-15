@@ -6,7 +6,7 @@ const shields = [
     def: 2,
     mdef: 0,
     martial: false,
-    init: 0
+    init: 0,
   },
   {
     category: "Shield",
@@ -15,8 +15,8 @@ const shields = [
     def: 2,
     mdef: 2,
     martial: true,
-    init: 0
-  }
+    init: 0,
+  },
 ];
 
 export default shields;

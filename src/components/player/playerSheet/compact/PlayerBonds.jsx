@@ -33,11 +33,11 @@ import DeleteConfirmationDialog from "../../../../components/common/DeleteConfir
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: 0,
-  color: "#fff"
+  color: "#fff",
 });
 
 const StyledTableCell = styled(TableCell)({
-  padding: 0
+  padding: 0,
 });
 
 const POSITIVE = ["admiration", "loyality", "affection"];
@@ -58,12 +58,24 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
-export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery = "" }) {
+export default function PlayerBonds({
+  player,
+  setPlayer,
+  isEditMode,
+  searchQuery = "",
+}) {
   const { t } = useTranslate();
   const custom = useCustomTheme();
   const theme = useTheme();
@@ -72,9 +84,13 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [draftBond, setDraftBond] = useState(null);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -93,15 +109,28 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   const addNewBond = () => {
     if (bonds.length >= 6) return;
-    const newBond = { name: "", admiration: false, loyality: false, affection: false, inferiority: false, mistrust: false, hatred: false };
-    setPlayer((prev) => ({ ...prev, info: { ...prev.info, bonds: [...prev.info.bonds, newBond] } }));
+    const newBond = {
+      name: "",
+      admiration: false,
+      loyality: false,
+      affection: false,
+      inferiority: false,
+      mistrust: false,
+      hatred: false,
+    };
+    setPlayer((prev) => ({
+      ...prev,
+      info: { ...prev.info, bonds: [...prev.info.bonds, newBond] },
+    }));
   };
 
   const handleDraftCheck = (key) => (event) => {
     setDraftBond((prev) => {
       const next = { ...prev, [key]: event.target.checked };
-      if (key === "admiration" && event.target.checked) next.inferiority = false;
-      if (key === "inferiority" && event.target.checked) next.admiration = false;
+      if (key === "admiration" && event.target.checked)
+        next.inferiority = false;
+      if (key === "inferiority" && event.target.checked)
+        next.admiration = false;
       if (key === "loyality" && event.target.checked) next.mistrust = false;
       if (key === "mistrust" && event.target.checked) next.loyality = false;
       if (key === "affection" && event.target.checked) next.hatred = false;
@@ -111,7 +140,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
   };
 
   const saveBond = () => {
-    const updated = bonds.map((b, i) => i === editBondIndex ? { ...draftBond } : b);
+    const updated = bonds.map((b, i) =>
+      i === editBondIndex ? { ...draftBond } : b,
+    );
     setPlayer((prev) => ({ ...prev, info: { ...prev.info, bonds: updated } }));
     closeModal();
   };
@@ -138,7 +169,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   return (
     <>
-      <TableContainer component={Paper} sx={{ width: '100%' }}>
+      <TableContainer component={Paper} sx={{ width: "100%" }}>
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow
@@ -154,11 +185,25 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
               <StyledTableCellHeader>
                 <Typography variant="h4">{t("Bonds")}</Typography>
               </StyledTableCellHeader>
-              <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }}>
-                <Typography variant="h4" sx={{ fontSize: '0.875rem' }}>{t("Sentiments")}</Typography>
+              <StyledTableCellHeader
+                sx={{
+                  width: { xs: 55, sm: 80 },
+                  display: { xs: "none", sm: "table-cell" },
+                }}
+              >
+                <Typography variant="h4" sx={{ fontSize: "0.875rem" }}>
+                  {t("Sentiments")}
+                </Typography>
               </StyledTableCellHeader>
-              <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-              <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+              <StyledTableCellHeader
+                sx={{
+                  width: { xs: 65, sm: 90 },
+                  display: { xs: "none", sm: "table-cell" },
+                }}
+              />
+              <StyledTableCellHeader
+                sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+              >
                 {isEditMode && (
                   <Tooltip title={t("Add Bond")}>
                     <span>
@@ -187,7 +232,12 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
               return (
                 <TableRow key={index}>
                   <StyledTableCell sx={{ width: 36 }} />
-                  <StyledTableCell sx={{ minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
+                  <StyledTableCell
+                    sx={{
+                      minWidth: { xs: 60, sm: 100 },
+                      wordBreak: "break-word",
+                    }}
+                  >
                     <Typography
                       variant="body2"
                       sx={{
@@ -195,40 +245,76 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                         textTransform: "uppercase",
                         wordBreak: "break-word",
                         overflowWrap: "break-word",
-                        fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                      }}>
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                      }}
+                    >
                       {highlightMatch(bond.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
-                  <StyledTableCell sx={{ width: { xs: 150, sm: 220 }, display: { xs: 'none', sm: 'table-cell' } }}>
-                    <Box sx={{ display: "flex", flexWrap: "nowrap", gap: 0.5, overflow: "visible" }}>
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 150, sm: 220 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexWrap: "nowrap",
+                        gap: 0.5,
+                        overflow: "visible",
+                      }}
+                    >
                       {sentiments.map((s, i) => (
                         <Typography
                           key={s}
                           variant="body2"
                           sx={{
-                            color: POSITIVE.includes(s) ? "success.main" : "error.main",
+                            color: POSITIVE.includes(s)
+                              ? "success.main"
+                              : "error.main",
                             textTransform: "uppercase",
                             fontSize: "0.75rem",
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
                           }}
                         >
-                          {highlightMatch(t(s.charAt(0).toUpperCase() + s.slice(1)), searchQuery)}
+                          {highlightMatch(
+                            t(s.charAt(0).toUpperCase() + s.slice(1)),
+                            searchQuery,
+                          )}
                           {i < sentiments.length - 1 && ","}
                         </Typography>
                       ))}
                     </Box>
                   </StyledTableCell>
-                  <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                  <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 0.5 }}>
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 65, sm: 90 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCell
+                    sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        gap: 0.5,
+                      }}
+                    >
                       {strength > 0 && (
                         <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                           ★{strength}
                         </Typography>
                       )}
                       {isEditMode && (
-                        <IconButton size="small" onClick={() => setEditBondIndex(originalIndex)} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => setEditBondIndex(originalIndex)}
+                          sx={{ p: 0.5 }}
+                        >
                           <EditIcon fontSize="small" />
                         </IconButton>
                       )}
@@ -247,33 +333,52 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
             <IconButton
               aria-label="close"
               onClick={closeModal}
-              sx={{ position: "absolute", right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
             >
               <CloseIcon />
             </IconButton>
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <TextField
                   fullWidth
                   label={t("Bond Name")}
                   value={draftBond.name}
-                  onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setDraftBond((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   slotProps={{
-                    htmlInput: { maxLength: 50 }
+                    htmlInput: { maxLength: 50 },
                   }}
                 />
               </Grid>
               {[
-                { key: "admiration", label: t("Admiration"), color: positiveColor },
+                {
+                  key: "admiration",
+                  label: t("Admiration"),
+                  color: positiveColor,
+                },
                 { key: "loyality", label: t("Loyality"), color: positiveColor },
-                { key: "affection", label: t("Affection"), color: positiveColor },
-                { key: "inferiority", label: t("Inferiority"), color: negativeColor },
+                {
+                  key: "affection",
+                  label: t("Affection"),
+                  color: positiveColor,
+                },
+                {
+                  key: "inferiority",
+                  label: t("Inferiority"),
+                  color: negativeColor,
+                },
                 { key: "mistrust", label: t("Mistrust"), color: negativeColor },
                 { key: "hatred", label: t("Hatred"), color: negativeColor },
               ].map(({ key, label, color }) => (
-                <Grid  key={key} size={4}>
+                <Grid key={key} size={4}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -281,23 +386,27 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                         onChange={handleDraftCheck(key)}
                       />
                     }
-                    label={<Typography sx={{ fontSize: "14px", color }}>{label}</Typography>}
+                    label={
+                      <Typography sx={{ fontSize: "14px", color }}>
+                        {label}
+                      </Typography>
+                    }
                   />
                 </Grid>
               ))}
             </Grid>
           </DialogContent>
           <DialogActions sx={{ justifyContent: "space-between", px: 3, py: 2 }}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDelete}
-            >
+            <Button variant="contained" color="error" onClick={handleDelete}>
               {t("Delete")}
             </Button>
             <Box>
-              <Button onClick={closeModal} sx={{ mr: 1 }}>{t("Cancel")}</Button>
-              <Button variant="contained" color="primary" onClick={saveBond}>{t("Save")}</Button>
+              <Button onClick={closeModal} sx={{ mr: 1 }}>
+                {t("Cancel")}
+              </Button>
+              <Button variant="contained" color="primary" onClick={saveBond}>
+                {t("Save")}
+              </Button>
             </Box>
           </DialogActions>
         </Dialog>
@@ -320,7 +429,11 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   <Typography
                     key={s}
                     variant="body2"
-                    sx={{ color: POSITIVE.includes(s) ? "success.main" : "error.main" }}
+                    sx={{
+                      color: POSITIVE.includes(s)
+                        ? "success.main"
+                        : "error.main",
+                    }}
                   >
                     {t(s.charAt(0).toUpperCase() + s.slice(1))}
                   </Typography>

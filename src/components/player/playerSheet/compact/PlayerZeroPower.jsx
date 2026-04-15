@@ -42,8 +42,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -55,11 +62,15 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" }) {
+export default function PlayerZeroPower({
+  player,
+  setPlayer,
+  searchQuery = "",
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
-  const zeroPowerKey = 'zeroPower-0';
+  const zeroPowerKey = "zeroPower-0";
 
   const zeroPower = player.zeroPower;
   if (!zeroPower?.name) return null;
@@ -101,18 +112,18 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
   const triggerName =
     typeof zeroPower.zeroTrigger === "string"
       ? zeroPower.zeroTrigger
-      : zeroPower.zeroTrigger?.name ?? "";
+      : (zeroPower.zeroTrigger?.name ?? "");
   const triggerDesc =
     typeof zeroPower.zeroTrigger === "object"
-      ? zeroPower.zeroTrigger?.description ?? ""
+      ? (zeroPower.zeroTrigger?.description ?? "")
       : "";
   const effectName =
     typeof zeroPower.zeroEffect === "string"
       ? zeroPower.zeroEffect
-      : zeroPower.zeroEffect?.name ?? "";
+      : (zeroPower.zeroEffect?.name ?? "");
   const effectDesc =
     typeof zeroPower.zeroEffect === "object"
-      ? zeroPower.zeroEffect?.description ?? ""
+      ? (zeroPower.zeroEffect?.description ?? "")
       : "";
 
   const hasDetails = triggerName || effectName;
@@ -157,7 +168,13 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
           <TableRow>
             <StyledTableCell sx={{ width: 36 }}>
               {hasDetails ? (
-                <IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleRow('zeroPower', zeroPowerKey); }}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleRow("zeroPower", zeroPowerKey);
+                  }}
+                >
                   {isOpen ? (
                     <KeyboardArrowUp fontSize="small" />
                   ) : (
@@ -167,8 +184,15 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
               ) : null}
             </StyledTableCell>
             <StyledTableCell
-              onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('zeroPower', zeroPowerKey); }}
-              sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasDetails) toggleRow("zeroPower", zeroPowerKey);
+              }}
+              sx={{
+                cursor: hasDetails ? "pointer" : "default",
+                minWidth: { xs: 60, sm: 100 },
+                wordBreak: "break-word",
+              }}
             >
               <Typography
                 variant="body2"
@@ -176,8 +200,9 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
                   fontWeight: "bold",
                   textTransform: "uppercase",
                   wordBreak: "break-word",
-                  overflowWrap: "break-word"
-                }}>
+                  overflowWrap: "break-word",
+                }}
+              >
                 {highlightMatch(zeroPower.name, searchQuery)}
               </Typography>
             </StyledTableCell>
@@ -207,14 +232,21 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
                 variant="body2"
                 sx={{
                   fontSize: "0.8rem",
-                  fontWeight: "bold"
-                }}>
+                  fontWeight: "bold",
+                }}
+              >
                 {filled}/{sections}
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ width: 90 }} />
             <StyledTableCell sx={{ width: 100, textAlign: "right" }}>
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                }}
+              >
                 <IconButton
                   size="small"
                   disabled={filled === 0}
@@ -251,11 +283,10 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
                         <strong>{t("Trigger")}: </strong>
                         {highlightMatch(triggerName, searchQuery)}
                         {triggerDesc && (
-                          <Typography
-                            variant="body2"
-                            component="div"
-                          >
-                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{highlightMarkdownText(triggerDesc, searchQuery)}</ReactMarkdown>
+                          <Typography variant="body2" component="div">
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                              {highlightMarkdownText(triggerDesc, searchQuery)}
+                            </ReactMarkdown>
                           </Typography>
                         )}
                       </Typography>
@@ -265,11 +296,10 @@ export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" })
                         <strong>{t("Effect")}: </strong>
                         {highlightMatch(effectName, searchQuery)}
                         {effectDesc && (
-                          <Typography
-                            variant="body2"
-                            component="div"
-                          >
-                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{highlightMarkdownText(effectDesc, searchQuery)}</ReactMarkdown>
+                          <Typography variant="body2" component="div">
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                              {highlightMarkdownText(effectDesc, searchQuery)}
+                            </ReactMarkdown>
                           </Typography>
                         )}
                       </Typography>

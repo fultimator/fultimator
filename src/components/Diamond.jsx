@@ -10,8 +10,10 @@ export default function Diamond({ color }) {
       component="span"
       sx={{
         fontSize: "smaller",
-        verticalAlign: "text-bottom"
-      }}>⬥
-          </Typography>
+        verticalAlign: "text-bottom",
+      }}
+    >
+      ⬥
+    </Typography>
   );
 }

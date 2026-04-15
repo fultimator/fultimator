@@ -41,8 +41,8 @@ export default function PlayerShields({
   const hasDualShieldBearer = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-    )
+        skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1,
+    ),
   );
 
   const checkIfEquippable = (shield) => {
@@ -63,13 +63,17 @@ export default function PlayerShields({
     const slots = player.equippedSlots;
     if (!slots) return null;
     const isMain =
-      slots.mainHand?.source === 'shields' &&
-      (slots.mainHand?.index !== undefined ? slots.mainHand.index === index : slots.mainHand?.name === shield.name);
-    if (isMain) return 'mainHand';
+      slots.mainHand?.source === "shields" &&
+      (slots.mainHand?.index !== undefined
+        ? slots.mainHand.index === index
+        : slots.mainHand?.name === shield.name);
+    if (isMain) return "mainHand";
     const isOff =
-      slots.offHand?.source === 'shields' &&
-      (slots.offHand?.index !== undefined ? slots.offHand.index === index : slots.offHand?.name === shield.name);
-    if (isOff) return 'offHand';
+      slots.offHand?.source === "shields" &&
+      (slots.offHand?.index !== undefined
+        ? slots.offHand.index === index
+        : slots.offHand?.name === shield.name);
+    if (isOff) return "offHand";
     return null;
   };
 
@@ -85,7 +89,7 @@ export default function PlayerShields({
       setSlotMenuAnchor(event.currentTarget);
       setSlotMenuIndex(index);
     } else {
-      onEquipShield(index, 'offHand');
+      onEquipShield(index, "offHand");
     }
   };
 
@@ -105,7 +109,7 @@ export default function PlayerShields({
     setExpanded(!expanded);
   };
 
-  const slotLabels = { mainHand: t('Main Hand'), offHand: t('Off Hand') };
+  const slotLabels = { mainHand: t("Main Hand"), offHand: t("Off Hand") };
   const mainHandOccupant = player.equippedSlots?.mainHand?.name;
   const offHandOccupant = player.equippedSlots?.offHand?.name;
 
@@ -134,40 +138,63 @@ export default function PlayerShields({
         <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {shields.map((shield, index) => {
             const equippedSlot = getShieldSlot(shield, index);
-            const twoHandedBlocked = !shield.isEquipped && isTwoHandedEquipped(player);
+            const twoHandedBlocked =
+              !shield.isEquipped && isTwoHandedEquipped(player);
             const tooltipTitle = twoHandedBlocked
-              ? t('Both hands are occupied by a two-handed weapon')
+              ? t("Both hands are occupied by a two-handed weapon")
               : shield.isEquipped
-              ? `${t('Unequip Shield')}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ''}`
-              : hasDualShieldBearer
-                ? t('Equip Shield')
-                : `${t('Equip Shield')} (${slotLabels.offHand})`;
+                ? `${t("Unequip Shield")}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ""}`
+                : hasDualShieldBearer
+                  ? t("Equip Shield")
+                  : `${t("Equip Shield")} (${slotLabels.offHand})`;
 
             return (
               <React.Fragment key={index}>
-                <Grid  sx={{ mb: 1 }} size={12}>
+                <Grid sx={{ mb: 1 }} size={12}>
                   <Box>
                     <PrettyArmor armor={shield} />
                   </Box>
 
-                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      mt: 0.25,
+                    }}
+                  >
                     {isEditMode && (
                       <Tooltip title={t("Edit")}>
-                        <IconButton onClick={() => onEditShield(index)} size="small">
+                        <IconButton
+                          onClick={() => onEditShield(index)}
+                          size="small"
+                        >
                           <Edit fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                    
+
                     <Box sx={{ ml: 0.5 }}>
                       {checkIfEquippable(shield) ? (
                         <Tooltip title={tooltipTitle}>
                           <span>
                             <Badge
-                            badgeContent={equippedSlot === 'mainHand' ? 'M' : equippedSlot === 'offHand' ? 'O' : null}
-                            color="primary"
-                            invisible={!shield.isEquipped || !equippedSlot}
-                            sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                              badgeContent={
+                                equippedSlot === "mainHand"
+                                  ? "M"
+                                  : equippedSlot === "offHand"
+                                    ? "O"
+                                    : null
+                              }
+                              color="primary"
+                              invisible={!shield.isEquipped || !equippedSlot}
+                              sx={{
+                                "& .MuiBadge-badge": {
+                                  fontSize: "0.6rem",
+                                  height: 14,
+                                  minWidth: 14,
+                                },
+                              }}
                             >
                               <IconButton
                                 onClick={(e) => handleEquipClick(e, index)}
@@ -184,7 +211,7 @@ export default function PlayerShields({
                                   },
                                   transition: "background-color 0.3s",
                                   p: 0.5,
-                                  border: `1px solid ${theme.palette.divider}`
+                                  border: `1px solid ${theme.palette.divider}`,
                                 }}
                               >
                                 <Equip
@@ -196,7 +223,8 @@ export default function PlayerShields({
                                       : theme.palette.text.secondary
                                   }
                                   strokeColor={
-                                    shield.isEquipped && theme.palette.mode === "dark"
+                                    shield.isEquipped &&
+                                    theme.palette.mode === "dark"
                                       ? theme.palette.white.main
                                       : theme.palette.secondary.main
                                   }
@@ -239,15 +267,15 @@ export default function PlayerShields({
         open={Boolean(slotMenuAnchor)}
         onClose={() => setSlotMenuAnchor(null)}
       >
-        <MenuItem onClick={() => handleSlotSelect('mainHand')}>
+        <MenuItem onClick={() => handleSlotSelect("mainHand")}>
           <ListItemText
-            primary={t('Main Hand')}
+            primary={t("Main Hand")}
             secondary={mainHandOccupant ?? undefined}
           />
         </MenuItem>
-        <MenuItem onClick={() => handleSlotSelect('offHand')}>
+        <MenuItem onClick={() => handleSlotSelect("offHand")}>
           <ListItemText
-            primary={t('Off Hand')}
+            primary={t("Off Hand")}
             secondary={offHandOccupant ?? undefined}
           />
         </MenuItem>

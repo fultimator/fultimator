@@ -1,11 +1,4 @@
-import {
-  Grid,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Chip,
-} from "@mui/material";
+import { Grid, Typography, Box, Card, CardContent, Chip } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
   Air,
@@ -69,8 +62,8 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
       const newWellsprings = isActive
         ? current.filter((w) => w !== wellspring)
         : current.length < 2
-        ? [...current, wellspring]
-        : [current[1], wellspring]; // Replace first with new
+          ? [...current, wellspring]
+          : [current[1], wellspring]; // Replace first with new
 
       return { ...prev, activeWellsprings: newWellsprings };
     });
@@ -112,16 +105,20 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={2}>
       {/* Wellspring Selection */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Active Wellsprings")} (Max 2)
         </Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
           {wellspringList.map((wellspring) => {
             const isActive = activeWellsprings.includes(wellspring.name);
-            const isInner = innerWellspring && chosenWellspring === wellspring.name;
+            const isInner =
+              innerWellspring && chosenWellspring === wellspring.name;
             const isSelected = isActive || isInner;
-            const backgroundColor = getWellspringColor(wellspring.name, isSelected);
+            const backgroundColor = getWellspringColor(
+              wellspring.name,
+              isSelected,
+            );
             const selectedTextColor = getSelectedTextColor(wellspring.name);
             const IconComponent = wellspring.icon;
 
@@ -137,7 +134,9 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
                 variant={isSelected ? "filled" : "outlined"}
                 sx={{
                   backgroundColor,
-                  color: isSelected ? `${selectedTextColor} !important` : "text.primary",
+                  color: isSelected
+                    ? `${selectedTextColor} !important`
+                    : "text.primary",
                   border: isSelected
                     ? undefined
                     : `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}`,
@@ -147,19 +146,26 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
                   cursor: isInner ? "default" : "pointer",
                   opacity: isInner ? 0.9 : 1,
                   "& .MuiChip-label": {
-                    color: isSelected ? `${selectedTextColor} !important` : undefined,
+                    color: isSelected
+                      ? `${selectedTextColor} !important`
+                      : undefined,
                     fontSize: "0.75rem",
                     fontWeight: isSelected ? "bold" : "normal",
                   },
                   "& .MuiChip-icon": {
-                    color: isSelected ? `${selectedTextColor} !important` : backgroundColor,
+                    color: isSelected
+                      ? `${selectedTextColor} !important`
+                      : backgroundColor,
                   },
                   "&:hover": {
                     opacity: isInner ? 0.9 : 0.8,
-                    color: isSelected ? `${selectedTextColor} !important` : "text.primary",
+                    color: isSelected
+                      ? `${selectedTextColor} !important`
+                      : "text.primary",
                   },
                   ...(isInner && {
-                    boxShadow: "0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)",
+                    boxShadow:
+                      "0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)",
                     border: "2px solid #2E7D32",
                   }),
                 }}
@@ -169,7 +175,7 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
         </Box>
       </Grid>
       {/* Available Invocations */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Available Invocations")} ({availableInvocations.length})
         </Typography>
@@ -177,8 +183,9 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           <Typography
             sx={{
               color: "text.secondary",
-              fontStyle: "italic"
-            }}>
+              fontStyle: "italic",
+            }}
+          >
             {t("Select wellsprings to see available invocations")}
           </Typography>
         ) : (
@@ -189,16 +196,20 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
                 size={{
                   xs: 12,
                   sm: 6,
-                  md: 4
-                }}>
+                  md: 4,
+                }}
+              >
                 <Card>
                   <CardContent>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       {t(inv.name)}
                     </Typography>
-                    <Typography variant="caption" sx={{
-                      color: "text.secondary"
-                    }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
                       {inv.type} • {t(inv.wellspring)}
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1 }}>

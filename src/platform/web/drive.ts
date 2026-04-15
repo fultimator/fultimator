@@ -29,7 +29,8 @@ export function storeAccessToken(token: string): void {
 async function requestFreshToken(): Promise<string> {
   const result = await signInWithPopup(auth, googleAuthProvider);
   const credential = GoogleAuthProvider.credentialFromResult(result);
-  if (!credential?.accessToken) throw new Error("Google sign-in did not return an access token");
+  if (!credential?.accessToken)
+    throw new Error("Google sign-in did not return an access token");
   storeAccessToken(credential.accessToken);
   return credential.accessToken;
 }
@@ -43,16 +44,23 @@ const BACKUP_FILE_NAME = "fultimatordb.json";
 async function findBackupFile(token: string): Promise<string | null> {
   const res = await fetch(
     `https://www.googleapis.com/drive/v3/files?q=name%3D'${BACKUP_FILE_NAME}'%20and%20trashed%3Dfalse&spaces=drive&fields=files(id,name)`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
   if (!res.ok) throw new Error(`Drive list failed: ${res.status}`);
-  const { files } = await res.json() as { files: Array<{ id: string }> };
+  const { files } = (await res.json()) as { files: Array<{ id: string }> };
   return files?.[0]?.id ?? null;
 }
 
-async function uploadContent(token: string, content: string, existingId: string | null): Promise<void> {
+async function uploadContent(
+  token: string,
+  content: string,
+  existingId: string | null,
+): Promise<void> {
   const boundary = "fultimator_mp_boundary";
-  const metadata = JSON.stringify({ name: BACKUP_FILE_NAME, mimeType: "application/json" });
+  const metadata = JSON.stringify({
+    name: BACKUP_FILE_NAME,
+    mimeType: "application/json",
+  });
   const body =
     `--${boundary}\r\nContent-Type: application/json\r\n\r\n${metadata}\r\n` +
     `--${boundary}\r\nContent-Type: application/json\r\n\r\n${content}\r\n` +
@@ -76,7 +84,9 @@ async function uploadContent(token: string, content: string, existingId: string 
 
 /** Returns true if the user is signed into Firebase and we have a Drive access token. */
 export function checkDriveAuth(): Promise<boolean> {
-  return Promise.resolve(auth.currentUser !== null && getStoredToken() !== null);
+  return Promise.resolve(
+    auth.currentUser !== null && getStoredToken() !== null,
+  );
 }
 
 /** Sign in with Google (or re-sign-in) to obtain a Drive access token. */
@@ -105,10 +115,10 @@ export async function restoreFromDrive(): Promise<void> {
 
   const res = await fetch(
     `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
   if (!res.ok) throw new Error(`Drive download failed: ${res.status}`);
-  const snapshot = await res.json() as Record<string, unknown[]>;
+  const snapshot = (await res.json()) as Record<string, unknown[]>;
 
   const db = await getDb();
   for (const [storeName, records] of Object.entries(snapshot)) {

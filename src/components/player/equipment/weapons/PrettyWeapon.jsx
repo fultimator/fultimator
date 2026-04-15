@@ -11,7 +11,12 @@ import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
-export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true, showHeader = true }) {
+export default function PrettyWeapon({
+  weapon,
+  isCharacterSheet,
+  showCard = true,
+  showHeader = true,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -33,13 +38,21 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -66,22 +79,18 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
               },
             }}
           >
-            <Grid  size={3}>
-              <Typography sx={{ textAlign: "left" }}>
-                {t("Weapon")}
-              </Typography>
+            <Grid size={3}>
+              <Typography sx={{ textAlign: "left" }}>{t("Weapon")}</Typography>
             </Grid>
-            <Grid  size={1}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Cost")}
-              </Typography>
+            <Grid size={1}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
             </Grid>
-            <Grid  size={4}>
+            <Grid size={4}>
               <Typography sx={{ textAlign: "center" }}>
                 {t("Accuracy")}
               </Typography>
             </Grid>
-            <Grid  size={4}>
+            <Grid size={4}>
               <Typography sx={{ textAlign: "center" }}>
                 {t("Damage")}
               </Typography>
@@ -89,10 +98,11 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column"  size="grow">
+          <Grid container direction="column" size="grow">
             {/* First Row */}
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "space-between",
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
@@ -100,17 +110,20 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}>
+              }}
+            >
               <Grid sx={{ display: "flex", alignItems: "center" }} size={3}>
                 <Typography sx={{ fontWeight: "bold", marginRight: "4px" }}>
                   {t(weapon.name)}
                 </Typography>
                 {weapon.martial && <Martial />}
               </Grid>
-              <Grid  size={1}>
-                <Typography sx={{ textAlign: "center" }}>{`${weapon.cost}z`}</Typography>
+              <Grid size={1}>
+                <Typography
+                  sx={{ textAlign: "center" }}
+                >{`${weapon.cost}z`}</Typography>
               </Grid>
-              <Grid  size={4}>
+              <Grid size={4}>
                 <Typography sx={{ textAlign: "center" }}>
                   <OpenBracket />
                   {`${attributes[weapon.att1].shortcaps} + ${
@@ -120,12 +133,12 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                   {weapon.prec > 0
                     ? `+${weapon.prec}`
                     : weapon.prec < 0
-                    ? `${weapon.prec}`
-                    : ""}
+                      ? `${weapon.prec}`
+                      : ""}
                 </Typography>
               </Grid>
 
-              <Grid  size={4}>
+              <Grid size={4}>
                 <Typography sx={{ textAlign: "center" }}>
                   <OpenBracket />
                   {t("HR")} {weapon.damage >= 0 ? "+" : ""} {weapon.damage}
@@ -137,7 +150,8 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
 
             {/* Second Row */}
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-end",
                 background: "transparent",
                 borderBottom: `1px solid ${theme.secondary}`,
@@ -147,24 +161,24 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
                 },
               }}
             >
-              <Grid  size={3}>
+              <Grid size={3}>
                 <Typography sx={{ fontWeight: "bold" }}>
                   {t(weapon.category)}
                 </Typography>
               </Grid>
-              <Grid  size={1}>
+              <Grid size={1}>
                 <Diamond color={theme.primary} />
               </Grid>
-              <Grid  size={4}>
+              <Grid size={4}>
                 <Typography sx={{ textAlign: "center" }}>
                   {weapon.hands === 1 && t("One-handed")}
                   {weapon.hands === 2 && t("Two-handed")}
                 </Typography>
               </Grid>
-              <Grid  size={1}>
+              <Grid size={1}>
                 <Diamond color="{primary}" />
               </Grid>
-              <Grid  size={3}>
+              <Grid size={3}>
                 <Typography sx={{ textAlign: "center" }}>
                   {weapon.melee && t("Melee")}
                   {weapon.ranged && t("Ranged")}
@@ -204,9 +218,7 @@ export default function PrettyWeapon({ weapon, isCharacterSheet, showCard = true
 
   return (
     <>
-      <Card sx={{ boxShadow: isCharacterSheet ? 0 : 2 }}>
-        {content}
-      </Card>
+      <Card sx={{ boxShadow: isCharacterSheet ? 0 : 2 }}>{content}</Card>
     </>
   );
 }

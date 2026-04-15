@@ -1,8 +1,8 @@
 // Available module types (slot is determined by type)
 export const moduleTypes = [
   "pilot_module_armor",
-  "pilot_module_weapon", 
-  "pilot_module_support"
+  "pilot_module_weapon",
+  "pilot_module_support",
 ];
 
 // Available vehicle frames
@@ -19,7 +19,7 @@ export const availableFrames = [
     },
   },
   {
-    name: "pilot_frame_mecha", 
+    name: "pilot_frame_mecha",
     description: "pilot_frame_mecha_desc",
     passengers: 0,
     distance: 2,
@@ -57,7 +57,7 @@ export const availableModules = {
     },
     {
       name: "pilot_module_heavy_plating",
-      type: "pilot_module_armor", 
+      type: "pilot_module_armor",
       cost: 500,
       def: 12,
       mdef: 8,
@@ -67,7 +67,7 @@ export const availableModules = {
     {
       name: "pilot_module_runic_plating",
       type: "pilot_module_armor",
-      slot: "pilot_slot_armor", 
+      slot: "pilot_slot_armor",
       cost: 500,
       def: 10,
       mdef: 11,
@@ -95,7 +95,7 @@ export const availableModules = {
       category: "Armor",
     },
   ],
-  
+
   // WEAPON MODULES - All weapon types
   weapon: [
     // Weapons
@@ -130,7 +130,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
-      name: "pilot_module_blade", 
+      name: "pilot_module_blade",
       type: "pilot_module_weapon",
       cumbersome: false,
       category: "Dagger",
@@ -177,7 +177,7 @@ export const availableModules = {
     {
       name: "pilot_module_claw",
       type: "pilot_module_weapon",
-       description: "pilot_module_claw_desc",
+      description: "pilot_module_claw_desc",
       cumbersome: false,
       category: "Brawling",
       quality: "",
@@ -376,7 +376,7 @@ export const availableModules = {
       att2: "dexterity",
     },
   ],
-  
+
   // SUPPORT MODULES - Special vehicle systems
   support: [
     {
@@ -384,91 +384,91 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "",
       customName: "",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_aerial",
       type: "pilot_module_support",
       description: "pilot_module_aerial_desc",
-      isComplex: true
+      isComplex: true,
     },
     {
       name: "pilot_module_anti-element",
-      type: "pilot_module_support", 
+      type: "pilot_module_support",
       description: "pilot_module_anti-element_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_advanced_targeting",
       type: "pilot_module_support",
       description: "pilot_module_advanced_targeting_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_counterstrike",
       type: "pilot_module_support",
       description: "pilot_module_counterstrike_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_excavation",
       type: "pilot_module_support",
       description: "pilot_module_excavation_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_expanded_plating",
       type: "pilot_module_support",
       description: "pilot_module_expanded_plating_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_magistatic",
       type: "pilot_module_support",
       description: "pilot_module_magistatic_desc",
-      isComplex: false
+      isComplex: false,
     },
-      {
+    {
       name: "pilot_module_power",
       type: "pilot_module_support",
       description: "pilot_module_power_desc",
-      isComplex: false
+      isComplex: false,
     },
-      {
+    {
       name: "pilot_module_rapid_interface",
       type: "pilot_module_support",
       description: "pilot_module_rapid_interface_desc",
-      isComplex: false
+      isComplex: false,
     },
-      {
+    {
       name: "pilot_module_seafarer",
       type: "pilot_module_support",
       description: "pilot_module_seafarer_desc",
-      isComplex: false
+      isComplex: false,
     },
-      {
+    {
       name: "pilot_module_seat",
       type: "pilot_module_support",
       description: "pilot_module_seat_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_secondary_offensive",
       type: "pilot_module_support",
       description: "pilot_module_secondary_offensive_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_sensor",
       type: "pilot_module_support",
       description: "pilot_module_sensor_desc",
-      isComplex: false
+      isComplex: false,
     },
     {
       name: "pilot_module_turbo",
       type: "pilot_module_support",
       description: "pilot_module_turbo_desc",
-      isComplex: false
+      isComplex: false,
     },
   ],
 };

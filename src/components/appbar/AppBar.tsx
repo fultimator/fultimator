@@ -73,7 +73,10 @@ const AppBar: React.FC<AppBarProps> = ({
           })}
         >
           <Container>
-            <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+            <Grid
+              container
+              sx={{ alignItems: "center", justifyContent: "space-between" }}
+            >
               <Grid
                 size={2}
                 sx={{
@@ -81,7 +84,8 @@ const AppBar: React.FC<AppBarProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                }}>
+                }}
+              >
                 {showGoBackButton && (
                   <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
@@ -99,7 +103,8 @@ const AppBar: React.FC<AppBarProps> = ({
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "4px 0 0",
-                  }}>
+                  }}
+                >
                   <RouterLink
                     to="/"
                     style={{
@@ -125,7 +130,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 </Grid>
               )}
 
-              <Grid  sx={{ textAlign: "right" }} size={2}>
+              <Grid sx={{ textAlign: "right" }} size={2}>
                 <Grid
                   container
                   sx={{

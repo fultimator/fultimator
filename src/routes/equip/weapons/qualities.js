@@ -12,7 +12,7 @@ const qualities = [
     name: t("Resistance", true),
     quality: t(
       "You have Resistance to a single type of damage (except physical)",
-      true
+      true,
     ),
     cost: 700,
   },
@@ -33,7 +33,7 @@ const qualities = [
     name: t("Dual Resistance", true),
     quality: t(
       "You have Resistance to two types of damage (except physical)",
-      true
+      true,
     ),
     cost: 1000,
   },
@@ -48,7 +48,7 @@ const qualities = [
     name: t("Immunity", true),
     quality: t(
       "You are immune to a single type of damage (except physical)",
-      true
+      true,
     ),
     cost: 1500,
   },
@@ -75,7 +75,7 @@ const qualities = [
     name: t("Hunter", true),
     quality: t(
       "The weapon deals 5 extra damage to creatures of a particular species",
-      true
+      true,
     ),
     cost: 300,
   },
@@ -90,7 +90,7 @@ const qualities = [
     name: t("Dual Hunter", true),
     quality: t(
       "The weapon deals 5 extra damage to the creatures of two particular species",
-      true
+      true,
     ),
     cost: 500,
   },
@@ -105,7 +105,7 @@ const qualities = [
     name: t("Status", true),
     quality: t(
       "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
-      true
+      true,
     ),
     cost: 1500,
   },
@@ -114,7 +114,7 @@ const qualities = [
     name: t("Status Plus", true),
     quality: t(
       "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
-      true
+      true,
     ),
     cost: 2000,
   },

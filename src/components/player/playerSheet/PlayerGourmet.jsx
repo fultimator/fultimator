@@ -14,10 +14,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import {
-  Info,
-  Restaurant,
-} from "@mui/icons-material";
+import { Info, Restaurant } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import {
@@ -53,69 +50,108 @@ export default function PlayerGourmet({ player }) {
   /* All cooking spells from all classes */
   const cookingSpells = useMemo(() => {
     if (!player || !player.classes) return [];
-    
+
     return player.classes
-      .flatMap((c) => (c.spells || []).map((spell) => ({ ...spell, className: c.name })))
+      .flatMap((c) =>
+        (c.spells || []).map((spell) => ({ ...spell, className: c.name })),
+      )
       .filter(
         (spell) =>
           spell !== undefined &&
           spell.spellType === "cooking" &&
-          (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+          (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
       )
       .sort((a, b) => (a.spellName || "").localeCompare(b.spellName || ""));
   }, [player]);
 
   const getEffectChoices = (effectText, t) => {
     const choices = [];
-    if (!effectText || typeof effectText !== 'string') return choices;
-    
+    if (!effectText || typeof effectText !== "string") return choices;
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_all_statuses"))) {
       choices.push({ type: "statusEffect", options: getStatusEffects(t) });
-    } else if (effectText.includes(t("gourmet_delicacy_effect_choose_some_statuses"))) {
-      choices.push({ type: "statusEffect", options: [t("dazed"), t("shaken"), t("slow"), t("weak")] });
+    } else if (
+      effectText.includes(t("gourmet_delicacy_effect_choose_some_statuses"))
+    ) {
+      choices.push({
+        type: "statusEffect",
+        options: [t("dazed"), t("shaken"), t("slow"), t("weak")],
+      });
     }
-    
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_damage_type"))) {
       choices.push({ type: "damageType", options: getDamageTypes(t) });
     }
-    
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_attributte"))) {
       choices.push({ type: "attribute", options: getAttributes(t) });
     }
-    
+
     return choices;
   };
 
   const renderEffectWithChoices = (effect, t) => {
     const choices = getEffectChoices(effect.effect, t);
     let displayText = effect.effect;
-    
-    choices.forEach(choice => {
+
+    choices.forEach((choice) => {
       const selectedValue = effect.customChoices?.[choice.type];
       if (selectedValue) {
         if (choice.type === "statusEffect") {
-          displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_all_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
-          ).replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_some_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
-          );
+          displayText = displayText
+            .replace(
+              new RegExp(
+                t("gourmet_delicacy_effect_choose_all_statuses").replace(
+                  /[.*+?^${}()|[\]\\]/g,
+                  "\\$&",
+                ),
+                "g",
+              ),
+              selectedValue,
+            )
+            .replace(
+              new RegExp(
+                t("gourmet_delicacy_effect_choose_some_statuses").replace(
+                  /[.*+?^${}()|[\]\\]/g,
+                  "\\$&",
+                ),
+                "g",
+              ),
+              selectedValue,
+            );
         } else if (choice.type === "damageType") {
           displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_damage_type").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_damage_type").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            selectedValue,
           );
         } else if (choice.type === "attribute") {
           displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_attributte").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_attributte").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            selectedValue,
           );
         }
       }
     });
-    
-    return <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>{displayText}</ReactMarkdown>;
+
+    return (
+      <ReactMarkdown
+        components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+      >
+        {displayText}
+      </ReactMarkdown>
+    );
   };
 
   return (
@@ -152,7 +188,11 @@ export default function PlayerGourmet({ player }) {
             >
               {t("Gourmet")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {cookingSpells.map((cookingSpell, csIndex) => {
                 // Convert cookbook effects to array for display
                 let cookbookEffectsArray = [];
@@ -160,12 +200,20 @@ export default function PlayerGourmet({ player }) {
                   if (Array.isArray(cookingSpell.cookbookEffects)) {
                     cookbookEffectsArray = cookingSpell.cookbookEffects;
                   } else {
-                    cookbookEffectsArray = Object.entries(cookingSpell.cookbookEffects).map(([key, data]) => ({
+                    cookbookEffectsArray = Object.entries(
+                      cookingSpell.cookbookEffects,
+                    ).map(([key, data]) => ({
                       ...data,
                       key: key,
-                      tasteCombination: data.taste1 && data.taste2 
-                        ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
-                        : key.split('_').map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' + '),
+                      tasteCombination:
+                        data.taste1 && data.taste2
+                          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+                          : key
+                              .split("_")
+                              .map(
+                                (t) => t.charAt(0).toUpperCase() + t.slice(1),
+                              )
+                              .join(" + "),
                     }));
                   }
                 }
@@ -173,30 +221,49 @@ export default function PlayerGourmet({ player }) {
                 return (
                   <React.Fragment key={csIndex}>
                     {/* Spell Header */}
-                    <Grid  size={12}>
-                      <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Restaurant fontSize="small" /> {cookingSpell.spellName || t("Gourmet")} - {t(cookingSpell.className)}
+                    <Grid size={12}>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Restaurant fontSize="small" />{" "}
+                        {cookingSpell.spellName || t("Gourmet")} -{" "}
+                        {t(cookingSpell.className)}
                       </Typography>
                     </Grid>
                     {/* Available Delicacies */}
                     {cookbookEffectsArray.length === 0 ? (
-                      <Grid  size={12}>
-                        <Typography sx={{ fontStyle: "italic", color: "text.secondary", mb: 2 }}>
+                      <Grid size={12}>
+                        <Typography
+                          sx={{
+                            fontStyle: "italic",
+                            color: "text.secondary",
+                            mb: 2,
+                          }}
+                        >
                           {t("gourmet_combination_no_defined")}
                         </Typography>
                       </Grid>
                     ) : (
                       cookbookEffectsArray.map((effect, eIndex) => (
                         <Grid
-                  container
-                  spacing={0}
-                  key={`${csIndex}-${eIndex}`}
+                          container
+                          spacing={0}
+                          key={`${csIndex}-${eIndex}`}
                           sx={{ display: "flex", alignItems: "stretch", mb: 1 }}
                           size={{
                             xs: 12,
-                            md: 6
-                          }}>
-                          <Grid  sx={{ display: "flex" }} size={10}>
+                            md: 6,
+                          }}
+                        >
+                          <Grid sx={{ display: "flex" }} size={10}>
                             <Typography
                               id="delicacy-left-name"
                               variant="h2"
@@ -211,13 +278,20 @@ export default function PlayerGourmet({ player }) {
                                 display: "flex",
                                 alignItems: "center",
                                 width: "100%",
-                                fontSize: { xs: "0.8rem", sm: "1rem" }
+                                fontSize: { xs: "0.8rem", sm: "1rem" },
                               }}
                             >
                               {effect.tasteCombination || t("gourmet_delicacy")}
                             </Typography>
                           </Grid>
-                          <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                          <Grid
+                            sx={{
+                              display: "flex",
+                              alignItems: "stretch",
+                              maxHeight: "40px",
+                            }}
+                            size={2}
+                          >
                             <div
                               id="delicacy-right-controls"
                               style={{
@@ -233,7 +307,9 @@ export default function PlayerGourmet({ player }) {
                               <Tooltip title={t("Info")}>
                                 <IconButton
                                   sx={{ padding: "0px" }}
-                                  onClick={() => handleOpenModal(cookingSpell, effect)}
+                                  onClick={() =>
+                                    handleOpenModal(cookingSpell, effect)
+                                  }
                                 >
                                   <Info />
                                 </IconButton>
@@ -244,39 +320,52 @@ export default function PlayerGourmet({ player }) {
                       ))
                     )}
                     {/* Ingredient Inventory Summary */}
-                    {cookingSpell.ingredientInventory && cookingSpell.ingredientInventory.length > 0 && (
-                      <Grid  sx={{ mt: 1, mb: 2 }} size={12}>
-                        <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                          {t("gourmet_ingredient_inventory")}
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {cookingSpell.ingredientInventory
-                            .filter(item => item.quantity > 0)
-                            .map((item, iIndex) => (
-                            <Paper 
-                              key={iIndex} 
-                              variant="outlined" 
-                              sx={{ 
-                                px: 1, 
-                                py: 0.5, 
-                                borderRadius: '16px', 
-                                backgroundColor: ternary,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5
-                              }}
-                            >
-                              <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                                {item.quantity}x
-                              </Typography>
-                              <Typography variant="caption">
-                                {item.name}
-                              </Typography>
-                            </Paper>
-                          ))}
-                        </Box>
-                      </Grid>
-                    )}
+                    {cookingSpell.ingredientInventory &&
+                      cookingSpell.ingredientInventory.length > 0 && (
+                        <Grid sx={{ mt: 1, mb: 2 }} size={12}>
+                          <Typography
+                            variant="h4"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              mb: 1,
+                            }}
+                          >
+                            {t("gourmet_ingredient_inventory")}
+                          </Typography>
+                          <Box
+                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          >
+                            {cookingSpell.ingredientInventory
+                              .filter((item) => item.quantity > 0)
+                              .map((item, iIndex) => (
+                                <Paper
+                                  key={iIndex}
+                                  variant="outlined"
+                                  sx={{
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: "16px",
+                                    backgroundColor: ternary,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ fontWeight: "bold" }}
+                                  >
+                                    {item.quantity}x
+                                  </Typography>
+                                  <Typography variant="caption">
+                                    {item.name}
+                                  </Typography>
+                                </Paper>
+                              ))}
+                          </Box>
+                        </Grid>
+                      )}
                   </React.Fragment>
                 );
               })}
@@ -287,22 +376,30 @@ export default function PlayerGourmet({ player }) {
               open={openModal}
               onClose={handleCloseModal}
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+                paper: { sx: { width: { xs: "90%", md: "80%" } } },
               }}
             >
               <DialogContent>
                 {selectedEffect && (
                   <>
-                    <Typography variant="h4" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        mb: 1,
+                      }}
+                    >
                       {selectedEffect.tasteCombination || t("gourmet_delicacy")}
                     </Typography>
-                    
+
                     <Typography
                       variant="subtitle2"
                       sx={{
                         color: "text.secondary",
-                        mb: 2
-                      }}>
+                        mb: 2,
+                      }}
+                    >
                       {selectedCookingSpell && selectedCookingSpell.spellName}
                     </Typography>
 
@@ -315,7 +412,11 @@ export default function PlayerGourmet({ player }) {
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>

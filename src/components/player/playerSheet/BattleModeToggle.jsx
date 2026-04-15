@@ -9,9 +9,9 @@ export default function BattleModeToggle({ battleMode, setBattleMode }) {
       variant="contained"
       sx={{ width: "100%", marginTop: "10px", marginBottom: "10px" }}
       onClick={() => setBattleMode(!battleMode)}
-      color={battleMode? "secondary" : "primary"}
+      color={battleMode ? "secondary" : "primary"}
     >
-        {battleMode? t("Go To Info Sheet") : t("Go To Battle Sheet")}
+      {battleMode ? t("Go To Info Sheet") : t("Go To Battle Sheet")}
     </Button>
   );
 }

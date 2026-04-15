@@ -105,7 +105,6 @@ export function calcInit(npc) {
     init = 0;
   }
 
-
   // Armor
   if (npc.armor?.init) {
     init += npc.armor?.init;

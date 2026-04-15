@@ -34,7 +34,10 @@ const NpcEditAppBar = ({
   return (
     <MuiAppBar position="fixed">
       <Container>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
           <Grid size={3} sx={{ textAlign: "left" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
@@ -48,7 +51,10 @@ const NpcEditAppBar = ({
             </Grid>
           </Grid>
           <Grid size={3} sx={{ textAlign: "right" }}>
-            <Grid container sx={{ alignItems: "center", justifyContent: "flex-end" }}>
+            <Grid
+              container
+              sx={{ alignItems: "center", justifyContent: "flex-end" }}
+            >
               {showGoBackButton && !isPcEdit && (
                 <Tooltip title="Open Compendium">
                   <IconButton color="inherit" onClick={openCompendiumModal}>
@@ -93,7 +99,10 @@ const PcEditAppBar = ({
   return (
     <MuiAppBar position="fixed">
       <Container>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+        >
           <Grid size={3} sx={{ textAlign: "left" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
@@ -107,7 +116,10 @@ const PcEditAppBar = ({
             </Grid>
           </Grid>
           <Grid size={3} sx={{ textAlign: "right" }}>
-            <Grid container sx={{ alignItems: "center", justifyContent: "flex-end" }}>
+            <Grid
+              container
+              sx={{ alignItems: "center", justifyContent: "flex-end" }}
+            >
               {showGoBackButton && (
                 <Tooltip title="Open Compendium">
                   <IconButton color="inherit" onClick={openCompendiumModal}>

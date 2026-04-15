@@ -36,9 +36,10 @@ export function PrettySingle({ quality, showActions }) {
   const theme = useCustomTheme();
   const [showImage, setShowImage] = useState(false);
 
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)`
-    : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`;
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)`
+      : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`;
 
   const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
@@ -69,21 +70,42 @@ export function PrettySingle({ quality, showActions }) {
             >
               <Grid sx={{ flex: "0 0 70px" }} />
               <Grid sx={{ flex: 1, pl: 1 }} container>
-              <Grid size={5}>
-                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Quality")}
-                </Typography>
-              </Grid>
-              <Grid size={3}>
-                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Category")}
-                </Typography>
-              </Grid>
-              <Grid size={4}>
-                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
+                <Grid size={5}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Quality")}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Category")}
+                  </Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
               </Grid>
             </Grid>
 
@@ -110,7 +132,8 @@ export function PrettySingle({ quality, showActions }) {
               {/* Content Column - contains rows */}
               <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
                 {/* Quality Name, Category and Cost Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -119,19 +142,51 @@ export function PrettySingle({ quality, showActions }) {
                     pl: 1,
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={5}>
-                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>{quality.name || t("No Name")}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: "2px" }}
+                    size={5}
+                  >
+                    <Typography
+                      sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}
+                    >
+                      {quality.name || t("No Name")}
+                    </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={3}>
-                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0, fontSize: "0.85rem", textTransform: "uppercase" }}>{t(quality.category)}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: "2px" }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                        fontSize: "0.85rem",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {t(quality.category)}
+                    </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>{`${quality.cost}z`}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: "2px" }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >{`${quality.cost}z`}</Typography>
                   </Grid>
                 </Grid>
 
                 {/* Quality Description Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     pl: 1,
                     minHeight: "40px",
@@ -140,8 +195,13 @@ export function PrettySingle({ quality, showActions }) {
                 >
                   <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
                     <Typography sx={{ lineHeight: 1, margin: 0 }}>
-                      {!quality.quality ? t("No Description") : (
-                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      {!quality.quality ? (
+                        t("No Description")
+                      ) : (
+                        <StyledMarkdown
+                          allowedElements={["strong", "em"]}
+                          unwrapDisallowed={true}
+                        >
                           {quality.quality}
                         </StyledMarkdown>
                       )}
@@ -161,11 +221,20 @@ export function PrettySingle({ quality, showActions }) {
                 <Download />
               </IconButton>
             </Tooltip>
-            <Export name={`${quality.name}`} dataType="quality" data={quality} />
+            <Export
+              name={`${quality.name}`}
+              dataType="quality"
+              data={quality}
+            />
             <AddToCompendiumButton itemType="quality" data={quality} />
           </div>
           <FormControlLabel
-            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            control={
+              <Checkbox
+                checked={showImage}
+                onChange={(e) => setShowImage(e.target.checked)}
+              />
+            }
             label={t("Add Image")}
           />
         </div>

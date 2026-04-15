@@ -4,7 +4,7 @@ import { PaletteOptions } from "@mui/material/styles";
 // Light Mode Theme
 const lightFabula = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
       main: "#2b4b42",
     },
@@ -38,7 +38,7 @@ const lightFabula = createTheme({
     },
     error: {
       main: "#d1232a",
-    }
+    },
   } as PaletteOptions,
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
@@ -86,7 +86,7 @@ const lightFabula = createTheme({
 // Dark Mode Theme
 const darkFabula = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
       main: "#2b4b42",
     },
@@ -120,7 +120,7 @@ const darkFabula = createTheme({
     },
     error: {
       main: "#d1232a",
-    }
+    },
   } as PaletteOptions,
   typography: {
     fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
@@ -168,7 +168,7 @@ const darkFabula = createTheme({
       styleOverrides: {
         root: {
           color: "#b0b0b0",
-          '&.Mui-focused': {
+          "&.Mui-focused": {
             color: "#ffffff",
           },
         },
@@ -179,7 +179,7 @@ const darkFabula = createTheme({
         outlined: {
           borderColor: "rgba(255, 255, 255, 0.23)",
           color: "#ffffff",
-          '&:hover': {
+          "&:hover": {
             borderColor: "#ffffff",
             backgroundColor: "#333333",
             color: "#ffffff",
@@ -190,16 +190,16 @@ const darkFabula = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
+          "& .MuiOutlinedInput-root": {
             backgroundColor: "#2b2b2b", // Darker background for textfield
             borderColor: "#555555", // Lighter border color for better contrast
-            '&:hover fieldset': {
+            "&:hover fieldset": {
               borderColor: "#ffffff", // White border on hover
             },
-            '&.Mui-focused fieldset': {
+            "&.Mui-focused fieldset": {
               borderColor: "#ffffff", // White border when focused
             },
-            '& .MuiInputBase-input': {
+            "& .MuiInputBase-input": {
               color: "#ffffff", // White text color for better readability in dark mode
             },
           },
@@ -217,7 +217,7 @@ const darkFabula = createTheme({
       styleOverrides: {
         root: () => ({
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor:  "#fff",
+            borderColor: "#fff",
           },
         }),
       },
@@ -276,7 +276,7 @@ const darkFabula = createTheme({
           },
         },
         thumb: {
-          backgroundColor: "#85C3B1", 
+          backgroundColor: "#85C3B1",
         },
         track: {
           backgroundColor: "#1e1e1e",
@@ -293,10 +293,10 @@ const darkFabula = createTheme({
         thumb: {
           backgroundColor: "#85C3B1",
           "&:hover, &.Mui-focusVisible": {
-            backgroundColor: "#47645b", 
+            backgroundColor: "#47645b",
           },
           "&.Mui-disabled": {
-            backgroundColor: "#47645b1A", 
+            backgroundColor: "#47645b1A",
           },
         },
         track: {
@@ -306,10 +306,10 @@ const darkFabula = createTheme({
           backgroundColor: "#47645b",
         },
         mark: {
-          backgroundColor: "#47645b", 
+          backgroundColor: "#47645b",
         },
         markActive: {
-          backgroundColor: "#85C3B1", 
+          backgroundColor: "#85C3B1",
         },
       },
     },
@@ -318,7 +318,7 @@ const darkFabula = createTheme({
         root: {
           color: "#85C3B1", // Secondary
           "&.Mui-checked": {
-            color: "#85C3B1",  // Secondary
+            color: "#85C3B1", // Secondary
           },
           "&.Mui-disabled": {
             color: "#47645b1A", // Quaternary with 10% opacity

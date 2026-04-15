@@ -80,8 +80,8 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
                 attr.value === attr.originalValue
                   ? "inherit"
                   : attr.value > attr.originalValue
-                  ? "green !important"
-                  : "red !important",
+                    ? "green !important"
+                    : "red !important",
             }}
           >
             {attr.value}

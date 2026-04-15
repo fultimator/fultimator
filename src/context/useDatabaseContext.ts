@@ -18,6 +18,7 @@ export const DatabaseContext = createContext<DatabaseContextValue | null>(null);
 
 export function useDatabaseContext(): DatabaseContextValue {
   const ctx = useContext(DatabaseContext);
-  if (!ctx) throw new Error("useDatabaseContext must be used inside DatabaseProvider");
+  if (!ctx)
+    throw new Error("useDatabaseContext must be used inside DatabaseProvider");
   return ctx;
 }

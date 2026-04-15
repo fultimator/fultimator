@@ -49,7 +49,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -89,7 +90,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -107,7 +109,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -153,11 +156,12 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={6}>
+                  size={6}
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {therioform.name === "mutant_therioform_custom_name"
@@ -171,7 +175,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={6}>
+                  size={6}
+                >
                   <ReactMarkdown components={components}>
                     {therioform.name === "mutant_therioform_custom_name"
                       ? therioform.genoclepsis
@@ -187,11 +192,13 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                  size="grow"></Grid>
+                  size="grow"
+                ></Grid>
               )}
             </div>
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -206,7 +213,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <ReactMarkdown components={components}>
                     {therioform.name === "mutant_therioform_custom_name"
                       ? therioform.description

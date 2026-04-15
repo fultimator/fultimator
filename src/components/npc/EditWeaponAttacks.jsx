@@ -48,10 +48,10 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
       weaponattacks: [
         ...(prevState.weaponattacks || []),
         {
-        name: "",
-        weapon: baseWeapons[0],
-        type: "physical",
-        special: [],
+          name: "",
+          weapon: baseWeapons[0],
+          type: "physical",
+          special: [],
         },
       ],
     }));
@@ -60,7 +60,9 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   const removeAttack = (i) => {
     setNpc((prevState) => ({
       ...prevState,
-      weaponattacks: (prevState.weaponattacks || []).filter((_, index) => index !== i),
+      weaponattacks: (prevState.weaponattacks || []).filter(
+        (_, index) => index !== i,
+      ),
     }));
   };
 
@@ -83,8 +85,9 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
             <Grid
               size={{
                 xs: 12,
-                md: 6
-              }}>
+                md: 6,
+              }}
+            >
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
@@ -94,15 +97,16 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
             <Grid
               size={{
                 xs: 12,
-                md: 6
-              }}>
+                md: 6,
+              }}
+            >
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.weaponattacks.length - 1 && (
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider />
               </Grid>
             )}
@@ -137,12 +141,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid  sx={{ p: 0, m: 0 }}>
+      <Grid sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
           <RemoveCircleOutlined />
         </IconButton>
       </Grid>
-      <Grid  size={5}>
+      <Grid size={5}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -155,7 +159,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size={5}>
+      <Grid size={5}>
         <SelectWeapon
           weapon={attack.weapon}
           setWeapon={(value) => {
@@ -164,7 +168,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           size="small"
         />
       </Grid>
-      <Grid  size={3}>
+      <Grid size={3}>
         <FormControl variant="standard">
           <TextField
             id="flathit"
@@ -176,12 +180,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             }}
             size="small"
             slotProps={{
-              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
             }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size={3}>
+      <Grid size={3}>
         <FormControl variant="standard">
           <TextField
             id="flatdmg"
@@ -193,12 +197,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             }}
             size="small"
             slotProps={{
-              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
             }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size={3}>
+      <Grid size={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
@@ -292,7 +296,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid> */}
-      <Grid  size="grow">
+      <Grid size="grow">
         <FormGroup>
           <FormControlLabel
             control={
@@ -330,7 +334,7 @@ function EditAttackSpecial({ attack, setAttack }) {
 
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="special"
@@ -373,7 +377,7 @@ function SelectWeapon({ weapon, setWeapon }) {
         <CloseBracket /> <OpenBracket />
         {t("HR +")} {weapon.damage}
         <CloseBracket />
-      </MenuItem>
+      </MenuItem>,
     );
   }
 

@@ -1,4 +1,11 @@
-import { Grid, Button, Typography, Box, IconButton, Tooltip } from "@mui/material";
+import {
+  Grid,
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { Add, Search } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 
@@ -89,18 +96,30 @@ export default function ContentSection({
   return (
     <Grid container spacing={2}>
       {/* Add Buttons */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t(addButtonLabel)}
         </Typography>
-        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            flexWrap: "wrap",
+            mb: 2,
+            alignItems: "center",
+          }}
+        >
           <Box sx={{ display: "flex", gap: 0.5 }}>
             {onBrowseCompendium && (
               <Tooltip title={t("Browse Compendium")}>
                 <IconButton
                   size="small"
                   onClick={onBrowseCompendium}
-                  sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                  }}
                 >
                   <Search fontSize="small" />
                 </IconButton>
@@ -114,7 +133,6 @@ export default function ContentSection({
             >
               {t(addButtonLabel)}
             </Button>
-
           </Box>
           {presetAddButtons.map((presetBtn) => (
             <Button
@@ -131,7 +149,7 @@ export default function ContentSection({
       </Grid>
       {/* Items List */}
       {items.length === 0 ? (
-        <Grid  size={12}>
+        <Grid size={12}>
           <Typography
             sx={{
               padding: "20px",
@@ -149,7 +167,7 @@ export default function ContentSection({
         </Grid>
       ) : (
         items.map((item, index) => (
-          <Grid  key={index} size={12}>
+          <Grid key={index} size={12}>
             <ItemComponent
               {...itemComponentProps}
               item={item}

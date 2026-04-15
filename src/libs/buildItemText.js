@@ -1,11 +1,20 @@
 import { t as staticT } from "../translation/translate";
 import attributes from "./attributes";
 import types from "./types";
-import { calcHP, calcMP, calcInit, calcDef, calcMDef, calcDamage, calcPrecision, calcMagic } from "./npcs";
+import {
+  calcHP,
+  calcMP,
+  calcInit,
+  calcDef,
+  calcMDef,
+  calcDamage,
+  calcPrecision,
+  calcMagic,
+} from "./npcs";
 
-// 
+//
 // Helpers
-// 
+//
 
 const ATTR_SHORT = {
   dexterity: "DEX",
@@ -31,7 +40,17 @@ const AFFINITY_LABEL = { vu: "VU", rs: "RS", im: "IM", ab: "AB" };
 // "wind" in NPC data → "air" in Obsidian fu-vault format
 const OBSIDIAN_AFFINITY_KEY = { wind: "air" };
 
-const NPC_AFFINITY_ORDER = ["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"];
+const NPC_AFFINITY_ORDER = [
+  "physical",
+  "wind",
+  "bolt",
+  "dark",
+  "earth",
+  "fire",
+  "ice",
+  "light",
+  "poison",
+];
 
 function npcRankLabel(rank) {
   const labels = {
@@ -68,7 +87,9 @@ function formatAttackDesc(attack, npc, md) {
 
   const specials = Array.isArray(attack.special)
     ? attack.special.filter(Boolean).join("; ")
-    : (typeof attack.special === "string" ? attack.special : "");
+    : typeof attack.special === "string"
+      ? attack.special
+      : "";
   if (specials) desc += `, ${specials}`;
   return desc;
 }
@@ -76,15 +97,15 @@ function formatAttackDesc(attack, npc, md) {
 function formatNpcAffinities(affinities, md) {
   if (!affinities) return null;
   const b = (s) => (md ? `**${s}**` : s);
-  const parts = NPC_AFFINITY_ORDER
-    .filter((k) => affinities[k] && AFFINITY_LABEL[affinities[k]])
-    .map((k) => `${DAMAGE_TYPE_LABEL[k] ?? k} ${AFFINITY_LABEL[affinities[k]]}`);
+  const parts = NPC_AFFINITY_ORDER.filter(
+    (k) => affinities[k] && AFFINITY_LABEL[affinities[k]],
+  ).map((k) => `${DAMAGE_TYPE_LABEL[k] ?? k} ${AFFINITY_LABEL[affinities[k]]}`);
   return parts.length ? `${b("Affinities:")} ${parts.join(", ")}` : null;
 }
 
-// 
+//
 // NPC text formatter
-// 
+//
 
 function buildNpcText(npc, md) {
   const b = (s) => (md ? `**${s}**` : s);
@@ -102,7 +123,7 @@ function buildNpcText(npc, md) {
   // Attributes
   const a = npc.attributes ?? {};
   parts.push(
-    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`
+    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`,
   );
 
   // Derived stats
@@ -112,7 +133,7 @@ function buildNpcText(npc, md) {
   const def = calcDef(npc);
   const mdef = calcMDef(npc);
   parts.push(
-    `${b("HP:")} ${hp}  ${b("MP:")} ${mp}  ${b("Init:")} ${init}  ${b("DEF:")} ${def}  ${b("M.DEF:")} ${mdef}`
+    `${b("HP:")} ${hp}  ${b("MP:")} ${mp}  ${b("Init:")} ${init}  ${b("DEF:")} ${def}  ${b("M.DEF:")} ${mdef}`,
   );
 
   // Affinities
@@ -164,9 +185,9 @@ function buildNpcText(npc, md) {
   return parts.join("\n\n");
 }
 
-// 
+//
 // NPC → Obsidian fu-vault formatter
-// 
+//
 
 function buildNpcObsidian(npc) {
   const rank = npc.rank || "soldier";
@@ -177,7 +198,10 @@ function buildNpcObsidian(npc) {
   if (rank !== "soldier") lines.push(`rank: ${npcRankLabel(rank)}`);
   lines.push(`level: ${npc.lvl ?? 1}`);
   if (npc.species) lines.push(`species: "${npc.species}"`);
-  if (npc.description) lines.push(`description: "${npc.description.replace(/"/g, '\\"').replace(/\n/g, " ")}"`);
+  if (npc.description)
+    lines.push(
+      `description: "${npc.description.replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+    );
   if (npc.traits) lines.push(`traits: "${npc.traits.replace(/"/g, '\\"')}"`);
 
   lines.push(`\nDEX: ${a.dexterity ?? 6}`);
@@ -208,8 +232,12 @@ function buildNpcObsidian(npc) {
   }
 
   // Attacks : split melee/ranged
-  const meleeAttacks = (npc.attacks ?? []).filter((a) => a.range !== "distance");
-  const rangedAttacks = (npc.attacks ?? []).filter((a) => a.range === "distance");
+  const meleeAttacks = (npc.attacks ?? []).filter(
+    (a) => a.range !== "distance",
+  );
+  const rangedAttacks = (npc.attacks ?? []).filter(
+    (a) => a.range === "distance",
+  );
 
   if (meleeAttacks.length) {
     lines.push("\nattacks-m:");
@@ -243,7 +271,9 @@ function buildNpcObsidian(npc) {
       }
       name += ` ~ ${spell.mp} MP ~ ${spell.target} ~ ${spell.duration}`;
       lines.push(`  - name: "${name.replace(/"/g, '\\"')}"`);
-      lines.push(`    desc: "${(spell.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`);
+      lines.push(
+        `    desc: "${(spell.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+      );
     }
   }
 
@@ -252,7 +282,9 @@ function buildNpcObsidian(npc) {
     lines.push("\nskills:");
     for (const action of npc.actions) {
       lines.push(`  - name: "${(action.name ?? "").replace(/"/g, '\\"')}"`);
-      lines.push(`    desc: "${(action.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`);
+      lines.push(
+        `    desc: "${(action.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+      );
     }
   }
 
@@ -261,7 +293,9 @@ function buildNpcObsidian(npc) {
     lines.push("\nrules:");
     for (const rule of npc.special) {
       lines.push(`  - name: "${(rule.name ?? "").replace(/"/g, '\\"')}"`);
-      lines.push(`    desc: "${(rule.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`);
+      lines.push(
+        `    desc: "${(rule.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+      );
     }
   }
 
@@ -269,9 +303,9 @@ function buildNpcObsidian(npc) {
   return lines.join("\n");
 }
 
-// 
+//
 // PC text formatter
-// 
+//
 
 function buildPcText(player, md) {
   const b = (s) => (md ? `**${s}**` : s);
@@ -294,7 +328,7 @@ function buildPcText(player, md) {
   // Attributes
   const a = player.attributes ?? {};
   parts.push(
-    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`
+    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`,
   );
 
   // Stats
@@ -303,12 +337,13 @@ function buildPcText(player, md) {
   const mp = stats.mp ?? {};
   const ip = stats.ip ?? {};
   parts.push(
-    `${b("HP:")} ${hp.current ?? 0}/${hp.base ?? 0}  ${b("MP:")} ${mp.current ?? 0}/${mp.base ?? 0}  ${b("IP:")} ${ip.current ?? 0}/${ip.base ?? 0}`
+    `${b("HP:")} ${hp.current ?? 0}/${hp.base ?? 0}  ${b("MP:")} ${mp.current ?? 0}/${mp.base ?? 0}  ${b("IP:")} ${ip.current ?? 0}/${ip.base ?? 0}`,
   );
 
   const extraFields = [
     player.info?.zenit != null && `${b("Zenit:")} ${player.info.zenit}`,
-    player.info?.fabulapoints != null && `${b("FP:")} ${player.info.fabulapoints}`,
+    player.info?.fabulapoints != null &&
+      `${b("FP:")} ${player.info.fabulapoints}`,
     player.info?.exp != null && `${b("Exp:")} ${player.info.exp}`,
   ].filter(Boolean);
   if (extraFields.length) parts.push(extraFields.join("  |  "));
@@ -325,7 +360,9 @@ function buildPcText(player, md) {
       if (cls.skills?.length) {
         for (const skill of cls.skills) {
           if (skill.currentLvl > 0) {
-            classLines.push(`  • ${skill.name} (Lv. ${skill.currentLvl}/${skill.maxLvl}): ${skill.description ?? ""}`);
+            classLines.push(
+              `  • ${skill.name} (Lv. ${skill.currentLvl}/${skill.maxLvl}): ${skill.description ?? ""}`,
+            );
           }
         }
       }
@@ -360,9 +397,9 @@ function buildPcText(player, md) {
   return parts.join("\n\n");
 }
 
-// 
+//
 // Main dispatcher
-// 
+//
 
 export function buildItemText(type, item, fmt) {
   if (type === "npc") {
@@ -378,8 +415,10 @@ export function buildItemText(type, item, fmt) {
   const b = (s) => (md ? `**${s}**` : s);
   const em = (s) => (md ? `*${s}*` : s);
   const h1 = (s) => (md ? `# ${s}` : s.toUpperCase());
-  const field = (label, value) => (value != null && value !== "" ? `${b(label + ":")} ${value}` : null);
-  const resolve = (s) => (typeof s === "string" ? s.replace(/\\n/g, "\n") : String(s ?? ""));
+  const field = (label, value) =>
+    value != null && value !== "" ? `${b(label + ":")} ${value}` : null;
+  const resolve = (s) =>
+    typeof s === "string" ? s.replace(/\\n/g, "\n") : String(s ?? "");
 
   switch (type) {
     case "heroics": {
@@ -387,7 +426,8 @@ export function buildItemText(type, item, fmt) {
       if (item.quote) parts.push(em(resolve(item.quote)));
       if (item.description) parts.push(resolve(item.description));
       const meta = [
-        item.applicableTo?.length && field("Applicable To", item.applicableTo.join(", ")),
+        item.applicableTo?.length &&
+          field("Applicable To", item.applicableTo.join(", ")),
         item.book && field("Book", item.book),
         item.source && field("Source", resolve(item.source)),
       ].filter(Boolean);
@@ -401,13 +441,22 @@ export function buildItemText(type, item, fmt) {
 
       // Non-static spell types (gifts, dances, etc.)
       if (st && st !== "default" && st !== "gamble") {
-        const typeLabel = {
-          gift: "Gift", dance: "Dance", therioform: "Therioform",
-          magichant: "Tone", symbol: "Symbol", invocation: "Invocation",
-          magiseed: "Magiseed", arcanist: "Arcanum", "arcanist-rework": "Arcanum",
-          "tinkerer-alchemy": "Alchemy", "tinkerer-infusion": "Infusion",
-          "pilot-vehicle": "Pilot Vehicle", cooking: "Delicacy",
-        }[st] ?? st;
+        const typeLabel =
+          {
+            gift: "Gift",
+            dance: "Dance",
+            therioform: "Therioform",
+            magichant: "Tone",
+            symbol: "Symbol",
+            invocation: "Invocation",
+            magiseed: "Magiseed",
+            arcanist: "Arcanum",
+            "arcanist-rework": "Arcanum",
+            "tinkerer-alchemy": "Alchemy",
+            "tinkerer-infusion": "Infusion",
+            "pilot-vehicle": "Pilot Vehicle",
+            cooking: "Delicacy",
+          }[st] ?? st;
         parts[0] = `${h1(resolve(staticT(item.name) || item.name))} ${md ? `*(${typeLabel})*` : `(${typeLabel})`}`;
 
         switch (st) {
@@ -416,12 +465,15 @@ export function buildItemText(type, item, fmt) {
             if (item.effect) parts.push(resolve(staticT(item.effect)));
             break;
           case "dance":
-            if (item.duration) parts.push(field("Duration", resolve(staticT(item.duration))));
+            if (item.duration)
+              parts.push(field("Duration", resolve(staticT(item.duration))));
             if (item.effect) parts.push(resolve(staticT(item.effect)));
             break;
           case "therioform":
-            if (item.genoclepsis) parts.push(em(resolve(staticT(item.genoclepsis))));
-            if (item.description) parts.push(resolve(staticT(item.description)));
+            if (item.genoclepsis)
+              parts.push(em(resolve(staticT(item.genoclepsis))));
+            if (item.description)
+              parts.push(resolve(staticT(item.description)));
             break;
           case "magichant":
           case "symbol":
@@ -435,26 +487,37 @@ export function buildItemText(type, item, fmt) {
             break;
           }
           case "magiseed":
-            if (item.description) parts.push(resolve(staticT(item.description)));
+            if (item.description)
+              parts.push(resolve(staticT(item.description)));
             if (item.effects) {
-              const tiers = Object.entries(item.effects)
-                .map(([tier, fx]) => `T${tier}: ${resolve(staticT(fx))}`);
+              const tiers = Object.entries(item.effects).map(
+                ([tier, fx]) => `T${tier}: ${resolve(staticT(fx))}`,
+              );
               if (tiers.length) parts.push(tiers.join("\n"));
             }
             break;
           case "arcanist":
           case "arcanist-rework":
-            if (item.domainDesc) parts.push(`${b("Domain:")} ${resolve(staticT(item.domainDesc))}`);
-            if (item.mergeDesc) parts.push(`${b("Merge:")} ${resolve(staticT(item.mergeDesc))}`);
-            if (item.dismissDesc) parts.push(`${b("Dismiss:")} ${resolve(staticT(item.dismissDesc))}`);
+            if (item.domainDesc)
+              parts.push(
+                `${b("Domain:")} ${resolve(staticT(item.domainDesc))}`,
+              );
+            if (item.mergeDesc)
+              parts.push(`${b("Merge:")} ${resolve(staticT(item.mergeDesc))}`);
+            if (item.dismissDesc)
+              parts.push(
+                `${b("Dismiss:")} ${resolve(staticT(item.dismissDesc))}`,
+              );
             break;
           case "tinkerer-alchemy":
             if (item.category) parts.push(b(item.category));
             if (item.effect) parts.push(resolve(item.effect));
             break;
           case "tinkerer-infusion":
-            if (item.infusionRank != null) parts.push(field("Rank", item.infusionRank));
-            if (item.effect ?? item.description) parts.push(resolve(item.effect ?? item.description));
+            if (item.infusionRank != null)
+              parts.push(field("Rank", item.infusionRank));
+            if (item.effect ?? item.description)
+              parts.push(resolve(item.effect ?? item.description));
             break;
           case "pilot-vehicle": {
             const stats2 = [
@@ -468,12 +531,14 @@ export function buildItemText(type, item, fmt) {
               item.range && field("Range", item.range),
             ].filter(Boolean);
             if (stats2.length) parts.push(stats2.join("\n"));
-            if (item.description) parts.push(resolve(staticT(item.description)));
+            if (item.description)
+              parts.push(resolve(staticT(item.description)));
             break;
           }
           default:
             if (item.effect) parts.push(resolve(staticT(item.effect)));
-            else if (item.description) parts.push(resolve(staticT(item.description)));
+            else if (item.description)
+              parts.push(resolve(staticT(item.description)));
         }
         return parts.join("\n\n");
       }
@@ -485,12 +550,20 @@ export function buildItemText(type, item, fmt) {
           item.mp != null && field("MP", item.mp),
           target && field("Target", resolve(target)),
           item.duration && field("Duration", resolve(item.duration)),
-          item.attr1 && item.attr2 && field("Roll", `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`),
+          item.attr1 &&
+            item.attr2 &&
+            field(
+              "Roll",
+              `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+            ),
         ].filter(Boolean);
         if (stats.length) parts.push(stats.join("\n"));
         if (item.targets?.length) {
           const rows = item.targets.map((t2) => {
-            const range = t2.rangeFrom === t2.rangeTo ? `${t2.rangeFrom}` : `${t2.rangeFrom}–${t2.rangeTo}`;
+            const range =
+              t2.rangeFrom === t2.rangeTo
+                ? `${t2.rangeFrom}`
+                : `${t2.rangeFrom}–${t2.rangeTo}`;
             return `${range}: ${resolve(staticT(t2.effect))}`;
           });
           parts.push(rows.join("\n"));
@@ -504,7 +577,12 @@ export function buildItemText(type, item, fmt) {
         item.mp != null && field("MP", item.mp),
         target && field("Target", resolve(target)),
         item.duration && field("Duration", resolve(item.duration)),
-        item.attr1 && item.attr2 && field("Roll", `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`),
+        item.attr1 &&
+          item.attr2 &&
+          field(
+            "Roll",
+            `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+          ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       const effect = item.effect ?? item.description;
@@ -516,7 +594,8 @@ export function buildItemText(type, item, fmt) {
       const attr1 = attributes[item.att1];
       const attr2 = attributes[item.att2];
       const dmgType = types[item.type];
-      const precStr = item.prec > 0 ? ` +${item.prec}` : item.prec < 0 ? ` ${item.prec}` : "";
+      const precStr =
+        item.prec > 0 ? ` +${item.prec}` : item.prec < 0 ? ` ${item.prec}` : "";
       const parts = [h1(resolve(item.name))];
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -524,8 +603,14 @@ export function buildItemText(type, item, fmt) {
         field("Range", item.melee ? "Melee" : "Ranged"),
         item.martial && field("Martial", "Yes"),
         item.cost != null && field("Cost", `${item.cost}z`),
-        attr1 && attr2 && field("Accuracy", `[${attr1.shortcaps} + ${attr2.shortcaps}]${precStr}`),
-        item.damage != null && field("Damage", `[HR + ${item.damage}] ${dmgType?.long ?? ""}`),
+        attr1 &&
+          attr2 &&
+          field(
+            "Accuracy",
+            `[${attr1.shortcaps} + ${attr2.shortcaps}]${precStr}`,
+          ),
+        item.damage != null &&
+          field("Damage", `[HR + ${item.damage}] ${dmgType?.long ?? ""}`),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       if (item.quality) parts.push(resolve(item.quality));
@@ -534,19 +619,27 @@ export function buildItemText(type, item, fmt) {
     case "armor":
     case "shields": {
       const parts = [h1(resolve(item.name))];
-      const defDisplay = item.category === "Shield"
-        ? `+${item.defbonus ?? item.def}`
-        : item.martial
-          ? String(item.def)
-          : item.defbonus ? `DEX die +${item.defbonus}` : "DEX die";
+      const defDisplay =
+        item.category === "Shield"
+          ? `+${item.defbonus ?? item.def}`
+          : item.martial
+            ? String(item.def)
+            : item.defbonus
+              ? `DEX die +${item.defbonus}`
+              : "DEX die";
       const mdefDisplay = item.martial
-        ? item.mdefbonus ? `INS die +${item.mdefbonus}` : "INS die"
-        : item.mdefbonus ? `INS die +${item.mdefbonus}` : "INS die";
+        ? item.mdefbonus
+          ? `INS die +${item.mdefbonus}`
+          : "INS die"
+        : item.mdefbonus
+          ? `INS die +${item.mdefbonus}`
+          : "INS die";
       const stats = [
         item.category && field("Category", resolve(item.category)),
         field("DEF", defDisplay),
         field("MDEF", mdefDisplay),
-        item.init != null && field("Initiative", item.init === 0 ? " - " : item.init),
+        item.init != null &&
+          field("Initiative", item.init === 0 ? " - " : item.init),
         item.cost != null && field("Cost", `${item.cost}z`),
         item.martial && field("Martial", "Yes"),
       ].filter(Boolean);
@@ -582,13 +675,19 @@ export function buildItemText(type, item, fmt) {
           benefits.martials?.shields && "Martial Shields",
           benefits.rituals?.ritualism && "Ritualism",
         ].filter(Boolean);
-        if (bLines.length) parts.push(`${b("Free Benefits:")}\n${bLines.map((l) => `• ${l}`).join("\n")}`);
+        if (bLines.length)
+          parts.push(
+            `${b("Free Benefits:")}\n${bLines.map((l) => `• ${l}`).join("\n")}`,
+          );
       }
       // Skills
       if (item.skills?.length) {
-        const skillText = item.skills.map((skill) =>
-          `${b(resolve(staticT(skill.skillName)))} (Max ${skill.maxLvl})\n${resolve(staticT(skill.description))}`
-        ).join("\n\n");
+        const skillText = item.skills
+          .map(
+            (skill) =>
+              `${b(resolve(staticT(skill.skillName)))} (Max ${skill.maxLvl})\n${resolve(staticT(skill.description))}`,
+          )
+          .join("\n\n");
         parts.push(skillText);
       }
       return parts.join("\n\n");
@@ -604,7 +703,10 @@ export function buildItemText(type, item, fmt) {
         item.martial && field("Martial", "Yes"),
         item.range && field("Range", resolve(staticT(item.range))),
         attr1 && attr2
-          ? field("Accuracy", `[${attr1.shortcaps} + ${attr2.shortcaps}]${hitBonus}`)
+          ? field(
+              "Accuracy",
+              `[${attr1.shortcaps} + ${attr2.shortcaps}]${hitBonus}`,
+            )
           : field("Accuracy", " - "),
         field("Damage", `[HR + ${item.flatdmg ?? 0}] ${dmgType?.long ?? ""}`),
       ].filter(Boolean);

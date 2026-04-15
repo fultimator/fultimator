@@ -26,7 +26,8 @@ export default function PlayerCardShort({
   const inv = player.equipment?.[0];
 
   /* player.armor.isEquipped (should be only one) */
-  const equippedArmor = inv?.armor?.find((armor) => isItemEquipped(player, armor)) || null;
+  const equippedArmor =
+    inv?.armor?.find((armor) => isItemEquipped(player, armor)) || null;
 
   /* player.shields.isEquipped (should be only one) */
   const equippedShield =
@@ -38,7 +39,8 @@ export default function PlayerCardShort({
 
   /* player.accessories.isEquipped (should be only one) */
   const equippedAccessory =
-    inv?.accessories?.find((accessory) => isItemEquipped(player, accessory)) || null;
+    inv?.accessories?.find((accessory) => isItemEquipped(player, accessory)) ||
+    null;
 
   // Function to format item names
   const formatItemName = (item) =>
@@ -83,7 +85,7 @@ export default function PlayerCardShort({
     (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.defModifier || 0),
-      0
+      0,
     ) +
     dodgeBonus;
 
@@ -98,7 +100,7 @@ export default function PlayerCardShort({
     (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
     equippedWeapons.reduce(
       (total, weapon) => total + (weapon.mDefModifier || 0),
-      0
+      0,
     );
 
   // Initialize INIT to 0
@@ -127,15 +129,17 @@ export default function PlayerCardShort({
               borderRight: "4px solid white",
               px: 2,
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               sx={{
                 color: "#fff",
                 fontFamily: "Antonio",
                 fontSize: "1.5rem",
                 fontWeight: "medium",
-                textTransform: "uppercase"
-              }}>
+                textTransform: "uppercase",
+              }}
+            >
               {player.name}
             </Typography>
           </Grid>
@@ -146,14 +150,16 @@ export default function PlayerCardShort({
               borderLeft: `2px solid ${primary} `,
               borderBottom: `2px solid ${primary} `,
               borderImage: `linear-gradient(45deg, ${secondary} , ${ternary}) 1;`,
-            }}>
+            }}
+          >
             <Typography
               sx={{
                 fontFamily: "Antonio",
                 fontSize: "1.25rem",
                 fontWeight: "medium",
-                textTransform: "uppercase"
-              }}>
+                textTransform: "uppercase",
+              }}
+            >
               {player.info.pronouns && (
                 <>
                   {player.info.pronouns} <Diamond color={primary} />{" "}
@@ -167,8 +173,9 @@ export default function PlayerCardShort({
           <Grid
             size={{
               xs: 3,
-              sm: 3
-            }}>
+              sm: 3,
+            }}
+          >
             <div style={{ position: "relative" }}>
               <img
                 src={
@@ -177,8 +184,8 @@ export default function PlayerCardShort({
                       ? characterImage
                       : avatar_image
                     : player.info.imgurl
-                    ? player.info.imgurl
-                    : avatar_image
+                      ? player.info.imgurl
+                      : avatar_image
                 }
                 alt="Player Avatar"
                 style={{
@@ -205,13 +212,13 @@ export default function PlayerCardShort({
                   height: "100%",
                   maxHeight: "9rem",
                   maxWidth: "9rem",
-                  marginTop:"5px"
+                  marginTop: "5px",
                 }}
               />
             </div>
           </Grid>
           <Grid container sx={{ marginTop: "5px", marginX: "-5px" }} size={9}>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Paper
                 elevation={3}
                 sx={{
@@ -242,8 +249,9 @@ export default function PlayerCardShort({
                   <Grid
                     size={{
                       xs: 12,
-                      md: 12
-                    }}>
+                      md: 12,
+                    }}
+                  >
                     <Typography variant="h4">
                       <span
                         style={{
@@ -269,8 +277,9 @@ export default function PlayerCardShort({
                   <Grid
                     size={{
                       xs: 12,
-                      md: 6
-                    }}>
+                      md: 6,
+                    }}
+                  >
                     <Typography variant="h4">
                       <span
                         style={{
@@ -296,8 +305,9 @@ export default function PlayerCardShort({
                   <Grid
                     size={{
                       xs: 12,
-                      md: 6
-                    }}>
+                      md: 6,
+                    }}
+                  >
                     <Typography variant="h4">
                       <span
                         style={{
@@ -334,7 +344,8 @@ export default function PlayerCardShort({
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              size={12}>
+              size={12}
+            >
               <Grid container sx={{ justifyContent: "center" }} size={4}>
                 <Typography variant="h2" align="center">
                   {t("HP") + ": " + player.stats.hp.max}
@@ -351,8 +362,14 @@ export default function PlayerCardShort({
                 </Typography>
               </Grid>
               <Grid
-                container sx={{ justifyContent: "center", marginTop: "5px", marginBottom: "5px" }}
-                size={12}>
+                container
+                sx={{
+                  justifyContent: "center",
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                }}
+                size={12}
+              >
                 <Divider sx={{ width: "100%" }} />
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={4}>
@@ -371,8 +388,14 @@ export default function PlayerCardShort({
                 </Typography>
               </Grid>
               <Grid
-                container sx={{ justifyContent: "center", marginTop: "5px", marginBottom: "5px" }}
-                size={12}>
+                container
+                sx={{
+                  justifyContent: "center",
+                  marginTop: "5px",
+                  marginBottom: "5px",
+                }}
+                size={12}
+              >
                 <Divider sx={{ width: "100%" }} />
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={3}>
@@ -406,12 +429,16 @@ export default function PlayerCardShort({
                   border: "2px solid",
                   borderColor: secondary,
                 }}
-                size={12}>
+                size={12}
+              >
                 <Grid container sx={{ alignItems: "center" }} size={12}>
                   {" "}
-                  <Typography variant="h3" sx={{
-                    fontWeight: "bolder"
-                  }}>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: "bolder",
+                    }}
+                  >
                     <span>{t("Equipment") + ": "}&nbsp;</span>
                   </Typography>
                   <Typography variant="h4">
@@ -431,16 +458,20 @@ export default function PlayerCardShort({
                   border: "2px solid",
                   borderColor: secondary,
                 }}
-                size={12}>
-                <Grid container  size={12}>
-                  <Typography variant="h3" sx={{
-                    fontWeight: "bolder"
-                  }}>
+                size={12}
+              >
+                <Grid container size={12}>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: "bolder",
+                    }}
+                  >
                     {t("Classes") + ": "}
                   </Typography>
                 </Grid>
                 {player.classes.map((cl, i) => (
-                  <Grid container  key={i} size={12}>
+                  <Grid container key={i} size={12}>
                     <Typography variant="h4">
                       {t(cl.name) + " (" + t("LVL") + " " + cl.lvl + "):"}&nbsp;
                     </Typography>
@@ -471,7 +502,7 @@ export default function PlayerCardShort({
                               {sp.name}
                               {j !==
                                 cl.spells.filter(
-                                  (sp) => sp.spellType === "default"
+                                  (sp) => sp.spellType === "default",
                                 ).length -
                                   1 && ", "}
                             </span>
@@ -482,7 +513,7 @@ export default function PlayerCardShort({
                     {cl.spells.filter(
                       (sp) =>
                         sp.spellType === "arcanist" ||
-                        sp.spellType === "arcanist-rework"
+                        sp.spellType === "arcanist-rework",
                     ).length > 0 && (
                       <Typography variant="h4">
                         &nbsp;{"- ( " + t("Arcana") + ": "}
@@ -490,7 +521,7 @@ export default function PlayerCardShort({
                           .filter(
                             (sp) =>
                               sp.spellType === "arcanist" ||
-                              sp.spellType === "arcanist-rework"
+                              sp.spellType === "arcanist-rework",
                           )
                           .map((sp, j) => (
                             <span key={j}>
@@ -499,7 +530,7 @@ export default function PlayerCardShort({
                                 cl.spells.filter(
                                   (sp) =>
                                     sp.spellType === "arcanist" ||
-                                    sp.spellType === "arcanist-rework"
+                                    sp.spellType === "arcanist-rework",
                                 ).length -
                                   1 && ", "}
                             </span>

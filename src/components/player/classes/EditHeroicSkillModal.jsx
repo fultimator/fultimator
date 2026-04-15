@@ -35,7 +35,7 @@ export default function EditHeroicSkillModal({
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
@@ -61,7 +61,7 @@ export default function EditHeroicSkillModal({
           fullWidth
           margin="normal"
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
         <TextField
@@ -71,7 +71,7 @@ export default function EditHeroicSkillModal({
           fullWidth
           margin="normal"
           slotProps={{
-            htmlInput: { maxLength: 200 }
+            htmlInput: { maxLength: 200 },
           }}
         />
         <CustomTextarea

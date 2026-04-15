@@ -54,7 +54,7 @@ export default function EditPublish({
         disabled: true,
         message: t(
           "It must have a description in order to be published.",
-          true
+          true,
         ),
       };
     }
@@ -71,7 +71,7 @@ export default function EditPublish({
         disabled: true,
         message: t(
           "'Credit By' needs to be filled in order to be published",
-          true
+          true,
         ),
       };
     }
@@ -94,7 +94,7 @@ export default function EditPublish({
       disabled: true,
       message: t(
         "It must have at least one attack, in order to be published.",
-        true
+        true,
       ),
     };
   };
@@ -129,7 +129,7 @@ export default function EditPublish({
               npc.published
                 ? t("This NPC is part of the Adversary Compendium.")
                 : t(
-                    "Help the Adversary Compendium grow by publishing your finished work!"
+                    "Help the Adversary Compendium grow by publishing your finished work!",
                   )
             }
             fullWidth
@@ -220,7 +220,7 @@ export default function EditPublish({
                 open={rulesDialogOpen}
                 onClose={handleDialogClose}
                 slotProps={{
-                  paper: { sx: { width: "80%", maxWidth: "lg" } }
+                  paper: { sx: { width: "80%", maxWidth: "lg" } },
                 }}
               >
                 <DialogTitle variant="h3">

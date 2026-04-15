@@ -12,7 +12,10 @@ const qualities = [
   {
     name: t("Resistance", true),
     category: "Defensive",
-    quality: t("You have Resistance to a single type of damage (except physical)", true),
+    quality: t(
+      "You have Resistance to a single type of damage (except physical)",
+      true,
+    ),
     cost: 700,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
@@ -33,7 +36,10 @@ const qualities = [
   {
     name: t("Dual Resistance", true),
     category: "Defensive",
-    quality: t("You have Resistance to two types of damage (except physical)", true),
+    quality: t(
+      "You have Resistance to two types of damage (except physical)",
+      true,
+    ),
     cost: 1000,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
@@ -47,7 +53,10 @@ const qualities = [
   {
     name: t("Immunity", true),
     category: "Defensive",
-    quality: t("You are immune to a single type of damage (except physical)", true),
+    quality: t(
+      "You are immune to a single type of damage (except physical)",
+      true,
+    ),
     cost: 1500,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
@@ -77,7 +86,10 @@ const qualities = [
   {
     name: t("Hunter", true),
     category: "Offensive",
-    quality: t("The weapon deals 5 extra damage to creatures of a particular species", true),
+    quality: t(
+      "The weapon deals 5 extra damage to creatures of a particular species",
+      true,
+    ),
     cost: 300,
     filter: ["weapon", "customWeapon"],
   },
@@ -91,7 +103,10 @@ const qualities = [
   {
     name: t("Dual Hunter", true),
     category: "Offensive",
-    quality: t("The weapon deals 5 extra damage to the creatures of two particular species", true),
+    quality: t(
+      "The weapon deals 5 extra damage to the creatures of two particular species",
+      true,
+    ),
     cost: 500,
     filter: ["weapon", "customWeapon"],
   },
@@ -105,14 +120,20 @@ const qualities = [
   {
     name: t("Status", true),
     category: "Offensive",
-    quality: t("Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)", true),
+    quality: t(
+      "Each target hit by the weapon suffers (choose one: confused, weak, slow, shaken)",
+      true,
+    ),
     cost: 1500,
     filter: ["weapon", "customWeapon"],
   },
   {
     name: t("Status Plus", true),
     category: "Offensive",
-    quality: t("Each target hit by the weapon suffers (choose one: poisoned, enraged)", true),
+    quality: t(
+      "Each target hit by the weapon suffers (choose one: poisoned, enraged)",
+      true,
+    ),
     cost: 2000,
     filter: ["weapon", "customWeapon"],
   },
@@ -121,7 +142,10 @@ const qualities = [
   {
     name: t("Damage Change", true),
     category: "Enhancement",
-    quality: t("All damage dealt by your weapons, spells, and Skills becomes of a specific type.", true),
+    quality: t(
+      "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
+      true,
+    ),
     cost: 300,
     filter: ["accessory"],
   },
@@ -156,7 +180,10 @@ const qualities = [
   {
     name: t("Healing Up", true),
     category: "Enhancement",
-    quality: t("Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.", true),
+    quality: t(
+      "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
+      true,
+    ),
     cost: 1500,
     filter: ["armor", "shield", "accessory"],
   },
@@ -170,7 +197,10 @@ const qualities = [
   {
     name: t("Weapon Up", true),
     category: "Enhancement",
-    quality: t("Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.", true),
+    quality: t(
+      "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
+      true,
+    ),
     cost: 2000,
     filter: ["armor", "shield", "accessory"],
   },

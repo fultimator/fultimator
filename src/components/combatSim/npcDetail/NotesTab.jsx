@@ -66,7 +66,7 @@ const NotesTab = ({
         }}
         sx={{ mt: 2 }}
         slotProps={{
-          htmlInput: { maxLength: 50 }
+          htmlInput: { maxLength: 50 },
         }}
       />
       <TextField
@@ -97,7 +97,7 @@ const NotesTab = ({
         }}
         sx={{ mt: 2 }}
         slotProps={{
-          htmlInput: { maxLength: 2000 }
+          htmlInput: { maxLength: 2000 },
         }}
       />
       <TextField
@@ -120,7 +120,7 @@ const NotesTab = ({
                 {t("combat_sim_send_log")}
               </Button>
             ),
-          }
+          },
         }}
       />
     </>

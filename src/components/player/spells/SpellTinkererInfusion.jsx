@@ -19,8 +19,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? '#ffffff' : '#000000';
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const iconColor = isDarkMode ? "#ffffff" : "#000000";
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const showInPlayerSheet =
     infusion.showInPlayerSheet || infusion.showInPlayerSheet === undefined;
@@ -46,12 +46,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         <AccordionDetails>
           <ReactMarkdown>
             {t(
-              "When you successfully hit one or more targets with an attack, you may spend 2 Inventory Points to produce a special **infusion** and apply the corresponding effect to that attack (if the attack had the **multi** property, apply the effects of the infusion to each target)."
+              "When you successfully hit one or more targets with an attack, you may spend 2 Inventory Points to produce a special **infusion** and apply the corresponding effect to that attack (if the attack had the **multi** property, apply the effects of the infusion to each target).",
             )}
           </ReactMarkdown>
           <ReactMarkdown>
             {t(
-              "You cannot apply more than one infusion to the same attack; producing and using an infusion are both part of the action you used to attack with the weapon."
+              "You cannot apply more than one infusion to the same attack; producing and using an infusion are both part of the action you used to attack with the weapon.",
             )}
           </ReactMarkdown>
         </AccordionDetails>
@@ -78,7 +78,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -92,7 +93,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={8}>
+            size={8}
+          >
             <Typography variant="h3">{t("Effect")}</Typography>
           </Grid>
         </Grid>
@@ -103,7 +105,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               alignItems: "center",
               flexShrink: 0,
             }}
-            size="grow">
+            size="grow"
+          >
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
@@ -128,11 +131,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontWeight: "bold"
+                  fontWeight: "bold",
                 }}
               >
                 {t("Basic Infusions")}
@@ -142,7 +146,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           {isEditMode && (
             <Grid
               style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-              size="grow">
+              size="grow"
+            >
               {!showInPlayerSheet && (
                 <Tooltip title={t("Infusion not shown in player sheet")}>
                   <Icon>
@@ -151,7 +156,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 </Tooltip>
               )}
               <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color:  iconColor }} />
+                <Edit style={{ color: iconColor }} />
               </IconButton>
             </Grid>
           )}
@@ -163,7 +168,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 1)
           .map((effect, i) => (
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -180,11 +186,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size="grow">
+                  size="grow"
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {effect.name}
@@ -196,7 +203,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                  size={8}>
+                  size={8}
+                >
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>
@@ -224,11 +232,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontWeight: "bold"
+                  fontWeight: "bold",
                 }}
               >
                 {t("Advanced Infusions")}
@@ -243,7 +252,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 flexShrink: 0,
                 minHeight: 34,
               }}
-              size="grow"></Grid>
+              size="grow"
+            ></Grid>
           )}
         </div>
       )}
@@ -253,7 +263,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 2)
           .map((effect, i) => (
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -270,11 +281,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size="grow">
+                  size="grow"
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {effect.name}
@@ -286,7 +298,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                  size={8}>
+                  size={8}
+                >
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>
@@ -314,11 +327,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontWeight: "bold"
+                  fontWeight: "bold",
                 }}
               >
                 {t("Superior Infusions")}
@@ -333,7 +347,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 flexShrink: 0,
                 minHeight: 34,
               }}
-              size="grow"></Grid>
+              size="grow"
+            ></Grid>
           )}
         </div>
       )}
@@ -343,7 +358,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 3)
           .map((effect, i) => (
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -360,11 +376,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size="grow">
+                  size="grow"
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {effect.name}
@@ -376,7 +393,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                  size={8}>
+                  size={8}
+                >
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>

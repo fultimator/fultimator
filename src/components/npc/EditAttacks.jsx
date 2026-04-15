@@ -58,13 +58,13 @@ export default function EditAttacks({ npc, setNpc }) {
       attacks: [
         ...(prevState.attacks || []),
         {
-        itemType: "basic",
-        name: "",
-        range: "melee",
-        attr1: "dexterity",
-        attr2: "dexterity",
-        type: "physical",
-        special: [],
+          itemType: "basic",
+          name: "",
+          range: "melee",
+          attr1: "dexterity",
+          attr2: "dexterity",
+          type: "physical",
+          special: [],
         },
       ],
     }));
@@ -97,8 +97,9 @@ export default function EditAttacks({ npc, setNpc }) {
             <Grid
               size={{
                 xs: 12,
-                md: 6
-              }}>
+                md: 6,
+              }}
+            >
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
@@ -108,15 +109,16 @@ export default function EditAttacks({ npc, setNpc }) {
             <Grid
               size={{
                 xs: 12,
-                md: 6
-              }}>
+                md: 6,
+              }}
+            >
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.attacks.length - 1 && (
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider />
               </Grid>
             )}
@@ -134,15 +136,15 @@ export default function EditAttacks({ npc, setNpc }) {
             attacks: [
               ...(prev.attacks || []),
               {
-              itemType: "basic",
-              name: item.name,
-              range: item.ranged === true ? "distance" : "melee",
-              attr1: item.attr1 || "dexterity",
-              attr2: item.attr2 || "dexterity",
-              type: item.type,
-              flathit: item.flathit,
-              flatdmg: item.flatdmg,
-              special: [],
+                itemType: "basic",
+                name: item.name,
+                range: item.ranged === true ? "distance" : "melee",
+                attr1: item.attr1 || "dexterity",
+                attr2: item.attr2 || "dexterity",
+                type: item.type,
+                flathit: item.flathit,
+                flatdmg: item.flatdmg,
+                special: [],
               },
             ],
           }));
@@ -176,12 +178,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid  sx={{ p: 0, m: 0 }}>
+      <Grid sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
           <RemoveCircleOutlined />
         </IconButton>
       </Grid>
-      <Grid  size={10}>
+      <Grid size={10}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -198,8 +200,9 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         size={{
           xs: 6,
           md: 4,
-          lg: 3
-        }}>
+          lg: 3,
+        }}
+      >
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr1label"}>
             {t("Attr 1:")}
@@ -225,8 +228,9 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         size={{
           xs: 6,
           md: 4,
-          lg: 3
-        }}>
+          lg: 3,
+        }}
+      >
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-attr2label"}>
             {t("Attr 2:")}
@@ -251,8 +255,9 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       <Grid
         size={{
           xs: 8,
-          lg: 3
-        }}>
+          lg: 3,
+        }}
+      >
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
@@ -323,7 +328,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid  size={2}>
+      <Grid size={2}>
         <FormControl variant="standard" fullWidth>
           <ToggleButtonGroup
             size="medium"
@@ -343,7 +348,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </ToggleButtonGroup>
         </FormControl>
       </Grid>
-      <Grid  size={3}>
+      <Grid size={3}>
         <FormControl variant="standard">
           <TextField
             id="flathit"
@@ -355,12 +360,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             }}
             size="small"
             slotProps={{
-              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
             }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size={3}>
+      <Grid size={3}>
         <FormControl variant="standard">
           <TextField
             id="flatdmg"
@@ -372,12 +377,12 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             }}
             size="small"
             slotProps={{
-              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
             }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size="grow">
+      <Grid size="grow">
         <FormGroup>
           <FormControlLabel
             control={
@@ -415,7 +420,7 @@ function EditAttackSpecial({ attack, setAttack }) {
 
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="special"

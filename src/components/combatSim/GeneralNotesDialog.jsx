@@ -263,7 +263,7 @@ const NoteItem = ({
           onChange={handleTitleChange}
           sx={{ mr: 1 }}
           slotProps={{
-            htmlInput: { maxLength: 100 }
+            htmlInput: { maxLength: 100 },
           }}
         />
 
@@ -288,8 +288,8 @@ const NoteItem = ({
               currentRowCount > (isMobile ? 3 : 5)
                 ? currentRowCount
                 : isMobile
-                ? 3
-                : 5
+                  ? 3
+                  : 5
             }
             placeholder={t("notes_note_content")}
             value={note.body}
@@ -299,7 +299,7 @@ const NoteItem = ({
             slotProps={{
               htmlInput: {
                 maxLength: maxNoteLength || undefined,
-              }
+              },
             }}
           />
 
@@ -424,7 +424,7 @@ export default function GeneralNotesDialog({
     initialNotes.map((note, index) => ({
       ...note,
       id: note.id || `note-${index}-${Date.now()}`,
-    }))
+    })),
   );
   const [viewMode, setViewMode] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
@@ -440,7 +440,7 @@ export default function GeneralNotesDialog({
         distance: 8,
       },
     }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   useEffect(() => {
@@ -698,7 +698,7 @@ export default function GeneralNotesDialog({
           </>
         ) : (
           // Empty state component when there are no notes
-          (<Box
+          <Box
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -717,9 +717,13 @@ export default function GeneralNotesDialog({
                 opacity: 0.6,
               }}
             />
-            <Typography variant="h5" gutterBottom sx={{
-              color: "text.secondary"
-            }}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {t("notes_empty_state")}
             </Typography>
             <Button
@@ -731,7 +735,7 @@ export default function GeneralNotesDialog({
             >
               {t("notes_create_new")}
             </Button>
-          </Box>)
+          </Box>
         )}
       </DialogContent>
       <DialogActions
@@ -776,7 +780,8 @@ export default function GeneralNotesDialog({
         itemPreview={
           noteToDeleteId !== null ? (
             <Typography variant="h4">
-              {notes.find((note) => note.id === noteToDeleteId)?.title || t("notes_unnamed")}
+              {notes.find((note) => note.id === noteToDeleteId)?.title ||
+                t("notes_unnamed")}
             </Typography>
           ) : null
         }

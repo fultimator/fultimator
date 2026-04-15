@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+  useEffect,
+} from "react";
 import {
   Dialog,
   DialogTitle,
@@ -54,12 +60,34 @@ import classList, { spellList } from "../../libs/classes";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 import useDownloadImage from "../../hooks/useDownloadImage";
 
-const _NPC_TYPES    = ["spells", "attacks", "special", "actions"];
-const _PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
+const _NPC_TYPES = ["spells", "attacks", "special", "actions"];
+const _PLAYER_TYPES = [
+  "weapons",
+  "armor",
+  "shields",
+  "custom-weapons",
+  "accessories",
+  "player-spells",
+  "qualities",
+  "classes",
+  "heroics",
+];
 
 const SIDEBAR_WIDTH = 300;
 
-const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells", context, restrictToTypes, viewOnly = false, initialOptionalSubtypes = [], initialSpellClass = "", initialSearchQuery = "", initialModuleTypeFilter = "" }) => {
+const CompendiumViewerModal = ({
+  open,
+  onClose,
+  onAddItem,
+  initialType = "spells",
+  context,
+  restrictToTypes,
+  viewOnly = false,
+  initialOptionalSubtypes = [],
+  initialSpellClass = "",
+  initialSearchQuery = "",
+  initialModuleTypeFilter = "",
+}) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
@@ -71,48 +99,67 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [selectedCompendium, setSelectedCompendium] = useState("official");
-  const [selectedSpellClass, setSelectedSpellClass] = useState(initialSpellClass);
-  const [selectedModuleType, setSelectedModuleType] = useState(initialModuleTypeFilter);
+  const [selectedSpellClass, setSelectedSpellClass] =
+    useState(initialSpellClass);
+  const [selectedModuleType, setSelectedModuleType] = useState(
+    initialModuleTypeFilter,
+  );
   const [selectedMagichantSubtype, setSelectedMagichantSubtype] = useState("");
   const [selectedBook, setSelectedBook] = useState([]);
   const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
-  const [selectedQualityCategories, setSelectedQualityCategories] = useState([]);
+  const [selectedQualityCategories, setSelectedQualityCategories] = useState(
+    [],
+  );
   const [selectedHeroicClasses, setSelectedHeroicClasses] = useState([]);
-  const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(initialOptionalSubtypes);
+  const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(
+    initialOptionalSubtypes,
+  );
 
   const matchesPilotModuleType = useCallback((item, moduleType) => {
     const filter = String(moduleType || "").toLowerCase();
     if (!filter) return true;
 
     if (filter === "frame") {
-      return item?.pilotSubtype === "frame"
-        || String(item?.category || "").toLowerCase() === "frame"
-        || item?.passengers != null
-        || String(item?.name || "").toLowerCase().includes("pilot_frame_");
+      return (
+        item?.pilotSubtype === "frame" ||
+        String(item?.category || "").toLowerCase() === "frame" ||
+        item?.passengers != null ||
+        String(item?.name || "")
+          .toLowerCase()
+          .includes("pilot_frame_")
+      );
     }
 
-    const normalizedValues = [item?.type, item?.category, item?.name, item?.spellType]
+    const normalizedValues = [
+      item?.type,
+      item?.category,
+      item?.name,
+      item?.spellType,
+    ]
       .filter(Boolean)
       .map((value) => String(value).toLowerCase());
 
-    const matchesFlatField = normalizedValues.some((value) =>
-      value === `pilot_module_${filter}` ||
-      value.endsWith(`_${filter}`) ||
-      value.includes(`module_${filter}`) ||
-      value.includes(`${filter} module`)
+    const matchesFlatField = normalizedValues.some(
+      (value) =>
+        value === `pilot_module_${filter}` ||
+        value.endsWith(`_${filter}`) ||
+        value.includes(`module_${filter}`) ||
+        value.includes(`${filter} module`),
     );
     if (matchesFlatField) return true;
 
-    if (!Array.isArray(item?.modules) || item.modules.length === 0) return false;
+    if (!Array.isArray(item?.modules) || item.modules.length === 0)
+      return false;
     return item.modules.some((module) => {
       const moduleValues = [module?.type, module?.category, module?.name]
         .filter(Boolean)
         .map((value) => String(value).toLowerCase());
-      return moduleValues.some((value) =>
-        value === `pilot_module_${filter}` ||
-        value.endsWith(`_${filter}`) ||
-        value.includes(`module_${filter}`) ||
-        value.includes(`${filter} module`)
+      return moduleValues.some(
+        (value) =>
+          value === `pilot_module_${filter}` ||
+          value.endsWith(`_${filter}`) ||
+          value.includes(`module_${filter}`) ||
+          value.includes(`${filter} module`),
       );
     });
   }, []);
@@ -142,7 +189,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const [editingPackName, setEditingPackName] = useState("");
   const [editingDescription, setEditingDescription] = useState("");
   const [editingAuthor, setEditingAuthor] = useState("");
-  const [exportMeta, setExportMeta] = useState({ version: "1.0.0", homepageUrl: "", manifestUrl: "", downloadUrl: "" });
+  const [exportMeta, setExportMeta] = useState({
+    version: "1.0.0",
+    homepageUrl: "",
+    manifestUrl: "",
+    downloadUrl: "",
+  });
   const [exporting, setExporting] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importTab, setImportTab] = useState(0);
@@ -153,13 +205,17 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
 
-  useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
+  useEffect(() => {
+    ensurePersonalPack();
+  }, [ensurePersonalPack]);
 
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
       const resolvedType = restrictToTypes?.length
-        ? (restrictToTypes.includes(initialType) ? initialType : restrictToTypes[0])
+        ? restrictToTypes.includes(initialType)
+          ? initialType
+          : restrictToTypes[0]
         : initialType;
       setSelectedType(resolvedType);
       setSearchQuery(initialSearchQuery);
@@ -173,11 +229,18 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       setSelectedHeroicClasses([]);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
     }
-  }, [open, initialType, initialSpellClass, initialSearchQuery, initialModuleTypeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    open,
+    initialType,
+    initialSpellClass,
+    initialSearchQuery,
+    initialModuleTypeFilter,
+  ]);
 
-  const activePack = selectedCompendium !== "official"
-    ? packs.find((p) => p.id === selectedCompendium) ?? null
-    : null;
+  const activePack =
+    selectedCompendium !== "official"
+      ? (packs.find((p) => p.id === selectedCompendium) ?? null)
+      : null;
 
   const activeSpellCls = useMemo(() => {
     if (selectedType !== "player-spells" || !selectedSpellClass) return null;
@@ -193,41 +256,72 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         .map((i) => ({ ...i.data, _packItemId: i.id }));
 
       if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter((item) =>
-          item.filter && selectedQualityFilters.some(f => item.filter.includes(f))
+        items = items.filter(
+          (item) =>
+            item.filter &&
+            selectedQualityFilters.some((f) => item.filter.includes(f)),
         );
       }
-      if (selectedType === "qualities" && selectedQualityCategories.length > 0) {
-        items = items.filter((item) =>
-          item.category && selectedQualityCategories.includes(item.category)
+      if (
+        selectedType === "qualities" &&
+        selectedQualityCategories.length > 0
+      ) {
+        items = items.filter(
+          (item) =>
+            item.category && selectedQualityCategories.includes(item.category),
         );
       }
-      if ((selectedType === "classes" || selectedType === "heroics") && selectedBook.length > 0) {
+      if (
+        (selectedType === "classes" || selectedType === "heroics") &&
+        selectedBook.length > 0
+      ) {
         items = items.filter((item) => selectedBook.includes(item.book));
       }
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter((item) =>
-          item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
+        items = items.filter(
+          (item) =>
+            item.applicableTo &&
+            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
         );
       }
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+        items = items.filter((item) =>
+          selectedOptionalSubtypes.includes(item.subtype),
+        );
       }
       if (selectedType === "player-spells" && selectedSpellClass) {
         const spellClasses = activeSpellCls?.benefits?.spellClasses ?? [];
         items = items.filter((item) => {
-          if (spellClasses.includes("default") && item.class === selectedSpellClass) {
+          if (
+            spellClasses.includes("default") &&
+            item.class === selectedSpellClass
+          ) {
             return true;
           }
           return spellClasses.includes(item.spellType);
         });
       }
-      if (selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "pilot" && selectedModuleType) {
-        items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
+      if (
+        selectedType === "player-spells" &&
+        String(selectedSpellClass).toLowerCase() === "pilot" &&
+        selectedModuleType
+      ) {
+        items = items.filter((item) =>
+          matchesPilotModuleType(item, selectedModuleType),
+        );
       }
-      if (selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "chanter" && selectedMagichantSubtype) {
+      if (
+        selectedType === "player-spells" &&
+        String(selectedSpellClass).toLowerCase() === "chanter" &&
+        selectedMagichantSubtype
+      ) {
         items = items.filter((item) => {
-          const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+          const isKey =
+            item.magichantSubtype === "key" ||
+            item.type ||
+            item.status ||
+            item.attribute ||
+            item.recovery;
           return selectedMagichantSubtype === "key" ? isKey : !isKey;
         });
       }
@@ -242,31 +336,43 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     if (selectedType !== "player-spells") {
       let items = getItems(selectedType);
       if (selectedType === "classes") {
-        items = items.filter(c => c.name !== "Blank Class" && c.book !== "homebrew");
+        items = items.filter(
+          (c) => c.name !== "Blank Class" && c.book !== "homebrew",
+        );
         if (selectedBook.length > 0) {
           items = items.filter((item) => selectedBook.includes(item.book));
         }
       }
       if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter((item) =>
-          item.filter && selectedQualityFilters.some(f => item.filter.includes(f))
+        items = items.filter(
+          (item) =>
+            item.filter &&
+            selectedQualityFilters.some((f) => item.filter.includes(f)),
         );
       }
-      if (selectedType === "qualities" && selectedQualityCategories.length > 0) {
-        items = items.filter((item) =>
-          item.category && selectedQualityCategories.includes(item.category)
+      if (
+        selectedType === "qualities" &&
+        selectedQualityCategories.length > 0
+      ) {
+        items = items.filter(
+          (item) =>
+            item.category && selectedQualityCategories.includes(item.category),
         );
       }
       if (selectedType === "heroics" && selectedBook.length > 0) {
         items = items.filter((item) => selectedBook.includes(item.book));
       }
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter((item) =>
-          item.applicableTo && selectedHeroicClasses.some(c => item.applicableTo.includes(c))
+        items = items.filter(
+          (item) =>
+            item.applicableTo &&
+            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
         );
       }
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) => selectedOptionalSubtypes.includes(item.subtype));
+        items = items.filter((item) =>
+          selectedOptionalSubtypes.includes(item.subtype),
+        );
       }
       if (!searchQuery.trim()) return items;
       const q = searchQuery.toLowerCase();
@@ -282,14 +388,18 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       items = [];
       for (const sc of scs) {
         if (sc === "default") {
-          items.push(...spellList.filter((s) => s.class === activeSpellCls.name));
+          items.push(
+            ...spellList.filter((s) => s.class === activeSpellCls.name),
+          );
         } else if (sc === "cooking") {
           const cookingEffects = getDelicacyEffects(staticT);
-          items.push(...cookingEffects.map(eff => ({
-            name: `Delicacy #${eff.id}`,
-            spellType: "cooking",
-            ...eff,
-          })));
+          items.push(
+            ...cookingEffects.map((eff) => ({
+              name: `Delicacy #${eff.id}`,
+              spellType: "cooking",
+              ...eff,
+            })),
+          );
         } else {
           const nonStatic = getNonStaticSpellItems(sc);
           if (nonStatic) items.push(...nonStatic);
@@ -297,13 +407,29 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       }
     }
     // Filter by module type (for Pilot spells)
-    const isPilotClassSelected = String(selectedSpellClass).toLowerCase() === "pilot";
-    if (selectedModuleType && selectedType === "player-spells" && isPilotClassSelected) {
-      items = items.filter((item) => matchesPilotModuleType(item, selectedModuleType));
+    const isPilotClassSelected =
+      String(selectedSpellClass).toLowerCase() === "pilot";
+    if (
+      selectedModuleType &&
+      selectedType === "player-spells" &&
+      isPilotClassSelected
+    ) {
+      items = items.filter((item) =>
+        matchesPilotModuleType(item, selectedModuleType),
+      );
     }
-    if (selectedMagichantSubtype && selectedType === "player-spells" && String(selectedSpellClass).toLowerCase() === "chanter") {
+    if (
+      selectedMagichantSubtype &&
+      selectedType === "player-spells" &&
+      String(selectedSpellClass).toLowerCase() === "chanter"
+    ) {
       items = items.filter((item) => {
-        const isKey = item.magichantSubtype === "key" || item.type || item.status || item.attribute || item.recovery;
+        const isKey =
+          item.magichantSubtype === "key" ||
+          item.type ||
+          item.status ||
+          item.attribute ||
+          item.recovery;
         return selectedMagichantSubtype === "key" ? isKey : !isKey;
       });
     }
@@ -314,13 +440,27 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
-        .includes(q)
+        .includes(q),
     );
-  }, [activePack, selectedType, searchQuery, activeSpellCls, selectedQualityFilters, selectedQualityCategories, selectedBook, selectedHeroicClasses, selectedOptionalSubtypes, selectedModuleType, selectedMagichantSubtype, selectedSpellClass, matchesPilotModuleType]);
+  }, [
+    activePack,
+    selectedType,
+    searchQuery,
+    activeSpellCls,
+    selectedQualityFilters,
+    selectedQualityCategories,
+    selectedBook,
+    selectedHeroicClasses,
+    selectedOptionalSubtypes,
+    selectedModuleType,
+    selectedMagichantSubtype,
+    selectedSpellClass,
+    matchesPilotModuleType,
+  ]);
 
   const itemIds = useMemo(
     () => filteredItems.map((item, idx) => makeId(item.name, idx)),
-    [filteredItems]
+    [filteredItems],
   );
 
   // Scroll selected item into view in the main panel
@@ -333,7 +473,10 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   }, [selectedIdx, itemIds]);
 
   const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
-  const [downloadSelectedImage] = useDownloadImage(selectedItem?.name ?? "item", selectedCardRef);
+  const [downloadSelectedImage] = useDownloadImage(
+    selectedItem?.name ?? "item",
+    selectedCardRef,
+  );
 
   const handleShareUrl = useCallback(async () => {
     const url = new URL(window.location.href);
@@ -350,18 +493,24 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   }, [selectedType, selectedCompendium, selectedItem]);
 
   // Handlers
-  const handleTypeChange = useCallback((type) => {
-    if (restrictToTypes && !restrictToTypes.includes(type)) return;
-    setSelectedType(type);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [restrictToTypes]);
+  const handleTypeChange = useCallback(
+    (type) => {
+      if (restrictToTypes && !restrictToTypes.includes(type)) return;
+      setSelectedType(type);
+      setSearchQuery("");
+      setSelectedIdx(null);
+      if (mainRef.current) mainRef.current.scrollTop = 0;
+    },
+    [restrictToTypes],
+  );
 
-  const handleItemClick = useCallback((item, idx) => {
-    setSelectedIdx(idx);
-    if (!isDesktop) setDrawerOpen(false);
-  }, [isDesktop]);
+  const handleItemClick = useCallback(
+    (item, idx) => {
+      setSelectedIdx(idx);
+      if (!isDesktop) setDrawerOpen(false);
+    },
+    [isDesktop],
+  );
 
   const handleSpellClassChange = useCallback((cls) => {
     setSelectedSpellClass(cls);
@@ -444,11 +593,14 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     setNewPackDialogOpen(false);
   }, [newPackName, createPack]);
 
-  const handleRemoveFromPack = useCallback(async (packItemId) => {
-    if (!activePack || !packItemId) return;
-    await removeItem(activePack.id, packItemId);
-    setSelectedIdx(null);
-  }, [activePack, removeItem]);
+  const handleRemoveFromPack = useCallback(
+    async (packItemId) => {
+      if (!activePack || !packItemId) return;
+      await removeItem(activePack.id, packItemId);
+      setSelectedIdx(null);
+    },
+    [activePack, removeItem],
+  );
 
   const handleExport = useCallback(async () => {
     if (!activePack) return;
@@ -461,21 +613,24 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     }
   }, [activePack, exportAsModule, exportMeta]);
 
-  const handleImportFile = useCallback(async (file) => {
-    if (importing) return;
-    setImporting(true);
-    setImportError("");
-    try {
-      const id = await importFromFile(file);
-      setImportUrl("");
-      setPendingNavPackId(id);
-      setImportDialogOpen(false);
-    } catch (err) {
-      setImportError(err.message ?? "Import failed");
-    } finally {
-      setImporting(false);
-    }
-  }, [importing, importFromFile]);
+  const handleImportFile = useCallback(
+    async (file) => {
+      if (importing) return;
+      setImporting(true);
+      setImportError("");
+      try {
+        const id = await importFromFile(file);
+        setImportUrl("");
+        setPendingNavPackId(id);
+        setImportDialogOpen(false);
+      } catch (err) {
+        setImportError(err.message ?? "Import failed");
+      } finally {
+        setImporting(false);
+      }
+    },
+    [importing, importFromFile],
+  );
 
   const handleImportUrl = useCallback(async () => {
     if (!importUrl.trim() || importing) return;
@@ -493,8 +648,14 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
     }
   }, [importing, importUrl, importFromManifestUrl]);
 
-  const selectedTypeContext = ITEM_TYPES.find((x) => x.key === selectedType)?.context;
-  const contextMismatch = context && selectedTypeContext && selectedTypeContext !== "both" && selectedTypeContext !== context;
+  const selectedTypeContext = ITEM_TYPES.find(
+    (x) => x.key === selectedType,
+  )?.context;
+  const contextMismatch =
+    context &&
+    selectedTypeContext &&
+    selectedTypeContext !== "both" &&
+    selectedTypeContext !== context;
 
   const handleAddItem = () => {
     if (selectedItem && onAddItem) {
@@ -545,7 +706,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         setEditingPackName(activePack?.name ?? "");
         setEditingDescription(activePack?.description ?? "");
         setEditingAuthor(activePack?.author ?? "");
-        setExportMeta({ version: "1.0.0", homepageUrl: "", manifestUrl: "", downloadUrl: "" });
+        setExportMeta({
+          version: "1.0.0",
+          homepageUrl: "",
+          manifestUrl: "",
+          downloadUrl: "",
+        });
         setManageDialogOpen(true);
       }}
       activePack={activePack}
@@ -564,7 +730,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       fullWidth
       fullScreen={!isDesktop}
       slotProps={{
-        paper: { sx: isDesktop ? { height: "90vh" } : {} }
+        paper: { sx: isDesktop ? { height: "90vh" } : {} },
       }}
     >
       <DialogTitle
@@ -581,7 +747,11 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         }}
       >
         {!isDesktop && (
-          <IconButton size="small" onClick={() => setDrawerOpen(true)} sx={{ color: "#ffffff", mr: 1 }}>
+          <IconButton
+            size="small"
+            onClick={() => setDrawerOpen(true)}
+            sx={{ color: "#ffffff", mr: 1 }}
+          >
             <MenuIcon />
           </IconButton>
         )}
@@ -624,31 +794,41 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               </IconButton>
             </Box>
             <Divider />
-            <Box sx={{ flex: 1, overflow: "hidden" }}>
-              {sidebarContent}
-            </Box>
+            <Box sx={{ flex: 1, overflow: "hidden" }}>{sidebarContent}</Box>
           </Drawer>
         )}
 
         {/* Main content */}
-        <Box ref={mainRef} sx={{ flex: 1, overflowY: "auto", p: { xs: 1.5, md: 2 } }}>
+        <Box
+          ref={mainRef}
+          sx={{ flex: 1, overflowY: "auto", p: { xs: 1.5, md: 2 } }}
+        >
           {/* Mobile type label */}
           {!isDesktop && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
+            >
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
               </Typography>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 ({filteredItems.length})
               </Typography>
             </Box>
           )}
           {filteredItems.length === 0 ? (
-            <Typography sx={{
-              color: "text.secondary"
-            }}>{t("No items found.")}</Typography>
+            <Typography
+              sx={{
+                color: "text.secondary",
+              }}
+            >
+              {t("No items found.")}
+            </Typography>
           ) : (
             <Grid container spacing={2}>
               {filteredItems.map((item, idx) => (
@@ -656,15 +836,17 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                   key={itemIds[idx]}
                   size={{
                     xs: 12,
-                    lg: selectedType === "classes" ? 12 : 6
-                  }}>
+                    lg: selectedType === "classes" ? 12 : 6,
+                  }}
+                >
                   <Box
                     ref={idx === selectedIdx ? selectedCardRef : null}
                     sx={{
                       borderRadius: 1,
-                      outline: idx === selectedIdx
-                        ? `2px solid ${customTheme.primary}`
-                        : "2px solid transparent",
+                      outline:
+                        idx === selectedIdx
+                          ? `2px solid ${customTheme.primary}`
+                          : "2px solid transparent",
                       transition: "outline 0.15s ease",
                     }}
                   >
@@ -676,55 +858,91 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                     />
                   </Box>
                   {idx === selectedIdx && (
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: 0.5,
+                        mt: 0.5,
+                      }}
+                    >
                       <Tooltip title={t("Share URL")}>
                         <IconButton size="small" onClick={handleShareUrl}>
-                          <LinkIcon sx={{
-                            fontSize: "small"
-                          }} />
+                          <LinkIcon
+                            sx={{
+                              fontSize: "small",
+                            }}
+                          />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t("Download as Image")}>
-                        <IconButton size="small" onClick={downloadSelectedImage}>
+                        <IconButton
+                          size="small"
+                          onClick={downloadSelectedImage}
+                        >
                           <DownloadIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Export name={item.name} dataType={selectedType} data={item} size="small" />
-                      {selectedCompendium !== "official" && item._packItemId && !activePack?.locked && VIEWER_TO_PACK_TYPE[selectedType] && (
-                        <Tooltip title={t("Edit")}>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              setEditPackItem({
-                                item,
-                                packItemId: item._packItemId,
-                                itemType: VIEWER_TO_PACK_TYPE[selectedType],
-                              })
-                            }
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      <Export
+                        name={item.name}
+                        dataType={selectedType}
+                        data={item}
+                        size="small"
+                      />
+                      {selectedCompendium !== "official" &&
+                        item._packItemId &&
+                        !activePack?.locked &&
+                        VIEWER_TO_PACK_TYPE[selectedType] && (
+                          <Tooltip title={t("Edit")}>
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                setEditPackItem({
+                                  item,
+                                  packItemId: item._packItemId,
+                                  itemType: VIEWER_TO_PACK_TYPE[selectedType],
+                                })
+                              }
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       {VIEWER_TO_PACK_TYPE[selectedType] && (
                         <AddToCompendiumButton
                           itemType={VIEWER_TO_PACK_TYPE[selectedType]}
                           data={item}
-                          excludePackId={selectedCompendium !== "official" ? selectedCompendium : undefined}
-                          tooltipOverride={selectedType === "classes" && selectedCompendium === "official" ? t("Clone to Custom") : undefined}
+                          excludePackId={
+                            selectedCompendium !== "official"
+                              ? selectedCompendium
+                              : undefined
+                          }
+                          tooltipOverride={
+                            selectedType === "classes" &&
+                            selectedCompendium === "official"
+                              ? t("Clone to Custom")
+                              : undefined
+                          }
                         />
                       )}
-                      {selectedCompendium !== "official" && item._packItemId && !activePack?.locked && (
-                        <Tooltip title={t("Remove from pack")}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => setDeletePackItem({ item, packItemId: item._packItemId })}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      {selectedCompendium !== "official" &&
+                        item._packItemId &&
+                        !activePack?.locked && (
+                          <Tooltip title={t("Remove from pack")}>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() =>
+                                setDeletePackItem({
+                                  item,
+                                  packItemId: item._packItemId,
+                                })
+                              }
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                     </Box>
                   )}
                 </Grid>
@@ -746,16 +964,27 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               gap: { xs: 1, sm: 0 },
             }}
           >
-            <Typography variant="body2" sx={{
-              color: "text.secondary"
-            }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               <strong>{t("Disclaimer")}:</strong>{" "}
-              {t("For personal use only; do not share exported data on official channels.")}
+              {t(
+                "For personal use only; do not share exported data on official channels.",
+              )}
             </Typography>
             <Tooltip
-              title={contextMismatch
-                ? t(context === "npc" ? "This item type is for player sheets only." : "This item type is for NPC sheets only.")
-                : ""}
+              title={
+                contextMismatch
+                  ? t(
+                      context === "npc"
+                        ? "This item type is for player sheets only."
+                        : "This item type is for NPC sheets only.",
+                    )
+                  : ""
+              }
               disableHoverListener={!contextMismatch}
             >
               <span>
@@ -822,9 +1051,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           deletePackItem?.item ? (
             <Box>
               <Typography variant="h4">{deletePackItem.item.name}</Typography>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t(selectedType)}
               </Typography>
             </Box>
@@ -845,7 +1077,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                 setPendingNavPackId(null);
               }
             },
-          }
+          },
         }}
       >
         <DialogTitle
@@ -872,10 +1104,19 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setNewPackDialogOpen(false); setNewPackName(""); }}>
+          <Button
+            onClick={() => {
+              setNewPackDialogOpen(false);
+              setNewPackName("");
+            }}
+          >
             {t("Cancel")}
           </Button>
-          <Button variant="contained" onClick={handleNewPack} disabled={!newPackName.trim()}>
+          <Button
+            variant="contained"
+            onClick={handleNewPack}
+            disabled={!newPackName.trim()}
+          >
             {t("Create")}
           </Button>
         </DialogActions>
@@ -894,7 +1135,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                 setPendingNavPackId(null);
               }
             },
-          }
+          },
         }}
       >
         <DialogTitle
@@ -909,7 +1150,14 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         >
           {activePack?.name}
         </DialogTitle>
-        <DialogContent sx={{ pt: "16px !important", display: "flex", flexDirection: "column", gap: 2 }}>
+        <DialogContent
+          sx={{
+            pt: "16px !important",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           {activePack && !activePack.isPersonal && (
             <TextField
               label={t("Pack name")}
@@ -941,8 +1189,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               sx={{
                 color: "text.secondary",
                 textTransform: "uppercase",
-                letterSpacing: 1
-              }}>
+                letterSpacing: 1,
+              }}
+            >
               {t("Module Export")}
             </Typography>
           </Divider>
@@ -950,7 +1199,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
             <TextField
               label={t("Version")}
               value={exportMeta.version}
-              onChange={(e) => setExportMeta((m) => ({ ...m, version: e.target.value }))}
+              onChange={(e) =>
+                setExportMeta((m) => ({ ...m, version: e.target.value }))
+              }
               size="small"
               sx={{ width: 120 }}
               placeholder="1.0.0"
@@ -958,7 +1209,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
             <TextField
               label={t("Homepage URL")}
               value={exportMeta.homepageUrl}
-              onChange={(e) => setExportMeta((m) => ({ ...m, homepageUrl: e.target.value }))}
+              onChange={(e) =>
+                setExportMeta((m) => ({ ...m, homepageUrl: e.target.value }))
+              }
               fullWidth
               size="small"
               placeholder="https://..."
@@ -967,7 +1220,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           <TextField
             label={t("Manifest URL")}
             value={exportMeta.manifestUrl}
-            onChange={(e) => setExportMeta((m) => ({ ...m, manifestUrl: e.target.value }))}
+            onChange={(e) =>
+              setExportMeta((m) => ({ ...m, manifestUrl: e.target.value }))
+            }
             fullWidth
             size="small"
             placeholder="https://.../manifest.json"
@@ -975,7 +1230,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           <TextField
             label={t("Download URL")}
             value={exportMeta.downloadUrl}
-            onChange={(e) => setExportMeta((m) => ({ ...m, downloadUrl: e.target.value }))}
+            onChange={(e) =>
+              setExportMeta((m) => ({ ...m, downloadUrl: e.target.value }))
+            }
             fullWidth
             size="small"
             placeholder="https://.../pack.fcp"
@@ -997,22 +1254,36 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
           <Box sx={{ display: "flex", gap: 1, ml: "auto" }}>
             <Button
-              startIcon={exporting ? <CircularProgress size={16} color="inherit" /> : <IosShareIcon />}
+              startIcon={
+                exporting ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <IosShareIcon />
+                )
+              }
               onClick={handleExport}
               disabled={exporting}
             >
               {t("Export")}
             </Button>
-            <Button onClick={() => setManageDialogOpen(false)} disabled={exporting}>
+            <Button
+              onClick={() => setManageDialogOpen(false)}
+              disabled={exporting}
+            >
               {t("Cancel")}
             </Button>
             <Button
               variant="contained"
-              disabled={exporting || (!activePack?.isPersonal && !editingPackName.trim())}
+              disabled={
+                exporting ||
+                (!activePack?.isPersonal && !editingPackName.trim())
+              }
               onClick={async () => {
                 if (!activePack) return;
                 const changes = {
-                  ...(!activePack.isPersonal ? { name: editingPackName.trim() } : {}),
+                  ...(!activePack.isPersonal
+                    ? { name: editingPackName.trim() }
+                    : {}),
                   description: editingDescription.trim() || undefined,
                   author: editingAuthor.trim() || undefined,
                 };
@@ -1039,7 +1310,7 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                 setPendingNavPackId(null);
               }
             },
-          }
+          },
         }}
       >
         <DialogTitle
@@ -1054,18 +1325,42 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         >
           {t("Import Pack")}
         </DialogTitle>
-        <DialogContent sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: 2 }}>
-          <Tabs value={importTab} onChange={(_, v) => { setImportTab(v); setImportError(""); }}>
+        <DialogContent
+          sx={{
+            pt: "8px !important",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <Tabs
+            value={importTab}
+            onChange={(_, v) => {
+              setImportTab(v);
+              setImportError("");
+            }}
+          >
             <Tab label={t("Upload .fcp file")} />
-            <Tab label={t("From URL")} icon={<LinkIcon sx={{
-              fontSize: "small"
-            }} />} iconPosition="end" />
+            <Tab
+              label={t("From URL")}
+              icon={
+                <LinkIcon
+                  sx={{
+                    fontSize: "small",
+                  }}
+                />
+              }
+              iconPosition="end"
+            />
           </Tabs>
           {importTab === 0 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("Select a .fcp file exported from Fultimator.")}
               </Typography>
               <Button
@@ -1097,10 +1392,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
           {importTab === 1 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
-                {t("Paste a manifest.json URL to download and import the pack.")}
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {t(
+                  "Paste a manifest.json URL to download and import the pack.",
+                )}
               </Typography>
               <TextField
                 label={t("Manifest URL")}
@@ -1117,7 +1417,10 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           {importError && <Alert severity="error">{importError}</Alert>}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setImportDialogOpen(false)} disabled={importing}>
+          <Button
+            onClick={() => setImportDialogOpen(false)}
+            disabled={importing}
+          >
             {t("Cancel")}
           </Button>
           {importTab === 1 && (
@@ -1125,7 +1428,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               variant="contained"
               onClick={handleImportUrl}
               disabled={importing || !importUrl.trim()}
-              startIcon={importing ? <CircularProgress size={16} color="inherit" /> : <FileUploadIcon />}
+              startIcon={
+                importing ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <FileUploadIcon />
+                )
+              }
             >
               {t("Import")}
             </Button>

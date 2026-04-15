@@ -22,9 +22,8 @@ function ChangeBase({ value, onChange }) {
     for (const weapon of weapons) {
       options.push(
         <MenuItem key={weapon.name} value={weapon.name}>
-          {t(weapon.name)} {" "}
-          {weapon.martial && <Martial />}{" "}
-        </MenuItem>
+          {t(weapon.name)} {weapon.martial && <Martial />}{" "}
+        </MenuItem>,
       );
     }
   }

@@ -36,7 +36,7 @@ export default function EditFreeBenefitsModal({
       open={open}
       onClose={onClose}
       slotProps={{
-        paper: { sx: { width: "80%", maxWidth: "lg" } }
+        paper: { sx: { width: "80%", maxWidth: "lg" } },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -56,7 +56,7 @@ export default function EditFreeBenefitsModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid  size={4}>
+          <Grid size={4}>
             <TextField
               label={t("HP Modifier")}
               type="number"
@@ -67,7 +67,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid  size={4}>
+          <Grid size={4}>
             <TextField
               label={t("MP Modifier")}
               type="number"
@@ -78,7 +78,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid  size={4}>
+          <Grid size={4}>
             <TextField
               label={t("IP Modifier")}
               type="number"
@@ -89,7 +89,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -103,14 +103,14 @@ export default function EditFreeBenefitsModal({
                 label={
                   <Typography>
                     {t(
-                      "You may perform Rituals whose effects fall within the Ritualism discipline."
+                      "You may perform Rituals whose effects fall within the Ritualism discipline.",
                     )}
                   </Typography>
                 }
               />
             </FormGroup>
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -127,7 +127,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -146,7 +146,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -165,7 +165,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -187,7 +187,8 @@ export default function EditFreeBenefitsModal({
           <>
             <Grid
               sx={{ marginTop: "20px", fontWeight: "bold", fontSize: "1.2rem" }}
-              size={12}>
+              size={12}
+            >
               {t("Custom Benefits")}
             </Grid>
             {benefits.custom.map((custombenefit, index) => (
@@ -195,13 +196,14 @@ export default function EditFreeBenefitsModal({
                 <Grid
                   size={{
                     xs: 2,
-                    sm: 1
-                  }}>
+                    sm: 1,
+                  }}
+                >
                   <IconButton onClick={() => setCustomBenefitToDelete(index)}>
                     <Delete />
                   </IconButton>
                 </Grid>
-                <Grid  sx={11} size={10}>
+                <Grid sx={11} size={10}>
                   <TextField
                     sx={{ width: "100%" }}
                     label={t("Custom Benefit") + " " + (index + 1)}
@@ -210,7 +212,7 @@ export default function EditFreeBenefitsModal({
                       onCustomBenefitChange(index, e.target.value)
                     }
                     slotProps={{
-                      htmlInput: { maxLength: 1000 }
+                      htmlInput: { maxLength: 1000 },
                     }}
                   />
                 </Grid>

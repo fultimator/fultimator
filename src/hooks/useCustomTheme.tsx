@@ -9,7 +9,7 @@ interface CustomTheme {
   quaternary: string;
   white: string;
   transparent: string;
-  mode: 'light' | 'dark';
+  mode: "light" | "dark";
   background: {
     default: string;
     paper: string;
@@ -18,10 +18,10 @@ interface CustomTheme {
     primary: string;
     secondary: string;
   };
-  breakpoints: Theme['breakpoints'];
-  spacing: Theme['spacing'];
-  typography: Theme['typography'];
-  zIndex: Theme['zIndex'];
+  breakpoints: Theme["breakpoints"];
+  spacing: Theme["spacing"];
+  typography: Theme["typography"];
+  zIndex: Theme["zIndex"];
 }
 
 // Custom hook to access theme variables
@@ -31,10 +31,13 @@ export const useCustomTheme = (): CustomTheme => {
   return {
     primary: theme.palette.primary.main,
     secondary: theme.palette.secondary.main,
-    ternary: theme.palette.ternary?.main || '',
-    quaternary: theme.palette.quaternary?.main || '',
+    ternary: theme.palette.ternary?.main || "",
+    quaternary: theme.palette.quaternary?.main || "",
     white: theme.palette.common.white,
-    transparent: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0)' : 'rgba(255, 255, 255, 0)',
+    transparent:
+      theme.palette.mode === "dark"
+        ? "rgba(0, 0, 0, 0)"
+        : "rgba(255, 255, 255, 0)",
     mode: theme.palette.mode,
     background: {
       default: theme.palette.background.default,

@@ -36,8 +36,12 @@ const StatsTab = ({
   const getDefenseValue = (defenseType) => {
     const baseValue =
       defenseType === "DEF"
-        ? (calcDef ? calcDef(selectedNPC) : 0)
-        : (calcMDef ? calcMDef(selectedNPC) : 0);
+        ? calcDef
+          ? calcDef(selectedNPC)
+          : 0
+        : calcMDef
+          ? calcMDef(selectedNPC)
+          : 0;
     const modifier =
       defenseType === "DEF"
         ? selectedNPC?.combatStats?.defenseModifier
@@ -48,7 +52,9 @@ const StatsTab = ({
         ? overrideMap["M.DEF"]
         : overrideMap[defenseType];
     const hasOverride =
-      overrideValue !== "" && overrideValue !== null && overrideValue !== undefined;
+      overrideValue !== "" &&
+      overrideValue !== null &&
+      overrideValue !== undefined;
     if (hasOverride) {
       return Number.parseInt(overrideValue, 10) || 0;
     }
@@ -59,8 +65,12 @@ const StatsTab = ({
         : baseValue + modifier;
     const attrValue =
       defenseType === "DEF"
-        ? (calcAttr ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC) : 0)
-        : (calcAttr ? calcAttr("Dazed", "Enraged", "insight", selectedNPC) : 0);
+        ? calcAttr
+          ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC)
+          : 0
+        : calcAttr
+          ? calcAttr("Dazed", "Enraged", "insight", selectedNPC)
+          : 0;
     return (calculatedValue || 0) + (attrValue || 0);
   };
 

@@ -42,18 +42,27 @@ export default function PlayerAccessoryModal({
   const [quality, setQuality] = useState(accessory?.quality || "");
   const [qualityCost, setQualityCost] = useState(accessory?.qualityCost || 0);
   const [selectedQuality, setSelectedQuality] = useState(
-    accessory?.selectedQuality || ""
+    accessory?.selectedQuality || "",
   );
   const {
-    defModifier, setDefModifier,
-    mDefModifier, setMDefModifier,
-    initModifier, setInitModifier,
-    magicModifier, setMagicModifier,
-    precModifier, setPrecModifier,
-    damageMeleeModifier, setDamageMeleeModifier,
-    damageRangedModifier, setDamageRangedModifier,
-    _isEquipped, _setIsEquipped,
-    modifiersExpanded, setModifiersExpanded,
+    defModifier,
+    setDefModifier,
+    mDefModifier,
+    setMDefModifier,
+    initModifier,
+    setInitModifier,
+    magicModifier,
+    setMagicModifier,
+    precModifier,
+    setPrecModifier,
+    damageMeleeModifier,
+    setDamageMeleeModifier,
+    damageRangedModifier,
+    setDamageRangedModifier,
+    _isEquipped,
+    _setIsEquipped,
+    modifiersExpanded,
+    setModifiersExpanded,
     expandModifiers,
     modifiers,
     clearModifiers,
@@ -61,14 +70,18 @@ export default function PlayerAccessoryModal({
 
   const fileInputRef = useRef(null);
 
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {
-          if (editAccIndex !== null) {
-            onDeleteAccessory(editAccIndex);
-          }
-          onClose();
-        },
-  });;
+      if (editAccIndex !== null) {
+        onDeleteAccessory(editAccIndex);
+      }
+      onClose();
+    },
+  });
 
   useEffect(() => {
     setName(accessory?.name || "");
@@ -103,13 +116,34 @@ export default function PlayerAccessoryModal({
       if (qualityCost) {
         setQualityCost(qualityCost);
       }
-      if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
-      if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
-      if (initModifier) { setInitModifier(initModifier); expandModifiers(); }
-      if (magicModifier) { setMagicModifier(magicModifier); expandModifiers(); }
-      if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
-      if (damageMeleeModifier) { setDamageMeleeModifier(damageMeleeModifier); expandModifiers(); }
-      if (damageRangedModifier) { setDamageRangedModifier(damageRangedModifier); expandModifiers(); }
+      if (defModifier) {
+        setDefModifier(defModifier);
+        expandModifiers();
+      }
+      if (mDefModifier) {
+        setMDefModifier(mDefModifier);
+        expandModifiers();
+      }
+      if (initModifier) {
+        setInitModifier(initModifier);
+        expandModifiers();
+      }
+      if (magicModifier) {
+        setMagicModifier(magicModifier);
+        expandModifiers();
+      }
+      if (precModifier) {
+        setPrecModifier(precModifier);
+        expandModifiers();
+      }
+      if (damageMeleeModifier) {
+        setDamageMeleeModifier(damageMeleeModifier);
+        expandModifiers();
+      }
+      if (damageRangedModifier) {
+        setDamageRangedModifier(damageRangedModifier);
+        expandModifiers();
+      }
     }
     fileInputRef.current.value = null;
   });
@@ -140,7 +174,7 @@ export default function PlayerAccessoryModal({
 
     onAddAccessory(updatedAccessory);
   };
-return (
+  return (
     <>
       <Dialog
         open={open}
@@ -151,7 +185,7 @@ return (
               width: "100%",
               maxWidth: "lg",
             },
-          }
+          },
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -174,18 +208,18 @@ return (
             {/* Form */}
 
             {/* Change Base */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid  size={6}>
+            <Grid size={6}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
                   const quality = qualities.find(
-                    (el) => el.name === e.target.value
+                    (el) => el.name === e.target.value,
                   );
                   setSelectedQuality(quality.name);
                   setQuality(quality.quality);
@@ -193,7 +227,7 @@ return (
                 }}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -219,8 +253,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"DEF Modifier"}
                       value={defModifier}
@@ -230,8 +265,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"MDEF Modifier"}
                       value={mDefModifier}
@@ -241,8 +277,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"INIT Modifier"}
                       value={initModifier}
@@ -252,8 +289,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Magic Modifier"}
                       value={magicModifier}
@@ -263,8 +301,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Precision Modifier"}
                       value={precModifier}
@@ -274,8 +313,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Damage (Melee) Modifier"}
                       value={damageMeleeModifier}
@@ -285,8 +325,9 @@ return (
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Damage (Ranged) Modifier"}
                       value={damageRangedModifier}
@@ -296,12 +337,12 @@ return (
                 </Grid>
               </AccordionDetails>
             </Accordion>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider />
             </Grid>
-            <Grid  sx={{ py: 0 }} size={12}>
+            <Grid sx={{ py: 0 }} size={12}>
               <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid >
+                <Grid>
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -309,7 +350,7 @@ return (
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid >
+                <Grid>
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
@@ -323,7 +364,7 @@ return (
                 />
               </Grid>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
             </Grid>
           </Grid>
@@ -331,8 +372,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <PrettyAccessory
               accessory={{
                 name: name,
@@ -344,15 +386,11 @@ return (
         </DialogContent>
         <DialogActions>
           {editAccIndex !== null && (
-            <Button onClick={handleDelete} color="error" variant="contained" >
+            <Button onClick={handleDelete} color="error" variant="contained">
               {t("Delete")}
             </Button>
           )}
-          <Button
-            onClick={handleSave}
-            color= "primary"
-            variant="contained"
-          >
+          <Button onClick={handleSave} color="primary" variant="contained">
             {t("Save Changes")}
           </Button>
         </DialogActions>

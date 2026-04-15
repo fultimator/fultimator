@@ -43,12 +43,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, index) =>
     index % 2 === 1 ? (
-      <mark key={`${part}-${index}`} style={{ backgroundColor: "yellow", padding: 0 }}>
+      <mark
+        key={`${part}-${index}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
         {part}
       </mark>
     ) : (
       part
-    )
+    ),
   );
 }
 
@@ -60,7 +63,14 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEditMode = false, onAddNote, onEditNote }) {
+export default function PlayerNotes({
+  player,
+  setPlayer,
+  searchQuery = "",
+  isEditMode = false,
+  onAddNote,
+  onEditNote,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -73,7 +83,9 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
         !normalizedQuery ||
         note.name?.toLowerCase().includes(normalizedQuery) ||
         note.description?.toLowerCase().includes(normalizedQuery) ||
-        note.clocks?.some((clock) => clock?.name?.toLowerCase().includes(normalizedQuery))
+        note.clocks?.some((clock) =>
+          clock?.name?.toLowerCase().includes(normalizedQuery),
+        ),
     );
 
   if (visibleNotes.length === 0 && !(isEditMode && onAddNote)) return null;
@@ -87,9 +99,9 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
           : {
               ...note,
               clocks: note.clocks.map((clock, ci) =>
-                ci !== clockIndex ? clock : { ...clock, state: newState }
+                ci !== clockIndex ? clock : { ...clock, state: newState },
               ),
-            }
+            },
       ),
     }));
   };
@@ -115,15 +127,11 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
   };
 
   const reset = (noteIndex, clockIndex, clock) => {
-    updateClock(
-      noteIndex,
-      clockIndex,
-      new Array(clock.sections).fill(false)
-    );
+    updateClock(noteIndex, clockIndex, new Array(clock.sections).fill(false));
   };
 
   return (
-    <TableContainer component={Paper} sx={{ width: '100%' }}>
+    <TableContainer component={Paper} sx={{ width: "100%" }}>
       <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
           <TableRow
@@ -139,14 +147,33 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
             <StyledTableCellHeader>
               <Typography variant="h4">{t("Notes")}</Typography>
             </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
-              <Typography variant="h4" sx={{ fontSize: '0.875rem' }}>{t("Sections")}</Typography>
+            <StyledTableCellHeader
+              sx={{
+                width: { xs: 55, sm: 80 },
+                display: { xs: "none", sm: "table-cell" },
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="h4" sx={{ fontSize: "0.875rem" }}>
+                {t("Sections")}
+              </Typography>
             </StyledTableCellHeader>
-            <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-            <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
+            <StyledTableCellHeader
+              sx={{
+                width: { xs: 65, sm: 90 },
+                display: { xs: "none", sm: "table-cell" },
+              }}
+            />
+            <StyledTableCellHeader
+              sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+            >
               {isEditMode && onAddNote && (
                 <Tooltip title={t("Add Note")}>
-                  <IconButton size="small" onClick={onAddNote} sx={{ color: '#fff', p: 0.5 }}>
+                  <IconButton
+                    size="small"
+                    onClick={onAddNote}
+                    sx={{ color: "#fff", p: 0.5 }}
+                  >
                     <Add fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -158,7 +185,8 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
           {visibleNotes.map((note, noteIndex) => {
             const noteKey = `note-${noteIndex}`;
             const descriptionMatchesQuery =
-              !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
+              !!normalizedQuery &&
+              !!note.description?.toLowerCase().includes(normalizedQuery);
             const isOpen = !!openRows.notes[noteKey] || descriptionMatchesQuery;
             return (
               <React.Fragment key={noteIndex}>
@@ -168,7 +196,10 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                     {note.description ? (
                       <IconButton
                         size="small"
-                        onClick={(e) => { e.stopPropagation(); toggleRow('notes', noteKey); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow("notes", noteKey);
+                        }}
                         sx={{ p: 0.5 }}
                       >
                         {isOpen ? (
@@ -186,8 +217,24 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                       </Tooltip>
                     )}
                   </StyledTableCell>
-                  <StyledTableCell onClick={(e) => { e.stopPropagation(); if (note.description) toggleRow('notes', noteKey); }} sx={{ cursor: note.description ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                  <StyledTableCell
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (note.description) toggleRow("notes", noteKey);
+                    }}
+                    sx={{
+                      cursor: note.description ? "pointer" : "default",
+                      minWidth: { xs: 60, sm: 100 },
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
                       <Typography
                         variant="body2"
                         sx={{
@@ -195,18 +242,37 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                           textTransform: "uppercase",
                           wordBreak: "break-word",
                           overflowWrap: "break-word",
-                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                        }}>
+                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        }}
+                      >
                         {highlightMatch(note.name, searchQuery)}
                       </Typography>
                     </Box>
                   </StyledTableCell>
-                  <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                  <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                  <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: 'right' }}>
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 55, sm: 80 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 65, sm: 90 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCell
+                    sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                  >
                     {isEditMode && (
                       <Tooltip title={t("Edit Note")}>
-                        <IconButton size="small" onClick={() => onEditNote && onEditNote(note.originalIndex)} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            onEditNote && onEditNote(note.originalIndex)
+                          }
+                          sx={{ p: 0.5 }}
+                        >
                           <StickyNote2Outlined fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -220,7 +286,10 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 2, py: 1 }}>
                           <NotesMarkdown sx={{ fontSize: "0.85rem" }}>
-                            {highlightMarkdownText(note.description, searchQuery)}
+                            {highlightMarkdownText(
+                              note.description,
+                              searchQuery,
+                            )}
                           </NotesMarkdown>
                         </Box>
                       </Collapse>
@@ -239,7 +308,14 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                       key={`clock-${noteIndex}-${clockIndex}`}
                       sx={{ bgcolor: "action.hover" }}
                     >
-                      <StyledTableCell sx={{ width: 36, pl: 1, display: "flex", alignItems: "center" }}>
+                      <StyledTableCell
+                        sx={{
+                          width: 36,
+                          pl: 1,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <Clock
                           numSections={total}
                           size={28}
@@ -248,28 +324,60 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                           isCharacterSheet={true}
                         />
                       </StyledTableCell>
-                      <StyledTableCell sx={{ minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word", pl: 1 }}>
-                        <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                      <StyledTableCell
+                        sx={{
+                          minWidth: { xs: 60, sm: 100 },
+                          wordBreak: "break-word",
+                          pl: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+                        >
                           {highlightMatch(clock.name, searchQuery)}
                         </Typography>
                       </StyledTableCell>
-                      <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
+                      <StyledTableCell
+                        sx={{
+                          width: { xs: 55, sm: 80 },
+                          display: { xs: "none", sm: "table-cell" },
+                          textAlign: "center",
+                        }}
+                      >
                         <Typography
                           variant="body2"
                           sx={{
                             fontSize: "0.8rem",
-                            fontWeight: "bold"
-                          }}>
+                            fontWeight: "bold",
+                          }}
+                        >
                           {filled}/{total}
                         </Typography>
                       </StyledTableCell>
-                      <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                      <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: 'right' }}>
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: 'flex-end', gap: 0.25 }}>
+                      <StyledTableCell
+                        sx={{
+                          width: { xs: 65, sm: 90 },
+                          display: { xs: "none", sm: "table-cell" },
+                        }}
+                      />
+                      <StyledTableCell
+                        sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                            gap: 0.25,
+                          }}
+                        >
                           <IconButton
                             size="small"
                             disabled={!canDecrement}
-                            onClick={() => decrement(note.originalIndex, clockIndex, clock)}
+                            onClick={() =>
+                              decrement(note.originalIndex, clockIndex, clock)
+                            }
                             sx={{ p: "4px" }}
                           >
                             <Remove fontSize="small" />
@@ -277,7 +385,9 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                           <IconButton
                             size="small"
                             disabled={!canIncrement}
-                            onClick={() => increment(note.originalIndex, clockIndex, clock)}
+                            onClick={() =>
+                              increment(note.originalIndex, clockIndex, clock)
+                            }
                             sx={{ p: "4px" }}
                           >
                             <Add fontSize="small" />
@@ -285,7 +395,9 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                           <Tooltip title={t("Reset")} arrow>
                             <IconButton
                               size="small"
-                              onClick={() => reset(note.originalIndex, clockIndex, clock)}
+                              onClick={() =>
+                                reset(note.originalIndex, clockIndex, clock)
+                              }
                               sx={{ p: "4px" }}
                             >
                               <RestartAlt fontSize="small" />
@@ -297,7 +409,8 @@ export default function PlayerNotes({ player, setPlayer, searchQuery = "", isEdi
                   );
                 })}
               </React.Fragment>
-            );})}
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

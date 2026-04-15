@@ -49,24 +49,37 @@ export default function CardLoadout({
   const { t } = useTranslate();
   const theme = useTheme();
   const [pickerSlot, setPickerSlot] = useState(null);
-  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
+  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =
+    useState(false);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
+  useEffect(() => {
+    store.init(setPlayer);
+  }, [setPlayer, store]);
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
-  const supportModules = getEquippedSupportModules(player).filter(m => m.enabled);
+  const supportModules = getEquippedSupportModules(player).filter(
+    (m) => m.enabled,
+  );
   const hasSupportColumn = showSupportColumn && supportModules.length > 0;
 
   const mainHandResolved = resolveEffectiveSlot(player, "mainHand");
-  const offHandResolved  = resolveEffectiveSlot(player, "offHand");
+  const offHandResolved = resolveEffectiveSlot(player, "offHand");
 
   const SLOTS = [
-    { key: "mainHand",  resolved: mainHandResolved,                        locked: mainHandLocked },
-    { key: "offHand",   resolved: offHandResolved,                         locked: offHandLocked },
-    { key: "armor",     resolved: resolveEffectiveSlot(player, "armor"),    locked: false },
-    { key: "accessory", resolved: resolveEffectiveSlot(player, "accessory"),locked: false },
+    { key: "mainHand", resolved: mainHandResolved, locked: mainHandLocked },
+    { key: "offHand", resolved: offHandResolved, locked: offHandLocked },
+    {
+      key: "armor",
+      resolved: resolveEffectiveSlot(player, "armor"),
+      locked: false,
+    },
+    {
+      key: "accessory",
+      resolved: resolveEffectiveSlot(player, "accessory"),
+      locked: false,
+    },
   ];
 
   const handleSlotClick = (slot) => {
@@ -120,17 +133,40 @@ export default function CardLoadout({
 
         {/* Lock / vehicle icon */}
         {locked && (
-          <LockIcon sx={{ fontSize: { xs: "0.5rem", sm: "0.6rem" }, color: "text.disabled", flexShrink: 0 }} />
+          <LockIcon
+            sx={{
+              fontSize: { xs: "0.5rem", sm: "0.6rem" },
+              color: "text.disabled",
+              flexShrink: 0,
+            }}
+          />
         )}
         {isVehicle && !locked && (
-          <PrecisionManufacturingIcon sx={{ fontSize: { xs: "0.5rem", sm: "0.6rem" }, color: "success.main", flexShrink: 0 }} />
+          <PrecisionManufacturingIcon
+            sx={{
+              fontSize: { xs: "0.5rem", sm: "0.6rem" },
+              color: "success.main",
+              flexShrink: 0,
+            }}
+          />
         )}
         {hasModule && !isVehicle && !isEmpty && !locked && (
-          <PrecisionManufacturingIcon sx={{ fontSize: { xs: "0.5rem", sm: "0.6rem" }, color: "success.light", opacity: 0.6, flexShrink: 0 }} />
+          <PrecisionManufacturingIcon
+            sx={{
+              fontSize: { xs: "0.5rem", sm: "0.6rem" },
+              color: "success.light",
+              opacity: 0.6,
+              flexShrink: 0,
+            }}
+          />
         )}
 
         {/* Item name */}
-        <Tooltip title={isEmpty || locked ? "" : name} placement="top" enterDelay={600}>
+        <Tooltip
+          title={isEmpty || locked ? "" : name}
+          placement="top"
+          enterDelay={600}
+        >
           <Typography
             noWrap
             sx={{
@@ -140,10 +176,10 @@ export default function CardLoadout({
               color: locked
                 ? theme.palette.text.disabled
                 : isEmpty
-                ? theme.palette.text.disabled
-                : isVehicle
-                ? theme.palette.success.main
-                : theme.palette.text.primary,
+                  ? theme.palette.text.disabled
+                  : isVehicle
+                    ? theme.palette.success.main
+                    : theme.palette.text.primary,
               fontStyle: isEmpty || locked ? "italic" : "normal",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -171,7 +207,10 @@ export default function CardLoadout({
           borderRadius: 1,
           border: "1px solid",
           borderColor: "divider",
-          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.02)",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.04)"
+              : "rgba(0,0,0,0.02)",
           "&:hover": { bgcolor: "action.hover" },
         }}
       >
@@ -188,7 +227,10 @@ export default function CardLoadout({
           borderRadius: 1,
           border: "1px solid",
           borderColor: "divider",
-          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.015)",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.03)"
+              : "rgba(0,0,0,0.015)",
         }}
       >
         {inner}
@@ -255,7 +297,14 @@ export default function CardLoadout({
             width: "100%",
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.45, width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.45,
+              width: "100%",
+            }}
+          >
             {SLOTS.map(renderSlotRow)}
           </Box>
           <Box
@@ -289,7 +338,12 @@ export default function CardLoadout({
             {supportModules.map((module, idx) => {
               const displayName = module.customName || t(module.name);
               return (
-                <Tooltip key={`${module.originalIndex}-${module.name}-${idx}`} title={displayName || ""} placement="top" enterDelay={600}>
+                <Tooltip
+                  key={`${module.originalIndex}-${module.name}-${idx}`}
+                  title={displayName || ""}
+                  placement="top"
+                  enterDelay={600}
+                >
                   <Box
                     sx={{
                       px: 0.55,
@@ -298,7 +352,10 @@ export default function CardLoadout({
                       borderRadius: 0.8,
                       border: "1px solid",
                       borderColor: "divider",
-                      bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.015)",
+                      bgcolor:
+                        theme.palette.mode === "dark"
+                          ? "rgba(255,255,255,0.03)"
+                          : "rgba(0,0,0,0.015)",
                     }}
                   >
                     <Typography
@@ -307,7 +364,9 @@ export default function CardLoadout({
                         fontFamily: "Antonio",
                         fontSize: { xs: "0.74rem", sm: "0.8rem" },
                         fontWeight: module.enabled ? 700 : 500,
-                        color: module.enabled ? theme.palette.text.primary : theme.palette.text.disabled,
+                        color: module.enabled
+                          ? theme.palette.text.primary
+                          : theme.palette.text.disabled,
                         fontStyle: module.enabled ? "normal" : "italic",
                         lineHeight: 1.15,
                       }}
@@ -321,7 +380,15 @@ export default function CardLoadout({
           </Box>
         </Box>
       ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.45, flex: 1, width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.45,
+            flex: 1,
+            width: "100%",
+          }}
+        >
           {SLOTS.map(renderSlotRow)}
         </Box>
       )}
@@ -330,12 +397,16 @@ export default function CardLoadout({
       {pickerSlot && (
         <SlotPickerDialog
           open
-          onClose={() => { setPickerSlot(null); setPickerOpenModuleOverride(false); }}
+          onClose={() => {
+            setPickerSlot(null);
+            setPickerOpenModuleOverride(false);
+          }}
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
           vehicleModules={
-            activeVehicle && ["mainHand", "offHand", "armor"].includes(pickerSlot)
+            activeVehicle &&
+            ["mainHand", "offHand", "armor"].includes(pickerSlot)
               ? getEquippedModulesForSlot(player, pickerSlot)
               : []
           }
@@ -344,7 +415,10 @@ export default function CardLoadout({
           openModuleOverride={pickerOpenModuleOverride}
           onClearOtherHandModule={
             activeVehicle && ["mainHand", "offHand"].includes(pickerSlot)
-              ? () => store.disableModule(pickerSlot === "mainHand" ? "offHand" : "mainHand")
+              ? () =>
+                  store.disableModule(
+                    pickerSlot === "mainHand" ? "offHand" : "mainHand",
+                  )
               : undefined
           }
         />

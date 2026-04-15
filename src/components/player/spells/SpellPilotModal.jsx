@@ -6,7 +6,9 @@ function normalizePilotSpell(pilot) {
   if (!pilot) return pilot;
 
   // Some callers may pass { spell, classIndex, spellIndex } instead of the spell itself.
-  const base = pilot.spell ? { ...pilot.spell, index: pilot.spell.index ?? pilot.index } : pilot;
+  const base = pilot.spell
+    ? { ...pilot.spell, index: pilot.spell.index ?? pilot.index }
+    : pilot;
 
   // Ensure we have vehicles in the right place
   let vehicles = base.vehicles || base.currentVehicles;
@@ -19,7 +21,9 @@ function normalizePilotSpell(pilot) {
   // Return with vehicles guaranteed at root level
   return {
     ...base,
-    vehicles: Array.isArray(vehicles) ? vehicles : (base.vehicles || base.currentVehicles || []),
+    vehicles: Array.isArray(vehicles)
+      ? vehicles
+      : base.vehicles || base.currentVehicles || [],
   };
 }
 

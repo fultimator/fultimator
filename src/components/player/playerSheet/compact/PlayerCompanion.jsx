@@ -7,7 +7,7 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Paper
+  Paper,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
@@ -28,8 +28,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -42,7 +49,7 @@ export default function PlayerCompanion({ player, searchQuery = "" }) {
     .flatMap((cls) => cls.skills)
     .filter(
       (skill) =>
-        skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0
+        skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0,
     );
 
   // Find the first class with a companion
@@ -69,8 +76,12 @@ export default function PlayerCompanion({ player, searchQuery = "" }) {
           <TableRow sx={{ background: theme.primary }}>
             <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader sx={{ px: 1, py: 0.5 }}>
-              <Typography variant="h4" sx={{ fontSize: "0.85rem", textTransform: "uppercase" }}>
-                {highlightMatch(t("Faithful Companion"), searchQuery)} (SL: {faithfulCompanionSkills[0].currentLvl})
+              <Typography
+                variant="h4"
+                sx={{ fontSize: "0.85rem", textTransform: "uppercase" }}
+              >
+                {highlightMatch(t("Faithful Companion"), searchQuery)} (SL:{" "}
+                {faithfulCompanionSkills[0].currentLvl})
               </Typography>
             </StyledTableCellHeader>
           </TableRow>

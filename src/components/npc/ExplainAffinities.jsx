@@ -6,9 +6,10 @@ import { useCustomTheme } from "../../hooks/useCustomTheme";
 export default function ExplainAffinities({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-  ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
-  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+      : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
   return (
     <Card
@@ -28,15 +29,16 @@ export default function ExplainAffinities({ npc }) {
             sx={{
               fontFamily: "Antonio",
               mt: 2,
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Species: Construct")}
           </Typography>
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
                 "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
-                true
+                true,
               )}
             </ReactMarkdown>
           </Typography>
@@ -48,15 +50,16 @@ export default function ExplainAffinities({ npc }) {
             sx={{
               fontFamily: "Antonio",
               mt: 2,
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Species: Demon")}
           </Typography>
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
                 "**Demons** are Resistant to two damage types of your choice.",
-                true
+                true,
               )}
             </ReactMarkdown>
           </Typography>
@@ -68,15 +71,16 @@ export default function ExplainAffinities({ npc }) {
             sx={{
               fontFamily: "Antonio",
               mt: 2,
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Species: Elemental")}
           </Typography>
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
                 "**Elementals** are Immune to **poison** damage, Immune to a second damage type of your choice, and immune to **poisoned**.",
-                true
+                true,
               )}
             </ReactMarkdown>
           </Typography>
@@ -88,15 +92,16 @@ export default function ExplainAffinities({ npc }) {
             sx={{
               fontFamily: "Antonio",
               mt: 2,
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Species: Undead")}
           </Typography>
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
                 "**Undead** are Immune to **dark** and **poison** damage, and Vulnerable to **light** damage.",
-                true
+                true,
               )}
             </ReactMarkdown>
           </Typography>
@@ -108,15 +113,16 @@ export default function ExplainAffinities({ npc }) {
             sx={{
               fontFamily: "Antonio",
               mt: 2,
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Species: Plant")}
           </Typography>
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
                 "  **Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
-                true
+                true,
               )}
             </ReactMarkdown>
           </Typography>

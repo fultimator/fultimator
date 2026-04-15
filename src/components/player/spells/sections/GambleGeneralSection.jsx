@@ -27,7 +27,8 @@ const ERROR_MESSAGES = {
   OVERLAPPING_RANGES: "Ranges cannot overlap.",
   INCOMPLETE_COVERAGE: "All 12 die faces must be covered without overlap.",
   MISSING_EFFECT: "All target effect fields must be filled out.",
-  INCOMPLETE_SECOND_EFFECTS: "All 6 die values for second effects must be covered.",
+  INCOMPLETE_SECOND_EFFECTS:
+    "All 6 die values for second effects must be covered.",
   MISSING_SECOND_EFFECT: "All second effect fields must be filled out.",
 };
 
@@ -42,7 +43,11 @@ const validateTargets = (targets) => {
     }))
     .sort((a, b) => a.from - b.from);
 
-  if (normalized.some((target) => !target.from || !target.to || target.from > target.to)) {
+  if (
+    normalized.some(
+      (target) => !target.from || !target.to || target.from > target.to,
+    )
+  ) {
     return "INVALID_RANGE";
   }
 
@@ -54,17 +59,25 @@ const validateTargets = (targets) => {
 
   const covered = new Set();
   normalized.forEach((target) => {
-    for (let value = target.from; value <= target.to; value += 1) covered.add(value);
+    for (let value = target.from; value <= target.to; value += 1)
+      covered.add(value);
   });
   if (covered.size !== 12) return "INCOMPLETE_COVERAGE";
   if (normalized.some((target) => !target.effect)) return "MISSING_EFFECT";
 
   for (const target of targets) {
     if (!target?.secondRoll) continue;
-    const secondEffects = Array.isArray(target.secondEffects) ? target.secondEffects : [];
+    const secondEffects = Array.isArray(target.secondEffects)
+      ? target.secondEffects
+      : [];
     if (secondEffects.length !== 6) return "INCOMPLETE_SECOND_EFFECTS";
-    const secondCovered = new Set(secondEffects.map((entry) => Number(entry?.dieValue)));
-    if (secondCovered.size !== 6 || SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))) {
+    const secondCovered = new Set(
+      secondEffects.map((entry) => Number(entry?.dieValue)),
+    );
+    if (
+      secondCovered.size !== 6 ||
+      SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))
+    ) {
       return "INCOMPLETE_SECOND_EFFECTS";
     }
     if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
@@ -80,11 +93,13 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   const targets = useMemo(
     () => (Array.isArray(formState.targets) ? formState.targets : []),
-    [formState.targets]
+    [formState.targets],
   );
 
   const validationErrorKey = useMemo(() => validateTargets(targets), [targets]);
-  const validationError = validationErrorKey ? t(ERROR_MESSAGES[validationErrorKey]) : "";
+  const validationError = validationErrorKey
+    ? t(ERROR_MESSAGES[validationErrorKey])
+    : "";
 
   const updateField = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -92,7 +107,9 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   const updateTarget = (index, patch) => {
     setFormState((prev) => {
-      const nextTargets = [...(Array.isArray(prev.targets) ? prev.targets : [])];
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
       nextTargets[index] = { ...nextTargets[index], ...patch };
       return { ...prev, targets: nextTargets };
     });
@@ -103,7 +120,13 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
       ...prev,
       targets: [
         ...(Array.isArray(prev.targets) ? prev.targets : []),
-        { rangeFrom: 1, rangeTo: 1, effect: "", secondRoll: false, secondEffects: [] },
+        {
+          rangeFrom: 1,
+          rangeTo: 1,
+          effect: "",
+          secondRoll: false,
+          secondEffects: [],
+        },
       ],
     }));
   };
@@ -111,18 +134,27 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
   const removeTarget = (index) => {
     setFormState((prev) => ({
       ...prev,
-      targets: (Array.isArray(prev.targets) ? prev.targets : []).filter((_, i) => i !== index),
+      targets: (Array.isArray(prev.targets) ? prev.targets : []).filter(
+        (_, i) => i !== index,
+      ),
     }));
   };
 
   const addSecondEffect = (targetIndex) => {
     const current = targets[targetIndex];
-    const usedDice = new Set((current?.secondEffects || []).map((entry) => Number(entry?.dieValue)));
-    const nextDie = SECOND_EFFECT_DICE.find((value) => !usedDice.has(value)) || 1;
+    const usedDice = new Set(
+      (current?.secondEffects || []).map((entry) => Number(entry?.dieValue)),
+    );
+    const nextDie =
+      SECOND_EFFECT_DICE.find((value) => !usedDice.has(value)) || 1;
 
     setFormState((prev) => {
-      const nextTargets = [...(Array.isArray(prev.targets) ? prev.targets : [])];
-      const secondEffects = Array.isArray(nextTargets[targetIndex]?.secondEffects)
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
         ? nextTargets[targetIndex].secondEffects
         : [];
       nextTargets[targetIndex] = {
@@ -135,8 +167,12 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   const updateSecondEffect = (targetIndex, effectIndex, patch) => {
     setFormState((prev) => {
-      const nextTargets = [...(Array.isArray(prev.targets) ? prev.targets : [])];
-      const secondEffects = Array.isArray(nextTargets[targetIndex]?.secondEffects)
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
         ? [...nextTargets[targetIndex].secondEffects]
         : [];
       secondEffects[effectIndex] = { ...secondEffects[effectIndex], ...patch };
@@ -147,9 +183,15 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   const removeSecondEffect = (targetIndex, effectIndex) => {
     setFormState((prev) => {
-      const nextTargets = [...(Array.isArray(prev.targets) ? prev.targets : [])];
-      const secondEffects = Array.isArray(nextTargets[targetIndex]?.secondEffects)
-        ? nextTargets[targetIndex].secondEffects.filter((_, i) => i !== effectIndex)
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
+        ? nextTargets[targetIndex].secondEffects.filter(
+            (_, i) => i !== effectIndex,
+          )
         : [];
       nextTargets[targetIndex] = { ...nextTargets[targetIndex], secondEffects };
       return { ...prev, targets: nextTargets };
@@ -168,48 +210,55 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid  size={12}>
+      <Grid size={12}>
         <TextField
           label={t("Spell Name")}
           fullWidth
           value={formState.spellName || ""}
           onChange={(e) => updateField("spellName", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          md: 4
-        }}>
+          md: 4,
+        }}
+      >
         <TextField
           type="number"
           label={t("MP x Dice")}
           fullWidth
           value={formState.mp ?? 0}
-          onChange={(e) => updateField("mp", Math.max(0, Number(e.target.value) || 0))}
+          onChange={(e) =>
+            updateField("mp", Math.max(0, Number(e.target.value) || 0))
+          }
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          md: 4
-        }}>
+          md: 4,
+        }}
+      >
         <TextField
           type="number"
           label={t("Max Throwable Dices")}
           fullWidth
           value={formState.maxTargets ?? 0}
-          onChange={(e) => updateField("maxTargets", Math.max(0, Number(e.target.value) || 0))}
+          onChange={(e) =>
+            updateField("maxTargets", Math.max(0, Number(e.target.value) || 0))
+          }
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          md: 4
-        }}>
+          md: 4,
+        }}
+      >
         <FormControl fullWidth>
           <InputLabel>{t("Attribute")}</InputLabel>
           <Select
@@ -225,27 +274,41 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid  size={12}>
+      <Grid size={12}>
         <Divider />
       </Grid>
       {targets.map((target, targetIndex) => (
-        <Grid  key={`target-${targetIndex}`} size={12}>
-          <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
+        <Grid key={`target-${targetIndex}`} size={12}>
+          <Box
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              p: 1.5,
+            }}
+          >
             <Grid container spacing={1.5} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range From")}</InputLabel>
                   <Select
                     value={target.rangeFrom ?? 1}
                     label={t("Range From")}
-                    onChange={(e) => updateTarget(targetIndex, { rangeFrom: Number(e.target.value) })}
+                    onChange={(e) =>
+                      updateTarget(targetIndex, {
+                        rangeFrom: Number(e.target.value),
+                      })
+                    }
                   >
                     {TARGET_DICE.map((value) => (
-                      <MenuItem key={value} value={value}>{value}</MenuItem>
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -253,17 +316,24 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range To")}</InputLabel>
                   <Select
                     value={target.rangeTo ?? 1}
                     label={t("Range To")}
-                    onChange={(e) => updateTarget(targetIndex, { rangeTo: Number(e.target.value) })}
+                    onChange={(e) =>
+                      updateTarget(targetIndex, {
+                        rangeTo: Number(e.target.value),
+                      })
+                    }
                   >
                     {TARGET_DICE.map((value) => (
-                      <MenuItem key={value} value={value}>{value}</MenuItem>
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -271,24 +341,28 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: 5
-                }}>
+                  sm: 5,
+                }}
+              >
                 <TextField
                   label={t("Effect")}
                   fullWidth
                   size="small"
                   value={target.effect || ""}
-                  onChange={(e) => updateTarget(targetIndex, { effect: e.target.value })}
+                  onChange={(e) =>
+                    updateTarget(targetIndex, { effect: e.target.value })
+                  }
                   slotProps={{
-                    htmlInput: { maxLength: 200 }
+                    htmlInput: { maxLength: 200 },
                   }}
                 />
               </Grid>
               <Grid
                 size={{
                   xs: 12,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <FormControlLabel
                   control={
                     <Switch
@@ -296,7 +370,9 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                       onChange={(e) =>
                         updateTarget(targetIndex, {
                           secondRoll: e.target.checked,
-                          secondEffects: e.target.checked ? (target.secondEffects || []) : [],
+                          secondEffects: e.target.checked
+                            ? target.secondEffects || []
+                            : [],
                         })
                       }
                     />
@@ -307,38 +383,53 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: 1
-                }}>
+                  sm: 1,
+                }}
+              >
                 <IconButton
                   color="error"
-                  onClick={() => setPendingDelete({ type: "target", targetIndex })}
+                  onClick={() =>
+                    setPendingDelete({ type: "target", targetIndex })
+                  }
                 >
                   <Delete />
                 </IconButton>
               </Grid>
 
               {target.secondRoll && (
-                <Grid  size={12}>
+                <Grid size={12}>
                   <Grid container spacing={1}>
                     {(target.secondEffects || []).map((entry, effectIndex) => (
-                      <Grid  key={`target-${targetIndex}-effect-${effectIndex}`} size={12}>
-                        <Grid container spacing={1} sx={{ alignItems: "center" }}>
+                      <Grid
+                        key={`target-${targetIndex}-effect-${effectIndex}`}
+                        size={12}
+                      >
+                        <Grid
+                          container
+                          spacing={1}
+                          sx={{ alignItems: "center" }}
+                        >
                           <Grid
                             size={{
                               xs: 4,
-                              sm: 2
-                            }}>
+                              sm: 2,
+                            }}
+                          >
                             <FormControl fullWidth size="small">
                               <InputLabel>{t("Die")}</InputLabel>
                               <Select
                                 value={entry.dieValue ?? 1}
                                 label={t("Die")}
                                 onChange={(e) =>
-                                  updateSecondEffect(targetIndex, effectIndex, { dieValue: Number(e.target.value) })
+                                  updateSecondEffect(targetIndex, effectIndex, {
+                                    dieValue: Number(e.target.value),
+                                  })
                                 }
                               >
                                 {SECOND_EFFECT_DICE.map((die) => (
-                                  <MenuItem key={die} value={die}>{die}</MenuItem>
+                                  <MenuItem key={die} value={die}>
+                                    {die}
+                                  </MenuItem>
                                 ))}
                               </Select>
                             </FormControl>
@@ -346,26 +437,30 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                           <Grid
                             size={{
                               xs: 8,
-                              sm: 9
-                            }}>
+                              sm: 9,
+                            }}
+                          >
                             <TextField
                               label={t("Effect")}
                               fullWidth
                               size="small"
                               value={entry.effect || ""}
                               onChange={(e) =>
-                                updateSecondEffect(targetIndex, effectIndex, { effect: e.target.value })
+                                updateSecondEffect(targetIndex, effectIndex, {
+                                  effect: e.target.value,
+                                })
                               }
                               slotProps={{
-                                htmlInput: { maxLength: 200 }
+                                htmlInput: { maxLength: 200 },
                               }}
                             />
                           </Grid>
                           <Grid
                             size={{
                               xs: 12,
-                              sm: 1
-                            }}>
+                              sm: 1,
+                            }}
+                          >
                             <IconButton
                               color="error"
                               onClick={() =>
@@ -383,8 +478,12 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                       </Grid>
                     ))}
                     {(target.secondEffects || []).length < 6 && (
-                      <Grid  size={12}>
-                        <Button size="small" variant="outlined" onClick={() => addSecondEffect(targetIndex)}>
+                      <Grid size={12}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => addSecondEffect(targetIndex)}
+                        >
                           {t("Add Second Effect")}
                         </Button>
                       </Grid>
@@ -396,28 +495,30 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Box>
         </Grid>
       ))}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Button variant="contained" onClick={addTarget}>
           {t("Add Target")}
         </Button>
       </Grid>
       {validationError ? (
-        <Grid  size={12}>
+        <Grid size={12}>
           <FormHelperText error>{validationError}</FormHelperText>
         </Grid>
       ) : null}
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch
               checked={formState.showInPlayerSheet !== false}
-              onChange={(e) => updateField("showInPlayerSheet", e.target.checked)}
+              onChange={(e) =>
+                updateField("showInPlayerSheet", e.target.checked)
+              }
             />
           }
           label={t("Show in Character Sheet")}
         />
       </Grid>
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch

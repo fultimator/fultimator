@@ -98,7 +98,7 @@ export function createLoadingWindow(parent: BrowserWindow): BrowserWindow {
   });
 
   loadingWindow.loadURL(
-    `data:text/html;charset=utf-8,${encodeURIComponent(loadingHTML)}`
+    `data:text/html;charset=utf-8,${encodeURIComponent(loadingHTML)}`,
   );
   return loadingWindow;
 }

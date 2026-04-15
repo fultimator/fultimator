@@ -3,7 +3,11 @@ import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
-import { playerNeedsMigration, applyPreSaveTransforms, applyPostLoadTransforms } from "../../components/player/playerTransforms";
+import {
+  playerNeedsMigration,
+  applyPreSaveTransforms,
+  applyPostLoadTransforms,
+} from "../../components/player/playerTransforms";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
@@ -95,7 +99,9 @@ function Personal() {
       }
       setSelectedIds(new Set());
     } else if (playerToDeleteRef.current) {
-      await db.deleteDoc(db.doc("player-personal", playerToDeleteRef.current.id));
+      await db.deleteDoc(
+        db.doc("player-personal", playerToDeleteRef.current.id),
+      );
       playerToDeleteRef.current = null;
       setPlayerToDelete(null);
     }
@@ -124,14 +130,15 @@ function Personal() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const { dbMode, requestModeSwitch, cloudUser, activeUid } = useDatabaseContext();
+  const { dbMode, requestModeSwitch, cloudUser, activeUid } =
+    useDatabaseContext();
   const db = useDatabase();
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
   const [download] = useDownload();
 
   const [personalList, loading, err] = db.useCollectionData(
-    db.query(db.collection("player-personal"))
+    db.query(db.collection("player-personal")),
   );
 
   const [snackMsg, setSnackMsg] = useState(null);
@@ -150,7 +157,7 @@ function Personal() {
       <Layout>
         <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
           {t(
-            "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+            "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)",
           )}
         </Paper>
       </Layout>
@@ -160,7 +167,10 @@ function Personal() {
   const filteredList = personalList
     ? personalList
         .filter((item) => {
-          if (name !== "" && !item.name.toLowerCase().includes(name.toLowerCase()))
+          if (
+            name !== "" &&
+            !item.name.toLowerCase().includes(name.toLowerCase())
+          )
             return false;
           return true;
         })
@@ -284,8 +294,13 @@ function Personal() {
 
     try {
       // Normalize and migrate before saving
-      const normalizedData = applyPreSaveTransforms(applyPostLoadTransforms(data));
-      const res = await db.addDoc(db.collection("player-personal"), normalizedData);
+      const normalizedData = applyPreSaveTransforms(
+        applyPostLoadTransforms(data),
+      );
+      const res = await db.addDoc(
+        db.collection("player-personal"),
+        normalizedData,
+      );
       console.debug(res);
     } catch (e) {
       console.debug(e);
@@ -343,7 +358,10 @@ function Personal() {
     if (!selected.length) return;
     const zip = new JSZip();
     selected.forEach((p) => {
-      zip.file(`${p.name.replace(/\s/g, "_").toLowerCase()}.json`, JSON.stringify(p, null, 2));
+      zip.file(
+        `${p.name.replace(/\s/g, "_").toLowerCase()}.json`,
+        JSON.stringify(p, null, 2),
+      );
     });
     const content = await zip.generateAsync({ type: "blob" });
     download(URL.createObjectURL(content), "selected_players.zip");
@@ -351,46 +369,76 @@ function Personal() {
 
   const copyPlayerToLocal = (player) => async () => {
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = { ...player, name: newName, uid: "local-user", published: false };
+      const data = {
+        ...player,
+        name: newName,
+        uid: "local-user",
+        published: false,
+      };
       delete data.id;
       await localDb.addDoc(localDb.collection("player-personal"), data);
       notify(t("Copied to Local"));
-    } catch { notify(t("Failed to copy to Local")); }
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
   };
 
   const copyPlayerToCloud = (player) => async () => {
-    if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
       const data = { ...player, name: newName, published: false };
       delete data.id;
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       notify(t("Copied to Cloud"));
-    } catch { notify(t("Failed to copy to Cloud")); }
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
   };
 
   const movePlayerToLocal = (player) => async () => {
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = { ...player, name: newName, uid: "local-user", published: false };
+      const data = {
+        ...player,
+        name: newName,
+        uid: "local-user",
+        published: false,
+      };
       delete data.id;
       await localDb.addDoc(localDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Local"));
-    } catch { notify(t("Failed to move to Local")); }
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
   };
 
   const movePlayerToCloud = (player) => async () => {
-    if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
       const data = { ...player, name: newName, published: false };
@@ -398,7 +446,9 @@ function Personal() {
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Cloud"));
-    } catch { notify(t("Failed to move to Cloud")); }
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
   };
 
   const stalePlayers = (personalList ?? []).filter(playerNeedsMigration);
@@ -421,7 +471,8 @@ function Personal() {
   const toggleSelectPlayer = (id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -436,25 +487,39 @@ function Personal() {
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, uid: "local-user", published: false };
+        const data = {
+          ...p,
+          name: newName,
+          uid: "local-user",
+          published: false,
+        };
         delete data.id;
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
-    } catch { notify(t("Failed to copy to Local")); }
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
   };
 
   const copySelectedToCloud = async () => {
-    if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
@@ -464,7 +529,9 @@ function Personal() {
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
-    } catch { notify(t("Failed to copy to Cloud")); }
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
   };
 
   const moveSelectedToLocal = async () => {
@@ -472,28 +539,42 @@ function Personal() {
     if (!selected.length) return;
     if (!window.confirm(`Move ${selected.length} player(s) to Local?`)) return;
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, uid: "local-user", published: false };
+        const data = {
+          ...p,
+          name: newName,
+          uid: "local-user",
+          published: false,
+        };
         delete data.id;
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
       setSelectedIds(new Set());
       notify(t("Moved to Local"));
-    } catch { notify(t("Failed to move to Local")); }
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
   };
 
   const moveSelectedToCloud = async () => {
-    if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     if (!window.confirm(`Move ${selected.length} player(s) to Cloud?`)) return;
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
@@ -505,28 +586,44 @@ function Personal() {
       }
       setSelectedIds(new Set());
       notify(t("Moved to Cloud"));
-    } catch { notify(t("Failed to move to Cloud")); }
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
   };
 
   const copyAllToLocal = async () => {
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, uid: "local-user", published: false };
+        const data = {
+          ...p,
+          name: newName,
+          uid: "local-user",
+          published: false,
+        };
         delete data.id;
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
-    } catch { notify(t("Failed to copy to Local")); }
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
   };
 
   const copyAllToCloud = async () => {
-    if (!cloudUser) { notify(t("Sign in to copy to Cloud")); return; }
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
@@ -536,31 +633,49 @@ function Personal() {
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
-    } catch { notify(t("Failed to copy to Cloud")); }
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
   };
 
   const moveAllToLocal = async () => {
-    if (!window.confirm(`Move all ${filteredList.length} player(s) to Local?`)) return;
+    if (!window.confirm(`Move all ${filteredList.length} player(s) to Local?`))
+      return;
     try {
-      const existing = await localDb.getDocs(localDb.query(localDb.collection("player-personal")));
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, uid: "local-user", published: false };
+        const data = {
+          ...p,
+          name: newName,
+          uid: "local-user",
+          published: false,
+        };
         delete data.id;
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
       notify(t("Moved to Local"));
-    } catch { notify(t("Failed to move to Local")); }
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
   };
 
   const moveAllToCloud = async () => {
-    if (!cloudUser) { notify(t("Sign in to move to Cloud")); return; }
-    if (!window.confirm(`Move all ${filteredList.length} player(s) to Cloud?`)) return;
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    if (!window.confirm(`Move all ${filteredList.length} player(s) to Cloud?`))
+      return;
     try {
-      const existing = await cloudDb.getDocs(cloudDb.query(cloudDb.collection("player-personal")));
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
       const usedNames = existing.map((n) => n.name);
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
@@ -571,7 +686,9 @@ function Personal() {
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
       notify(t("Moved to Cloud"));
-    } catch { notify(t("Failed to move to Cloud")); }
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
   };
 
   const deletePlayer = (player) => (e) => {
@@ -608,21 +725,23 @@ function Personal() {
     <>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
-
           {/* Zone 1: Filters */}
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={{
                 xs: 12,
-                sm: "grow"
-              }}>
+                sm: "grow",
+              }}
+            >
               <TextField
                 label={t("Search by Player Name")}
                 variant="outlined"
                 size="small"
                 fullWidth
                 value={name}
-                onChange={(evt) => { setName(evt.target.value); }}
+                onChange={(evt) => {
+                  setName(evt.target.value);
+                }}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -632,15 +751,17 @@ function Personal() {
                     ),
                   },
 
-                  htmlInput: { maxLength: 50 }
-                }} />
+                  htmlInput: { maxLength: 50 },
+                }}
+              />
             </Grid>
             <Grid
               sx={{ minWidth: 160 }}
               size={{
                 xs: 12,
-                sm: "auto"
-              }}>
+                sm: "auto",
+              }}
+            >
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select
@@ -648,7 +769,9 @@ function Personal() {
                   id="select-direction"
                   value={direction}
                   label="direction:"
-                  onChange={(evt) => { setDirection(evt.target.value); }}
+                  onChange={(evt) => {
+                    setDirection(evt.target.value);
+                  }}
                 >
                   <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
                   <MenuItem value={"descending"}>{t("Descending")}</MenuItem>
@@ -660,15 +783,29 @@ function Personal() {
           <Divider sx={{ my: 0.75 }} />
 
           {/* Actions + Status (single row) */}
-          <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-            <Button variant="contained" startIcon={<HistoryEdu />} onClick={addPlayer} disabled={dbMode === "cloud" && !cloudUser}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            <Button
+              variant="contained"
+              startIcon={<HistoryEdu />}
+              onClick={addPlayer}
+              disabled={dbMode === "cloud" && !cloudUser}
+            >
               {t("Create Player")}
             </Button>
             {SUPPORTS_LOCAL_DB && (
               <ToggleButtonGroup
                 value={dbMode}
                 exclusive
-                onChange={(_, val) => { if (val !== null) requestModeSwitch(val); }}
+                onChange={(_, val) => {
+                  if (val !== null) requestModeSwitch(val);
+                }}
                 size="small"
               >
                 <ToggleButton value="local">
@@ -683,7 +820,11 @@ function Personal() {
             )}
             {dbMode === "local" && <DriveSync />}
             <Box sx={{ flex: 1 }} />
-            <Button variant="outlined" size="small" onClick={() => fileInputRef.current.click()}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => fileInputRef.current.click()}
+            >
               {t("Add PC from JSON")}
             </Button>
             <Tooltip title={t("Add PC from Clipboard")}>
@@ -713,9 +854,12 @@ function Personal() {
               style={{ display: "none" }}
             />
             <Divider orientation="vertical" flexItem />
-            <Typography variant="body1" sx={{
-              fontWeight: 600
-            }}>
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+              }}
+            >
               {filteredList?.length ?? 0} {t("Players")}
             </Typography>
             {stalePlayers.length > 0 && (
@@ -731,7 +875,9 @@ function Personal() {
                 </Button>
               </Tooltip>
             )}
-            <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select Players")}>
+            <Tooltip
+              title={selectMode ? t("Exit Select Mode") : t("Select Players")}
+            >
               <Button
                 variant={selectMode ? "contained" : "outlined"}
                 size="small"
@@ -745,10 +891,24 @@ function Personal() {
 
           {/* Select mode sub-bar */}
           <Collapse in={selectMode}>
-            <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+                mt: 0.75,
+                pt: 0.75,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -760,22 +920,61 @@ function Personal() {
               >
                 {t("Copy")}
               </Button>
-              <MuiMenu anchorEl={copyAnchor} open={Boolean(copyAnchor)} onClose={() => setCopyAnchor(null)}>
-                <MenuItem disabled={selectedIds.size === 0} onClick={() => { setCopyAnchor(null); copySelectedToLocal(); }}>
-                  <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
-                  <ListItemText primary={`${t("Copy Selected to Local")} (${selectedIds.size})`} />
+              <MuiMenu
+                anchorEl={copyAnchor}
+                open={Boolean(copyAnchor)}
+                onClose={() => setCopyAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Local")} (${selectedIds.size})`}
+                  />
                 </MenuItem>
-                <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setCopyAnchor(null); copySelectedToCloud(); }}>
-                  <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
-                  <ListItemText primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`} />
+                <MenuItem
+                  disabled={selectedIds.size === 0 || !cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`}
+                  />
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={() => { setCopyAnchor(null); copyAllToLocal(); }}>
-                  <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+                <MenuItem
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
                   <ListItemText primary={t("Copy All to Local")} />
                 </MenuItem>
-                <MenuItem disabled={!cloudUser} onClick={() => { setCopyAnchor(null); copyAllToCloud(); }}>
-                  <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+                <MenuItem
+                  disabled={!cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
                   <ListItemText primary={t("Copy All to Cloud")} />
                 </MenuItem>
               </MuiMenu>
@@ -787,61 +986,128 @@ function Personal() {
               >
                 {t("Move")}
               </Button>
-              <MuiMenu anchorEl={moveAnchor} open={Boolean(moveAnchor)} onClose={() => setMoveAnchor(null)}>
-                <MenuItem disabled={selectedIds.size === 0} onClick={() => { setMoveAnchor(null); moveSelectedToLocal(); }}>
-                  <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
-                  <ListItemText primary={`${t("Move Selected to Local")} (${selectedIds.size})`} />
+              <MuiMenu
+                anchorEl={moveAnchor}
+                open={Boolean(moveAnchor)}
+                onClose={() => setMoveAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveSelectedToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Move Selected to Local")} (${selectedIds.size})`}
+                  />
                 </MenuItem>
-                <MenuItem disabled={selectedIds.size === 0 || !cloudUser} onClick={() => { setMoveAnchor(null); moveSelectedToCloud(); }}>
-                  <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
-                  <ListItemText primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`} />
+                <MenuItem
+                  disabled={selectedIds.size === 0 || !cloudUser}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveSelectedToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`}
+                  />
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={() => { setMoveAnchor(null); moveAllToLocal(); }}>
-                  <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+                <MenuItem
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveAllToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
                   <ListItemText primary={t("Move All to Local")} />
                 </MenuItem>
-                <MenuItem disabled={!cloudUser} onClick={() => { setMoveAnchor(null); moveAllToCloud(); }}>
-                  <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+                <MenuItem
+                  disabled={!cloudUser}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveAllToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
                   <ListItemText primary={t("Move All to Cloud")} />
                 </MenuItem>
               </MuiMenu>
-              <Tooltip title={`${t("Export Selected as JSON")} (${selectedIds.size})`}>
+              <Tooltip
+                title={`${t("Export Selected as JSON")} (${selectedIds.size})`}
+              >
                 <span>
-                  <IconButton onClick={exportSelectedAsJson} disabled={selectedIds.size === 0}>
+                  <IconButton
+                    onClick={exportSelectedAsJson}
+                    disabled={selectedIds.size === 0}
+                  >
                     <Download />
                   </IconButton>
                 </span>
               </Tooltip>
               <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
                 <span>
-                  <IconButton onClick={deleteSelected} disabled={selectedIds.size === 0} color="error">
+                  <IconButton
+                    onClick={deleteSelected}
+                    disabled={selectedIds.size === 0}
+                    color="error"
+                  >
                     <Delete />
                   </IconButton>
                 </span>
               </Tooltip>
             </Box>
           </Collapse>
-
         </Paper>
       </div>
       {!cloudUser && (
         <Paper
           elevation={dbMode === "cloud" ? 3 : 0}
           variant={dbMode === "cloud" ? "elevation" : "outlined"}
-          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
           <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
-          <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
             {dbMode === "cloud"
               ? t("You have to be logged in to access this feature")
-              : t("Have a Google account? Sign in to sync your data between devices")}
+              : t(
+                  "Have a Google account? Sign in to sync your data between devices",
+                )}
           </Typography>
           <SignIn />
         </Paper>
       )}
       {loading && (dbMode !== "cloud" || cloudUser) && (
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 50,
+          }}
+        >
           <CircularProgress />
         </div>
       )}
@@ -853,18 +1119,27 @@ function Personal() {
               alignItems: "center",
               justifyContent: "center",
               marginBottom: "20px",
-              ...(selectMode ? {
-                cursor: "pointer",
-                outline: selectedIds.has(player.id) ? "3px solid" : "1px dashed",
-                outlineColor: selectedIds.has(player.id) ? "primary.main" : "divider",
-                borderRadius: 1,
-              } : {}),
+              ...(selectMode
+                ? {
+                    cursor: "pointer",
+                    outline: selectedIds.has(player.id)
+                      ? "3px solid"
+                      : "1px dashed",
+                    outlineColor: selectedIds.has(player.id)
+                      ? "primary.main"
+                      : "divider",
+                    borderRadius: 1,
+                  }
+                : {}),
             }}
-            onClick={selectMode ? () => toggleSelectPlayer(player.id) : undefined}
+            onClick={
+              selectMode ? () => toggleSelectPlayer(player.id) : undefined
+            }
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <PlayerGalleryCardActions
               player={player}
               t={t}
@@ -879,7 +1154,7 @@ function Personal() {
             />
           </Grid>
         ))}
-        <Grid  size={12}>
+        <Grid size={12}>
           <Button
             variant="outlined"
             startIcon={<BugReport />}
@@ -902,18 +1177,25 @@ function Personal() {
         open={deleteDialogOpen}
         onClose={closeDeleteDialog}
         onConfirm={performDelete}
-        title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
+        title={
+          isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")
+        }
         message={
           isBulkDelete
-            ? t("Are you sure you want to delete {count} player(s)?").replace("{count}", String(selectedIds.size))
+            ? t("Are you sure you want to delete {count} player(s)?").replace(
+                "{count}",
+                String(selectedIds.size),
+              )
             : t("Are you sure you want to delete this player?")
         }
         itemPreview={
-          !isBulkDelete && playerToDelete && (
+          !isBulkDelete &&
+          playerToDelete && (
             <Box>
               <Typography variant="h4">{playerToDelete.name}</Typography>
               <Typography variant="body2">
-                {t("Level")} {playerToDelete.lvl} - {playerToDelete.info?.identity}
+                {t("Level")} {playerToDelete.lvl} -{" "}
+                {playerToDelete.info?.identity}
               </Typography>
             </Box>
           )
@@ -984,7 +1266,16 @@ function PlayerGalleryCardActions({
           sx={{ marginBottom: 1 }}
         />
       </Box>
-      <Box sx={{ mt: "3px", display: "flex", alignItems: "center", gap: 0.25, flexWrap: "wrap" }} onClick={(e) => e.stopPropagation()}>
+      <Box
+        sx={{
+          mt: "3px",
+          display: "flex",
+          alignItems: "center",
+          gap: 0.25,
+          flexWrap: "wrap",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <PlayerTransferButton
           player={player}
           copyPlayerToLocal={copyPlayerToLocal}
@@ -999,7 +1290,9 @@ function PlayerGalleryCardActions({
           </IconButton>
         </Tooltip>
         <Tooltip title={t("Edit")}>
-          <IconButton onClick={() => handleNavigation(`/player-edit/${player.id}`)}>
+          <IconButton
+            onClick={() => handleNavigation(`/player-edit/${player.id}`)}
+          >
             <Edit />
           </IconButton>
         </Tooltip>
@@ -1010,13 +1303,18 @@ function PlayerGalleryCardActions({
         </Tooltip>
         <Tooltip title={t("Share URL")}>
           <span>
-            <IconButton onClick={() => sharePlayer(player.id)} disabled={dbMode === "local"}>
+            <IconButton
+              onClick={() => sharePlayer(player.id)}
+              disabled={dbMode === "local"}
+            >
               <Share />
             </IconButton>
           </span>
         </Tooltip>
         <Tooltip title={t("Player Sheet")}>
-          <IconButton onClick={() => handleNavigation(`/character-sheet/${player.id}`)}>
+          <IconButton
+            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
+          >
             <Badge />
           </IconButton>
         </Tooltip>
@@ -1032,7 +1330,14 @@ function PlayerGalleryCardActions({
   );
 }
 
-function PlayerTransferButton({ player, copyPlayerToLocal, copyPlayerToCloud, movePlayerToLocal, movePlayerToCloud, t }) {
+function PlayerTransferButton({
+  player,
+  copyPlayerToLocal,
+  copyPlayerToCloud,
+  movePlayerToLocal,
+  movePlayerToCloud,
+  t,
+}) {
   const { cloudUser } = useDatabaseContext();
   const [anchor, setAnchor] = useState(null);
   return (
@@ -1042,22 +1347,56 @@ function PlayerTransferButton({ player, copyPlayerToLocal, copyPlayerToCloud, mo
           <FileCopy />
         </IconButton>
       </Tooltip>
-      <MuiMenu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
-        <MenuItem onClick={() => { setAnchor(null); copyPlayerToLocal(player)(); }}>
-          <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+      <MuiMenu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={() => setAnchor(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            copyPlayerToLocal(player)();
+          }}
+        >
+          <ListItemIcon>
+            <StorageIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText primary={t("Copy to Local")} />
         </MenuItem>
-        <MenuItem disabled={!cloudUser} onClick={() => { setAnchor(null); copyPlayerToCloud(player)(); }}>
-          <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          disabled={!cloudUser}
+          onClick={() => {
+            setAnchor(null);
+            copyPlayerToCloud(player)();
+          }}
+        >
+          <ListItemIcon>
+            <CloudIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText primary={t("Copy to Cloud")} />
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => { setAnchor(null); movePlayerToLocal(player)(); }}>
-          <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            movePlayerToLocal(player)();
+          }}
+        >
+          <ListItemIcon>
+            <StorageIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText primary={t("Move to Local")} />
         </MenuItem>
-        <MenuItem disabled={!cloudUser} onClick={() => { setAnchor(null); movePlayerToCloud(player)(); }}>
-          <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          disabled={!cloudUser}
+          onClick={() => {
+            setAnchor(null);
+            movePlayerToCloud(player)();
+          }}
+        >
+          <ListItemIcon>
+            <CloudIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText primary={t("Move to Cloud")} />
         </MenuItem>
       </MuiMenu>

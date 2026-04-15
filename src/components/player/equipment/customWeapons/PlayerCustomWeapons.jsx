@@ -37,8 +37,16 @@ export default function PlayerCustomWeapons({
     const { classes } = player;
 
     // Check if any customizations make this weapon martial
-    const martialCustomizations = ['weapon_customization_quick', 'weapon_customization_magicdefenseboost', 'weapon_customization_powerful'];
-    const isMartialFromCustomization = customWeapon.customizations && customWeapon.customizations.some(c => martialCustomizations.includes(c.name));
+    const martialCustomizations = [
+      "weapon_customization_quick",
+      "weapon_customization_magicdefenseboost",
+      "weapon_customization_powerful",
+    ];
+    const isMartialFromCustomization =
+      customWeapon.customizations &&
+      customWeapon.customizations.some((c) =>
+        martialCustomizations.includes(c.name),
+      );
     const isMartial = customWeapon.martial || isMartialFromCustomization;
 
     // If the weapon is not martial, it is always equippable
@@ -81,7 +89,10 @@ export default function PlayerCustomWeapons({
   const handleSwapForm = (index) => {
     const updatedCustomWeapons = customWeapons.map((cw, i) => {
       if (i !== index) return cw;
-      return { ...cw, activeForm: cw.activeForm === "secondary" ? "primary" : "secondary" };
+      return {
+        ...cw,
+        activeForm: cw.activeForm === "secondary" ? "primary" : "secondary",
+      };
     });
     onUpdateCustomWeapons(updatedCustomWeapons);
   };
@@ -122,16 +133,23 @@ export default function PlayerCustomWeapons({
         <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {customWeapons.map((customWeapon, index) => {
             // Check if weapon has transforming customization
-            const hasTransforming = customWeapon.customizations && customWeapon.customizations.some(
-              (c) => c.name === "weapon_customization_transforming"
-            );
+            const hasTransforming =
+              customWeapon.customizations &&
+              customWeapon.customizations.some(
+                (c) => c.name === "weapon_customization_transforming",
+              );
 
             return (
               <React.Fragment key={index}>
-                <Grid  sx={{ mb: 2 }} size={12}>
+                <Grid sx={{ mb: 2 }} size={12}>
                   {/* Primary Weapon */}
-                  <Box sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
-                    <PrettyCustomWeapon 
+                  <Box
+                    sx={{
+                      opacity:
+                        customWeapon.activeForm === "secondary" ? 0.6 : 1,
+                    }}
+                  >
+                    <PrettyCustomWeapon
                       weaponData={{
                         ...customWeapon,
                         hands: 2, // Custom weapons are always two-handed
@@ -140,65 +158,110 @@ export default function PlayerCustomWeapons({
                         precModifier: customWeapon.precModifier || 0,
                         defModifier: customWeapon.defModifier || 0,
                         mDefModifier: customWeapon.mDefModifier || 0,
-                        overrideDamageType: customWeapon.overrideDamageType || false,
-                        customDamageType: customWeapon.customDamageType || "physical",
-                      }} 
+                        overrideDamageType:
+                          customWeapon.overrideDamageType || false,
+                        customDamageType:
+                          customWeapon.customDamageType || "physical",
+                      }}
                       showActions={false}
                     />
                   </Box>
 
                   {/* Secondary Weapon (Transforming Form) */}
                   {hasTransforming && (
-                    <Box sx={{ mt: 0.5, opacity: customWeapon.activeForm === "secondary" ? 1 : 0.6 }}>
+                    <Box
+                      sx={{
+                        mt: 0.5,
+                        opacity:
+                          customWeapon.activeForm === "secondary" ? 1 : 0.6,
+                      }}
+                    >
                       {(() => {
                         const secondWeaponData = {
                           ...customWeapon,
-                          name: customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`,
-                          category: customWeapon.secondSelectedCategory || "weapon_category_brawling",
-                          range: customWeapon.secondSelectedRange || "weapon_range_melee", 
-                          accuracyCheck: customWeapon.secondSelectedAccuracyCheck || {att1: "dexterity", att2: "might"},
+                          name:
+                            customWeapon.secondWeaponName ||
+                            `${customWeapon.name} (Transforming)`,
+                          category:
+                            customWeapon.secondSelectedCategory ||
+                            "weapon_category_brawling",
+                          range:
+                            customWeapon.secondSelectedRange ||
+                            "weapon_range_melee",
+                          accuracyCheck:
+                            customWeapon.secondSelectedAccuracyCheck || {
+                              att1: "dexterity",
+                              att2: "might",
+                            },
                           type: customWeapon.secondSelectedType || "physical",
-                          customizations: customWeapon.secondCurrentCustomizations || [],
+                          customizations:
+                            customWeapon.secondCurrentCustomizations || [],
                           hands: 2, // Custom weapons are always two-handed
                           cost: customWeapon.cost || 300, // Same cost as primary
-                          damageModifier: customWeapon.secondDamageModifier || 0,
+                          damageModifier:
+                            customWeapon.secondDamageModifier || 0,
                           precModifier: customWeapon.secondPrecModifier || 0,
                           defModifier: customWeapon.secondDefModifier || 0,
                           mDefModifier: customWeapon.secondMDefModifier || 0,
-                          overrideDamageType: customWeapon.secondOverrideDamageType || false,
-                          customDamageType: customWeapon.secondCustomDamageType || "physical",
+                          overrideDamageType:
+                            customWeapon.secondOverrideDamageType || false,
+                          customDamageType:
+                            customWeapon.secondCustomDamageType || "physical",
                         };
-                        
-                        return <PrettyCustomWeapon weaponData={secondWeaponData} showActions={false} />;
+
+                        return (
+                          <PrettyCustomWeapon
+                            weaponData={secondWeaponData}
+                            showActions={false}
+                          />
+                        );
                       })()}
                     </Box>
                   )}
 
                   {/* Compact Actions Row Below Card */}
-                  <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      mt: 0.25,
+                    }}
+                  >
                     {isEditMode && (
                       <Tooltip title={t("Edit")}>
-                        <IconButton onClick={() => onEditCustomWeapon(index)} size="small">
+                        <IconButton
+                          onClick={() => onEditCustomWeapon(index)}
+                          size="small"
+                        >
                           <Edit fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                    
+
                     <Box sx={{ ml: 0.5 }}>
                       {checkIfEquippable(customWeapon) ? (
                         <Tooltip
                           title={
                             customWeapon.isEquipped
-                              ? t("Unequip Weapon") + ` (${t("Main Hand")} + ${t("Off Hand")})`
-                              : t("Equip Weapon") + ` (${t("Main Hand")} + ${t("Off Hand")})`
+                              ? t("Unequip Weapon") +
+                                ` (${t("Main Hand")} + ${t("Off Hand")})`
+                              : t("Equip Weapon") +
+                                ` (${t("Main Hand")} + ${t("Off Hand")})`
                           }
                         >
                           <span>
                             <Badge
-                            badgeContent="M+O"
-                            color="primary"
-                            invisible={!customWeapon.isEquipped}
-                            sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                              badgeContent="M+O"
+                              color="primary"
+                              invisible={!customWeapon.isEquipped}
+                              sx={{
+                                "& .MuiBadge-badge": {
+                                  fontSize: "0.6rem",
+                                  height: 14,
+                                  minWidth: 14,
+                                },
+                              }}
                             >
                               <IconButton
                                 onClick={() => handleEquipClick(index)}
@@ -215,7 +278,7 @@ export default function PlayerCustomWeapons({
                                   },
                                   transition: "background-color 0.3s",
                                   p: 0.5,
-                                  border: `1px solid ${theme.palette.divider}`
+                                  border: `1px solid ${theme.palette.divider}`,
                                 }}
                               >
                                 <Equip
@@ -266,7 +329,7 @@ export default function PlayerCustomWeapons({
                                   backgroundColor: theme.palette.secondary.main,
                                 },
                                 p: 0.5,
-                                border: `1px solid ${theme.palette.divider}`
+                                border: `1px solid ${theme.palette.divider}`,
                               }}
                             >
                               <SwapHoriz fontSize="small" />

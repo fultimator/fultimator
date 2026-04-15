@@ -17,7 +17,9 @@ const store = new Store();
 
 function validateCredentials() {
   if (!clientId || !clientSecret) {
-    throw new Error("Missing required parameter: VITE_GOOGLE_CLIENT_ID or VITE_GOOGLE_CLIENT_SECRET for desktop app. Please check your .env file.");
+    throw new Error(
+      "Missing required parameter: VITE_GOOGLE_CLIENT_ID or VITE_GOOGLE_CLIENT_SECRET for desktop app. Please check your .env file.",
+    );
   }
 }
 
@@ -60,7 +62,7 @@ export async function loginGoogle() {
 
         res.writeHead(200, { "Content-Type": "text/html" });
         res.end(
-          "<h1>Sign-in complete.</h1><p>You can close this window and return to Fultimator.</p>"
+          "<h1>Sign-in complete.</h1><p>You can close this window and return to Fultimator.</p>",
         );
 
         server.close();
@@ -77,7 +79,10 @@ export async function loginGoogle() {
         }
 
         try {
-          const { tokens } = await OAuth2.getToken({ code, redirect_uri: redirectUri });
+          const { tokens } = await OAuth2.getToken({
+            code,
+            redirect_uri: redirectUri,
+          });
           OAuth2.setCredentials(tokens);
           store.set("googleTokens", tokens);
           resolve(tokens);
@@ -137,7 +142,8 @@ export async function uploadToGoogleDrive(filePath: string) {
     }
 
     const { isAuthenticated } = await checkAuth();
-    if (!isAuthenticated) throw new Error("Not authenticated with Google Drive. Please sign in.");
+    if (!isAuthenticated)
+      throw new Error("Not authenticated with Google Drive. Please sign in.");
 
     const drive = google.drive({ version: "v3", auth: OAuth2 });
 
@@ -147,7 +153,7 @@ export async function uploadToGoogleDrive(filePath: string) {
     });
 
     const existingFile = response.data.files.find(
-      (file) => file.name === "fultimatordb.json"
+      (file) => file.name === "fultimatordb.json",
     );
 
     let res;
@@ -187,13 +193,14 @@ export async function downloadFromGoogleDrive(fileId: string) {
   console.log("Requested file ID:", fileId);
   try {
     const { isAuthenticated } = await checkAuth();
-    if (!isAuthenticated) throw new Error("Not authenticated with Google Drive. Please sign in.");
+    if (!isAuthenticated)
+      throw new Error("Not authenticated with Google Drive. Please sign in.");
 
     const drive = google.drive({ version: "v3", auth: OAuth2 });
 
     const res = await drive.files.get(
       { fileId: fileId, alt: "media" },
-      { responseType: "stream" }
+      { responseType: "stream" },
     );
 
     const filePath = path.join(app.getPath("documents"), "fultimatordb.json");
@@ -224,7 +231,8 @@ export async function downloadFromGoogleDrive(fileId: string) {
 export async function listGoogleDriveFiles() {
   try {
     const { isAuthenticated } = await checkAuth();
-    if (!isAuthenticated) throw new Error("Not authenticated with Google Drive. Please sign in.");
+    if (!isAuthenticated)
+      throw new Error("Not authenticated with Google Drive. Please sign in.");
 
     const drive = google.drive({ version: "v3", auth: OAuth2 });
 
@@ -249,19 +257,27 @@ export async function listGoogleDriveFiles() {
 // Token accessors (used by IPC handler to pass id_token to renderer)
 
 export function getStoredIdToken(): string | null {
-  const tokens = store.get("googleTokens") as Record<string, string> | undefined;
+  const tokens = store.get("googleTokens") as
+    | Record<string, string>
+    | undefined;
   return tokens?.id_token ?? null;
 }
 
 export function getStoredAccessToken(): string | null {
-  const tokens = store.get("googleTokens") as Record<string, string> | undefined;
+  const tokens = store.get("googleTokens") as
+    | Record<string, string>
+    | undefined;
   return tokens?.access_token ?? null;
 }
 
 // Handle upload from an in-memory buffer (used by IDB Drive sync)
-export async function uploadBufferToGoogleDrive(buffer: ArrayBuffer, fileName: string): Promise<string> {
+export async function uploadBufferToGoogleDrive(
+  buffer: ArrayBuffer,
+  fileName: string,
+): Promise<string> {
   const { isAuthenticated } = await checkAuth();
-  if (!isAuthenticated) throw new Error("Not authenticated with Google Drive. Please sign in.");
+  if (!isAuthenticated)
+    throw new Error("Not authenticated with Google Drive. Please sign in.");
   // checkAuth() already called OAuth2.setCredentials() with fresh tokens
   const drive = google.drive({ version: "v3", auth: OAuth2 });
 

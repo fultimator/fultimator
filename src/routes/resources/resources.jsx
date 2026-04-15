@@ -97,11 +97,11 @@ function Resources() {
   const getCollectionPriority = (collection) => {
     // Higher priority = lower number (sorts first)
     const priorities = {
-      'rulebook': 1,
-      'website': 2,
-      'social_media': 3,
-      'tools': 4,
-      'content': 5
+      rulebook: 1,
+      website: 2,
+      social_media: 3,
+      tools: 4,
+      content: 5,
     };
     return priorities[collection] || 6;
   };
@@ -110,20 +110,22 @@ function Resources() {
     if (!tags || !Array.isArray(tags)) return 4;
 
     // Higher priority = lower number (sorts first)
-    if (tags.includes('corebook')) return 1;
-    if (tags.includes('expansion')) return 2;
-    if (tags.includes('adventure')) return 3;
+    if (tags.includes("corebook")) return 1;
+    if (tags.includes("expansion")) return 2;
+    if (tags.includes("adventure")) return 3;
     return 4;
   };
 
   const sortResourcesWithinLanguage = useCallback((resources) => {
     return resources.sort((a, b) => {
       // 1. Sort by collection priority (rulebook first, then website, etc.)
-      const collectionDiff = getCollectionPriority(a.collection) - getCollectionPriority(b.collection);
+      const collectionDiff =
+        getCollectionPriority(a.collection) -
+        getCollectionPriority(b.collection);
       if (collectionDiff !== 0) return collectionDiff;
 
       // 2. For rulebooks, sort by publish date (newest first) if both have dates
-      if (a.collection === 'rulebook' && b.collection === 'rulebook') {
+      if (a.collection === "rulebook" && b.collection === "rulebook") {
         const aDate = a.publish_date ? new Date(a.publish_date) : null;
         const bDate = b.publish_date ? new Date(b.publish_date) : null;
 
@@ -219,18 +221,20 @@ function Resources() {
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           (resource.author &&
-            resource.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            resource.author
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())) ||
           // Also search in purchase options reseller names
           (resource.purchase_options &&
             resource.purchase_options.some((option) =>
-              option.reseller.toLowerCase().includes(searchQuery.toLowerCase())
-            ))
+              option.reseller.toLowerCase().includes(searchQuery.toLowerCase()),
+            )),
       );
     }
 
     if (typeFilter !== "all") {
       resourceList = resourceList.filter(
-        (resource) => resource.type === typeFilter
+        (resource) => resource.type === typeFilter,
       );
     }
 
@@ -264,7 +268,9 @@ function Resources() {
 
     // Sort resources within each language group
     Object.keys(grouped).forEach((langKey) => {
-      grouped[langKey].resources = sortResourcesWithinLanguage(grouped[langKey].resources);
+      grouped[langKey].resources = sortResourcesWithinLanguage(
+        grouped[langKey].resources,
+      );
     });
 
     // Create ordered object with selected language first
@@ -277,18 +283,23 @@ function Resources() {
 
     // Add all other languages in alphabetical order
     Object.keys(grouped)
-      .filter(langKey => langKey !== selectedLanguage)
+      .filter((langKey) => langKey !== selectedLanguage)
       .sort((a, b) => {
         const langA = languages[a]?.lang || "Other";
         const langB = languages[b]?.lang || "Other";
         return langA.localeCompare(langB);
       })
-      .forEach(langKey => {
+      .forEach((langKey) => {
         orderedGrouped[langKey] = grouped[langKey];
       });
 
     return orderedGrouped;
-  }, [filteredResources, activeTab, selectedLanguage, sortResourcesWithinLanguage]);
+  }, [
+    filteredResources,
+    activeTab,
+    selectedLanguage,
+    sortResourcesWithinLanguage,
+  ]);
 
   // Show loading state
   if (loading) {

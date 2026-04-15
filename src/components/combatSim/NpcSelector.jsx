@@ -144,9 +144,12 @@ export default function NpcSelector({
                   >
                     <ListItemText
                       primary={
-                        <Typography variant="h5" sx={{
-                          fontWeight: "bold"
-                        }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                          }}
+                        >
                           {npc.name}
                         </Typography>
                       }
@@ -156,8 +159,9 @@ export default function NpcSelector({
                           component="span"
                           sx={{
                             color: "text.secondary",
-                            fontFamily: "Antonio"
-                          }}>
+                            fontFamily: "Antonio",
+                          }}
+                        >
                           <Tooltip title={t(npc.species)}>
                             <span>
                               {npc.species === "Beast" && <GiWolfHead />}
@@ -217,7 +221,7 @@ export default function NpcSelector({
               sx={{ marginBottom: 2 }}
               size="small"
               slotProps={{
-                htmlInput: { maxLength: 100 }
+                htmlInput: { maxLength: 100 },
               }}
             />
             <FormControl fullWidth>
@@ -335,8 +339,9 @@ export default function NpcSelector({
                         sx={{
                           color: "text.secondary",
                           display: "flex",
-                          alignItems: "center"
-                        }}>
+                          alignItems: "center",
+                        }}
+                      >
                         {t("Level")}: {npc.lvl}{" "}
                         {npc.rank && " | " + t(rankText(npc.rank))}
                       </Typography>
@@ -473,9 +478,12 @@ export default function NpcSelector({
                     >
                       <ListItemText
                         primary={
-                          <Typography variant="h5" sx={{
-                            fontWeight: "bold"
-                          }}>
+                          <Typography
+                            variant="h5"
+                            sx={{
+                              fontWeight: "bold",
+                            }}
+                          >
                             {npc.name}
                           </Typography>
                         }
@@ -485,8 +493,9 @@ export default function NpcSelector({
                             component="span"
                             sx={{
                               color: "text.secondary",
-                              fontFamily: "Antonio"
-                            }}>
+                              fontFamily: "Antonio",
+                            }}
+                          >
                             <Tooltip title={t(npc.species)}>
                               <span>
                                 {npc.species === "Beast" && <GiWolfHead />}

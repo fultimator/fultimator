@@ -101,7 +101,9 @@ export default function SelectorPanel({
             }}
           >
             <Typography variant="h5">
-              {selectorTab === 0 ? t("combat_sim_npc_selector") : t("PC Selector")}
+              {selectorTab === 0
+                ? t("combat_sim_npc_selector")
+                : t("PC Selector")}
             </Typography>
             <Tooltip
               title={t("Collapse")}
@@ -109,7 +111,10 @@ export default function SelectorPanel({
               enterDelay={500}
               enterNextDelay={300}
             >
-              <IconButton onClick={() => setIsExpanded(false)} sx={{ padding: 0 }}>
+              <IconButton
+                onClick={() => setIsExpanded(false)}
+                sx={{ padding: 0 }}
+              >
                 <KeyboardArrowLeft />
               </IconButton>
             </Tooltip>

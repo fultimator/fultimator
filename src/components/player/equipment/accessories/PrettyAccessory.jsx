@@ -4,7 +4,12 @@ import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 
-function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHeader = true }) {
+function PrettyAccessory({
+  accessory,
+  isCharacterSheet,
+  showCard = true,
+  showHeader = true,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -26,13 +31,21 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -46,7 +59,8 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
       <Stack>
         {showHeader && (
           <Grid
-            container sx={{
+            container
+            sx={{
               justifyContent: "space-between",
               alignItems: "center",
               p: 0.5,
@@ -58,20 +72,18 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
               },
             }}
           >
-            <Grid  size={6}>
+            <Grid size={6}>
               <Typography sx={{ textAlign: "left" }}>
                 {t("Accessory")}
               </Typography>
             </Grid>
-            <Grid  size={2}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Cost")}
-              </Typography>
+            <Grid size={2}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
             </Grid>
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column"  size="grow">
+          <Grid container direction="column" size="grow">
             {/* First Row */}
             <Grid
               container
@@ -83,12 +95,17 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}>
-              <Grid  size={6}>
-                <Typography sx={{ fontWeight: "bold" }}>{accessory.name}</Typography>
+              }}
+            >
+              <Grid size={6}>
+                <Typography sx={{ fontWeight: "bold" }}>
+                  {accessory.name}
+                </Typography>
               </Grid>
-              <Grid  size={2}>
-                <Typography sx={{ textAlign: "center" }}>{`${accessory.cost}z`}</Typography>
+              <Grid size={2}>
+                <Typography
+                  sx={{ textAlign: "center" }}
+                >{`${accessory.cost}z`}</Typography>
               </Grid>
             </Grid>
 
@@ -125,9 +142,7 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
 
   return (
     <>
-      <Card sx={{ boxShadow: isCharacterSheet ? 0 : 2 }}>
-        {content}
-      </Card>
+      <Card sx={{ boxShadow: isCharacterSheet ? 0 : 2 }}>{content}</Card>
     </>
   );
 }

@@ -28,7 +28,13 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import { Add, Remove, Casino, ContentCopy, ShoppingCart } from "@mui/icons-material";
+import {
+  Add,
+  Remove,
+  Casino,
+  ContentCopy,
+  ShoppingCart,
+} from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import {
   getDelicacyEffects,
@@ -42,7 +48,9 @@ import {
 } from "../../../../libs/gourmetCookingData";
 
 const MarkdownComponents = {
-  p: ({ _node, ...props }) => <span style={{ margin: 0, padding: 0 }} {...props} />,
+  p: ({ _node, ...props }) => (
+    <span style={{ margin: 0, padding: 0 }} {...props} />
+  ),
   strong: ({ _node, ...props }) => <strong {...props} />,
   em: ({ _node, ...props }) => <em {...props} />,
 };
@@ -50,11 +58,7 @@ const MarkdownComponents = {
 /**
  * GourmetCookingTab - Complete cooking interface with effects table, ingredient rolling, and cooking
  */
-export default function GourmetCookingTab({
-  formState,
-  setFormState,
-  t,
-}) {
+export default function GourmetCookingTab({ formState, setFormState, t }) {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [selectedTastesPreview, setSelectedTastesPreview] = useState([]);
@@ -69,7 +73,10 @@ export default function GourmetCookingTab({
   const [choiceDialogOpen, setChoiceDialogOpen] = useState(false);
   const [choiceDialogRolls, setChoiceDialogRolls] = useState([]);
 
-  const ingredientInventory = useMemo(() => formState.ingredientInventory || [], [formState.ingredientInventory]);
+  const ingredientInventory = useMemo(
+    () => formState.ingredientInventory || [],
+    [formState.ingredientInventory],
+  );
   const cookbookEffects = formState.cookbookEffects || {};
   const allYouCanEat = formState.allYouCanEat || false;
   const usedAllYouCanEat = formState.usedAllYouCanEat || false;
@@ -80,10 +87,17 @@ export default function GourmetCookingTab({
     selectedIngredients
       .filter((selected) => selected.amount > 0)
       .forEach((selected) => {
-        const ingredient = ingredientInventory.find((i) => i.id === selected.id);
-        if (ingredient?.taste && ingredient.taste.trim() && ingredient.taste !== "choice") {
+        const ingredient = ingredientInventory.find(
+          (i) => i.id === selected.id,
+        );
+        if (
+          ingredient?.taste &&
+          ingredient.taste.trim() &&
+          ingredient.taste !== "choice"
+        ) {
           const displayTaste =
-            ingredient.taste.charAt(0).toUpperCase() + ingredient.taste.slice(1).toLowerCase();
+            ingredient.taste.charAt(0).toUpperCase() +
+            ingredient.taste.slice(1).toLowerCase();
           for (let i = 0; i < selected.amount; i++) {
             tastes.push(displayTaste);
           }
@@ -92,15 +106,19 @@ export default function GourmetCookingTab({
     setSelectedTastesPreview(tastes);
   }, [selectedIngredients, ingredientInventory]);
 
-  const availableIngredients = ingredientInventory.filter((ing) => ing.quantity > 0);
+  const availableIngredients = ingredientInventory.filter(
+    (ing) => ing.quantity > 0,
+  );
   const maxIngredients = allYouCanEat && !usedAllYouCanEat ? 4 : 3;
-  const totalSelectedIngredients = selectedIngredients.filter((s) => s.amount > 0).length;
+  const totalSelectedIngredients = selectedIngredients.filter(
+    (s) => s.amount > 0,
+  ).length;
 
   const updateSelectedIngredient = (id, amount) => {
     const existing = selectedIngredients.find((s) => s.id === id);
     if (existing) {
       setSelectedIngredients(
-        selectedIngredients.map((s) => (s.id === id ? { ...s, amount } : s))
+        selectedIngredients.map((s) => (s.id === id ? { ...s, amount } : s)),
       );
     } else {
       setSelectedIngredients([...selectedIngredients, { id, amount }]);
@@ -127,8 +145,10 @@ export default function GourmetCookingTab({
 
             return (
               combinationTastes.length === 2 &&
-              ((combinationTastes[0] === cleanTaste1 && combinationTastes[1] === cleanTaste2) ||
-                (combinationTastes[0] === cleanTaste2 && combinationTastes[1] === cleanTaste1))
+              ((combinationTastes[0] === cleanTaste1 &&
+                combinationTastes[1] === cleanTaste2) ||
+                (combinationTastes[0] === cleanTaste2 &&
+                  combinationTastes[1] === cleanTaste1))
             );
           });
 
@@ -144,9 +164,10 @@ export default function GourmetCookingTab({
   };
 
   const possibleCombinations = getPossibleCombinations();
-  const combinationOptions = possibleCombinations.length > 0
-    ? possibleCombinations
-    : getTasteCombinations(t);
+  const combinationOptions =
+    possibleCombinations.length > 0
+      ? possibleCombinations
+      : getTasteCombinations(t);
 
   // Rolling handlers
   const handleRollDelicacyEffect = () => {
@@ -210,7 +231,9 @@ export default function GourmetCookingTab({
 
     setFormState((prev) => {
       const newEffects = { ...prev.cookbookEffects };
-      const combo = getTasteCombinations(t).find((c) => c.key === targetCombination);
+      const combo = getTasteCombinations(t).find(
+        (c) => c.key === targetCombination,
+      );
 
       if (combo) {
         newEffects[combo.key] = {
@@ -235,20 +258,29 @@ export default function GourmetCookingTab({
 
   const getTasteKeyFromRoll = (rollId) => {
     switch (rollId) {
-      case 1: return "bitter";
-      case 2: return "salty";
-      case 3: return "sour";
-      case 4: return "sweet";
-      case 5: return "umami";
-      case 6: return "choice";
-      default: return "";
+      case 1:
+        return "bitter";
+      case 2:
+        return "salty";
+      case 3:
+        return "sour";
+      case 4:
+        return "sweet";
+      case 5:
+        return "umami";
+      case 6:
+        return "choice";
+      default:
+        return "";
     }
   };
 
   const addRollsToInventory = (rolls) => {
     if (!Array.isArray(rolls) || rolls.length === 0) return;
 
-    const hasChoiceTaste = rolls.some((roll) => getTasteKeyFromRoll(roll?.id) === "choice");
+    const hasChoiceTaste = rolls.some(
+      (roll) => getTasteKeyFromRoll(roll?.id) === "choice",
+    );
     if (hasChoiceTaste) {
       setChoiceDialogRolls(
         rolls.map((roll, index) => ({
@@ -259,7 +291,7 @@ export default function GourmetCookingTab({
             getTasteKeyFromRoll(roll.id) === "choice"
               ? ""
               : getTasteKeyFromRoll(roll.id),
-        }))
+        })),
       );
       setChoiceDialogOpen(true);
       return;
@@ -273,7 +305,7 @@ export default function GourmetCookingTab({
         const tasteKey = getTasteKeyFromRoll(roll.id);
         const ingredientName = t("Ingredient");
         const existingIndex = inventory.findIndex(
-          (item) => item.taste === tasteKey && item.name === ingredientName
+          (item) => item.taste === tasteKey && item.name === ingredientName,
         );
 
         if (existingIndex >= 0) {
@@ -303,7 +335,7 @@ export default function GourmetCookingTab({
 
   const handleConfirmChoiceIngredients = () => {
     const invalidChoice = choiceDialogRolls.some(
-      (roll) => getTasteKeyFromRoll(roll.id) === "choice" && !roll.taste
+      (roll) => getTasteKeyFromRoll(roll.id) === "choice" && !roll.taste,
     );
     if (invalidChoice) return;
 
@@ -316,7 +348,7 @@ export default function GourmetCookingTab({
         if (!tasteKey) return;
 
         const existingIndex = inventory.findIndex(
-          (item) => item.taste === tasteKey && item.name === ingredientName
+          (item) => item.taste === tasteKey && item.name === ingredientName,
         );
 
         if (existingIndex >= 0) {
@@ -347,12 +379,18 @@ export default function GourmetCookingTab({
   };
 
   const handleAddIngredientToInventory = () => {
-    if (!rollResult || rollResult.type !== "ingredient" || !rollResult.data) return;
+    if (!rollResult || rollResult.type !== "ingredient" || !rollResult.data)
+      return;
     addRollsToInventory([rollResult.data]);
   };
 
   const handleAddBulkIngredientsToInventory = () => {
-    if (!rollResult || rollResult.type !== "bulk_ingredient" || !Array.isArray(rollResult.data)) return;
+    if (
+      !rollResult ||
+      rollResult.type !== "bulk_ingredient" ||
+      !Array.isArray(rollResult.data)
+    )
+      return;
     addRollsToInventory(rollResult.data);
   };
 
@@ -365,7 +403,8 @@ export default function GourmetCookingTab({
       const existingIndex = inventory.findIndex(
         (item) =>
           (item.name || "").trim().toLowerCase() === name.toLowerCase() &&
-          (item.taste || "").trim().toLowerCase() === shopIngredientTaste.toLowerCase()
+          (item.taste || "").trim().toLowerCase() ===
+            shopIngredientTaste.toLowerCase(),
       );
 
       if (existingIndex >= 0) {
@@ -411,7 +450,10 @@ export default function GourmetCookingTab({
   return (
     <Box sx={{ width: "100%" }}>
       {/* Tabs */}
-      <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+      <Tabs
+        value={activeTab}
+        onChange={(e, newValue) => setActiveTab(newValue)}
+      >
         <Tab label={t("gourmet_delicacy_effect_label")} />
         <Tab label={t("gourmet_ingredient_select_to_cook")} />
       </Tabs>
@@ -419,7 +461,7 @@ export default function GourmetCookingTab({
       {activeTab === 0 && (
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Delicacy Effects Table */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               {t("gourmet_delicacy_effect_label")}
             </Typography>
@@ -448,7 +490,9 @@ export default function GourmetCookingTab({
                 <TableBody>
                   {getDelicacyEffects(t).map((effect) => (
                     <TableRow key={effect.id}>
-                      <TableCell sx={{ fontWeight: "bold" }}>{effect.id}</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        {effect.id}
+                      </TableCell>
                       <TableCell>
                         <ReactMarkdown components={MarkdownComponents}>
                           {effect.effect}
@@ -462,7 +506,7 @@ export default function GourmetCookingTab({
           </Grid>
 
           {/* Ingredient Taste Rolling */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
               {t("gourmet_details")}
             </Typography>
@@ -470,8 +514,9 @@ export default function GourmetCookingTab({
               variant="body2"
               sx={{
                 color: "text.secondary",
-                mb: 2
-              }}>
+                mb: 2,
+              }}
+            >
               {t("gourmet_details_1")}
             </Typography>
 
@@ -489,10 +534,14 @@ export default function GourmetCookingTab({
                   size="small"
                   type="number"
                   value={bulkRollCount}
-                  onChange={(e) => setBulkRollCount(Math.min(10, parseInt(e.target.value) || 1))}
+                  onChange={(e) =>
+                    setBulkRollCount(
+                      Math.min(10, parseInt(e.target.value) || 1),
+                    )
+                  }
                   sx={{ width: "80px" }}
                   slotProps={{
-                    htmlInput: { min: 1, max: 10 }
+                    htmlInput: { min: 1, max: 10 },
                   }}
                 />
                 <Button
@@ -520,7 +569,9 @@ export default function GourmetCookingTab({
                 <TableBody>
                   {getIngredientTastes(t).map((taste) => (
                     <TableRow key={taste.id}>
-                      <TableCell sx={{ fontWeight: "bold" }}>{taste.id}</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        {taste.id}
+                      </TableCell>
                       <TableCell>{taste.name}</TableCell>
                     </TableRow>
                   ))}
@@ -529,18 +580,22 @@ export default function GourmetCookingTab({
             </TableContainer>
           </Grid>
 
-          <Grid  size={12}>
+          <Grid size={12}>
             <Card sx={{ mt: 1 }}>
               <CardContent>
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: "bold", mb: 1 }}
+                >
                   {t("Shop Buy Ingredients")}
                 </Typography>
                 <Grid container spacing={1} sx={{ alignItems: "center" }}>
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 4
-                    }}>
+                      sm: 4,
+                    }}
+                  >
                     <TextField
                       fullWidth
                       size="small"
@@ -552,8 +607,9 @@ export default function GourmetCookingTab({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 4
-                    }}>
+                      sm: 4,
+                    }}
+                  >
                     <FormControl fullWidth size="small">
                       <InputLabel>{t("gourmet_taste")}</InputLabel>
                       <Select
@@ -566,7 +622,9 @@ export default function GourmetCookingTab({
                           .map((taste) => (
                             <MenuItem
                               key={taste.id}
-                              value={taste.name.toLowerCase().replace(/\s+/g, "")}
+                              value={taste.name
+                                .toLowerCase()
+                                .replace(/\s+/g, "")}
                             >
                               {taste.name}
                             </MenuItem>
@@ -577,21 +635,36 @@ export default function GourmetCookingTab({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 2
-                    }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                      sm: 2,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 0.5,
+                      }}
+                    >
                       <IconButton
                         size="small"
-                        onClick={() => setShopIngredientQty((prev) => Math.max(1, prev - 1))}
+                        onClick={() =>
+                          setShopIngredientQty((prev) => Math.max(1, prev - 1))
+                        }
                       >
                         <Remove />
                       </IconButton>
-                      <Typography variant="body2" sx={{ minWidth: "20px", textAlign: "center" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ minWidth: "20px", textAlign: "center" }}
+                      >
                         {shopIngredientQty}
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={() => setShopIngredientQty((prev) => Math.min(99, prev + 1))}
+                        onClick={() =>
+                          setShopIngredientQty((prev) => Math.min(99, prev + 1))
+                        }
                       >
                         <Add />
                       </IconButton>
@@ -600,14 +673,17 @@ export default function GourmetCookingTab({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 2
-                    }}>
+                      sm: 2,
+                    }}
+                  >
                     <Button
                       fullWidth
                       variant="outlined"
                       startIcon={<ShoppingCart />}
                       onClick={handleBuyIngredient}
-                      disabled={!shopIngredientName.trim() || !shopIngredientTaste}
+                      disabled={
+                        !shopIngredientName.trim() || !shopIngredientTaste
+                      }
                     >
                       {t("Buy")}
                     </Button>
@@ -623,7 +699,7 @@ export default function GourmetCookingTab({
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* All You Can Eat */}
           {allYouCanEat && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -642,7 +718,7 @@ export default function GourmetCookingTab({
           )}
 
           {/* Ingredient Selection */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h6" gutterBottom>
               {t("gourmet_ingredient_select_to_cook")}
             </Typography>
@@ -651,8 +727,9 @@ export default function GourmetCookingTab({
               <Typography
                 sx={{
                   color: "text.secondary",
-                  fontStyle: "italic"
-                }}>
+                  fontStyle: "italic",
+                }}
+              >
                 {t("gourmet_no_ingredients_available")}
               </Typography>
             ) : (
@@ -662,13 +739,17 @@ export default function GourmetCookingTab({
                     <TableRow sx={{ backgroundColor: "action.hover" }}>
                       <TableCell>{t("gourmet_ingredient")}</TableCell>
                       <TableCell>{t("gourmet_taste")}</TableCell>
-                      <TableCell align="center">{t("gourmet_available")}</TableCell>
+                      <TableCell align="center">
+                        {t("gourmet_available")}
+                      </TableCell>
                       <TableCell align="center">{t("gourmet_use")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {availableIngredients.map((ingredient) => {
-                      const selected = selectedIngredients.find((s) => s.id === ingredient.id);
+                      const selected = selectedIngredients.find(
+                        (s) => s.id === ingredient.id,
+                      );
                       const amount = selected?.amount || 0;
                       const isDisabled =
                         !ingredient.taste ||
@@ -678,18 +759,24 @@ export default function GourmetCookingTab({
                       return (
                         <TableRow key={ingredient.id} hover>
                           <TableCell>
-                            <Typography variant="body2">{ingredient.name}</Typography>
+                            <Typography variant="body2">
+                              {ingredient.name}
+                            </Typography>
                           </TableCell>
                           <TableCell>
                             <Typography
                               variant="body2"
-                              color={isDisabled ? "warning.main" : "text.secondary"}
+                              color={
+                                isDisabled ? "warning.main" : "text.secondary"
+                              }
                             >
                               {getTasteLabel(ingredient.taste)}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
-                            <Typography variant="body2">{ingredient.quantity}</Typography>
+                            <Typography variant="body2">
+                              {ingredient.quantity}
+                            </Typography>
                           </TableCell>
                           <TableCell align="center">
                             <Box
@@ -703,7 +790,10 @@ export default function GourmetCookingTab({
                               <IconButton
                                 size="small"
                                 onClick={() =>
-                                  updateSelectedIngredient(ingredient.id, Math.max(0, amount - 1))
+                                  updateSelectedIngredient(
+                                    ingredient.id,
+                                    Math.max(0, amount - 1),
+                                  )
                                 }
                                 disabled={amount <= 0 || isDisabled}
                               >
@@ -724,12 +814,14 @@ export default function GourmetCookingTab({
                                 onClick={() =>
                                   updateSelectedIngredient(
                                     ingredient.id,
-                                    Math.min(ingredient.quantity, amount + 1)
+                                    Math.min(ingredient.quantity, amount + 1),
                                   )
                                 }
                                 disabled={
                                   amount >= ingredient.quantity ||
-                                  (amount === 0 && totalSelectedIngredients >= maxIngredients) ||
+                                  (amount === 0 &&
+                                    totalSelectedIngredients >=
+                                      maxIngredients) ||
                                   isDisabled
                                 }
                               >
@@ -748,19 +840,23 @@ export default function GourmetCookingTab({
 
           {/* Cooking Preview */}
           {selectedTastesPreview.length > 0 && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Card sx={{ backgroundColor: "action.hover" }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     {t("gourmet_cooking_preview")}
                   </Typography>
                   <Typography variant="body2" gutterBottom>
-                    <strong>{t("gourmet_selected_tastes")}:</strong> {selectedTastesPreview.join(" + ")}
+                    <strong>{t("gourmet_selected_tastes")}:</strong>{" "}
+                    {selectedTastesPreview.join(" + ")}
                   </Typography>
 
                   {possibleCombinations.length > 0 && (
                     <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: "bold", mb: 1 }}
+                      >
                         {t("Possible Taste Combinations")}:
                       </Typography>
                       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -771,9 +867,13 @@ export default function GourmetCookingTab({
                               key={combo.key}
                               sx={{
                                 p: 1,
-                                backgroundColor: hasEffect ? "warning.light" : "background.paper",
+                                backgroundColor: hasEffect
+                                  ? "warning.light"
+                                  : "background.paper",
                                 border: hasEffect ? "2px solid" : "1px solid",
-                                borderColor: hasEffect ? "warning.main" : "divider",
+                                borderColor: hasEffect
+                                  ? "warning.main"
+                                  : "divider",
                               }}
                             >
                               <Typography variant="body2">
@@ -793,7 +893,7 @@ export default function GourmetCookingTab({
 
           {/* Roll for Effect Button */}
           {selectedTastesPreview.length >= 2 && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Button
                 variant="contained"
                 size="large"
@@ -808,26 +908,45 @@ export default function GourmetCookingTab({
         </Grid>
       )}
       {/* Roll Result Dialog */}
-      <Dialog open={rollDialogOpen} onClose={() => setRollDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={rollDialogOpen}
+        onClose={() => setRollDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle sx={{ fontWeight: "bold" }}>
           {rollResult?.title}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           {rollResult?.type === "effect" && rollResult.data && (
             <Box>
-              <Typography variant="body2" gutterBottom sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("Effect")} #{rollResult.data.id}:
               </Typography>
-              <Box sx={{ p: 2, backgroundColor: "action.hover", borderRadius: 1, mb: 2 }}>
+              <Box
+                sx={{
+                  p: 2,
+                  backgroundColor: "action.hover",
+                  borderRadius: 1,
+                  mb: 2,
+                }}
+              >
                 <ReactMarkdown components={MarkdownComponents}>
                   {rollResult.data.effect}
                 </ReactMarkdown>
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: "bold", mb: 1 }}
+                >
                   {t("gourmet_select_combination")}:
                 </Typography>
                 <FormControl fullWidth>
@@ -853,7 +972,10 @@ export default function GourmetCookingTab({
               {/* Custom Choices */}
               {rollResult.data.effect.includes("choose one:") && (
                 <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: "bold", mb: 1 }}
+                  >
                     {t("Custom Choices")}:
                   </Typography>
 
@@ -862,7 +984,9 @@ export default function GourmetCookingTab({
                       <InputLabel>{t("Status Effect")}</InputLabel>
                       <Select
                         value={customChoices.statusEffect || ""}
-                        onChange={(e) => handleCustomChoice("statusEffect", e.target.value)}
+                        onChange={(e) =>
+                          handleCustomChoice("statusEffect", e.target.value)
+                        }
                         label={t("Status Effect")}
                       >
                         {getStatusEffects(t).map((effect) => (
@@ -879,7 +1003,9 @@ export default function GourmetCookingTab({
                       <InputLabel>{t("Damage Type")}</InputLabel>
                       <Select
                         value={customChoices.damageType || ""}
-                        onChange={(e) => handleCustomChoice("damageType", e.target.value)}
+                        onChange={(e) =>
+                          handleCustomChoice("damageType", e.target.value)
+                        }
                         label={t("Damage Type")}
                       >
                         {getDamageTypes(t).map((type) => (
@@ -896,7 +1022,9 @@ export default function GourmetCookingTab({
                       <InputLabel>{t("Attribute")}</InputLabel>
                       <Select
                         value={customChoices.attribute || ""}
-                        onChange={(e) => handleCustomChoice("attribute", e.target.value)}
+                        onChange={(e) =>
+                          handleCustomChoice("attribute", e.target.value)
+                        }
                         label={t("Attribute")}
                       >
                         {getAttributes(t).map((attr) => (
@@ -920,18 +1048,22 @@ export default function GourmetCookingTab({
             </Box>
           )}
 
-          {rollResult?.type === "bulk_ingredient" && Array.isArray(rollResult.data) && (
-            <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
-                {t("Results")}:
-              </Typography>
-              {rollResult.data.map((roll, idx) => (
-                <Typography key={idx} variant="body2">
-                  {idx + 1}. {t("Roll")}: {roll.id} - {roll.name}
+          {rollResult?.type === "bulk_ingredient" &&
+            Array.isArray(rollResult.data) && (
+              <Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: "bold", mb: 1 }}
+                >
+                  {t("Results")}:
                 </Typography>
-              ))}
-            </Box>
-          )}
+                {rollResult.data.map((roll, idx) => (
+                  <Typography key={idx} variant="body2">
+                    {idx + 1}. {t("Roll")}: {roll.id} - {roll.name}
+                  </Typography>
+                ))}
+              </Box>
+            )}
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "space-between" }}>
@@ -977,25 +1109,34 @@ export default function GourmetCookingTab({
           </Box>
         </DialogActions>
       </Dialog>
-      <Dialog open={choiceDialogOpen} onClose={() => setChoiceDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={choiceDialogOpen}
+        onClose={() => setChoiceDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{t("Choose Taste Before Adding")}</DialogTitle>
         <DialogContent sx={{ mt: 1 }}>
           <Grid container spacing={2}>
             {choiceDialogRolls.map((roll, index) => (
-              <Grid  key={`${roll.id}-${roll.key}`} size={12}>
+              <Grid key={`${roll.id}-${roll.key}`} size={12}>
                 <Card variant="outlined">
                   <CardContent>
-                    <Typography variant="caption" sx={{
-                      color: "text.secondary"
-                    }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
                       {t("Roll")} {roll.id}
                     </Typography>
                     <Grid container spacing={1} sx={{ mt: 0.5 }}>
                       <Grid
                         size={{
                           xs: 12,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         <TextField
                           fullWidth
                           size="small"
@@ -1004,8 +1145,10 @@ export default function GourmetCookingTab({
                           onChange={(e) =>
                             setChoiceDialogRolls((prev) =>
                               prev.map((item, i) =>
-                                i === index ? { ...item, name: e.target.value } : item
-                              )
+                                i === index
+                                  ? { ...item, name: e.target.value }
+                                  : item,
+                              ),
                             )
                           }
                         />
@@ -1013,8 +1156,9 @@ export default function GourmetCookingTab({
                       <Grid
                         size={{
                           xs: 12,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         <FormControl fullWidth size="small">
                           <InputLabel>{t("gourmet_taste")}</InputLabel>
                           <Select
@@ -1022,8 +1166,10 @@ export default function GourmetCookingTab({
                             onChange={(e) =>
                               setChoiceDialogRolls((prev) =>
                                 prev.map((item, i) =>
-                                  i === index ? { ...item, taste: e.target.value } : item
-                                )
+                                  i === index
+                                    ? { ...item, taste: e.target.value }
+                                    : item,
+                                ),
                               )
                             }
                             label={t("gourmet_taste")}
@@ -1033,7 +1179,9 @@ export default function GourmetCookingTab({
                               .map((taste) => (
                                 <MenuItem
                                   key={taste.id}
-                                  value={taste.name.toLowerCase().replace(/\s+/g, "")}
+                                  value={taste.name
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "")}
                                 >
                                   {taste.name}
                                 </MenuItem>
@@ -1049,7 +1197,9 @@ export default function GourmetCookingTab({
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setChoiceDialogOpen(false)}>{t("Cancel")}</Button>
+          <Button onClick={() => setChoiceDialogOpen(false)}>
+            {t("Cancel")}
+          </Button>
           <Button
             variant="contained"
             onClick={handleConfirmChoiceIngredients}

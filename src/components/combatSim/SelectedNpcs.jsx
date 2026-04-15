@@ -79,7 +79,7 @@ export default function SelectedNpcs({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Handle drag end
@@ -88,10 +88,10 @@ export default function SelectedNpcs({
 
     if (active.id !== over.id) {
       const oldIndex = selectedNPCs.findIndex(
-        (npc) => npc.combatId === active.id
+        (npc) => npc.combatId === active.id,
       );
       const newIndex = selectedNPCs.findIndex(
-        (npc) => npc.combatId === over.id
+        (npc) => npc.combatId === over.id,
       );
 
       // Call parent component's handler with sorted array
@@ -124,13 +124,14 @@ export default function SelectedNpcs({
           flexGrow: 1,
           overflowY: "auto",
           paddingTop: 1,
-          ...(selectedNPCs.length === 0 && selectedPCs.length === 0 && {
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }),
+          ...(selectedNPCs.length === 0 &&
+            selectedPCs.length === 0 && {
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }),
         }}
       >
         {selectedNPCs.length === 0 && selectedPCs.length === 0 ? (
@@ -181,11 +182,21 @@ export default function SelectedNpcs({
             {selectedPCs.length > 0 && (
               <>
                 {selectedNPCs.length > 0 && (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, my: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      my: 1,
+                    }}
+                  >
                     <Divider sx={{ flex: 1 }} />
-                    <Typography variant="caption" sx={{
-                      color: "text.secondary"
-                    }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
                       PCs
                     </Typography>
                     <Divider sx={{ flex: 1 }} />

@@ -3,11 +3,11 @@
 export type DbMode = "cloud" | "local";
 
 export type DbErrorCode =
-  | "quota-exceeded"    // Cloud only: Firebase free-tier limit hit
+  | "quota-exceeded" // Cloud only: Firebase free-tier limit hit
   | "permission-denied" // Cloud only: Firestore security rules rejected the op
-  | "not-found"         // Document does not exist (both adapters)
-  | "unavailable"       // Cloud only: network unreachable
-  | "unknown";          // Catch-all
+  | "not-found" // Document does not exist (both adapters)
+  | "unavailable" // Cloud only: network unreachable
+  | "unknown"; // Catch-all
 
 export interface DbError {
   code: DbErrorCode;
@@ -51,7 +51,10 @@ export interface DatabaseAdapter {
   getDocs: (query: unknown) => Promise<unknown[]>;
 
   // Writes
-  addDoc: (ref: unknown, data: Record<string, unknown>) => Promise<{ id: string }>;
+  addDoc: (
+    ref: unknown,
+    data: Record<string, unknown>,
+  ) => Promise<{ id: string }>;
   setDoc: (ref: unknown, data: Record<string, unknown>) => Promise<void>;
   deleteDoc: (ref: unknown) => Promise<void>;
   writeBatch: () => WriteBatch;

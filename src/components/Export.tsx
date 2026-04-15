@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
-import { Tooltip, IconButton, Menu, MenuItem, Snackbar, Divider } from "@mui/material";
+import {
+  Tooltip,
+  IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
+  Divider,
+} from "@mui/material";
 import { useTranslate } from "../translation/translate";
 import { buildItemText } from "../libs/buildItemText";
 
@@ -19,7 +26,10 @@ enum ExportAction {
 
 function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
   const { t } = useTranslate();
-  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, { ...data, dataType });
+  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, {
+    ...data,
+    dataType,
+  });
 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [exportAnchor, setExportAnchor] = useState(null);
@@ -91,19 +101,43 @@ function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
         open={isExportMenuOpen}
         onClose={handleCloseExportMenu}
       >
-        <MenuItem onClick={() => { exportJSON(ExportAction.CLIPBOARD); }}>{t("copy_json_clipboard")}</MenuItem>
-        <MenuItem onClick={() => { exportJSON(ExportAction.FILE); }}>{t("export_json_file")}</MenuItem>
+        <MenuItem
+          onClick={() => {
+            exportJSON(ExportAction.CLIPBOARD);
+          }}
+        >
+          {t("copy_json_clipboard")}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            exportJSON(ExportAction.FILE);
+          }}
+        >
+          {t("export_json_file")}
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={() => handleCopyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>
-        <MenuItem onClick={() => handleDownloadText("markdown")}>{t("Export as Markdown (.md)")}</MenuItem>
+        <MenuItem onClick={() => handleCopyText("markdown")}>
+          {t("Copy Markdown to Clipboard")}
+        </MenuItem>
+        <MenuItem onClick={() => handleDownloadText("markdown")}>
+          {t("Export as Markdown (.md)")}
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={() => handleCopyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>
-        <MenuItem onClick={() => handleDownloadText("plain")}>{t("Export as Plaintext (.txt)")}</MenuItem>
+        <MenuItem onClick={() => handleCopyText("plain")}>
+          {t("Copy Plaintext to Clipboard")}
+        </MenuItem>
+        <MenuItem onClick={() => handleDownloadText("plain")}>
+          {t("Export as Plaintext (.txt)")}
+        </MenuItem>
         {dataType === "npc" && (
-          <MenuItem onClick={() => handleCopyText("obsidian")}>{t("Copy Obsidian (BlueCorvid) to Clipboard")}</MenuItem>
+          <MenuItem onClick={() => handleCopyText("obsidian")}>
+            {t("Copy Obsidian (BlueCorvid) to Clipboard")}
+          </MenuItem>
         )}
         {dataType === "npc" && (
-          <MenuItem onClick={() => handleDownloadText("obsidian")}>{t("Export as Obsidian (.md)")}</MenuItem>
+          <MenuItem onClick={() => handleDownloadText("obsidian")}>
+            {t("Export as Obsidian (.md)")}
+          </MenuItem>
         )}
       </Menu>
       <Snackbar

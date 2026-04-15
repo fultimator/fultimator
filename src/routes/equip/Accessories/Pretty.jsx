@@ -36,15 +36,17 @@ function PrettySingle({ accessory, showActions }) {
   const theme = useCustomTheme();
   const [showImage, setShowImage] = useState(false);
 
-  const background = theme.mode === 'dark'
-  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
-  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+      : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
 
   const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
-  const cardBackground = theme.mode === 'dark'
-  ? `backgroundColor: "#181a1b", background: "#181a1b"`
-  : `backgroundColor: "white", background: "white"`
+  const cardBackground =
+    theme.mode === "dark"
+      ? `backgroundColor: "#181a1b", background: "#181a1b"`
+      : `backgroundColor: "white", background: "white"`;
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(accessory.name, ref);
@@ -56,10 +58,7 @@ function PrettySingle({ accessory, showActions }) {
   return (
     <>
       <Card>
-        <div
-          ref={ref}
-          style={{ cardBackground }}
-        >
+        <div ref={ref} style={{ cardBackground }}>
           <Stack>
             <Grid
               container
@@ -76,16 +75,30 @@ function PrettySingle({ accessory, showActions }) {
             >
               <Grid sx={{ flex: "0 0 70px" }} />
               <Grid sx={{ flex: 1, pl: 1 }} container>
-              <Grid size={6}>
-                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Accessory")}
-                </Typography>
-              </Grid>
-              <Grid size={4}>
-                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
+                <Grid size={6}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Accessory")}
+                  </Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
               </Grid>
             </Grid>
 
@@ -112,7 +125,8 @@ function PrettySingle({ accessory, showActions }) {
               {/* Content Column - contains all rows */}
               <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
                 {/* First Data Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -121,16 +135,35 @@ function PrettySingle({ accessory, showActions }) {
                     pl: 1,
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={6}>
-                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>{accessory.name || t("No Name")}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: "2px" }}
+                    size={6}
+                  >
+                    <Typography
+                      sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}
+                    >
+                      {accessory.name || t("No Name")}
+                    </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>{`${accessory.cost}z`}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: "2px" }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >{`${accessory.cost}z`}</Typography>
                   </Grid>
                 </Grid>
 
                 {/* Quality Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     pl: 1,
                     minHeight: "40px",
@@ -139,8 +172,13 @@ function PrettySingle({ accessory, showActions }) {
                 >
                   <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
                     <Typography sx={{ lineHeight: 1, margin: 0 }}>
-                      {!accessory.quality ? t("No Description") : (
-                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      {!accessory.quality ? (
+                        t("No Description")
+                      ) : (
+                        <StyledMarkdown
+                          allowedElements={["strong", "em"]}
+                          unwrapDisallowed={true}
+                        >
                           {accessory.quality}
                         </StyledMarkdown>
                       )}
@@ -160,11 +198,20 @@ function PrettySingle({ accessory, showActions }) {
                 <Download />
               </IconButton>
             </Tooltip>
-            <Export name={`${accessory.name}`} dataType="accessory" data={accessory} />
+            <Export
+              name={`${accessory.name}`}
+              dataType="accessory"
+              data={accessory}
+            />
             <AddToCompendiumButton itemType="accessory" data={accessory} />
           </div>
           <FormControlLabel
-            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            control={
+              <Checkbox
+                checked={showImage}
+                onChange={(e) => setShowImage(e.target.checked)}
+              />
+            }
             label={t("Add Image")}
           />
         </div>

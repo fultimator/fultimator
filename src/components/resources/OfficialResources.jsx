@@ -66,8 +66,9 @@ export default function OfficialResources({ groupedOfficialResources }) {
                   size={{
                     xs: 12,
                     md: 6,
-                    lg: 4
-                  }}>
+                    lg: 4,
+                  }}
+                >
                   <ResourceCard resource={resource} />
                 </Grid>
               ))}

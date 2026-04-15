@@ -27,9 +27,13 @@ export default function SpellArcanistModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   useEffect(() => {
     setEditedSpell(spell || {});
@@ -42,7 +46,7 @@ export default function SpellArcanistModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-return (
+  return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -52,7 +56,7 @@ return (
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -75,8 +79,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <TextField
               label={t("Arcana Name")}
               variant="outlined"
@@ -84,15 +89,16 @@ return (
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <TextField
               label={t("Domain")}
               variant="outlined"
@@ -100,15 +106,16 @@ return (
               value={editedSpell.domain || ""}
               onChange={(e) => handleChange("domain", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <TextField
               label={t("Arcana Description")}
               variant="outlined"
@@ -116,15 +123,16 @@ return (
               value={editedSpell.description || ""}
               onChange={(e) => handleChange("description", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               label={t("Domain Description")}
               fullWidth
@@ -137,8 +145,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <TextField
               label={t("Merge Name")}
               variant="outlined"
@@ -146,15 +155,16 @@ return (
               value={editedSpell.merge || ""}
               onChange={(e) => handleChange("merge", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               label={t("Merge Description")}
               fullWidth
@@ -169,8 +179,9 @@ return (
               <Grid
                 size={{
                   xs: 12,
-                  sm: 12
-                }}>
+                  sm: 12,
+                }}
+              >
                 <TextField
                   label={t("Pulse Name")}
                   variant="outlined"
@@ -178,15 +189,16 @@ return (
                   value={editedSpell.pulse || ""}
                   onChange={(e) => handleChange("pulse", e.target.value)}
                   slotProps={{
-                    htmlInput: { maxLength: 50 }
+                    htmlInput: { maxLength: 50 },
                   }}
                 />
               </Grid>
               <Grid
                 size={{
                   xs: 12,
-                  sm: 12
-                }}>
+                  sm: 12,
+                }}
+              >
                 <CustomTextarea
                   label={t("Merge Description")}
                   fullWidth
@@ -201,8 +213,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <TextField
               label={t("Dismiss Name")}
               variant="outlined"
@@ -210,15 +223,16 @@ return (
               value={editedSpell.dismiss || ""}
               onChange={(e) => handleChange("dismiss", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               label={t("Dismiss Description")}
               fullWidth
@@ -231,8 +245,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <FormControlLabel
               control={
                 <Switch

@@ -83,7 +83,6 @@ function Home() {
       link: "/roller",
       hoverKey: "dice_roller",
     },
-
   ];
 
   return (
@@ -128,8 +127,12 @@ function Home() {
       </div>
       <Alert severity="warning" sx={{ mx: "1em" }}>
         <AlertTitle>{t("important_announcement")}</AlertTitle>
-          {t("important_announcement_desc")}:{" "}
-        <Link href="https://fultimator.com" target="_blank" rel="noopener noreferrer">
+        {t("important_announcement_desc")}:{" "}
+        <Link
+          href="https://fultimator.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           https://fultimator.com
         </Link>
       </Alert>
@@ -147,8 +150,9 @@ function Home() {
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Paper
               elevation={3}
               sx={{
@@ -206,8 +210,9 @@ function Home() {
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Paper
               elevation={3}
               sx={{
@@ -268,8 +273,9 @@ function Home() {
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Paper
               elevation={3}
               sx={{
@@ -342,8 +348,9 @@ function Home() {
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Paper
               elevation={3}
               sx={{
@@ -414,7 +421,7 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid  size={12}>
+          <Grid size={12}>
             <Paper
               elevation={3}
               sx={{
@@ -468,7 +475,7 @@ function Home() {
               </Box>
             </Paper>
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <Divider sx={{ marginBottom: 3 }} />
             <Box
               sx={{

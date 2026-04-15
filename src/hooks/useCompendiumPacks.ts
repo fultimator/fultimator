@@ -1,14 +1,19 @@
 // Hook for managing Compendium Packs stored in IndexedDB ("compendium-packs" store).
 // Always local — never synced to Firestore, but included in Drive backup via STORES.
-  // Pack CRUD
+// Pack CRUD
 import { useState, useEffect, useCallback } from "react";
 import { getDb, notifyListeners, subscribeToStore } from "../platform/idb";
-import type { CompendiumPack, CompendiumItem, CompendiumItemType, PackType } from "../types/CompendiumPack";
+import type {
+  CompendiumPack,
+  CompendiumItem,
+  CompendiumItemType,
+  PackType,
+} from "../types/CompendiumPack";
 import { validateManifest } from "../utils/validateCompendiumPack";
-  // Item operations
+// Item operations
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
-  // Module I/O
+// Module I/O
 async function getAllPacks(): Promise<CompendiumPack[]> {
   const db = await getDb();
   return db.getAll(STORE) as Promise<CompendiumPack[]>;
@@ -80,25 +85,31 @@ export function useCompendiumPacks() {
       await savePack(pack);
       return id;
     },
-    []
+    [],
   );
 
   const updatePack = useCallback(
-    async (id: string, changes: Partial<Pick<CompendiumPack, "name" | "description" | "author">>): Promise<void> => {
+    async (
+      id: string,
+      changes: Partial<Pick<CompendiumPack, "name" | "description" | "author">>,
+    ): Promise<void> => {
       const all = await getAllPacks();
       const pack = all.find((p) => p.id === id);
       if (!pack) return;
       await savePack({ ...pack, ...changes, updatedAt: Date.now() });
     },
-    []
+    [],
   );
 
-  const setPackActive = useCallback(async (id: string, active: boolean): Promise<void> => {
-    const all = await getAllPacks();
-    const pack = all.find((p) => p.id === id);
-    if (!pack) return;
-    await savePack({ ...pack, active, updatedAt: Date.now() });
-  }, []);
+  const setPackActive = useCallback(
+    async (id: string, active: boolean): Promise<void> => {
+      const all = await getAllPacks();
+      const pack = all.find((p) => p.id === id);
+      if (!pack) return;
+      await savePack({ ...pack, active, updatedAt: Date.now() });
+    },
+    [],
+  );
 
   const toggleLock = useCallback(async (id: string): Promise<void> => {
     const all = await getAllPacks();
@@ -118,7 +129,11 @@ export function useCompendiumPacks() {
 
   // Item operations
   const addItem = useCallback(
-    async (packId: string, type: CompendiumItemType, data: unknown): Promise<void> => {
+    async (
+      packId: string,
+      type: CompendiumItemType,
+      data: unknown,
+    ): Promise<void> => {
       const targetId = packId === PERSONAL_ID ? PERSONAL_ID : packId;
       const all = await getAllPacks();
       let pack = all.find((p) => p.id === targetId);
@@ -133,10 +148,11 @@ export function useCompendiumPacks() {
       const incoming = data as Record<string, unknown>;
       if (incoming.id !== undefined) {
         const duplicate = pack.items.find(
-          (i) => i.type === type && i.data.id === incoming.id
+          (i) => i.type === type && i.data.id === incoming.id,
         );
         if (duplicate) {
-          const itemName = typeof incoming.name === "string" ? incoming.name : "Item";
+          const itemName =
+            typeof incoming.name === "string" ? incoming.name : "Item";
           throw new Error(`"${itemName}" is already in "${pack.name}"`);
         }
       }
@@ -153,33 +169,47 @@ export function useCompendiumPacks() {
         updatedAt: Date.now(),
       });
     },
-    [ensurePersonalPack]
+    [ensurePersonalPack],
   );
 
-  const updateItem = useCallback(async (packId: string, itemId: string, newData: unknown): Promise<void> => {
-    const all = await getAllPacks();
-    const pack = all.find((p) => p.id === packId);
-    if (!pack) return;
-    await savePack({
-      ...pack,
-      items: pack.items.map((i) => i.id === itemId ? { ...i, data: newData as Record<string, unknown> } : i),
-      updatedAt: Date.now(),
-    });
-  }, []);
+  const updateItem = useCallback(
+    async (packId: string, itemId: string, newData: unknown): Promise<void> => {
+      const all = await getAllPacks();
+      const pack = all.find((p) => p.id === packId);
+      if (!pack) return;
+      await savePack({
+        ...pack,
+        items: pack.items.map((i) =>
+          i.id === itemId
+            ? { ...i, data: newData as Record<string, unknown> }
+            : i,
+        ),
+        updatedAt: Date.now(),
+      });
+    },
+    [],
+  );
 
-  const removeItem = useCallback(async (packId: string, itemId: string): Promise<void> => {
-    const all = await getAllPacks();
-    const pack = all.find((p) => p.id === packId);
-    if (!pack) return;
-    await savePack({
-      ...pack,
-      items: pack.items.filter((i) => i.id !== itemId),
-      updatedAt: Date.now(),
-    });
-  }, []);
+  const removeItem = useCallback(
+    async (packId: string, itemId: string): Promise<void> => {
+      const all = await getAllPacks();
+      const pack = all.find((p) => p.id === packId);
+      if (!pack) return;
+      await savePack({
+        ...pack,
+        items: pack.items.filter((i) => i.id !== itemId),
+        updatedAt: Date.now(),
+      });
+    },
+    [],
+  );
 
   const moveItem = useCallback(
-    async (itemId: string, fromPackId: string, toPackId: string): Promise<void> => {
+    async (
+      itemId: string,
+      fromPackId: string,
+      toPackId: string,
+    ): Promise<void> => {
       const all = await getAllPacks();
       const fromPack = all.find((p) => p.id === fromPackId);
       const toPack = all.find((p) => p.id === toPackId);
@@ -190,15 +220,23 @@ export function useCompendiumPacks() {
 
       const db = await getDb();
       const tx = db.transaction(STORE, "readwrite");
-      await tx.store.put({ ...fromPack, items: fromPack.items.filter((i) => i.id !== itemId), updatedAt: Date.now() });
-      await tx.store.put({ ...toPack, items: [...toPack.items, { ...item, addedAt: Date.now() }], updatedAt: Date.now() });
+      await tx.store.put({
+        ...fromPack,
+        items: fromPack.items.filter((i) => i.id !== itemId),
+        updatedAt: Date.now(),
+      });
+      await tx.store.put({
+        ...toPack,
+        items: [...toPack.items, { ...item, addedAt: Date.now() }],
+        updatedAt: Date.now(),
+      });
       await tx.done;
       notifyListeners(STORE);
     },
-    []
+    [],
   );
 
-  // Module I/O 
+  // Module I/O
   const exportAsModule = useCallback(
     async (
       packId: string,
@@ -207,7 +245,7 @@ export function useCompendiumPacks() {
         homepageUrl?: string;
         manifestUrl?: string;
         downloadUrl?: string;
-      } = {}
+      } = {},
     ): Promise<void> => {
       const JSZip = (await import("jszip")).default;
       const all = await getAllPacks();
@@ -227,7 +265,10 @@ export function useCompendiumPacks() {
         for (const item of items) {
           const baseName = item.data.name as string | undefined;
           const baseSlug = baseName
-            ? baseName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+            ? baseName
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "")
             : "item";
           const filename = `${baseSlug}-${item.id.slice(0, 8)}.json`;
           typeFolder.file(filename, JSON.stringify(item.data, null, 2));
@@ -252,7 +293,10 @@ export function useCompendiumPacks() {
       const blob = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      const packSlug = pack.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const packSlug = pack.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
       a.href = url;
       a.download = `${packSlug}.fcp`;
       document.body.appendChild(a);
@@ -260,7 +304,7 @@ export function useCompendiumPacks() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     },
-    []
+    [],
   );
 
   const importFromFile = useCallback(async (file: File): Promise<string> => {
@@ -276,7 +320,8 @@ export function useCompendiumPacks() {
     }
 
     const manifestFile = zip.file("manifest.json");
-    if (!manifestFile) throw new Error("Invalid .fcp file: missing manifest.json");
+    if (!manifestFile)
+      throw new Error("Invalid .fcp file: missing manifest.json");
 
     let manifest: Record<string, unknown>;
     try {
@@ -291,7 +336,17 @@ export function useCompendiumPacks() {
       throw new Error(`Invalid manifest: ${validation.errors.join("; ")}`);
     }
 
-    const validTypes: CompendiumItemType[] = ["npc-attack", "npc-spell", "weapon", "armor", "shield", "player-spell", "quality", "class", "heroic"];
+    const validTypes: CompendiumItemType[] = [
+      "npc-attack",
+      "npc-spell",
+      "weapon",
+      "armor",
+      "shield",
+      "player-spell",
+      "quality",
+      "class",
+      "heroic",
+    ];
     const now = Date.now();
     const packId = crypto.randomUUID();
     const items: CompendiumItem[] = [];
@@ -307,7 +362,8 @@ export function useCompendiumPacks() {
       try {
         const text = await zipEntry.async("text");
         const parsed: unknown = JSON.parse(text);
-        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) continue;
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+          continue;
         data = parsed as Record<string, unknown>;
       } catch {
         continue; // skip corrupt item files silently
@@ -316,17 +372,28 @@ export function useCompendiumPacks() {
     }
 
     const rawType = manifest.type;
-    const packType: PackType = rawType === "supplement" ? "supplement" : "compendium";
+    const packType: PackType =
+      rawType === "supplement" ? "supplement" : "compendium";
 
     const pack: CompendiumPack = {
       id: packId,
       name: (manifest.name as string).trim(),
-      description: typeof manifest.description === "string" ? manifest.description.trim() || undefined : undefined,
-      author: typeof manifest.author === "string" ? manifest.author.trim() || undefined : undefined,
+      description:
+        typeof manifest.description === "string"
+          ? manifest.description.trim() || undefined
+          : undefined,
+      author:
+        typeof manifest.author === "string"
+          ? manifest.author.trim() || undefined
+          : undefined,
       type: packType,
-      version: typeof manifest.version === "string" ? manifest.version.trim() || undefined : undefined,
+      version:
+        typeof manifest.version === "string"
+          ? manifest.version.trim() || undefined
+          : undefined,
       isPersonal: false,
-      createdAt: typeof manifest.createdAt === "number" ? manifest.createdAt : now,
+      createdAt:
+        typeof manifest.createdAt === "number" ? manifest.createdAt : now,
       updatedAt: now,
       items,
     };
@@ -347,7 +414,8 @@ export function useCompendiumPacks() {
       }
 
       const manifestResp = await fetch(url);
-      if (!manifestResp.ok) throw new Error(`Failed to fetch manifest: ${manifestResp.status}`);
+      if (!manifestResp.ok)
+        throw new Error(`Failed to fetch manifest: ${manifestResp.status}`);
 
       let manifest: Record<string, unknown>;
       try {
@@ -371,11 +439,14 @@ export function useCompendiumPacks() {
       }
 
       const packResp = await fetch(manifest.downloadUrl);
-      if (!packResp.ok) throw new Error(`Failed to fetch pack: ${packResp.status}`);
+      if (!packResp.ok)
+        throw new Error(`Failed to fetch pack: ${packResp.status}`);
       const blob = await packResp.blob();
-      return importFromFile(new File([blob], "pack.fcp", { type: "application/zip" }));
+      return importFromFile(
+        new File([blob], "pack.fcp", { type: "application/zip" }),
+      );
     },
-    [importFromFile]
+    [importFromFile],
   );
 
   return {

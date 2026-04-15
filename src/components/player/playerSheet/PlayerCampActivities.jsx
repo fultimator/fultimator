@@ -52,8 +52,11 @@ export default function PlayerCampActivities({ player }) {
                     px: "10px",
                     py: "5px",
                   }}
-                  size={12}>
-                  <Typography sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}>
+                  size={12}
+                >
+                  <Typography
+                    sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
+                  >
                     <strong>{t("Target")}: </strong>
                     {activity.targetDescription}
                   </Typography>
@@ -67,7 +70,8 @@ export default function PlayerCampActivities({ player }) {
                     px: "10px",
                     py: "5px",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <div
                     style={{
                       whiteSpace: "pre-line",

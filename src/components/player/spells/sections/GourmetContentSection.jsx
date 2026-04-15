@@ -43,24 +43,27 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
   const [editingText, setEditingText] = useState("");
   const [editingCustomChoices, setEditingCustomChoices] = useState({});
 
-  const escapedChoices = useMemo(() => ({
-    chooseAllStatuses: t("gourmet_delicacy_effect_choose_all_statuses"),
-    chooseSomeStatuses: t("gourmet_delicacy_effect_choose_some_statuses"),
-    chooseDamageType: t("gourmet_delicacy_effect_choose_damage_type"),
-    chooseAttribute: t("gourmet_delicacy_effect_choose_attributte"),
-  }), [t]);
+  const escapedChoices = useMemo(
+    () => ({
+      chooseAllStatuses: t("gourmet_delicacy_effect_choose_all_statuses"),
+      chooseSomeStatuses: t("gourmet_delicacy_effect_choose_some_statuses"),
+      chooseDamageType: t("gourmet_delicacy_effect_choose_damage_type"),
+      chooseAttribute: t("gourmet_delicacy_effect_choose_attributte"),
+    }),
+    [t],
+  );
 
   // Convert cookbookEffects from object to array if needed
   const cookbookEffects = Array.isArray(formState.cookbookEffects)
     ? formState.cookbookEffects
-    : formState.cookbookEffects && typeof formState.cookbookEffects === 'object'
-    ? Object.entries(formState.cookbookEffects).map(([key, data]) => ({
-        tasteKey: key,
-        name: data.tasteCombination || key,
-        description: data.effect || '',
-        ...data,
-      }))
-    : [];
+    : formState.cookbookEffects && typeof formState.cookbookEffects === "object"
+      ? Object.entries(formState.cookbookEffects).map(([key, data]) => ({
+          tasteKey: key,
+          name: data.tasteCombination || key,
+          description: data.effect || "",
+          ...data,
+        }))
+      : [];
   const ingredientInventory = formState.ingredientInventory || [];
 
   const handleDeleteEffect = (tasteKey) => {
@@ -77,7 +80,9 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
   const handleDeleteIngredient = (index) => {
     setFormState((prev) => ({
       ...prev,
-      ingredientInventory: prev.ingredientInventory.filter((_, i) => i !== index),
+      ingredientInventory: prev.ingredientInventory.filter(
+        (_, i) => i !== index,
+      ),
     }));
   };
 
@@ -87,18 +92,37 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
 
     const replaceAll = (source, from, to) => {
       if (!from || !to) return source;
-      return source.replace(new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), to);
+      return source.replace(
+        new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+        to,
+      );
     };
 
     if (customChoices.statusEffect) {
-      displayText = replaceAll(displayText, escapedChoices.chooseAllStatuses, customChoices.statusEffect);
-      displayText = replaceAll(displayText, escapedChoices.chooseSomeStatuses, customChoices.statusEffect);
+      displayText = replaceAll(
+        displayText,
+        escapedChoices.chooseAllStatuses,
+        customChoices.statusEffect,
+      );
+      displayText = replaceAll(
+        displayText,
+        escapedChoices.chooseSomeStatuses,
+        customChoices.statusEffect,
+      );
     }
     if (customChoices.damageType) {
-      displayText = replaceAll(displayText, escapedChoices.chooseDamageType, customChoices.damageType);
+      displayText = replaceAll(
+        displayText,
+        escapedChoices.chooseDamageType,
+        customChoices.damageType,
+      );
     }
     if (customChoices.attribute) {
-      displayText = replaceAll(displayText, escapedChoices.chooseAttribute, customChoices.attribute);
+      displayText = replaceAll(
+        displayText,
+        escapedChoices.chooseAttribute,
+        customChoices.attribute,
+      );
     }
 
     return displayText;
@@ -165,7 +189,7 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={2}>
       {/* Cookbook Effects */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Cookbook Effects")} ({cookbookEffects.length})
         </Typography>
@@ -173,8 +197,9 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           <Typography
             sx={{
               color: "text.secondary",
-              fontStyle: "italic"
-            }}>
+              fontStyle: "italic",
+            }}
+          >
             {t("No cookbook effects yet")}
           </Typography>
         ) : (
@@ -201,7 +226,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
                         }}
                       >
                         <ReactMarkdown>
-                          {applyCustomChoices(effect.description || "", effect.customChoices)}
+                          {applyCustomChoices(
+                            effect.description || "",
+                            effect.customChoices,
+                          )}
                         </ReactMarkdown>
                       </Box>
                     </TableCell>
@@ -231,7 +259,7 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
         )}
       </Grid>
       {/* Ingredient Inventory */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Ingredient Inventory")} ({ingredientInventory.length})
         </Typography>
@@ -239,14 +267,15 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           <Typography
             sx={{
               color: "text.secondary",
-              fontStyle: "italic"
-            }}>
+              fontStyle: "italic",
+            }}
+          >
             {t("No ingredients in inventory")}
           </Typography>
         ) : (
           <Grid container spacing={1}>
             {ingredientInventory.map((ingredient, idx) => (
-              <Grid  key={idx}>
+              <Grid key={idx}>
                 <Chip
                   label={`${ingredient.name} (x${ingredient.quantity || 1})`}
                   onDelete={() => handleDeleteIngredient(idx)}
@@ -258,16 +287,23 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
         )}
       </Grid>
       {/* Info Box */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Card sx={{ backgroundColor: "info.lighter", border: "1px solid" }}>
           <CardContent>
             <Typography variant="body2">
-              {t("Note: Full cooking mechanics with ingredient selection, taste combinations, and effect rolling are managed separately. This view shows your current cookbook and inventory.")}
+              {t(
+                "Note: Full cooking mechanics with ingredient selection, taste combinations, and effect rolling are managed separately. This view shows your current cookbook and inventory.",
+              )}
             </Typography>
           </CardContent>
         </Card>
       </Grid>
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{t("Edit Effect")}</DialogTitle>
         <DialogContent>
           <CustomTextarea
@@ -288,7 +324,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
               <Select
                 value={editingCustomChoices[choice.type] || ""}
                 onChange={(e) =>
-                  setEditingCustomChoices((prev) => ({ ...prev, [choice.type]: e.target.value }))
+                  setEditingCustomChoices((prev) => ({
+                    ...prev,
+                    [choice.type]: e.target.value,
+                  }))
                 }
                 label={
                   choice.type === "statusEffect"
@@ -311,7 +350,9 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>{t("Cancel")}</Button>
+          <Button onClick={() => setEditDialogOpen(false)}>
+            {t("Cancel")}
+          </Button>
           <Button variant="contained" onClick={handleSaveEditEffect}>
             {t("Save")}
           </Button>

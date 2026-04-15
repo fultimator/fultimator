@@ -20,13 +20,13 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? '#ffffff' : '#000000';
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const iconColor = isDarkMode ? "#ffffff" : "#000000";
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const showInPlayerSheet =
     magitech.showInPlayerSheet || magitech.showInPlayerSheet === undefined;
 
-    const ranks = ["Basic", "Advanced", "Superior"];
+  const ranks = ["Basic", "Advanced", "Superior"];
 
   return (
     <>
@@ -49,21 +49,23 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
-              {t("Current Rank") + ": " + t(ranks[magitech.rank-1])}
+              {t("Current Rank") + ": " + t(ranks[magitech.rank - 1])}
             </Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow">
+            size="grow"
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("Magitech not shown in player sheet")}>
                 <Icon>
@@ -72,7 +74,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color:  iconColor }} />
+              <Edit style={{ color: iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -100,7 +102,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -116,7 +119,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 flexShrink: 0,
               }}
-              size="grow">
+              size="grow"
+            >
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -132,11 +136,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <ReactMarkdown>
-              {t(
-                "MagitechOverride_desc"
-              )}
-            </ReactMarkdown>
+            <ReactMarkdown>{t("MagitechOverride_desc")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -163,7 +163,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -179,7 +180,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 flexShrink: 0,
               }}
-              size="grow">
+              size="grow"
+            >
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -195,16 +197,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <ReactMarkdown>
-              {t(
-                "Magicannon_desc1"
-              )}
-            </ReactMarkdown>
-            <ReactMarkdown>
-              {t(
-                "Magicannon_desc2"
-              )}
-            </ReactMarkdown>
+            <ReactMarkdown>{t("Magicannon_desc1")}</ReactMarkdown>
+            <ReactMarkdown>{t("Magicannon_desc2")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -231,7 +225,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -247,7 +242,8 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
                 alignItems: "center",
                 flexShrink: 0,
               }}
-              size="grow">
+              size="grow"
+            >
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -263,21 +259,9 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <ReactMarkdown>
-              {t(
-                "Magispheres_desc1"
-              )}
-            </ReactMarkdown>
-            <ReactMarkdown>
-              {t(
-                "Magispheres_desc2"
-              )}
-            </ReactMarkdown>
-            <ReactMarkdown>
-              {t(
-                "Magispheres_desc3"
-              )}
-            </ReactMarkdown>
+            <ReactMarkdown>{t("Magispheres_desc1")}</ReactMarkdown>
+            <ReactMarkdown>{t("Magispheres_desc2")}</ReactMarkdown>
+            <ReactMarkdown>{t("Magispheres_desc3")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}

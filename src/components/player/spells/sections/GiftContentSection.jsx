@@ -33,7 +33,7 @@ export default function GiftContentSection({ formState, setFormState, t }) {
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   const getAvailablePresets = useCallback(() => {
@@ -42,31 +42,29 @@ export default function GiftContentSection({ formState, setFormState, t }) {
       .filter((name) => name !== "esper_gift_custom_name");
     return availableGifts.filter(
       (preset) =>
-        preset.name !== "esper_gift_custom_name" && !addedNames.includes(preset.name)
+        preset.name !== "esper_gift_custom_name" &&
+        !addedNames.includes(preset.name),
     );
   }, [currentGifts]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setFormState) => {
-        const preset = availableGifts.find((g) => g.name === presetName);
-        if (!preset) return;
-        setFormState((prev) => ({
-          ...prev,
-          gifts: [
-            ...(prev.gifts || []),
-            {
-              name: preset.name,
-              event: preset.event,
-              effect: preset.effect,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setFormState) => {
+      const preset = availableGifts.find((g) => g.name === presetName);
+      if (!preset) return;
+      setFormState((prev) => ({
+        ...prev,
+        gifts: [
+          ...(prev.gifts || []),
+          {
+            name: preset.name,
+            event: preset.event,
+            effect: preset.effect,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),

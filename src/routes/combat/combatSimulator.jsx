@@ -50,10 +50,22 @@ export default function CombatSimulator() {
         <Paper
           elevation={dbMode === "cloud" ? 3 : 0}
           variant={dbMode === "cloud" ? "elevation" : "outlined"}
-          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
           <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
-          <Typography variant="body2" color={dbMode === "cloud" ? "text.primary" : "text.secondary"} sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -260,7 +272,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         handleSaveState(true, encounterToSave);
       }
     }, AUTO_SAVE_DELAY),
-    [isDifferentUser, autosaveEnabled, AUTO_SAVE_DELAY]
+    [isDifferentUser, autosaveEnabled, AUTO_SAVE_DELAY],
   );
 
   // Effect to track changes and trigger debounced autosave
@@ -372,11 +384,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         if (seconds < 60) setTimeAgo(t("combat_sim_last_saved_just_now"));
         else if (seconds < 3600)
           setTimeAgo(
-            t("combat_sim_last_saved_minutes_ago", Math.floor(seconds / 60))
+            t("combat_sim_last_saved_minutes_ago", Math.floor(seconds / 60)),
           );
         else
           setTimeAgo(
-            t("combat_sim_last_saved_hours_ago", Math.floor(seconds / 3600))
+            t("combat_sim_last_saved_hours_ago", Math.floor(seconds / 3600)),
           );
       }
     };
@@ -454,9 +466,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         ...npc,
         combatStats: {
           ...npc.combatStats,
-          turns: npc.combatStats.turns ? npc.combatStats.turns.map(() => false) : [],
+          turns: npc.combatStats.turns
+            ? npc.combatStats.turns.map(() => false)
+            : [],
         },
-      }))
+      })),
     );
 
     // Reset the turns for each selected PC
@@ -464,7 +478,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       prev.map((pc) => ({
         ...pc,
         combatStats: { ...pc.combatStats, turns: [false] },
-      }))
+      })),
     );
 
     // Increment the round
@@ -482,8 +496,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       prev.map((npc) =>
         npc.combatId === combatId
           ? { ...npc, combatStats: { ...npc.combatStats, turns: newTurns } }
-          : npc
-      )
+          : npc,
+      ),
     );
 
     // Add log entry if new turns have been checked so oldTurns < newTurns
@@ -500,7 +514,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               (npc?.combatStats?.combatNotes
                 ? "【" + npc.combatStats.combatNotes + "】"
                 : ""),
-            newTurnsCount
+            newTurnsCount,
           );
         }
       }
@@ -601,7 +615,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Handle Remove PC from the selected PCs list
   const handleRemovePC = async (pcCombatId) => {
     if (askBeforeRemoveNpc) {
-      const confirmRemove = await globalConfirm(t("combat_sim_remove_npc_confirm"));
+      const confirmRemove = await globalConfirm(
+        t("combat_sim_remove_npc_confirm"),
+      );
       if (!confirmRemove) return;
     }
     setSelectedPCs((prev) => prev.filter((pc) => pc.combatId !== pcCombatId));
@@ -623,8 +639,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       prev.map((pc) =>
         pc.combatId === combatId
           ? { ...pc, combatStats: { ...pc.combatStats, turns: newTurns } }
-          : pc
-      )
+          : pc,
+      ),
     );
   };
 
@@ -632,14 +648,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleRemoveNPC = async (npcCombatId, isAutoRemove = false) => {
     if (askBeforeRemoveNpc && !isAutoRemove) {
       const confirmRemove = await globalConfirm(
-        t("combat_sim_remove_npc_confirm")
+        t("combat_sim_remove_npc_confirm"),
       );
       if (!confirmRemove) return;
     }
 
-    const npcToRemove = selectedNPCs.find((npc) => npc.combatId === npcCombatId);
+    const npcToRemove = selectedNPCs.find(
+      (npc) => npc.combatId === npcCombatId,
+    );
     setSelectedNPCs((prev) =>
-      prev.filter((npc) => npc.combatId !== npcCombatId)
+      prev.filter((npc) => npc.combatId !== npcCombatId),
     );
     // if selectedNPC is the one removed, set selectedNPC to null
     if (selectedNPC?.combatId === npcCombatId) {
@@ -653,7 +671,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         npcToRemove.name +
           (npcToRemove?.combatStats?.combatNotes
             ? "【" + npcToRemove.combatStats.combatNotes + "】"
-            : "")
+            : ""),
       );
     }
   };
@@ -735,12 +753,20 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         prev.map((pc) => {
           if (pc.combatId !== npcClicked.combatId) return pc;
           const newHp = Math.min(
-            Math.max(pc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0),
-            maxHP
+            Math.max(
+              pc.combatStats.currentHp +
+                (statType === "HP" ? adjustedValue : 0),
+              0,
+            ),
+            maxHP,
           );
           const newMp = Math.min(
-            Math.max(pc.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0),
-            maxMP
+            Math.max(
+              pc.combatStats.currentMp +
+                (statType === "MP" ? adjustedValue : 0),
+              0,
+            ),
+            maxMP,
           );
           return {
             ...pc,
@@ -750,24 +776,34 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               currentMp: statType === "MP" ? newMp : pc.combatStats.currentMp,
             },
           };
-        })
+        }),
       );
 
       if (selectedPC && selectedPC.combatId === npcClicked.combatId) {
         const newHp = Math.min(
-          Math.max(selectedPC.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0),
-          maxHP
+          Math.max(
+            selectedPC.combatStats.currentHp +
+              (statType === "HP" ? adjustedValue : 0),
+            0,
+          ),
+          maxHP,
         );
         const newMp = Math.min(
-          Math.max(selectedPC.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0),
-          maxMP
+          Math.max(
+            selectedPC.combatStats.currentMp +
+              (statType === "MP" ? adjustedValue : 0),
+            0,
+          ),
+          maxMP,
         );
         setSelectedPC({
           ...selectedPC,
           combatStats: {
             ...selectedPC.combatStats,
-            currentHp: statType === "HP" ? newHp : selectedPC.combatStats.currentHp,
-            currentMp: statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
+            currentHp:
+              statType === "HP" ? newHp : selectedPC.combatStats.currentHp,
+            currentMp:
+              statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
           },
         });
       }
@@ -779,7 +815,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     // NPC path
     if (!isHealing && statType === "HP") {
       adjustedValue = -Number(
-        calculateDamage(npcClicked, value, damageType, isGuarding)
+        calculateDamage(npcClicked, value, damageType, isGuarding),
       );
     } else {
       adjustedValue = isHealing ? Number(value) : -Number(value);
@@ -792,16 +828,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const newHp = Math.min(
           Math.max(
             npc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0),
-            0
+            0,
           ),
-          maxHP
+          maxHP,
         );
         const newMp = Math.min(
           Math.max(
             npc.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0),
-            0
+            0,
           ),
-          maxMP
+          maxMP,
         );
 
         return {
@@ -825,17 +861,17 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         Math.max(
           npcClicked.combatStats.currentHp +
             (statType === "HP" ? adjustedValue : 0),
-          0
+          0,
         ),
-        maxHP
+        maxHP,
       );
       const newMp = Math.min(
         Math.max(
           npcClicked.combatStats.currentMp +
             (statType === "MP" ? adjustedValue : 0),
-          0
+          0,
         ),
-        maxMP
+        maxMP,
       );
 
       setSelectedNPC({
@@ -866,7 +902,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             ? "【" + npcClicked.combatStats.combatNotes + "】"
             : ""),
         Math.abs(adjustedValue),
-        damageType
+        damageType,
       );
     } else if (adjustedValue < 0 && statType === "HP" && logNpcDamageNoType) {
       addLog(
@@ -875,7 +911,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           (npcClicked?.combatStats?.combatNotes
             ? "【" + npcClicked.combatStats.combatNotes + "】"
             : ""),
-        Math.abs(adjustedValue)
+        Math.abs(adjustedValue),
       );
     } else if (adjustedValue < 0 && statType === "MP" && logNpcUsedMp) {
       addLog(
@@ -884,7 +920,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           (npcClicked?.combatStats?.combatNotes
             ? "【" + npcClicked.combatStats.combatNotes + "】"
             : ""),
-        Math.abs(adjustedValue)
+        Math.abs(adjustedValue),
       );
     } else if (adjustedValue > 0 && logNpcHeal) {
       addLog(
@@ -894,7 +930,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             ? "【" + npcClicked.combatStats.combatNotes + "】"
             : ""),
         Math.abs(adjustedValue),
-        statType
+        statType,
       );
     }
 
@@ -911,7 +947,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             npcClicked.name +
               (npcClicked?.combatStats?.combatNotes
                 ? "【" + npcClicked.combatStats.combatNotes + "】"
-                : "")
+                : ""),
           );
         }, 200);
       }
@@ -928,7 +964,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     npc,
     damageValue,
     damageType = "",
-    isGuarding = false
+    isGuarding = false,
   ) {
     const affinities = npc.affinities || {};
     const damage = parseInt(damageValue, 10) || 0;
@@ -1005,8 +1041,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     // Update data in the selectedNPCs list
     setSelectedNPCs((prev) =>
       prev.map((npc) =>
-        npc.combatId === updatedNPC.combatId ? updatedNPC : npc
-      )
+        npc.combatId === updatedNPC.combatId ? updatedNPC : npc,
+      ),
     );
 
     // Add log entry if status effect is added or removed
@@ -1019,7 +1055,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               ? "【" + npc.combatStats.combatNotes + "】"
               : ""),
           null,
-          status
+          status,
         );
       }
     } else {
@@ -1031,7 +1067,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               ? "【" + npc.combatStats.combatNotes + "】"
               : ""),
           null,
-          status
+          status,
         );
       }
     }
@@ -1076,8 +1112,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
                 ultima: (npc.combatStats.ultima || 0) + 1,
               },
             }
-          : npc
-      )
+          : npc,
+      ),
     );
   };
 
@@ -1100,8 +1136,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
                 ultima: Math.max((npc.combatStats.ultima || 0) - 1, 0),
               },
             }
-          : npc
-      )
+          : npc,
+      ),
     );
 
     if (logUseUltimaPoint) {
@@ -1111,7 +1147,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         selectedNPC.name +
           (selectedNPC?.combatStats?.combatNotes
             ? "【" + selectedNPC.combatStats.combatNotes + "】"
-            : "")
+            : ""),
       );
     }
   };
@@ -1131,7 +1167,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     const deltaX = e.clientX - startX.current;
     const newWidth = Math.max(
       20, // Minimum width is 20%
-      Math.min(50, startWidth.current - (deltaX / window.innerWidth) * 100)
+      Math.min(50, startWidth.current - (deltaX / window.innerWidth) * 100),
     );
     setNpcDetailWidth(newWidth);
   };
@@ -1164,7 +1200,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (!selectedNPC) return;
     if (isDirty) {
       const confirm = await globalConfirm(
-        "You have unsaved changes. Are you sure you want to leave?"
+        "You have unsaved changes. Are you sure you want to leave?",
       );
       if (!confirm) return;
     }
@@ -1204,7 +1240,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleRemoveClock = async (index) => {
     if (askBeforeRemoveClock) {
       const confirmRemove = await globalConfirm(
-        t("combat_sim_remove_clock_confirm")
+        t("combat_sim_remove_clock_confirm"),
       );
       if (!confirmRemove) return;
     }

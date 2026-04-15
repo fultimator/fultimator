@@ -1,14 +1,10 @@
 import React from "react";
-import {
-  Typography,
-  Box,
-  Paper
-} from "@mui/material";
+import { Typography, Box, Paper } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 
-export default function HeaderSection({isMobile = false}) {
+export default function HeaderSection({ isMobile = false }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";

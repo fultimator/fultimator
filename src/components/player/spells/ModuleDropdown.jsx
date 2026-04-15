@@ -9,13 +9,9 @@ const ModuleDropdown = memo(({ value, onChange, disabled }) => {
   return (
     <FormControl fullWidth>
       <InputLabel>{t("Module")}</InputLabel>
-      <Select
-        value={value}
-        onChange={onChange}
-        disabled={disabled}
-      >
+      <Select value={value} onChange={onChange} disabled={disabled}>
         {/* Armor Modules */}
-        <MenuItem disabled sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <MenuItem disabled sx={{ fontWeight: "bold", color: "primary.main" }}>
           {t("pilot_module_armor")}
         </MenuItem>
         {availableModules.armor.map((availableModule) => (
@@ -27,9 +23,9 @@ const ModuleDropdown = memo(({ value, onChange, disabled }) => {
             {t(availableModule.name)}
           </MenuItem>
         ))}
-        
+
         {/* Weapon Modules */}
-        <MenuItem disabled sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <MenuItem disabled sx={{ fontWeight: "bold", color: "primary.main" }}>
           {t("pilot_module_weapon")}
         </MenuItem>
         {availableModules.weapon.map((availableModule) => (
@@ -42,9 +38,9 @@ const ModuleDropdown = memo(({ value, onChange, disabled }) => {
             {availableModule.cumbersome && " 🚫"}
           </MenuItem>
         ))}
-        
+
         {/* Support Modules */}
-        <MenuItem disabled sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+        <MenuItem disabled sx={{ fontWeight: "bold", color: "primary.main" }}>
           {t("pilot_module_support")}
         </MenuItem>
         {availableModules.support.map((availableModule) => (
@@ -61,6 +57,6 @@ const ModuleDropdown = memo(({ value, onChange, disabled }) => {
   );
 });
 
-ModuleDropdown.displayName = 'ModuleDropdown';
+ModuleDropdown.displayName = "ModuleDropdown";
 
 export default ModuleDropdown;

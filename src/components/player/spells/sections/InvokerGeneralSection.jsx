@@ -1,4 +1,14 @@
-import { Grid, FormControlLabel, Switch, Typography, FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
+import {
+  Grid,
+  FormControlLabel,
+  Switch,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+} from "@mui/material";
 import { invocationsByWellspring } from "../spellOptionData";
 
 /**
@@ -57,7 +67,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={3}>
       {/* Show in Player Sheet */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -69,7 +79,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
         />
       </Grid>
       {/* Skill Level */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Skill Level")}
         </Typography>
@@ -89,13 +99,14 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           variant="body2"
           sx={{
             color: "text.secondary",
-            mt: 1
-          }}>
+            mt: 1,
+          }}
+        >
           {t("Skill level determines which invocation types are available")}
         </Typography>
       </Grid>
       {/* Inner Wellspring Toggle */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -105,15 +116,18 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           }
           label={t("Inner Wellspring")}
         />
-        <Typography variant="body2" sx={{
-          color: "text.secondary"
-        }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {t("When enabled, one wellspring is locked as the inner wellspring")}
         </Typography>
       </Grid>
       {/* Chosen Wellspring (if Inner Wellspring enabled) */}
       {innerWellspring && (
-        <Grid  size={12}>
+        <Grid size={12}>
           <FormControl fullWidth>
             <InputLabel>{t("Inner Wellspring")}</InputLabel>
             <Select
@@ -131,7 +145,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
         </Grid>
       )}
       {/* Available Invocations Preview */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Available Invocation Types")}
         </Typography>
@@ -142,7 +156,11 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
               case 1:
                 return <Typography>{t("Blast")}</Typography>;
               case 2:
-                return <Typography>{t("Blast")}, {t("Hex")}</Typography>;
+                return (
+                  <Typography>
+                    {t("Blast")}, {t("Hex")}
+                  </Typography>
+                );
               case 3:
                 return (
                   <Typography>

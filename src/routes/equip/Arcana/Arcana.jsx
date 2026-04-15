@@ -100,8 +100,9 @@ function Arcana() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -117,13 +118,13 @@ function Arcana() {
             icon={<AutoAwesome fontSize="large" />}
           />
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid  size={6}>
+            <Grid size={6}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="effect"
@@ -133,7 +134,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="description"
@@ -144,7 +145,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="mergeName"
@@ -155,7 +156,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 <CustomTextarea
                   id="mergeBenefit"
@@ -169,7 +170,7 @@ function Arcana() {
             {/* Pulse fields */}
             {rework && (
               <>
-                <Grid  size={12}>
+                <Grid size={12}>
                   <FormControl variant="standard" fullWidth>
                     <TextField
                       id="pulseName"
@@ -180,7 +181,7 @@ function Arcana() {
                     />
                   </FormControl>
                 </Grid>
-                <Grid  size={12}>
+                <Grid size={12}>
                   <FormControl variant="standard" fullWidth>
                     <CustomTextarea
                       id="pulseBenefit"
@@ -193,7 +194,7 @@ function Arcana() {
               </>
             )}
 
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="dismissName"
@@ -204,7 +205,7 @@ function Arcana() {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 <CustomTextarea
                   id="dismissBenefit"
@@ -215,9 +216,9 @@ function Arcana() {
               </FormControl>
               <Divider />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid >
+                <Grid>
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -225,12 +226,12 @@ function Arcana() {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid >
+                <Grid>
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
-                <Grid  size="grow">
+                <Grid size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
               </Grid>
@@ -259,8 +260,9 @@ function Arcana() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Pretty
           custom={{
             name: name,

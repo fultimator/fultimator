@@ -48,7 +48,7 @@ export default function PlayerSymbol({ player }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "symbol" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -86,22 +86,31 @@ export default function PlayerSymbol({ player }) {
             >
               {t("symbol_symbols")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {symbolSpells.map((symbolSpell, ssIndex) => (
                 <React.Fragment key={ssIndex}>
                   {/* Individual Symbols */}
                   {symbolSpell.symbols &&
                     symbolSpell.symbols.map((sym, sIndex) => (
                       <Grid
-                  container
-                  spacing={0}
-                  key={`${ssIndex}-${sIndex}`}
-                        sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                        container
+                        spacing={0}
+                        key={`${ssIndex}-${sIndex}`}
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
                         size={{
                           xs: 12,
-                          md: 6
-                        }}>
-                        <Grid  sx={{ display: "flex" }} size={10}>
+                          md: 6,
+                        }}
+                      >
+                        <Grid sx={{ display: "flex" }} size={10}>
                           <Typography
                             id="spell-left-name"
                             variant="h2"
@@ -123,7 +132,14 @@ export default function PlayerSymbol({ player }) {
                               : t(sym.name)}
                           </Typography>
                         </Grid>
-                        <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                        <Grid
+                          sx={{
+                            display: "flex",
+                            alignItems: "stretch",
+                            maxHeight: "40px",
+                          }}
+                          size={2}
+                        >
                           <div
                             id="spell-right-controls"
                             style={{
@@ -140,7 +156,9 @@ export default function PlayerSymbol({ player }) {
                             <Tooltip title={t("Info")}>
                               <IconButton
                                 sx={{ padding: "0px" }}
-                                onClick={() => handleOpenModal(symbolSpell, sym)}
+                                onClick={() =>
+                                  handleOpenModal(symbolSpell, sym)
+                                }
                               >
                                 <Info />
                               </IconButton>
@@ -156,16 +174,21 @@ export default function PlayerSymbol({ player }) {
               open={openModal}
               onClose={handleCloseModal}
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+                paper: { sx: { width: { xs: "90%", md: "80%" } } },
               }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSymbol && (
-                  <NonStaticSpellCard item={{
-                    ...selectedSymbol,
-                    spellType: "symbol",
-                    name: selectedSymbol.name === "symbol_custom_name" ? selectedSymbol.customName : selectedSymbol.name,
-                  }} />
+                  <NonStaticSpellCard
+                    item={{
+                      ...selectedSymbol,
+                      spellType: "symbol",
+                      name:
+                        selectedSymbol.name === "symbol_custom_name"
+                          ? selectedSymbol.customName
+                          : selectedSymbol.name,
+                    }}
+                  />
                 )}
               </DialogContent>
               <DialogActions>

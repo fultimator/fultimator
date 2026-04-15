@@ -28,7 +28,10 @@ function Pretty({ base, custom }) {
     <ThemeProvider theme={theme}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <PrettySingle armor={base} />
-        <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+        <Typography
+          variant="h4"
+          sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}
+        >
           <ArrowDownward />
         </Typography>
         <PrettySingle armor={custom} showActions />
@@ -41,15 +44,17 @@ function PrettySingle({ armor, showActions }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const [showImage, setShowImage] = useState(false);
-  const background = theme.mode === 'dark'
-  ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
-  : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+      : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
 
   const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
-  const cardBackground = theme.mode === 'dark'
-  ? `backgroundColor: "#181a1b", background: "#181a1b"`
-  : `backgroundColor: "white", background: "white"`
+  const cardBackground =
+    theme.mode === "dark"
+      ? `backgroundColor: "#181a1b", background: "#181a1b"`
+      : `backgroundColor: "white", background: "white"`;
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(armor.name, ref);
@@ -61,10 +66,7 @@ function PrettySingle({ armor, showActions }) {
   return (
     <>
       <Card>
-        <div
-          ref={ref}
-          style={{ cardBackground }}
-        >
+        <div ref={ref} style={{ cardBackground }}>
           <Stack>
             <Grid
               container
@@ -87,33 +89,68 @@ function PrettySingle({ armor, showActions }) {
                 }}
               />
               <Grid sx={{ flex: 1, pl: 1 }} container>
-              <Grid size={3}>
-                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
-                  {armor.category}
-                </Typography>
-              </Grid>
-              <Grid size={1}>
-                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid size={2}>
-                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("Defense")}
-                </Typography>
-              </Grid>
-              <Grid size={2}>
-                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                  {t("M. Defense")}
-                </Typography>
-              </Grid>
-              {!armor.rework && (
-                <Grid size={2}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
-                    {t("Initiative")}
+                <Grid size={3}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {armor.category}
                   </Typography>
                 </Grid>
-              )}
+                <Grid size={1}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("Defense")}
+                  </Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {t("M. Defense")}
+                  </Typography>
+                </Grid>
+                {!armor.rework && (
+                  <Grid size={2}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        textAlign: "center",
+                        fontSize: "1rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t("Initiative")}
+                    </Typography>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
             {/* All Rows Container */}
@@ -139,7 +176,8 @@ function PrettySingle({ armor, showActions }) {
               {/* Content Column - contains all rows */}
               <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
                 {/* First Data Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -148,17 +186,61 @@ function PrettySingle({ armor, showActions }) {
                     pl: 1,
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", padding: "2px" }} size={3}>
-                    <Typography sx={{ fontWeight: "bold", marginRight: "4px", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "2px",
+                    }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        marginRight: "4px",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {armor.name || t("No Name")}
                     </Typography>
                     {armor.martial && <Martial />}
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", padding: "2px" }} size={1}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>{`${armor.cost}z`}</Typography>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "2px",
+                    }}
+                    size={1}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >{`${armor.cost}z`}</Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", padding: "2px" }} size={2}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "2px",
+                    }}
+                    size={2}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {armor.category === t("Shield") ? "+" + armor.def : ""}
                       {armor.category === t("Armor") && armor.martial
                         ? armor.def
@@ -170,8 +252,23 @@ function PrettySingle({ armor, showActions }) {
                         : ""}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", padding: "2px" }} size={2}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "2px",
+                    }}
+                    size={2}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {armor.category === t("Shield") ? "+" + armor.mdef : ""}
                       {armor.category === t("Armor")
                         ? armor.mdef === 0
@@ -181,9 +278,25 @@ function PrettySingle({ armor, showActions }) {
                     </Typography>
                   </Grid>
                   {!armor.rework && (
-                    <Grid sx={{ display: "flex", alignItems: "center", padding: "2px" }} size={2}>
-                      <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>
-                        {armor.category === t("Armor") || armor.category === t("Shield")
+                    <Grid
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "2px",
+                      }}
+                      size={2}
+                    >
+                      <Typography
+                        sx={{
+                          textAlign: "center",
+                          width: "100%",
+                          fontWeight: "bold",
+                          lineHeight: 1,
+                          margin: 0,
+                        }}
+                      >
+                        {armor.category === t("Armor") ||
+                        armor.category === t("Shield")
                           ? armor.init === 0
                             ? "-"
                             : armor.init
@@ -194,7 +307,8 @@ function PrettySingle({ armor, showActions }) {
                 </Grid>
 
                 {/* Quality Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background: "transparent",
                     pl: 1,
@@ -204,8 +318,13 @@ function PrettySingle({ armor, showActions }) {
                 >
                   <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
                     <Typography sx={{ lineHeight: 1, margin: 0 }}>
-                      {!armor.quality ? t("No Description") : (
-                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                      {!armor.quality ? (
+                        t("No Description")
+                      ) : (
+                        <StyledMarkdown
+                          allowedElements={["strong", "em"]}
+                          unwrapDisallowed={true}
+                        >
                           {armor.quality}
                         </StyledMarkdown>
                       )}
@@ -226,10 +345,18 @@ function PrettySingle({ armor, showActions }) {
               </IconButton>
             </Tooltip>
             <Export name={`${armor.name}`} dataType="armor" data={armor} />
-            <AddToCompendiumButton itemType={armor.category === t("Shield") ? "shield" : "armor"} data={armor} />
+            <AddToCompendiumButton
+              itemType={armor.category === t("Shield") ? "shield" : "armor"}
+              data={armor}
+            />
           </div>
           <FormControlLabel
-            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            control={
+              <Checkbox
+                checked={showImage}
+                onChange={(e) => setShowImage(e.target.checked)}
+              />
+            }
             label={t("Add Image")}
           />
         </div>

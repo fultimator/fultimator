@@ -4,7 +4,11 @@ import MagichantKeyItem from "./MagichantKeyItem";
 import { availableMagichantKeys } from "../spellOptionData";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 
-export default function MagichantKeysContentSection({ formState, setFormState, t }) {
+export default function MagichantKeysContentSection({
+  formState,
+  setFormState,
+  t,
+}) {
   const currentKeys = useMemo(() => formState.keys || [], [formState.keys]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
@@ -25,33 +29,33 @@ export default function MagichantKeysContentSection({ formState, setFormState, t
       .filter((name) => name !== "magichant_custom_name");
     return availableMagichantKeys.filter(
       (preset) =>
-        preset.name !== "magichant_custom_name" && !addedNames.includes(preset.name)
+        preset.name !== "magichant_custom_name" &&
+        !addedNames.includes(preset.name),
     );
   }, [currentKeys]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setState) => {
-        const preset = availableMagichantKeys.find((key) => key.name === presetName);
-        if (!preset) return;
-        setState((prev) => ({
-          ...prev,
-          keys: [
-            ...(prev.keys || []),
-            {
-              name: preset.name,
-              type: preset.type,
-              status: preset.status,
-              attribute: preset.attribute,
-              recovery: preset.recovery,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setState) => {
+      const preset = availableMagichantKeys.find(
+        (key) => key.name === presetName,
+      );
+      if (!preset) return;
+      setState((prev) => ({
+        ...prev,
+        keys: [
+          ...(prev.keys || []),
+          {
+            name: preset.name,
+            type: preset.type,
+            status: preset.status,
+            attribute: preset.attribute,
+            recovery: preset.recovery,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -60,7 +64,12 @@ export default function MagichantKeysContentSection({ formState, setFormState, t
 
   const handleCompendiumImport = useCallback(
     (item) => {
-      const isKeyItem = item?.magichantSubtype === "key" || item?.type || item?.status || item?.attribute || item?.recovery;
+      const isKeyItem =
+        item?.magichantSubtype === "key" ||
+        item?.type ||
+        item?.status ||
+        item?.attribute ||
+        item?.recovery;
       if (!isKeyItem) return;
       setFormState((prev) => ({
         ...prev,
@@ -78,7 +87,7 @@ export default function MagichantKeysContentSection({ formState, setFormState, t
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

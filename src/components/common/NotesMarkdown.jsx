@@ -54,7 +54,7 @@ const NotesMarkdown = ({ children, ...props }) => {
       /\[ICON:(physical|wind|bolt|dark|earth|fire|ice|light|poison)\]/g;
     intermediate = intermediate.replace(
       typeIconRegex,
-      (_, type) => `<span class="type-icon" data-type="${type}"></span>`
+      (_, type) => `<span class="type-icon" data-type="${type}"></span>`,
     );
 
     // Handle dice icons with [ICON:d4], [ICON:d6], etc. syntax
@@ -62,7 +62,7 @@ const NotesMarkdown = ({ children, ...props }) => {
     intermediate = intermediate.replace(
       diceIconRegex,
       (_, dice) =>
-        `<span class="dice-icon" data-dice="${dice.toLowerCase()}"></span>`
+        `<span class="dice-icon" data-dice="${dice.toLowerCase()}"></span>`,
     );
 
     // Handle other icons with [ICON:...] "melee", "ranged", "magic", "spell", "martial"
@@ -70,7 +70,7 @@ const NotesMarkdown = ({ children, ...props }) => {
     intermediate = intermediate.replace(
       otherIconRegex,
       (_, icon) =>
-        `<span class="other-icon" data-icon="${icon.toLowerCase()}"></span>`
+        `<span class="other-icon" data-icon="${icon.toLowerCase()}"></span>`,
     );
 
     // Return the processed markdown, including HTML for custom blocks and icons
@@ -278,7 +278,7 @@ const NotesMarkdown = ({ children, ...props }) => {
                       ordered: true,
                       index: itemIndex++,
                     })
-                  : child
+                  : child,
               )}
             </ol>
           );
@@ -300,7 +300,7 @@ const NotesMarkdown = ({ children, ...props }) => {
             {React.Children.map(children, (child) =>
               React.isValidElement(child)
                 ? React.cloneElement(child, { ordered: false })
-                : child
+                : child,
             )}
           </ul>
         ),
@@ -545,8 +545,8 @@ const NotesMarkdown = ({ children, ...props }) => {
               type === "ternary" || type === "quaternary"
                 ? selectedColor?.main || "#e0e0e0"
                 : isDark
-                ? `linear-gradient(to right, ${selectedColor.dark}, ${selectedColor.light})`
-                : `linear-gradient(to right, ${selectedColor.main}, ${selectedColor.light})`;
+                  ? `linear-gradient(to right, ${selectedColor.dark}, ${selectedColor.light})`
+                  : `linear-gradient(to right, ${selectedColor.main}, ${selectedColor.light})`;
 
             return (
               <Box

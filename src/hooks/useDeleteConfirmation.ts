@@ -93,7 +93,8 @@ export function useDeleteConfirmation({
 
         // Try native event
         if (!isCtrl && (event as React.MouseEvent<HTMLElement>).nativeEvent) {
-          const nativeEvent = (event as React.MouseEvent<HTMLElement>).nativeEvent;
+          const nativeEvent = (event as React.MouseEvent<HTMLElement>)
+            .nativeEvent;
           isCtrl = nativeEvent.ctrlKey || nativeEvent.metaKey;
         }
       }
@@ -110,7 +111,11 @@ export function useDeleteConfirmation({
         const result = onConfirm() as Promise<void> | void;
 
         // Handle both sync and async operations
-        if (result && typeof result === "object" && typeof (result as Promise<void>).finally === "function") {
+        if (
+          result &&
+          typeof result === "object" &&
+          typeof (result as Promise<void>).finally === "function"
+        ) {
           (result as Promise<void>).finally(() => closeDialog());
         } else {
           closeDialog();
@@ -120,7 +125,7 @@ export function useDeleteConfirmation({
         openDialog();
       }
     },
-    [onConfirm, openDialog, closeDialog]
+    [onConfirm, openDialog, closeDialog],
   );
 
   return {

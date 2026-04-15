@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { Paper, Typography, Grid, Box, IconButton, Dialog, DialogContent, DialogActions, Button } from "@mui/material";
+import {
+  Paper,
+  Typography,
+  Grid,
+  Box,
+  IconButton,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader2 from "../../common/CustomHeader2";
@@ -13,7 +23,13 @@ import EditPlayerClasses from "../classes/EditPlayerClasses";
 import EditHeroicSkillModal from "../classes/EditHeroicSkillModal";
 import EditSkillModal from "../classes/EditSkillModal";
 
-export default function PlayerClasses({ player, setPlayer = null, isEditMode = false, isCharacterSheet, updateMaxStats }) {
+export default function PlayerClasses({
+  player,
+  setPlayer = null,
+  isEditMode = false,
+  isCharacterSheet,
+  updateMaxStats,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
 
@@ -26,8 +42,11 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
       ...prev,
       classes: prev.classes.map((cls, i) =>
         i === heroicPickerClassIdx
-          ? { ...cls, heroic: { name: item.name, description: item.description } }
-          : cls
+          ? {
+              ...cls,
+              heroic: { name: item.name, description: item.description },
+            }
+          : cls,
       ),
     }));
   };
@@ -43,10 +62,10 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
               skills: cls.skills.map((skill, j) =>
                 j === skillIndex && skill.currentLvl < skill.maxLvl
                   ? { ...skill, currentLvl: skill.currentLvl + 1 }
-                  : skill
+                  : skill,
               ),
             }
-          : cls
+          : cls,
       ),
     }));
     if (updateMaxStats) updateMaxStats();
@@ -60,7 +79,9 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
 
   const openHeroicEdit = (classIndex) => {
     setHeroicEditClassIdx(classIndex);
-    setHeroicEditData({ ...(player.classes[classIndex]?.heroic || { name: "", description: "" }) });
+    setHeroicEditData({
+      ...(player.classes[classIndex]?.heroic || { name: "", description: "" }),
+    });
   };
 
   const handleSaveHeroic = (heroic) => {
@@ -68,7 +89,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls, i) =>
-        i === heroicEditClassIdx ? { ...cls, heroic } : cls
+        i === heroicEditClassIdx ? { ...cls, heroic } : cls,
       ),
     }));
     setHeroicEditClassIdx(null);
@@ -97,12 +118,15 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                       description: skill.description,
                       specialSkill: skill.specialSkill || "",
                       maxLvl: Number(skill.maxLvl) || s.maxLvl,
-                      currentLvl: Math.min(s.currentLvl, Number(skill.maxLvl) || s.maxLvl),
+                      currentLvl: Math.min(
+                        s.currentLvl,
+                        Number(skill.maxLvl) || s.maxLvl,
+                      ),
                     }
-                  : s
+                  : s,
               ),
             }
-          : cls
+          : cls,
       ),
     }));
     setSkillEditTarget(null);
@@ -120,10 +144,10 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
               skills: cls.skills.map((skill, j) =>
                 j === skillIndex && skill.currentLvl > 0
                   ? { ...skill, currentLvl: skill.currentLvl - 1 }
-                  : skill
+                  : skill,
               ),
             }
-          : cls
+          : cls,
       ),
     }));
     if (updateMaxStats) updateMaxStats();
@@ -167,7 +191,16 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                     }
               }
             >
-              <Box sx={{ backgroundColor: primary, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", borderRadius: "8px 8px 0 0" }}>
+              <Box
+                sx={{
+                  backgroundColor: primary,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              >
                 <Typography
                   variant="h1"
                   sx={{
@@ -192,19 +225,19 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
               </Box>
               {c.benefits && (
                 <>
-                  <Grid  size={12}>
+                  <Grid size={12}>
                     <CustomHeader2
                       headerText={`${t("Free Benefits")}`}
                       isEditMode={false}
                     />
                   </Grid>
-                  <Grid  style={{ margin: "-20px 0 0 0" }} size={12}>
+                  <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
                     <ul>
                       {c.benefits.hpplus !== 0 && (
                         <li>
                           <Typography>
                             {t(
-                              "Permanently increase your maximum Hit Points by"
+                              "Permanently increase your maximum Hit Points by",
                             )}{" "}
                             {c.benefits.hpplus}.
                           </Typography>
@@ -214,7 +247,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                         <li>
                           <Typography>
                             {t(
-                              "Permanently increase your maximum Mind Points by"
+                              "Permanently increase your maximum Mind Points by",
                             )}{" "}
                             {c.benefits.mpplus}.
                           </Typography>
@@ -224,7 +257,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                         <li>
                           <Typography>
                             {t(
-                              "Permanently increase your maximum Inventory Points by"
+                              "Permanently increase your maximum Inventory Points by",
                             )}{" "}
                             {c.benefits.ipplus}.
                           </Typography>
@@ -236,7 +269,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                             <li>
                               <Typography>
                                 {t(
-                                  "You may perform Rituals whose effects fall within the Ritualism discipline."
+                                  "You may perform Rituals whose effects fall within the Ritualism discipline.",
                                 )}
                               </Typography>
                             </li>
@@ -249,7 +282,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                             <li>
                               <Typography>
                                 {t(
-                                  "Gain the ability to equip martial melee weapons."
+                                  "Gain the ability to equip martial melee weapons.",
                                 )}
                               </Typography>
                             </li>
@@ -258,7 +291,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                             <li>
                               <Typography>
                                 {t(
-                                  "Gain the ability to equip martial ranged weapons."
+                                  "Gain the ability to equip martial ranged weapons.",
                                 )}
                               </Typography>
                             </li>
@@ -267,7 +300,7 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                             <li>
                               <Typography>
                                 {t(
-                                  "Gain the ability to equip martial shields."
+                                  "Gain the ability to equip martial shields.",
                                 )}
                               </Typography>
                             </li>
@@ -297,17 +330,26 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                 .map(({ s, skillIndex }) => (
                   <React.Fragment key={skillIndex}>
                     <CustomHeader3
-                      headerText={(c.isHomebrew === undefined ? true : c.isHomebrew) ? s.skillName : t(s.skillName)}
+                      headerText={
+                        (c.isHomebrew === undefined ? true : c.isHomebrew)
+                          ? s.skillName
+                          : t(s.skillName)
+                      }
                       currentLvl={s.currentLvl}
                       maxLvl={s.maxLvl}
                       isEditMode={isEditMode && !!setPlayer}
-                      onIncrease={() => handleIncreaseSkillLevel(index, skillIndex)}
-                      onDecrease={() => handleDecreaseSkillLevel(index, skillIndex)}
+                      onIncrease={() =>
+                        handleIncreaseSkillLevel(index, skillIndex)
+                      }
+                      onDecrease={() =>
+                        handleDecreaseSkillLevel(index, skillIndex)
+                      }
                       onEdit={() => openSkillEdit(index, skillIndex)}
                       isHeroicSkill={false}
                     />
                     <Typography
-                      variant="body1" sx={{
+                      variant="body1"
+                      sx={{
                         justifyContent: "flex-start",
                         background: "transparent",
                         padding: "0 17px",
@@ -317,14 +359,16 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                         allowedElements={["strong", "em"]}
                         unwrapDisallowed={true}
                       >
-                        {(c.isHomebrew === undefined ? true : c.isHomebrew) ? s.description : t(s.description)}
+                        {(c.isHomebrew === undefined ? true : c.isHomebrew)
+                          ? s.description
+                          : t(s.description)}
                       </StyledMarkdown>
                     </Typography>
                   </React.Fragment>
                 ))}
               {c.lvl === 10 && (
                 <>
-                  <Grid  sx={{ marginTop: "1em" }} size={12}>
+                  <Grid sx={{ marginTop: "1em" }} size={12}>
                     <CustomHeader2
                       headerText={t("Heroic Skill")}
                       //buttonText={t("Edit Benefits")}
@@ -332,18 +376,27 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
                       isEditMode={false}
                     />
                   </Grid>
-                  <Grid  size={12}>
+                  <Grid size={12}>
                     <CustomHeader3
                       headerText={c.heroic.name}
                       currentLvl={0}
                       maxLvl={0}
                       isEditMode={isEditMode && !!setPlayer}
                       isHeroicSkill={true}
-                      onOpenCompendium={isEditMode && setPlayer ? () => setHeroicPickerClassIdx(index) : undefined}
-                      onEdit={isEditMode && setPlayer ? () => openHeroicEdit(index) : undefined}
+                      onOpenCompendium={
+                        isEditMode && setPlayer
+                          ? () => setHeroicPickerClassIdx(index)
+                          : undefined
+                      }
+                      onEdit={
+                        isEditMode && setPlayer
+                          ? () => openHeroicEdit(index)
+                          : undefined
+                      }
                     />
                     <Typography
-                      variant="body1" sx={{
+                      variant="body1"
+                      sx={{
                         justifyContent: "flex-start",
                         background: "transparent",
                         padding: "0 17px",
@@ -374,7 +427,10 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
       {skillEditData !== null && (
         <EditSkillModal
           open={skillEditTarget !== null}
-          onClose={() => { setSkillEditTarget(null); setSkillEditData(null); }}
+          onClose={() => {
+            setSkillEditTarget(null);
+            setSkillEditData(null);
+          }}
           onSave={handleSaveSkill}
           skill={skillEditData}
           setSkill={setSkillEditData}
@@ -383,18 +439,37 @@ export default function PlayerClasses({ player, setPlayer = null, isEditMode = f
       {heroicEditData !== null && (
         <EditHeroicSkillModal
           open={heroicEditClassIdx !== null}
-          onClose={() => { setHeroicEditClassIdx(null); setHeroicEditData(null); }}
+          onClose={() => {
+            setHeroicEditClassIdx(null);
+            setHeroicEditData(null);
+          }}
           onSave={handleSaveHeroic}
           heroic={heroicEditData}
           setHeroic={setHeroicEditData}
         />
       )}
-      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
+      <Dialog
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        fullWidth
+        maxWidth="lg"
+      >
         <DialogContent sx={{ p: 0 }}>
-          <EditPlayerClasses player={player} setPlayer={setPlayer} isEditMode={true} updateMaxStats={updateMaxStats} />
+          <EditPlayerClasses
+            player={player}
+            setPlayer={setPlayer}
+            isEditMode={true}
+            updateMaxStats={updateMaxStats}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
+          <Button
+            onClick={() => setOpenEdit(false)}
+            variant="contained"
+            color="primary"
+          >
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

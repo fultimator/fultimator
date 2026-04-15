@@ -7,7 +7,7 @@ const armor = [
     mdef: 2,
     armor: true,
     martial: false,
-    init: -1
+    init: -1,
   },
   {
     category: "Armor",
@@ -17,7 +17,7 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: false,
-    init: -1
+    init: -1,
   },
   {
     category: "Armor",
@@ -27,7 +27,7 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: false,
-    init: 0
+    init: 0,
   },
   {
     category: "Armor",
@@ -37,7 +37,7 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: false,
-    init: 0
+    init: 0,
   },
   {
     category: "Armor",
@@ -47,7 +47,7 @@ const armor = [
     mdef: 2,
     armor: true,
     martial: false,
-    init: -2
+    init: -2,
   },
   {
     category: "Armor",
@@ -57,7 +57,7 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -2
+    init: -2,
   },
   {
     category: "Armor",
@@ -67,7 +67,7 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -3
+    init: -3,
   },
   {
     category: "Armor",
@@ -77,7 +77,7 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: true,
-    init: -3
+    init: -3,
   },
   {
     category: "Armor",
@@ -87,7 +87,7 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -4
+    init: -4,
   },
 ];
 

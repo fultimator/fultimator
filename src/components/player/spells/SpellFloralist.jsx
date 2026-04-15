@@ -12,13 +12,26 @@ import {
   LinearProgress,
   Box,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Eco, Circle, CheckCircle } from "@mui/icons-material";
+import {
+  VisibilityOff,
+  ExpandMore,
+  Eco,
+  Circle,
+  CheckCircle,
+} from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
 
-function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
+function ThemedSpellFloralist({
+  floralist,
+  onEditMagiseeds,
+  isEditMode,
+  onEdit,
+  onMagiseedChange,
+  onGrowthClockChange,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -48,13 +61,17 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
   // Get current effect based on growth clock sections
   const getCurrentEffect = () => {
     if (!currentMagiseed || growthClock === 0) return null;
-    
-    const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
+
+    const magiseedTemplate = magiseeds.find(
+      (m) => m.name === currentMagiseed.name,
+    );
     if (!magiseedTemplate) return null;
 
     const effectKey = Math.min(growthClock, 4);
-    const effect = currentMagiseed.effects?.[effectKey] || magiseedTemplate.effects?.[effectKey];
-    
+    const effect =
+      currentMagiseed.effects?.[effectKey] ||
+      magiseedTemplate.effects?.[effectKey];
+
     return effect ? t(effect) : null;
   };
 
@@ -64,13 +81,13 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
     for (let i = 1; i <= 4; i++) {
       const filled = i <= growthClock;
       sections.push(
-        <Box key={i} sx={{ display: 'flex', alignItems: 'center', mx: 0.5 }}>
+        <Box key={i} sx={{ display: "flex", alignItems: "center", mx: 0.5 }}>
           {filled ? (
-            <CheckCircle sx={{ color: theme.primary, fontSize: '1.2rem' }} />
+            <CheckCircle sx={{ color: theme.primary, fontSize: "1.2rem" }} />
           ) : (
-            <Circle sx={{ color: theme.secondary, fontSize: '1.2rem' }} />
+            <Circle sx={{ color: theme.secondary, fontSize: "1.2rem" }} />
           )}
-        </Box>
+        </Box>,
       );
     }
     return sections;
@@ -92,7 +109,8 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -139,7 +157,8 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -157,7 +176,8 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -188,18 +208,27 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               flexDirection: "column",
               justifyContent: "center",
             }}
-            size={6}>
+            size={6}
+          >
             {currentMagiseed ? (
               <div>
-                <Typography sx={{ fontWeight: "bold" }} style={{ marginBottom: "4px" }}>
+                <Typography
+                  sx={{ fontWeight: "bold" }}
+                  style={{ marginBottom: "4px" }}
+                >
                   {currentMagiseed.customName || t(currentMagiseed.name)}
                 </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.75em" }}>
-                  {t(`floralist_magiseed_type_${currentMagiseed.type || 'custom'}`)}
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", fontSize: "0.75em" }}
+                >
+                  {t(
+                    `floralist_magiseed_type_${currentMagiseed.type || "custom"}`,
+                  )}
                 </Typography>
               </div>
             ) : (
-              <Typography sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+              <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
                 {t("floralist_no_magiseed")}
               </Typography>
             )}
@@ -210,8 +239,15 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               flexDirection: "column",
               justifyContent: "center",
             }}
-            size={6}>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            size={6}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
               <Typography variant="body2" sx={{ marginRight: 1 }}>
                 {growthClock}/4
               </Typography>
@@ -223,18 +259,21 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               sx={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: theme.secondary + '40',
-                '& .MuiLinearProgress-bar': {
+                backgroundColor: theme.secondary + "40",
+                "& .MuiLinearProgress-bar": {
                   backgroundColor: theme.primary,
                 },
               }}
             />
             {isEditMode && (
-              <div style={{ marginTop: '8px', display: 'flex', gap: '4px' }}>
+              <div style={{ marginTop: "8px", display: "flex", gap: "4px" }}>
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={() => onGrowthClockChange && onGrowthClockChange(Math.max(0, growthClock - 1))}
+                  onClick={() =>
+                    onGrowthClockChange &&
+                    onGrowthClockChange(Math.max(0, growthClock - 1))
+                  }
                   disabled={growthClock === 0}
                 >
                   -
@@ -242,7 +281,10 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={() => onGrowthClockChange && onGrowthClockChange(Math.min(4, growthClock + 1))}
+                  onClick={() =>
+                    onGrowthClockChange &&
+                    onGrowthClockChange(Math.min(4, growthClock + 1))
+                  }
                   disabled={growthClock === 4}
                 >
                   +
@@ -294,13 +336,30 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               </ReactMarkdown>
             </div>
             {(() => {
-              const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
-              const isEndOfTurn = magiseedTemplate?.endOfTurnEffect || currentMagiseed.endOfTurnEffect;
-              const isPassive = magiseedTemplate?.passive || currentMagiseed.passive;
-              
+              const magiseedTemplate = magiseeds.find(
+                (m) => m.name === currentMagiseed.name,
+              );
+              const isEndOfTurn =
+                magiseedTemplate?.endOfTurnEffect ||
+                currentMagiseed.endOfTurnEffect;
+              const isPassive =
+                magiseedTemplate?.passive || currentMagiseed.passive;
+
               return (
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontStyle: 'italic', mt: 1, display: 'block' }}>
-                  {isEndOfTurn ? t("floralist_end_of_turn_effect") : isPassive ? t("floralist_passive_effect") : t("floralist_triggered_effect")}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    fontStyle: "italic",
+                    mt: 1,
+                    display: "block",
+                  }}
+                >
+                  {isEndOfTurn
+                    ? t("floralist_end_of_turn_effect")
+                    : isPassive
+                      ? t("floralist_passive_effect")
+                      : t("floralist_triggered_effect")}
                 </Typography>
               );
             })()}
@@ -313,7 +372,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           <div
             style={{
               backgroundColor: theme.primary,
-              fontFamily: "Antonio", 
+              fontFamily: "Antonio",
               fontWeight: "normal",
               fontSize: "1.1em",
               padding: "2px 17px",
@@ -332,31 +391,54 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               style={{
                 padding: "8px 17px",
                 borderBottom: `1px solid ${theme.secondary}`,
-                backgroundColor: magiseed === currentMagiseed ? theme.ternary + "20" : "transparent",
-                borderLeft: magiseed === currentMagiseed ? `4px solid ${theme.primary}` : "none",
+                backgroundColor:
+                  magiseed === currentMagiseed
+                    ? theme.ternary + "20"
+                    : "transparent",
+                borderLeft:
+                  magiseed === currentMagiseed
+                    ? `4px solid ${theme.primary}`
+                    : "none",
               }}
             >
               <Grid container sx={{ alignItems: "center" }}>
-                <Grid  size={8}>
-                  <Typography sx={{
-                    fontWeight: magiseed === currentMagiseed ? "bold" : "normal"
-                  }}>
+                <Grid size={8}>
+                  <Typography
+                    sx={{
+                      fontWeight:
+                        magiseed === currentMagiseed ? "bold" : "normal",
+                    }}
+                  >
                     {magiseed.customName || t(magiseed.name)}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                    {t(`floralist_magiseed_type_${magiseed.type || 'custom'}`)}
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary" }}
+                  >
+                    {t(`floralist_magiseed_type_${magiseed.type || "custom"}`)}
                   </Typography>
                 </Grid>
-                <Grid  style={{ textAlign: 'right' }} size={4}>
+                <Grid style={{ textAlign: "right" }} size={4}>
                   {isEditMode && (
                     <Button
                       size="small"
-                      variant={magiseed === currentMagiseed ? "contained" : "outlined"}
-                      color={magiseed === currentMagiseed ? "success" : "primary"}
-                      onClick={() => onMagiseedChange && onMagiseedChange(magiseed === currentMagiseed ? null : magiseed)}
+                      variant={
+                        magiseed === currentMagiseed ? "contained" : "outlined"
+                      }
+                      color={
+                        magiseed === currentMagiseed ? "success" : "primary"
+                      }
+                      onClick={() =>
+                        onMagiseedChange &&
+                        onMagiseedChange(
+                          magiseed === currentMagiseed ? null : magiseed,
+                        )
+                      }
                       disabled={currentMagiseed && magiseed !== currentMagiseed}
                     >
-                      {magiseed === currentMagiseed ? t("floralist_remove_from_garden") : t("floralist_plant_in_garden")}
+                      {magiseed === currentMagiseed
+                        ? t("floralist_remove_from_garden")
+                        : t("floralist_plant_in_garden")}
                     </Button>
                   )}
                   {!isEditMode && magiseed === currentMagiseed && (
@@ -364,7 +446,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
                       sx={{
                         color: "success.main",
                         fontWeight: "bold",
-                        fontSize: "0.85em"
+                        fontSize: "0.85em",
                       }}
                     >
                       {t("floralist_in_garden")}

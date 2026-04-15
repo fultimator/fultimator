@@ -1,5 +1,12 @@
 import React from "react";
-import { Paper, Grid, Typography, Divider, IconButton, Tooltip } from "@mui/material";
+import {
+  Paper,
+  Grid,
+  Typography,
+  Divider,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -55,10 +62,9 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
 
         const sections = other.clock?.sections ?? 0;
         const hasClock = sections > 0;
-        const clockState =
-          hasClock
-            ? (other.clockState ?? new Array(sections).fill(false))
-            : [];
+        const clockState = hasClock
+          ? (other.clockState ?? new Array(sections).fill(false))
+          : [];
 
         return (
           <React.Fragment key={index}>
@@ -98,7 +104,8 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                       pt: 1,
                       pb: 0.5,
                     }}
-                    size={12}>
+                    size={12}
+                  >
                     <Clock
                       numSections={sections}
                       size={180}
@@ -109,7 +116,15 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                 )}
 
                 {isEditMode && setPlayer && hasClock && (
-                  <Grid sx={{ display: "flex", justifyContent: "center", pb: 1, gap: 1 }} size={12}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      pb: 1,
+                      gap: 1,
+                    }}
+                    size={12}
+                  >
                     <Tooltip title={t("Decrement")} arrow>
                       <IconButton
                         color="primary"
@@ -133,7 +148,9 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                     <Tooltip title={t("Increment")} arrow>
                       <IconButton
                         color="primary"
-                        onClick={() => incrementClock(index, sections, clockState)}
+                        onClick={() =>
+                          incrementClock(index, sections, clockState)
+                        }
                         size="small"
                         variant="outlined"
                       >
@@ -153,7 +170,8 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                       px: "10px",
                       py: "5px",
                     }}
-                    size={12}>
+                    size={12}
+                  >
                     <div
                       style={{
                         whiteSpace: "pre-line",
@@ -174,7 +192,8 @@ export default function PlayerOthers({ player, setPlayer, isEditMode }) {
                       px: "10px",
                       py: "5px",
                     }}
-                    size={12}>
+                    size={12}
+                  >
                     <div
                       style={{
                         whiteSpace: "pre-line",

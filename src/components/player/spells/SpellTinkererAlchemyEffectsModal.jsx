@@ -41,7 +41,9 @@ export default function SpellTinkererAlchemyEffectsModal({
     const usedValues = effects.map(({ dieValue }) => dieValue);
     const uniqueValues = new Set(usedValues.filter((value) => value !== 0));
 
-    if (usedValues.filter((value) => value !== 0).length !== uniqueValues.size) {
+    if (
+      usedValues.filter((value) => value !== 0).length !== uniqueValues.size
+    ) {
       error = t("Each non-'Any' die value must be unique.");
     }
 
@@ -76,7 +78,9 @@ export default function SpellTinkererAlchemyEffectsModal({
     if (validateEffects()) {
       // Separate effects with "Any" dieValue (0) from specific dieValues
       const anyDieEffects = effects.filter((effect) => effect.dieValue === 0);
-      const specificDieEffects = effects.filter((effect) => effect.dieValue !== 0);
+      const specificDieEffects = effects.filter(
+        (effect) => effect.dieValue !== 0,
+      );
 
       // Sort specificDieEffects by dieValue in ascending order
       specificDieEffects.sort((a, b) => a.dieValue - b.dieValue);
@@ -98,7 +102,7 @@ export default function SpellTinkererAlchemyEffectsModal({
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -119,8 +123,8 @@ export default function SpellTinkererAlchemyEffectsModal({
       <DialogContent>
         <Grid container spacing={2}>
           {effects.map((effect, index) => (
-            <Grid  key={index} container spacing={2} size={12}>
-              <Grid  size={3}>
+            <Grid key={index} container spacing={2} size={12}>
+              <Grid size={3}>
                 <FormControl fullWidth>
                   <InputLabel id={`die-value-label-${index}`}>
                     {t("Die")}
@@ -143,7 +147,7 @@ export default function SpellTinkererAlchemyEffectsModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid  size={8}>
+              <Grid size={8}>
                 <TextField
                   label={t("Effect")}
                   value={effect.effect}
@@ -153,7 +157,7 @@ export default function SpellTinkererAlchemyEffectsModal({
                   fullWidth
                 />
               </Grid>
-              <Grid  size={1}>
+              <Grid size={1}>
                 <Button
                   variant="contained"
                   color="error"
@@ -164,13 +168,13 @@ export default function SpellTinkererAlchemyEffectsModal({
               </Grid>
             </Grid>
           ))}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Button variant="contained" onClick={handleAddEffect}>
               {t("Add Effect")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}

@@ -44,7 +44,9 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
     if (!selectedPackId) return [];
     const pack = packs.find((p) => p.id === selectedPackId);
     if (!pack) return [];
-    return pack.items.filter((i) => i.type === selectedEquipType).map((i) => i.data);
+    return pack.items
+      .filter((i) => i.type === selectedEquipType)
+      .map((i) => i.data);
   }, [selectedPackId, selectedEquipType, packs]);
 
   // Auto-select first item when list changes
@@ -79,12 +81,16 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
       open={open}
       onClose={onClose}
       slotProps={{
-        paper: { sx: { width: "80%", maxWidth: "lg" } }
+        paper: { sx: { width: "80%", maxWidth: "lg" } },
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
-          <Grid  size={5}>
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+          spacing={1}
+        >
+          <Grid size={5}>
             <Select
               value={selectedEquipType}
               onChange={(e) => setSelectedEquipType(e.target.value)}
@@ -98,7 +104,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               ))}
             </Select>
           </Grid>
-          <Grid  size={5}>
+          <Grid size={5}>
             <Select
               value={selectedPackId}
               onChange={(e) => setSelectedPackId(e.target.value)}
@@ -118,7 +124,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               )}
             </Select>
           </Grid>
-          <Grid >
+          <Grid>
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -132,9 +138,12 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
-              <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
+              <Typography
+                variant="body2"
+                sx={{ p: 1, color: "text.secondary" }}
+              >
                 {t("No items in this pack for the selected type.")}
               </Typography>
             ) : (
@@ -158,7 +167,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               </List>
             )}
           </Grid>
-          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
             {selectedItem && (
               <div>
                 <Typography variant="h3">
@@ -169,32 +178,58 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       {t(selectedItem.category)}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}><Diamond /></Box>
-                      {selectedItem.hands === 1 ? t("One-handed") : t("Two-handed")}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}><Diamond /></Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
+                        <Diamond />
+                      </Box>
+                      {selectedItem.hands === 1
+                        ? t("One-handed")
+                        : t("Two-handed")}
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
+                        <Diamond />
+                      </Box>
                       {selectedItem.melee ? t("Melee") : t("Ranged")}
                     </Typography>
                     <Typography variant="body1">
                       <strong>
                         <OpenBracket />
-                        {selectedItem.att1 && attributes[selectedItem.att1]?.shortcaps}
+                        {selectedItem.att1 &&
+                          attributes[selectedItem.att1]?.shortcaps}
                         {" + "}
-                        {selectedItem.att2 && attributes[selectedItem.att2]?.shortcaps}
+                        {selectedItem.att2 &&
+                          attributes[selectedItem.att2]?.shortcaps}
                         <CloseBracket />
                       </strong>
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}><Diamond /></Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
+                        <Diamond />
+                      </Box>
                       <strong>
-                        <OpenBracket />{t("HR")} + {selectedItem.damage || 0}<CloseBracket />
+                        <OpenBracket />
+                        {t("HR")} + {selectedItem.damage || 0}
+                        <CloseBracket />
                       </strong>
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}><Diamond /></Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
+                        <Diamond />
+                      </Box>
                       {t(selectedItem.type)}
                     </Typography>
                     <Typography variant="body2">
@@ -202,22 +237,34 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
                     </Typography>
                   </>
                 )}
-                {(selectedEquipType === "armor" || selectedEquipType === "shield") && (
+                {(selectedEquipType === "armor" ||
+                  selectedEquipType === "shield") && (
                   <>
                     <Typography variant="body1">
                       {t("DEF")} +{selectedItem.def ?? 0}
-                      <Box component="span" sx={{
-                        mx: 1
-                      }}><Diamond /></Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          mx: 1,
+                        }}
+                      >
+                        <Diamond />
+                      </Box>
                       {t("MDEF")} +{selectedItem.mdef ?? 0}
-                      {selectedItem.init !== undefined && selectedItem.init !== 0 && (
-                        <>
-                          <Box component="span" sx={{
-                            mx: 1
-                          }}><Diamond /></Box>
-                          {t("Initiative")} {selectedItem.init}
-                        </>
-                      )}
+                      {selectedItem.init !== undefined &&
+                        selectedItem.init !== 0 && (
+                          <>
+                            <Box
+                              component="span"
+                              sx={{
+                                mx: 1,
+                              }}
+                            >
+                              <Diamond />
+                            </Box>
+                            {t("Initiative")} {selectedItem.init}
+                          </>
+                        )}
                     </Typography>
                     <Typography variant="body2">
                       {t("Cost")}: {selectedItem.cost} {t("zenit")}

@@ -157,7 +157,7 @@ export default function CombatSimClocks({
         <Grid container spacing={3}>
           {/* Add new clock section - Collapsible */}
           {!isMaxClocksReached && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Paper
                 sx={{
                   p: 2,
@@ -196,7 +196,7 @@ export default function CombatSimClocks({
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                   <Box sx={{ mt: 2 }}>
                     <Grid container spacing={2}>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <TextField
                           autoFocus={expanded}
                           fullWidth
@@ -204,11 +204,11 @@ export default function CombatSimClocks({
                           value={clockName}
                           onChange={handleClockNameChange}
                           slotProps={{
-                            htmlInput: { maxLength: 30 }
+                            htmlInput: { maxLength: 30 },
                           }}
                         />
                       </Grid>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <Typography variant="subtitle1" sx={{ mb: 1 }}>
                           {t("clocks_sections_title")}
                         </Typography>
@@ -231,7 +231,7 @@ export default function CombatSimClocks({
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <Tooltip
                           title={t("clocks_name_required")}
                           disableHoverListener={!shouldShowTooltip}
@@ -259,7 +259,7 @@ export default function CombatSimClocks({
           )}
 
           {/* Existing clocks or Empty state */}
-          <Grid  size={12}>
+          <Grid size={12}>
             {clocks.length > 0 ? (
               <>
                 <Divider sx={{ my: 2 }} />
@@ -270,8 +270,9 @@ export default function CombatSimClocks({
                       size={{
                         xs: 12,
                         sm: 6,
-                        md: 4
-                      }}>
+                        md: 4,
+                      }}
+                    >
                       <Paper
                         sx={{
                           p: 2,
@@ -282,7 +283,15 @@ export default function CombatSimClocks({
                           alignItems: "center",
                         }}
                       >
-                        <Box sx={{ position: "absolute", right: 8, top: 8, display: "flex", gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            right: 8,
+                            top: 8,
+                            display: "flex",
+                            gap: 0.5,
+                          }}
+                        >
                           <Tooltip title={t("Decrement")}>
                             <IconButton
                               size="small"

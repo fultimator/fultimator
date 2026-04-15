@@ -15,7 +15,6 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-
   const themes = [
     t("Ambition"),
     t("Anger"),
@@ -43,18 +42,17 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
 
   const handleThemeChange = (event, newValue) => {
     // If newValue is null, set it to an empty string
-    const updatedValue = newValue === null ? '' : newValue;
-  
+    const updatedValue = newValue === null ? "" : newValue;
+
     setInputTheme(updatedValue);
-    
+
     setPlayer((prevState) => {
       const newState = { ...prevState };
       newState.info.theme = updatedValue; // Update the theme in the player state
       return newState;
     });
   };
-  
-  
+
   const handleThemeInputChange = (event, newInputValue) => {
     setInputTheme(newInputValue);
     setPlayer((prevState) => {
@@ -75,16 +73,19 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2}>
-        <Grid  size={12}>
-          <CustomHeader type="top" headerText={t("Traits")}
+        <Grid size={12}>
+          <CustomHeader
+            type="top"
+            headerText={t("Traits")}
             showIconButton={false}
           />
         </Grid>
         <Grid
           size={{
             xs: 12,
-            sm: 12
-          }}>
+            sm: 12,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="identity"
@@ -96,15 +97,17 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                   readOnly: !isEditMode,
                 },
 
-                htmlInput: { maxLength: 300 }
-              }} />
+                htmlInput: { maxLength: 300 },
+              }}
+            />
           </FormControl>
         </Grid>
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <Autocomplete
             id="theme-autocomplete"
             options={themes}
@@ -119,7 +122,7 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                 label={t("Theme") + ":"}
                 fullWidth
                 slotProps={{
-                  htmlInput: { ...params.inputProps, maxLength: 50 }
+                  htmlInput: { ...params.inputProps, maxLength: 50 },
                 }}
               />
             )}
@@ -128,8 +131,9 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
         <Grid
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="origin"
@@ -141,8 +145,9 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                   readOnly: !isEditMode,
                 },
 
-                htmlInput: { maxLength: 50 }
-              }} />
+                htmlInput: { maxLength: 50 },
+              }}
+            />
           </FormControl>
         </Grid>
       </Grid>

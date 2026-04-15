@@ -4,7 +4,11 @@ import MagichantToneItem from "./MagichantToneItem";
 import { availableMagichantTones } from "../spellOptionData";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 
-export default function MagichantTonesContentSection({ formState, setFormState, t }) {
+export default function MagichantTonesContentSection({
+  formState,
+  setFormState,
+  t,
+}) {
   const currentTones = useMemo(() => formState.tones || [], [formState.tones]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
@@ -22,30 +26,30 @@ export default function MagichantTonesContentSection({ formState, setFormState, 
       .filter((name) => name !== "magichant_custom_name");
     return availableMagichantTones.filter(
       (preset) =>
-        preset.name !== "magichant_custom_name" && !addedNames.includes(preset.name)
+        preset.name !== "magichant_custom_name" &&
+        !addedNames.includes(preset.name),
     );
   }, [currentTones]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setState) => {
-        const preset = availableMagichantTones.find((tone) => tone.name === presetName);
-        if (!preset) return;
-        setState((prev) => ({
-          ...prev,
-          tones: [
-            ...(prev.tones || []),
-            {
-              name: preset.name,
-              effect: preset.effect,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setState) => {
+      const preset = availableMagichantTones.find(
+        (tone) => tone.name === presetName,
+      );
+      if (!preset) return;
+      setState((prev) => ({
+        ...prev,
+        tones: [
+          ...(prev.tones || []),
+          {
+            name: preset.name,
+            effect: preset.effect,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -54,7 +58,9 @@ export default function MagichantTonesContentSection({ formState, setFormState, 
 
   const handleCompendiumImport = useCallback(
     (item) => {
-      const isToneItem = item?.magichantSubtype === "tone" || (item?.effect && !item?.type && !item?.status);
+      const isToneItem =
+        item?.magichantSubtype === "tone" ||
+        (item?.effect && !item?.type && !item?.status);
       if (!isToneItem) return;
       setFormState((prev) => ({
         ...prev,
@@ -69,7 +75,7 @@ export default function MagichantTonesContentSection({ formState, setFormState, 
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

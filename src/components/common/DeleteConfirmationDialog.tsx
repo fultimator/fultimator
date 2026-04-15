@@ -36,9 +36,14 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
     onClose();
   };
 
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.metaKey
+    ) {
       event.preventDefault();
       handleConfirm();
       return;
@@ -51,18 +56,18 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
+    <Dialog
+      open={open}
+      onClose={onClose}
       onKeyDown={handleKeyDown}
-      fullWidth 
+      fullWidth
       maxWidth="xs"
       slotProps={{
         paper: {
           sx: {
             borderRadius: 2,
-          }
-        }
+          },
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ color: "error.main" }}>
@@ -72,7 +77,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
         <Typography variant="body1" sx={{ mb: 2 }}>
           {message}
         </Typography>
-        
+
         {itemPreview && (
           <Box
             sx={{
@@ -89,17 +94,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           </Box>
         )}
 
-        <Typography variant="body2" color="error" sx={{ fontWeight: "bold", mt: 2, mb: 2 }}>
+        <Typography
+          variant="body2"
+          color="error"
+          sx={{ fontWeight: "bold", mt: 2, mb: 2 }}
+        >
           {t("This action is permanent and cannot be undone.")}
         </Typography>
       </DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
-        <Button 
-          onClick={onClose} 
-          variant="outlined" 
-          color="primary"
-          fullWidth
-        >
+        <Button onClick={onClose} variant="outlined" color="primary" fullWidth>
           {t("Cancel")}
         </Button>
         <Button
@@ -107,12 +111,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           variant="contained"
           color="error"
           fullWidth
-          title={enableCtrlBypass ? "Ctrl+Click on the initial delete button to skip this dialog" : undefined}
+          title={
+            enableCtrlBypass
+              ? "Ctrl+Click on the initial delete button to skip this dialog"
+              : undefined
+          }
           sx={{
             fontWeight: "bold",
             "&:hover": {
               bgcolor: "error.dark",
-            }
+            },
           }}
         >
           {t("Delete")}

@@ -4,7 +4,13 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { useTranslate } from "../../translation/translate";
 
-type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
+type ThemeValue =
+  | "Fabula"
+  | "High"
+  | "Techno"
+  | "Natural"
+  | "Bravely"
+  | "Obscura";
 
 export interface ThemeSwitcherProps {
   selectedTheme: ThemeValue;

@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Typography,
-  LinearProgress,
-  Card,
-  Box,
-} from "@mui/material";
+import { Typography, LinearProgress, Card, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
@@ -18,22 +13,24 @@ import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import CardLoadout from "./CardLoadout";
 // Styled Components
 // Sub-components
-const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }) => ({
-  height: 18,
-  [theme.breakpoints.down("sm")]: {
-    height: 14,
-  },
-  [theme.breakpoints.up("md")]: {
-    height: 20,
-  },
-  borderRadius: 0,
-  backgroundColor: "transparent",
-  "& .MuiLinearProgress-bar": {
-    background: `linear-gradient(to right, ${color1}, ${color2})`,
+const GradientLinearProgress = styled(LinearProgress)(
+  ({ theme, color1, color2 }) => ({
+    height: 18,
+    [theme.breakpoints.down("sm")]: {
+      height: 14,
+    },
+    [theme.breakpoints.up("md")]: {
+      height: 20,
+    },
     borderRadius: 0,
-    transition: "width 1s ease-in-out",
-  },
-}));
+    backgroundColor: "transparent",
+    "& .MuiLinearProgress-bar": {
+      background: `linear-gradient(to right, ${color1}, ${color2})`,
+      borderRadius: 0,
+      transition: "width 1s ease-in-out",
+    },
+  }),
+);
 // Main Component
 const StatBarWrapper = styled(Box)(({ theme }) => ({
   position: "relative",
@@ -131,7 +128,12 @@ function CombatStat({ icon, label, value, theme }) {
         sx={{
           fontFamily: "'Antonio', fantasy, sans-serif",
           fontWeight: "bold",
-          fontSize: { xs: "0.55rem", sm: "0.62rem", md: "0.68rem", lg: "0.74rem" },
+          fontSize: {
+            xs: "0.55rem",
+            sm: "0.62rem",
+            md: "0.68rem",
+            lg: "0.74rem",
+          },
           letterSpacing: "0.06em",
           textTransform: "uppercase",
           color: theme.palette.text.secondary,
@@ -140,14 +142,35 @@ function CombatStat({ icon, label, value, theme }) {
       >
         {label}
       </Typography>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2px" }}>
-        <Box sx={{ display: "flex", alignItems: "center", "& svg": { width: { xs: 14, sm: 18, md: 20 }, height: { xs: 14, sm: 18, md: 20 } } }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "2px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            "& svg": {
+              width: { xs: 14, sm: 18, md: 20 },
+              height: { xs: 14, sm: 18, md: 20 },
+            },
+          }}
+        >
           {icon}
         </Box>
         <Typography
           sx={{
             fontFamily: "'Antonio', fantasy, sans-serif",
-            fontSize: { xs: "0.9rem", sm: "1.1rem", md: "1.2rem", lg: "1.3rem" },
+            fontSize: {
+              xs: "0.9rem",
+              sm: "1.1rem",
+              md: "1.2rem",
+              lg: "1.3rem",
+            },
             fontWeight: "bold",
             lineHeight: 1.3,
           }}
@@ -160,7 +183,11 @@ function CombatStat({ icon, label, value, theme }) {
 }
 
 // Main Component
-export default function PlayerCardGallery({ player, setPlayer, isExpanded = false }) {
+export default function PlayerCardGallery({
+  player,
+  setPlayer,
+  isExpanded = false,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -170,10 +197,38 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
 
   const loadoutBreakpoint = "md";
 
-  const currDex = calculateAttribute(player, player.attributes.dexterity, ["slow", "enraged"], ["dexUp"], 6, 12);
-  const currInsight = calculateAttribute(player, player.attributes.insight, ["dazed", "enraged"], ["insUp"], 6, 12);
-  const currMight = calculateAttribute(player, player.attributes.might, ["weak", "poisoned"], ["migUp"], 6, 12);
-  const currWillpower = calculateAttribute(player, player.attributes.willpower, ["shaken", "poisoned"], ["wlpUp"], 6, 12);
+  const currDex = calculateAttribute(
+    player,
+    player.attributes.dexterity,
+    ["slow", "enraged"],
+    ["dexUp"],
+    6,
+    12,
+  );
+  const currInsight = calculateAttribute(
+    player,
+    player.attributes.insight,
+    ["dazed", "enraged"],
+    ["insUp"],
+    6,
+    12,
+  );
+  const currMight = calculateAttribute(
+    player,
+    player.attributes.might,
+    ["weak", "poisoned"],
+    ["migUp"],
+    6,
+    12,
+  );
+  const currWillpower = calculateAttribute(
+    player,
+    player.attributes.willpower,
+    ["shaken", "poisoned"],
+    ["wlpUp"],
+    6,
+    12,
+  );
 
   const getAttributeColor = (base, current) => {
     if (current < base) return theme.palette.error.main;
@@ -183,30 +238,51 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
 
   // Equipment resolution for DEF / MDEF / INIT
   const inv = player.equipment?.[0];
-  const equippedArmor = inv?.armor?.find((a) => isItemEquipped(player, a)) || null;
-  const equippedShields = inv?.shields?.filter((s) => isItemEquipped(player, s)) || [];
-  const equippedWeapons = inv?.weapons?.filter((w) => isItemEquipped(player, w)) || [];
-  const equippedCustomWeapons = inv?.customWeapons?.filter((w) => isItemEquipped(player, w)) || [];
-  const equippedAccessory = inv?.accessories?.find((a) => isItemEquipped(player, a)) || null;
+  const equippedArmor =
+    inv?.armor?.find((a) => isItemEquipped(player, a)) || null;
+  const equippedShields =
+    inv?.shields?.filter((s) => isItemEquipped(player, s)) || [];
+  const equippedWeapons =
+    inv?.weapons?.filter((w) => isItemEquipped(player, w)) || [];
+  const equippedCustomWeapons =
+    inv?.customWeapons?.filter((w) => isItemEquipped(player, w)) || [];
+  const equippedAccessory =
+    inv?.accessories?.find((a) => isItemEquipped(player, a)) || null;
 
   const pilotSpells = (player.classes || [])
     .flatMap((c) => c.spells || [])
-    .filter((s) => s?.spellType === "pilot-vehicle" && s.showInPlayerSheet !== false);
-  const activeVehicle = pilotSpells.flatMap((s) => s.vehicles || []).find((v) => v.enabled);
-  const equippedModules = activeVehicle?.modules?.filter((m) => m.equipped) || [];
-  const armorModule = equippedModules.find((m) => m.type === "pilot_module_armor");
+    .filter(
+      (s) => s?.spellType === "pilot-vehicle" && s.showInPlayerSheet !== false,
+    );
+  const activeVehicle = pilotSpells
+    .flatMap((s) => s.vehicles || [])
+    .find((v) => v.enabled);
+  const equippedModules =
+    activeVehicle?.modules?.filter((m) => m.equipped) || [];
+  const armorModule = equippedModules.find(
+    (m) => m.type === "pilot_module_armor",
+  );
 
-  const isMartialArmor = armorModule ? armorModule.martial : equippedArmor?.martial || false;
+  const isMartialArmor = armorModule
+    ? armorModule.martial
+    : equippedArmor?.martial || false;
   const dodgeBonus =
     equippedShields.length === 0 && !isMartialArmor
-      ? (player.classes || []).flatMap((c) => c.skills || [])
-        .filter((s) => s.specialSkill === "Dodge")
-        .reduce((sum, s) => sum + (s.currentLvl || 0), 0)
+      ? (player.classes || [])
+          .flatMap((c) => c.skills || [])
+          .filter((s) => s.specialSkill === "Dodge")
+          .reduce((sum, s) => sum + (s.currentLvl || 0), 0)
       : 0;
 
   const baseDef = armorModule
-    ? armorModule.martial ? armorModule.def || 0 : currDex + (armorModule.def || 0)
-    : equippedArmor ? equippedArmor.martial ? equippedArmor.def : currDex + equippedArmor.def : currDex;
+    ? armorModule.martial
+      ? armorModule.def || 0
+      : currDex + (armorModule.def || 0)
+    : equippedArmor
+      ? equippedArmor.martial
+        ? equippedArmor.def
+        : currDex + equippedArmor.def
+      : currDex;
 
   const currDef =
     baseDef +
@@ -216,12 +292,19 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
     equippedShields.reduce((acc, s) => acc + (s.defModifier || 0), 0) +
     (equippedAccessory?.defModifier || 0) +
     equippedWeapons.reduce((acc, w) => acc + (w.defModifier || 0), 0) +
-    equippedCustomWeapons.reduce((acc, w) => acc + (parseInt(w.defModifier || 0, 10) || 0), 0) +
+    equippedCustomWeapons.reduce(
+      (acc, w) => acc + (parseInt(w.defModifier || 0, 10) || 0),
+      0,
+    ) +
     dodgeBonus;
 
   const baseMDef = armorModule
-    ? armorModule.martial ? armorModule.mdef || 0 : currInsight + (armorModule.mdef || 0)
-    : equippedArmor ? currInsight + equippedArmor.mdef : currInsight;
+    ? armorModule.martial
+      ? armorModule.mdef || 0
+      : currInsight + (armorModule.mdef || 0)
+    : equippedArmor
+      ? currInsight + equippedArmor.mdef
+      : currInsight;
 
   const currMDef =
     baseMDef +
@@ -231,7 +314,10 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
     equippedShields.reduce((acc, s) => acc + (s.mDefModifier || 0), 0) +
     (equippedAccessory?.mDefModifier || 0) +
     equippedWeapons.reduce((acc, w) => acc + (w.mDefModifier || 0), 0) +
-    equippedCustomWeapons.reduce((acc, w) => acc + (parseInt(w.mDefModifier || 0, 10) || 0), 0);
+    equippedCustomWeapons.reduce(
+      (acc, w) => acc + (parseInt(w.mDefModifier || 0, 10) || 0),
+      0,
+    );
 
   const baseInit = armorModule ? 0 : equippedArmor?.init || 0;
   const currInit =
@@ -255,24 +341,42 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
     const name = spell?.name || spell?.spellName;
     if (name && name !== t("Unnamed Spell")) return name;
     switch (spell?.spellType) {
-      case "magiseed": return t("magiseed_garden");
-      case "cooking": return t("Gourmet");
-      case "invocation": return t("Invoker");
-      case "deck": return t("ace_deck_management");
-      case "tinkerer-alchemy": return t("Alchemy");
-      case "tinkerer-infusion": return t("Infusion");
-      case "tinkerer-magitech": return t("Magitech");
-      case "magichant": return t("Magichant");
-      case "symbol": return t("Symbol");
-      case "dance": return t("Dance");
-      case "gift": return t("Gift");
-      case "therioform": return t("Therioform");
-      case "pilot-vehicle": return t("Pilot Vehicle");
-      case "arcanist": return t("arcanist_arcanum");
-      case "arcanist-rework": return t("Arcanist-Rework");
-      case "default": return t("Spell");
-      case "gamble": return t("Gamble");
-      default: return t(spell?.spellType || "Unnamed Spell");
+      case "magiseed":
+        return t("magiseed_garden");
+      case "cooking":
+        return t("Gourmet");
+      case "invocation":
+        return t("Invoker");
+      case "deck":
+        return t("ace_deck_management");
+      case "tinkerer-alchemy":
+        return t("Alchemy");
+      case "tinkerer-infusion":
+        return t("Infusion");
+      case "tinkerer-magitech":
+        return t("Magitech");
+      case "magichant":
+        return t("Magichant");
+      case "symbol":
+        return t("Symbol");
+      case "dance":
+        return t("Dance");
+      case "gift":
+        return t("Gift");
+      case "therioform":
+        return t("Therioform");
+      case "pilot-vehicle":
+        return t("Pilot Vehicle");
+      case "arcanist":
+        return t("arcanist_arcanum");
+      case "arcanist-rework":
+        return t("Arcanist-Rework");
+      case "default":
+        return t("Spell");
+      case "gamble":
+        return t("Gamble");
+      default:
+        return t(spell?.spellType || "Unnamed Spell");
     }
   };
   const NON_STATIC_SPELL_TYPES = new Set([
@@ -291,24 +395,40 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
   ]);
   const getSystemSpellLabel = (spellType) => {
     switch (spellType) {
-      case "pilot-vehicle": return t("Pilot Vehicle");
-      case "magiseed": return t("magiseed_garden");
-      case "deck": return t("ace_deck_management");
-      case "invocation": return t("invoker_invocation");
-      case "gift": return t("esper_psychic_gifts");
-      case "therioform": return t("mutant_therioforms");
-      case "dance": return t("Dance");
-      case "symbol": return t("symbol_symbols");
-      case "cooking": return t("Gourmet");
-      case "tinkerer-alchemy": return t("Alchemy");
-      case "tinkerer-infusion": return t("Infusion");
-      case "tinkerer-magitech": return t("Magitech");
-      default: return t(spellType || "System");
+      case "pilot-vehicle":
+        return t("Pilot Vehicle");
+      case "magiseed":
+        return t("magiseed_garden");
+      case "deck":
+        return t("ace_deck_management");
+      case "invocation":
+        return t("invoker_invocation");
+      case "gift":
+        return t("esper_psychic_gifts");
+      case "therioform":
+        return t("mutant_therioforms");
+      case "dance":
+        return t("Dance");
+      case "symbol":
+        return t("symbol_symbols");
+      case "cooking":
+        return t("Gourmet");
+      case "tinkerer-alchemy":
+        return t("Alchemy");
+      case "tinkerer-infusion":
+        return t("Infusion");
+      case "tinkerer-magitech":
+        return t("Magitech");
+      default:
+        return t(spellType || "System");
     }
   };
   const listNames = (items = [], nameKey = "name", customKey = "customName") =>
     items
-      .map((item) => (item?.[customKey] || (item?.[nameKey] ? t(item[nameKey]) : "")))
+      .map(
+        (item) =>
+          item?.[customKey] || (item?.[nameKey] ? t(item[nameKey]) : ""),
+      )
       .filter(Boolean);
 
   const getSystemSpellSummary = (spell) => {
@@ -317,7 +437,8 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
       const vehicles = spell.vehicles || [];
       const activeVehicle = vehicles.find((v) => v.enabled) || null;
       if (!activeVehicle) return `${t("Vehicles")}: ${vehicles.length}`;
-      const vehicleName = activeVehicle.customName || t(activeVehicle.name || "pilot_vehicle");
+      const vehicleName =
+        activeVehicle.customName || t(activeVehicle.name || "pilot_vehicle");
       const frameName = t(activeVehicle.frame || "pilot_frame_exoskeleton");
       const modules = activeVehicle.modules || [];
       const enabledModules = modules.filter((m) => m.enabled);
@@ -328,14 +449,20 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         .filter((m) => !m.enabled)
         .map((m) => m.customName || t(m.name || ""))
         .filter(Boolean);
-      const enabledText = enabledNames.length ? `${t("Active")}: ${enabledNames.join(", ")}` : `${t("Active")}: -`;
-      const othersText = otherNames.length ? ` - ${t("Others")}: ${otherNames.join(", ")}` : "";
+      const enabledText = enabledNames.length
+        ? `${t("Active")}: ${enabledNames.join(", ")}`
+        : `${t("Active")}: -`;
+      const othersText = otherNames.length
+        ? ` - ${t("Others")}: ${otherNames.join(", ")}`
+        : "";
       return `${vehicleName} [${frameName}] - ${t("Modules")}: ${enabledModules.length}/${modules.length} - ${enabledText}${othersText}`;
     }
     if (spell.spellType === "magiseed") {
       const seeds = spell.magiseeds || [];
       const current = spell.currentMagiseed;
-      const currentName = current ? (current.customName || t(current.name || "")) : t("magiseed_no_magiseed");
+      const currentName = current
+        ? current.customName || t(current.name || "")
+        : t("magiseed_no_magiseed");
       const otherSeeds = seeds
         .filter((seed) => {
           if (!current) return true;
@@ -345,7 +472,9 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         })
         .map((seed) => seed.customName || t(seed.name || ""))
         .filter(Boolean);
-      const othersText = otherSeeds.length ? ` - ${t("Others")}: ${otherSeeds.join(", ")}` : "";
+      const othersText = otherSeeds.length
+        ? ` - ${t("Others")}: ${otherSeeds.join(", ")}`
+        : "";
       return `${t("Current")}: ${currentName}${othersText}`;
     }
     if (spell.spellType === "deck") {
@@ -356,7 +485,9 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
     }
     if (spell.spellType === "invocation") {
       const wells = spell.activeWellsprings || [];
-      const inner = spell.innerWellspring ? ` + ${spell.chosenWellspring || ""}` : "";
+      const inner = spell.innerWellspring
+        ? ` + ${spell.chosenWellspring || ""}`
+        : "";
       return `${t("Wellsprings")}: ${wells.join(", ") || "-"}${inner}`;
     }
     if (spell.spellType === "gift") {
@@ -416,10 +547,16 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             sx={{
               color: "#fff",
               fontFamily: "Antonio",
-              fontSize: { xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" },
+              fontSize: {
+                xs: "1.15rem",
+                sm: "1.5rem",
+                md: "1.7rem",
+                lg: "1.85rem",
+              },
               fontWeight: "medium",
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {player.name}
           </Typography>
         </Box>
@@ -436,27 +573,61 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           <Typography
             sx={{
               fontFamily: "Antonio",
-              fontSize: { xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" },
+              fontSize: {
+                xs: "0.96rem",
+                sm: "1.25rem",
+                md: "1.35rem",
+                lg: "1.45rem",
+              },
               fontWeight: "medium",
-              textTransform: "uppercase"
-            }}>
-            {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
+              textTransform: "uppercase",
+            }}
+          >
+            {player.info.pronouns && (
+              <>
+                {player.info.pronouns} <Diamond color={primary} />{" "}
+              </>
+            )}
             {t("Lvl")} {player.lvl}
           </Typography>
         </Box>
       </Box>
       {/* Body */}
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
-
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "minmax(80px, 32%) 1fr",
+            sm: "minmax(140px, 35%) 1fr",
+            md: "minmax(170px, 34%) 1fr",
+            lg: "minmax(200px, 32%) 1fr",
+          },
+          alignItems: "stretch",
+        }}
+      >
         {/* Avatar + Stat Bars */}
-        <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden", height: "100%", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+            overflow: "hidden",
+            height: "100%",
+            justifyContent: "space-between",
+          }}
+        >
           {/* Top section: avatar + bars */}
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Box sx={{ position: "relative" }}>
               <img
                 src={player.info.imgurl || avatar_image}
                 alt="Player Avatar"
-                style={{ width: "100%", aspectRatio: "1", objectFit: "cover", display: "block" }}
+                style={{
+                  width: "100%",
+                  aspectRatio: "1",
+                  objectFit: "cover",
+                  display: "block",
+                }}
               />
               {inCrisis && (
                 <Box
@@ -478,9 +649,42 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
                 </Box>
               )}
             </Box>
-            <StatBar label={t("HP")} value={player.stats.hp.current} max={player.stats.hp.max} color1={isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80)} color2={theme.palette.error.main} trackColor="rgba(35,35,35,0.88)" />
-            <StatBar label={t("MP")} value={player.stats.mp.current} max={player.stats.mp.max} color1={isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80)} color2={theme.palette.info.main} trackColor="rgba(35,35,35,0.88)" />
-            <StatBar label={t("IP")} value={player.stats.ip.current} max={player.stats.ip.max} color1={isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80)} color2={theme.palette.success.main} trackColor="rgba(35,35,35,0.88)" />
+            <StatBar
+              label={t("HP")}
+              value={player.stats.hp.current}
+              max={player.stats.hp.max}
+              color1={
+                isDark
+                  ? newShade(theme.palette.error.main, 10)
+                  : newShade(theme.palette.error.main, 80)
+              }
+              color2={theme.palette.error.main}
+              trackColor="rgba(35,35,35,0.88)"
+            />
+            <StatBar
+              label={t("MP")}
+              value={player.stats.mp.current}
+              max={player.stats.mp.max}
+              color1={
+                isDark
+                  ? newShade(theme.palette.info.main, 10)
+                  : newShade(theme.palette.info.main, 80)
+              }
+              color2={theme.palette.info.main}
+              trackColor="rgba(35,35,35,0.88)"
+            />
+            <StatBar
+              label={t("IP")}
+              value={player.stats.ip.current}
+              max={player.stats.ip.max}
+              color1={
+                isDark
+                  ? newShade(theme.palette.success.main, 10)
+                  : newShade(theme.palette.success.main, 80)
+              }
+              color2={theme.palette.success.main}
+              trackColor="rgba(35,35,35,0.88)"
+            />
           </Box>
 
           {/* Attributes (always 2x2) */}
@@ -543,31 +747,111 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         </Box>
 
         {/* Right column */}
-        <Box sx={{ display: "flex", flexDirection: "column", p: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 }, gap: { xs: 0.75, sm: 1, md: 1.2, lg: 1.4 }, minWidth: 0 }}>
-
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            p: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 },
+            gap: { xs: 0.75, sm: 1, md: 1.2, lg: 1.4 },
+            minWidth: 0,
+          }}
+        >
           {/* Traits */}
-          <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
+          <Box
+            sx={{
+              border: `0.5px solid ${theme.palette.divider}`,
+              borderRadius: "6px",
+              overflow: "hidden",
+            }}
+          >
             <Box sx={{ background: primary, px: 1, py: "2px" }}>
-              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem", lg: "1.16rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Typography
+                sx={{
+                  color: custom.white,
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.85rem",
+                    sm: "1rem",
+                    md: "1.08rem",
+                    lg: "1.16rem",
+                  },
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
                 {t("Traits")}
               </Typography>
             </Box>
-            <Box sx={{ px: { xs: 1, md: 1.25 }, py: { xs: "5px", md: "8px" }, display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: { xs: "2px 8px", md: "6px 12px" } }}>
+            <Box
+              sx={{
+                px: { xs: 1, md: 1.25 },
+                py: { xs: "5px", md: "8px" },
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: { xs: "2px 8px", md: "6px 12px" },
+              }}
+            >
               <Box sx={{ gridColumn: "1 / -1" }}>
-                <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontSize: {
+                      xs: "0.85rem",
+                      sm: "0.9rem",
+                      md: "0.96rem",
+                      lg: "1rem",
+                    },
+                    textTransform: "uppercase",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   <strong>{t("Identity")}: </strong>
                   {player.info.identity && player.info.identity.length > 40
                     ? player.info.identity.slice(0, 40) + "…"
                     : player.info.identity}
                 </Typography>
               </Box>
-              <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.85rem",
+                    sm: "0.9rem",
+                    md: "0.96rem",
+                    lg: "1rem",
+                  },
+                  textTransform: "uppercase",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 <strong>{t("Theme")}: </strong>
-                {t(player.info.theme)?.length > 18 ? t(player.info.theme).slice(0, 18) + "…" : t(player.info.theme)}
+                {t(player.info.theme)?.length > 18
+                  ? t(player.info.theme).slice(0, 18) + "…"
+                  : t(player.info.theme)}
               </Typography>
-              <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.85rem",
+                    sm: "0.9rem",
+                    md: "0.96rem",
+                    lg: "1rem",
+                  },
+                  textTransform: "uppercase",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 <strong>{t("Origin")}: </strong>
-                {player.info.origin?.length > 18 ? player.info.origin.slice(0, 18) + "…" : player.info.origin}
+                {player.info.origin?.length > 18
+                  ? player.info.origin.slice(0, 18) + "…"
+                  : player.info.origin}
               </Typography>
             </Box>
           </Box>
@@ -584,9 +868,31 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
               overflow: "hidden",
             }}
           >
-            <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden", width: "100%", display: "flex", flexDirection: "column" }}>
+            <Box
+              sx={{
+                border: `0.5px solid ${theme.palette.divider}`,
+                borderRadius: "6px",
+                overflow: "hidden",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               <Box sx={{ background: primary, px: 1, py: "2px" }}>
-                <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem", lg: "1.16rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <Typography
+                  sx={{
+                    color: custom.white,
+                    fontFamily: "Antonio",
+                    fontSize: {
+                      xs: "0.85rem",
+                      sm: "1rem",
+                      md: "1.08rem",
+                      lg: "1.16rem",
+                    },
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                  }}
+                >
                   {t("Loadout")}
                 </Typography>
               </Box>
@@ -617,13 +923,33 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           </Box>
 
           {/* DEF / MDEF / INIT */}
-          <Box sx={{ display: "flex", gap: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 }, flexWrap: "wrap" }}>
-            <CombatStat theme={theme} label={t("DEF")} icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />} value={currDef} />
-            <CombatStat theme={theme} label={t("M.DEF")} icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />} value={currMDef} />
-            <CombatStat theme={theme} label={t("INIT")} icon={<InitIcon size="18px" color={isDark ? "white" : "black"} />} value={(currInit > 0 ? "+" : "") + currInit} />
+          <Box
+            sx={{
+              display: "flex",
+              gap: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 },
+              flexWrap: "wrap",
+            }}
+          >
+            <CombatStat
+              theme={theme}
+              label={t("DEF")}
+              icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />}
+              value={currDef}
+            />
+            <CombatStat
+              theme={theme}
+              label={t("M.DEF")}
+              icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />}
+              value={currMDef}
+            />
+            <CombatStat
+              theme={theme}
+              label={t("INIT")}
+              icon={<InitIcon size="18px" color={isDark ? "white" : "black"} />}
+              value={(currInit > 0 ? "+" : "") + currInit}
+            />
           </Box>
         </Box>
-
       </Box>
       {isExpanded && (
         <Box
@@ -635,9 +961,23 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             gap: { xs: 0.75, sm: 1 },
           }}
         >
-          <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
+          <Box
+            sx={{
+              border: `0.5px solid ${theme.palette.divider}`,
+              borderRadius: "6px",
+              overflow: "hidden",
+            }}
+          >
             <Box sx={{ background: primary, px: 1, py: "2px" }}>
-              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Typography
+                sx={{
+                  color: custom.white,
+                  fontFamily: "Antonio",
+                  fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem" },
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
                 {t("Description")}
               </Typography>
             </Box>
@@ -648,7 +988,9 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
                   fontSize: { xs: "0.82rem", sm: "0.92rem", md: "0.98rem" },
                   lineHeight: 1.45,
                   whiteSpace: "pre-line",
-                  color: hasDescription ? theme.palette.text.primary : theme.palette.text.secondary,
+                  color: hasDescription
+                    ? theme.palette.text.primary
+                    : theme.palette.text.secondary,
                   fontStyle: hasDescription ? "normal" : "italic",
                 }}
               >
@@ -657,24 +999,65 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             </Box>
           </Box>
 
-          <Box sx={{ border: `0.5px solid ${theme.palette.divider}`, borderRadius: "6px", overflow: "hidden" }}>
+          <Box
+            sx={{
+              border: `0.5px solid ${theme.palette.divider}`,
+              borderRadius: "6px",
+              overflow: "hidden",
+            }}
+          >
             <Box sx={{ background: primary, px: 1, py: "2px" }}>
-              <Typography sx={{ color: custom.white, fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <Typography
+                sx={{
+                  color: custom.white,
+                  fontFamily: "Antonio",
+                  fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem" },
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
                 {t("Classes")}
               </Typography>
             </Box>
-            <Box sx={{ px: 1, py: { xs: "6px", sm: "8px" }, display: "flex", flexDirection: "column", gap: "6px" }}>
+            <Box
+              sx={{
+                px: 1,
+                py: { xs: "6px", sm: "8px" },
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+              }}
+            >
               {visibleClasses.length === 0 && (
-                <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.82rem", sm: "0.92rem" }, color: theme.palette.text.secondary, fontStyle: "italic" }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontSize: { xs: "0.82rem", sm: "0.92rem" },
+                    color: theme.palette.text.secondary,
+                    fontStyle: "italic",
+                  }}
+                >
                   {t("No classes")}
                 </Typography>
               )}
               {visibleClasses.map((c, idx) => {
-                const skills = (c.skills || []).filter((s) => (s.currentLvl || 0) > 0);
-                const visibleSpells = (c.spells || []).filter((sp) => sp && sp.showInPlayerSheet !== false);
-                const spells = visibleSpells.filter((sp) => !NON_STATIC_SPELL_TYPES.has(sp.spellType));
-                const systemSpells = visibleSpells.filter((sp) => NON_STATIC_SPELL_TYPES.has(sp.spellType));
-                const heroicName = c.heroic?.name ? (c.isHomebrew === undefined ? t(c.heroic.name) : c.heroic.name) : "";
+                const skills = (c.skills || []).filter(
+                  (s) => (s.currentLvl || 0) > 0,
+                );
+                const visibleSpells = (c.spells || []).filter(
+                  (sp) => sp && sp.showInPlayerSheet !== false,
+                );
+                const spells = visibleSpells.filter(
+                  (sp) => !NON_STATIC_SPELL_TYPES.has(sp.spellType),
+                );
+                const systemSpells = visibleSpells.filter((sp) =>
+                  NON_STATIC_SPELL_TYPES.has(sp.spellType),
+                );
+                const heroicName = c.heroic?.name
+                  ? c.isHomebrew === undefined
+                    ? t(c.heroic.name)
+                    : c.heroic.name
+                  : "";
                 return (
                   <Box
                     key={`${c.name}-${idx}`}
@@ -685,31 +1068,84 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
                       background: theme.palette.background.default,
                     }}
                   >
-                    <Typography sx={{ fontFamily: "Antonio", fontWeight: 700, fontSize: { xs: "0.82rem", sm: "0.94rem" }, textTransform: "uppercase" }}>
-                      {(c.isHomebrew === undefined ? t(c.name) : c.name)} ({t("Lvl")} {c.lvl || 0})
+                    <Typography
+                      sx={{
+                        fontFamily: "Antonio",
+                        fontWeight: 700,
+                        fontSize: { xs: "0.82rem", sm: "0.94rem" },
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {c.isHomebrew === undefined ? t(c.name) : c.name} (
+                      {t("Lvl")} {c.lvl || 0})
                     </Typography>
                     {skills.length > 0 && (
-                      <Typography sx={{ mt: "2px", fontFamily: "Antonio", fontSize: { xs: "0.78rem", sm: "0.88rem" }, lineHeight: 1.3 }}>
+                      <Typography
+                        sx={{
+                          mt: "2px",
+                          fontFamily: "Antonio",
+                          fontSize: { xs: "0.78rem", sm: "0.88rem" },
+                          lineHeight: 1.3,
+                        }}
+                      >
                         <strong>{t("Skills")}:</strong>{" "}
-                        {skills.map((s) => `${(c.isHomebrew === undefined ? t(s.skillName) : s.skillName)} (SL${s.currentLvl || 0})`).join(", ")}
+                        {skills
+                          .map(
+                            (s) =>
+                              `${c.isHomebrew === undefined ? t(s.skillName) : s.skillName} (SL${s.currentLvl || 0})`,
+                          )
+                          .join(", ")}
                       </Typography>
                     )}
                     {heroicName && (
-                      <Typography sx={{ mt: "2px", fontFamily: "Antonio", fontSize: { xs: "0.78rem", sm: "0.88rem" }, lineHeight: 1.3 }}>
+                      <Typography
+                        sx={{
+                          mt: "2px",
+                          fontFamily: "Antonio",
+                          fontSize: { xs: "0.78rem", sm: "0.88rem" },
+                          lineHeight: 1.3,
+                        }}
+                      >
                         <strong>{t("Heroic Skill")}:</strong> {heroicName}
                       </Typography>
                     )}
                     {spells.length > 0 && (
-                      <Typography sx={{ mt: "2px", fontFamily: "Antonio", fontSize: { xs: "0.78rem", sm: "0.88rem" }, lineHeight: 1.3 }}>
+                      <Typography
+                        sx={{
+                          mt: "2px",
+                          fontFamily: "Antonio",
+                          fontSize: { xs: "0.78rem", sm: "0.88rem" },
+                          lineHeight: 1.3,
+                        }}
+                      >
                         <strong>{t("Spells")}:</strong>{" "}
                         {spells.map((sp) => getSpellLabel(sp)).join(", ")}
                       </Typography>
                     )}
                     {systemSpells.length > 0 && (
-                      <Box sx={{ mt: "2px", display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <Box
+                        sx={{
+                          mt: "2px",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "2px",
+                        }}
+                      >
                         {systemSpells.map((sp, sysIdx) => (
-                          <Typography key={`${sp.spellType}-${sysIdx}`} sx={{ fontFamily: "Antonio", fontSize: { xs: "0.78rem", sm: "0.88rem" }, lineHeight: 1.3, whiteSpace: "normal", overflowWrap: "anywhere" }}>
-                            <strong>{getSystemSpellLabel(sp.spellType)}:</strong> {getSystemSpellSummary(sp)}
+                          <Typography
+                            key={`${sp.spellType}-${sysIdx}`}
+                            sx={{
+                              fontFamily: "Antonio",
+                              fontSize: { xs: "0.78rem", sm: "0.88rem" },
+                              lineHeight: 1.3,
+                              whiteSpace: "normal",
+                              overflowWrap: "anywhere",
+                            }}
+                          >
+                            <strong>
+                              {getSystemSpellLabel(sp.spellType)}:
+                            </strong>{" "}
+                            {getSystemSpellSummary(sp)}
                           </Typography>
                         ))}
                       </Box>
@@ -723,9 +1159,22 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
       )}
       {/* Affinity Strip */}
       <AffinityStrip>
-        {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
+        {[
+          "physical",
+          "wind",
+          "bolt",
+          "dark",
+          "earth",
+          "fire",
+          "ice",
+          "light",
+          "poison",
+        ].map((type) => (
           <AffinityCell key={type}>
-            <TypeAffinity type={type} affinity={player.affinities?.[type] || ""} />
+            <TypeAffinity
+              type={type}
+              affinity={player.affinities?.[type] || ""}
+            />
           </AffinityCell>
         ))}
       </AffinityStrip>

@@ -40,7 +40,15 @@ function RollerScoped() {
       <Layout>
         <Paper
           elevation={3}
-          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
           <CloudIcon color="primary" />
           <Typography
@@ -48,8 +56,9 @@ function RollerScoped() {
             sx={{
               color: "text.primary",
               flex: 1,
-              minWidth: 200
-            }}>
+              minWidth: 200,
+            }}
+          >
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -133,16 +142,18 @@ function RollerScopedAuthenticated({ user }) {
           sx={{ order: 1 }}
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <ShareLink scope={scope} />
         </Grid>
         <Grid
           sx={{ order: 1 }}
           size={{
             xs: 12,
-            sm: 6
-          }}>
+            sm: 6,
+          }}
+        >
           <Card sx={{ p: 2 }}>
             <Typography sx={{ marginBottom: "8px" }}>
               {t("Set name to display here:")}
@@ -158,9 +169,9 @@ function RollerScopedAuthenticated({ user }) {
               fullWidth
             ></TextField>
           </Card>
-        </Grid>        
+        </Grid>
 
-        <Grid  sx={{ order: 3 }} size={12}>
+        <Grid sx={{ order: 3 }} size={12}>
           <PrepareRoll
             savePreparedRoll={savePreparedRoll}
             createRoll={createRoll}
@@ -170,22 +181,25 @@ function RollerScopedAuthenticated({ user }) {
           sx={{ order: { xs: 6, sm: 5 } }}
           size={{
             xs: 12,
-            sm: 5.5
-          }}>
+            sm: 5.5,
+          }}
+        >
           <RollList scope={scope} saveRoll={saveRoll} user={user} />
         </Grid>
         <Grid
           sx={{ order: { xs: 6, sm: 5 } }}
           size={{
             xs: 0,
-            sm: 1
-          }} />
+            sm: 1,
+          }}
+        />
         <Grid
           sx={{ my: 1, order: { xs: 5, sm: 6 } }}
           size={{
             xs: 12,
-            sm: 5.5
-          }}>
+            sm: 5.5,
+          }}
+        >
           <PreparedRolls user={user} scope={scope} createRoll={createRoll} />
         </Grid>
       </Grid>
@@ -200,7 +214,7 @@ function PreparedRolls({ user, scope, createRoll }) {
     preparedRollsRef,
     where("uid", "==", user.uid),
     where("scope", "==", scope),
-    orderBy("timestamp", "desc")
+    orderBy("timestamp", "desc"),
   );
 
   const deletePreparedRoll = (id) => {
@@ -243,7 +257,7 @@ function RollList({ scope, saveRoll, user }) {
   const rollsQuery = query(
     rollsRef,
     where("scope", "==", scope),
-    orderBy("timestamp", "desc")
+    orderBy("timestamp", "desc"),
   );
 
   const [rolls] = useCollectionData(rollsQuery, {

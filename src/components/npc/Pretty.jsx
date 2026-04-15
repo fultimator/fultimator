@@ -32,7 +32,14 @@ import { useTranslate, t } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useTheme } from "@mui/material/styles";
 
-function NpcPretty({ npc, study, npcImage, collapse, onClick = () => {}, ref }) {
+function NpcPretty({
+  npc,
+  study,
+  npcImage,
+  collapse,
+  onClick = () => {},
+  ref,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
 
@@ -68,14 +75,16 @@ function NpcPretty({ npc, study, npcImage, collapse, onClick = () => {}, ref }) 
                     display: "flex",
                     justifyContent: "center",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <ArrowDropDown />
                   <Typography
                     color={theme.palette.text.primary}
                     sx={{
                       fontSize: "1.1rem",
-                      fontWeight: "medium"
-                    }}>
+                      fontWeight: "medium",
+                    }}
+                  >
                     {t("Expand")}
                   </Typography>
                   <ArrowDropDown />
@@ -127,13 +136,21 @@ function Header({ npc, npcImage }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -159,15 +176,17 @@ function Header({ npc, npcImage }) {
             borderRight,
             px: 2,
           }}
-          size="grow">
+          size="grow"
+        >
           <Typography
             sx={{
               color: "white.main",
               fontFamily: "Antonio",
               fontSize: "1.5rem",
               fontWeight: "medium",
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {npc.name}
           </Typography>
         </Grid>
@@ -178,14 +197,16 @@ function Header({ npc, npcImage }) {
             borderLeft: borderLeft,
             borderBottom: borderBottom,
             borderImage: borderImage,
-          }}>
+          }}
+        >
           <Typography
             sx={{
               fontFamily: "Antonio",
               fontSize: "1.25rem",
               fontWeight: "medium",
-              textTransform: "uppercase"
-            }}>
+              textTransform: "uppercase",
+            }}
+          >
             {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
           </Typography>
         </Grid>
@@ -248,8 +269,9 @@ function Header({ npc, npcImage }) {
                 sx={{
                   fontFamily: "Antonio",
                   fontSize: "1.25rem",
-                  textTransform: "uppercase"
-                }}>
+                  textTransform: "uppercase",
+                }}
+              >
                 {RenderVillainPhase(npc)}
               </Typography>
             </Box>
@@ -328,8 +350,9 @@ function Stats({ npc }) {
         fontFamily: "Antonio",
         fontWeight: "bold",
         textAlign: "center",
-        fontSize: isMobile ? "0.74rem" : "0.9rem"
-      }}>
+        fontSize: isMobile ? "0.74rem" : "0.9rem",
+      }}
+    >
       <Grid container>
         <Grid
           sx={{
@@ -340,8 +363,12 @@ function Stats({ npc }) {
             mr: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
-          }}>
-          <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
+          }}
+        >
+          <Grid
+            container
+            sx={{ alignItems: "stretch", justifyContent: "space-between" }}
+          >
             <Grid
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1E2122" : "#efecf5",
@@ -351,7 +378,8 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {t("DEX")} d{npc.attributes?.dexterity}
             </Grid>
             <Grid
@@ -363,7 +391,8 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {t("INS")} d{npc.attributes?.insight}
             </Grid>
             <Grid
@@ -375,7 +404,8 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {t("MIG")} d{npc.attributes?.might}
             </Grid>
             <Grid
@@ -383,7 +413,8 @@ function Stats({ npc }) {
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#f9f8fb",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {t("WLP")} d{npc.attributes?.will}
             </Grid>
           </Grid>
@@ -397,34 +428,36 @@ function Stats({ npc }) {
             ml: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
-          }}>
-          <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
-            <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
-              {t("HP")}
-            </Grid>
+          }}
+        >
+          <Grid
+            container
+            sx={{ alignItems: "stretch", justifyContent: "space-between" }}
+          >
+            <Grid sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>{t("HP")}</Grid>
             <Grid
               sx={{
                 py: 0.4,
                 px: isMobile ? 0.75 : 1.5,
                 color: "white.main",
                 bgcolor: "red.main",
-              }}>
+              }}
+            >
               {calcHP(npc)} <Diamond color="white.main" />{" "}
               {Math.floor(calcHP(npc) / 2)}
             </Grid>
-            <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
-              {t("MP")}
-            </Grid>
+            <Grid sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>{t("MP")}</Grid>
             <Grid
               sx={{
                 px: isMobile ? 0.75 : 1.5,
                 py: 0.4,
                 color: "white.main",
                 bgcolor: "cyan.main",
-              }}>
+              }}
+            >
               {calcMP(npc)}
             </Grid>
-            <Grid  sx={{ py: 0.4 }} size="grow">
+            <Grid sx={{ py: 0.4 }} size="grow">
               {t("Init.")} {calcInit(npc)}
             </Grid>
           </Grid>
@@ -437,10 +470,14 @@ function Stats({ npc }) {
             borderImage,
             mr: isMobile ? "1px" : "2px",
             flexBasis: "calc(25% - 2px)",
-          }}>
-          <Grid container sx={{
-            justifyItems: "space-between"
-          }}>
+          }}
+        >
+          <Grid
+            container
+            sx={{
+              justifyItems: "space-between",
+            }}
+          >
             <Grid
               sx={{
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
@@ -450,7 +487,8 @@ function Stats({ npc }) {
                     : "1px solid #ffffff",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {npc.armor?.def > 0 || npc.extra?.defOverride ? (
                 <>
                   {t("DEF")} {calcDef(npc)}
@@ -466,7 +504,8 @@ function Stats({ npc }) {
                 bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
                 py: 0.4,
               }}
-              size="grow">
+              size="grow"
+            >
               {npc.extra?.mDefOverride ? (
                 <>
                   {t("M.DEF")} {calcMDef(npc)}
@@ -488,37 +527,62 @@ function Stats({ npc }) {
             ml: isMobile ? "1px" : "2px",
             mt: 0,
           }}
-          size="grow">
+          size="grow"
+        >
           {npc.affinities && (
             <Grid container>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #42484B" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #42484B" }}
+                size="grow"
+              >
                 <TypeAffinity
                   type="physical"
                   affinity={npc.affinities.physical}
                 />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #604365" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #604365" }}
+                size="grow"
+              >
                 <TypeAffinity type="wind" affinity={npc.affinities.wind} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #6f5375" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}
+                size="grow"
+              >
                 <TypeAffinity type="bolt" affinity={npc.affinities.bolt} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #816687" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #816687" }}
+                size="grow"
+              >
                 <TypeAffinity type="dark" affinity={npc.affinities.dark} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #957d9b" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}
+                size="grow"
+              >
                 <TypeAffinity type="earth" affinity={npc.affinities.earth} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}
+                size="grow"
+              >
                 <TypeAffinity type="fire" affinity={npc.affinities.fire} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}
+                size="grow"
+              >
                 <TypeAffinity type="ice" affinity={npc.affinities.ice} />
               </Grid>
-              <Grid  sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }} size="grow">
+              <Grid
+                sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}
+                size="grow"
+              >
                 <TypeAffinity type="light" affinity={npc.affinities.light} />
               </Grid>
-              <Grid  sx={{ py: 0.4 }} size="grow">
+              <Grid sx={{ py: 0.4 }} size="grow">
                 <TypeAffinity type="poison" affinity={npc.affinities.poison} />
               </Grid>
             </Grid>
@@ -533,13 +597,15 @@ function Immunities({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, #1E2122 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient
-    : `linear-gradient(90deg, #f6f4f9 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, #1E2122 0%, rgba(255, 255, 255, 0) 100%)` // Dark mode gradient
+      : `linear-gradient(90deg, #f6f4f9 0%, #ffffff 100%)`; // Light mode gradient
 
-  const backgroundColor = theme.mode === 'dark'
-    ? `#583871` // Dark mode background color
-    : `#6e468d`; // Light mode background color
+  const backgroundColor =
+    theme.mode === "dark"
+      ? `#583871` // Dark mode background color
+      : `#6e468d`; // Light mode background color
 
   // Immunities labels
   const immunitiesLabels = {
@@ -564,21 +630,24 @@ function Immunities({ npc }) {
 
   return (
     <Grid
-      container sx={{
+      container
+      sx={{
         justifyContent: "space-between",
         mt: 1,
         py: 0.1,
-      }}>
+      }}
+    >
       {/* Immunity Label */}
       <Grid
         sx={{
-          textAlign: 'center',
+          textAlign: "center",
           backgroundColor: backgroundColor,
           color: `${theme.white}`,
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
         }}
-        size={2}>
+        size={2}
+      >
         <Typography
           sx={{
             color: "white.main",
@@ -586,8 +655,9 @@ function Immunities({ npc }) {
             fontSize: "1.1rem",
             fontWeight: "medium",
             textTransform: "uppercase",
-            margin: "auto"
-          }}>
+            margin: "auto",
+          }}
+        >
           {t("Immunities")}
         </Typography>
       </Grid>
@@ -595,11 +665,12 @@ function Immunities({ npc }) {
       <Grid
         sx={{
           px: 1,
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           background: background,
         }}
-        size={10}>
+        size={10}
+      >
         <Typography sx={{ fontWeight: "bold", margin: "auto 0" }}>
           {immunitiesList}
         </Typography>
@@ -665,28 +736,30 @@ function Attacks({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Basic Attacks")}
         </Typography>
       </Grid>
       {npc.attacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 {attack.range === "melee" && <MeleeIcon />}
                 {attack.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
@@ -752,13 +825,13 @@ function Attacks({ npc }) {
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 {attack.weapon.range === "melee" && <MeleeIcon />}
                 {attack.weapon.range === "distance" && <DistanceIcon />}
               </Typography>
             </Grid>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>
                   {attack.name} ({attack.weapon.name}){" "}
@@ -794,7 +867,9 @@ function Attacks({ npc }) {
                     <span style={{ textTransform: "lowercase" }}>
                       <SpanMarkdown
                         components={{
-                          strong: ({ _node, ...props }) => <strong {...props} />,
+                          strong: ({ _node, ...props }) => (
+                            <strong {...props} />
+                          ),
                         }}
                       >
                         {t(damageTypeLabels[attack.type || attack.weapon.type])}
@@ -847,13 +922,21 @@ function Spells({ npc }) {
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -870,27 +953,29 @@ function Spells({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Spells")}
         </Typography>
       </Grid>
       {npc.spells?.map((spell, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 <SpellIcon />
               </Typography>
             </Grid>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{spell.name}</strong>{" "}
                 {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
@@ -906,7 +991,8 @@ function Spells({ npc }) {
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
                       <OpenBracket />
                       HR + {spell.damage || 0}
-                      <CloseBracket /> {spell.damagetype ? t(spell.damagetype) : "physical"}
+                      <CloseBracket />{" "}
+                      {spell.damagetype ? t(spell.damagetype) : "physical"}
                       <Diamond />
                     </>
                   )}{" "}
@@ -958,7 +1044,7 @@ function Special({ npc }) {
       name: t("Construct"),
       effect: t(
         "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
-        true
+        true,
       ),
     });
   }
@@ -968,7 +1054,7 @@ function Special({ npc }) {
       name: t("Undead"),
       effect: t(
         "Immune to **poisoned** status and additionally, when an effect (such as an Arcanum, a potion or a spell) would cause an undead creature to recover Hit Points, whoever controls that effect may instead have the undead lose half as many Hit Points.",
-        true
+        true,
       ),
     });
   }
@@ -1022,22 +1108,24 @@ function Special({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Special Rules")}
         </Typography>
       </Grid>
       {special?.map((special, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 3, py: 0.5 }} size={12}>
+            <Grid sx={{ px: 3, py: 0.5 }} size={12}>
               <Typography component="div">
                 <span style={{ display: "inline" }}>
                   <strong>{special.name}</strong> <Diamond />{" "}
@@ -1120,27 +1208,29 @@ function Actions({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Other Actions")}
         </Typography>
       </Grid>
       {actions?.map((actions, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 <ActionIcon />
               </Typography>
             </Grid>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{actions.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1221,27 +1311,29 @@ function Notes({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Notes")}
         </Typography>
       </Grid>
       {notes?.map((notes, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ pl: 2, py: 1 }} size={1}>
+            <Grid sx={{ pl: 2, py: 1 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 <NotesIcon />
               </Typography>
             </Grid>
-            <Grid  sx={{ pl: 1, pr: 5, py: 1 }} size={11}>
+            <Grid sx={{ pl: 1, pr: 5, py: 1 }} size={11}>
               <Typography component="div">
                 <strong>{notes.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1322,27 +1414,29 @@ function RareGear({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Rare Equipment")}
         </Typography>
       </Grid>
       {raregear?.map((raregear, i) => {
         return (
           <Fragment key={i}>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={1}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 <RareItemIcon />
               </Typography>
             </Grid>
-            <Grid  sx={{ px: 1, py: 0.5 }} size={11}>
+            <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{raregear.name}</strong> <Diamond />{" "}
                 <SpanMarkdown
@@ -1439,21 +1533,23 @@ function Equip({ npc }) {
           py: 0.3,
           background,
         }}
-        size={12}>
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
             fontWeight: "medium",
-            textTransform: "uppercase"
-          }}>
+            textTransform: "uppercase",
+          }}
+        >
           {t("Equipment")}
         </Typography>
       </Grid>
       {/* Weapons */}
       {weapons.map((weapon, i) => (
-        <Grid key={i}  sx={{ px: 2, py: 0 }} size={12}>
+        <Grid key={i} sx={{ px: 2, py: 0 }} size={12}>
           <Typography>
             <strong>{t("Weapon:")}</strong> {weapon.name}{" "}
             {weapon.martial && <Martial />} <Diamond />{" "}
@@ -1521,7 +1617,7 @@ function Equip({ npc }) {
       )}
       {/* Shield */}
       {npc.shield && npc.shield.name !== "No Shield" && (
-        <Grid  sx={{ px: 2, py: 0 }} size={12}>
+        <Grid sx={{ px: 2, py: 0 }} size={12}>
           <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
           {npc.shield.martial && <Martial />}
           <Diamond />{" "}
@@ -1564,7 +1660,7 @@ function RenderVillainPhase({ villain, phases, multipart }) {
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
 
   const values = [getVillainLabel(villain), phaseString, multipart].filter(
-    Boolean
+    Boolean,
   );
 
   const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;

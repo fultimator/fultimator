@@ -1,13 +1,18 @@
-import { TypePlayer, PlayerClass, Spells, Skills } from '../../../../types/Players';
+import {
+  TypePlayer,
+  PlayerClass,
+  Spells,
+  Skills,
+} from "../../../../types/Players";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
   isTwoHandedEquipped,
   isItemEquipped,
   ResolvedVehicleModule,
-} from './equipmentSlots';
-import { availableFrames } from '../../../../libs/pilotVehicleData';
-import { getModuleTypeForLimits } from '../../spells/vehicleReducer';
+} from "./equipmentSlots";
+import { availableFrames } from "../../../../libs/pilotVehicleData";
+import { getModuleTypeForLimits } from "../../spells/vehicleReducer";
 
 // Types
 
@@ -44,7 +49,7 @@ export type AuxHandItem = {
 export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
   for (const [ci, cls] of (player.classes ?? []).entries()) {
     for (const [si, spell] of (cls.spells ?? []).entries()) {
-      if (spell.spellType === 'pilot-vehicle') {
+      if (spell.spellType === "pilot-vehicle") {
         return { spell, classIndex: ci, spellIndex: si };
       }
     }
@@ -58,14 +63,18 @@ export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
  * All modules installed on the active vehicle that are relevant for `slot`
  * (regardless of enabled/equipped state), with their original array index attached.
  */
-export function getEquippedModulesForSlot(player: TypePlayer, slot: string): IndexedModule[] {
+export function getEquippedModulesForSlot(
+  player: TypePlayer,
+  slot: string,
+): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return [];
   return vehicle.modules
     .map((m, originalIndex) => ({ ...m, originalIndex }))
-    .filter(m => {
-      if (slot === 'armor') return m.type === 'pilot_module_armor';
-      if (slot === 'mainHand' || slot === 'offHand') return m.type === 'pilot_module_weapon';
+    .filter((m) => {
+      if (slot === "armor") return m.type === "pilot_module_armor";
+      if (slot === "mainHand" || slot === "offHand")
+        return m.type === "pilot_module_weapon";
       return false;
     }) as IndexedModule[];
 }
@@ -74,20 +83,27 @@ export function getEquippedModulesForSlot(player: TypePlayer, slot: string): Ind
  * The single active module for `slot` (the one whose equippedSlot matches),
  * or the first installed module for that slot type, or null.
  */
-export function getEquippedModuleForSlot(player: TypePlayer, slot: string): IndexedModule | null {
+export function getEquippedModuleForSlot(
+  player: TypePlayer,
+  slot: string,
+): IndexedModule | null {
   const mods = getEquippedModulesForSlot(player, slot);
-  const activeMods = mods.filter(m => m.enabled || m.equipped);
+  const activeMods = mods.filter((m) => m.enabled || m.equipped);
   return (
-    activeMods.find(m => {
-      if (slot === 'armor') return m.equippedSlot === 'armor';
-      if (slot === 'mainHand')
-        return m.equippedSlot === 'main'
-          || m.equippedSlot === 'mainHand'
-          || m.equippedSlot === 'both';
-      if (slot === 'offHand')
-        return m.equippedSlot === 'off'
-          || m.equippedSlot === 'offHand'
-          || m.equippedSlot === 'both';
+    activeMods.find((m) => {
+      if (slot === "armor") return m.equippedSlot === "armor";
+      if (slot === "mainHand")
+        return (
+          m.equippedSlot === "main" ||
+          m.equippedSlot === "mainHand" ||
+          m.equippedSlot === "both"
+        );
+      if (slot === "offHand")
+        return (
+          m.equippedSlot === "off" ||
+          m.equippedSlot === "offHand" ||
+          m.equippedSlot === "both"
+        );
       return false;
     }) ??
     activeMods[0] ??
@@ -105,20 +121,22 @@ export function getEquippedModuleForSlot(player: TypePlayer, slot: string): Inde
  *                 vehicle module but no offHand module exists, OR mainHand holds
  *                 a two-handed player item.
  */
-export function getSlotLocks(
-  player: TypePlayer,
-): { mainHandLocked: boolean; offHandLocked: boolean } {
-  const mainHandResolved = resolveEffectiveSlot(player, 'mainHand');
-  const offHandResolved = resolveEffectiveSlot(player, 'offHand');
+export function getSlotLocks(player: TypePlayer): {
+  mainHandLocked: boolean;
+  offHandLocked: boolean;
+} {
+  const mainHandResolved = resolveEffectiveSlot(player, "mainHand");
+  const offHandResolved = resolveEffectiveSlot(player, "offHand");
 
   const mainHandLocked = !!(
-    offHandResolved?.kind === 'vehicleModule' && !getEquippedModuleForSlot(player, 'mainHand')
+    offHandResolved?.kind === "vehicleModule" &&
+    !getEquippedModuleForSlot(player, "mainHand")
   );
 
   const offHandLocked = (() => {
-    if (mainHandResolved?.kind === 'vehicleModule') {
+    if (mainHandResolved?.kind === "vehicleModule") {
       if (mainHandResolved.module.cumbersome) return true;
-      if (!getEquippedModuleForSlot(player, 'offHand')) return true;
+      if (!getEquippedModuleForSlot(player, "offHand")) return true;
       return false;
     }
     return isTwoHandedEquipped(player);
@@ -140,17 +158,29 @@ export function getVehicleModuleUsage(
   if (!vehicle) return null;
 
   const frame =
-    availableFrames.find((f: Record<string, unknown>) => f.name === ('frame' in vehicle ? (vehicle as Record<string, unknown>).frame : undefined)) ??
-    ({ limits: { weapon: 2, armor: 1, support: -1 } } as Record<string, unknown>);
+    availableFrames.find(
+      (f: Record<string, unknown>) =>
+        f.name ===
+        ("frame" in vehicle
+          ? (vehicle as Record<string, unknown>).frame
+          : undefined),
+    ) ??
+    ({ limits: { weapon: 2, armor: 1, support: -1 } } as Record<
+      string,
+      unknown
+    >);
 
   const counts: Record<string, number> = { weapon: 0, armor: 0, support: 0 };
   for (const m of vehicle.modules) {
     if (!m.equipped) continue;
     const type = getModuleTypeForLimits(m);
-    if (type === 'custom') continue;
-    counts[type] += type === 'support' && m.isComplex ? 2 : 1;
+    if (type === "custom") continue;
+    counts[type] += type === "support" && m.isComplex ? 2 : 1;
   }
-  return { counts, limits: (frame as Record<string, unknown>).limits as Record<string, number> };
+  return {
+    counts,
+    limits: (frame as Record<string, unknown>).limits as Record<string, number>,
+  };
 }
 
 // Support modules
@@ -164,7 +194,9 @@ export function getEquippedSupportModules(player: TypePlayer): IndexedModule[] {
   if (!vehicle) return [];
   return vehicle.modules
     .map((m, i) => ({ ...m, originalIndex: i }))
-    .filter(m => m.equipped && m.type === 'pilot_module_support') as IndexedModule[];
+    .filter(
+      (m) => m.equipped && m.type === "pilot_module_support",
+    ) as IndexedModule[];
 }
 
 /**
@@ -178,13 +210,14 @@ export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
 
   const seen = new Set<string>();
   return (vs.support ?? [])
-    .map(ref => {
+    .map((ref) => {
       if (!ref) return null;
       const key = `${ref.vehicleName}|${ref.moduleName}`;
       if (seen.has(key)) return null;
       seen.add(key);
       const module =
-        vehicle?.modules.find(m => m.name === ref.moduleName && m.enabled) ?? null;
+        vehicle?.modules.find((m) => m.name === ref.moduleName && m.enabled) ??
+        null;
       return { ref, module } as SupportSlotEntry;
     })
     .filter((e): e is SupportSlotEntry => e !== null);
@@ -199,27 +232,30 @@ export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
 export function getAuxHandItem(player: TypePlayer): AuxHandItem | null {
   const hasDualShieldBearer = (player.classes ?? []).some((cls: PlayerClass) =>
     (cls.skills ?? []).some(
-      (sk: Skills) => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1,
+      (sk: Skills) =>
+        sk.specialSkill === "Dual Shieldbearer" && sk.currentLvl === 1,
     ),
   );
   if (!hasDualShieldBearer) return null;
 
   const inv = player.equipment?.[0];
-  const equippedShieldsCount = (inv?.shields ?? []).filter(s => isItemEquipped(player, s)).length;
+  const equippedShieldsCount = (inv?.shields ?? []).filter((s) =>
+    isItemEquipped(player, s),
+  ).length;
   if (equippedShieldsCount < 2) return null;
 
   const defensiveMasteryBonus = (player.classes ?? [])
     .flatMap((cls: PlayerClass) => cls.skills ?? [])
-    .filter((sk: Skills) => sk.specialSkill === 'Defensive Mastery')
+    .filter((sk: Skills) => sk.specialSkill === "Defensive Mastery")
     .reduce((sum: number, sk: Skills) => sum + (sk.currentLvl ?? 0), 0);
 
   return {
-    name: 'Twin Shields',
-    att1: 'might',
-    att2: 'might',
+    name: "Twin Shields",
+    att1: "might",
+    att2: "might",
     damage: 5 + defensiveMasteryBonus,
     prec: 0,
-    type: 'physical',
+    type: "physical",
     hands: 2,
     melee: true,
   };

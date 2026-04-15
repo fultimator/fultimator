@@ -38,9 +38,13 @@ export default function AddSkillModal({
   onDeleteSkill,
 }) {
   const { t } = useTranslate();
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: onDeleteSkill,
-  });;
+  });
 
   // Group skills by class
   const groupedSkills = skills.reduce((acc, skill) => {
@@ -71,7 +75,7 @@ export default function AddSkillModal({
             width: "80%", // Adjust width as needed
             maxWidth: "lg", // Adjust maximum width as needed
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -94,23 +98,25 @@ export default function AddSkillModal({
           <Grid
             size={{
               sm: 10,
-              xs: 12
-            }}>
+              xs: 12,
+            }}
+          >
             <TextField
               label={t("Skill Name")}
               fullWidth
               value={skillName}
               onChange={(e) => setSkillName(e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               sm: 2,
-              xs: 12
-            }}>
+              xs: 12,
+            }}
+          >
             <TextField
               label={t("Max Level")}
               type="number"
@@ -142,11 +148,11 @@ export default function AddSkillModal({
                 input: {
                   inputProps: { min: 1, max: 10 },
                   readOnly: !!specialSkill,
-                }
+                },
               }}
             />
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -156,15 +162,15 @@ export default function AddSkillModal({
               maxRows={10}
             />
           </Grid>
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography>
               {t("Special Skill Effect")}
               <IconButton
                 onClick={() =>
                   alert(
                     t(
-                      "Skills from this list will automatically update the Character with the selected effect. Please select one if needed."
-                    )
+                      "Skills from this list will automatically update the Character with the selected effect. Please select one if needed.",
+                    ),
                   )
                 }
               >

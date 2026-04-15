@@ -87,7 +87,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "gift" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -137,29 +137,60 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
             >
               {t("esper_psychic_gifts")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {giftSpells.map((giftSpell, gsIndex) => (
                 <React.Fragment key={gsIndex}>
                   {/* Brainwave Clock Section */}
-                  <Grid  sx={{ mb: 2 }} size={12}>
-                    <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
+                  <Grid sx={{ mb: 2 }} size={12}>
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        mb: 1,
+                      }}
+                    >
                       {t("esper_brainwave_clock")} - {t(giftSpell.className)}
                     </Typography>
-                    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
-                      <Grid >
+                    <Grid
+                      container
+                      sx={{ alignItems: "flex-start" }}
+                      spacing={2}
+                    >
+                      <Grid>
                         <Clock
                           numSections={4}
                           size={60}
                           state={getClockState(giftSpell.clock || 0)}
-                          setState={(isEditMode || setPlayer) ? (newState) => {
-                            const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
-                            handleClockChange(giftSpell, filledSections);
-                          } : undefined}
+                          setState={
+                            isEditMode || setPlayer
+                              ? (newState) => {
+                                  const filledSections = newState.reduce(
+                                    (count, section) =>
+                                      count + (section ? 1 : 0),
+                                    0,
+                                  );
+                                  handleClockChange(giftSpell, filledSections);
+                                }
+                              : undefined
+                          }
                           isCharacterSheet={!isEditMode && !setPlayer}
-                          onReset={(isEditMode || setPlayer) ? () => handleClockChange(giftSpell, 0) : undefined}
+                          onReset={
+                            isEditMode || setPlayer
+                              ? () => handleClockChange(giftSpell, 0)
+                              : undefined
+                          }
                         />
                         {(isEditMode || setPlayer) && (
-                          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            sx={{ mt: 1, justifyContent: "center" }}
+                          >
                             <Tooltip title={t("Decrement")} arrow>
                               <IconButton
                                 color="primary"
@@ -193,7 +224,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                           </Stack>
                         )}
                       </Grid>
-                      <Grid  size="grow">
+                      <Grid size="grow">
                         <LinearProgress
                           variant="determinate"
                           value={getClockProgress(giftSpell.clock || 0)}
@@ -206,7 +237,10 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                             },
                           }}
                         />
-                        <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ mt: 0.5, display: "block" }}
+                        >
                           {giftSpell.clock || 0} / 4
                         </Typography>
                       </Grid>
@@ -214,62 +248,77 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                   </Grid>
 
                   {/* Individual Gifts */}
-                  {giftSpell.gifts && giftSpell.gifts.map((gift, gIndex) => (
-                    <Grid
-                  container
-                  spacing={0}
-                  key={`${gsIndex}-${gIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
-                      size={{
-                        xs: 12,
-                        md: 6
-                      }}>
-                      <Grid  sx={{ display: "flex" }} size={10}>
-                        <Typography
-                          id="spell-left-name"
-                          variant="h2"
+                  {giftSpell.gifts &&
+                    giftSpell.gifts.map((gift, gIndex) => (
+                      <Grid
+                        container
+                        spacing={0}
+                        key={`${gsIndex}-${gIndex}`}
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
+                        size={{
+                          xs: 12,
+                          md: 6,
+                        }}
+                      >
+                        <Grid sx={{ display: "flex" }} size={10}>
+                          <Typography
+                            id="spell-left-name"
+                            variant="h2"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              backgroundColor: primary,
+                              padding: "5px",
+                              paddingLeft: "10px",
+                              color: "#fff",
+                              borderRadius: "8px 0 0 8px",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                          >
+                            {gift.name === "esper_gift_custom_name"
+                              ? gift.customName
+                              : t(gift.name)}
+                          </Typography>
+                        </Grid>
+                        <Grid
                           sx={{
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            backgroundColor: primary,
-                            padding: "5px",
-                            paddingLeft: "10px",
-                            color: "#fff",
-                            borderRadius: "8px 0 0 8px",
                             display: "flex",
-                            alignItems: "center",
-                            width: "100%",
+                            alignItems: "stretch",
+                            maxHeight: "40px",
                           }}
+                          size={2}
                         >
-                          {gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
-                        </Typography>
+                          <div
+                            id="spell-right-controls"
+                            style={{
+                              padding: "10px",
+                              backgroundColor: ternary,
+                              borderRadius: "0 8px 8px 0",
+                              marginRight: "15px",
+                              display: "flex",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                            className="spell-right-controls"
+                          >
+                            <Tooltip title={t("Info")}>
+                              <IconButton
+                                sx={{ padding: "0px" }}
+                                onClick={() => handleOpenModal(giftSpell, gift)}
+                              >
+                                <Info />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        </Grid>
                       </Grid>
-                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
-                        <div
-                          id="spell-right-controls"
-                          style={{
-                            padding: "10px",
-                            backgroundColor: ternary,
-                            borderRadius: "0 8px 8px 0",
-                            marginRight: "15px",
-                            display: "flex",
-                            alignItems: "center",
-                            flexDirection: "row",
-                          }}
-                          className="spell-right-controls"
-                        >
-                          <Tooltip title={t("Info")}>
-                            <IconButton
-                              sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(giftSpell, gift)}
-                            >
-                              <Info />
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      </Grid>
-                    </Grid>
-                  ))}
+                    ))}
                 </React.Fragment>
               ))}
             </Grid>
@@ -277,20 +326,29 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
               open={openModal}
               onClose={handleCloseModal}
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+                paper: { sx: { width: { xs: "90%", md: "80%" } } },
               }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedGift && (
-                  <NonStaticSpellCard item={{
-                    ...selectedGift,
-                    spellType: "gift",
-                    name: selectedGift.name === "esper_gift_custom_name" ? selectedGift.customName : selectedGift.name,
-                  }} />
+                  <NonStaticSpellCard
+                    item={{
+                      ...selectedGift,
+                      spellType: "gift",
+                      name:
+                        selectedGift.name === "esper_gift_custom_name"
+                          ? selectedGift.customName
+                          : selectedGift.name,
+                    }}
+                  />
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>

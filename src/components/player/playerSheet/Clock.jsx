@@ -10,7 +10,14 @@ function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   };
 }
 
-const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onReset }) => {
+const Clock = ({
+  numSections,
+  size,
+  state = [],
+  setState,
+  isCharacterSheet,
+  onReset,
+}) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -72,8 +79,18 @@ const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onRe
     const startAngle = (360 / numSections) * i;
     const endAngle = (360 / numSections) * (i + 1);
 
-    const startPoint = calculateCoordinates(size / 2, size / 2, size / 2, startAngle);
-    const endPoint = calculateCoordinates(size / 2, size / 2, size / 2, endAngle);
+    const startPoint = calculateCoordinates(
+      size / 2,
+      size / 2,
+      size / 2,
+      startAngle,
+    );
+    const endPoint = calculateCoordinates(
+      size / 2,
+      size / 2,
+      size / 2,
+      endAngle,
+    );
 
     const pathData = `
       M ${size / 2},${size / 2}
@@ -105,13 +122,13 @@ const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onRe
         onMouseEnter={() => handleMouseEnter(i)}
         onMouseLeave={handleMouseLeave}
         style={{ cursor: "pointer" }}
-      />
+      />,
     );
   }
 
   return (
-    <svg 
-      width={size} 
+    <svg
+      width={size}
       height={size}
       onContextMenu={handleRightClick}
       style={{ cursor: isCharacterSheet ? "default" : "pointer" }}

@@ -7,7 +7,7 @@ import { useTranslate } from "../../translation/translate";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
-  const {t} = useTranslate();
+  const { t } = useTranslate();
   const [rollToDelete, setRollToDelete] = useState(null);
 
   const openDeleteDialog = (event, roll) => {
@@ -43,7 +43,7 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
             rowSpacing={1}
             sx={{ my: 1, alignItems: "center" }}
           >
-            <Grid >
+            <Grid>
               <Button
                 variant="contained"
                 startIcon={
@@ -54,14 +54,16 @@ export default function PreparedRollsList({ rolls, handleRoll, handleDelete }) {
                 {t("Roll")}
               </Button>
             </Grid>
-            <Grid  size="grow">
-              <Typography sx={{
-                fontSize: "1.1rem"
-              }}>
-                <Roll roll={roll} /> { roll.label && <Diamond />} {roll.label}
+            <Grid size="grow">
+              <Typography
+                sx={{
+                  fontSize: "1.1rem",
+                }}
+              >
+                <Roll roll={roll} /> {roll.label && <Diamond />} {roll.label}
               </Typography>
             </Grid>
-            <Grid >
+            <Grid>
               <Button
                 variant="outlined"
                 color="red"

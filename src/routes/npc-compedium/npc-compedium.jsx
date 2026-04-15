@@ -76,7 +76,15 @@ export default function NpcCompedium() {
       {!loading && !user && (
         <Paper
           elevation={3}
-          sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
           <CloudIcon color="primary" />
           <Typography
@@ -84,8 +92,9 @@ export default function NpcCompedium() {
             sx={{
               color: "text.primary",
               flex: 1,
-              minWidth: 200
-            }}>
+              minWidth: 200,
+            }}
+          >
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -154,7 +163,7 @@ function Personal({ user }) {
           .replace(/[\W_]+/g, " ")
           .toLowerCase()
           .split(" "),
-      ])
+      ]),
     );
   }
 
@@ -245,7 +254,8 @@ function Personal({ user }) {
   const enemyType = (token, name, label) => {
     const isMobile = window.innerWidth < 900;
     return (
-      <Grid sx={{
+      <Grid
+        sx={{
           alignItems: "center",
           justifyContent: "center",
           display: "flex",
@@ -253,8 +263,9 @@ function Personal({ user }) {
         }}
         size={{
           xs: 4,
-          md: 1.3
-        }}>
+          md: 1.3,
+        }}
+      >
         <Avatar
           alt="icon"
           src={token}
@@ -265,16 +276,16 @@ function Personal({ user }) {
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             height:
               selectedType === name
                 ? isMobile
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             border: selectedType === name ? "6px solid purple" : "none",
             cursor: "pointer",
           }}
@@ -332,7 +343,7 @@ function Personal({ user }) {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)",
         )}
       </Paper>
     );
@@ -354,12 +365,18 @@ function Personal({ user }) {
         </Grid>
 
         <Grid container spacing={1} sx={{ py: 0, justifyContent: "center" }}>
-          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+          <Grid
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
             size={{
               xs: 12,
               md: 3,
-              lg: 4
-            }}>
+              lg: 4,
+            }}
+          >
             <TextField
               id="outlined-basic"
               label={t("Adversary Name")}
@@ -373,11 +390,19 @@ function Personal({ user }) {
             />
           </Grid>
 
-          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex", marginLeft: 5, marginRight: 5 }}
+          <Grid
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+              marginLeft: 5,
+              marginRight: 5,
+            }}
             size={{
               xs: 12,
-              md: 3
-            }}>
+              md: 3,
+            }}
+          >
             <Slider
               getAriaLabel={() => "Level"}
               value={levels}
@@ -395,11 +420,17 @@ function Personal({ user }) {
               }}
             />
           </Grid>
-          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+          <Grid
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
             size={{
               xs: 6,
-              md: 2
-            }}>
+              md: 2,
+            }}
+          >
             <FormControl fullWidth size="small">
               <InputLabel id="rank">{t("Rank:")}</InputLabel>
               <Select
@@ -426,11 +457,13 @@ function Personal({ user }) {
             </FormControl>
           </Grid>
 
-          <Grid sx={{ alignItems: "center", display: "flex" }}
+          <Grid
+            sx={{ alignItems: "center", display: "flex" }}
             size={{
               xs: 6,
-              md: 2
-            }}>
+              md: 2,
+            }}
+          >
             <FormControl fullWidth size="small">
               <InputLabel id="Language">{t("Language:")}</InputLabel>
               <Select
@@ -450,11 +483,13 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid sx={{ alignItems: "center", display: "flex" }}
+          <Grid
+            sx={{ alignItems: "center", display: "flex" }}
             size={{
               xs: 6,
-              md: 2
-            }}>
+              md: 2,
+            }}
+          >
             <Button
               variant="outlined"
               fullWidth
@@ -469,8 +504,9 @@ function Personal({ user }) {
             sx={{ alignItems: "center", justifyContent: "center" }}
             size={{
               xs: 6,
-              md: 2
-            }}>
+              md: 2,
+            }}
+          >
             <Button
               fullWidth
               variant="contained"
@@ -594,8 +630,9 @@ function Personal({ user }) {
                 <Typography
                   sx={{
                     fontWeight: 700,
-                    marginBottom: 4
-                  }}>
+                    marginBottom: 4,
+                  }}
+                >
                   {t(" No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
@@ -668,8 +705,9 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
       sx={{ marginBottom: 3 }}
       size={{
         xs: 12,
-        md: 12
-      }}>
+        md: 12,
+      }}
+    >
       <NpcPretty
         npc={npc}
         ref={ref}

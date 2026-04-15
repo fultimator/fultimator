@@ -26,17 +26,22 @@ function emptyCampActivity() {
   return { name: "", targetDescription: "", effect: "" };
 }
 
-export default function EditPlayerCampActivities({ player, setPlayer, isEditMode }) {
+export default function EditPlayerCampActivities({
+  player,
+  setPlayer,
+  isEditMode,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
-    onConfirm: () => {
-          if (deleteIndex !== null) handleRemove(deleteIndex);
-        },
-  });;
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } =
+    useDeleteConfirmation({
+      onConfirm: () => {
+        if (deleteIndex !== null) handleRemove(deleteIndex);
+      },
+    });
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const activities = player.campActivities ?? [];
@@ -54,7 +59,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         return { ...prev, campActivities: updated };
       });
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleAdd = useCallback(() => {
@@ -72,7 +77,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         return { ...prev, campActivities: updated };
       });
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleReplaceFromCompendium = useCallback(
@@ -88,13 +93,13 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 targetDescription: item.targetDescription ?? "",
                 effect: item.effect ?? "",
               }
-            : activity
+            : activity,
         ),
       }));
       setReplaceCompendiumOpen(false);
       setReplaceIndex(null);
     },
-    [replaceIndex, setPlayer]
+    [replaceIndex, setPlayer],
   );
 
   return (
@@ -108,7 +113,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
       }}
     >
       <Grid container>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Camp Activities (Max 2)")}
@@ -120,7 +125,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         </Grid>
 
         {activities.length === 0 && (
-          <Grid  sx={{ py: 2 }} size={12}>
+          <Grid sx={{ py: 2 }} size={12}>
             <Typography sx={{ textAlign: "center" }}>
               {t("No camp activities yet.")}
             </Typography>
@@ -130,34 +135,43 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         {activities.map((activity, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ py: 1, alignItems: "flex-start" }}
+            >
               <Grid
                 size={{
                   xs: 9,
-                  sm: 10
-                }}>
+                  sm: 10,
+                }}
+              >
                 <TextField
                   label={t("Name") + ":"}
                   value={activity.name ?? ""}
-                  onChange={(e) => onChangeActivity(index, "name")(e.target.value)}
+                  onChange={(e) =>
+                    onChangeActivity(index, "name")(e.target.value)
+                  }
                   fullWidth
                   size="small"
                   slotProps={{
                     input: { readOnly: !isEditMode },
-                    htmlInput: { maxLength: 100 }
-                  }} />
+                    htmlInput: { maxLength: 100 },
+                  }}
+                />
               </Grid>
               {isEditMode && (
                 <Grid
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
                   size={{
                     xs: 3,
-                    sm: 2
-                  }}>
+                    sm: 2,
+                  }}
+                >
                   <Tooltip title={t("Replace from Compendium")}>
                     <IconButton
                       size="small"
@@ -184,14 +198,21 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 </Grid>
               )}
 
-              <Grid  size={12}>
+              <Grid size={12}>
                 {isEditMode ? (
                   <Autocomplete
                     freeSolo
                     options={targetOptions}
                     value={activity.targetDescription ?? ""}
-                    onInputChange={(_, value) => onChangeActivity(index, "targetDescription")(value)}
-                    onChange={(_, value) => onChangeActivity(index, "targetDescription")(typeof value === "string" ? value : "")}
+                    onInputChange={(_, value) =>
+                      onChangeActivity(index, "targetDescription")(value)
+                    }
+                    onChange={(_, value) =>
+                      onChangeActivity(
+                        index,
+                        "targetDescription",
+                      )(typeof value === "string" ? value : "")
+                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -208,17 +229,19 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                     fullWidth
                     size="small"
                     slotProps={{
-                      input: { readOnly: true }
+                      input: { readOnly: true },
                     }}
                   />
                 )}
               </Grid>
 
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomTextarea
                   label={t("Effect") + ":"}
                   value={activity.effect ?? ""}
-                  onChange={(e) => onChangeActivity(index, "effect")(e.target.value)}
+                  onChange={(e) =>
+                    onChangeActivity(index, "effect")(e.target.value)
+                  }
                   maxLength={5000}
                   maxRows={8}
                   readOnly={!isEditMode}

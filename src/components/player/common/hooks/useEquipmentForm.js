@@ -35,19 +35,19 @@ export function useEquipmentForm(item) {
   const [magicModifier, setMagicModifier] = useState(item?.magicModifier || 0);
   const [precModifier, setPrecModifier] = useState(item?.precModifier || 0);
   const [damageMeleeModifier, setDamageMeleeModifier] = useState(
-    item?.damageMeleeModifier || 0
+    item?.damageMeleeModifier || 0,
   );
   const [damageRangedModifier, setDamageRangedModifier] = useState(
-    item?.damageRangedModifier || 0
+    item?.damageRangedModifier || 0,
   );
   // Weapon-only modifier
   const [damageModifier, setDamageModifier] = useState(
-    item?.damageModifier || 0
+    item?.damageModifier || 0,
   );
   // Common UX
   const [isEquipped, setIsEquipped] = useState(item?.isEquipped || false);
-  const [modifiersExpanded, setModifiersExpanded] = useState(
-    () => hasAnyModifier(item)
+  const [modifiersExpanded, setModifiersExpanded] = useState(() =>
+    hasAnyModifier(item),
   );
 
   // Reset all state whenever the item being edited changes.
@@ -68,17 +68,30 @@ export function useEquipmentForm(item) {
   const expandModifiers = useCallback(() => setModifiersExpanded(true), []);
 
   /** Returns all modifier values as parsed integers, ready to spread into a saved item. */
-  const modifiers = useCallback(() => ({
-    defModifier: parseInt(defModifier),
-    mDefModifier: parseInt(mDefModifier),
-    initModifier: parseInt(initModifier),
-    magicModifier: parseInt(magicModifier),
-    precModifier: parseInt(precModifier),
-    damageMeleeModifier: parseInt(damageMeleeModifier),
-    damageRangedModifier: parseInt(damageRangedModifier),
-    damageModifier: parseInt(damageModifier),
-    isEquipped,
-  }), [defModifier, mDefModifier, initModifier, magicModifier, precModifier, damageMeleeModifier, damageRangedModifier, damageModifier, isEquipped]);
+  const modifiers = useCallback(
+    () => ({
+      defModifier: parseInt(defModifier),
+      mDefModifier: parseInt(mDefModifier),
+      initModifier: parseInt(initModifier),
+      magicModifier: parseInt(magicModifier),
+      precModifier: parseInt(precModifier),
+      damageMeleeModifier: parseInt(damageMeleeModifier),
+      damageRangedModifier: parseInt(damageRangedModifier),
+      damageModifier: parseInt(damageModifier),
+      isEquipped,
+    }),
+    [
+      defModifier,
+      mDefModifier,
+      initModifier,
+      magicModifier,
+      precModifier,
+      damageMeleeModifier,
+      damageRangedModifier,
+      damageModifier,
+      isEquipped,
+    ],
+  );
 
   /** Resets all modifier fields to zero and collapses the accordion. */
   const clearModifiers = useCallback(() => {
@@ -95,16 +108,26 @@ export function useEquipmentForm(item) {
   }, []);
 
   return {
-    defModifier, setDefModifier,
-    mDefModifier, setMDefModifier,
-    initModifier, setInitModifier,
-    magicModifier, setMagicModifier,
-    precModifier, setPrecModifier,
-    damageMeleeModifier, setDamageMeleeModifier,
-    damageRangedModifier, setDamageRangedModifier,
-    damageModifier, setDamageModifier,
-    isEquipped, setIsEquipped,
-    modifiersExpanded, setModifiersExpanded,
+    defModifier,
+    setDefModifier,
+    mDefModifier,
+    setMDefModifier,
+    initModifier,
+    setInitModifier,
+    magicModifier,
+    setMagicModifier,
+    precModifier,
+    setPrecModifier,
+    damageMeleeModifier,
+    setDamageMeleeModifier,
+    damageRangedModifier,
+    setDamageRangedModifier,
+    damageModifier,
+    setDamageModifier,
+    isEquipped,
+    setIsEquipped,
+    modifiersExpanded,
+    setModifiersExpanded,
     expandModifiers,
     modifiers,
     clearModifiers,

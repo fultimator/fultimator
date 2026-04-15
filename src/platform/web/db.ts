@@ -32,5 +32,11 @@ export {
 } from "react-firebase-hooks/firestore";
 export { useAuthState } from "react-firebase-hooks/auth";
 
-export { syncToDrive, restoreFromDrive, checkDriveAuth, loginDrive, storeAccessToken } from "./drive";
+export {
+  syncToDrive,
+  restoreFromDrive,
+  checkDriveAuth,
+  loginDrive,
+  storeAccessToken,
+} from "./drive";
 export { usePendingSync } from "../idb";

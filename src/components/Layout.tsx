@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({
   const handleNavigation = async () => {
     if (unsavedChanges) {
       const message = t(
-        "You have unsaved changes. Are you sure you want to leave?"
+        "You have unsaved changes. Are you sure you want to leave?",
       );
       const confirmation = await globalConfirm(message);
       if (!confirmation) return;
@@ -138,12 +138,12 @@ const Layout: React.FC<LayoutProps> = ({
 
   const npcRoutes = ["/npc-gallery/:npcId"];
   const isNpcEdit = npcRoutes.some((route) =>
-    new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname)
+    new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
 
   const pcRoutes = ["/pc-gallery/:playerId", "/character-sheet/:playerId"];
   const isPcEdit = pcRoutes.some((route) =>
-    new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname)
+    new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
 
   // Determine if the current path is the homepage

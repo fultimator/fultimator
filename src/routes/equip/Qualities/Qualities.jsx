@@ -98,8 +98,9 @@ function Qualities() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -124,7 +125,10 @@ function Qualities() {
             sx={{
               mb: 2,
               "& .MuiTab-root": {
-                color: theme.palette.mode === "dark" ? "rgba(255,255,255,0.7)" : undefined,
+                color:
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.7)"
+                    : undefined,
               },
               "& .MuiTab-root.Mui-selected": {
                 color: theme.palette.mode === "dark" ? "#ffffff" : undefined,
@@ -138,14 +142,15 @@ function Qualities() {
 
           {tab === 0 && (
             <Grid container spacing={2} sx={{ alignItems: "center" }}>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <SelectBase value={selectedBase} onChange={handleBaseChange} />
               </Grid>
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <ChangeName
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -154,8 +159,9 @@ function Qualities() {
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <FormControl fullWidth variant="standard">
                   <InputLabel id="category-label">{t("Category")}</InputLabel>
                   <Select
@@ -173,7 +179,7 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <ChangeQuality
                   quality={quality}
                   setQuality={(e) => setQuality(e.target.value)}
@@ -181,9 +187,11 @@ function Qualities() {
                   setQualityCost={(e) => setCost(e.target.value)}
                 />
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <FormControl fullWidth>
-                  <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
+                  <InputLabel id="filter-label">
+                    {t("Applicable to")}
+                  </InputLabel>
                   <Select
                     labelId="filter-label"
                     id="filter-select"
@@ -198,7 +206,7 @@ function Qualities() {
                             key={value}
                             label={t(
                               FILTER_OPTIONS.find((o) => o.value === value)
-                                ?.label || value
+                                ?.label || value,
                             )}
                           />
                         ))}
@@ -213,9 +221,9 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                  <Grid >
+                  <Grid>
                     <Button
                       variant="outlined"
                       onClick={() => fileInputRef.current.click()}
@@ -223,7 +231,7 @@ function Qualities() {
                       {t("Upload JSON")}
                     </Button>
                   </Grid>
-                  <Grid >
+                  <Grid>
                     <Button variant="outlined" onClick={handleClearFields}>
                       {t("Clear All Fields")}
                     </Button>
@@ -249,8 +257,9 @@ function Qualities() {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Pretty
           custom={{
             name,

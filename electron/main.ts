@@ -32,7 +32,6 @@ let win: BrowserWindow | null;
 let loadingWindow: BrowserWindow | null;
 
 function createWindow() {
-
   if (!app.isReady()) {
     console.error("App is not ready yet! Waiting before creating window.");
     return;
@@ -109,7 +108,6 @@ function createWindow() {
       console.error("Main window not found");
     }
   });
-  
 
   // Open external links in default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -150,9 +148,12 @@ app.on("activate", () => {
 
 console.log("Electron app is starting...");
 
-app.whenReady().then(() => {
-  console.log("App is ready, creating window...");
-  createWindow();
-}).catch(err => {
-  console.error("Error during app initialization:", err);
-});
+app
+  .whenReady()
+  .then(() => {
+    console.log("App is ready, creating window...");
+    createWindow();
+  })
+  .catch((err) => {
+    console.error("Error during app initialization:", err);
+  });

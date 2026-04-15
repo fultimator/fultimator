@@ -98,7 +98,10 @@ export function notifyListeners(storeName: string): void {
   storeListeners.get(storeName)?.forEach((fn) => fn());
 }
 
-export function subscribeToStore(storeName: string, listener: Listener): () => void {
+export function subscribeToStore(
+  storeName: string,
+  listener: Listener,
+): () => void {
   if (!storeListeners.has(storeName)) storeListeners.set(storeName, new Set());
   storeListeners.get(storeName)!.add(listener);
   return () => storeListeners.get(storeName)?.delete(listener);

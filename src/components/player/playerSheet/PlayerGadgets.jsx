@@ -110,7 +110,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
     // Check if player has enough IP
     if (player.stats.ip.current < ipCost && useIP) {
       window.electron.alert(
-        t("You don't have enough IP to roll this alchemy!")
+        t("You don't have enough IP to roll this alchemy!"),
       );
       return;
     }
@@ -124,7 +124,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
     // Simulate rolling the dice
     const rolledValues = Array.from(
       { length: numDice },
-      () => Math.floor(Math.random() * 20) + 1
+      () => Math.floor(Math.random() * 20) + 1,
     );
 
     setRolledDice(rolledValues);
@@ -155,10 +155,10 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
         // Find corresponding targets and effects for the rolled values
         const matchedTarget = alchemy.targets.find(
           (target) =>
-            targetRoll >= target.rangeFrom && targetRoll <= target.rangeTo
+            targetRoll >= target.rangeFrom && targetRoll <= target.rangeTo,
         );
         const matchedEffect = alchemy.effects.find(
-          (effect) => effect.dieValue === effectRoll
+          (effect) => effect.dieValue === effectRoll,
         );
 
         if (matchedTarget && matchedEffect) {
@@ -175,7 +175,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
     }
 
     const anyEffects = alchemy.effects.filter(
-      (effect) => effect.dieValue === 0
+      (effect) => effect.dieValue === 0,
     );
 
     // Combination with specific target and any effect
@@ -184,7 +184,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
         const targetRoll = diceValue;
         const matchedTarget = alchemy.targets.find(
           (target) =>
-            targetRoll >= target.rangeFrom && targetRoll <= target.rangeTo
+            targetRoll >= target.rangeFrom && targetRoll <= target.rangeTo,
         );
         const combination = {
           target: matchedTarget.effect,
@@ -247,42 +247,43 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       player.stats.ip.current -= 3;
       setPlayer({ ...player });
     }
-  
+
     const inv = player.equipment?.[0] || {};
     const weapons = inv.weapons || [];
-    const hasMagicannon = weapons.some(weapon => weapon.magicannon === true);
-  
+    const hasMagicannon = weapons.some((weapon) => weapon.magicannon === true);
+
     let updatedInv = { ...inv };
 
     if (hasMagicannon) {
       // Delete the existing Magicannon
-      updatedInv.weapons = weapons.filter(weapon => !weapon.magicannon);
+      updatedInv.weapons = weapons.filter((weapon) => !weapon.magicannon);
     }
-  
+
     if (equipMagicannon) {
       // Unequip any currently equipped weapons or shields
-      updatedInv.weapons = (updatedInv.weapons || []).map(weapon => ({
+      updatedInv.weapons = (updatedInv.weapons || []).map((weapon) => ({
         ...weapon,
-        isEquipped: false
+        isEquipped: false,
       }));
-      updatedInv.shields = (updatedInv.shields || []).map(shield => ({
+      updatedInv.shields = (updatedInv.shields || []).map((shield) => ({
         ...shield,
-        isEquipped: false
+        isEquipped: false,
       }));
     }
-  
+
     // Add Magicannon weapon to the player weapons
     updatedInv.weapons = [...(updatedInv.weapons || []), magicannonItem];
-  
-    setPlayer(syncSlots({
-      ...player,
-      equipment: [updatedInv, ...(player.equipment?.slice(1) ?? [])]
-    }));
-  
+
+    setPlayer(
+      syncSlots({
+        ...player,
+        equipment: [updatedInv, ...(player.equipment?.slice(1) ?? [])],
+      }),
+    );
+
     // Close modal
     handleCloseModal();
   };
-  
 
   /* All alchemy spells from all classes */
   const alchemySpells = player.classes
@@ -291,7 +292,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "tinkerer-alchemy" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -301,7 +302,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "tinkerer-infusion" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -311,7 +312,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "tinkerer-magitech" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -351,18 +352,27 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
             >
               {t("Gadgets")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {alchemySpells.map((alchemy, index) => (
                 <Grid
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -387,7 +397,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(alchemy.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -428,12 +445,17 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -458,7 +480,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(infusion.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -489,12 +518,17 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -519,7 +553,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                         t(magitech.className)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -548,12 +589,17 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               {magitechSpells.some((magitech) => magitech.rank >= 2) && (
                 <Grid
                   container
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -573,7 +619,14 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                       {t("Magicannon")}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -609,7 +662,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     width: "80%",
                     maxWidth: "lg",
                   },
-                }
+                },
               }}
             >
               <DialogContent>
@@ -633,7 +686,11 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>
@@ -647,7 +704,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     width: "80%",
                     maxWidth: "lg",
                   },
-                }
+                },
               }}
             >
               <DialogContent>
@@ -658,7 +715,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                   {t("Current IP") + ": " + player.stats.ip.current}
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid  size={8}>
+                  <Grid size={8}>
                     <FormControl fullWidth sx={{ mt: 3 }}>
                       <InputLabel id="rank-select-label">
                         {t("Select Rank")}
@@ -674,7 +731,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                           selectedAlchemy.rank &&
                           ranks
                             .filter(
-                              (rank, index) => index < selectedAlchemy.rank
+                              (rank, index) => index < selectedAlchemy.rank,
                             ) // Filter ranks based on selectedAlchemy.rank
                             .map((rank, index) => (
                               <MenuItem key={index} value={rank}>
@@ -689,7 +746,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControl fullWidth sx={{ mt: 3 }}>
                       <FormControlLabel
                         control={
@@ -724,17 +781,17 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                               effect: combination.effect,
                               combined:
                                 combination.target + " " + combination.effect,
-                            })
+                            }),
                           );
 
                           const uniqueCombinations = Array.from(
                             new Set(
-                              allCombinations.map((item) => item.combined)
-                            )
+                              allCombinations.map((item) => item.combined),
+                            ),
                           ).map((combined) =>
                             allCombinations.find(
-                              (item) => item.combined === combined
-                            )
+                              (item) => item.combined === combined,
+                            ),
                           );
 
                           uniqueCombinations.sort((a, b) => {
@@ -753,7 +810,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                                     <strong>{uniqueCombination.target}</strong>{" "}
                                     <em>{uniqueCombination.effect}</em>
                                   </li>
-                                )
+                                ),
                               )}
                               {uniqueCombinations.length <
                                 allCombinations.length && (
@@ -801,7 +858,7 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     width: "80%",
                     maxWidth: "lg",
                   },
-                }
+                },
               }}
             >
               <DialogContent>
@@ -812,20 +869,12 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
                     marginBottom: "10px",
                   }}
                 >
-                  <ReactMarkdown>
-                    {t(
-                      "Magicannon_desc1"
-                    )}
-                  </ReactMarkdown>
-                  <ReactMarkdown>
-                    {t(
-                      "Magicannon_desc2"
-                    )}
-                  </ReactMarkdown>
+                  <ReactMarkdown>{t("Magicannon_desc1")}</ReactMarkdown>
+                  <ReactMarkdown>{t("Magicannon_desc2")}</ReactMarkdown>
                 </div>
                 <Typography variant="body1">
                   {t(
-                    "Do you want to create a new Magicannon? Creating a new Magicannon will replace any current Magicannon."
+                    "Do you want to create a new Magicannon? Creating a new Magicannon will replace any current Magicannon.",
                   )}
                 </Typography>
                 {/* Select type of damage from elements const */}

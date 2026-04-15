@@ -1,4 +1,4 @@
-import { TypeNpc } from '../../types/Npcs';
+import { TypeNpc } from "../../types/Npcs";
 // Types
 // Pre-save transforms
 type NpcTransform = (npc: TypeNpc) => TypeNpc;

@@ -1,9 +1,9 @@
 /**
  * Fixes vertical text orientation issues for html2canvas.
- * it finds elements with 'writing-mode: vertical-*' and replaces them with 
- * a horizontal container + a rotated inner wrapper to ensure correct rendering 
+ * it finds elements with 'writing-mode: vertical-*' and replaces them with
+ * a horizontal container + a rotated inner wrapper to ensure correct rendering
  * in the screenshot.
- * 
+ *
  * @param {HTMLElement} originalRoot - The original element being captured.
  * @param {Document} clonedDoc - The cloned document from html2canvas onclone callback.
  */
@@ -24,7 +24,11 @@ export const fixVerticalLabels = (originalRoot, clonedDoc) => {
         const content = clonedEl.innerHTML;
 
         // Force the cloned container to be horizontal but lock it to original physical dimensions
-        clonedEl.style.setProperty("writing-mode", "horizontal-tb", "important");
+        clonedEl.style.setProperty(
+          "writing-mode",
+          "horizontal-tb",
+          "important",
+        );
         clonedEl.style.setProperty("display", "flex", "important");
         clonedEl.style.setProperty("align-items", "center", "important");
         clonedEl.style.setProperty("justify-content", "center", "important");
@@ -34,7 +38,7 @@ export const fixVerticalLabels = (originalRoot, clonedDoc) => {
         clonedEl.style.setProperty("padding", "0", "important");
         clonedEl.style.setProperty("margin", style.margin, "important");
 
-        // Rotated inner wrapper. 
+        // Rotated inner wrapper.
         // Swap width/height so that when rotated 90deg it fits the vertical space.
         clonedEl.innerHTML = `<div style="
           display: flex;

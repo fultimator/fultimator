@@ -11,7 +11,12 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
-export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isEditMode }) {
+export default function EditPlayerStats({
+  player,
+  setPlayer,
+  updateMaxStats,
+  isEditMode,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -22,8 +27,8 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
         0,
         Math.min(
           prevPlayer.stats[stat].current + value,
-          prevPlayer.stats[stat].max
-        )
+          prevPlayer.stats[stat].max,
+        ),
       );
       return {
         ...prevPlayer,
@@ -45,8 +50,9 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
         <Grid
           size={{
             xs: 12,
-            sm: 1
-          }}>
+            sm: 1,
+          }}
+        >
           <Typography variant="h2" sx={{ minWidth: "50px" }}>
             {t(label)}
           </Typography>
@@ -54,23 +60,25 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
         <Grid
           size={{
             xs: 6,
-            sm: 2
-          }}>
+            sm: 2,
+          }}
+        >
           <TextField
             label={t("Max")}
             value={player.stats[stat].max}
             variant="outlined"
             fullWidth
             slotProps={{
-              input: { readOnly: true }
+              input: { readOnly: true },
             }}
           />
         </Grid>
         <Grid
           size={{
             xs: 6,
-            sm: 2
-          }}>
+            sm: 2,
+          }}
+        >
           <TextField
             label={t("Current")}
             value={player.stats[stat].current}
@@ -86,14 +94,16 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <Grid container spacing={1} sx={{ justifyContent: "center" }}>
               <Grid
                 size={{
                   xs: 12,
-                  sm: "auto"
-                }}>
+                  sm: "auto",
+                }}
+              >
                 <ButtonGroup
                   variant="outlined"
                   size="small"
@@ -110,8 +120,9 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
               <Grid
                 size={{
                   xs: 12,
-                  sm: "auto"
-                }}>
+                  sm: "auto",
+                }}
+              >
                 <ButtonGroup
                   variant="outlined"
                   size="small"
@@ -129,15 +140,16 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
                 <Grid
                   size={{
                     xs: 12,
-                    sm: "auto"
-                  }}>
+                    sm: "auto",
+                  }}
+                >
                   <Button
                     variant="contained"
                     color="warning"
                     onClick={changeStat(
                       "hp",
                       Math.floor(player.stats.hp.max / 2) -
-                        player.stats.hp.current
+                        player.stats.hp.current,
                     )}
                   >
                     {t("Half")}
@@ -147,8 +159,9 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
               <Grid
                 size={{
                   xs: 12,
-                  sm: "auto"
-                }}>
+                  sm: "auto",
+                }}
+              >
                 <Button
                   variant="contained"
                   color={color}
@@ -162,7 +175,7 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
         )}
         {stat === "hp" &&
           player.stats.hp.current <= Math.floor(player.stats.hp.max / 2) && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Typography
                 variant="body1"
                 color="error"
@@ -187,30 +200,30 @@ export default function EditPlayerStats({ player, setPlayer, updateMaxStats, isE
       }}
     >
       <Grid container spacing={2}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Statistics")}
             showIconButton={false}
           />
         </Grid>
-        <Grid  size={12}>
+        <Grid size={12}>
           {renderStatControls(
             "hp",
             "HP",
             "error",
-            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
+            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20],
           )}
         </Grid>
-        <Grid  size={12}>
+        <Grid size={12}>
           {renderStatControls(
             "mp",
             "MP",
             "info",
-            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20]
+            [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20],
           )}
         </Grid>
-        <Grid  size={12}>
+        <Grid size={12}>
           {renderStatControls("ip", "IP", "success", [-3, -2, -1, 1, 2, 3])}
         </Grid>
       </Grid>

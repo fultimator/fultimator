@@ -48,7 +48,7 @@ export default function PlayerTherioforms({ player }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "therioform" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -86,65 +86,86 @@ export default function PlayerTherioforms({ player }) {
             >
               {t("mutant_therioforms")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {therioformSpells.map((mutantSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
-                  {mutantSpell.therioforms && mutantSpell.therioforms.map((therioform, tIndex) => (
-                    <Grid
-                  container
-                  spacing={0}
-                  key={`${msIndex}-${tIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
-                      size={{
-                        xs: 12,
-                        md: 6
-                      }}>
-                      <Grid  sx={{ display: "flex" }} size={10}>
-                        <Typography
-                          id="spell-left-name"
-                          variant="h2"
+                  {mutantSpell.therioforms &&
+                    mutantSpell.therioforms.map((therioform, tIndex) => (
+                      <Grid
+                        container
+                        spacing={0}
+                        key={`${msIndex}-${tIndex}`}
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
+                        size={{
+                          xs: 12,
+                          md: 6,
+                        }}
+                      >
+                        <Grid sx={{ display: "flex" }} size={10}>
+                          <Typography
+                            id="spell-left-name"
+                            variant="h2"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              backgroundColor: primary,
+                              padding: "5px",
+                              paddingLeft: "10px",
+                              color: "#fff",
+                              borderRadius: "8px 0 0 8px",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                          >
+                            {therioform.name === "mutant_therioform_custom_name"
+                              ? therioform.customName
+                              : t(therioform.name)}
+                          </Typography>
+                        </Grid>
+                        <Grid
                           sx={{
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            backgroundColor: primary,
-                            padding: "5px",
-                            paddingLeft: "10px",
-                            color: "#fff",
-                            borderRadius: "8px 0 0 8px",
                             display: "flex",
-                            alignItems: "center",
-                            width: "100%",
+                            alignItems: "stretch",
+                            maxHeight: "40px",
                           }}
+                          size={2}
                         >
-                          {therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name)}
-                        </Typography>
+                          <div
+                            id="spell-right-controls"
+                            style={{
+                              padding: "10px",
+                              backgroundColor: ternary,
+                              borderRadius: "0 8px 8px 0",
+                              marginRight: "15px",
+                              display: "flex",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                            className="spell-right-controls"
+                          >
+                            <Tooltip title={t("Info")}>
+                              <IconButton
+                                sx={{ padding: "0px" }}
+                                onClick={() =>
+                                  handleOpenModal(mutantSpell, therioform)
+                                }
+                              >
+                                <Info />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        </Grid>
                       </Grid>
-                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
-                        <div
-                          id="spell-right-controls"
-                          style={{
-                            padding: "10px",
-                            backgroundColor: ternary,
-                            borderRadius: "0 8px 8px 0",
-                            marginRight: "15px",
-                            display: "flex",
-                            alignItems: "center",
-                            flexDirection: "row",
-                          }}
-                          className="spell-right-controls"
-                        >
-                          <Tooltip title={t("Info")}>
-                            <IconButton
-                              sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(mutantSpell, therioform)}
-                            >
-                              <Info />
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      </Grid>
-                    </Grid>
-                  ))}
+                    ))}
                 </React.Fragment>
               ))}
             </Grid>
@@ -152,20 +173,30 @@ export default function PlayerTherioforms({ player }) {
               open={openModal}
               onClose={handleCloseModal}
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+                paper: { sx: { width: { xs: "90%", md: "80%" } } },
               }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedTherioform && (
-                  <NonStaticSpellCard item={{
-                    ...selectedTherioform,
-                    spellType: "therioform",
-                    name: selectedTherioform.name === "mutant_therioform_custom_name" ? selectedTherioform.customName : selectedTherioform.name,
-                  }} />
+                  <NonStaticSpellCard
+                    item={{
+                      ...selectedTherioform,
+                      spellType: "therioform",
+                      name:
+                        selectedTherioform.name ===
+                        "mutant_therioform_custom_name"
+                          ? selectedTherioform.customName
+                          : selectedTherioform.name,
+                    }}
+                  />
                 )}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>

@@ -47,20 +47,29 @@ export default function PlayerArmorModal({
   const [martial, setMartial] = useState(armorPlayer?.martial || false);
   const [qualityCost, setQualityCost] = useState(armorPlayer?.qualityCost || 0);
   const [selectedQuality, setSelectedQuality] = useState(
-    armorPlayer?.selectedQuality || ""
+    armorPlayer?.selectedQuality || "",
   );
   const [init, setInit] = useState(armorPlayer?.init || 0);
   const [rework, setRework] = useState(armorPlayer?.rework || false);
   const {
-    defModifier, setDefModifier,
-    mDefModifier, setMDefModifier,
-    initModifier, setInitModifier,
-    magicModifier, setMagicModifier,
-    precModifier, setPrecModifier,
-    damageMeleeModifier, setDamageMeleeModifier,
-    damageRangedModifier, setDamageRangedModifier,
-    isEquipped, _setIsEquipped,
-    modifiersExpanded, setModifiersExpanded,
+    defModifier,
+    setDefModifier,
+    mDefModifier,
+    setMDefModifier,
+    initModifier,
+    setInitModifier,
+    magicModifier,
+    setMagicModifier,
+    precModifier,
+    setPrecModifier,
+    damageMeleeModifier,
+    setDamageMeleeModifier,
+    damageRangedModifier,
+    setDamageRangedModifier,
+    isEquipped,
+    _setIsEquipped,
+    modifiersExpanded,
+    setModifiersExpanded,
     expandModifiers,
     modifiers,
     clearModifiers,
@@ -68,7 +77,11 @@ export default function PlayerArmorModal({
 
   const fileInputRef = useRef(null);
 
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpenFalse, handleDelete: handleDeleteWithConfirm } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpenFalse,
+    handleDelete: handleDeleteWithConfirm,
+  } = useDeleteConfirmation({
     onConfirm: () => {
       if (editArmorIndex !== null) {
         onDeleteArmor(editArmorIndex);
@@ -133,13 +146,34 @@ export default function PlayerArmorModal({
         if (rework) {
           setRework(rework);
         }
-        if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
-        if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
-        if (initModifier) { setInitModifier(initModifier); expandModifiers(); }
-        if (magicModifier) { setMagicModifier(magicModifier); expandModifiers(); }
-        if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
-        if (damageMeleeModifier) { setDamageMeleeModifier(damageMeleeModifier); expandModifiers(); }
-        if (damageRangedModifier) { setDamageRangedModifier(damageRangedModifier); expandModifiers(); }
+        if (defModifier) {
+          setDefModifier(defModifier);
+          expandModifiers();
+        }
+        if (mDefModifier) {
+          setMDefModifier(mDefModifier);
+          expandModifiers();
+        }
+        if (initModifier) {
+          setInitModifier(initModifier);
+          expandModifiers();
+        }
+        if (magicModifier) {
+          setMagicModifier(magicModifier);
+          expandModifiers();
+        }
+        if (precModifier) {
+          setPrecModifier(precModifier);
+          expandModifiers();
+        }
+        if (damageMeleeModifier) {
+          setDamageMeleeModifier(damageMeleeModifier);
+          expandModifiers();
+        }
+        if (damageRangedModifier) {
+          setDamageRangedModifier(damageRangedModifier);
+          expandModifiers();
+        }
       }
     }
     fileInputRef.current.value = null;
@@ -200,7 +234,7 @@ export default function PlayerArmorModal({
               width: "100%",
               maxWidth: "lg",
             },
-          }
+          },
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -226,8 +260,9 @@ export default function PlayerArmorModal({
             <Grid
               size={{
                 xs: 12,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
@@ -246,13 +281,14 @@ export default function PlayerArmorModal({
             <Grid
               size={{
                 xs: 12,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
                   const quality = qualities.find(
-                    (el) => el.name === e.target.value
+                    (el) => el.name === e.target.value,
                   );
                   setSelectedQuality(quality.name);
                   setQuality(quality.quality);
@@ -264,14 +300,15 @@ export default function PlayerArmorModal({
             <Grid
               size={{
                 xs: 12,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -296,8 +333,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"DEF Modifier"}
                       value={defModifier}
@@ -307,8 +345,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"MDEF Modifier"}
                       value={mDefModifier}
@@ -318,8 +357,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"INIT Modifier"}
                       value={initModifier}
@@ -329,8 +369,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Magic Modifier"}
                       value={magicModifier}
@@ -340,8 +381,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Precision Modifier"}
                       value={precModifier}
@@ -351,8 +393,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Damage (Melee) Modifier"}
                       value={damageMeleeModifier}
@@ -362,8 +405,9 @@ export default function PlayerArmorModal({
                   <Grid
                     size={{
                       xs: 6,
-                      md: 4
-                    }}>
+                      md: 4,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Damage (Ranged) Modifier"}
                       value={damageRangedModifier}
@@ -373,12 +417,12 @@ export default function PlayerArmorModal({
                 </Grid>
               </AccordionDetails>
             </Accordion>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider />
             </Grid>
-            <Grid  sx={{ py: 0 }} size={12}>
+            <Grid sx={{ py: 0 }} size={12}>
               <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid >
+                <Grid>
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -386,13 +430,13 @@ export default function PlayerArmorModal({
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid >
+                <Grid>
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}
-                <Grid  size="grow">
+                <Grid size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
                 <input
@@ -404,7 +448,7 @@ export default function PlayerArmorModal({
                 />
               </Grid>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
             </Grid>
           </Grid>
@@ -412,8 +456,9 @@ export default function PlayerArmorModal({
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <PrettyArmor
               armor={{
                 base,
@@ -433,11 +478,7 @@ export default function PlayerArmorModal({
         </DialogContent>
         <DialogActions>
           {editArmorIndex !== null && (
-            <Button
-              onClick={handleDelete}
-              color="error"
-              variant="contained"
-            >
+            <Button onClick={handleDelete} color="error" variant="contained">
               {t("Delete")}
             </Button>
           )}

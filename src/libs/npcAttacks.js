@@ -13,7 +13,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -27,7 +27,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -41,7 +41,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "distance",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -55,7 +55,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "distance",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -69,7 +69,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -83,7 +83,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "distance",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -97,7 +97,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -111,7 +111,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -125,7 +125,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "distance",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -139,7 +139,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -153,7 +153,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -167,7 +167,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -181,7 +181,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -195,7 +195,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: false
+    martial: false,
   },
   {
     itemType: "basic",
@@ -209,7 +209,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -223,7 +223,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -237,7 +237,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 2,
     range: "melee",
-    martial: true
+    martial: true,
   },
   {
     itemType: "basic",
@@ -251,7 +251,7 @@ export const npcAttacks = [
     type: "physical",
     hands: 1,
     range: "melee",
-    martial: true
+    martial: true,
   },
 ];
 

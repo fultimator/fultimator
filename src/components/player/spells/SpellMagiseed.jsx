@@ -14,19 +14,31 @@ import {
   Collapse,
   Divider,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, LocalFlorist, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import {
+  VisibilityOff,
+  ExpandMore,
+  LocalFlorist,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+} from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
 import Clock from "../../player/playerSheet/Clock";
 
-function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, onGrowthClockChange }) {
+function ThemedSpellMagiseed({
+  magiseed,
+  isEditMode,
+  onEdit,
+  onMagiseedChange,
+  onGrowthClockChange,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
-  
+
   const [expandedMagiseeds, setExpandedMagiseeds] = useState(new Set());
   const [localClock, setLocalClock] = useState(magiseed.growthClock || 0);
 
@@ -36,7 +48,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
   }, [magiseed.growthClock]);
 
   const toggleMagiseedExpansion = (index) => {
-    setExpandedMagiseeds(prev => {
+    setExpandedMagiseeds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);
@@ -79,7 +91,10 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
 
   // Handle clock state changes from Clock component
   const handleClockStateChange = (newState) => {
-    const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
+    const filledSections = newState.reduce(
+      (count, section) => count + (section ? 1 : 0),
+      0,
+    );
     setLocalClock(filledSections);
     if (onGrowthClockChange) {
       onGrowthClockChange(filledSections);
@@ -105,16 +120,19 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
   // Get current effect based on growth clock sections
   const getCurrentEffect = () => {
     if (!currentMagiseed) return null;
-    
-    const magiseedTemplate = magiseeds.find(m => m.name === currentMagiseed.name);
+
+    const magiseedTemplate = magiseeds.find(
+      (m) => m.name === currentMagiseed.name,
+    );
     if (!magiseedTemplate) return null;
 
     const effectKey = Math.min(growthClock, 3);
-    const effect = currentMagiseed.effects?.[effectKey] || magiseedTemplate.effects?.[effectKey];
-    
+    const effect =
+      currentMagiseed.effects?.[effectKey] ||
+      magiseedTemplate.effects?.[effectKey];
+
     return effect ? t(effect) : null;
   };
-
 
   return (
     <>
@@ -132,7 +150,8 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -171,7 +190,8 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -189,7 +209,8 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -220,15 +241,19 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
               flexDirection: "column",
               justifyContent: "center",
             }}
-            size={6}>
+            size={6}
+          >
             {currentMagiseed ? (
               <div>
-                <Typography sx={{ fontWeight: "bold" }} style={{ marginBottom: "4px" }}>
+                <Typography
+                  sx={{ fontWeight: "bold" }}
+                  style={{ marginBottom: "4px" }}
+                >
                   {currentMagiseed.customName || t(currentMagiseed.name)}
                 </Typography>
               </div>
             ) : (
-              <Typography sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+              <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
                 {t("magiseed_no_magiseed")}
               </Typography>
             )}
@@ -240,10 +265,17 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
               justifyContent: "center",
               alignItems: "flex-start",
             }}
-            size={6}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            size={6}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               {/* Growth Clock Visual */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 <Clock
                   numSections={4}
                   size={60}
@@ -256,22 +288,29 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                   {growthClock}/4
                 </Typography>
               </div>
-              
+
               {/* Linear Progress Bar */}
-              <div style={{ flex: 1, minWidth: '80px' }}>
+              <div style={{ flex: 1, minWidth: "80px" }}>
                 <LinearProgress
                   variant="determinate"
                   value={getGrowthClockProgress()}
                   sx={{
                     height: 8,
                     borderRadius: 4,
-                    backgroundColor: theme.secondary + '40',
-                    '& .MuiLinearProgress-bar': {
+                    backgroundColor: theme.secondary + "40",
+                    "& .MuiLinearProgress-bar": {
                       backgroundColor: theme.primary,
                     },
                   }}
                 />
-                <div style={{ marginTop: '8px', display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                <div
+                  style={{
+                    marginTop: "8px",
+                    display: "flex",
+                    gap: "4px",
+                    justifyContent: "center",
+                  }}
+                >
                   <Button
                     size="small"
                     variant="outlined"
@@ -344,7 +383,7 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           <div
             style={{
               backgroundColor: theme.primary,
-              fontFamily: "Antonio", 
+              fontFamily: "Antonio",
               fontWeight: "normal",
               fontSize: "1.1em",
               padding: "2px 17px",
@@ -359,61 +398,90 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
           </div>
           {magiseed.magiseeds.map((seed, index) => {
             const isExpanded = expandedMagiseeds.has(index);
-            const magiseedTemplate = magiseeds.find(m => m.name === seed.name);
-            
+            const magiseedTemplate = magiseeds.find(
+              (m) => m.name === seed.name,
+            );
+
             return (
               <div key={index}>
                 <div
                   style={{
                     padding: "8px 17px",
                     borderBottom: `1px solid ${theme.secondary}`,
-                    backgroundColor: currentMagiseed && seed.name === currentMagiseed.name ? theme.ternary + "20" : "transparent",
-                    borderLeft: currentMagiseed && seed.name === currentMagiseed.name ? `4px solid ${theme.primary}` : "none",
+                    backgroundColor:
+                      currentMagiseed && seed.name === currentMagiseed.name
+                        ? theme.ternary + "20"
+                        : "transparent",
+                    borderLeft:
+                      currentMagiseed && seed.name === currentMagiseed.name
+                        ? `4px solid ${theme.primary}`
+                        : "none",
                     cursor: "pointer",
                   }}
                   onClick={() => toggleMagiseedExpansion(index)}
                 >
                   <Grid container sx={{ alignItems: "center" }}>
-                    <Grid  size={1}>
+                    <Grid size={1}>
                       {isExpanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
                     </Grid>
-                    <Grid  size={7}>
-                      <Typography sx={{
-                        fontWeight: currentMagiseed && seed.name === currentMagiseed.name ? "bold" : "normal"
-                      }}>
+                    <Grid size={7}>
+                      <Typography
+                        sx={{
+                          fontWeight:
+                            currentMagiseed &&
+                            seed.name === currentMagiseed.name
+                              ? "bold"
+                              : "normal",
+                        }}
+                      >
                         {seed.customName || t(seed.name)}
                       </Typography>
                     </Grid>
-                    <Grid  style={{ textAlign: 'right' }} size={4}>
+                    <Grid style={{ textAlign: "right" }} size={4}>
                       {isEditMode && (
                         <Button
                           size="small"
-                          variant={currentMagiseed && seed.name === currentMagiseed.name ? "contained" : "outlined"}
-                          color={currentMagiseed && seed.name === currentMagiseed.name ? "success" : "primary"}
+                          variant={
+                            currentMagiseed &&
+                            seed.name === currentMagiseed.name
+                              ? "contained"
+                              : "outlined"
+                          }
+                          color={
+                            currentMagiseed &&
+                            seed.name === currentMagiseed.name
+                              ? "success"
+                              : "primary"
+                          }
                           onClick={(e) => {
                             e.stopPropagation();
-                            const isCurrentSeed = currentMagiseed && seed.name === currentMagiseed.name;
-                            if (onMagiseedChange) onMagiseedChange(isCurrentSeed ? null : seed);
+                            const isCurrentSeed =
+                              currentMagiseed &&
+                              seed.name === currentMagiseed.name;
+                            if (onMagiseedChange)
+                              onMagiseedChange(isCurrentSeed ? null : seed);
                           }}
                         >
                           {currentMagiseed && seed.name === currentMagiseed.name
-                            ? t("magiseed_remove_from_garden") 
-                            : currentMagiseed 
+                            ? t("magiseed_remove_from_garden")
+                            : currentMagiseed
                               ? t("magiseed_graft_in_garden")
                               : t("magiseed_plant_in_garden")}
                         </Button>
                       )}
-                      {!isEditMode && currentMagiseed && seed.name === currentMagiseed.name && (
-                        <Typography
-                          sx={{
-                            color: "success.main",
-                            fontWeight: "bold",
-                            fontSize: "0.85em"
-                          }}
-                        >
-                          {t("magiseed_plant_in_garden")}
-                        </Typography>
-                      )}
+                      {!isEditMode &&
+                        currentMagiseed &&
+                        seed.name === currentMagiseed.name && (
+                          <Typography
+                            sx={{
+                              color: "success.main",
+                              fontWeight: "bold",
+                              fontSize: "0.85em",
+                            }}
+                          >
+                            {t("magiseed_plant_in_garden")}
+                          </Typography>
+                        )}
                     </Grid>
                   </Grid>
                 </div>
@@ -426,44 +494,66 @@ function ThemedSpellMagiseed({ magiseed, isEditMode, onEdit, onMagiseedChange, o
                     }}
                   >
                     {/* Description */}
-                    <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 2 }}>
-                      {seed.description ? t(seed.description) : (magiseedTemplate && t(magiseedTemplate.description)) || t("No description available")}
+                    <Typography
+                      variant="body2"
+                      sx={{ fontStyle: "italic", mb: 2 }}
+                    >
+                      {seed.description
+                        ? t(seed.description)
+                        : (magiseedTemplate &&
+                            t(magiseedTemplate.description)) ||
+                          t("No description available")}
                     </Typography>
-                    
+
                     {/* Effect Range */}
-                    {seed.rangeStart !== undefined && seed.rangeEnd !== undefined && (
-                      <>
-                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 0.5 }}>
-                          {t("magiseed_effect_range")}:
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 2 }}>
-                          T = {seed.rangeStart} to T = {seed.rangeEnd}
-                        </Typography>
-                      </>
-                    )}
-                    
+                    {seed.rangeStart !== undefined &&
+                      seed.rangeEnd !== undefined && (
+                        <>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: "bold", mb: 0.5 }}
+                          >
+                            {t("magiseed_effect_range")}:
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 2 }}>
+                            T = {seed.rangeStart} to T = {seed.rangeEnd}
+                          </Typography>
+                        </>
+                      )}
+
                     <Divider sx={{ my: 2 }} />
-                    
+
                     {/* Effects by growth clock section */}
-                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: "bold", mb: 1 }}
+                    >
                       {t("magiseed_effect_by_growth_clock")}
                     </Typography>
-                    
+
                     {(() => {
-                      const rangeStart = seed.rangeStart ?? (magiseedTemplate?.rangeStart ?? 0);
-                      const rangeEnd = seed.rangeEnd ?? (magiseedTemplate?.rangeEnd ?? 3);
+                      const rangeStart =
+                        seed.rangeStart ?? magiseedTemplate?.rangeStart ?? 0;
+                      const rangeEnd =
+                        seed.rangeEnd ?? magiseedTemplate?.rangeEnd ?? 3;
                       const sections = [];
                       for (let i = rangeStart; i <= rangeEnd; i++) {
                         sections.push(i);
                       }
                       return sections;
                     })().map((section) => {
-                      const effect = seed.effects?.[section] || (magiseedTemplate && magiseedTemplate.effects?.[section]);
+                      const effect =
+                        seed.effects?.[section] ||
+                        (magiseedTemplate &&
+                          magiseedTemplate.effects?.[section]);
                       if (!effect) return null;
-                      
+
                       return (
                         <Box key={section} sx={{ mb: 1.5 }}>
-                          <Typography variant="caption" sx={{ fontWeight: "bold", color: theme.primary }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: "bold", color: theme.primary }}
+                          >
                             T = {section}:
                           </Typography>
                           <Box sx={{ ml: 2, mt: 0.5 }}>

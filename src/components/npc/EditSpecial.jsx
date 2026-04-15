@@ -5,19 +5,19 @@ import {
   FormControl,
   IconButton,
   TextField,
-  useMediaQuery
+  useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
-  const isSmallScreen = useMediaQuery('(max-width: 899px)');
+  const isSmallScreen = useMediaQuery("(max-width: 899px)");
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingSpecialIndex, setPendingSpecialIndex] = useState(null);
@@ -35,8 +35,8 @@ export default function EditSpecial({ npc, setNpc }) {
       special: [
         ...(prevState.special || []),
         {
-        name: "",
-        effect: "",
+          name: "",
+          effect: "",
         },
       ],
     }));
@@ -56,16 +56,22 @@ export default function EditSpecial({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type={isSmallScreen ? 'middle' : 'top'} addItem={addSpecial} headerText={t("Special Rules")} icon={Add} openCompendium={() => setModalOpen(true)} />
+      <CustomHeader
+        type={isSmallScreen ? "middle" : "top"}
+        addItem={addSpecial}
+        headerText={t("Special Rules")}
+        icon={Add}
+        openCompendium={() => setModalOpen(true)}
+      />
       {npc.special?.map((special, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid  sx={{ p: 0, m: 0 }}>
+            <Grid sx={{ p: 0, m: 0 }}>
               <IconButton onClick={() => openDeleteDialog(i)}>
                 <RemoveCircleOutlined />
               </IconButton>
             </Grid>
-            <Grid  size="grow">
+            <Grid size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -78,7 +84,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={3}>
+            <Grid size={3}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="spCost"
@@ -88,12 +94,12 @@ export default function EditSpecial({ npc, setNpc }) {
                   onChange={(e) => onChangeSpecial(i, "spCost", e.target.value)}
                   size="small"
                   slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
                   }}
                 />
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={special.effect}
                   onChange={(e) => {
@@ -126,7 +132,11 @@ export default function EditSpecial({ npc, setNpc }) {
             ...prev,
             special: [
               ...(prev.special || []),
-              { name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 },
+              {
+                name: item.name,
+                effect: item.effect || "",
+                spCost: item.spCost ?? 1,
+              },
             ],
           }));
         }}

@@ -16,7 +16,7 @@ export const globalConfirm = async (message) => {
     const result = await Promise.race([
       Promise.resolve(confirmFunction(message)),
       new Promise((resolve) =>
-        setTimeout(() => resolve("__confirm_timeout__"), CONFIRM_TIMEOUT_MS)
+        setTimeout(() => resolve("__confirm_timeout__"), CONFIRM_TIMEOUT_MS),
       ),
     ]);
 
@@ -30,4 +30,3 @@ export const globalConfirm = async (message) => {
     return window.confirm(message);
   }
 };
-  

@@ -43,9 +43,13 @@ export default function SpellEntropistGambleModal({
   const [editedGamble, setEditedGamble] = useState(gamble || {});
   const [targets, setTargets] = useState(gamble?.targets || []);
   const [validationError, setValidationError] = useState("");
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   useEffect(() => {
     if (gamble) {
@@ -77,7 +81,7 @@ export default function SpellEntropistGambleModal({
 
       // Ensure all 12 die faces are covered
       const requiredDieFaces = new Set(
-        Array.from({ length: 12 }, (_, i) => i + 1)
+        Array.from({ length: 12 }, (_, i) => i + 1),
       );
       const coveredDieFaces = new Set();
       for (const range of ranges) {
@@ -104,7 +108,7 @@ export default function SpellEntropistGambleModal({
 
       // Check second effects if enabled
       const targetsWithSecondEffects = targets.filter(
-        (target) => target.secondRoll
+        (target) => target.secondRoll,
       );
       if (!error) {
         for (const target of targetsWithSecondEffects) {
@@ -171,7 +175,7 @@ export default function SpellEntropistGambleModal({
         ...newTargets[targetIndex],
         secondEffects: newTargets[targetIndex].secondEffects.map(
           (effect, idx) =>
-            idx === effectIndex ? { ...effect, [field]: value } : effect
+            idx === effectIndex ? { ...effect, [field]: value } : effect,
         ),
       };
       return newTargets;
@@ -215,7 +219,7 @@ export default function SpellEntropistGambleModal({
       newTargets[targetIndex] = {
         ...newTargets[targetIndex],
         secondEffects: newTargets[targetIndex].secondEffects.filter(
-          (_, i) => i !== effectIndex
+          (_, i) => i !== effectIndex,
         ),
       };
       return newTargets;
@@ -225,12 +229,12 @@ export default function SpellEntropistGambleModal({
   const handleSave = () => {
     if (validateTargets()) {
       const sortedTargets = [...targets].sort(
-        (a, b) => a.rangeFrom - b.rangeFrom
+        (a, b) => a.rangeFrom - b.rangeFrom,
       );
       onSave(editedGamble.index, { ...editedGamble, targets: sortedTargets });
     }
   };
-return (
+  return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -240,7 +244,7 @@ return (
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -260,7 +264,7 @@ return (
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid  size={12}>
+          <Grid size={12}>
             <TextField
               label={t("Spell Name")}
               variant="outlined"
@@ -268,15 +272,16 @@ return (
               value={editedGamble.spellName}
               onChange={(e) => handleChange("spellName", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              md: 4
-            }}>
+              md: 4,
+            }}
+          >
             <TextField
               type="number"
               label={t("MP x Dice")}
@@ -310,8 +315,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              md: 4
-            }}>
+              md: 4,
+            }}
+          >
             <TextField
               type="number"
               label={t("Max Throwable Dices")}
@@ -331,7 +337,7 @@ return (
                 ) {
                   handleChange(
                     "maxTargets",
-                    value === "" ? 0 : parseInt(value, 10)
+                    value === "" ? 0 : parseInt(value, 10),
                   );
                 }
               }}
@@ -349,8 +355,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              md: 4
-            }}>
+              md: 4,
+            }}
+          >
             <FormControl fullWidth>
               <InputLabel id="attr-label">{t("Attribute")}</InputLabel>
               <Select
@@ -373,12 +380,14 @@ return (
               container
               spacing={2}
               sx={{ mt: 2, pt: 2, borderTop: "1px solid #e0e0e0" }}
-              size={12}>
+              size={12}
+            >
               <Grid
                 size={{
                   xs: 12,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <FormControl fullWidth>
                   <InputLabel id={`range-from-label-${index}`}>
                     {t("Range From")}
@@ -397,7 +406,7 @@ return (
                         <MenuItem key={value} value={value}>
                           {value}
                         </MenuItem>
-                      )
+                      ),
                     )}
                   </Select>
                 </FormControl>
@@ -405,8 +414,9 @@ return (
               <Grid
                 size={{
                   xs: 12,
-                  sm: 2
-                }}>
+                  sm: 2,
+                }}
+              >
                 <FormControl fullWidth>
                   <InputLabel id={`range-to-label-${index}`}>
                     {t("Range To")}
@@ -425,7 +435,7 @@ return (
                         <MenuItem key={value} value={value}>
                           {value}
                         </MenuItem>
-                      )
+                      ),
                     )}
                   </Select>
                 </FormControl>
@@ -433,8 +443,9 @@ return (
               <Grid
                 size={{
                   xs: 12,
-                  sm: 4
-                }}>
+                  sm: 4,
+                }}
+              >
                 <TextField
                   label={t("Effect")}
                   value={target.effect}
@@ -443,15 +454,16 @@ return (
                   }
                   fullWidth
                   slotProps={{
-                    htmlInput: { maxLength: 200 }
+                    htmlInput: { maxLength: 200 },
                   }}
                 />
               </Grid>
               <Grid
                 size={{
                   xs: 12,
-                  sm: 3
-                }}>
+                  sm: 3,
+                }}
+              >
                 <FormControlLabel
                   control={
                     <Switch
@@ -460,7 +472,7 @@ return (
                         handleTargetChange(
                           index,
                           "secondRoll",
-                          e.target.checked
+                          e.target.checked,
                         )
                       }
                       color="primary"
@@ -473,8 +485,9 @@ return (
                 sx={{ mt: 2 }}
                 size={{
                   xs: 12,
-                  sm: 1
-                }}>
+                  sm: 1,
+                }}
+              >
                 <IconButton
                   aria-label="remove"
                   onClick={() => handleRemoveTarget(index)}
@@ -484,14 +497,15 @@ return (
                 </IconButton>
               </Grid>
               {target.secondRoll && (
-                <Grid  sx={{ mt: 2 }} size={12}>
+                <Grid sx={{ mt: 2 }} size={12}>
                   {target.secondEffects.map((effect, effectIndex) => (
                     <Grid container spacing={2} key={effectIndex}>
                       <Grid
                         size={{
                           xs: 5,
-                          sm: 3
-                        }}>
+                          sm: 3,
+                        }}
+                      >
                         <FormControl fullWidth sx={{ mb: 2 }}>
                           <InputLabel
                             id={`die-value-label-${index}-${effectIndex}`}
@@ -507,7 +521,7 @@ return (
                                 index,
                                 effectIndex,
                                 "dieValue",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                           >
@@ -522,8 +536,9 @@ return (
                       <Grid
                         size={{
                           xs: 5,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         <TextField
                           label={t("Effect")}
                           value={effect.effect}
@@ -532,20 +547,21 @@ return (
                               index,
                               effectIndex,
                               "effect",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           fullWidth
                           slotProps={{
-                            htmlInput: { maxLength: 200 }
+                            htmlInput: { maxLength: 200 },
                           }}
                         />
                       </Grid>
                       <Grid
                         size={{
                           xs: 2,
-                          sm: 3
-                        }}>
+                          sm: 3,
+                        }}
+                      >
                         <Button
                           variant="contained"
                           color="error"
@@ -571,16 +587,16 @@ return (
               )}
             </Grid>
           ))}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Divider sx={{ my: 2 }} />
           </Grid>
-          <Grid  sx={{ mt: 2 }} size={12}>
+          <Grid sx={{ mt: 2 }} size={12}>
             <Button variant="contained" onClick={handleAddTarget}>
               {t("Add Target")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid  sx={{ mt: 2 }} size={12}>
+            <Grid sx={{ mt: 2 }} size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}
@@ -588,8 +604,9 @@ return (
         <Grid
           size={{
             xs: 12,
-            sm: 12
-          }}>
+            sm: 12,
+          }}
+        >
           <FormControlLabel
             sx={{ mt: 4 }}
             control={
@@ -606,8 +623,9 @@ return (
         <Grid
           size={{
             xs: 12,
-            sm: 12
-          }}>
+            sm: 12,
+          }}
+        >
           <FormControlLabel
             control={
               <Switch

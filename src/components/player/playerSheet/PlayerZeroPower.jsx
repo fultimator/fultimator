@@ -1,5 +1,12 @@
 import React from "react";
-import { Paper, Grid, Typography, Divider, IconButton, Tooltip } from "@mui/material";
+import {
+  Paper,
+  Grid,
+  Typography,
+  Divider,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -52,18 +59,18 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
   const triggerName =
     typeof zeroPower.zeroTrigger === "string"
       ? zeroPower.zeroTrigger
-      : zeroPower.zeroTrigger?.name ?? "";
+      : (zeroPower.zeroTrigger?.name ?? "");
   const triggerDesc =
     typeof zeroPower.zeroTrigger === "object"
-      ? zeroPower.zeroTrigger?.description ?? ""
+      ? (zeroPower.zeroTrigger?.description ?? "")
       : "";
   const effectName =
     typeof zeroPower.zeroEffect === "string"
       ? zeroPower.zeroEffect
-      : zeroPower.zeroEffect?.name ?? "";
+      : (zeroPower.zeroEffect?.name ?? "");
   const effectDesc =
     typeof zeroPower.zeroEffect === "object"
-      ? zeroPower.zeroEffect?.description ?? ""
+      ? (zeroPower.zeroEffect?.description ?? "")
       : "";
 
   return (
@@ -99,7 +106,8 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
           {sections > 0 && (
             <Grid
               sx={{ display: "flex", justifyContent: "center", pt: 1, pb: 0.5 }}
-              size={12}>
+              size={12}
+            >
               <Clock
                 numSections={sections}
                 size={180}
@@ -110,7 +118,10 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
           )}
 
           {isEditMode && setPlayer && (
-            <Grid sx={{ display: "flex", justifyContent: "center", pb: 1, gap: 1 }} size={12}>
+            <Grid
+              sx={{ display: "flex", justifyContent: "center", pb: 1, gap: 1 }}
+              size={12}
+            >
               <Tooltip title={t("Decrement")} arrow>
                 <IconButton
                   color="primary"
@@ -152,7 +163,8 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
                 px: "10px",
                 py: "5px",
               }}
-              size={12}>
+              size={12}
+            >
               <Typography
                 sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
               >
@@ -180,7 +192,8 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
                 px: "10px",
                 py: "5px",
               }}
-              size={12}>
+              size={12}
+            >
               <Typography
                 sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
               >

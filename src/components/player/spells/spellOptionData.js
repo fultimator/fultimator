@@ -404,33 +404,77 @@ export const availableSymbols = [
 
 export const invocationsByWellspring = {
   Air: [
-    { name: "invoker_aero_blast", type: "Blast", effect: "invoker_aero_blast_desc" },
+    {
+      name: "invoker_aero_blast",
+      type: "Blast",
+      effect: "invoker_aero_blast_desc",
+    },
     { name: "invoker_aero_hex", type: "Hex", effect: "invoker_aero_hex_desc" },
     { name: "invoker_breeze", type: "Utility", effect: "invoker_breeze_desc" },
-    { name: "invoker_twister", type: "Utility", effect: "invoker_twister_desc" },
+    {
+      name: "invoker_twister",
+      type: "Utility",
+      effect: "invoker_twister_desc",
+    },
   ],
   Earth: [
-    { name: "invoker_geo_blast", type: "Blast", effect: "invoker_geo_blast_desc" },
+    {
+      name: "invoker_geo_blast",
+      type: "Blast",
+      effect: "invoker_geo_blast_desc",
+    },
     { name: "invoker_geo_hex", type: "Hex", effect: "invoker_geo_hex_desc" },
     { name: "invoker_growth", type: "Utility", effect: "invoker_growth_desc" },
-    { name: "invoker_quicksand", type: "Utility", effect: "invoker_quicksand_desc" },
+    {
+      name: "invoker_quicksand",
+      type: "Utility",
+      effect: "invoker_quicksand_desc",
+    },
   ],
   Fire: [
-    { name: "invoker_pyro_blast", type: "Blast", effect: "invoker_pyro_blast_desc" },
+    {
+      name: "invoker_pyro_blast",
+      type: "Blast",
+      effect: "invoker_pyro_blast_desc",
+    },
     { name: "invoker_pyro_hex", type: "Hex", effect: "invoker_pyro_hex_desc" },
     { name: "invoker_burst", type: "Utility", effect: "invoker_burst_desc" },
     { name: "invoker_smoke", type: "Utility", effect: "invoker_smoke_desc" },
   ],
   Lightning: [
-    { name: "invoker_electro_blast", type: "Blast", effect: "invoker_electro_blast_desc" },
-    { name: "invoker_electro_hex", type: "Hex", effect: "invoker_electro_hex_desc" },
+    {
+      name: "invoker_electro_blast",
+      type: "Blast",
+      effect: "invoker_electro_blast_desc",
+    },
+    {
+      name: "invoker_electro_hex",
+      type: "Hex",
+      effect: "invoker_electro_hex_desc",
+    },
     { name: "invoker_static", type: "Utility", effect: "invoker_static_desc" },
-    { name: "invoker_thunder", type: "Utility", effect: "invoker_thunder_desc" },
+    {
+      name: "invoker_thunder",
+      type: "Utility",
+      effect: "invoker_thunder_desc",
+    },
   ],
   Water: [
-    { name: "invoker_hydro_blast", type: "Blast", effect: "invoker_hydro_blast_desc" },
-    { name: "invoker_hydro_hex", type: "Hex", effect: "invoker_hydro_hex_desc" },
+    {
+      name: "invoker_hydro_blast",
+      type: "Blast",
+      effect: "invoker_hydro_blast_desc",
+    },
+    {
+      name: "invoker_hydro_hex",
+      type: "Hex",
+      effect: "invoker_hydro_hex_desc",
+    },
     { name: "invoker_chill", type: "Utility", effect: "invoker_chill_desc" },
-    { name: "invoker_frostbite", type: "Utility", effect: "invoker_frostbite_desc" },
+    {
+      name: "invoker_frostbite",
+      type: "Utility",
+      effect: "invoker_frostbite_desc",
+    },
   ],
 };

@@ -67,12 +67,24 @@ const DataSyncMenu: React.FC<DataSyncMenuProps> = ({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         {supportsLocalDb && [
-          <MenuItem key="export-local" onClick={wrap(onLocalExport)} disabled={isLoading}>
-            <ListItemIcon><FileDownload /></ListItemIcon>
+          <MenuItem
+            key="export-local"
+            onClick={wrap(onLocalExport)}
+            disabled={isLoading}
+          >
+            <ListItemIcon>
+              <FileDownload />
+            </ListItemIcon>
             <ListItemText primary={t("Export Local Database")} />
           </MenuItem>,
-          <MenuItem key="import-local" onClick={wrap(onLocalImport)} disabled={isLoading}>
-            <ListItemIcon><FileUpload /></ListItemIcon>
+          <MenuItem
+            key="import-local"
+            onClick={wrap(onLocalImport)}
+            disabled={isLoading}
+          >
+            <ListItemIcon>
+              <FileUpload />
+            </ListItemIcon>
             <ListItemText primary={t("Import Local Database")} />
           </MenuItem>,
         ]}
@@ -80,12 +92,24 @@ const DataSyncMenu: React.FC<DataSyncMenuProps> = ({
         {supportsLocalDb && isAuthenticated && <Divider key="drive-divider" />}
 
         {isAuthenticated && [
-          <MenuItem key="drive-export" onClick={wrap(onDriveExport)} disabled={isLoading}>
-            <ListItemIcon><CloudUpload /></ListItemIcon>
+          <MenuItem
+            key="drive-export"
+            onClick={wrap(onDriveExport)}
+            disabled={isLoading}
+          >
+            <ListItemIcon>
+              <CloudUpload />
+            </ListItemIcon>
             <ListItemText primary={t("Export to Google Drive")} />
           </MenuItem>,
-          <MenuItem key="drive-import" onClick={wrap(onDriveImport)} disabled={isLoading}>
-            <ListItemIcon><CloudDownload /></ListItemIcon>
+          <MenuItem
+            key="drive-import"
+            onClick={wrap(onDriveImport)}
+            disabled={isLoading}
+          >
+            <ListItemIcon>
+              <CloudDownload />
+            </ListItemIcon>
             <ListItemText primary={t("Restore from Google Drive")} />
           </MenuItem>,
         ]}

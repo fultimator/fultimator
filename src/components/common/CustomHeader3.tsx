@@ -120,7 +120,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
                 <span key={index}>{FilledStarSVG}</span>
               ) : (
                 <span key={index}>{EmptyStarSVG}</span>
-              )
+              ),
             )}
           </>
         )}

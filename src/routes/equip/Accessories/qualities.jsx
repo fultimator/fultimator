@@ -12,7 +12,7 @@ const qualities = [
     name: t("Resistance", true),
     quality: t(
       "You have Resistance to a single type of damage (except physical)",
-      true
+      true,
     ),
     cost: 700,
   },
@@ -33,7 +33,7 @@ const qualities = [
     name: t("Dual Resistance", true),
     quality: t(
       "You have Resistance to two types of damage (except physical)",
-      true
+      true,
     ),
     cost: 1000,
   },
@@ -48,7 +48,7 @@ const qualities = [
     name: t("Immunity", true),
     quality: t(
       "You are immune to a single type of damage (except physical)",
-      true
+      true,
     ),
     cost: 1500,
   },
@@ -69,17 +69,14 @@ const qualities = [
     name: t("Damage Change", true),
     quality: t(
       "All damage dealt by your weapons, spells, and Skills becomes of a specific type.",
-      true
+      true,
     ),
     cost: 300,
   },
   {
     category: t("Enhancement Qualities", true),
     name: t("Initiative Up", true),
-    quality: t(
-      "You gain a +4 bonus to your Initiative modifier.",
-      true
-    ),
+    quality: t("You gain a +4 bonus to your Initiative modifier.", true),
     cost: 500,
   },
   {
@@ -105,7 +102,7 @@ const qualities = [
     name: t("Healing Up", true),
     quality: t(
       "Spells you cast that whose effects restore Hit Points will restore 5 extra Hit Points.",
-      true
+      true,
     ),
     cost: 1500,
   },
@@ -120,7 +117,7 @@ const qualities = [
     name: t("Weapon Up", true),
     quality: t(
       "Your attacks with (choose one: melee, ranged) weapons deal 5 extra damage.",
-      true
+      true,
     ),
     cost: 2000,
   },

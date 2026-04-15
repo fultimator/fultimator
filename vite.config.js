@@ -1,16 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import svgr from 'vite-plugin-svgr';
-import path from 'path';
-import { readFileSync } from 'fs';
-const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
+import svgr from "vite-plugin-svgr";
+import path from "path";
+import { readFileSync } from "fs";
+const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
 export default defineConfig({
-  plugins: [react(), svgr({
-    svgrOptions: {
-      icon: true,
-    },
-  })],
+  plugins: [
+    react(),
+    svgr({
+      svgrOptions: {
+        icon: true,
+      },
+    }),
+  ],
   server: {
     port: 3000,
     open: true, // Automatically opens the browser
@@ -21,16 +24,16 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@routes': path.resolve(__dirname, 'src/routes'),
-      '@platform/cloud': path.resolve(__dirname, 'src/platform/web/db'),
-      '@platform': path.resolve(__dirname, 'src/platform/web'),
+      "@routes": path.resolve(__dirname, "src/routes"),
+      "@platform/cloud": path.resolve(__dirname, "src/platform/web/db"),
+      "@platform": path.resolve(__dirname, "src/platform/web"),
     },
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   css: {
     preprocessorOptions: {
       sass: {
-        api: 'modern',
+        api: "modern",
       },
     },
   },
