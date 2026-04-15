@@ -105,14 +105,16 @@ function PackRow({ pack, onSetActive, onDelete }: {
         <TableCell sx={{ width: 96 }}>
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title={t("Delete")}>
-              <IconButton
-                size="small"
-                color="error"
-                onClick={handleDelete}
-                disabled={pack.isPersonal || pack.locked}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={handleDelete}
+                  disabled={pack.isPersonal || pack.locked}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title={t("More actions (coming soon)")}>
               <span>

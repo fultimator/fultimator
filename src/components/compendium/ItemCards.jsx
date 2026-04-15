@@ -686,6 +686,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
           <>
             <Typography
               variant="body2"
+              component="div"
               sx={{
                 color: "text.secondary",
                 fontStyle: "italic",
@@ -732,6 +733,7 @@ export const NonStaticSpellCard = React.memo(function NonStaticSpellCard({ item,
             {item.genoclepsis && (
               <Typography
                 variant="body2"
+                component="div"
                 sx={{
                   color: "text.secondary",
                   fontStyle: "italic",
@@ -1823,6 +1825,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
             <Typography
               key={ki}
               variant="body2"
+              component="div"
               sx={{
                 color: "text.secondary",
                 mb: ki < rank.descKeys.length - 1 ? 0.5 : 0

@@ -140,15 +140,17 @@ export default function BattleHeader({
         }}
       >
         <Tooltip title={t("combat_sim_previous_round")}>
-          <IconButton
-            onClick={handleDecreaseRound}
-            color={isDarkMode ? "#fff" : "primary"}
-            size="small"
-            sx={{ padding: 1 }}
-            disabled={round <= 1}
-          >
-            <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={handleDecreaseRound}
+              color={isDarkMode ? "#fff" : "primary"}
+              size="small"
+              sx={{ padding: 1 }}
+              disabled={round <= 1}
+            >
+              <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
+            </IconButton>
+          </span>
         </Tooltip>
         <Typography
           variant="h5"
@@ -235,18 +237,20 @@ export default function BattleHeader({
         {/* Save Button */}
         {isMobile ? (
           <Tooltip title={t("combat_sim_save")}>
-            <IconButton
-              onClick={handleSaveState}
-              color="white"
-              size="small"
-              disabled={!isDirty}
-              sx={{
-                backgroundColor: "primary.main",
-                margin: 0,
-              }}
-            >
-              <Save fontSize="medium" />
-            </IconButton>
+            <span>
+              <IconButton
+                onClick={handleSaveState}
+                color="white"
+                size="small"
+                disabled={!isDirty}
+                sx={{
+                  backgroundColor: "primary.main",
+                  margin: 0,
+                }}
+              >
+                <Save fontSize="medium" />
+              </IconButton>
+            </span>
           </Tooltip>
         ) : (
           <Button

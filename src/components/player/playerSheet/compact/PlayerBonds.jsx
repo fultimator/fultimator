@@ -161,14 +161,16 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
               <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                 {isEditMode && (
                   <Tooltip title={t("Add Bond")}>
-                    <IconButton
-                      size="small"
-                      onClick={addNewBond}
-                      disabled={bonds.length >= 6}
-                      sx={{ color: "#fff", p: 0.5 }}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={addNewBond}
+                        disabled={bonds.length >= 6}
+                        sx={{ color: "#fff", p: 0.5 }}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 )}
               </StyledTableCellHeader>

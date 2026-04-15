@@ -119,58 +119,62 @@ export default function PlayerArmor({
                             : t("Equip Armor")
                         }
                       >
-                        <Badge
+                        <span>
+                          <Badge
                           badgeContent="E"
                           color="primary"
                           invisible={!armorItem.isEquipped}
                           sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
-                        >
-                          <IconButton
-                            onClick={() => onEquipArmor(index)}
-
-                            disabled={!isEditMode}
-                            size="small"
-                            sx={{
-                              backgroundColor: armorItem.isEquipped
-                                ? theme.palette.ternary.main
-                                : theme.palette.background.paper,
-                              "&:hover": {
-                                backgroundColor: armorItem.isEquipped
-                                  ? theme.palette.quaternary.main
-                                  : theme.palette.secondary.main,
-                              },
-                              transition: "background-color 0.3s",
-                              p: 0.5,
-                              border: `1px solid ${theme.palette.divider}`
-                            }}
                           >
-                            <Equip
-                              color={
-                                armorItem.isEquipped
-                                  ? theme.palette.mode === "dark"
+                            <IconButton
+                              onClick={() => onEquipArmor(index)}
+
+                              disabled={!isEditMode}
+                              size="small"
+                              sx={{
+                                backgroundColor: armorItem.isEquipped
+                                  ? theme.palette.ternary.main
+                                  : theme.palette.background.paper,
+                                "&:hover": {
+                                  backgroundColor: armorItem.isEquipped
+                                    ? theme.palette.quaternary.main
+                                    : theme.palette.secondary.main,
+                                },
+                                transition: "background-color 0.3s",
+                                p: 0.5,
+                                border: `1px solid ${theme.palette.divider}`
+                              }}
+                            >
+                              <Equip
+                                color={
+                                  armorItem.isEquipped
+                                    ? theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.primary.main
+                                    : theme.palette.text.secondary
+                                }
+                                strokeColor={
+                                  armorItem.isEquipped &&
+                                  theme.palette.mode === "dark"
                                     ? theme.palette.white.main
-                                    : theme.palette.primary.main
-                                  : theme.palette.text.secondary
-                              }
-                              strokeColor={
-                                armorItem.isEquipped &&
-                                theme.palette.mode === "dark"
-                                  ? theme.palette.white.main
-                                  : theme.palette.secondary.main
-                              }
-                            />
-                          </IconButton>
-                        </Badge>
+                                    : theme.palette.secondary.main
+                                }
+                              />
+                            </IconButton>
+                          </Badge>
+                        </span>
                       </Tooltip>
                     ) : (
                       <Tooltip title={t("Not proficient  -  martial item")}>
-                        <IconButton
-                          onClick={() => onEquipArmor(index)}
-                          disabled={!isEditMode}
-                          size="small"
-                        >
-                          <WarningAmber color="warning" fontSize="small" />
-                        </IconButton>
+                        <span>
+                          <IconButton
+                            onClick={() => onEquipArmor(index)}
+                            disabled={!isEditMode}
+                            size="small"
+                          >
+                            <WarningAmber color="warning" fontSize="small" />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     )}
                   </Box>

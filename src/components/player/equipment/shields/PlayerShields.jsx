@@ -162,56 +162,60 @@ export default function PlayerShields({
                     <Box sx={{ ml: 0.5 }}>
                       {checkIfEquippable(shield) ? (
                         <Tooltip title={tooltipTitle}>
-                          <Badge
+                          <span>
+                            <Badge
                             badgeContent={equippedSlot === 'mainHand' ? 'M' : equippedSlot === 'offHand' ? 'O' : null}
                             color="primary"
                             invisible={!shield.isEquipped || !equippedSlot}
                             sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
-                          >
+                            >
+                              <IconButton
+                                onClick={(e) => handleEquipClick(e, index)}
+                                disabled={!isEditMode}
+                                size="small"
+                                sx={{
+                                  backgroundColor: shield.isEquipped
+                                    ? theme.palette.ternary.main
+                                    : theme.palette.background.paper,
+                                  "&:hover": {
+                                    backgroundColor: shield.isEquipped
+                                      ? theme.palette.quaternary.main
+                                      : theme.palette.secondary.main,
+                                  },
+                                  transition: "background-color 0.3s",
+                                  p: 0.5,
+                                  border: `1px solid ${theme.palette.divider}`
+                                }}
+                              >
+                                <Equip
+                                  color={
+                                    shield.isEquipped
+                                      ? theme.palette.mode === "dark"
+                                        ? theme.palette.white.main
+                                        : theme.palette.primary.main
+                                      : theme.palette.text.secondary
+                                  }
+                                  strokeColor={
+                                    shield.isEquipped && theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.secondary.main
+                                  }
+                                />
+                              </IconButton>
+                            </Badge>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={t("Not proficient  -  martial item")}>
+                          <span>
                             <IconButton
                               onClick={(e) => handleEquipClick(e, index)}
                               disabled={!isEditMode}
                               size="small"
-                              sx={{
-                                backgroundColor: shield.isEquipped
-                                  ? theme.palette.ternary.main
-                                  : theme.palette.background.paper,
-                                "&:hover": {
-                                  backgroundColor: shield.isEquipped
-                                    ? theme.palette.quaternary.main
-                                    : theme.palette.secondary.main,
-                                },
-                                transition: "background-color 0.3s",
-                                p: 0.5,
-                                border: `1px solid ${theme.palette.divider}`
-                              }}
                             >
-                              <Equip
-                                color={
-                                  shield.isEquipped
-                                    ? theme.palette.mode === "dark"
-                                      ? theme.palette.white.main
-                                      : theme.palette.primary.main
-                                    : theme.palette.text.secondary
-                                }
-                                strokeColor={
-                                  shield.isEquipped && theme.palette.mode === "dark"
-                                    ? theme.palette.white.main
-                                    : theme.palette.secondary.main
-                                }
-                              />
+                              <WarningAmber color="warning" fontSize="small" />
                             </IconButton>
-                          </Badge>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={t("Not proficient  -  martial item")}>
-                          <IconButton
-                            onClick={(e) => handleEquipClick(e, index)}
-                            disabled={!isEditMode}
-                            size="small"
-                          >
-                            <WarningAmber color="warning" fontSize="small" />
-                          </IconButton>
+                          </span>
                         </Tooltip>
                       )}
                     </Box>

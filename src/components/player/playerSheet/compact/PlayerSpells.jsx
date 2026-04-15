@@ -815,14 +815,16 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
                     <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                       <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5 }}>
                         <Tooltip title={addDisabled ? t("Cannot add more of this spell type") : t("Add New Spell")}>
-                          <IconButton
-                            size="small"
-                            onClick={(event) => handleOpenAddMenu(event, classIndex)}
-                            disabled={addDisabled}
-                            sx={{ color: "#fff", p: 0 }}
-                          >
-                            <Add fontSize="small" />
-                          </IconButton>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={(event) => handleOpenAddMenu(event, classIndex)}
+                              disabled={addDisabled}
+                              sx={{ color: "#fff", p: 0 }}
+                            >
+                              <Add fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                         <Tooltip title={t("Search Compendium")}>
                           <IconButton

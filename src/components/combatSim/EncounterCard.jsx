@@ -178,20 +178,22 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
         </Tooltip>
 
         <Tooltip title={t("Delete")}>
-          <IconButton
-            size="small"
-            disabled={selectMode}
-            onClick={openDeleteDialog}
-            sx={{
-              color: theme.palette.error.main,
-              "&:hover": {
-                backgroundColor: theme.palette.error.light,
-                color: theme.palette.error.dark,
-              },
-            }}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          <span>
+            <IconButton
+              size="small"
+              disabled={selectMode}
+              onClick={openDeleteDialog}
+              sx={{
+                color: theme.palette.error.main,
+                "&:hover": {
+                  backgroundColor: theme.palette.error.light,
+                  color: theme.palette.error.dark,
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       </CardActions>
       </Card>
