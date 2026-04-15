@@ -66,10 +66,13 @@ import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
 import {  WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
 
-import classList, { spellList } from "../../libs/classes";
+import classList, { spellList, spellsByClass } from "../../libs/classes";
 import _attributes from "../../libs/attributes";
 import _types from "../../libs/types";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
+
+// Pre-compute delicacy effects once at module load
+const staticDelicacyEffects = getDelicacyEffects(staticT);
 import {
   CLASS_BOOK_OPTIONS,
   QUALITY_FILTER_OPTIONS,
@@ -927,10 +930,9 @@ function CompendiumViewer() {
       items = [];
       for (const sc of scs) {
         if (sc === "default") {
-          items.push(...spellList.filter((s) => s.class === activeSpellCls.name));
+          items.push(...(spellsByClass[activeSpellCls.name] || []));
         } else if (sc === "cooking") {
-          const cookingEffects = getDelicacyEffects(staticT);
-          items.push(...cookingEffects.map(eff => ({
+          items.push(...staticDelicacyEffects.map(eff => ({
             name: `Delicacy #${eff.id}`,
             spellType: "cooking",
             ...eff,
@@ -1158,7 +1160,11 @@ function CompendiumViewer() {
       const id = itemIds[idx];
       const scrollToItem = () => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "instant", block: "center" });
+        if (el) {
+          requestAnimationFrame(() => {
+            el.scrollIntoView({ behavior: "auto", block: "center" });
+          });
+        }
       };
       if (!isDesktop) {
         setDrawerOpen(false);
@@ -1168,6 +1174,12 @@ function CompendiumViewer() {
       }
     },
     [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, setSearchParams]
+  );
+
+  // Memoize click handlers per item to prevent ItemCard re-renders from stale closures
+  const itemClickHandlers = useMemo(
+    () => filteredItems.map((item, idx) => () => handleItemClick(item, idx)),
+    [filteredItems, handleItemClick]
   );
 
   const sidebarContent = (
@@ -1381,7 +1393,8 @@ function CompendiumViewer() {
                     size={{
                       xs: 12,
                       lg: selectedType === "classes" ? 12 : 6
-                    }}>
+                    }}
+                    sx={{ contain: "layout paint" }}>
                     <Box
                       ref={idx === selectedIdx ? selectedCardRef : null}
                       sx={{
@@ -1390,13 +1403,14 @@ function CompendiumViewer() {
                           ? `2px solid ${customTheme.primary}`
                           : "2px solid transparent",
                         transition: "outline 0.15s ease",
+                        contain: "content",
                       }}
                     >
                       <ItemCard
                         type={selectedType}
                         item={item}
                         id={itemIds[idx]}
-                        onHeaderClick={() => handleItemClick(item, idx)}
+                        onHeaderClick={itemClickHandlers[idx]}
                       />
                     </Box>
                     {idx === selectedIdx && (

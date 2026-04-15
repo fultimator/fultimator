@@ -147,75 +147,67 @@ export function makeId(name, idx) {
   return `compendium-item-${name.replace(/[^a-zA-Z0-9]/g, "-")}-${idx}`;
 }
 
+//
+// Pre-computed non-static spell items by type O(1) lookup
+//
+const _nonStaticItemsByType = {
+  gift: availableGifts
+    .filter(g => !g.name.includes("_custom_"))
+    .map(g => ({ ...g, spellType: "gift" })),
+  dance: availableDances
+    .filter(d => !d.name.includes("_custom_"))
+    .map(d => ({ ...d, spellType: "dance" })),
+  therioform: availableTherioforms
+    .filter(tf => !tf.name.includes("_custom_"))
+    .map(tf => ({ ...tf, spellType: "therioform" })),
+  magichant: [
+    ...availableMagichantKeys
+      .filter((key) => !key.name.includes("_custom_"))
+      .map((key) => ({ ...key, spellType: "magichant", magichantSubtype: "key" })),
+    ...availableMagichantTones
+      .filter((tone) => !tone.name.includes("_custom_"))
+      .map((tone) => ({ ...tone, spellType: "magichant", magichantSubtype: "tone" })),
+  ],
+  symbol: availableSymbols
+    .filter(s => !s.name.includes("_custom_"))
+    .map(s => ({ ...s, spellType: "symbol" })),
+  invocation: Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) =>
+    invocations.map(inv => ({ ...inv, spellType: "invocation", wellspring }))
+  ),
+  magiseed: magiseeds.map(ms => ({ ...ms, spellType: "magiseed" })),
+  arcanist: arcanumList.map(arc => ({ ...arc, spellType: "arcanist" })),
+  "arcanist-rework": arcanumList.map(arc => ({ ...arc, spellType: "arcanist-rework" })),
+  "tinkerer-alchemy": [
+    ...tinkererAlchemy.targets.map(t => ({
+      name: t.rangeFrom === t.rangeTo ? `${t.rangeFrom}` : `${t.rangeFrom}–${t.rangeTo}`,
+      spellType: "tinkerer-alchemy",
+      category: "Target",
+      effect: t.effect,
+    })),
+    ...tinkererAlchemy.effects.map(e => ({
+      name: `Die: ${e.dieValue}`,
+      spellType: "tinkerer-alchemy",
+      category: "Effect",
+      effect: e.effect,
+    })),
+  ],
+  "tinkerer-infusion": tinkererInfusion.effects.map(e => ({
+    name: `Rank ${e.infusionRank}: ${e.name ?? ""}`.trim().replace(/: $/, ""),
+    spellType: "tinkerer-infusion",
+    ...e,
+  })),
+  "pilot-vehicle": [
+    ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame", pilotSubtype: "frame" })),
+    ...availableModules.armor
+      .filter(m => !m.customName && m.name !== "pilot_custom_armor")
+      .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module", pilotSubtype: "armor" })),
+    ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module", pilotSubtype: "weapon" })),
+    ...availableModules.support
+      .filter(m => m.name !== "pilot_custom_support")
+      .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module", pilotSubtype: "support" })),
+  ],
+};
+
 export function getNonStaticSpellItems(sc) {
-  switch (sc) {
-    case "gift":
-      return availableGifts
-        .filter(g => !g.name.includes("_custom_"))
-        .map(g => ({ ...g, spellType: "gift" }));
-    case "dance":
-      return availableDances
-        .filter(d => !d.name.includes("_custom_"))
-        .map(d => ({ ...d, spellType: "dance" }));
-    case "therioform":
-      return availableTherioforms
-        .filter(tf => !tf.name.includes("_custom_"))
-        .map(tf => ({ ...tf, spellType: "therioform" }));
-    case "magichant":
-      return [
-        ...availableMagichantKeys
-          .filter((key) => !key.name.includes("_custom_"))
-          .map((key) => ({ ...key, spellType: "magichant", magichantSubtype: "key" })),
-        ...availableMagichantTones
-          .filter((tone) => !tone.name.includes("_custom_"))
-          .map((tone) => ({ ...tone, spellType: "magichant", magichantSubtype: "tone" })),
-      ];
-    case "symbol":
-      return availableSymbols
-        .filter(s => !s.name.includes("_custom_"))
-        .map(s => ({ ...s, spellType: "symbol" }));
-    case "invocation":
-      return Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) =>
-        invocations.map(inv => ({ ...inv, spellType: "invocation", wellspring }))
-      );
-    case "magiseed":
-      return magiseeds.map(ms => ({ ...ms, spellType: "magiseed" }));
-    case "arcanist":
-    case "arcanist-rework":
-      return arcanumList.map(arc => ({ ...arc, spellType: sc }));
-    case "tinkerer-alchemy":
-      return [
-        ...tinkererAlchemy.targets.map(t => ({
-          name: t.rangeFrom === t.rangeTo ? `${t.rangeFrom}` : `${t.rangeFrom}–${t.rangeTo}`,
-          spellType: "tinkerer-alchemy",
-          category: "Target",
-          effect: t.effect,
-        })),
-        ...tinkererAlchemy.effects.map(e => ({
-          name: `Die: ${e.dieValue}`,
-          spellType: "tinkerer-alchemy",
-          category: "Effect",
-          effect: e.effect,
-        })),
-      ];
-    case "tinkerer-infusion":
-      return tinkererInfusion.effects.map(e => ({
-        name: `Rank ${e.infusionRank}: ${e.name ?? ""}`.trim().replace(/: $/, ""),
-        spellType: "tinkerer-infusion",
-        ...e,
-      }));
-    case "pilot-vehicle":
-      return [
-        ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame", pilotSubtype: "frame" })),
-        ...availableModules.armor
-          .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module", pilotSubtype: "armor" })),
-        ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module", pilotSubtype: "weapon" })),
-        ...availableModules.support
-          .filter(m => m.name !== "pilot_custom_support")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module", pilotSubtype: "support" })),
-      ];
-    default:
-      return null;
-  }
+  return _nonStaticItemsByType[sc] ?? null;
 }

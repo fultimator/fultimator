@@ -7,14 +7,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { styled } from "@mui/system";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { Martial, OffensiveSpellIcon } from "../icons";
 import { OpenBracket, CloseBracket } from "../Bracket";
 import Diamond from "../Diamond";
 import attributes from "../../libs/attributes";
 import types from "../../libs/types";
-import { spellList, tinkererAlchemy, tinkererInfusion, arcanumList } from "../../libs/classes";
+import { spellList, tinkererAlchemy, tinkererInfusion, arcanumList, spellsByClass } from "../../libs/classes";
 import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
 import { magiseeds } from "../../libs/floralistMagiseedData";
@@ -69,9 +69,9 @@ export const StyledMarkdown = ({ remarkPlugins = [], children, ...props }) => (
   </_StyledMarkdown>
 );
 
-// 
+//
 // WeaponCard
-// 
+//
 
 export const WeaponCard = React.memo(function WeaponCard({ weapon, id, onHeaderClick }) {
   const { t } = useTranslate();
@@ -1490,9 +1490,35 @@ export const QualityCard = React.memo(function QualityCard({ quality, id, onHead
   );
 });
 
-// 
+//
+// Pre-filtered static spell-type data (computed once at module load, not per-render)
+//
+const _giftItems = availableGifts.filter(g => !g.name.includes("_custom_"));
+const _danceItems = availableDances.filter(d => !d.name.includes("_custom_"));
+const _therioformItems = availableTherioforms.filter(tf => !tf.name.includes("_custom_"));
+const _magichantKeyItems = availableMagichantKeys.filter((key) => !key.name.includes("_custom_"));
+const _magichantToneItems = availableMagichantTones.filter((tone) => !tone.name.includes("_custom_"));
+const _symbolItems = availableSymbols.filter(s => !s.name.includes("_custom_"));
+const _invocationsByWellspringEntries = Object.entries(invocationsByWellspring);
+const _cookingEffects = getDelicacyEffects(staticT);
+const _tinkererAlchemyTargets = tinkererAlchemy.targets;
+const _tinkererAlchemyEffects = tinkererAlchemy.effects;
+
+// Pre-build tinkerer-infusion byRank grouping
+const _tinkererInfusionByRank = {};
+tinkererInfusion.effects.forEach(eff => {
+  const r = eff.infusionRank;
+  if (!_tinkererInfusionByRank[r]) _tinkererInfusionByRank[r] = [];
+  _tinkererInfusionByRank[r].push(eff);
+});
+
+const _pilotArmorModules = availableModules.armor.filter(m => m.name !== "pilot_custom_armor");
+const _pilotWeaponModules = availableModules.weapon;
+const _pilotSupportModules = availableModules.support.filter(m => m.name !== "pilot_custom_support");
+
+//
 // Per-character spell-type content renderer (internal)
-// 
+//
 
 function renderSpellTypeContent(sc, t, customTheme) {
   const border = { borderTop: `1px solid ${customTheme.secondary}` };
@@ -1520,9 +1546,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
   switch (sc) {
 
     case "gift":
-      return availableGifts
-        .filter(g => !g.name.includes("_custom_"))
-        .map((g, i) => (
+      return _giftItems.map((g, i) => (
           <Box key={i} sx={itemSx}>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75, mb: 0.25, flexWrap: "wrap" }}>
               <Typography variant="body2" sx={{
@@ -1544,9 +1568,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
         ));
 
     case "dance":
-      return availableDances
-        .filter(d => !d.name.includes("_custom_"))
-        .map((d, i) => (
+      return _danceItems.map((d, i) => (
           <Box key={i} sx={itemSx}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25 }}>
               <Typography variant="body2" sx={{
@@ -1565,9 +1587,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
         ));
 
     case "therioform":
-      return availableTherioforms
-        .filter(tf => !tf.name.includes("_custom_"))
-        .map((tf, i) => (
+      return _therioformItems.map((tf, i) => (
           <Box key={i} sx={itemSx}>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.75, mb: 0.25, flexWrap: "wrap" }}>
               <Typography variant="body2" sx={{
@@ -1593,9 +1613,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
     case "magichant":
       return [
         <Box key="keys_h" sx={sectionHeaderSx}>{captionHeader(t("magichant_key"))}</Box>,
-        ...availableMagichantKeys
-          .filter((key) => !key.name.includes("_custom_"))
-          .map((key, i) => (
+        ..._magichantKeyItems.map((key, i) => (
             <Box key={`key_${i}`} sx={itemSx}>
               <Typography
                 variant="body2"
@@ -1616,9 +1634,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
             </Box>
           )),
         <Box key="tones_h" sx={sectionHeaderSx}>{captionHeader(t("magichant_tone"))}</Box>,
-        ...availableMagichantTones
-          .filter((tone) => !tone.name.includes("_custom_"))
-          .map((tone, i) => (
+        ..._magichantToneItems.map((tone, i) => (
             <Box key={`tone_${i}`} sx={itemSx}>
               <Typography
                 variant="body2"
@@ -1634,9 +1650,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
       ];
 
     case "symbol":
-      return availableSymbols
-        .filter(s => !s.name.includes("_custom_"))
-        .map((s, i) => (
+      return _symbolItems.map((s, i) => (
           <Box key={i} sx={itemSx}>
             <Typography
               variant="body2"
@@ -1651,7 +1665,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
         ));
 
     case "invocation":
-      return Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) => [
+      return _invocationsByWellspringEntries.flatMap(([wellspring, invocations]) => [
         <Box key={wellspring + "_h"} sx={sectionHeaderSx}>{captionHeader(wellspring)}</Box>,
         ...invocations.map((inv, i) => (
           <Box key={wellspring + i} sx={itemSx}>
@@ -1710,9 +1724,8 @@ function renderSpellTypeContent(sc, t, customTheme) {
         </Box>
       ));
 
-    case "cooking": {
-      const effects = getDelicacyEffects(t);
-      return effects.map((eff, i) => (
+    case "cooking":
+      return _cookingEffects.map((eff, i) => (
         <Box key={i} sx={itemSx}>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Typography
@@ -1732,12 +1745,11 @@ function renderSpellTypeContent(sc, t, customTheme) {
           </Box>
         </Box>
       ));
-    }
 
-    case "tinkerer-alchemy": {
+    case "tinkerer-alchemy":
       return [
         <Box key="targets_h" sx={sectionHeaderSx}>{captionHeader(t("Targets"))}</Box>,
-        ...tinkererAlchemy.targets.map((target, i) => (
+        ..._tinkererAlchemyTargets.map((target, i) => (
           <Box key={"t" + i} sx={itemSx}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Typography
@@ -1781,16 +1793,9 @@ function renderSpellTypeContent(sc, t, customTheme) {
           </Box>
         )),
       ];
-    }
 
-    case "tinkerer-infusion": {
-      const byRank = {};
-      tinkererInfusion.effects.forEach(eff => {
-        const r = eff.infusionRank;
-        if (!byRank[r]) byRank[r] = [];
-        byRank[r].push(eff);
-      });
-      return Object.entries(byRank).flatMap(([rank, effs]) => [
+    case "tinkerer-infusion":
+      return Object.entries(_tinkererInfusionByRank).flatMap(([rank, effs]) => [
         <Box key={"rank_" + rank} sx={sectionHeaderSx}>
           {captionHeader(`${t("Rank")} ${rank}`)}
         </Box>,
@@ -1808,15 +1813,13 @@ function renderSpellTypeContent(sc, t, customTheme) {
           </Box>
         )),
       ]);
-    }
 
-    case "tinkerer-magitech": {
-      const magitechRanks = [
+    case "tinkerer-magitech":
+      return [
         { rankLabel: t("Basic"), name: t("Magitech Override"), descKeys: ["MagitechOverride_desc"] },
         { rankLabel: t("Advanced"), name: t("Magicannon"), descKeys: ["Magicannon_desc1", "Magicannon_desc2"] },
         { rankLabel: t("Superior"), name: t("Magispheres"), descKeys: ["Magispheres_desc1", "Magispheres_desc2", "Magispheres_desc3"] },
-      ];
-      return magitechRanks.flatMap((rank, ri) => [
+      ].flatMap((rank, ri) => [
         <Box key={"mtr_" + ri} sx={sectionHeaderSx}>
           {captionHeader(`${rank.rankLabel}  -  ${rank.name}`)}
         </Box>,
@@ -1835,10 +1838,9 @@ function renderSpellTypeContent(sc, t, customTheme) {
           ))}
         </Box>,
       ]);
-    }
 
     case "arcanist":
-    case "arcanist-rework": {
+    case "arcanist-rework":
       return arcanumList.flatMap((arc, i) => [
         <Box key={"arc_h_" + i} sx={sectionHeaderSx}>
           {captionHeader(arc.name)}
@@ -1879,9 +1881,8 @@ function renderSpellTypeContent(sc, t, customTheme) {
           }}>{md(t(arc.dismissDesc))}</Typography>
         </Box>,
       ]);
-    }
 
-    case "pilot-vehicle": {
+    case "pilot-vehicle":
       return [
         <Box key="frames_h" sx={sectionHeaderSx}>{captionHeader(t("Frames"))}</Box>,
         ...availableFrames.map((frame, i) => (
@@ -1903,9 +1904,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
         )),
 
         <Box key="armor_h" sx={sectionHeaderSx}>{captionHeader(t("Armor Modules"))}</Box>,
-        ...availableModules.armor
-          .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map((m, i) => (
+        ..._pilotArmorModules.map((m, i) => (
             <Box key={"am" + i} sx={itemSx}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
                 <Typography variant="body2" sx={{
@@ -1921,7 +1920,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
           )),
 
         <Box key="weapon_h" sx={sectionHeaderSx}>{captionHeader(t("Weapon Modules"))}</Box>,
-        ...availableModules.weapon.map((m, i) => (
+        ..._pilotWeaponModules.map((m, i) => (
           <Box key={"wm" + i} sx={itemSx}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
               <Typography variant="body2" sx={{
@@ -1939,9 +1938,7 @@ function renderSpellTypeContent(sc, t, customTheme) {
         )),
 
         <Box key="support_h" sx={sectionHeaderSx}>{captionHeader(t("Support Modules"))}</Box>,
-        ...availableModules.support
-          .filter(m => m.name !== "pilot_custom_support")
-          .map((m, i) => (
+        ..._pilotSupportModules.map((m, i) => (
             <Box key={"sm" + i} sx={itemSx}>
               <Typography
                 variant="body2"
@@ -1959,7 +1956,6 @@ function renderSpellTypeContent(sc, t, customTheme) {
             </Box>
           )),
       ];
-    }
 
     default:
       return null;
@@ -2077,7 +2073,7 @@ export const ClassCard = React.memo(function ClassCard({ cls, id, onHeaderClick 
         {/* Skills */}
         {/* Spells accordion */}
         {(() => {
-          const classSpells = spellList.filter((s) => s.class === cls.name);
+          const classSpells = spellsByClass[cls.name] || [];
           const hasCustomSpells =
             cls.benefits?.spellClasses?.length > 0 && classSpells.length === 0;
           if (!cls.benefits?.spellClasses?.length && classSpells.length === 0)
