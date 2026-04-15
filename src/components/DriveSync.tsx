@@ -14,7 +14,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { syncToDrive, restoreFromDrive, usePendingSync } from "@platform/db";
 import { useTranslate } from "../translation/translate";
-import { useDatabaseContext } from "../context/DatabaseContext";
+import { useDatabaseContext } from "../context/useDatabaseContext";
 
 type Status = "idle" | "syncing" | "restoring" | "success" | "error";
 

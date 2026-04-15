@@ -21,6 +21,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { OffensiveSpellIcon } from "../../icons";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellDefaultModal({
   open,
@@ -31,6 +33,9 @@ export default function SpellDefaultModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
   const [inputDuration, setInputDuration] = useState(
     editedSpell.duration || ""
   );
@@ -68,12 +73,7 @@ export default function SpellDefaultModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-
-  const handleDelete = () => {
-    onDelete(spell.index);
-  };
-
-  const handleDurationChange = (event, newValue) => {
+const handleDurationChange = (event, newValue) => {
     setInputDuration(newValue);
     handleChange("duration", newValue);
   };
@@ -97,11 +97,13 @@ export default function SpellDefaultModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -121,17 +123,27 @@ export default function SpellDefaultModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={7}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <TextField
               label={t("Spell Name")}
               variant="outlined"
               fullWidth
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={1}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 1
+            }}>
             <FormControl
               variant="standard"
               fullWidth
@@ -152,7 +164,11 @@ export default function SpellDefaultModal({
               </ToggleButton>
             </FormControl>
           </Grid>
-          <Grid item xs={6} sm={2}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 2
+            }}>
             <TextField
               type="number"
               label={t("MP x Target")}
@@ -183,7 +199,11 @@ export default function SpellDefaultModal({
               }}
             />
           </Grid>
-          <Grid item xs={6} sm={2}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 2
+            }}>
             <TextField
               type="number"
               label={t("Max Targets")}
@@ -218,7 +238,11 @@ export default function SpellDefaultModal({
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             {/* <TextField
               label={t("Target Description")}
               variant="outlined"
@@ -239,12 +263,18 @@ export default function SpellDefaultModal({
                   {...params}
                   label={t("Target Description")}
                   fullWidth
-                  inputProps={{ ...params.inputProps, maxLength: 100 }}
+                  slotProps={{
+                    htmlInput: { ...params.inputProps, maxLength: 100 }
+                  }}
                 />
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             {/* <TextField
               label={t("Duration")}
               variant="outlined"
@@ -265,14 +295,20 @@ export default function SpellDefaultModal({
                   {...params}
                   label={t("Duration")}
                   fullWidth
-                  inputProps={{ ...params.inputProps, maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { ...params.inputProps, maxLength: 50 }
+                  }}
                 />
               )}
             />
           </Grid>
           {editedSpell.isOffensive ? (
             <>
-              <Grid item xs={6} sm={6}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 6
+                }}>
                 <Select
                   fullWidth
                   value={editedSpell.attr1 || "dexterity"}
@@ -292,7 +328,11 @@ export default function SpellDefaultModal({
                   </MenuItem>
                 </Select>
               </Grid>
-              <Grid item xs={6} sm={6}>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 6
+                }}>
                 <Select
                   fullWidth
                   value={editedSpell.attr2 || "dexterity"}
@@ -314,7 +354,11 @@ export default function SpellDefaultModal({
               </Grid>
             </>
           ) : null}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -324,7 +368,11 @@ export default function SpellDefaultModal({
               maxLength={1500}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <FormControlLabel
               control={
                 <Switch
@@ -341,7 +389,11 @@ export default function SpellDefaultModal({
               label={t("Show in Character Sheet")}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <FormControlLabel
               control={
                 <Switch
@@ -364,6 +416,13 @@ export default function SpellDefaultModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(spell.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this spell?")}
+      />
     </Dialog>
   );
 }

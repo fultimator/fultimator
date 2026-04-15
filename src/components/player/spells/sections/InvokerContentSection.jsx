@@ -106,13 +106,13 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
 
   const availableInvocations = getAvailableInvocations();
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   return (
     <Grid container spacing={2}>
       {/* Wellspring Selection */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Active Wellsprings")} (Max 2)
         </Typography>
@@ -168,26 +168,37 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           })}
         </Box>
       </Grid>
-
       {/* Available Invocations */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Available Invocations")} ({availableInvocations.length})
         </Typography>
         {availableInvocations.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("Select wellsprings to see available invocations")}
           </Typography>
         ) : (
           <Grid container spacing={1}>
             {availableInvocations.map((inv, idx) => (
-              <Grid item xs={12} sm={6} md={4} key={idx}>
+              <Grid
+                key={idx}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4
+                }}>
                 <Card>
                   <CardContent>
                     <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                       {t(inv.name)}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{
+                      color: "text.secondary"
+                    }}>
                       {inv.type} • {t(inv.wellspring)}
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 1 }}>

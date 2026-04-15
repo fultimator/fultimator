@@ -86,7 +86,8 @@ export interface Skills {
     name: string,
     description: string,
     currentLvl: number,
-    maxLvl: number
+    maxLvl: number,
+    specialSkill?: string
 }
 
 export interface PlayerModifiers {
@@ -107,6 +108,33 @@ export interface HeroicSkills {
     description: string
 }
 
+export interface VehicleModule {
+    name: string;
+    type: string;
+    equippedSlot: string | null;
+    enabled: boolean;
+    equipped: boolean;
+    isShield?: boolean;
+    cumbersome?: boolean;
+    def?: number;
+    mdef?: number;
+    damage?: number;
+    prec?: number;
+    range?: string;
+    damageType?: string;
+    att1?: string;
+    att2?: string;
+    customName?: string;
+    description?: string;
+    isComplex?: boolean;
+}
+
+export interface Vehicle {
+    customName: string;
+    enabled: boolean;
+    modules: VehicleModule[];
+}
+
 export interface Spells {
     name: string,
     class: string,
@@ -122,7 +150,10 @@ export interface Spells {
     effect3: string,
     effect4: string,
     effect5: string,
-    effect6: string
+    effect6: string,
+    spellType?: string,
+    vehicles?: Vehicle[],
+    currentVehicles?: Vehicle[]
 }
 
 export interface PlayerClass {
@@ -245,6 +276,8 @@ export interface PlayerEquipment {
     accessories: Accessories[],
     armor: Armor[]
 }
+
+export type AnyEquipmentItem = Weapons | CustomWeapons | Armor | Shields | Accessories;
 
 export interface Martials {
     armor: boolean,

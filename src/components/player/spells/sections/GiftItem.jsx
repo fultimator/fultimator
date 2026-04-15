@@ -16,6 +16,8 @@ import {
 import { Delete, ContentCopy, ExpandMore } from "@mui/icons-material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import { availableGifts } from "../spellOptionData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function GiftItem({
   item,
@@ -39,6 +41,9 @@ export default function GiftItem({
 
   const isCustom = item.name === "esper_gift_custom_name";
   const [expanded, setExpanded] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -56,7 +61,7 @@ export default function GiftItem({
 
   const handleDeleteClick = (e) => {
     e.stopPropagation();
-    onDeleteItem(itemIndex);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloneClick = (e) => {
@@ -64,12 +69,15 @@ export default function GiftItem({
     handleCloneToCustom();
   };
 
+  const itemDisplayName = item.customName || t(item.name || "esper_gift_custom_name");
+
   return (
+    <>
     <Accordion expanded={expanded} onChange={() => setExpanded((prev) => !prev)} sx={{ mb: 2 }}>
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box sx={{ width: "100%", display: "flex", alignItems: "center", gap: 1 }}>
           <Typography sx={{ flex: 1, fontWeight: "bold" }}>
-            {item.customName || t(item.name || "esper_gift_custom_name")}
+            {itemDisplayName}
           </Typography>
           <Button
             size="small"
@@ -91,8 +99,12 @@ export default function GiftItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={4}>
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("Gift Type")}</InputLabel>
               <Select
@@ -111,7 +123,11 @@ export default function GiftItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               fullWidth
               label={t("Event")}
@@ -130,7 +146,11 @@ export default function GiftItem({
           </Grid>
 
           {isCustom && (
-            <Grid item xs={12} sm={4}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 4
+              }}>
               <TextField
                 fullWidth
                 label={t("Custom Name")}
@@ -142,7 +162,7 @@ export default function GiftItem({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Gift Effect")}
               value={
@@ -163,5 +183,14 @@ export default function GiftItem({
         </Grid>
       </AccordionDetails>
     </Accordion>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this item?")}
+      itemPreview={<Typography variant="h4">{itemDisplayName}</Typography>}
+    />
+    </>
   );
 }

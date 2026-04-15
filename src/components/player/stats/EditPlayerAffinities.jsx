@@ -11,12 +11,12 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-import { TypeIcon, typeList, TypeName } from "../../types";
+import { TypeIcon, TypeName } from "../../types";
+import { typeList } from "../../typeConstants";
 
 export default function EditPlayerAffinities({
   player,
-  setPlayer,
-  isEditMode,
+  setPlayer
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -80,7 +80,7 @@ export default function EditPlayerAffinities({
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Affinity")}
@@ -88,7 +88,11 @@ export default function EditPlayerAffinities({
           />
         </Grid>
         {/* Affinities control */}
-        <Grid item xs={12} sm={10}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 10
+          }}>
           <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
             {Object.keys(typeList).map((type, i, arr) => {
               const marks =
@@ -122,7 +126,7 @@ export default function EditPlayerAffinities({
 
               return (
                 <Fragment key={i}>
-                  <Grid item xs={3}>
+                  <Grid  size={3}>
                     <InputLabel
                       id={typeKey}
                       sx={{ fontSize: { xs: "16px", sm: "20px" }, fontWeight: 400 }}
@@ -130,7 +134,7 @@ export default function EditPlayerAffinities({
                       <TypeIcon type={typeKey} /> <TypeName type={typeKey} />
                     </InputLabel>
                   </Grid>
-                  <Grid item xs={9}>
+                  <Grid  size={9}>
                     <FormControl variant="standard" fullWidth>
                       <Slider
                         marks={marks}

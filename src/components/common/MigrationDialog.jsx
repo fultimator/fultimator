@@ -22,7 +22,7 @@ export default function MigrationDialog({ open, onClose, actors, actorType, onMi
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
 
-  const label = actorType === 'npc' ? t('NPC') : t('Player');
+  // const label = actorType === 'npc' ? t('NPC') : t('Player');
   const labelPlural = actorType === 'npc' ? t('NPCs') : t('Players');
 
   const handleMigrateAll = async () => {
@@ -49,13 +49,24 @@ export default function MigrationDialog({ open, onClose, actors, actorType, onMi
       <DialogContent sx={{ p: 0 }}>
         {done ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
-            <Typography color="success.main" fontWeight={700}>
+            <Typography
+              sx={{
+                color: "success.main",
+                fontWeight: 700
+              }}>
               {t('Migration complete!')} {actors.length} {labelPlural} {t('updated.')}
             </Typography>
           </Box>
         ) : (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                px: 2,
+                pt: 1.5,
+                pb: 0.5
+              }}>
               {t('The following')} {labelPlural.toLowerCase()} {t('have an outdated data format and will be updated when saved individually. You can migrate all of them now.')}
             </Typography>
             <List dense sx={{ maxHeight: 320, overflowY: 'auto' }}>
@@ -74,10 +85,16 @@ export default function MigrationDialog({ open, onClose, actors, actorType, onMi
         )}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={{
+          color: "text.secondary"
+        }}>
           {!done && `${actors.length} ${labelPlural.toLowerCase()} ${t('will be updated in the database.')}`}
         </Typography>
-        <Box display="flex" gap={1}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1
+          }}>
           <Button onClick={handleClose} size="small">{t('Close')}</Button>
           {!done && (
             <Button

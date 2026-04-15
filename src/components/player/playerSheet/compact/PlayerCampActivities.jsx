@@ -106,14 +106,17 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('campActivities', activityKey); }}
+                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('campActivities', activityKey); }}
                     sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
                   >
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
-                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word"
+                      }}>
                       {highlightMatch(activity.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -121,7 +124,6 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                   <StyledTableCell sx={{ width: 90 }} />
                   <StyledTableCell sx={{ width: 100 }} />
                 </TableRow>
-
                 {hasDetails && (
                   <TableRow>
                     <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>

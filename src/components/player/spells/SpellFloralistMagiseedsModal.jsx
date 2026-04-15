@@ -121,7 +121,9 @@ export default function SpellFloralistMagiseedsModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "90%", maxWidth: "xl" } }}
+      slotProps={{
+        paper: { sx: { width: "90%", maxWidth: "xl" } }
+      }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("magiseed_edit_magiseed")}
@@ -141,12 +143,12 @@ export default function SpellFloralistMagiseedsModal({
       <DialogContent>
         <Grid container spacing={2}>
           {/* Add Magiseed Buttons */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h6" gutterBottom>
               {t("magiseed_add_magiseed")}
             </Typography>
             <Grid container spacing={1} sx={{ mb: 2 }}>
-              <Grid item>
+              <Grid >
                 <Button
                   variant="outlined"
                   startIcon={<Add />}
@@ -156,7 +158,7 @@ export default function SpellFloralistMagiseedsModal({
                 </Button>
               </Grid>
               {getAvailablePresets().map((preset) => (
-                <Grid item key={preset.name}>
+                <Grid  key={preset.name}>
                   <Button
                     variant="outlined"
                     startIcon={<Add />}
@@ -170,14 +172,14 @@ export default function SpellFloralistMagiseedsModal({
           </Grid>
 
           {/* Magiseeds List */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h6" gutterBottom>
               {t("magiseed_available_magiseeds")} ({currentMagiseeds.length})
             </Typography>
           </Grid>
 
           {currentMagiseeds.length === 0 ? (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Typography
                 sx={{
                   padding: "20px",
@@ -193,7 +195,7 @@ export default function SpellFloralistMagiseedsModal({
             </Grid>
           ) : (
             currentMagiseeds.map((magiseed, index) => (
-              <Grid item xs={12} key={index}>
+              <Grid  key={index} size={12}>
                 <MagiseedItem
                   magiseed={magiseed}
                   magiseedIndex={index}
@@ -206,7 +208,7 @@ export default function SpellFloralistMagiseedsModal({
           )}
 
           {/* Show in Player Sheet Toggle */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormControlLabel
               control={
                 <Switch

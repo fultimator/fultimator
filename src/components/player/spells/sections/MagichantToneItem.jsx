@@ -13,6 +13,8 @@ import {
 import { Delete, ContentCopy } from "@mui/icons-material";
 import CustomTextarea from "../../../common/CustomTextarea";
 import { availableMagichantTones } from "../spellOptionData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function MagichantToneItem({
   item,
@@ -35,6 +37,9 @@ export default function MagichantToneItem({
   const isCustom =
     item.name === "magichant_custom_name" ||
     !availableMagichantTones.find((entry) => entry.name === item.name);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -46,11 +51,18 @@ export default function MagichantToneItem({
     });
   };
 
+  const itemDisplayName = item.customName || t(item.name || "magichant_custom_name");
+
   return (
+    <>
     <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={5}>
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("magichant_tone")}</InputLabel>
               <Select
@@ -67,17 +79,23 @@ export default function MagichantToneItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={7}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <TextField
               fullWidth
               label={t("magichant_name")}
               value={isCustom ? (item.customName || "") : t(item.name || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "customName", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("magichant_tone_effect")}
               value={isCustom ? (item.effect || "") : t(item.effect || "")}
@@ -87,11 +105,11 @@ export default function MagichantToneItem({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth
-                onClick={() => onDeleteItem(itemIndex)}
+                onClick={handleDelete}
                 variant="outlined"
                 color="error"
                 startIcon={<Delete />}
@@ -111,5 +129,14 @@ export default function MagichantToneItem({
         </Grid>
       </CardContent>
     </Card>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this item?")}
+      itemPreview={<Box sx={{ fontWeight: "bold" }}>{itemDisplayName}</Box>}
+    />
+    </>
   );
 }

@@ -804,7 +804,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </Box>
         </AccordionDetails>
       </Accordion>
-
       {/* Combat Status - Compact version */}
       {deckState.hand.length > 0 && (
         <Box sx={{ 
@@ -864,7 +863,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           )}
         </Box>
       )}
-
       {/* Unified Action Section */}
       <Box sx={{ 
         display: 'flex', 
@@ -1031,7 +1029,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </Button>
         )}
       </Box>
-
       {/* Current Hand */}
       {deckState.hand.length > 0 && (
         <>
@@ -1134,7 +1131,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           )}
         </>
       )}
-      
       <Box sx={{ 
         padding: potentialSet ? 1.5 : 2, 
         backgroundColor: theme.ternary, 
@@ -1440,8 +1436,7 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </Box>
         )}
       </Box>
-
-            {/* Combat Log */}
+      {/* Combat Log */}
       {combatLog.length > 0 && (
         <Card sx={{ mb: 1 }}>
           <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
@@ -1510,7 +1505,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </CardContent>
         </Card>
       )}
-
       {/* Suit Configuration */}
       {deckState.hand.length === 0 && (
         <Box
@@ -1530,7 +1524,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </Typography>
         </Box>
       )}
-      
       {deckState.hand.length === 0 && (
         <Box sx={{ padding: 2, backgroundColor: theme.ternary, marginBottom: 2 }}>
           <Grid container spacing={2}>
@@ -1543,7 +1536,12 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
               const IconComponent = getSuitIcon(suit.name, true);
               const suitSymbol = getSuitIcon(suit.name);
               return (
-                <Grid item xs={6} sm={3} key={suit.name}>
+                <Grid
+                  key={suit.name}
+                  size={{
+                    xs: 6,
+                    sm: 3
+                  }}>
                   <Card sx={{ 
                     textAlign: 'center', 
                     backgroundColor: getSuitColor(suit.name), 
@@ -1576,7 +1574,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           </Box>
         </Box>
       )}
-
       {/* Trap Card Dialog */}
       <Dialog open={trapCardDialogOpen} onClose={() => setTrapCardDialogOpen(false)}>
         <DialogTitle>{t("ace_trap_card_title")}</DialogTitle>
@@ -1607,7 +1604,6 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
           <Button onClick={() => setTrapCardDialogOpen(false)}>{t("Cancel")}</Button>
         </DialogActions>
       </Dialog>
-
       {/* Discard Pile Modal */}
       <Dialog 
         open={discardModalOpen} 
@@ -1627,7 +1623,14 @@ function ThemedSpellDeck({ deck = {}, onEdit, onDeckUpdate = () => {}, isEditMod
                 const isRed = ['Fire', 'Lightning'].includes(card.suit);
                 
                 return (
-                  <Grid item xs={4} sm={3} md={2.4} lg={2} key={actualIndex}>
+                  <Grid
+                    key={actualIndex}
+                    size={{
+                      xs: 4,
+                      sm: 3,
+                      md: 2.4,
+                      lg: 2
+                    }}>
                     <Card 
                       sx={{ 
                         width: '100%',

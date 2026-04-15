@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Typography,
   Table,
@@ -18,7 +18,6 @@ import {
   Shuffle,
   Refresh,
   Delete,
-  Layers,
   NewReleases,
   Air,
   Terrain,
@@ -40,7 +39,7 @@ const StyledTableCell = styled(TableCell)({
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
-export default function SpellDeck({ spell, setPlayer, isEditMode }) {
+export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -457,18 +456,18 @@ export default function SpellDeck({ spell, setPlayer, isEditMode }) {
             }}
           >
             <StyledTableCell sx={{ textAlign: "center" }}>
-              <Typography variant="caption" fontWeight="bold">
+              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("ace_deck")}: {cardsInDeck}
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ textAlign: "center" }}>
-              <Typography variant="caption" fontWeight="bold">
+              <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("Hand")}: {hand.length}
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ textAlign: "center" }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
-                <Typography variant="caption" fontWeight="bold">
+                <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                   {t("ace_discard_pile")}: {discardPile.length}
                 </Typography>
                 {totalTracked !== 30 && (
@@ -579,7 +578,7 @@ export default function SpellDeck({ spell, setPlayer, isEditMode }) {
                 <StyledTableCell colSpan={3} sx={{ py: 0.5 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
                     <Lightbulb sx={{ fontSize: "0.9rem", color: "warning.main" }} />
-                    <Typography variant="caption" fontWeight="bold" sx={{ mr: 0.5 }}>
+                    <Typography variant="caption" sx={{ fontWeight: "bold", mr: 0.5 }}>
                       {t("ace_quick_sets")} ({suggestions.length}):
                     </Typography>
                     {suggestions.map((suggestion, index) => (

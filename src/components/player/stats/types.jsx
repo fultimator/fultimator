@@ -11,6 +11,7 @@ import {
   WindIcon,
 } from "../../icons"
 import { useTranslate } from "../../../translation/translate";
+// import { typeList } from "../../typeConstants";
 
 export function TypeName({ type }) {
   const { t } = useTranslate();
@@ -53,27 +54,18 @@ export function TypeAffinity({ type, affinity }) {
 
   return (
     <Typography
-      color="red.main"
-      fontWeight="bold"
-      fontFamily="inherit"
-      textAlign="left"
-      sx={{ textTransform: "uppercase", px: 0.2, fontSize: "1rem" }}
-    >
+      sx={{
+        color: "red.main",
+        fontWeight: "bold",
+        fontFamily: "inherit",
+        textAlign: "left",
+        textTransform: "uppercase",
+        px: 0.2,
+        fontSize: "1rem"
+      }}>
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
       {/* Affinity */} {affinity}
     </Typography>
   );
 }
-
-export const typeList = [
-  "physical",
-  "wind",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];

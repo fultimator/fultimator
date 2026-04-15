@@ -26,13 +26,13 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -46,10 +46,9 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
       <Stack>
         {showHeader && (
           <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
+            container sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
               p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
@@ -59,39 +58,37 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
               },
             }}
           >
-            <Grid item xs={6}>
-              <Typography variant="h4" textAlign="left">
+            <Grid  size={6}>
+              <Typography sx={{ textAlign: "left" }}>
                 {t("Accessory")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
-              <Typography variant="h4" textAlign="center">
+            <Grid  size={2}>
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Cost")}
               </Typography>
             </Grid>
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column" item xs>
+          <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
               container
-              justifyContent="space-between"
-              item
               sx={{
+                justifyContent: `space-between`,
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}
-            >
-              <Grid item xs={6}>
-                <Typography fontWeight="bold">{accessory.name}</Typography>
+              }}>
+              <Grid  size={6}>
+                <Typography sx={{ fontWeight: "bold" }}>{accessory.name}</Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
+              <Grid  size={2}>
+                <Typography sx={{ textAlign: "center" }}>{`${accessory.cost}z`}</Typography>
               </Grid>
             </Grid>
 
@@ -107,10 +104,10 @@ function PrettyAccessory({ accessory, isCharacterSheet, showCard = true, showHea
               {!accessory.quality}{" "}
               <StyledMarkdown
                 components={{
-                  strong: (props) => (
+                  strong: ({ _node, ...props }) => (
                     <strong style={{ fontWeight: "bold" }} {...props} />
                   ),
-                  em: (props) => (
+                  em: ({ _node, ...props }) => (
                     <em style={{ fontStyle: "italic" }} {...props} />
                   ),
                 }}

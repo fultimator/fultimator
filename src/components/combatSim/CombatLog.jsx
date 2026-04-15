@@ -25,6 +25,7 @@ import { t } from "../../translation/translate";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Define the mapping of tags to components
 const tagMap = {
@@ -69,14 +70,14 @@ const SpanMarkdown = ({ children, ...props }) => {
       <ReactMarkdown
         {...props}
         components={{
-          p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-          strong: ({ ...props }) => (
+          p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+          strong: ({ _node, ...props }) => (
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
-          em: ({ ...props }) => (
+          em: ({ _node, ...props }) => (
             <em style={{ fontStyle: "italic" }} {...props} />
           ),
-          span: ({ ...props }) => <span {...props} />,
+          span: ({ _node, ...props }) => <span {...props} />,
         }}
       >
         {children}
@@ -94,7 +95,7 @@ function replaceTagsWithComponents(
   value5
 ) {
   if (value1 === "--isAttack--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -154,7 +155,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isSpell--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -196,7 +197,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isStandardRoll--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         if (part === "{{npc-name}}") {
@@ -222,7 +223,7 @@ function replaceTagsWithComponents(
         return part;
       });
   } else if (value1 === "--isClock--") {
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         // If the part matches the value placeholders, replace with actual values
@@ -241,7 +242,7 @@ function replaceTagsWithComponents(
       });
   } else {
     // Use a regular expression to replace tags with the corresponding component
-    return t(text)
+    return (t(text) || "")
       .split(/(\{\{.*?\}\})/)
       .map((part) => {
         // If the part matches the value placeholders, replace with actual values
@@ -304,6 +305,7 @@ export default function CombatLog({
 
   const [open, setOpen] = useState(controlledOpen);
   const [height, setHeight] = useState(isSmallScreen ? 150 : 200);
+  const [isClearLogsDialogOpen, setIsClearLogsDialogOpen] = useState(false);
   const logContainerRef = useRef(null);
   const isResizing = useRef(false);
   const startY = useRef(0);
@@ -372,7 +374,7 @@ export default function CombatLog({
   // Improved function to convert formatted log text to plain text
   const getPlainTextLog = (text, value1, value2, value3, value4, value5) => {
     // Start with the original text template
-    let plainText = t(text);
+    let plainText = t(text) || "";
 
     // Handle special case for attack logs
     if (value1 === "--isAttack--") {
@@ -530,7 +532,7 @@ export default function CombatLog({
         {open && (
           <Tooltip title={t("combat_sim_log_clear")} placement="top">
             <Button
-              onClick={clearLogs}
+              onClick={() => setIsClearLogsDialogOpen(true)}
               size="small"
               sx={{
                 minWidth: "auto",
@@ -621,9 +623,11 @@ export default function CombatLog({
                   }}
                 >
                   <Typography variant="caption" color="textSecondary">
-                    {isToday(log.timestamp)
-                      ? format(log.timestamp, "HH:mm:ss")
-                      : format(log.timestamp, "PP HH:mm:ss")}
+                    {log.timestamp && new Date(log.timestamp).getTime() > 0
+                      ? isToday(log.timestamp)
+                        ? format(log.timestamp, "HH:mm:ss")
+                        : format(log.timestamp, "PP HH:mm:ss")
+                      : "--:--:--"}
                   </Typography>
                   <Tooltip
                     title={t("combat_sim_copy_log_entry")}
@@ -670,6 +674,16 @@ export default function CombatLog({
           )}
         </Paper>
       </Collapse>
+      <DeleteConfirmationDialog
+        open={isClearLogsDialogOpen}
+        onClose={() => setIsClearLogsDialogOpen(false)}
+        onConfirm={() => {
+          clearLogs();
+          setIsClearLogsDialogOpen(false);
+        }}
+        title={t("combat_sim_log_clear")}
+        message={t("Are you sure you want to delete?")}
+      />
     </Box>
   );
 }

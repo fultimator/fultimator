@@ -28,7 +28,7 @@ export const validateCharacter = (character) => {
       "immunities",
     ];
     for (const prop of basicProperties) {
-      if (!character.hasOwnProperty(prop)) {
+      if (!Object.prototype.hasOwnProperty.call(character, prop)) {
         errors.push(`Missing: ${prop}`);
       }
     }
@@ -54,7 +54,7 @@ export const validateCharacter = (character) => {
       errors.push("Missing: info");
     } else {
       for (const prop of infoProps) {
-        if (!character.info.hasOwnProperty(prop)) {
+        if (!Object.prototype.hasOwnProperty.call(character.info, prop)) {
           errors.push(`Missing: ${prop} in info`);
         }
       }
@@ -71,7 +71,7 @@ export const validateCharacter = (character) => {
     } else {
       for (const prop of attributeProps) {
         if (
-          !character.attributes.hasOwnProperty(prop) ||
+          !Object.prototype.hasOwnProperty.call(character.attributes, prop) ||
           typeof character.attributes[prop] !== "number"
         ) {
           errors.push(`Missing or invalid: ${prop} in attributes`);
@@ -90,7 +90,7 @@ export const validateCharacter = (character) => {
     } else {
       for (const stat of statsProps) {
         if (
-          !character.stats.hasOwnProperty(stat) ||
+          !Object.prototype.hasOwnProperty.call(character.stats, stat) ||
           typeof character.stats[stat] !== "object"
         ) {
           errors.push(`Missing: ${stat} in stats`);
@@ -98,7 +98,7 @@ export const validateCharacter = (character) => {
           const subProps = ["max", "current"];
           for (const prop of subProps) {
             if (
-              !character.stats[stat].hasOwnProperty(prop) ||
+              !Object.prototype.hasOwnProperty.call(character.stats[stat], prop) ||
               typeof character.stats[stat][prop] !== "number"
             ) {
               errors.push(`Missing or invalid: ${stat} ${prop} in stats`);
@@ -130,7 +130,7 @@ export const validateCharacter = (character) => {
     } else {
       for (const prop of statusProps) {
         if (
-          !character.statuses.hasOwnProperty(prop) ||
+          !Object.prototype.hasOwnProperty.call(character.statuses, prop) ||
           typeof character.statuses[prop] !== "boolean"
         ) {
           errors.push(`Missing or invalid: ${prop} in statuses`);
@@ -156,7 +156,7 @@ export const validateCharacter = (character) => {
     } else {
       for (const prop of immunityProps) {
         if (
-          !character.immunities.hasOwnProperty(prop) ||
+          !Object.prototype.hasOwnProperty.call(character.immunities, prop) ||
           typeof character.immunities[prop] !== "boolean"
         ) {
           errors.push(`Missing or invalid: ${prop} in immunities`);
@@ -194,7 +194,7 @@ export const validateCharacter = (character) => {
   } else {
     for (const prop of modifierProps) {
       if (
-        !character.modifiers.hasOwnProperty(prop) ||
+        !Object.prototype.hasOwnProperty.call(character.modifiers, prop) ||
         typeof character.modifiers[prop] !== "number"
       ) {
         errors.push(`Missing or invalid: ${prop} in modifiers`);
@@ -232,11 +232,11 @@ export const validateCharacter = (character) => {
       "affinities",
     ];
     for (const prop of basicProperties) {
-      if (!npc.hasOwnProperty(prop)) {
+      if (!Object.prototype.hasOwnProperty.call(npc, prop)) {
         errors.push(`Missing: ${prop}`);
       }
     }
-  
+
     // Validate 'attributes' object
     const attributeProps = ["dexterity", "might", "will", "insight"];
     if (
@@ -248,7 +248,7 @@ export const validateCharacter = (character) => {
     } else {
       for (const prop of attributeProps) {
         if (
-          !npc.attributes.hasOwnProperty(prop) ||
+          !Object.prototype.hasOwnProperty.call(npc.attributes, prop) ||
           typeof npc.attributes[prop] !== "number"
         ) {
           errors.push(`Missing or invalid: ${prop} in attributes`);

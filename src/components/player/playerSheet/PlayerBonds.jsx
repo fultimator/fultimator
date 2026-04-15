@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Paper, Grid, Typography, Divider, Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Checkbox, FormControlLabel } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -6,6 +6,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const POSITIVE_SENTIMENTS = ["admiration", "loyality", "affection"];
@@ -22,9 +23,11 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [draftBond, setDraftBond] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
-  const bonds = player.info?.bonds ?? [];
+  const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
 
   useEffect(() => {
     if (editBondIndex !== null && bonds[editBondIndex]) {
@@ -134,30 +137,41 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                 )}
               </Box>
             ) : (
-              <Box sx={{ backgroundColor: primary, display: "flex", flexDirection: "column", alignItems: "center", py: 1, position: "relative" }}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    writingMode: "vertical-lr",
-                    textTransform: "uppercase",
-                    color: custom.white,
-                    transform: "rotate(180deg)",
-                    fontSize: "2em",
-                    minHeight: "100px",
-                  }}
-                  align="center"
-                >
-                  {t("Bonds")}
-                </Typography>
-              </Box>
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  paddingY: "10px",
+                  backgroundColor: primary,
+                  color: custom.white,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                }}
+                align="center"
+              >
+                {t("Bonds")}
+              </Typography>
             )}
 
             <Grid container spacing={0.75} sx={{ p: 0.75 }}>
               {bonds && bonds.length > 0
                 ? bonds.map((bond, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Grid
+                    key={index}
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                      md: 4
+                    }}>
                     <Box
                       sx={{
+                        height: "100%",
                         border: "1px solid",
                         borderColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)",
                         borderRadius: 1,
@@ -225,7 +239,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                             </Typography>
                           ))
                         ) : (
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{
+                            color: "text.secondary"
+                          }}>
                             {"-"}
                           </Typography>
                         )}
@@ -238,7 +254,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </Paper>
         </>
       )}
-
       {editBondIndex !== null && draftBond && (
         <Dialog open onClose={closeModal} fullWidth maxWidth="sm">
           <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
@@ -253,13 +268,15 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField
                   fullWidth
                   label={t("Bond Name")}
                   value={draftBond.name}
                   onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
               {[
@@ -270,7 +287,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
                 { key: "mistrust", label: t("Mistrust"), color: negativeColor },
                 { key: "hatred", label: t("Hatred"), color: negativeColor },
               ].map(({ key, label, color }) => (
-                <Grid item xs={4} key={key}>
+                <Grid  key={key} size={4}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -288,7 +305,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
             <Button
               variant="contained"
               color="error"
-              onClick={() => setDeleteDialogOpen(true)}
+              onClick={handleDelete}
             >
               {t("Delete")}
             </Button>
@@ -299,10 +316,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, isCharacter
           </DialogActions>
         </Dialog>
       )}
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => deleteBond(editBondIndex)}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to remove this bond?")}

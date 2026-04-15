@@ -17,7 +17,7 @@ import {
   Collapse,
 } from "@mui/material";
 import {
-  RemoveCircleOutline,
+  RemoveCircleOutlined,
   RestartAlt,
   Close,
   Add,
@@ -93,6 +93,26 @@ export default function CombatSimClocks({
     onUpdate(index, newState);
   };
 
+  const incrementClock = (index, clock) => {
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled < clock.sections) {
+      const newState = new Array(clock.sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      onUpdate(index, newState);
+    }
+  };
+
+  const decrementClock = (index, clock) => {
+    const currentFilled = clock.state.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clock.state];
+      newState[currentFilled - 1] = false;
+      onUpdate(index, newState);
+    }
+  };
+
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
@@ -137,7 +157,7 @@ export default function CombatSimClocks({
         <Grid container spacing={3}>
           {/* Add new clock section - Collapsible */}
           {!isMaxClocksReached && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Paper
                 sx={{
                   p: 2,
@@ -176,17 +196,19 @@ export default function CombatSimClocks({
                 <Collapse in={expanded} timeout="auto" unmountOnExit>
                   <Box sx={{ mt: 2 }}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <TextField
                           autoFocus={expanded}
                           fullWidth
                           label={t("clocks_name_label")}
                           value={clockName}
                           onChange={handleClockNameChange}
-                          inputProps={{ maxLength: 30 }}
+                          slotProps={{
+                            htmlInput: { maxLength: 30 }
+                          }}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Typography variant="subtitle1" sx={{ mb: 1 }}>
                           {t("clocks_sections_title")}
                         </Typography>
@@ -209,7 +231,7 @@ export default function CombatSimClocks({
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Tooltip
                           title={t("clocks_name_required")}
                           disableHoverListener={!shouldShowTooltip}
@@ -237,13 +259,19 @@ export default function CombatSimClocks({
           )}
 
           {/* Existing clocks or Empty state */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             {clocks.length > 0 ? (
               <>
                 <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
                   {clocks.map((clock, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Grid
+                      key={index}
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4
+                      }}>
                       <Paper
                         sx={{
                           p: 2,
@@ -254,14 +282,30 @@ export default function CombatSimClocks({
                           alignItems: "center",
                         }}
                       >
-                        <Box sx={{ position: "absolute", right: 8, top: 8 }}>
+                        <Box sx={{ position: "absolute", right: 8, top: 8, display: "flex", gap: 0.5 }}>
+                          <Tooltip title={t("Decrement")}>
+                            <IconButton
+                              size="small"
+                              onClick={() => decrementClock(index, clock)}
+                            >
+                              <RemoveCircleOutlined fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip title={t("clocks_reset_tooltip")}>
                             <IconButton
                               size="small"
                               onClick={() => onReset(index)}
-                              sx={{ mr: 1 }}
+                              sx={{ mr: 0.5 }}
                             >
                               <RestartAlt fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t("Increment")}>
+                            <IconButton
+                              size="small"
+                              onClick={() => incrementClock(index, clock)}
+                            >
+                              <Add fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title={t("clocks_remove_tooltip")}>
@@ -270,7 +314,7 @@ export default function CombatSimClocks({
                               onClick={() => onRemove(index)}
                               color="error"
                             >
-                              <RemoveCircleOutline fontSize="small" />
+                              <RemoveCircleOutlined fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </Box>

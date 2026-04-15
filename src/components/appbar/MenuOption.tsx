@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
 import { IS_ELECTRON, SUPPORTS_LOCAL_DB } from "../../platform";
-
+  // Local DB export / import
 import {
   getAuth,
   onAuthStateChanged,
@@ -39,7 +39,7 @@ import type { UserCredential } from "@platform/db";
 import { GoogleAuthProvider } from "firebase/auth";
 import { storeAccessToken } from "@platform/db";
 import { exportDatabase, importDatabase } from "../../utility/dbExportImport";
-
+  // Drive sync
 import DarkModeToggle, { DarkModeToggleProps } from "./DarkModeToggle";
 import ThemeSwitcher, { ThemeSwitcherProps } from "./ThemeSwitcher";
 import LanguageMenu from "./LanguageMenu";
@@ -119,7 +119,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     setIsSnackbarOpen(true);
   };
 
-  // ── Auth ────────────────────────────────────────────────────────────────────
+  // Auth
 
   const handleAuthentication = async (
     authAction: () => Promise<UserCredential | void>,
@@ -182,8 +182,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     await switchGoogleAccount();
   };
 
-  // ── Local DB export / import ────────────────────────────────────────────────
-
+  // Local DB export / import
   const handleLocalExport = async () => {
     setIsLoading(true);
     try {
@@ -224,8 +223,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     }
   };
 
-  // ── Drive sync ──────────────────────────────────────────────────────────────
-
+  // Drive sync
   const handleDriveExport = async () => {
     setIsLoading(true);
     try {

@@ -17,12 +17,17 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../translation/translate";
 import Clock from "./Clock";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 
@@ -116,6 +121,26 @@ export default function PlayerRituals({
     resetClock();
   };
 
+  const incrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled < clockSections) {
+      const newState = new Array(clockSections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        newState[i] = true;
+      }
+      setClockState(newState);
+    }
+  };
+
+  const decrementClock = () => {
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const newState = [...clockState];
+      newState[currentFilled - 1] = false;
+      setClockState(newState);
+    }
+  };
+
   if (
     !hasRitualism &&
     !hasSpiritism &&
@@ -168,7 +193,12 @@ export default function PlayerRituals({
         { checked: hasRitualism, label: "Ritualism" },
         { checked: hasSpiritism, label: "Spiritism" },
       ].map(({ checked, label }) => (
-        <Grid item xs={4} md={2} key={label}>
+        <Grid
+          key={label}
+          size={{
+            xs: 4,
+            md: 2
+          }}>
           <FormControlLabel
             sx={compact ? { margin: 0 } : undefined}
             control={
@@ -189,7 +219,11 @@ export default function PlayerRituals({
 
       {isEditMode && (
         <Grid container spacing={compact ? 1 : 2} sx={{ padding: compact ? "0.4em" : "1em" }}>
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8
+            }}>
             <RitualsCalculator
               compact={compact}
               power={power}
@@ -211,14 +245,11 @@ export default function PlayerRituals({
           </Grid>
 
           <Grid
-            container
-            justifyContent="center"
-            alignItems="center"
-            item
-            xs={12}
-            md={4}
-            sx={{ textAlign: "center" }}
-          >
+            container sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <Clock
               numSections={clockSections}
               size={compact ? 140 : 200}
@@ -227,7 +258,11 @@ export default function PlayerRituals({
             />
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8
+            }}>
             <Button
               variant="contained"
               size={compact ? "small" : "medium"}
@@ -237,15 +272,44 @@ export default function PlayerRituals({
               {t("Set New Clock")}
             </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Button
-              variant="outlined"
-              size={compact ? "small" : "medium"}
-              sx={{ width: "100%" }}
-              onClick={resetClock}
-            >
-              {t("Reset Clock")}
-            </Button>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}
+            container
+            sx={{ justifyContent: "center", gap: compact ? 0.5 : 1 }}
+          >
+            <Tooltip title={t("Decrement")} arrow>
+              <IconButton
+                color="primary"
+                onClick={decrementClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <RemoveIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Reset")} arrow>
+              <IconButton
+                color="primary"
+                onClick={resetClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <RestartAltIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Increment")} arrow>
+              <IconButton
+                color="primary"
+                onClick={incrementClock}
+                size={compact ? "small" : "medium"}
+                variant="outlined"
+              >
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       )}
@@ -368,7 +432,6 @@ function RitualsCalculator({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const custom = useCustomTheme();
   const secondary = theme.palette.secondary.main;
 
   const labelFontSize = compact
@@ -391,7 +454,7 @@ function RitualsCalculator({
       }}
     >
       <Grid container>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Potency")}
@@ -418,7 +481,7 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Area")}
@@ -445,7 +508,7 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Reductions")}
@@ -497,18 +560,30 @@ function RitualsCalculator({
       </Grid>
       <Divider />
       <Grid container sx={{ m: compact ? 0.5 : 1 }}>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+        <Grid  size={4}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {calcPM} {t("MP")}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+        <Grid  size={4}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {calcLD} {t("DL")}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
-          <Typography fontWeight="bold" fontSize={compact ? "0.8em" : undefined}>
+        <Grid  size={4}>
+          <Typography
+            sx={{
+              fontSize: compact ? "0.8em" : undefined,
+              fontWeight: "bold"
+            }}>
             {t("Clock")} {calcClock}
           </Typography>
         </Grid>

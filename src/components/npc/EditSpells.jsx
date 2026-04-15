@@ -1,6 +1,6 @@
 import { useState } from "react";
 import types from "../../libs/types";
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -22,11 +22,14 @@ import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingSpellIndex, setPendingSpellIndex] = useState(null);
 
   const openCompendiumModal = () => {
     setModalOpen(true);
@@ -47,12 +50,11 @@ export default function EditSpells({ npc, setNpc }) {
   };
 
   const addSpell = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.spells) {
-        newState.spells = [];
-      }
-      newState.spells.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      spells: [
+        ...(prevState.spells || []),
+        {
         itemType: "spell",
         name: "",
         range: "melee",
@@ -62,19 +64,21 @@ export default function EditSpells({ npc, setNpc }) {
         damagetype: "physical",
         damage: 0,
         special: [],
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeSpell = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.spells.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      spells: (prevState.spells || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingSpellIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -89,15 +93,15 @@ export default function EditSpells({ npc, setNpc }) {
       {npc.spells?.map((spell, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <EditSpell
                 spell={spell}
                 setSpell={onChangeSpells(i)}
-                removeSpell={removeSpell(i)}
+                removeSpell={() => openDeleteDialog(i)}
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
-              <Grid item xs={12} sx={{ py: 1 }}>
+              <Grid  sx={{ py: 1 }} size={12}>
                 <Divider />
               </Grid>
             )}
@@ -111,28 +115,51 @@ export default function EditSpells({ npc, setNpc }) {
         initialType="spells"
         onAddItem={(item, sourceType) => {
           setNpc((prev) => {
-            const newState = { ...prev };
-            if (!newState.spells) newState.spells = [];
             // player-spells have a different shape than npc spells
             const isPlayerSpell = sourceType === "player-spells";
-            newState.spells.push({
-              itemType: "spell",
-              name: item.name,
-              attr1: item.attr1 || "insight",
-              attr2: item.attr2 || "will",
-              type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
-              damagetype: item.damagetype || "physical",
-              damage: item.damage || 0,
-              mp: String(item.mp ?? ""),
-              maxTargets: item.maxTargets || 0,
-              target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
-              duration: isPlayerSpell ? staticT(item.duration || "") : (item.duration || ""),
-              effect: isPlayerSpell ? staticT(item.description || "") : (item.effect || ""),
-              special: item.special || [],
-            });
-            return newState;
+            return {
+              ...prev,
+              spells: [
+                ...(prev.spells || []),
+                {
+                  itemType: "spell",
+                  name: item.name,
+                  attr1: item.attr1 || "insight",
+                  attr2: item.attr2 || "will",
+                  type: isPlayerSpell ? (item.isOffensive ? "offensive" : "") : (item.type || ""),
+                  damagetype: item.damagetype || "physical",
+                  damage: item.damage || 0,
+                  mp: String(item.mp ?? ""),
+                  maxTargets: item.maxTargets || 0,
+                  target: isPlayerSpell ? staticT(item.targetDesc || "") : (item.target || ""),
+                  duration: isPlayerSpell ? staticT(item.duration || "") : (item.duration || ""),
+                  effect: isPlayerSpell ? staticT(item.description || "") : (item.effect || ""),
+                  special: item.special || [],
+                },
+              ],
+            };
           });
         }}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingSpellIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingSpellIndex === null) return;
+          removeSpell(pendingSpellIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingSpellIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingSpellIndex !== null
+            ? npc.spells?.[pendingSpellIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );
@@ -178,24 +205,36 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
   };
 
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item sx={{ p: 0, m: 0 }}>
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
+      <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeSpell}>
-          <RemoveCircleOutline />
+          <RemoveCircleOutlined />
         </IconButton>
       </Grid>
-      <Grid item xs={12} sm={6} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6,
+          md: 6
+        }}>
         <TextField
           label={t("Spell Name:")}
           variant="outlined"
           fullWidth
           value={spell.name}
           onChange={(e) => setSpell("name", e.target.value)}
-          inputProps={{ maxLength: 50 }}
           size="small"
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
-      <Grid item xs={12} sm={1} md={1}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 1,
+          md: 1
+        }}>
         <FormControl variant="standard" fullWidth style={{ height: "100%" }}>
           <ToggleButton
             selected={spell.type === "offensive"}
@@ -212,7 +251,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </ToggleButton>
         </FormControl>
       </Grid>
-      <Grid item xs={6} sm={3} md={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3,
+          md: 2
+        }}>
         <TextField
           id="mp"
           label={t("MP x Target")}
@@ -230,7 +274,12 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           size="small"
         />
       </Grid>
-      <Grid item xs={6} sm={4} md={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 4,
+          md: 2
+        }}>
         <TextField
           type="number"
           label={t("Max Targets")}
@@ -266,7 +315,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           }}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="target"
@@ -290,13 +343,19 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 {...params}
                 label={t("Target Description")}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 100 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 100 }
+                }}
               />
             )}
           />
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField
             id="duration"
@@ -320,14 +379,20 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 {...params}
                 label={t("Duration")}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 50 }
+                }}
               />
             )}
           />
         </FormControl>
       </Grid>
       {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr1label"}>
               {t("Attr 1:")}
@@ -351,7 +416,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={6} sm={4}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"spell-" + i + "-attr2label"}>
               {t("Attr 2:")}
@@ -375,7 +444,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
             <Select
@@ -448,7 +521,11 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
         </Grid>
       )}
       {spell.type === "offensive" && (
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <TextField
             type="number"
             label={t("Damage")}
@@ -482,7 +559,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControl variant="outlined" fullWidth>
           {/* <TextField id="effect" label={t("Effect:")} value={spell.effect}
             onChange={(e) => {

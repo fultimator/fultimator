@@ -121,7 +121,7 @@ export default function EditPlayerBasics({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Basic Information")}
@@ -130,35 +130,51 @@ export default function EditPlayerBasics({
             customTooltip="Console.log Player Object"
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="name"
               label={t("Name") + ":"}
               value={player.name}
               onChange={onChange("name")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 50 }} // Set the maximum length to 50 characters
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="pronouns"
               label={t("Pronouns") + ":"}
               value={player.info.pronouns}
               onChange={(e) => onChangeInfo("pronouns")(e.target.value)}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 15 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 15 }
+              }} />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <EditPlayerLevel
             player={player}
             setPlayer={setPlayer}
@@ -166,7 +182,7 @@ export default function EditPlayerBasics({
             updateMaxStats={updateMaxStats}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <FormControl variant="standard" fullWidth>
             <CustomTextarea
               id="description"
@@ -179,7 +195,11 @@ export default function EditPlayerBasics({
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="fabulapoints"
@@ -206,20 +226,26 @@ export default function EditPlayerBasics({
                 onChangeInfo("fabulapoints")(value);
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <FabulaIcon style={{ width: "28px", height: "28px" }} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton>
+                        <FabulaIcon style={{ width: "28px", height: "28px" }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="exp"
@@ -242,23 +268,29 @@ export default function EditPlayerBasics({
                 onChangeInfo("exp")(value);
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <ExpAdornment
-                    exp={player.info.exp}
-                    isEditMode={isEditMode}
-                    player={player}
-                    setPlayer={setPlayer}
-                    onLevelUp={handleLevelUp}
-                    onCloseLevelUp={handleCloseLevelUp}
-                  />
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <ExpAdornment
+                      exp={player.info.exp}
+                      isEditMode={isEditMode}
+                      player={player}
+                      setPlayer={setPlayer}
+                      onLevelUp={handleLevelUp}
+                      onCloseLevelUp={handleCloseLevelUp}
+                    />
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="zenit"
@@ -274,22 +306,28 @@ export default function EditPlayerBasics({
                 }
               }}
               type="number"
-              InputProps={{
-                readOnly: !isEditMode,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <ZenitIcon style={{ width: "28px", height: "28px" }} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton>
+                        <ZenitIcon style={{ width: "28px", height: "28px" }} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
         {isEditMode ? (
           <>
-            <Grid item xs={12} sm={8}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 8
+              }}>
               <TextField
                 id="imgurl"
                 label={t("Image URL") + ":"}
@@ -306,7 +344,11 @@ export default function EditPlayerBasics({
                 }
               />
             </Grid>
-            <Grid item xs={6} sm={2}>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 2
+              }}>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -334,7 +376,11 @@ export default function EditPlayerBasics({
                 message={t("Image uploaded successfully!")}
               />
             </Grid>
-            <Grid item xs={6} sm={2}>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 2
+              }}>
               <Button
                 variant="outlined"
                 onClick={() => {
@@ -386,28 +432,30 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
         label={t("Level") + ":"}
         sx={{ width: "100%" }}
         value={player.lvl}
-        InputProps={{
-          readOnly: true,
-          startAdornment: (
-            <IconButton
-              aria-label="decrease level"
-              edge="start"
-              onClick={onLowerLevel}
-              disabled={!isEditMode}
-            >
-              <Remove />
-            </IconButton>
-          ),
-          endAdornment: (
-            <IconButton
-              aria-label="increase level"
-              edge="end"
-              onClick={onRaiseLevel}
-              disabled={!isEditMode}
-            >
-              <Add />
-            </IconButton>
-          ),
+        slotProps={{
+          input: {
+            readOnly: true,
+            startAdornment: (
+              <IconButton
+                aria-label="decrease level"
+                edge="start"
+                onClick={onLowerLevel}
+                disabled={!isEditMode}
+              >
+                <Remove />
+              </IconButton>
+            ),
+            endAdornment: (
+              <IconButton
+                aria-label="increase level"
+                edge="end"
+                onClick={onRaiseLevel}
+                disabled={!isEditMode}
+              >
+                <Add />
+              </IconButton>
+            ),
+          }
         }}
       />
     </FormControl>
@@ -487,11 +535,13 @@ function ExpAdornment({
       <Dialog
         open={levelUpDialogOpen}
         onClose={handleClose}
-        PaperProps={{
-          sx: {
-            width: "80%",
-            maxWidth: "md",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "80%",
+              maxWidth: "md",
+            },
+          }
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -508,11 +558,13 @@ function ExpAdornment({
       <Dialog
         open={levelUpCelebrationOpen}
         onClose={handleClose}
-        PaperProps={{
-          sx: {
-            width: "80%",
-            maxWidth: "lg",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              width: "80%",
+              maxWidth: "lg",
+            },
+          }
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>

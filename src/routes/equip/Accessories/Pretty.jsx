@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Card,
   Grid,
@@ -7,6 +7,8 @@ import {
   ThemeProvider,
   Tooltip,
   IconButton,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
@@ -14,6 +16,7 @@ import { styled } from "@mui/system";
 import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -31,14 +34,13 @@ function Pretty({ custom }) {
 function PrettySingle({ accessory, showActions }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const [showImage, setShowImage] = useState(false);
 
   const background = theme.mode === 'dark'
   ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
   : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
 
-  const background2 = theme.mode === 'dark'
-  ? `black`
-  : `white`;
+  const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
   const cardBackground = theme.mode === 'dark'
   ? `backgroundColor: "#181a1b", background: "#181a1b"`
@@ -61,10 +63,9 @@ function PrettySingle({ accessory, showActions }) {
           <Stack>
             <Grid
               container
-              justifyContent="space-between"
-              alignItems="center"
               sx={{
-                p: 1,
+                alignItems: "center",
+                py: 1,
                 background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
@@ -73,66 +74,78 @@ function PrettySingle({ accessory, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={6}>
-                <Typography variant="h4" textAlign="left">
+              <Grid sx={{ flex: "0 0 70px" }} />
+              <Grid sx={{ flex: 1, pl: 1 }} container>
+              <Grid size={6}>
+                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
                   {t("Accessory")}
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Typography variant="h4" textAlign="center">
+              <Grid size={4}>
+                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
                   {t("Cost")}
                 </Typography>
               </Grid>
+              </Grid>
             </Grid>
-            <Grid container>
+
+            {/* All Rows Container */}
+            <Grid
+              container
+              sx={{
+                borderBottom: `1px solid ${theme.secondary}`,
+              }}
+            >
+              {/* Image Column - spans all rows */}
               <Grid
-                item
                 sx={{
                   flex: "0 0 70px",
-                  minWidth: "70px",
-                  minHeight: "70px",
-                  background2,
+                  width: "70px",
+                  background: imageBackground,
+                  display: "grid",
+                  placeItems: "center",
+                  overflow: "hidden",
                 }}
               >
-                <EditableImage size={70} />
+                {showImage && <EditableImage size={70} />}
               </Grid>
-
-              <Grid container direction="column" item xs>
-                {/* First Row */}
-                <Grid
-                  container
-                  justifyContent="space-between"
-                  item
+              {/* Content Column - contains all rows */}
+              <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
+                {/* First Data Row */}
+                <Grid container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
-                    padding: "5px",
+                    alignItems: "center",
+                    minHeight: "40px",
+                    pl: 1,
                   }}
                 >
-                  <Grid item xs={6}>
-                    <Typography fontWeight="bold">{accessory.name}</Typography>
+                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={6}>
+                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>{accessory.name || t("No Name")}</Typography>
                   </Grid>
-                  <Grid item xs={2}>
-                    <Typography textAlign="center">{`${accessory.cost}z`}</Typography>
+                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={4}>
+                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>{`${accessory.cost}z`}</Typography>
                   </Grid>
                 </Grid>
 
-                {/* Second Row */}
-                <Grid
-                  container
-                  justifyContent="flex-start"
+                {/* Quality Row */}
+                <Grid container
                   sx={{
-                    background2,
-                    padding: "5px",
+                    pl: 1,
+                    minHeight: "40px",
+                    alignItems: "center",
                   }}
                 >
-                  <Typography>
-                    {!accessory.quality}{" "}
-                    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
-                      {accessory.quality}
-                    </StyledMarkdown>
-                  </Typography>
+                  <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
+                    <Typography sx={{ lineHeight: 1, margin: 0 }}>
+                      {!accessory.quality ? t("No Description") : (
+                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                          {accessory.quality}
+                        </StyledMarkdown>
+                      )}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -140,13 +153,20 @@ function PrettySingle({ accessory, showActions }) {
         </div>
       </Card>
       {showActions && (
-        <div style={{ display: "flex" }}>
-          <Tooltip title={t("Download as Image")}>
-            <IconButton onClick={downloadImage}>
-              <Download />
-            </IconButton>
-          </Tooltip>
-          <Export name={`${accessory.name}`} dataType="accessory" data={accessory} />
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export name={`${accessory.name}`} dataType="accessory" data={accessory} />
+            <AddToCompendiumButton itemType="accessory" data={accessory} />
+          </div>
+          <FormControlLabel
+            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            label={t("Add Image")}
+          />
         </div>
       )}
     </>

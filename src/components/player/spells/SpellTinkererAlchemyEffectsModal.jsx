@@ -92,11 +92,13 @@ export default function SpellTinkererAlchemyEffectsModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -117,8 +119,8 @@ export default function SpellTinkererAlchemyEffectsModal({
       <DialogContent>
         <Grid container spacing={2}>
           {effects.map((effect, index) => (
-            <Grid item xs={12} key={index} container spacing={2}>
-              <Grid item xs={3}>
+            <Grid  key={index} container spacing={2} size={12}>
+              <Grid  size={3}>
                 <FormControl fullWidth>
                   <InputLabel id={`die-value-label-${index}`}>
                     {t("Die")}
@@ -141,7 +143,7 @@ export default function SpellTinkererAlchemyEffectsModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={8}>
+              <Grid  size={8}>
                 <TextField
                   label={t("Effect")}
                   value={effect.effect}
@@ -151,7 +153,7 @@ export default function SpellTinkererAlchemyEffectsModal({
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Button
                   variant="contained"
                   color="error"
@@ -162,13 +164,13 @@ export default function SpellTinkererAlchemyEffectsModal({
               </Grid>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button variant="contained" onClick={handleAddEffect}>
               {t("Add Effect")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}

@@ -12,13 +12,17 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
-import RemoveCircleOutline from "@mui/icons-material/RemoveCircleOutline";
+import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
+import { useState } from "react";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingBondIndex, setPendingBondIndex] = useState(null);
 
   const handleBondChange = (index, key) => (event) => {
     const updatedBonds = player.info.bonds.map((bond, i) => {
@@ -100,6 +104,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
     }));
   };
 
+  const openDeleteDialog = (index) => {
+    setPendingBondIndex(index);
+    setIsDeleteDialogOpen(true);
+  };
+
   return (
     <Paper
       elevation={3}
@@ -111,7 +120,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Bonds")}
@@ -121,32 +130,46 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (
-          <Grid item xs={12} key={index}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={4}>
-                <Box display="flex" alignItems="center">
+          <Grid  key={index} size={12}>
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 4
+                }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center"
+                  }}>
                   {isEditMode ? <IconButton
                     aria-label="delete"
-                    onClick={() => deleteBond(index)}
+                    onClick={() => openDeleteDialog(index)}
                     sx={{ ml: 1 }}
                   >
-                    <RemoveCircleOutline />
+                    <RemoveCircleOutlined />
                   </IconButton> : null}
                   <TextField
                     fullWidth
                     label={t("Bond Name")}
                     value={bond.name}
                     onChange={handleBondNameChange(index)}
-                    InputProps={{
-                      readOnly: !isEditMode,
-                    }}
-                    inputProps={{ maxLength: 50 }}
-                  />
+                    slotProps={{
+                      input: {
+                        readOnly: !isEditMode,
+                      },
+
+                      htmlInput: { maxLength: 50 }
+                    }} />
                 </Box>
               </Grid>
-              <Grid item xs={12} md={8}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 8
+                }}>
                 <Grid container spacing={1}>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -162,7 +185,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -178,7 +201,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -194,7 +217,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -210,7 +233,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -226,7 +249,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       }
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid  size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -246,13 +269,33 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
               </Grid>
             </Grid>
             {index < player.info.bonds.length - 1 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
             )}
           </Grid>
         ))}
       </Grid>
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingBondIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingBondIndex === null) return;
+          deleteBond(pendingBondIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingBondIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingBondIndex !== null
+            ? player.info.bonds?.[pendingBondIndex]?.name || ""
+            : ""
+        }
+      />
     </Paper>
   );
 }

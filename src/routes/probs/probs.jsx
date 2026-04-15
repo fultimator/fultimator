@@ -110,12 +110,17 @@ export default function Probs() {
   return (
     <div>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader type="top" headerText={t("Attacks Chance Generator")} showIconButton={false}/>
         </Grid>
 
         {/* First die */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"firstdie"}>{t("Die 1")}</InputLabel>
             <Select
@@ -137,7 +142,12 @@ export default function Probs() {
         </Grid>
 
         {/* Second die */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"seconddie"}>{t("Die 2")}</InputLabel>
             <Select
@@ -159,7 +169,12 @@ export default function Probs() {
         </Grid>
 
         {/* Bonus */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="bonus"
@@ -169,37 +184,44 @@ export default function Probs() {
               max={60}
               value={bonus}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setBonus(bonus - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setBonus(bonus + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={() => {
+                        setBonus(bonus - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() => {
+                        setBonus(bonus + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
 
         {/* Damage */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
@@ -209,36 +231,43 @@ export default function Probs() {
               max={60}
               value={damage}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setDamage(damage - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setDamage(damage + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={() => {
+                        setDamage(damage - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() => {
+                        setDamage(damage + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
         {/* LD */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
@@ -248,36 +277,43 @@ export default function Probs() {
               max={20}
               value={dl}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setDl(dl - 1);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setDl(dl + 1);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={() => {
+                        setDl(dl - 1);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() => {
+                        setDl(dl + 1);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>
         </Grid>
         {/* HP */}
-        <Grid item xs={6} sm={4} lg={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4,
+            lg: 2
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"
@@ -287,30 +323,32 @@ export default function Probs() {
               max={300}
               value={hp}
               size="small"
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="start"
-                    onClick={(e) => {
-                      setHp(hp - 5);
-                    }}
-                  >
-                    <Remove />
-                  </IconButton>
-                ),
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    edge="end"
-                    onClick={(e) => {
-                      setHp(hp + 5);
-                    }}
-                  >
-                    <Add />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  startAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="start"
+                      onClick={() => {
+                        setHp(hp - 5);
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  ),
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      edge="end"
+                      onClick={() => {
+                        setHp(hp + 5);
+                      }}
+                    >
+                      <Add />
+                    </IconButton>
+                  ),
+                }
               }}
             />
           </FormControl>

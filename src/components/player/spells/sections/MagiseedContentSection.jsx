@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import MagiseedItem from "./MagiseedItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
@@ -9,7 +9,7 @@ import { magiseeds } from "../../../../libs/floralistMagiseedData";
  * Manages the array of magiseeds with add/edit/delete
  */
 export default function MagiseedContentSection({ formState, setFormState, t }) {
-  const currentMagiseeds = formState.magiseeds || [];
+  const currentMagiseeds = useMemo(() => formState.magiseeds || [], [formState.magiseeds]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   // Function to create a new blank magiseed

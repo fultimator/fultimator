@@ -4,7 +4,6 @@ import LockIcon from "@mui/icons-material/Lock";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import { useTranslate } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
@@ -49,16 +48,15 @@ export default function CardLoadout({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const custom = useCustomTheme();
   const [pickerSlot, setPickerSlot] = useState(null);
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
-  const supportModules = getEquippedSupportModules(player);
+  const supportModules = getEquippedSupportModules(player).filter(m => m.enabled);
   const hasSupportColumn = showSupportColumn && supportModules.length > 0;
 
   const mainHandResolved = resolveEffectiveSlot(player, "mainHand");

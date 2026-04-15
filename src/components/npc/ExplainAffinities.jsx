@@ -25,9 +25,11 @@ export default function ExplainAffinities({ npc }) {
       {npc.species === "Construct" && (
         <>
           <Typography
-            fontFamily="Antonio"
-            sx={{ mt: 2, textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              mt: 2,
+              textTransform: "uppercase"
+            }}>
             {t("Species: Construct")}
           </Typography>
           <Typography>
@@ -43,9 +45,11 @@ export default function ExplainAffinities({ npc }) {
       {npc.species === "Demon" && (
         <>
           <Typography
-            fontFamily="Antonio"
-            sx={{ mt: 2, textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              mt: 2,
+              textTransform: "uppercase"
+            }}>
             {t("Species: Demon")}
           </Typography>
           <Typography>
@@ -61,9 +65,11 @@ export default function ExplainAffinities({ npc }) {
       {npc.species === "Elemental" && (
         <>
           <Typography
-            fontFamily="Antonio"
-            sx={{ mt: 2, textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              mt: 2,
+              textTransform: "uppercase"
+            }}>
             {t("Species: Elemental")}
           </Typography>
           <Typography>
@@ -79,9 +85,11 @@ export default function ExplainAffinities({ npc }) {
       {npc.species === "Undead" && (
         <>
           <Typography
-            fontFamily="Antonio"
-            sx={{ mt: 2, textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              mt: 2,
+              textTransform: "uppercase"
+            }}>
             {t("Species: Undead")}
           </Typography>
           <Typography>
@@ -97,9 +105,11 @@ export default function ExplainAffinities({ npc }) {
       {npc.species === "Plant" && (
         <>
           <Typography
-            fontFamily="Antonio"
-            sx={{ mt: 2, textTransform: "uppercase" }}
-          >
+            sx={{
+              fontFamily: "Antonio",
+              mt: 2,
+              textTransform: "uppercase"
+            }}>
             {t("Species: Plant")}
           </Typography>
           <Typography>

@@ -15,7 +15,7 @@ import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import {
   getTypeIcon,
-  getTypeLabel,
+  useTypeLabel,
   getTypeColor,
   languages
 } from "./resourceUtils";
@@ -33,6 +33,7 @@ export default function FilterSection({
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const getTypeLabel = useTypeLabel();
 
   return (
     <Paper
@@ -44,29 +45,40 @@ export default function FilterSection({
         borderRadius: "16px",
       }}
     >
-      <Grid container spacing={3} alignItems="center">
-        <Grid item xs={12} md={6}>
+      <Grid container spacing={3} sx={{ alignItems: "center" }}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <TextField
             fullWidth
             variant="outlined"
             placeholder={t("resources_search_placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: "12px",
               },
             }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              }
+            }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <FormControl fullWidth>
             <InputLabel>{t("resources_filter_by_type")}</InputLabel>
             <Select
@@ -89,7 +101,12 @@ export default function FilterSection({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <FormControl fullWidth>
             <InputLabel>{t("resources_filter_by_language")}</InputLabel>
             <Select

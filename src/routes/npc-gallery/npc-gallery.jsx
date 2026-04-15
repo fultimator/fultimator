@@ -3,7 +3,7 @@ import {
   useSearchParams,
   useNavigate,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
 
 import {
   Box,
@@ -63,7 +63,7 @@ import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
@@ -244,7 +244,7 @@ function Personal() {
       const docRef = await db.addDoc(db.collection("npc-personal"), data);
       notify(t("NPC copied"));
       setTimeout(() => { window.location.href = `/npc-gallery/${docRef.id}`; }, 800);
-    } catch (e) {
+    } catch {
       notify(t("Failed to copy NPC"));
     }
   };
@@ -285,8 +285,7 @@ function Personal() {
   const [moveAnchor, setMoveAnchor] = useState(null);
   const [exportAnchor, setExportAnchor] = useState(null);
 
-  // ── Bulk cross-DB copy / move ────────────────────────────────────────────────
-
+  // Bulk cross-DB copy / move
   const bulkCopyToDb = async (npcs, targetDb) => {
     for (const npc of npcs) {
       const data = { ...npc, published: false };
@@ -481,7 +480,6 @@ function Personal() {
 
           return true;
         })
-        // eslint-disable-next-line array-callback-return
         .sort((item1, item2) => {
           if (direction === "ascending") {
             if (sort === "name") return item1.name.localeCompare(item2.name);
@@ -544,9 +542,13 @@ function Personal() {
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
-          {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} md={3}>
+          {/* Zone 1: Filters */}
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 3
+              }}>
               <TextField
                 label={t("Adversary Name")}
                 variant="outlined"
@@ -556,7 +558,11 @@ function Personal() {
                 onChange={(evt) => { updateName(evt.target.value); }}
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 2
+              }}>
               <Autocomplete
                 fullWidth
                 size="small"
@@ -573,7 +579,12 @@ function Personal() {
                 )}
               />
             </Grid>
-            <Grid item xs={6} sm={4} md>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="rank">{t("Rank:")}</InputLabel>
                 <Select labelId="rank" id="select-rank" value={rank} label={t("Rank:")} onChange={(evt) => { updateRank(evt.target.value); }}>
@@ -591,7 +602,12 @@ function Personal() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} sm={4} md>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="species">{t("Species:")}</InputLabel>
                 <Select labelId="species" id="select-species" value={species} label={t("Species:")} onChange={(evt) => { updateSpecies(evt.target.value); }}>
@@ -607,7 +623,12 @@ function Personal() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} sm={4} md>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="sort">{t("Sort:")}</InputLabel>
                 <Select labelId="sort" id="select-sort" value={sort} label="Sort:" onChange={(evt) => { updateSort(evt.target.value); }}>
@@ -617,7 +638,12 @@ function Personal() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} sm={4} md>
+            <Grid
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select labelId="direction" id="select-direction" value={direction} label="direction:" onChange={(evt) => { updateDirection(evt.target.value); }}>
@@ -626,7 +652,12 @@ function Personal() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm="auto" sx={{ display: "flex", justifyContent: { xs: "flex-end", sm: "center" } }}>
+            <Grid
+              sx={{ display: "flex", justifyContent: { xs: "flex-end", sm: "center" } }}
+              size={{
+                xs: 12,
+                sm: "auto"
+              }}>
               <Tooltip title={t("clear_search_filters")} placement="top">
                 <span>
                   <IconButton
@@ -643,7 +674,7 @@ function Personal() {
 
           <Divider sx={{ my: 0.75 }} />
 
-          {/* ── Actions + Status (single row) ───────────────────────────────── */}
+          {/* Actions + Status (single row) */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
             <Button variant="contained" startIcon={<HistoryEdu />} onClick={addNpc} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create NPC")}
@@ -707,7 +738,9 @@ function Personal() {
               </IconButton>
             </Tooltip>
             <Divider orientation="vertical" flexItem />
-            <Typography variant="body1" fontWeight={600}>
+            <Typography variant="body1" sx={{
+              fontWeight: 600
+            }}>
               {t("filtered_npc_count") + " " + filteredList?.length}
             </Typography>
             {staleNpcs.length > 0 && (
@@ -735,10 +768,12 @@ function Personal() {
             </Tooltip>
           </Box>
 
-          {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
+          {/* Select mode sub-bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -854,7 +889,6 @@ function Personal() {
 
         </Paper>
       </div>
-
       {!cloudUser && (
         <Paper
           elevation={dbMode === "cloud" ? 3 : 0}
@@ -870,7 +904,6 @@ function Personal() {
           <SignIn />
         </Paper>
       )}
-
       {isMobile ? (
         <div>
           {filteredList?.map((npc, i) => (
@@ -960,7 +993,6 @@ function Personal() {
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
         {loading && (dbMode !== "cloud" || cloudUser) && <CircularProgress />}
       </div>
-
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={Boolean(snackMsg)}
@@ -968,7 +1000,6 @@ function Personal() {
         onClose={() => setSnackMsg(null)}
         message={snackMsg}
       />
-
       <MigrationDialog
         open={migrationDialogOpen}
         onClose={() => setMigrationDialogOpen(false)}
@@ -976,7 +1007,6 @@ function Personal() {
         actorType="npc"
         onMigrateAll={handleMigrateAllNpcs}
       />
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -1026,7 +1056,7 @@ function Personal() {
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbMode, selectMode, isSelected, onToggleSelect, onRegisterDownload, copyNpcToLocal, copyNpcToCloud, moveNpcToLocal, moveNpcToCloud }) {
+function Npc({ npc, _copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbMode, selectMode, isSelected, onToggleSelect, onRegisterDownload, copyNpcToLocal, copyNpcToCloud, moveNpcToLocal, moveNpcToCloud }) {
   const { t } = useTranslate();
   const { cloudUser } = useDatabaseContext();
   const ref = useRef();
@@ -1050,7 +1080,12 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams, dbM
   }, [npc.id, onRegisterDownload, expandAndDownloadImage]);
 
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
+    <Grid
+      sx={{ marginBottom: 3 }}
+      size={{
+        xs: 12,
+        md: 12
+      }}>
       <Box
         sx={isSelected ? {
           outline: "3px solid",

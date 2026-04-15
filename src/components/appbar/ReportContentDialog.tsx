@@ -140,11 +140,13 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "sm",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: "sm",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3">{t("Report Content")}</DialogTitle>
@@ -180,8 +182,10 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          inputProps={{
-            maxLength: 5000,
+          slotProps={{
+            htmlInput: {
+              maxLength: 5000,
+            }
           }}
         />
         <Typography variant="body2" sx={{ mt: 1 }}>

@@ -31,7 +31,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
   };
 
   const components = {
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   return (
@@ -72,15 +72,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -89,32 +87,27 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={8}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={8}>
             <Typography variant="h3">{t("Effect")}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
             }}
-          >
+            size="grow">
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
       </div>
-
       {/* Row 2 */}
       {infusion.rank >= 1 && (
         <div
@@ -129,18 +122,18 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Basic Infusions")}
               </Typography>
@@ -148,10 +141,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            >
+              size="grow">
               {!showInPlayerSheet && (
                 <Tooltip title={t("Infusion not shown in player sheet")}>
                   <Icon>
@@ -172,9 +163,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 1)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -184,31 +174,29 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs
                   flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>
                 </Grid>
                 <Grid
-                  item
-                  xs={8}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                >
+                  size={8}>
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>
@@ -230,18 +218,18 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Advanced Infusions")}
               </Typography>
@@ -249,15 +237,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
                 minHeight: 34,
               }}
-            ></Grid>
+              size="grow"></Grid>
           )}
         </div>
       )}
@@ -267,9 +253,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 2)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -279,31 +264,29 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs
                   flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>
                 </Grid>
                 <Grid
-                  item
-                  xs={8}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                >
+                  size={8}>
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>
@@ -325,18 +308,18 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {t("Superior Infusions")}
               </Typography>
@@ -344,15 +327,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
                 minHeight: 34,
               }}
-            ></Grid>
+              size="grow"></Grid>
           )}
         </div>
       )}
@@ -362,9 +343,8 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           .filter((ef) => ef.infusionRank === 3)
           .map((effect, i) => (
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -374,31 +354,29 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs
                   flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {effect.name}
                   </Typography>
                 </Grid>
                 <Grid
-                  item
-                  xs={8}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                >
+                  size={8}>
                   <ReactMarkdown components={components}>
                     {effect.effect}
                   </ReactMarkdown>

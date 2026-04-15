@@ -98,13 +98,13 @@ const RollsTab = ({
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -180,7 +180,7 @@ const RollsTab = ({
           </Box>
           <Divider orientation="vertical" flexItem sx={{ mx: 1, my: -1 }} />
           <Box sx={{ flexGrow: 1, px: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
               {data.name}{" "}
               {type === "Spell" && data.type === "offensive" && (
                 <OffensiveSpellIcon />
@@ -238,10 +238,12 @@ const RollsTab = ({
               <Box sx={{ maxWidth: "80%", overflowWrap: "break-word" }}>
                 <Typography
                   variant="body2"
-                  color="text.secondary"
                   component="div"
-                  sx={{ whiteSpace: "pre-wrap", my: -1 }}
-                >
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "pre-wrap",
+                    my: -1
+                  }}>
                   <StyledMarkdown>{extra}</StyledMarkdown>
                 </Typography>
               </Box>

@@ -26,7 +26,7 @@ export default function PlayerTherioforms({ player }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedTherioform, setSelectedTherioform] = useState(null);
-  const [selectedMutantSpell, setSelectedMutantSpell] = useState(null);
+  const [_selectedMutantSpell, setSelectedMutantSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (mutantSpell, therioform) => {
@@ -86,19 +86,20 @@ export default function PlayerTherioforms({ player }) {
             >
               {t("mutant_therioforms")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {therioformSpells.map((mutantSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {mutantSpell.therioforms && mutantSpell.therioforms.map((therioform, tIndex) => (
                     <Grid
-                      item
-                      container
-                      xs={12}
-                      md={6}
-                      key={`${msIndex}-${tIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`${msIndex}-${tIndex}`}
+                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -118,11 +119,7 @@ export default function PlayerTherioforms({ player }) {
                           {therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name)}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{
@@ -154,7 +151,9 @@ export default function PlayerTherioforms({ player }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedTherioform && (

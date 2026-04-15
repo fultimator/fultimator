@@ -41,7 +41,7 @@ interface LoadoutStore {
 
   // Vehicle enter / exit
   toggleVehicle: () => void;
-  saveVehicles: (updatedPilot: { vehicles: any[]; showInPlayerSheet?: boolean }) => void;
+  saveVehicles: (updatedPilot: { vehicles: unknown[]; showInPlayerSheet?: boolean }) => void;
 
   // Transforming weapon
   swapForm: (slot: string) => void;

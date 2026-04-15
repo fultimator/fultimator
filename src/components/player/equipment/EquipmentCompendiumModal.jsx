@@ -58,7 +58,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
       setSelectedPackId(packs[0].id);
       setSelectedEquipType("weapon");
     }
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, packs]);
 
   // Set default pack when packs first load
   useEffect(() => {
@@ -78,11 +78,13 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
+      slotProps={{
+        paper: { sx: { width: "80%", maxWidth: "lg" } }
+      }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
-          <Grid item xs={5}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
+          <Grid  size={5}>
             <Select
               value={selectedEquipType}
               onChange={(e) => setSelectedEquipType(e.target.value)}
@@ -96,7 +98,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               ))}
             </Select>
           </Grid>
-          <Grid item xs={5}>
+          <Grid  size={5}>
             <Select
               value={selectedPackId}
               onChange={(e) => setSelectedPackId(e.target.value)}
@@ -116,7 +118,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               )}
             </Select>
           </Grid>
-          <Grid item>
+          <Grid >
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -130,7 +132,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
+          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
               <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
                 {t("No items in this pack for the selected type.")}
@@ -156,7 +158,7 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
               </List>
             )}
           </Grid>
-          <Grid item xs={8} sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }}>
+          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
             {selectedItem && (
               <div>
                 <Typography variant="h3">
@@ -167,9 +169,13 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       {t(selectedItem.category)}
-                      <Box component="span" mx={1}><Diamond /></Box>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}><Diamond /></Box>
                       {selectedItem.hands === 1 ? t("One-handed") : t("Two-handed")}
-                      <Box component="span" mx={1}><Diamond /></Box>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}><Diamond /></Box>
                       {selectedItem.melee ? t("Melee") : t("Ranged")}
                     </Typography>
                     <Typography variant="body1">
@@ -180,11 +186,15 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
                         {selectedItem.att2 && attributes[selectedItem.att2]?.shortcaps}
                         <CloseBracket />
                       </strong>
-                      <Box component="span" mx={1}><Diamond /></Box>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}><Diamond /></Box>
                       <strong>
                         <OpenBracket />{t("HR")} + {selectedItem.damage || 0}<CloseBracket />
                       </strong>
-                      <Box component="span" mx={1}><Diamond /></Box>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}><Diamond /></Box>
                       {t(selectedItem.type)}
                     </Typography>
                     <Typography variant="body2">
@@ -196,11 +206,15 @@ const EquipmentCompendiumModal = ({ open, onClose, onSave }) => {
                   <>
                     <Typography variant="body1">
                       {t("DEF")} +{selectedItem.def ?? 0}
-                      <Box component="span" mx={1}><Diamond /></Box>
+                      <Box component="span" sx={{
+                        mx: 1
+                      }}><Diamond /></Box>
                       {t("MDEF")} +{selectedItem.mdef ?? 0}
                       {selectedItem.init !== undefined && selectedItem.init !== 0 && (
                         <>
-                          <Box component="span" mx={1}><Diamond /></Box>
+                          <Box component="span" sx={{
+                            mx: 1
+                          }}><Diamond /></Box>
                           {t("Initiative")} {selectedItem.init}
                         </>
                       )}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme } from "@mui/material";
 
 function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees - 90) * (Math.PI / 180);
@@ -16,15 +16,34 @@ const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onRe
   const secondary = theme.palette.secondary.main;
   const hoveredActiveColor = theme.palette.info.main; // Define a new color in the theme
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [isMouseDown, setIsMouseDown] = useState(false);
+  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // const [_isMouseDown, setIsMouseDown] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleClick = (index) => {
-    const updatedSections = [...state];
-    updatedSections[index] = !updatedSections[index];
+    const updatedSections = new Array(numSections).fill(false);
+    // Fill from 0 to index (inclusive)
+    for (let i = 0; i <= index; i++) {
+      updatedSections[i] = true;
+    }
     setState(updatedSections);
   };
+
+  // const handleIncrement = () => {
+  //   const currentFilled = state.filter(Boolean).length;
+  //   if (currentFilled < numSections) {
+  //     handleClick(currentFilled);
+  //   }
+  // };
+
+  // const handleDecrement = () => {
+  //   const currentFilled = state.filter(Boolean).length;
+  //   if (currentFilled > 0) {
+  //     const updatedSections = [...state];
+  //     updatedSections[currentFilled - 1] = false;
+  //     setState(updatedSections);
+  //   }
+  // };
 
   const handleRightClick = (e) => {
     e.preventDefault(); // Prevent context menu
@@ -33,12 +52,12 @@ const Clock = ({ numSections, size, state = [], setState, isCharacterSheet, onRe
     }
   };
 
-  const handleMouseDown = (index) => {
-    if (!isCharacterSheet && !isMobile) {
-      setIsMouseDown(true);
-      handleClick(index);
-    }
-  };
+  // const handleMouseDown = (index) => {
+  //   if (!isCharacterSheet && !isMobile) {
+  //     setIsMouseDown(true);
+  //     handleClick(index);
+  //   }
+  // };
 
   const handleMouseEnter = (index) => {
     setHoveredIndex(index);

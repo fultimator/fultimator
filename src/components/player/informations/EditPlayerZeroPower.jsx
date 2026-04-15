@@ -133,7 +133,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Zero Power")}
@@ -141,18 +141,27 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
             openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
           />
         </Grid>
-        <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-          <Grid item xs={12} sm={8}>
+        <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8
+            }}>
             <TextField
               label={t("Zero Power Name") + ":"}
               value={zeroPower.name ?? ""}
               onChange={(e) => onChangePower("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               label={t("Clock Sections") + ":"}
               value={clockSections}
@@ -166,23 +175,33 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
                 }))
               }
               type="number"
-              inputProps={{ min: 2, max: 12, readOnly: !isEditMode }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
+              }} />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Trigger Name") + ":"}
               value={triggerName}
               onChange={(e) => onChangeTrigger("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Trigger Description") + ":"}
               value={triggerDesc}
@@ -193,17 +212,26 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Effect Name") + ":"}
               value={effectName}
               onChange={(e) => onChangeEffect("name")(e.target.value)}
-              inputProps={{ maxLength: 100 }}
-              InputProps={{ readOnly: !isEditMode }}
               fullWidth
-            />
+              slotProps={{
+                input: { readOnly: !isEditMode },
+                htmlInput: { maxLength: 100 }
+              }} />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <CustomTextarea
               label={t("Effect Description") + ":"}
               value={effectDesc}
@@ -215,7 +243,6 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
-
       {isEditMode && (
         <CompendiumViewerModal
           open={compendiumOpen}

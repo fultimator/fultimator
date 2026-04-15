@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 
 import {
   Grid,
@@ -13,11 +13,14 @@ import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
   const isSmallScreen = useMediaQuery('(max-width: 899px)');
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingSpecialIndex, setPendingSpecialIndex] = useState(null);
   const onChangeSpecial = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -27,27 +30,28 @@ export default function EditSpecial({ npc, setNpc }) {
   };
 
   const addSpecial = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.special) {
-        newState.special = [];
-      }
-      newState.special.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      special: [
+        ...(prevState.special || []),
+        {
         name: "",
         effect: "",
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeSpecial = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.special.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      special: (prevState.special || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingSpecialIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -56,12 +60,12 @@ export default function EditSpecial({ npc, setNpc }) {
       {npc.special?.map((special, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={removeSpecial(i)}>
-                <RemoveCircleOutline />
+            <Grid  sx={{ p: 0, m: 0 }}>
+              <IconButton onClick={() => openDeleteDialog(i)}>
+                <RemoveCircleOutlined />
               </IconButton>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -74,20 +78,22 @@ export default function EditSpecial({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="spCost"
                   label={t("SP Cost:")}
                   type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   value={special?.spCost ?? 1}
                   onChange={(e) => onChangeSpecial(i, "spCost", e.target.value)}
                   size="small"
+                  slotProps={{
+                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+                  }}
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={special.effect}
                   onChange={(e) => {
@@ -116,13 +122,34 @@ export default function EditSpecial({ npc, setNpc }) {
         context="npc"
         initialType="special"
         onAddItem={(item) => {
-          setNpc((prev) => {
-            const newState = { ...prev };
-            if (!newState.special) newState.special = [];
-            newState.special.push({ name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 });
-            return newState;
-          });
+          setNpc((prev) => ({
+            ...prev,
+            special: [
+              ...(prev.special || []),
+              { name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 },
+            ],
+          }));
         }}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingSpecialIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingSpecialIndex === null) return;
+          removeSpecial(pendingSpecialIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingSpecialIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingSpecialIndex !== null
+            ? npc.special?.[pendingSpecialIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );

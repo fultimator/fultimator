@@ -14,6 +14,8 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellArcanistModal({
   open,
@@ -25,6 +27,9 @@ export default function SpellArcanistModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   useEffect(() => {
     setEditedSpell(spell || {});
@@ -37,20 +42,17 @@ export default function SpellArcanistModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-
-  const handleDelete = () => {
-    onDelete(spell.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -70,37 +72,59 @@ export default function SpellArcanistModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Arcana Name")}
               variant="outlined"
               fullWidth
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             <TextField
               label={t("Domain")}
               variant="outlined"
               fullWidth
               value={editedSpell.domain || ""}
               onChange={(e) => handleChange("domain", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Arcana Description")}
               variant="outlined"
               fullWidth
               value={editedSpell.description || ""}
               onChange={(e) => handleChange("description", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Domain Description")}
               fullWidth
@@ -110,17 +134,27 @@ export default function SpellArcanistModal({
               maxLength={1500}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Merge Name")}
               variant="outlined"
               fullWidth
               value={editedSpell.merge || ""}
               onChange={(e) => handleChange("merge", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Merge Description")}
               fullWidth
@@ -132,17 +166,27 @@ export default function SpellArcanistModal({
           </Grid>
           {isRework && (
             <>
-              <Grid item xs={12} sm={12}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 12
+                }}>
                 <TextField
                   label={t("Pulse Name")}
                   variant="outlined"
                   fullWidth
                   value={editedSpell.pulse || ""}
                   onChange={(e) => handleChange("pulse", e.target.value)}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
-              <Grid item xs={12} sm={12}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 12
+                }}>
                 <CustomTextarea
                   label={t("Merge Description")}
                   fullWidth
@@ -154,17 +198,27 @@ export default function SpellArcanistModal({
               </Grid>
             </>
           )}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <TextField
               label={t("Dismiss Name")}
               variant="outlined"
               fullWidth
               value={editedSpell.dismiss || ""}
               onChange={(e) => handleChange("dismiss", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               label={t("Dismiss Description")}
               fullWidth
@@ -174,7 +228,11 @@ export default function SpellArcanistModal({
               maxLength={1500}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <FormControlLabel
               control={
                 <Switch
@@ -201,6 +259,13 @@ export default function SpellArcanistModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(spell.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this arcana?")}
+      />
     </Dialog>
   );
 }

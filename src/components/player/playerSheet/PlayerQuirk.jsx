@@ -4,7 +4,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-export default function PlayerQuirk({ player, isCharacterSheet }) {
+export default function PlayerQuirk({ player }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -42,7 +42,7 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
 
             <Grid container>
               {player.quirk.description && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",
@@ -60,7 +60,7 @@ export default function PlayerQuirk({ player, isCharacterSheet }) {
                 </Grid>
               )}
               {player.quirk.effect && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",

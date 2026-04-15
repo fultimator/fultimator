@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import {
   Grid,
   Divider,
@@ -13,7 +13,6 @@ import {
   useMediaQuery,
   Alert,
   Snackbar,
-  Fade,
 } from "@mui/material";
 import {
   Download,
@@ -78,9 +77,9 @@ export default function NpcEdit() {
   const db = isLocalNpc ? localDb : cloudDb;
 
   const ref = db.doc("npc-personal", params.npcId);
-  const activeSetDoc = (r, data) => db.setDoc(r, data);
+  const activeSetDoc = useCallback((r, data) => db.setDoc(r, data), [db]);
   const activeAddDoc = (r, data) => db.addDoc(r, data);
-  const activeCollection = (_, path) => db.collection(path);
+  const _activeCollection = (_, path) => db.collection(path);
 
   const { cloudUser: user } = useDatabaseContext();
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -149,7 +148,7 @@ export default function NpcEdit() {
         activeSetDoc(ref, npcTemp);
       }
     },
-    [ref, npcTemp]
+    [ref, npcTemp, activeSetDoc]
   );
 
   // Effect for scroll and keyboard shortcuts
@@ -341,7 +340,11 @@ export default function NpcEdit() {
         )}
         <Grid container spacing={2}>
           {/* NPC Pretty Display (Left-side Grid Item) */}
-          <Grid item xs={12} md={8}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 8
+            }}>
             <NpcPretty
               npc={npcTemp}
               ref={prettyRef}
@@ -351,7 +354,11 @@ export default function NpcEdit() {
           </Grid>
 
           {/* Skills, Controls and Publish (Right-side Grid Item) */}
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             {/* Skill Points */}
             <ExplainSkills npc={npcTemp} />
             <Divider sx={{ my: 1 }} />
@@ -448,7 +455,11 @@ export default function NpcEdit() {
               }}
             >
               <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <CustomHeader
                     type="top"
                     headerText={t("Affinity")}
@@ -457,7 +468,11 @@ export default function NpcEdit() {
                   <ExplainAffinities npc={npcTemp} />
                   <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <CustomHeader
                     type={isSmallScreen ? "middle" : "top"}
                     headerText={t("Bonuses")}
@@ -480,10 +495,10 @@ export default function NpcEdit() {
               }}
             >
               <Grid container>
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
               </Grid>
@@ -516,19 +531,35 @@ export default function NpcEdit() {
             >
               <Grid container spacing={2}>
                 {/* Edit Other Actions */}
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <EditActions npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Special Rules */}
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Rare Gear */}
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Notes */}
-                <Grid item xs={12} md={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
                   <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
               </Grid>

@@ -91,8 +91,10 @@ export default function BattleHeader({
                 ? t("combat_sim_empty_name_warning")
                 : ""
             }
-            inputProps={{ maxLength: 100 }}
             sx={{ width: "100%" }}
+            slotProps={{
+              htmlInput: { maxLength: 100 }
+            }}
           />
         ) : (
           <Box
@@ -127,7 +129,6 @@ export default function BattleHeader({
           </Box>
         )}
       </Box>
-
       {/* Center Section for Round - Always Centered */}
       <Box
         sx={{
@@ -139,15 +140,17 @@ export default function BattleHeader({
         }}
       >
         <Tooltip title={t("combat_sim_previous_round")}>
-          <IconButton
-            onClick={handleDecreaseRound}
-            color={isDarkMode ? "#fff" : "primary"}
-            size="small"
-            sx={{ padding: 1 }}
-            disabled={round <= 1}
-          >
-            <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={handleDecreaseRound}
+              color={isDarkMode ? "#fff" : "primary"}
+              size="small"
+              sx={{ padding: 1 }}
+              disabled={round <= 1}
+            >
+              <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
+            </IconButton>
+          </span>
         </Tooltip>
         <Typography
           variant="h5"
@@ -172,7 +175,6 @@ export default function BattleHeader({
           </IconButton>
         </Tooltip>
       </Box>
-
       {/* Save Button & Status Section (Right) */}
       <Box
         sx={{
@@ -211,42 +213,44 @@ export default function BattleHeader({
               {autoSaveTimeText && (
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  whiteSpace="nowrap"
-                >
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "nowrap"
+                  }}>
                   {autoSaveTimeText}
                 </Typography>
               )}
             </>
           ) : (
             // Show manual save time only if autosave is OFF and it's been saved before
-            timeAgo !== "Not saved yet" && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                whiteSpace="nowrap"
-              >
-                {timeAgo}
-              </Typography>
-            )
+            (timeAgo !== "Not saved yet" && (<Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              whiteSpace: "nowrap"
+            }}>
+              {timeAgo}
+            </Typography>))
           )}
         </Box>
 
         {/* Save Button */}
         {isMobile ? (
           <Tooltip title={t("combat_sim_save")}>
-            <IconButton
-              onClick={handleSaveState}
-              color="white"
-              size="small"
-              disabled={!isDirty}
-              sx={{
-                backgroundColor: "primary.main",
-                margin: 0,
-              }}
-            >
-              <Save fontSize="medium" />
-            </IconButton>
+            <span>
+              <IconButton
+                onClick={handleSaveState}
+                color="white"
+                size="small"
+                disabled={!isDirty}
+                sx={{
+                  backgroundColor: "primary.main",
+                  margin: 0,
+                }}
+              >
+                <Save fontSize="medium" />
+              </IconButton>
+            </span>
           </Tooltip>
         ) : (
           <Button

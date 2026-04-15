@@ -159,10 +159,8 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
       </Accordion>
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -179,7 +177,6 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
           )}
         </Grid>
       )}
-
       {/* VEHICLES */}
       <div
         style={{
@@ -197,15 +194,13 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -217,15 +212,13 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -238,7 +231,6 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
           </Grid>
         </Grid>
       </div>
-
       {pilot.vehicles && pilot.vehicles.length === 0 ? (
         <Typography
           sx={{
@@ -267,18 +259,18 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs={6}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={6}>
                   <div>
                     <Typography
-                      fontWeight="bold"
                       style={{ flexGrow: 1, marginRight: "5px" }}
+                      sx={{
+                        fontWeight: "bold"
+                      }}
                     >
                       {vehicle.customName || t("Vehicle")}
                     </Typography>
@@ -327,14 +319,12 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                   </div>
                 </Grid>
                 <Grid
-                  item
-                  xs={5}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={5}>
                   <Typography style={{ flexGrow: 1, marginRight: "5px" }}>
                     {vehicle.modules && vehicle.modules.filter(m => m.equipped).length > 0
                       ? vehicle.modules.filter(m => m.equipped).map(m => {
@@ -355,14 +345,12 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                   </Typography>
                 </Grid>
                 <Grid
-                  item
-                  xs={1}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "flex-end",
                   }}
-                >
+                  size={1}>
                   {isEditMode && (
                     <Button
                       variant={vehicle.enabled ? "contained" : "outlined"}
@@ -378,15 +366,13 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
               </Grid>
               {isEditMode && (
                 <Grid
-                  item
-                  xs
                   style={{
                     display: "flex",
                     alignItems: "center",
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                ></Grid>
+                  size="grow"></Grid>
               )}
             </div>
 
@@ -405,13 +391,13 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                   }}
                 >
                   <Grid container>
-                    <Grid item xs={4}>
+                    <Grid  size={4}>
                       <Typography variant="h3">{t("pilot_module")}</Typography>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid  size={6}>
                       <Typography variant="h3">{t("Description")}</Typography>
                     </Grid>
-                    <Grid item xs={2}>
+                    <Grid  size={2}>
                       <Typography variant="h3">{t("Status")}</Typography>
                     </Grid>
                   </Grid>
@@ -492,15 +478,19 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                           }}
                         >
                           <Grid container>
-                            <Grid item xs={4}>
-                              <Typography fontWeight={module.enabled ? "bold" : "normal"} sx={{ fontSize: "1em" }}>
+                            <Grid  size={4}>
+                              <Typography
+                                sx={{
+                                  fontWeight: module.enabled ? "bold" : "normal",
+                                  fontSize: "1em"
+                                }}>
                                 {(module.name === "pilot_custom_armor" || module.name === "pilot_custom_weapon" || module.name === "pilot_custom_support")
                                   ? module.customName
                                   : t(module.name)}
                                 {module.cumbersome && " ⚠"}
                               </Typography>
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid  size={6}>
                               {(module.type === "pilot_module_weapon") ? (
                                 <div>
                                   <Typography sx={{ fontSize: "0.9em", fontWeight: "bold" }}>
@@ -550,7 +540,7 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                                 </div>
                               )}
                             </Grid>
-                            <Grid item xs={2}>
+                            <Grid  size={2}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
                                 {isEditMode && (
                                   <>
@@ -569,7 +559,7 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                                       <div style={{ marginLeft: 8 }}>
                                         {module.isShield ? (
                                           // Shields can now be M or O to support Dual Shieldbearer
-                                          <ToggleButtonGroup
+                                          (<ToggleButtonGroup
                                             value={module.equippedSlot || "off"}
                                             exclusive
                                             onChange={(e, newValue) => {
@@ -587,20 +577,19 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                                               M
                                             </ToggleButton>
                                             <ToggleButton value="off" sx={{ minWidth: 30, fontSize: '0.7rem', px: 1 }}>O</ToggleButton>
-                                          </ToggleButtonGroup>
+                                          </ToggleButtonGroup>)
                                         ) : module.cumbersome ? (
                                           // Cumbersome weapons use both hands
-                                          <Button
+                                          (<Button
                                             variant="contained"
                                             size="small"
                                             disabled
                                             sx={{ minWidth: 40, fontSize: '0.75rem' }}
-                                          >
-                                            M+O
-                                          </Button>
+                                          >M+O
+                                                                                      </Button>)
                                         ) : (
                                           // Regular weapons can toggle between main/off
-                                          <ToggleButtonGroup
+                                          (<ToggleButtonGroup
                                             value={module.equippedSlot || "main"}
                                             exclusive
                                             onChange={(e, newValue) => {
@@ -618,7 +607,7 @@ function ThemedSpellPilot({ pilot, isEditMode, onEdit, onModuleChange, onVehicle
                                             >
                                               O
                                             </ToggleButton>
-                                          </ToggleButtonGroup>
+                                          </ToggleButtonGroup>)
                                         )}
                                       </div>
                                     )}

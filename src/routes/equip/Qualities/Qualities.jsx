@@ -10,10 +10,8 @@ import {
   OutlinedInput,
   Box,
   Chip,
-  TextField,
   Tabs,
   Tab,
-  Divider,
 } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState, useRef } from "react";
@@ -97,7 +95,11 @@ function Qualities() {
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -119,24 +121,41 @@ function Qualities() {
             indicatorColor="primary"
             textColor="primary"
             variant="fullWidth"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              "& .MuiTab-root": {
+                color: theme.palette.mode === "dark" ? "rgba(255,255,255,0.7)" : undefined,
+              },
+              "& .MuiTab-root.Mui-selected": {
+                color: theme.palette.mode === "dark" ? "#ffffff" : undefined,
+                fontWeight: 700,
+              },
+            }}
           >
             <Tab label={t("Custom")} />
             <Tab label={t("Generator")} />
           </Tabs>
 
           {tab === 0 && (
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12}>
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              <Grid  size={12}>
                 <SelectBase value={selectedBase} onChange={handleBaseChange} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <ChangeName
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 <FormControl fullWidth variant="standard">
                   <InputLabel id="category-label">{t("Category")}</InputLabel>
                   <Select
@@ -154,7 +173,7 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <ChangeQuality
                   quality={quality}
                   setQuality={(e) => setQuality(e.target.value)}
@@ -162,7 +181,7 @@ function Qualities() {
                   setQualityCost={(e) => setCost(e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <FormControl fullWidth>
                   <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
                   <Select
@@ -194,9 +213,9 @@ function Qualities() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
+              <Grid  size={12}>
+                <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                  <Grid >
                     <Button
                       variant="outlined"
                       onClick={() => fileInputRef.current.click()}
@@ -204,7 +223,7 @@ function Qualities() {
                       {t("Upload JSON")}
                     </Button>
                   </Grid>
-                  <Grid item>
+                  <Grid >
                     <Button variant="outlined" onClick={handleClearFields}>
                       {t("Clear All Fields")}
                     </Button>
@@ -226,9 +245,12 @@ function Qualities() {
           )}
         </Paper>
       </Grid>
-
       {/* Pretty */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Pretty
           custom={{
             name,

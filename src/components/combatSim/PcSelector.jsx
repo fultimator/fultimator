@@ -29,7 +29,9 @@ export default function PcSelector({ playerList = [], handleSelectPC, loading })
           value={filterText}
           onChange={(e) => setFilterText(e.target.value)}
           fullWidth
-          inputProps={{ maxLength: 100 }}
+          slotProps={{
+            htmlInput: { maxLength: 100 }
+          }}
         />
       </Box>
       <Box sx={{ maxHeight: "calc(100vh - 295px)", overflowY: "auto" }}>
@@ -53,17 +55,18 @@ export default function PcSelector({ playerList = [], handleSelectPC, loading })
               >
                 <ListItemText
                   primary={
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
                       {player.name}
                     </Typography>
                   }
                   secondary={
                     <Typography
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ fontFamily: "Antonio" }}
                       component="span"
-                    >
+                      sx={{
+                        color: "text.secondary",
+                        fontFamily: "Antonio"
+                      }}>
                       {t("Level")}: {player.lvl ?? "?"}
                     </Typography>
                   }

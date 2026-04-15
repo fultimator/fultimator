@@ -9,14 +9,14 @@ import {
   TextField,
   Grid,
   Typography,
-  Divider,
   Box,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { Close, Add, RemoveCircleOutline } from "@mui/icons-material";
+import { Close, Add, RemoveCircleOutlined } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function PlayerNoteModal({
@@ -38,7 +38,13 @@ export default function PlayerNoteModal({
   const [clockName, setClockName] = useState("");
   const [clockSections, setClockSections] = useState(4);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          onDeleteNote(editNoteIndex);
+          setDeleteDialogOpen(false);
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setName(note?.name || "");
@@ -107,16 +113,18 @@ export default function PlayerNoteModal({
         </DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <TextField
                 fullWidth
                 label={t("Note Name")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                inputProps={{ maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { maxLength: 50 }
+                }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <CustomTextarea
                 label={t("Description")}
                 value={description}
@@ -124,7 +132,7 @@ export default function PlayerNoteModal({
                 maxRows={10}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -135,7 +143,7 @@ export default function PlayerNoteModal({
                 label={t("Show in Character Sheet")}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                 <Typography variant="h6">{t("Clocks")}</Typography>
                 <Button
@@ -150,7 +158,7 @@ export default function PlayerNoteModal({
               </Box>
               <Grid container spacing={1}>
                 {clocks.map((clock, index) => (
-                  <Grid item xs={12} key={index}>
+                  <Grid  key={index} size={12}>
                     <Box
                       sx={{
                         display: "flex",
@@ -170,7 +178,7 @@ export default function PlayerNoteModal({
                         color="error"
                         onClick={() => handleRemoveClock(index)}
                       >
-                        <RemoveCircleOutline fontSize="small" />
+                        <RemoveCircleOutlined fontSize="small" />
                       </IconButton>
                     </Box>
                   </Grid>
@@ -185,7 +193,7 @@ export default function PlayerNoteModal({
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => setDeleteDialogOpen(true)}
+                onClick={handleDelete}
               >
                 {t("Delete")}
               </Button>
@@ -201,7 +209,6 @@ export default function PlayerNoteModal({
           </Box>
         </DialogActions>
       </Dialog>
-
       {/* Add Clock Dialog */}
       <Dialog open={clockDialogOpen} onClose={() => setClockDialogOpen(false)}>
         <DialogTitle variant="h3">{t("Add Clock")}</DialogTitle>
@@ -214,7 +221,9 @@ export default function PlayerNoteModal({
             variant="outlined"
             value={clockName}
             onChange={(e) => setClockName(e.target.value)}
-            inputProps={{ maxLength: 30 }}
+            slotProps={{
+              htmlInput: { maxLength: 30 }
+            }}
           />
           <TextField
             margin="dense"
@@ -224,7 +233,9 @@ export default function PlayerNoteModal({
             variant="outlined"
             value={clockSections}
             onChange={(e) => setClockSections(parseInt(e.target.value, 10))}
-            inputProps={{ min: 2, max: 30 }}
+            slotProps={{
+              htmlInput: { min: 2, max: 30 }
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -236,11 +247,10 @@ export default function PlayerNoteModal({
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Delete Confirmation */}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           onDeleteNote(editNoteIndex);
           setDeleteDialogOpen(false);

@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -25,9 +25,12 @@ import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import { TypeIcon } from "../types";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingAttackIndex, setPendingAttackIndex] = useState(null);
 
   const onChangeAttacks = (i) => {
     return (key, value) => {
@@ -40,29 +43,30 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   };
 
   const addAttack = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.weaponattacks) {
-        newState.weaponattacks = [];
-      }
-      newState.weaponattacks.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      weaponattacks: [
+        ...(prevState.weaponattacks || []),
+        {
         name: "",
         weapon: baseWeapons[0],
         type: "physical",
         special: [],
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeAttack = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.weaponattacks.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      weaponattacks: (prevState.weaponattacks || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingAttackIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -76,27 +80,55 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
       {npc.weaponattacks?.map((attack, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item xs={12} md={6}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <EditAttack
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
-                removeAttack={removeAttack(i)}
+                removeAttack={() => openDeleteDialog(i)}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <EditAttackSpecial
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
               />
             </Grid>
             {i !== npc.weaponattacks.length - 1 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider />
               </Grid>
             )}
           </Grid>
         );
       })}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingAttackIndex === null) return;
+          removeAttack(pendingAttackIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingAttackIndex !== null
+            ? npc.weaponattacks?.[pendingAttackIndex]?.name || ""
+            : ""
+        }
+      />
     </>
   );
 }
@@ -104,13 +136,13 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item sx={{ p: 0, m: 0 }}>
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
+      <Grid  sx={{ p: 0, m: 0 }}>
         <IconButton onClick={removeAttack}>
-          <RemoveCircleOutline />
+          <RemoveCircleOutlined />
         </IconButton>
       </Grid>
-      <Grid item xs={5}>
+      <Grid  size={5}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -123,7 +155,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={5}>
+      <Grid  size={5}>
         <SelectWeapon
           weapon={attack.weapon}
           setWeapon={(value) => {
@@ -132,37 +164,41 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           size="small"
         />
       </Grid>
-      <Grid item xs={3}>
+      <Grid  size={3}>
         <FormControl variant="standard">
           <TextField
             id="flathit"
             type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
             label={t("Acc.")}
             value={attack.flathit || 0}
             onChange={(e) => {
               return setAttack("flathit", e.target.value);
             }}
             size="small"
+            slotProps={{
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+            }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid  size={3}>
         <FormControl variant="standard">
           <TextField
             id="flatdmg"
             type="number"
-            inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
             label={t("Dmg.")}
             value={attack.flatdmg || 0}
             onChange={(e) => {
               return setAttack("flatdmg", e.target.value);
             }}
             size="small"
+            slotProps={{
+              htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+            }}
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={3}>
+      <Grid  size={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
@@ -233,7 +269,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      {/* <Grid item xs={8} lg={3}>
+      {/* <Grid size={8} lg={3}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
@@ -256,7 +292,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid> */}
-      <Grid item xs>
+      <Grid  size="grow">
         <FormGroup>
           <FormControlLabel
             control={
@@ -293,8 +329,8 @@ function EditAttackSpecial({ attack, setAttack }) {
   };
 
   return (
-    <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-      <Grid item xs={12}>
+    <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
+      <Grid  size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="special"

@@ -61,15 +61,13 @@ function ThemedSpellDefault({
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -78,51 +76,47 @@ function ThemedSpellDefault({
               </Typography>
             </Grid>
             <Grid
-              item
-              xs={2}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={2}>
               <Typography variant="h3">{t("MP")}</Typography>
             </Grid>
             <Grid
-              item
-              xs={3}
-              sm={4}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={{
+                xs: 3,
+                sm: 4
+              }}>
               <Typography variant="h3">{t("Target")}</Typography>
             </Grid>
             <Grid
-              item
-              xs={4}
-              sm={3}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={{
+                xs: 4,
+                sm: 3
+              }}>
               <Typography variant="h3">{t("Duration")}</Typography>
             </Grid>
           </Grid>
           {isEditMode && (
             <Grid
-              item
-              xs
               style={{
                 display: "flex",
                 alignItems: "center",
                 flexShrink: 0,
               }}
-            >
+              size="grow">
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -141,20 +135,19 @@ function ThemedSpellDefault({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              fontSize={{ xs: "0.8rem", sm: "1rem" }}
-            >
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "0.8rem", sm: "1rem" }
+              }}>
               {isMagisphere && (
                 <Tooltip title={t("Magisphere")}>
                   <SettingsSuggest sx={{ fontSize: "1rem" }} />
@@ -164,54 +157,56 @@ function ThemedSpellDefault({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            size={2}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {mp}
               {maxTargets !== 1 ? " × " + t("T") : ""}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={4}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            size={{
+              xs: 3,
+              sm: 4
+            }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {targetDesc}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={4}
-            sm={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
-            <Typography fontSize={{ xs: "0.7rem", sm: "1rem" }}>
+            size={{
+              xs: 4,
+              sm: 3
+            }}>
+            <Typography sx={{
+              fontSize: { xs: "0.7rem", sm: "1rem" }
+            }}>
               {duration}
             </Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             {!showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
                 <Icon>
@@ -225,19 +220,17 @@ function ThemedSpellDefault({
           </Grid>
         )}
       </div>
-
       {/* Row 3 */}
       <Grid
-        container
-        justifyContent="flex-start"
-        sx={{
+        container sx={{
+          justifyContent: "flex-start",
           background: "transparent",
           padding: "3px 17px",
           marginBottom: "6px",
           borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Typography component={"div"} sx={{ minHeight: "30px" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {description}
@@ -245,7 +238,7 @@ function ThemedSpellDefault({
           </Typography>
         </Grid>
         {isOffensive && (
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography
               variant="body1"
               style={{

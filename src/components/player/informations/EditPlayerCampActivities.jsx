@@ -17,6 +17,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
@@ -31,7 +32,11 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (deleteIndex !== null) handleRemove(deleteIndex);
+        },
+  });;
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const activities = player.campActivities ?? [];
@@ -103,7 +108,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Camp Activities (Max 2)")}
@@ -115,8 +120,8 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         </Grid>
 
         {activities.length === 0 && (
-          <Grid item xs={12} sx={{ py: 2 }}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+          <Grid  sx={{ py: 2 }} size={12}>
+            <Typography sx={{ textAlign: "center" }}>
               {t("No camp activities yet.")}
             </Typography>
           </Grid>
@@ -125,24 +130,34 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         {activities.map((activity, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1 }} alignItems="flex-start">
-              <Grid item xs={9} sm={10}>
+            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
+              <Grid
+                size={{
+                  xs: 9,
+                  sm: 10
+                }}>
                 <TextField
                   label={t("Name") + ":"}
                   value={activity.name ?? ""}
                   onChange={(e) => onChangeActivity(index, "name")(e.target.value)}
-                  inputProps={{ maxLength: 100 }}
-                  InputProps={{ readOnly: !isEditMode }}
                   fullWidth
                   size="small"
-                />
+                  slotProps={{
+                    input: { readOnly: !isEditMode },
+                    htmlInput: { maxLength: 100 }
+                  }} />
               </Grid>
               {isEditMode && (
-                <Grid item xs={3} sm={2} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                <Grid
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
+                  size={{
+                    xs: 3,
+                    sm: 2
+                  }}>
                   <Tooltip title={t("Replace from Compendium")}>
                     <IconButton
                       size="small"
@@ -169,7 +184,7 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                 </Grid>
               )}
 
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 {isEditMode ? (
                   <Autocomplete
                     freeSolo
@@ -190,14 +205,16 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
                   <TextField
                     label={t("Target") + ":"}
                     value={activity.targetDescription ?? ""}
-                    InputProps={{ readOnly: true }}
                     fullWidth
                     size="small"
+                    slotProps={{
+                      input: { readOnly: true }
+                    }}
                   />
                 )}
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea
                   label={t("Effect") + ":"}
                   value={activity.effect ?? ""}
@@ -211,7 +228,6 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
           </React.Fragment>
         ))}
       </Grid>
-
       {isEditMode && replaceIndex !== null && (
         <CompendiumViewerModal
           open={replaceCompendiumOpen}

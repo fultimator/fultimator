@@ -81,7 +81,11 @@ function Accessories() {
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Paper
           elevation={3}
           sx={{
@@ -96,14 +100,14 @@ function Accessories() {
             headerText={t("Accessories")}
             icon={<AutoAwesome fontSize="large" />}
           />
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={6}>
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid  size={6}>
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid  size={6}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
@@ -116,7 +120,7 @@ function Accessories() {
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -125,7 +129,7 @@ function Accessories() {
               />
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <Accordion
                 sx={{ width: "100%" }}
                 expanded={modifiersExpanded}
@@ -136,25 +140,53 @@ function Accessories() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Grid container spacing={2}>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"DEF Modifier"} value={defModifier} onChange={(e) => setDefModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"MDEF Modifier"} value={mDefModifier} onChange={(e) => setMDefModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"INIT Modifier"} value={initModifier} onChange={(e) => setInitModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Magic Modifier"} value={magicModifier} onChange={(e) => setMagicModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Precision Modifier"} value={precModifier} onChange={(e) => setPrecModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Damage (Melee) Modifier"} value={damageMeleeModifier} onChange={(e) => setDamageMeleeModifier(e.target.value)} />
                     </Grid>
-                    <Grid item xs={6} md={4}>
+                    <Grid
+                      size={{
+                        xs: 6,
+                        md: 4
+                      }}>
                       <ChangeModifiers label={"Damage (Ranged) Modifier"} value={damageRangedModifier} onChange={(e) => setDamageRangedModifier(e.target.value)} />
                     </Grid>
                   </Grid>
@@ -162,9 +194,9 @@ function Accessories() {
               </Accordion>
               <Divider />
             </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
+            <Grid  size={12}>
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                <Grid >
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -172,7 +204,7 @@ function Accessories() {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid item>
+                <Grid >
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
@@ -199,9 +231,12 @@ function Accessories() {
           </Grid>
         </Paper>
       </Grid>
-
       {/* Pretty */}
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Pretty
           custom={{
             name: name,

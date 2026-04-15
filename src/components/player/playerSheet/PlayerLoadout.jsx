@@ -3,9 +3,9 @@ import {
   Paper, Grid, Typography, Card, CardActionArea, CardContent,
   Box, Chip, Divider, Tooltip, Button, Checkbox, IconButton,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText, Radio,
-  Badge,
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText
 } from '@mui/material';
+import ReactMarkdown from 'react-markdown';
 import LockIcon from '@mui/icons-material/Lock';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
@@ -16,7 +16,7 @@ import { SwapHoriz } from '@mui/icons-material';
 import { useTranslate } from '../../../translation/translate';
 import { useCustomTheme } from '../../../hooks/useCustomTheme';
 import attributes from '../../../libs/attributes';
-import { resolveEffectiveSlot, getActiveVehicle, isItemEquipped } from '../equipment/slots/equipmentSlots';
+import { resolveEffectiveSlot, getActiveVehicle } from '../equipment/slots/equipmentSlots';
 import { calculateAttribute, calculateCustomWeaponStats } from '../common/playerCalculations';
 import {
   getSlotLocks,
@@ -122,8 +122,21 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
 
   const cardInner = (
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
-      <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-        <Typography variant="caption" color="text.secondary" fontWeight={800} letterSpacing={0.4} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 0.5,
+          mb: 0.5,
+          alignItems: "center"
+        }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 800,
+            letterSpacing: 0.4,
+            fontSize: { xs: "0.68rem", sm: "0.72rem" }
+          }}>
           {label}
         </Typography>
         {isAux && (
@@ -143,27 +156,37 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         )}
       </Box>
       {isEmpty ? (
-        <Typography variant="body2" color="text.disabled" fontStyle="italic">
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.disabled",
+            fontStyle: "italic"
+          }}>
           {t('- Empty -')}
         </Typography>
       ) : (
         <>
-          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "0.84rem", sm: "0.9rem" }
+            }}>
             {itemName}
           </Typography>
           {statLine && (
             <Typography
               variant="caption"
-              color="text.secondary"
               sx={{
+                color: "text.secondary",
                 fontSize: { xs: "0.72rem", sm: "0.76rem" },
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2,
-              }}
-            >
+                lineHeight: 1.2
+              }}>
               {statLine}
             </Typography>
           )}
@@ -179,7 +202,7 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         opacity: locked ? 0.45 : 1,
         position: 'relative',
         height: '100%',
-        minWidth: isEmpty ? 120 : 0,
+        minWidth: '100%',
         border: isAux ? '1px dashed' : isVehicle ? '1px solid' : (hasModule && !isVehicle && !isEmpty) ? '1px dashed' : undefined,
         borderColor: isAux ? 'warning.main' : isVehicle ? 'success.main' : (hasModule && !isVehicle && !isEmpty) ? 'success.light' : undefined,
       }}
@@ -212,7 +235,12 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
         )}
       </Box>
       {locked && (
-        <Box position="absolute" top={4} right={4}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 4,
+            right: 4
+          }}>
           <LockIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
         </Box>
       )}
@@ -222,39 +250,69 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
 
 // VehicleSupportCard
 
-function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
+function VehicleSupportCard({ label, module, isEditMode, onClick }) {
   const { t } = useTranslate();
   const clickable = isEditMode && !!onClick;
   const content = (
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
       {module ? (
         <>
-          <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-            <Typography variant="caption" color="text.secondary" fontWeight={800} sx={{ fontSize: { xs: "0.68rem", sm: "0.72rem" } }}>{label}</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.5,
+              mb: 0.5,
+              alignItems: "center"
+            }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                fontWeight: 800,
+                fontSize: { xs: "0.68rem", sm: "0.72rem" }
+              }}>{label}</Typography>
             <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
           </Box>
-          <Typography variant="body2" fontWeight={700} sx={{ fontSize: { xs: "0.84rem", sm: "0.9rem" } }} noWrap>{module.customName || t(module.name)}</Typography>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: "0.84rem", sm: "0.9rem" }
+            }}>{module.customName || t(module.name)}</Typography>
           {module.description && (
             <Typography
               variant="caption"
-              color="text.secondary"
+              component="div"
               sx={{
+                color: "text.secondary",
                 fontSize: { xs: "0.72rem", sm: "0.76rem" },
                 display: "-webkit-box",
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2,
-              }}
-            >
-              {(module.name === 'pilot_custom_support' ? module.description : t(module.description)).slice(0, 80)}
+                lineHeight: 1.2
+              }}>
+              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                {(module.name === 'pilot_custom_support' ? module.description : t(module.description))}
+              </ReactMarkdown>
             </Typography>
           )}
         </>
       ) : (
         <>
-          <Typography variant="caption" color="text.secondary" fontWeight={700}>{label}</Typography>
-          <Typography variant="body2" color="text.disabled" fontStyle="italic">{t('- Empty -')}</Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+              fontWeight: 700
+            }}>{label}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.disabled",
+              fontStyle: "italic"
+            }}>{t('- Empty -')}</Typography>
         </>
       )}
     </CardContent>
@@ -266,6 +324,7 @@ function VehicleSupportCard({ label, module, vehicle, isEditMode, onClick }) {
       sx={{
         height: '100%',
         minWidth: !module ? 120 : 0,
+        maxWidth: '100%',
         border: module ? '1px solid' : undefined,
         borderColor: module ? 'success.main' : undefined,
       }}
@@ -295,7 +354,7 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   const [rollDialog, setRollDialog] = useState(null);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   // Shared selectors
   const auxHandItem = getAuxHandItem(player);
@@ -444,19 +503,28 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       >
         {t('Loadout')}
       </Typography>
-
       <Box sx={{ p: 1.5, flexGrow: 1 }}>
 
         {/* Vehicle enter/exit + swap: shown when a pilot-vehicle spell exists */}
         {(isOwner || isEditMode) && pilotSpellInfo && (
           
           <>
-            <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mb: 1.5,
+                alignItems: "center"
+              }}>
               <PrecisionManufacturingIcon sx={{ fontSize: 16, color: activeVehicle ? 'success.main' : 'text.disabled' }} />
-              <Typography variant="caption" fontWeight={700} color={activeVehicle ? 'success.main' : 'text.secondary'}>
+              <Typography variant="caption" color={activeVehicle ? 'success.main' : 'text.secondary'} sx={{
+                fontWeight: 700
+              }}>
                 {activeVehicle ? (activeVehicle.customName || t('Vehicle')) : t('No vehicle active')}
               </Typography>
-              <Box flex={1} />
+              <Box sx={{
+                flex: 1
+              }} />
               <Button
                 size="small"
                 variant={activeVehicle ? 'outlined' : 'contained'}
@@ -484,7 +552,14 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {/* 4-slot grid + aux hand */}
         <Grid container spacing={1}>
           {slotCards.map(({ slot, label, resolved, locked }) => (
-            <Grid item xs={6} sm={3} md={3} key={slot} sx={{ display: 'flex' }}>
+            <Grid
+              key={slot}
+              sx={{ display: 'flex' }}
+              size={{
+                xs: 6,
+                sm: 3,
+                md: 3
+              }}>
               <SlotCard
                 label={label}
                 resolved={resolved}
@@ -498,7 +573,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Grid>
           ))}
           {auxHandItem && (
-            <Grid item xs={6} sm={3} md={3} sx={{ display: 'flex' }}>
+            <Grid
+              sx={{ display: 'flex' }}
+              size={{
+                xs: 6,
+                sm: 3,
+                md: 3
+              }}>
               <SlotCard
                 label={t('Aux Hand')}
                 resolved={{ kind: 'playerItem', item: auxHandItem }}
@@ -546,7 +627,12 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
             </Divider>
             <Grid container spacing={1}>
               {vehicleAccessoryModule && (
-                <Grid item xs={6} sm={3} md={3}>
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
                     label={t('Accessory')}
                     module={vehicleAccessoryModule}
@@ -555,7 +641,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 </Grid>
               )}
               {supportSlots.map((entry, i) => (
-                <Grid item xs={6} sm={3} md={3} key={i}>
+                <Grid
+                  key={i}
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
                     label={`${t('Support')} ${i + 1}`}
                     module={entry.module}
@@ -565,15 +657,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                   />
                 </Grid>
               ))}
-              {/* Add slot card when there are equipped-but-not-all-enabled support modules */}
-              {isEditMode && equippedSupportModules.some(m => !m.enabled) && (
-                <Grid item xs={6} sm={3} md={3}>
+              {/* Add empty slot card when no support slots are enabled */}
+              {supportSlots.length === 0 && (
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                    md: 3
+                  }}>
                   <VehicleSupportCard
-                    label={`${t('Support')} ${supportSlots.length + 1}`}
+                    label={`${t('Support')} 1`}
                     module={null}
                     vehicle={activeVehicle}
                     isEditMode={canClickSlot}
-                    onClick={() => setSupportPickerOpen(true)}
+                    onClick={canClickSlot ? () => setSupportPickerOpen(true) : undefined}
                   />
                 </Grid>
               )}
@@ -581,11 +678,12 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </>
         )}
       </Box>
-
       {/* Roll result dialog */}
       {rollDialog && (
         <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth
-          PaperProps={{ sx: { width: { xs: '90%', md: '30%' } } }}
+          slotProps={{
+            paper: { sx: { width: { xs: '90%', md: '30%' } } }
+          }}
         >
           <DialogTitle variant="h3" sx={{
             backgroundColor: rollDialog.isCritFail ? '#bb2124' : rollDialog.isCritSuccess ? '#22bb33' : '#aaaaaa',
@@ -594,25 +692,29 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </DialogTitle>
           <DialogContent sx={{ mt: 1 }}>
             <Grid container spacing={2} sx={{ textAlign: 'center', pt: 1 }}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Accuracy')}</Typography>
                 <Typography variant="h1">{rollDialog.accuracy}</Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Damage')}</Typography>
                 <Typography variant="h1">{rollDialog.damageRoll}</Typography>
                 {rollDialog.type && (
                   <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>
                 )}
               </Grid>
-              <Grid item xs={12} sx={{ mt: 1 }}>
-                <Typography variant="body2" color="text.secondary">
+              <Grid  sx={{ mt: 1 }} size={12}>
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
                   {rollDialog.r2} [{attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
                   {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ''}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {t('Damage')}: {Math.max(rollDialog.r1, rollDialog.r2)} + {rollDialog.damage}
                 </Typography>
               </Grid>
@@ -624,7 +726,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           </DialogActions>
         </Dialog>
       )}
-
       {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
@@ -644,7 +745,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           }
         />
       )}
-
       {/* Support module picker dialog */}
       <Dialog
         open={supportPickerOpen}
@@ -658,12 +758,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         </DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
           {equippedSupportModules.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               {t('No support modules installed on this vehicle.')}
             </Typography>
           ) : (
             <>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block"
+                }}>
                 {t('Enable or disable support modules:')}
               </Typography>
               <List dense>
@@ -681,9 +789,20 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                       </ListItemIcon>
                       <ListItemText
                         primary={m.customName || t(m.name)}
-                        secondary={m.isComplex ? `${t('Complex')} - ${(m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 40)}` : (m.name === 'pilot_custom_support' ? m.description : t(m.description || '')).slice(0, 50)}
+                        secondary={
+                          <Box sx={{ color: "text.secondary", fontSize: "0.75rem" }}>
+                            {m.isComplex && (
+                              <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
+                                {t('Complex')} -{' '}
+                              </Typography>
+                            )}
+                            <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                              {m.name === 'pilot_custom_support' ? m.description : t(m.description || '')}
+                            </ReactMarkdown>
+                          </Box>
+                        }
                         primaryTypographyProps={{ variant: 'body2', fontWeight: m.enabled ? 700 : 400 }}
-                        secondaryTypographyProps={{ variant: 'caption' }}
+                        secondaryTypographyProps={{ component: 'div' }}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -696,7 +815,6 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           <Button size="small" onClick={() => setSupportPickerOpen(false)}>{t('Done')}</Button>
         </DialogActions>
       </Dialog>
-
       {/* Vehicle swap modal */}
       {pilotSpellInfo && (
         <SpellPilotVehiclesModal

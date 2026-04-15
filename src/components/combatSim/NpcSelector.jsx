@@ -144,17 +144,20 @@ export default function NpcSelector({
                   >
                     <ListItemText
                       primary={
-                        <Typography variant="h5" fontWeight={"bold"}>
+                        <Typography variant="h5" sx={{
+                          fontWeight: "bold"
+                        }}>
                           {npc.name}
                         </Typography>
                       }
                       secondary={
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          sx={{ fontFamily: "Antonio" }}
                           component="span"
-                        >
+                          sx={{
+                            color: "text.secondary",
+                            fontFamily: "Antonio"
+                          }}>
                           <Tooltip title={t(npc.species)}>
                             <span>
                               {npc.species === "Beast" && <GiWolfHead />}
@@ -213,7 +216,9 @@ export default function NpcSelector({
               onChange={(e) => setFilterText(e.target.value)}
               sx={{ marginBottom: 2 }}
               size="small"
-              inputProps={{ maxLength: 100 }}
+              slotProps={{
+                htmlInput: { maxLength: 100 }
+              }}
             />
             <FormControl fullWidth>
               <InputLabel>{t("combat_sim_filter_by")}</InputLabel>
@@ -322,14 +327,16 @@ export default function NpcSelector({
                     )}
 
                     <Box>
-                      <Typography variant="body1" fontWeight="bold">
+                      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                         {npc.name} {/* Displaying the original NPC name */}
                       </Typography>
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
+                        sx={{
+                          color: "text.secondary",
+                          display: "flex",
+                          alignItems: "center"
+                        }}>
                         {t("Level")}: {npc.lvl}{" "}
                         {npc.rank && " | " + t(rankText(npc.rank))}
                       </Typography>
@@ -466,17 +473,20 @@ export default function NpcSelector({
                     >
                       <ListItemText
                         primary={
-                          <Typography variant="h5" fontWeight={"bold"}>
+                          <Typography variant="h5" sx={{
+                            fontWeight: "bold"
+                          }}>
                             {npc.name}
                           </Typography>
                         }
                         secondary={
                           <Typography
                             variant="body2"
-                            color="text.secondary"
-                            sx={{ fontFamily: "Antonio" }}
                             component="span"
-                          >
+                            sx={{
+                              color: "text.secondary",
+                              fontFamily: "Antonio"
+                            }}>
                             <Tooltip title={t(npc.species)}>
                               <span>
                                 {npc.species === "Beast" && <GiWolfHead />}

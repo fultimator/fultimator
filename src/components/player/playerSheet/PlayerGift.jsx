@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogActions,
   LinearProgress,
+  Stack,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -18,6 +19,9 @@ import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import Clock from "./Clock";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 export default function PlayerGift({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -28,7 +32,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedGift, setSelectedGift] = useState(null);
-  const [selectedGiftSpell, setSelectedGiftSpell] = useState(null);
+  const [_selectedGiftSpell, setSelectedGiftSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (giftSpell, gift) => {
@@ -60,6 +64,20 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
       });
       return { ...prevPlayer, classes: newClasses };
     });
+  };
+
+  const incrementGiftClock = (giftSpell) => {
+    const currentClock = giftSpell.clock || 0;
+    if (currentClock < 4) {
+      handleClockChange(giftSpell, currentClock + 1);
+    }
+  };
+
+  const decrementGiftClock = (giftSpell) => {
+    const currentClock = giftSpell.clock || 0;
+    if (currentClock > 0) {
+      handleClockChange(giftSpell, currentClock - 1);
+    }
   };
 
   /* All gift spells from all classes */
@@ -119,16 +137,16 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
             >
               {t("esper_psychic_gifts")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {giftSpells.map((giftSpell, gsIndex) => (
                 <React.Fragment key={gsIndex}>
                   {/* Brainwave Clock Section */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("esper_brainwave_clock")} - {t(giftSpell.className)}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
-                      <Grid item>
+                    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
+                      <Grid >
                         <Clock
                           numSections={4}
                           size={60}
@@ -140,8 +158,42 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                           isCharacterSheet={!isEditMode && !setPlayer}
                           onReset={(isEditMode || setPlayer) ? () => handleClockChange(giftSpell, 0) : undefined}
                         />
+                        {(isEditMode || setPlayer) && (
+                          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+                            <Tooltip title={t("Decrement")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => decrementGiftClock(giftSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RemoveIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Reset")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => handleClockChange(giftSpell, 0)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RestartAltIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Increment")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => incrementGiftClock(giftSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        )}
                       </Grid>
-                      <Grid item xs>
+                      <Grid  size="grow">
                         <LinearProgress
                           variant="determinate"
                           value={getClockProgress(giftSpell.clock || 0)}
@@ -164,14 +216,15 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                   {/* Individual Gifts */}
                   {giftSpell.gifts && giftSpell.gifts.map((gift, gIndex) => (
                     <Grid
-                      item
-                      container
-                      xs={12}
-                      md={6}
-                      key={`${gsIndex}-${gIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`${gsIndex}-${gIndex}`}
+                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -191,11 +244,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                           {gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{
@@ -227,7 +276,9 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedGift && (

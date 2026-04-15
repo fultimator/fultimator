@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   List,
   ListItem,
   ListItemButton,
@@ -26,7 +25,7 @@ import { useTheme } from "@mui/material/styles";
 import {
   getTypeIcon,
   getTypeColor,
-  getTypeLabel,
+  useTypeLabel,
   languages,
 } from "./resourceUtils";
 
@@ -38,6 +37,7 @@ export default function ResourceCard({
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const getTypeLabel = useTypeLabel();
 
   const [digitalDialogOpen, setDigitalDialogOpen] = useState(false);
   const [physicalDialogOpen, setPhysicalDialogOpen] = useState(false);
@@ -83,7 +83,12 @@ export default function ResourceCard({
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mb: 2
+          }}>
           {t("resources_choose_reseller")}
         </Typography>
         <List>

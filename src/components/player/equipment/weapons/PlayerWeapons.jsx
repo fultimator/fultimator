@@ -127,7 +127,7 @@ export default function PlayerWeapons({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {weapons.map((weapon, index) => {
             const equippedSlot = getWeaponSlot(weapon, index);
             const isTwoHand = weapon.hands === 2 || weapon.isTwoHand;
@@ -139,7 +139,7 @@ export default function PlayerWeapons({
 
             return (
               <React.Fragment key={index}>
-                <Grid item xs={12} sx={{ mb: 2 }}>
+                <Grid  sx={{ mb: 2 }} size={12}>
                   <Box>
                     <PrettyWeapon weapon={weapon} />
                   </Box>
@@ -161,56 +161,60 @@ export default function PlayerWeapons({
                     <Box sx={{ ml: 0.5 }}>
                       {checkIfEquippable(weapon) ? (
                         <Tooltip title={tooltipTitle}>
-                          <Badge
+                          <span>
+                            <Badge
                             badgeContent={equippedSlot === 'mainHand' ? (isTwoHand ? 'M+O' : 'M') : equippedSlot === 'offHand' ? 'O' : null}
                             color="primary"
                             invisible={!weapon.isEquipped || !equippedSlot}
                             sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
-                          >
+                            >
+                              <IconButton
+                                onClick={(e) => handleEquipClick(e, index)}
+                                disabled={!isEditMode}
+                                size="small"
+                                sx={{
+                                  backgroundColor: weapon.isEquipped
+                                    ? theme.palette.ternary.main
+                                    : theme.palette.background.paper,
+                                  "&:hover": {
+                                    backgroundColor: weapon.isEquipped
+                                      ? theme.palette.quaternary.main
+                                      : theme.palette.secondary.main,
+                                  },
+                                  transition: "background-color 0.3s",
+                                  p: 0.5,
+                                  border: `1px solid ${theme.palette.divider}`
+                                }}
+                              >
+                                <Equip
+                                  color={
+                                    weapon.isEquipped
+                                      ? theme.palette.mode === "dark"
+                                        ? theme.palette.white.main
+                                        : theme.palette.primary.main
+                                      : theme.palette.text.secondary
+                                  }
+                                  strokeColor={
+                                    weapon.isEquipped && theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.secondary.main
+                                  }
+                                />
+                              </IconButton>
+                            </Badge>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={t("Not proficient  -  martial item")}>
+                          <span>
                             <IconButton
                               onClick={(e) => handleEquipClick(e, index)}
                               disabled={!isEditMode}
                               size="small"
-                              sx={{
-                                backgroundColor: weapon.isEquipped
-                                  ? theme.palette.ternary.main
-                                  : theme.palette.background.paper,
-                                "&:hover": {
-                                  backgroundColor: weapon.isEquipped
-                                    ? theme.palette.quaternary.main
-                                    : theme.palette.secondary.main,
-                                },
-                                transition: "background-color 0.3s",
-                                p: 0.5,
-                                border: `1px solid ${theme.palette.divider}`
-                              }}
                             >
-                              <Equip
-                                color={
-                                  weapon.isEquipped
-                                    ? theme.palette.mode === "dark"
-                                      ? theme.palette.white.main
-                                      : theme.palette.primary.main
-                                    : theme.palette.text.secondary
-                                }
-                                strokeColor={
-                                  weapon.isEquipped && theme.palette.mode === "dark"
-                                    ? theme.palette.white.main
-                                    : theme.palette.secondary.main
-                                }
-                              />
+                              <WarningAmber color="warning" fontSize="small" />
                             </IconButton>
-                          </Badge>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={t("Not proficient  -  martial item")}>
-                          <IconButton
-                            onClick={(e) => handleEquipClick(e, index)}
-                            disabled={!isEditMode}
-                            size="small"
-                          >
-                            <WarningAmber color="warning" fontSize="small" />
-                          </IconButton>
+                          </span>
                         </Tooltip>
                       )}
                     </Box>

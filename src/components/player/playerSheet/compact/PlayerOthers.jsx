@@ -55,7 +55,7 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuery = "" }) {
+export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -81,15 +81,24 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
   };
 
   const increment = (index, clockState) => {
-    const next = [...clockState];
-    const i = next.indexOf(false);
-    if (i !== -1) { next[i] = true; updateClock(index, next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    const sections = clockState.length;
+    if (currentFilled < sections) {
+      const next = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        next[i] = true;
+      }
+      updateClock(index, next);
+    }
   };
 
   const decrement = (index, clockState) => {
-    const next = [...clockState];
-    const i = next.lastIndexOf(true);
-    if (i !== -1) { next[i] = false; updateClock(index, next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const next = [...clockState];
+      next[currentFilled - 1] = false;
+      updateClock(index, next);
+    }
   };
 
   const reset = (index, sections) =>
@@ -153,14 +162,17 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('others', otherKey); }}
+                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('others', otherKey); }}
                     sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
                   >
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
-                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word"
+                      }}>
                       {highlightMatch(other.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -168,7 +180,6 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                   <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
                   <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
                 </TableRow>
-
                 {/* Clock row */}
                 {hasClock && (
                   <TableRow sx={{ bgcolor: "action.hover" }}>
@@ -187,7 +198,12 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                       </Typography>
                     </StyledTableCell>
                     <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
-                      <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "0.8rem",
+                          fontWeight: "bold"
+                        }}>
                         {filled}/{sections}
                       </Typography>
                     </StyledTableCell>
@@ -223,7 +239,6 @@ export default function PlayerOthers({ player, setPlayer, isEditMode, searchQuer
                     </StyledTableCell>
                   </TableRow>
                 )}
-
                 {/* Collapsible description + effect */}
                 {hasDetails && (
                   <TableRow>

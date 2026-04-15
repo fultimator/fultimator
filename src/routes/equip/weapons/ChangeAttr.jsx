@@ -6,7 +6,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1}>
-      <Grid item xs={6}>
+      <Grid  size={6}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id="att1">{t("Change Attr 1")}</InputLabel>
           <Select
@@ -16,7 +16,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             label="Change Type"
             onChange={setAtt1}
           >
-            {Object.entries(attributes).map((key, i) => {
+            {Object.entries(attributes).map((key, _i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
                   {key[1].shortcaps}
@@ -26,7 +26,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={6}>
+      <Grid  size={6}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel id="att2">{t("Change Attr 2")}</InputLabel>
           <Select
@@ -36,7 +36,7 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             label="Change Type"
             onChange={setAtt2}
           >
-            {Object.entries(attributes).map((key, i) => {
+            {Object.entries(attributes).map((key, _i) => {
               return (
                 <MenuItem key={key[0]} value={key[0]}>
                   {key[1].shortcaps}

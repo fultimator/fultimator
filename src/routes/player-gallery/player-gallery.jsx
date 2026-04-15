@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
 import { playerNeedsMigration, applyPreSaveTransforms, applyPostLoadTransforms } from "../../components/player/playerTransforms";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import {
   Divider,
@@ -59,7 +60,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { validateCharacter } from "../../utility/validateJson";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
@@ -84,7 +85,31 @@ function Personal() {
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
 
   // Deletion confirmation states
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const playerToDeleteRef = useRef(null);
+  const isBulkDeleteRef = useRef(false);
+
+  const performDelete = async () => {
+    if (isBulkDeleteRef.current) {
+      for (const id of selectedIds) {
+        await db.deleteDoc(db.doc("player-personal", id));
+      }
+      setSelectedIds(new Set());
+    } else if (playerToDeleteRef.current) {
+      await db.deleteDoc(db.doc("player-personal", playerToDeleteRef.current.id));
+      playerToDeleteRef.current = null;
+      setPlayerToDelete(null);
+    }
+    closeDeleteDialog();
+  };
+
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: closeDeleteDialog,
+    handleDelete,
+  } = useDeleteConfirmation({
+    onConfirm: performDelete,
+  });
+
   const [playerToDelete, setPlayerToDelete] = useState(null);
   const [isBulkDelete, setIsBulkDelete] = useState(false);
 
@@ -109,13 +134,26 @@ function Personal() {
     db.query(db.collection("player-personal"))
   );
 
+  const [snackMsg, setSnackMsg] = useState(null);
+
+  // Migration
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+
+  // Select mode
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [copyAnchor, setCopyAnchor] = useState(null);
+  const [moveAnchor, setMoveAnchor] = useState(null);
+
   if (err?.code === "quota-exceeded") {
     return (
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
-        )}
-      </Paper>
+      <Layout>
+        <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+          {t(
+            "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+          )}
+        </Paper>
+      </Layout>
     );
   }
 
@@ -288,7 +326,6 @@ function Personal() {
     }
   };
 
-  const [snackMsg, setSnackMsg] = useState(null);
   const notify = (msg) => setSnackMsg(msg);
 
   const uniqueName = (name, existingNames) => {
@@ -364,8 +401,6 @@ function Personal() {
     } catch { notify(t("Failed to move to Cloud")); }
   };
 
-  // ── Migration ────────────────────────────────────────────────────────────────
-  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
   const stalePlayers = (personalList ?? []).filter(playerNeedsMigration);
 
   const handleMigrateAllPlayers = async (actors) => {
@@ -375,12 +410,6 @@ function Personal() {
       await db.setDoc(ref, applyPreSaveTransforms(migrated));
     }
   };
-
-  // ── Select mode ──────────────────────────────────────────────────────────────
-  const [selectMode, setSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState(new Set());
-  const [copyAnchor, setCopyAnchor] = useState(null);
-  const [moveAnchor, setMoveAnchor] = useState(null);
 
   const toggleSelectMode = () => {
     setSelectMode((prev) => {
@@ -397,9 +426,10 @@ function Personal() {
     });
   };
 
-  const deleteSelected = async () => {
+  const deleteSelected = (e) => {
+    isBulkDeleteRef.current = true;
     setIsBulkDelete(true);
-    setDeleteDialogOpen(true);
+    handleDelete(e);
   };
 
   const copySelectedToLocal = async () => {
@@ -544,12 +574,12 @@ function Personal() {
     } catch { notify(t("Failed to move to Cloud")); }
   };
 
-  const deletePlayer = function (player) {
-    return function () {
-      setPlayerToDelete(player);
-      setIsBulkDelete(false);
-      setDeleteDialogOpen(true);
-    };
+  const deletePlayer = (player) => (e) => {
+    playerToDeleteRef.current = player;
+    setPlayerToDelete(player);
+    isBulkDeleteRef.current = false;
+    setIsBulkDelete(false);
+    handleDelete(e);
   };
 
   const handleClose = () => {
@@ -579,9 +609,13 @@ function Personal() {
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
 
-          {/* ── Zone 1: Filters ─────────────────────────────────────────────── */}
-          <Grid container spacing={1} alignItems="center">
-            <Grid item xs={12} sm>
+          {/* Zone 1: Filters */}
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: "grow"
+              }}>
               <TextField
                 label={t("Search by Player Name")}
                 variant="outlined"
@@ -589,17 +623,24 @@ function Personal() {
                 fullWidth
                 value={name}
                 onChange={(evt) => { setName(evt.target.value); }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                inputProps={{ maxLength: 50 }}
-              />
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { maxLength: 50 }
+                }} />
             </Grid>
-            <Grid item xs={12} sm="auto" sx={{ minWidth: 160 }}>
+            <Grid
+              sx={{ minWidth: 160 }}
+              size={{
+                xs: 12,
+                sm: "auto"
+              }}>
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
                 <Select
@@ -618,7 +659,7 @@ function Personal() {
 
           <Divider sx={{ my: 0.75 }} />
 
-          {/* ── Actions + Status (single row) ───────────────────────────────── */}
+          {/* Actions + Status (single row) */}
           <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
             <Button variant="contained" startIcon={<HistoryEdu />} onClick={addPlayer} disabled={dbMode === "cloud" && !cloudUser}>
               {t("Create Player")}
@@ -672,7 +713,9 @@ function Personal() {
               style={{ display: "none" }}
             />
             <Divider orientation="vertical" flexItem />
-            <Typography variant="body1" fontWeight={600}>
+            <Typography variant="body1" sx={{
+              fontWeight: 600
+            }}>
               {filteredList?.length ?? 0} {t("Players")}
             </Typography>
             {stalePlayers.length > 0 && (
@@ -700,10 +743,12 @@ function Personal() {
             </Tooltip>
           </Box>
 
-          {/* ── Select mode sub-bar ─────────────────────────────────────────── */}
+          {/* Select mode sub-bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -780,7 +825,6 @@ function Personal() {
 
         </Paper>
       </div>
-
       {!cloudUser && (
         <Paper
           elevation={dbMode === "cloud" ? 3 : 0}
@@ -796,7 +840,6 @@ function Personal() {
           <SignIn />
         </Paper>
       )}
-
       {loading && (dbMode !== "cloud" || cloudUser) && (
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}>
           <CircularProgress />
@@ -805,13 +848,10 @@ function Personal() {
       <Grid container spacing={1} sx={{ py: 1 }}>
         {filteredList.map((player) => (
           <Grid
-            item
-            xs={12}
-            md={6}
-            alignItems="center"
-            justifyContent="center"
             key={player.id}
             sx={{
+              alignItems: "center",
+              justifyContent: "center",
               marginBottom: "20px",
               ...(selectMode ? {
                 cursor: "pointer",
@@ -821,7 +861,10 @@ function Personal() {
               } : {}),
             }}
             onClick={selectMode ? () => toggleSelectPlayer(player.id) : undefined}
-          >
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <PlayerGalleryCardActions
               player={player}
               t={t}
@@ -836,7 +879,7 @@ function Personal() {
             />
           </Grid>
         ))}
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Button
             variant="outlined"
             startIcon={<BugReport />}
@@ -855,21 +898,10 @@ function Personal() {
         actorType="player"
         onMigrateAll={handleMigrateAllPlayers}
       />
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={async () => {
-          if (isBulkDelete) {
-            for (const id of selectedIds) {
-              await db.deleteDoc(db.doc("player-personal", id));
-            }
-            setSelectedIds(new Set());
-          } else if (playerToDelete) {
-            await db.deleteDoc(db.doc("player-personal", playerToDelete.id));
-            setPlayerToDelete(null);
-          }
-        }}
+        onClose={closeDeleteDialog}
+        onConfirm={performDelete}
         title={isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")}
         message={
           isBulkDelete
@@ -967,7 +999,7 @@ function PlayerGalleryCardActions({
           </IconButton>
         </Tooltip>
         <Tooltip title={t("Edit")}>
-          <IconButton onClick={() => handleNavigation(`/pc-gallery/${player.id}`)}>
+          <IconButton onClick={() => handleNavigation(`/player-edit/${player.id}`)}>
             <Edit />
           </IconButton>
         </Tooltip>

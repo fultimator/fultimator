@@ -33,7 +33,7 @@ export default function ContentSection({
 }) {
   const items = formState[itemsArrayName] || [];
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   const handleAddItem = () => {
@@ -89,7 +89,7 @@ export default function ContentSection({
   return (
     <Grid container spacing={2}>
       {/* Add Buttons */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t(addButtonLabel)}
         </Typography>
@@ -129,10 +129,9 @@ export default function ContentSection({
           ))}
         </Box>
       </Grid>
-
       {/* Items List */}
       {items.length === 0 ? (
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Typography
             sx={{
               padding: "20px",
@@ -150,7 +149,7 @@ export default function ContentSection({
         </Grid>
       ) : (
         items.map((item, index) => (
-          <Grid item xs={12} key={index}>
+          <Grid  key={index} size={12}>
             <ItemComponent
               {...itemComponentProps}
               item={item}

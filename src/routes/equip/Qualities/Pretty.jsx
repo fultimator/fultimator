@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Card,
   Grid,
@@ -7,12 +7,13 @@ import {
   ThemeProvider,
   Tooltip,
   IconButton,
-  Chip,
-  Box,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
+import EditableImage from "../../../components/EditableImage";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
@@ -33,16 +34,13 @@ function Pretty({ custom }) {
 export function PrettySingle({ quality, showActions }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const [showImage, setShowImage] = useState(false);
 
   const background = theme.mode === 'dark'
     ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)`
     : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`;
 
-  const background2 = theme.mode === 'dark' ? `black` : `white`;
-
-  const cardBackground = theme.mode === 'dark'
-    ? { backgroundColor: "#181a1b", background: "#181a1b" }
-    : { backgroundColor: "white", background: "white" };
+  const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
   const ref = useRef();
   const [downloadImage] = useDownloadImage(quality.name, ref);
@@ -54,14 +52,13 @@ export function PrettySingle({ quality, showActions }) {
   return (
     <>
       <Card>
-        <div ref={ref} style={cardBackground}>
+        <div ref={ref}>
           <Stack>
             <Grid
               container
-              justifyContent="space-between"
-              alignItems="center"
               sx={{
-                p: 1,
+                alignItems: "center",
+                py: 1,
                 background: `${theme.primary}`,
                 color: "#ffffff",
                 "& .MuiTypography-root": {
@@ -70,92 +67,107 @@ export function PrettySingle({ quality, showActions }) {
                 },
               }}
             >
-              <Grid item xs={1}></Grid>
-              <Grid item xs={7}>
-                <Typography variant="h4" textAlign="left">
+              <Grid sx={{ flex: "0 0 70px" }} />
+              <Grid sx={{ flex: 1, pl: 1 }} container>
+              <Grid size={5}>
+                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
                   {t("Quality")}
                 </Typography>
               </Grid>
-              <Grid item xs={3}>
-                <Typography variant="h4" textAlign="center">
+              <Grid size={3}>
+                <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
+                  {t("Category")}
+                </Typography>
+              </Grid>
+              <Grid size={4}>
+                <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
                   {t("Cost")}
                 </Typography>
               </Grid>
+              </Grid>
             </Grid>
-            <Grid container direction="column">
-              {/* Name and Cost Row */}
-              <Grid
-                container
-                justifyContent="space-between"
-                item
-                sx={{
-                  background,
-                  borderBottom: `1px solid ${theme.secondary}`,
-                  padding: "5px",
-                }}
-              >
-                <Grid item xs={8}>
-                  <Typography fontWeight="bold">{quality.name}</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography textAlign="center">{`${quality.cost}z`}</Typography>
-                </Grid>
-              </Grid>
 
-              {/* Category and Filter Row */}
+            {/* All Rows Container */}
+            <Grid
+              container
+              sx={{
+                borderBottom: `1px solid ${theme.secondary}`,
+              }}
+            >
+              {/* Image Column - spans rows */}
               <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
                 sx={{
-                  background2,
-                  padding: "5px",
-                  borderBottom: `1px solid ${theme.secondary}`,
+                  flex: "0 0 70px",
+                  width: "70px",
+                  background: imageBackground,
+                  display: "grid",
+                  placeItems: "center",
+                  overflow: "hidden",
                 }}
               >
-                <Grid item>
-                   <Typography variant="body2" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
-                    {t(quality.category)}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                    {quality.filter?.map((f) => (
-                      <Chip key={f} label={t(f)} size="small" variant="outlined" />
-                    ))}
-                  </Box>
-                </Grid>
+                {showImage && <EditableImage size={70} />}
               </Grid>
+              {/* Content Column - contains rows */}
+              <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
+                {/* Quality Name, Category and Cost Row */}
+                <Grid container
+                  sx={{
+                    background,
+                    borderBottom: `1px solid ${theme.secondary}`,
+                    alignItems: "center",
+                    minHeight: "40px",
+                    pl: 1,
+                  }}
+                >
+                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={5}>
+                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>{quality.name || t("No Name")}</Typography>
+                  </Grid>
+                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={3}>
+                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0, fontSize: "0.85rem", textTransform: "uppercase" }}>{t(quality.category)}</Typography>
+                  </Grid>
+                  <Grid sx={{ display: "flex", alignItems: "center", p: "2px" }} size={4}>
+                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>{`${quality.cost}z`}</Typography>
+                  </Grid>
+                </Grid>
 
-              {/* Quality Description Row */}
-              <Grid
-                container
-                justifyContent="flex-start"
-                sx={{
-                  background2,
-                  padding: "5px",
-                }}
-              >
-                <Typography variant="body2">
-                  {!quality.quality && t("No Description")}{" "}
-                  <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
-                    {quality.quality}
-                  </StyledMarkdown>
-                </Typography>
+                {/* Quality Description Row */}
+                <Grid container
+                  sx={{
+                    pl: 1,
+                    minHeight: "40px",
+                    alignItems: "center",
+                  }}
+                >
+                  <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
+                    <Typography sx={{ lineHeight: 1, margin: 0 }}>
+                      {!quality.quality ? t("No Description") : (
+                        <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                          {quality.quality}
+                        </StyledMarkdown>
+                      )}
+                    </Typography>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Stack>
         </div>
       </Card>
       {showActions && (
-        <div style={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Tooltip title={t("Download as Image")}>
-            <IconButton onClick={downloadImage}>
-              <Download />
-            </IconButton>
-          </Tooltip>
-          <Export name={`${quality.name}`} dataType="quality" data={quality} />
-          <AddToCompendiumButton itemType="quality" data={quality} />
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export name={`${quality.name}`} dataType="quality" data={quality} />
+            <AddToCompendiumButton itemType="quality" data={quality} />
+          </div>
+          <FormControlLabel
+            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            label={t("Add Image")}
+          />
         </div>
       )}
     </>

@@ -18,6 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const OTHER_SUBTYPES = ["other"];
@@ -32,7 +33,11 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (deleteIndex !== null) handleRemove(deleteIndex);
+        },
+  });;
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const others = player.others ?? [];
@@ -100,7 +105,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Other Optionals")}
@@ -112,8 +117,8 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         </Grid>
 
         {others.length === 0 && (
-          <Grid item xs={12} sx={{ py: 2 }}>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+          <Grid  sx={{ py: 2 }} size={12}>
+            <Typography sx={{ textAlign: "center" }}>
               {t("No optional entries yet.")}
             </Typography>
           </Grid>
@@ -122,24 +127,34 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         {others.map((other, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1 }} alignItems="flex-start">
-              <Grid item xs={9} sm={10}>
+            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
+              <Grid
+                size={{
+                  xs: 9,
+                  sm: 10
+                }}>
                 <TextField
                   label={t("Name") + ":"}
                   value={other.name ?? ""}
                   onChange={(e) => onChangeOther(index, "name")(e.target.value)}
-                  inputProps={{ maxLength: 100 }}
-                  InputProps={{ readOnly: !isEditMode }}
                   fullWidth
                   size="small"
-                />
+                  slotProps={{
+                    input: { readOnly: !isEditMode },
+                    htmlInput: { maxLength: 100 }
+                  }} />
               </Grid>
               {isEditMode && (
-                <Grid item xs={3} sm={2} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                <Grid
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
+                  size={{
+                    xs: 3,
+                    sm: 2
+                  }}>
                   <Tooltip title={t("Replace from Compendium")}>
                     <IconButton
                       size="small"
@@ -165,7 +180,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   </Tooltip>
                 </Grid>
               )}
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea
                   label={t("Description") + ":"}
                   value={other.description ?? ""}
@@ -175,7 +190,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   readOnly={!isEditMode}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomTextarea
                   label={t("Effect") + ":"}
                   value={other.effect ?? ""}
@@ -185,7 +200,11 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   readOnly={!isEditMode}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6
+                }}>
                 {isEditMode ? (
                   <FormControlLabel
                     control={
@@ -207,14 +226,20 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   />
                 ) : (
                   other.clock?.sections && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>
                       {t("Clock")}: {other.clock.sections}
                     </Typography>
                   )
                 )}
               </Grid>
               {other.clock?.sections && (
-                <Grid item xs={12} sm={6}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6
+                  }}>
                   <TextField
                     label={t("Clock Sections") + ":"}
                     value={other.clock.sections}
@@ -226,18 +251,18 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                       });
                     }}
                     type="number"
-                    inputProps={{ min: 2, max: 12, readOnly: !isEditMode }}
-                    InputProps={{ readOnly: !isEditMode }}
                     fullWidth
                     size="small"
-                  />
+                    slotProps={{
+                      input: { readOnly: !isEditMode },
+                      htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
+                    }} />
                 </Grid>
               )}
             </Grid>
           </React.Fragment>
         ))}
       </Grid>
-
       {isEditMode && replaceIndex !== null && (
         <CompendiumViewerModal
           open={replaceCompendiumOpen}

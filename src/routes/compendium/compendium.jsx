@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import {
   Box,
   TextField,
@@ -27,7 +27,6 @@ import {
   ThemeProvider,
   Snackbar,
   Autocomplete,
-  Menu,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -51,11 +50,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  ListItemIcon,
-  Alert,
   CircularProgress,
-  Tabs,
-  Tab,
 } from "@mui/material";
 
 import Layout from "../../components/Layout";
@@ -69,163 +64,28 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
-import { StyledMarkdown, WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
+import {  WeaponCard, ArmorCard, SpellCard, PlayerSpellCard, NonStaticSpellCard, AttackCard, QualityCard, HeroicCard, ClassCard, SpecialRuleCard, ActionCard, CustomWeaponCard, AccessoryCard, OptionalCard } from "../../components/compendium/ItemCards";
 
-import weapons from "../../libs/weapons";
-import heroics from "../../libs/heroics";
-import qualities from "../../libs/qualities";
-import { baseArmors, baseShields } from "../../libs/equip";
-import { npcSpells } from "../../libs/npcSpells";
-import { npcAttacks } from "../../libs/npcAttacks";
-import classList, { spellList, tinkererAlchemy, tinkererInfusion, arcanumList } from "../../libs/classes";
-import attributes from "../../libs/attributes";
-import types from "../../libs/types";
-import { availableFrames, availableModules } from "../../libs/pilotVehicleData";
-import { magiseeds } from "../../libs/floralistMagiseedData";
+import classList, { spellList, spellsByClass } from "../../libs/classes";
+import _attributes from "../../libs/attributes";
+import _types from "../../libs/types";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-import { availableGifts } from "../../components/player/spells/spellOptionData";
-import { availableDances } from "../../components/player/spells/spellOptionData";
-import { availableTherioforms } from "../../components/player/spells/spellOptionData";
-import { availableMagichantKeys, availableMagichantTones } from "../../components/player/spells/spellOptionData";
-import { availableSymbols } from "../../components/player/spells/spellOptionData";
-import { invocationsByWellspring } from "../../components/player/spells/spellOptionData";
 
-export const CLASS_BOOK_OPTIONS = [
-  { label: "Core", value: "core" },
-  { label: "Rework", value: "rework" },
-  { label: "Bonus", value: "bonus" },
-  { label: "High Fantasy", value: "high" },
-  { label: "Techno Fantasy", value: "techno" },
-  { label: "Natural Fantasy", value: "natural" },
-];
-
-export const QUALITY_FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
-
-export const QUALITY_CATEGORY_OPTIONS = [
-  { label: "Defensive", value: "Defensive" },
-  { label: "Offensive", value: "Offensive" },
-  { label: "Enhancement", value: "Enhancement" },
-];
-
-// ---------------------------------------------------------------------------
-// Data preparation
-// ---------------------------------------------------------------------------
-
-const armors = baseArmors
-  .filter((a) => a.name !== "No Armor")
-  .map((a) => ({ ...a, category: "Armor" }));
-
-const shields = baseShields
-  .filter((s) => s.name !== "No Shield")
-  .map((s) => ({ ...s, category: "Shield" }));
-
-export const ITEM_TYPES = [
-  { key: "weapons",        label: "Weapons",        context: "player" },
-  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
-  { key: "shields",        label: "Shields",        context: "player" },
-  { key: "armor",          label: "Armor",          context: "player" },
-  { key: "accessories",    label: "Accessories",    context: "player" },
-  { key: "spells",         label: "NPC Spells",     context: "npc" },
-  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
-  { key: "special",        label: "Special Rules",  context: "npc" },
-  { key: "actions",        label: "Other Actions",  context: "npc" },
-  { key: "classes",        label: "Classes",        context: "player" },
-  { key: "player-spells",  label: "Spells",         context: "both" },
-  { key: "qualities",      label: "Qualities",      context: "player" },
-  { key: "heroics",        label: "Heroic Skills",  context: "player" },
-  { key: "optionals",      label: "Optionals",      context: "player" },
-];
-
-// Item types available when browsing a pack (no classes / non-standard types)
-export const PACK_ITEM_TYPES = [
-  { key: "weapons",        label: "Weapons",        context: "player" },
-  { key: "armor",          label: "Armor",          context: "player" },
-  { key: "shields",        label: "Shields",        context: "player" },
-  { key: "custom-weapons", label: "Custom Weapons", context: "player" },
-  { key: "accessories",    label: "Accessories",    context: "player" },
-  { key: "spells",         label: "NPC Spells",     context: "npc" },
-  { key: "attacks",        label: "NPC Attacks",    context: "npc" },
-  { key: "special",        label: "Special Rules",  context: "npc" },
-  { key: "actions",        label: "Other Actions",  context: "npc" },
-  { key: "player-spells",  label: "Spells",         context: "both" },
-  { key: "qualities",      label: "Qualities",      context: "player" },
-  { key: "classes",        label: "Classes",        context: "player" },
-  { key: "heroics",        label: "Heroic Skills",  context: "player" },
-  { key: "optionals",      label: "Optionals",      context: "player" },
-];
-
-// viewer key → CompendiumItemType
-export const VIEWER_TO_PACK_TYPE = {
-  weapons:          "weapon",
-  armor:            "armor",
-  shields:          "shield",
-  "custom-weapons": "custom-weapon",
-  accessories:      "accessory",
-  spells:           "npc-spell",
-  attacks:          "npc-attack",
-  special:          "npc-special",
-  actions:          "npc-action",
-  "player-spells":  "player-spell",
-  qualities:        "quality",
-  classes:          "class",
-  heroics:          "heroic",
-  optionals:        "optional",
-};
-
-export function getItems(type) {
-  switch (type) {
-    case "weapons":
-      return weapons;
-    case "armor":
-      return armors;
-    case "shields":
-      return shields;
-    case "spells":
-      return npcSpells;
-    case "attacks":
-      return npcAttacks;
-    case "classes":
-      return classList;
-    case "player-spells":
-      return spellList;
-    case "qualities":
-      return qualities;
-    case "heroics":
-      return heroics;
-    case "special":
-    case "actions":
-    case "custom-weapons":
-    case "accessories":
-    case "optionals":
-      return []; // pack-only, no official data
-    default:
-      return [];
-  }
-}
-
-export function getItemSearchText(item) {
-  const skillNames = item.skills
-    ? item.skills.map((s) => s.skillName).join(" ")
-    : "";
-  return [item.name, item.category, item.type, item.range, item.book, skillNames, item.quality, item.subtype, item.description, item.effect, item.targetDescription]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-}
-
-export function makeId(name, idx) {
-  return `compendium-item-${name.replace(/[^a-zA-Z0-9]/g, "-")}-${idx}`;
-}
-
-function toSlug(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
+// Pre-compute delicacy effects once at module load
+const staticDelicacyEffects = getDelicacyEffects(staticT);
+import {
+  CLASS_BOOK_OPTIONS,
+  QUALITY_FILTER_OPTIONS,
+  QUALITY_CATEGORY_OPTIONS,
+  ITEM_TYPES,
+  PACK_ITEM_TYPES,
+  VIEWER_TO_PACK_TYPE,
+  getItems,
+  getItemSearchText,
+  toSlug,
+  makeId,
+  getNonStaticSpellItems,
+} from "../../libs/compendium";
 
 // ---------------------------------------------------------------------------
 // Sidebar table columns per type
@@ -290,8 +150,10 @@ const SidebarRow = React.memo(function SidebarRow({
       <TableCell sx={{ pl: isSelected ? "5px" : "8px" }}>
         <Typography
           variant="body2"
-          fontWeight={isSelected ? "bold" : "normal"}
           color={isSelected ? (customTheme.mode === "dark" ? "primary.light" : primaryColor) : "text.primary"}
+          sx={{
+            fontWeight: isSelected ? "bold" : "normal"
+          }}
         >
           {t(item.name)}
         </Typography>
@@ -374,7 +236,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
       >
         {t("Quick Create")}
       </Button>
-
       <Paper
         variant="outlined"
         sx={{
@@ -565,7 +426,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Book")} placeholder={t("Filters")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 return (
@@ -587,12 +448,14 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           placeholder={t("Search...")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }
           }}
         />
 
@@ -607,7 +470,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Applicable To")} placeholder={t("All classes")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 return <Chip key={key} label={t(option)} size="small" {...tagProps} />;
@@ -628,7 +491,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderInput={(params) => (
               <TextField {...params} label={t("Subtype")} placeholder={t("All subtypes")} />
             )}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
                 const label = { "quirk": "Quirk", "camp-activities": "Camp Activities", "zero-trigger": "Zero Trigger", "zero-effect": "Zero Effect", "zero-power": "Zero Power", "other": "Other" }[option] ?? option;
@@ -652,7 +515,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 renderInput={(params) => (
                   <TextField {...params} label={t("Category")} placeholder={t("Filters")} />
                 )}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     return (
@@ -685,7 +548,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 renderInput={(params) => (
                   <TextField {...params} label={t("Applicable To")} placeholder={t("Filters")} />
                 )}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...tagProps } = getTagProps({ index });
                     return (
@@ -712,7 +575,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           {filteredItems.length} {t("items")}
         </Typography> */}
       </Paper>
-
       <TableContainer
         component={Paper}
         variant="outlined"
@@ -755,83 +617,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     </Box>
   );
 });
-
-// ---------------------------------------------------------------------------
-// Per-character spell-type item builder
-// ---------------------------------------------------------------------------
-
-export function getNonStaticSpellItems(sc) {
-  switch (sc) {
-    case "gift":
-      return availableGifts
-        .filter(g => !g.name.includes("_custom_"))
-        .map(g => ({ ...g, spellType: "gift" }));
-    case "dance":
-      return availableDances
-        .filter(d => !d.name.includes("_custom_"))
-        .map(d => ({ ...d, spellType: "dance" }));
-    case "therioform":
-      return availableTherioforms
-        .filter(tf => !tf.name.includes("_custom_"))
-        .map(tf => ({ ...tf, spellType: "therioform" }));
-    case "magichant":
-      return [
-        ...availableMagichantKeys
-          .filter((key) => !key.name.includes("_custom_"))
-          .map((key) => ({ ...key, spellType: "magichant", magichantSubtype: "key" })),
-        ...availableMagichantTones
-          .filter((tone) => !tone.name.includes("_custom_"))
-          .map((tone) => ({ ...tone, spellType: "magichant", magichantSubtype: "tone" })),
-      ];
-    case "symbol":
-      return availableSymbols
-        .filter(s => !s.name.includes("_custom_"))
-        .map(s => ({ ...s, spellType: "symbol" }));
-    case "invocation":
-      return Object.entries(invocationsByWellspring).flatMap(([wellspring, invocations]) =>
-        invocations.map(inv => ({ ...inv, spellType: "invocation", wellspring }))
-      );
-    case "magiseed":
-      return magiseeds.map(ms => ({ ...ms, spellType: "magiseed" }));
-    case "arcanist":
-    case "arcanist-rework":
-      return arcanumList.map(arc => ({ ...arc, spellType: sc }));
-    case "tinkerer-alchemy":
-      return [
-        ...tinkererAlchemy.targets.map(t => ({
-          name: t.rangeFrom === t.rangeTo ? `${t.rangeFrom}` : `${t.rangeFrom}–${t.rangeTo}`,
-          spellType: "tinkerer-alchemy",
-          category: "Target",
-          effect: t.effect,
-        })),
-        ...tinkererAlchemy.effects.map(e => ({
-          name: `Die: ${e.dieValue}`,
-          spellType: "tinkerer-alchemy",
-          category: "Effect",
-          effect: e.effect,
-        })),
-      ];
-    case "tinkerer-infusion":
-      return tinkererInfusion.effects.map(e => ({
-        name: `Rank ${e.infusionRank}: ${e.name ?? ""}`.trim().replace(/: $/, ""),
-        spellType: "tinkerer-infusion",
-        ...e,
-      }));
-    case "pilot-vehicle":
-      return [
-        ...availableFrames.map(f => ({ ...f, spellType: "pilot-vehicle", category: "Frame", pilotSubtype: "frame" })),
-        ...availableModules.armor
-          .filter(m => !m.customName && m.name !== "pilot_custom_armor")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Armor Module", pilotSubtype: "armor" })),
-        ...availableModules.weapon.map(m => ({ ...m, spellType: "pilot-vehicle", category: "Weapon Module", pilotSubtype: "weapon" })),
-        ...availableModules.support
-          .filter(m => m.name !== "pilot_custom_support")
-          .map(m => ({ ...m, spellType: "pilot-vehicle", category: "Support Module", pilotSubtype: "support" })),
-      ];
-    default:
-      return null;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Card dispatcher
@@ -892,7 +677,7 @@ function CompendiumViewer() {
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
 
   // Pack state
-  const { packs, loading: packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule } = useCompendiumPacks();
+  const { packs, loading: _packsLoading, createPack, updatePack, deletePack, toggleLock, removeItem, ensurePersonalPack, exportAsModule } = useCompendiumPacks();
   const [newPackDialogOpen, setNewPackDialogOpen] = useState(false);
   const [newPackName, setNewPackName] = useState("");
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
@@ -908,7 +693,7 @@ function CompendiumViewer() {
   const [exporting, setExporting] = useState(false);
 
   const [manageModulesOpen, setManageModulesOpen] = useState(false);
-  const [pendingNavPackId, setPendingNavPackId] = useState(null);
+  const [_pendingNavPackId, setPendingNavPackId] = useState(null);
 
   // Always ensure the personal pack exists so it shows in the dropdown
   useEffect(() => { ensurePersonalPack(); }, [ensurePersonalPack]);
@@ -1028,7 +813,7 @@ function CompendiumViewer() {
   }, [selectedType, selectedSpellClass]);
 
   const filteredItems = useMemo(() => {
-    // ── Pack mode ────────────────────────────────────────────────────────────
+    // Pack mode
     if (activePack) {
       const packType = VIEWER_TO_PACK_TYPE[selectedType];
       let items = activePack.items
@@ -1092,7 +877,7 @@ function CompendiumViewer() {
       return items;
     }
 
-    // ── Official mode ─────────────────────────────────────────────────────
+    // Official mode
     if (selectedType !== "player-spells") {
       let items = getItems(selectedType);
 
@@ -1145,10 +930,9 @@ function CompendiumViewer() {
       items = [];
       for (const sc of scs) {
         if (sc === "default") {
-          items.push(...spellList.filter((s) => s.class === activeSpellCls.name));
+          items.push(...(spellsByClass[activeSpellCls.name] || []));
         } else if (sc === "cooking") {
-          const cookingEffects = getDelicacyEffects(staticT);
-          items.push(...cookingEffects.map(eff => ({
+          items.push(...staticDelicacyEffects.map(eff => ({
             name: `Delicacy #${eff.id}`,
             spellType: "cooking",
             ...eff,
@@ -1274,9 +1058,13 @@ function CompendiumViewer() {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
-    setSearchParams({ ...base, type: selectedType, ...(books.length > 0 ? { book: books.join(",") } : {}) });
+    const heroicClasses = searchParams.get("heroicClasses");
+    const newParams = { ...base, type: selectedType };
+    if (books.length > 0) newParams.book = books.join(",");
+    if (heroicClasses) newParams.heroicClasses = heroicClasses;
+    setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleQualityFiltersChange = useCallback((filters) => {
     setSearchQuery("");
@@ -1306,21 +1094,25 @@ function CompendiumViewer() {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const book = searchParams.get("book");
     const newParams = { ...base, type: selectedType };
     if (classes.length > 0) newParams.heroicClasses = classes.join(",");
+    if (book) newParams.book = book;
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleOptionalSubtypesChange = useCallback((subtypes) => {
     setSearchQuery("");
     setSelectedIdx(null);
     const base = selectedCompendium !== "official" ? { compendium: selectedCompendium } : {};
+    const book = searchParams.get("book");
     const newParams = { ...base, type: selectedType };
     if (subtypes.length > 0) newParams.optionalSubtypes = subtypes.join(",");
+    if (book) newParams.book = book;
     setSearchParams(newParams);
     if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, [selectedCompendium, selectedType, setSearchParams]);
+  }, [selectedCompendium, selectedType, setSearchParams, searchParams]);
 
   const handleCompendiumChange = useCallback((compendium) => {
     if (compendium === "__manage_modules__") {
@@ -1371,12 +1163,21 @@ function CompendiumViewer() {
         ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
         ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
         ...(selectedMagichantSubtype ? { magichantSubtype: selectedMagichantSubtype } : {}),
+        ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
+        ...(selectedQualityFilters.length > 0 ? { qualityFilters: selectedQualityFilters.join(",") } : {}),
+        ...(selectedQualityCategories.length > 0 ? { qualityCategories: selectedQualityCategories.join(",") } : {}),
+        ...(selectedHeroicClasses.length > 0 ? { heroicClasses: selectedHeroicClasses.join(",") } : {}),
+        ...(selectedOptionalSubtypes.length > 0 ? { optionalSubtypes: selectedOptionalSubtypes.join(",") } : {}),
         item: toSlug(item.name),
       });
       const id = itemIds[idx];
       const scrollToItem = () => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "instant", block: "center" });
+        if (el) {
+          requestAnimationFrame(() => {
+            el.scrollIntoView({ behavior: "auto", block: "center" });
+          });
+        }
       };
       if (!isDesktop) {
         setDrawerOpen(false);
@@ -1385,7 +1186,13 @@ function CompendiumViewer() {
         requestAnimationFrame(scrollToItem);
       }
     },
-    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, setSearchParams]
+    [itemIds, isDesktop, selectedType, selectedSpellClass, selectedCompendium, selectedModuleType, selectedMagichantSubtype, selectedBook, selectedQualityFilters, selectedQualityCategories, selectedHeroicClasses, selectedOptionalSubtypes, setSearchParams]
+  );
+
+  // Memoize click handlers per item to prevent ItemCard re-renders from stale closures
+  const itemClickHandlers = useMemo(
+    () => filteredItems.map((item, idx) => () => handleItemClick(item, idx)),
+    [filteredItems, handleItemClick]
   );
 
   const sidebarContent = (
@@ -1522,12 +1329,14 @@ function CompendiumViewer() {
                   mb: 2,
                 }}
               >
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                   {t(
                     ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? ""
                   )}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   ({filteredItems.length})
                 </Typography>
               </Box>
@@ -1569,42 +1378,52 @@ function CompendiumViewer() {
 
             {/* Desktop section title */}
             {isDesktop && (
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
                 {t(
                   ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? ""
                 )}
                 <Typography
                   component="span"
                   variant="body2"
-                  color="text.secondary"
-                  sx={{ ml: 1 }}
-                >
+                  sx={{
+                    color: "text.secondary",
+                    ml: 1
+                  }}>
                   ({filteredItems.length} {t("items")})
                 </Typography>
               </Typography>
             )}
 
             {filteredItems.length === 0 ? (
-              <Typography color="text.secondary">{t("No items found.")}</Typography>
+              <Typography sx={{
+                color: "text.secondary"
+              }}>{t("No items found.")}</Typography>
             ) : (
               <Grid container spacing={2}>
                 {filteredItems.map((item, idx) => (
-                  <Grid item xs={12} lg={selectedType === "classes" ? 12 : 6} key={itemIds[idx]}>
+                  <Grid
+                    key={itemIds[idx]}
+                    size={{
+                      xs: 12,
+                      lg: selectedType === "classes" ? 12 : 6
+                    }}
+                    sx={{ contain: "layout paint" }}>
                     <Box
                       ref={idx === selectedIdx ? selectedCardRef : null}
                       sx={{
-                        borderRadius: 1,
-                        outline: idx === selectedIdx
+                        borderRadius: 2,
+                        border: idx === selectedIdx
                           ? `2px solid ${customTheme.primary}`
                           : "2px solid transparent",
-                        transition: "outline 0.15s ease",
+                        transition: "border-color 0.15s ease",
+                        contain: "content",
                       }}
                     >
                       <ItemCard
                         type={selectedType}
                         item={item}
                         id={itemIds[idx]}
-                        onHeaderClick={() => handleItemClick(item, idx)}
+                        onHeaderClick={itemClickHandlers[idx]}
                       />
                     </Box>
                     {idx === selectedIdx && (
@@ -1661,13 +1480,11 @@ function CompendiumViewer() {
         onClose={() => setShareSnackOpen(false)}
         message={t("Copied to Clipboard!")}
       />
-
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
       />
-
       {/* Create item dialog */}
       {activePack && (
         <CompendiumItemCreateDialog
@@ -1677,7 +1494,6 @@ function CompendiumViewer() {
           packId={activePack.id}
         />
       )}
-
       {/* Edit class dialog */}
       {activePack && editClassItem && (
         <CompendiumItemCreateDialog
@@ -1689,7 +1505,6 @@ function CompendiumViewer() {
           editItemId={editClassItem.packItemId}
         />
       )}
-
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
@@ -1729,7 +1544,6 @@ function CompendiumViewer() {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Manage Pack dialog — rename, description, author, module meta, export */}
       <Dialog
         open={manageDialogOpen}
@@ -1777,7 +1591,13 @@ function CompendiumViewer() {
           />
 
           <Divider>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: 1
+              }}>
               {t("Module Export")}
             </Typography>
           </Divider>
@@ -1814,7 +1634,7 @@ function CompendiumViewer() {
             onChange={(e) => setExportMeta((m) => ({ ...m, downloadUrl: e.target.value }))}
             fullWidth
             size="small"
-            placeholder="https://.../pack.fcp"
+            placeholder="https://.../compendium.zip"
           />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between" }}>
@@ -1861,7 +1681,6 @@ function CompendiumViewer() {
           </Box>
         </DialogActions>
       </Dialog>
-
       <ManageModulesModal
         open={manageModulesOpen}
         onClose={() => setManageModulesOpen(false)}

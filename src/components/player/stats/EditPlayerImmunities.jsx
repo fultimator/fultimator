@@ -60,7 +60,7 @@ export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) 
         borderColor: secondary,
       }}
     >
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <CustomHeader
           type="top"
           headerText={t("Status Effect Immunities")}
@@ -69,7 +69,12 @@ export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) 
       </Grid>
       <Grid container spacing={1}>
         {Object.keys(statusDescriptions).map((status) => (
-          <Grid item xs={12} md={6} key={status}>
+          <Grid
+            key={status}
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <FormControlLabel
               control={
                 <Checkbox

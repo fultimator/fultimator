@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useState } from "react";
 import {
   addDoc,
@@ -43,7 +43,13 @@ function RollerScoped() {
           sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
         >
           <CloudIcon color="primary" />
-          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200
+            }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -72,20 +78,18 @@ function RollerScopedAuthenticated({ user }) {
 
     try {
       const rollsPreparedRef = collection(firestore, "rolls-prepared");
-      const res = await addDoc(rollsPreparedRef, data);
-      console.debug(res);
-    } catch (e) {
-      console.debug(e);
+      await addDoc(rollsPreparedRef, data);
+    } catch {
+      // Handle error silently
     }
   };
 
   const saveRoll = async (roll) => {
     const ref = doc(firestore, "rolls", roll.id);
     try {
-      const res = await setDoc(ref, roll);
-      console.debug(res);
-    } catch (e) {
-      console.debug(e);
+      await setDoc(ref, roll);
+    } catch {
+      // Handle error silently
     }
   };
 
@@ -116,20 +120,29 @@ function RollerScopedAuthenticated({ user }) {
 
     try {
       const rollsRef = collection(firestore, "rolls");
-      const res = await addDoc(rollsRef, data);
-      console.debug(res);
-    } catch (e) {
-      console.debug(e);
+      await addDoc(rollsRef, data);
+    } catch {
+      // Handle error silently
     }
   };
 
   return (
     <Layout>
-      <Grid container justifyContent="center" spacing={1}>
-        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+      <Grid container spacing={1} sx={{ justifyContent: "center" }}>
+        <Grid
+          sx={{ order: 1 }}
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <ShareLink scope={scope} />
         </Grid>
-        <Grid item xs={12} sm={6} sx={{ order: 1 }}>
+        <Grid
+          sx={{ order: 1 }}
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Card sx={{ p: 2 }}>
             <Typography sx={{ marginBottom: "8px" }}>
               {t("Set name to display here:")}
@@ -147,17 +160,32 @@ function RollerScopedAuthenticated({ user }) {
           </Card>
         </Grid>        
 
-        <Grid item xs={12} sx={{ order: 3 }}>
+        <Grid  sx={{ order: 3 }} size={12}>
           <PrepareRoll
             savePreparedRoll={savePreparedRoll}
             createRoll={createRoll}
           />
         </Grid>
-        <Grid item xs={12} sm={5.5} sx={{ order: { xs: 6, sm: 5 } }}>
+        <Grid
+          sx={{ order: { xs: 6, sm: 5 } }}
+          size={{
+            xs: 12,
+            sm: 5.5
+          }}>
           <RollList scope={scope} saveRoll={saveRoll} user={user} />
         </Grid>
-        <Grid item xs={0} sm={1} sx={{ order: { xs: 6, sm: 5 } }} />
-        <Grid item xs={12} sm={5.5} sx={{ my: 1, order: { xs: 5, sm: 6 } }}>
+        <Grid
+          sx={{ order: { xs: 6, sm: 5 } }}
+          size={{
+            xs: 0,
+            sm: 1
+          }} />
+        <Grid
+          sx={{ my: 1, order: { xs: 5, sm: 6 } }}
+          size={{
+            xs: 12,
+            sm: 5.5
+          }}>
           <PreparedRolls user={user} scope={scope} createRoll={createRoll} />
         </Grid>
       </Grid>
@@ -186,11 +214,11 @@ function PreparedRolls({ user, scope, createRoll }) {
     };
   };
 
-  const [rolls, success, err] = useCollectionData(preparedRollsQuery, {
+  const [rolls, _success, _err] = useCollectionData(preparedRollsQuery, {
     idField: "id",
   });
 
-  console.debug(success, err);
+  // console.debug(success, err);
 
   const handleRoll = (roll) => {
     return () => {
@@ -218,11 +246,9 @@ function RollList({ scope, saveRoll, user }) {
     orderBy("timestamp", "desc")
   );
 
-  const [rolls, success, err] = useCollectionData(rollsQuery, {
+  const [rolls] = useCollectionData(rollsQuery, {
     idField: "id",
   });
-
-  console.debug(success, err);
 
   return (
     <Stack spacing={2} sx={{ marginBottom: 10 }}>

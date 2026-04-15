@@ -34,22 +34,24 @@ export default function ShareLink({ scope }) {
         fullWidth
         size="small"
         value={url}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <CopyToClipboard
-                text={url}
-                onCopy={() => {
-                  setSnackbarOpen(true);
-                }}
-                title={t("Copy")}
-              >
-                <IconButton>
-                  <ContentCopy />
-                </IconButton>
-              </CopyToClipboard>
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                <CopyToClipboard
+                  text={url}
+                  onCopy={() => {
+                    setSnackbarOpen(true);
+                  }}
+                  title={t("Copy")}
+                >
+                  <IconButton>
+                    <ContentCopy />
+                  </IconButton>
+                </CopyToClipboard>
+              </InputAdornment>
+            ),
+          }
         }}
       />
       <Snackbar

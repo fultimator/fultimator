@@ -28,7 +28,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Mix")}: {ranks[spell.rank - 1]} ({t("IP Cost")}: {spell.rank + 2})
           </Typography>
         </StyledTableCell>
@@ -76,7 +76,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
           </Typography>
         </StyledTableCell>
@@ -87,7 +87,7 @@ export default function SpellGadget({ spell }) {
             {effect.name}
           </StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
-            <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
               {effect.effect}
             </ReactMarkdown>
           </StyledTableCell>
@@ -100,7 +100,7 @@ export default function SpellGadget({ spell }) {
     <>
       <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
         <StyledTableCell colSpan={2}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
           </Typography>
         </StyledTableCell>
@@ -109,7 +109,7 @@ export default function SpellGadget({ spell }) {
         <TableRow>
           <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magitech Override")}</StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
               {t("MagitechOverride_desc")}
             </ReactMarkdown>
           </StyledTableCell>
@@ -119,7 +119,7 @@ export default function SpellGadget({ spell }) {
         <TableRow>
           <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magicannon")}</StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
               {t("Magicannon_desc1")}
             </ReactMarkdown>
           </StyledTableCell>
@@ -129,7 +129,7 @@ export default function SpellGadget({ spell }) {
         <TableRow>
           <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magispheres")}</StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
               {t("Magispheres_desc1")}
             </ReactMarkdown>
           </StyledTableCell>

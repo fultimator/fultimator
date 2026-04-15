@@ -12,6 +12,7 @@ import {
   DialogActions,
   LinearProgress,
   Box,
+  Stack,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -20,6 +21,10 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import Clock from "./Clock";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import ReactMarkdown from "react-markdown";
 
 export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -30,7 +35,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedSeed, setSelectedSeed] = useState(null);
-  const [selectedMagiseedSpell, setSelectedMagiseedSpell] = useState(null);
+  const [_selectedMagiseedSpell, setSelectedMagiseedSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (magiseedSpell, seed) => {
@@ -62,6 +67,20 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
       });
       return { ...prevPlayer, classes: newClasses };
     });
+  };
+
+  const incrementMagiseedClock = (magiseedSpell) => {
+    const currentClock = magiseedSpell.growthClock || 0;
+    if (currentClock < 4) {
+      handleClockChange(magiseedSpell, currentClock + 1);
+    }
+  };
+
+  const decrementMagiseedClock = (magiseedSpell) => {
+    const currentClock = magiseedSpell.growthClock || 0;
+    if (currentClock > 0) {
+      handleClockChange(magiseedSpell, currentClock - 1);
+    }
   };
 
   /* All magiseed spells from all classes */
@@ -135,16 +154,16 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
             >
               {t("magiseed_garden")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {magiseedSpells.map((magiseedSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* Growth Clock Section */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid  sx={{ mb: 2 }} size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
                       {t("magiseed_growth_clock")} - {t(magiseedSpell.className)}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
-                      <Grid item>
+                    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
+                      <Grid >
                         <Clock
                           numSections={4}
                           size={60}
@@ -156,10 +175,44 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           isCharacterSheet={!isEditMode && !setPlayer}
                           onReset={(isEditMode || setPlayer) ? () => handleClockChange(magiseedSpell, 0) : undefined}
                         />
+                        {(isEditMode || setPlayer) && (
+                          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+                            <Tooltip title={t("Decrement")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => decrementMagiseedClock(magiseedSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RemoveIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Reset")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => handleClockChange(magiseedSpell, 0)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <RestartAltIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Increment")} arrow>
+                              <IconButton
+                                color="primary"
+                                onClick={() => incrementMagiseedClock(magiseedSpell)}
+                                size="small"
+                                sx={{ p: 0.25 }}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        )}
                       </Grid>
-                      <Grid item xs>
-                        <Typography fontWeight="bold" sx={{ mb: 0.5 }}>
-                          {magiseedSpell.currentMagiseed 
+                      <Grid  size="grow">
+                        <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
+                          {magiseedSpell.currentMagiseed
                             ? (magiseedSpell.currentMagiseed.customName || t(magiseedSpell.currentMagiseed.name))
                             : t("magiseed_no_magiseed")}
                         </Typography>
@@ -184,7 +237,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
 
                   {/* Current Effect */}
                   {magiseedSpell.currentMagiseed && getCurrentEffect(magiseedSpell) && (
-                    <Grid item xs={12} sx={{ mb: 2 }}>
+                    <Grid  sx={{ mb: 2 }} size={12}>
                       <Box sx={{ 
                         p: 1.5, 
                         backgroundColor: ternary + "20", 
@@ -204,14 +257,15 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                   {/* Available Magiseeds */}
                   {magiseedSpell.magiseeds && magiseedSpell.magiseeds.map((seed, sIndex) => (
                     <Grid
-                      item
-                      container
-                      xs={12}
-                      md={6}
-                      key={`${msIndex}-${sIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch" }}
-                    >
-                      <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`${msIndex}-${sIndex}`}
+                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                      size={{
+                        xs: 12,
+                        md: 6
+                      }}>
+                      <Grid  sx={{ display: "flex" }} size={10}>
                         <Typography
                           id="spell-left-name"
                           variant="h2"
@@ -236,11 +290,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           )}
                         </Typography>
                       </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
+                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                         <div
                           id="spell-right-controls"
                           style={{
@@ -272,7 +322,9 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSeed && (() => {

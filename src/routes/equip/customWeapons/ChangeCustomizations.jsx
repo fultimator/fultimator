@@ -72,9 +72,9 @@ function ChangeCustomizations({
     totalCustomizationCost + selectedCustomizationCost > 3;
 
   return (
-    <Grid container item xs={12} spacing={1}>
+    <Grid container  spacing={1} size={12}>
       {/* Customization Selection */}
-      <Grid item xs={10}>
+      <Grid  size={10}>
         <FormControl fullWidth>
           <InputLabel>{t("weapons_customization_select")}</InputLabel>
           <Select
@@ -104,9 +104,8 @@ function ChangeCustomizations({
           </Select>
         </FormControl>
       </Grid>
-
       {/* Add Customization Button */}
-      <Grid item xs={2}>
+      <Grid  size={2}>
         <Button
           variant="contained"
           onClick={() => {
@@ -126,12 +125,11 @@ function ChangeCustomizations({
           {"+"}
         </Button>
       </Grid>
-
       {/* List of selected customizations */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Grid container spacing={1} direction="row">
           {currentCustomizations.map((customization) => (
-            <Grid item key={customization.name}>
+            <Grid  key={customization.name}>
               <Chip
                 label={
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

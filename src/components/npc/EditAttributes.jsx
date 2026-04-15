@@ -44,7 +44,7 @@ export function EditAttributes({ npc, setNpc }) {
     <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
       {attributeList.map((attribute, i) => (
         <React.Fragment key={i}>
-          <Grid item xs={2}>
+          <Grid  size={2}>
             <InputLabel
               id={attribute.key}
               sx={{ fontSize: "20px", fontWeight: 400 }}
@@ -52,7 +52,7 @@ export function EditAttributes({ npc, setNpc }) {
               {attribute.label}
             </InputLabel>
           </Grid>
-          <Grid item xs={10}>
+          <Grid  size={10}>
             <FormControl variant="standard" fullWidth>
               <Slider
                 marks={attribute.marks}

@@ -15,6 +15,7 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import Pretty from "../../../npc/Pretty";
 
 const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
+const StyledTableCell = styled(TableCell)({ padding: 0, color: "#fff" });
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

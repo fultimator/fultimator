@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
   Divider,
@@ -21,13 +21,11 @@ import {
   Checkbox,
   Select,
   MenuItem,
-  TextField,
   FormControl,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Fade,
 } from "@mui/material";
 import { Tabs } from "@mui/base/Tabs";
 import { TabsList as BaseTabsList } from "@mui/base/TabsList";
@@ -53,7 +51,7 @@ import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses
 import PlayerControls from "../../components/player/playerSheet/PlayerControls";
 import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
-import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
+import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
@@ -99,7 +97,6 @@ import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
 import PlayerDance from "../../components/player/playerSheet/PlayerDance";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 import { fixVerticalLabels } from "../../utility/screenshotFix";
-import { isItemEquipped } from '../../components/player/equipment/slots/equipmentSlots';
 import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
 import classList from "../../libs/classes";
 import PlayerLoadout from '../../components/player/playerSheet/PlayerLoadout';
@@ -158,7 +155,7 @@ export default function PlayerEdit() {
   const isUsingLocalDb = resolvedMode === "local";
   const db = isUsingLocalDb ? localDb : cloudDb;
   const ref = isUsingLocalDb ? localRef : cloudRef;
-  const activeSetDoc = (r, data) => db.setDoc(r, data);
+  const activeSetDoc = useCallback((r, data) => db.setDoc(r, data), [db]);
   const player = isUsingLocalDb ? localPlayer : cloudPlayer;
   const playerLoading = isUsingLocalDb ? localLoading : cloudLoading;
   const playerError = isUsingLocalDb ? localError : cloudError;
@@ -198,7 +195,7 @@ export default function PlayerEdit() {
         activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
       }
     },
-    [ref, playerTemp, compactView, isOwner]
+    [ref, playerTemp, compactView, isOwner, activeSetDoc]
   );
 
   useEffect(() => {
@@ -267,13 +264,12 @@ export default function PlayerEdit() {
   const updateMaxStats = () => {
     if (playerTemp) {
       setPlayerTemp((prevPlayer) => {
-        const dex = prevPlayer.attributes.dexterity;
-        const ins = prevPlayer.attributes.insight;
-        const mig = prevPlayer.attributes.might;
-        const wil = prevPlayer.attributes.will;
+        const mig = Number(prevPlayer.attributes?.might) || 0;
+        const wil = Number(prevPlayer.attributes?.will) || 0;
+        const lvl = Number(prevPlayer.lvl) || 0;
 
-        const baseMaxHP = mig * 5 + prevPlayer.lvl;
-        const baseMaxMP = wil * 5 + prevPlayer.lvl;
+        const baseMaxHP = mig * 5 + lvl;
+        const baseMaxMP = wil * 5 + lvl;
 
         let hpBonus = 0;
         let mpBonus = 0;
@@ -281,33 +277,33 @@ export default function PlayerEdit() {
 
         prevPlayer.classes.forEach((cls) => {
           if (cls.benefits) {
-            hpBonus += cls.benefits.hpplus || 0;
-            mpBonus += cls.benefits.mpplus || 0;
-            ipBonus += cls.benefits.ipplus || 0;
+            hpBonus += Number(cls.benefits.hpplus) || 0;
+            mpBonus += Number(cls.benefits.mpplus) || 0;
+            ipBonus += Number(cls.benefits.ipplus) || 0;
           }
         });
 
         if (prevPlayer.modifiers) {
-          hpBonus += prevPlayer.modifiers.hp || 0;
-          mpBonus += prevPlayer.modifiers.mp || 0;
-          ipBonus += prevPlayer.modifiers.ip || 0;
+          hpBonus += Number(prevPlayer.modifiers.hp) || 0;
+          mpBonus += Number(prevPlayer.modifiers.mp) || 0;
+          ipBonus += Number(prevPlayer.modifiers.ip) || 0;
         }
 
         // Guardian: Fortress Skill Bonus
         const fortressBonus = prevPlayer.classes
-          .map((cls) => cls.skills)
+          .map((cls) => cls.skills || [])
           .flat()
           .filter((skill) => skill.specialSkill === "Fortress")
-          .map((skill) => skill.currentLvl * 3)
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
           .reduce((a, b) => a + b, 0);
         hpBonus += fortressBonus;
 
         // Loremaster: Focused Skill Bonus
         const focusedBonus = prevPlayer.classes
-          .map((cls) => cls.skills)
+          .map((cls) => cls.skills || [])
           .flat()
           .filter((skill) => skill.specialSkill === "Focused")
-          .map((skill) => skill.currentLvl * 3)
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
           .reduce((a, b) => a + b, 0);
         mpBonus += focusedBonus;
 
@@ -321,17 +317,17 @@ export default function PlayerEdit() {
             hp: {
               ...prevPlayer.stats.hp,
               max: maxHP,
-              current: Math.min(prevPlayer.stats.hp.current, maxHP),
+              current: Math.min(Number(prevPlayer.stats.hp.current) || 0, maxHP),
             },
             mp: {
               ...prevPlayer.stats.mp,
               max: maxMP,
-              current: Math.min(prevPlayer.stats.mp.current, maxMP),
+              current: Math.min(Number(prevPlayer.stats.mp.current) || 0, maxMP),
             },
             ip: {
               ...prevPlayer.stats.ip,
               max: maxIP,
-              current: Math.min(prevPlayer.stats.ip.current, maxIP),
+              current: Math.min(Number(prevPlayer.stats.ip.current) || 0, maxIP),
             },
           },
         };
@@ -339,39 +335,39 @@ export default function PlayerEdit() {
     }
   };
 
-  const checkEquipment = () => {
-    if (playerTemp) {
-      const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
-        playerClass.skills.some(
-          (skill) =>
-            skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-        )
-      );
+  // const checkEquipment = () => {
+  //   if (playerTemp) {
+  //     const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
+  //       playerClass.skills.some(
+  //         (skill) =>
+  //           skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
+  //       )
+  //     );
       
-      const inv = playerTemp.equipment?.[0];
-      const equippedShields =
-        inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
+  //     const inv = playerTemp.equipment?.[0];
+  //     const equippedShields =
+  //       inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
 
-      if (!hasDualShieldBearer && equippedShields.length > 1) {
-        // Unequip all shields but the first one
-        setPlayerTemp((prevPlayer) => {
-          const inv = prevPlayer.equipment?.[0];
-          if (!inv) return prevPlayer;
-          const newShields = inv.shields.map((shield, index) => ({
-            ...shield,
-            isEquipped:
-              index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
-          }));
+  //     if (!hasDualShieldBearer && equippedShields.length > 1) {
+  //       // Unequip all shields but the first one
+  //       setPlayerTemp((prevPlayer) => {
+  //         const inv = prevPlayer.equipment?.[0];
+  //         if (!inv) return prevPlayer;
+  //         const newShields = inv.shields.map((shield, index) => ({
+  //           ...shield,
+  //           isEquipped:
+  //             index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
+  //         }));
 
-          const updatedInv = { ...inv, shields: newShields };
-          return {
-            ...prevPlayer,
-            equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
-          };
-        });
-      }
-    }
-  };
+  //         const updatedInv = { ...inv, shields: newShields };
+  //         return {
+  //           ...prevPlayer,
+  //           equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
+  //         };
+  //       });
+  //     }
+  //   }
+  // };
 
   const handleBugDialogClose = () => {
     setIsBugDialogOpen(false);
@@ -577,7 +573,7 @@ export default function PlayerEdit() {
         {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
-            <Grid item xs={isSmallScreen ? 10 : 6}>
+            <Grid  size={isSmallScreen ? 10 : 6}>
               <Button
                 variant="contained"
                 color="primary"
@@ -588,7 +584,7 @@ export default function PlayerEdit() {
                 {t("Download Character Sheet")}
               </Button>
             </Grid>
-            <Grid item xs={isSmallScreen ? 2 : 6}>
+            <Grid  size={isSmallScreen ? 2 : 6}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -623,10 +619,11 @@ export default function PlayerEdit() {
           {compactView ? (
             <Grid
               container
-              sx={{ padding: 1 }}
-              justifyContent={"center"}
-            >
-              <Grid container item xs={12}>
+              sx={{
+                justifyContent: "center",
+                padding: 1
+              }}>
+              <Grid container  size={12}>
                 <PlayerCardSheet
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
@@ -652,7 +649,7 @@ export default function PlayerEdit() {
                 updateMaxStats={updateMaxStats}
               />
               <Divider sx={{ my: 1 }} />
-              <PlayerNumbers player={playerTemp} isEditMode={isEditMode} />
+              <PlayerNumbers player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} isOwner={isOwner} />
               <Divider sx={{ my: 1 }} />
               <GenericRolls player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
@@ -914,7 +911,7 @@ export default function PlayerEdit() {
             }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Settings")}
@@ -922,7 +919,7 @@ export default function PlayerEdit() {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <Box sx={{ px: 2, pb: 2 }}>
                   <SettingRow
                     label={t("Default View")}
@@ -979,7 +976,6 @@ export default function PlayerEdit() {
         </Button>
         <Box sx={{ height: "15vh" }} />
       </Tabs>
-
       {/* Floating Action Buttons */}
       {isSmallScreen && (
         <Box
@@ -992,7 +988,7 @@ export default function PlayerEdit() {
           }}
         >
           <Fab onClick={toggleDrawer(true)} color="primary" size="medium">
-            <Stack direction="column" alignItems="center" spacing={0.5}>
+            <Stack direction="column" sx={{ alignItems: "center" }} spacing={0.5}>
               <MenuBookIcon fontSize="medium" />
               <Typography variant="caption" sx={{ fontSize: "10px" }}>
                 {t("Menu")}
@@ -1001,7 +997,6 @@ export default function PlayerEdit() {
           </Fab>
         </Box>
       )}
-
       <Box
         sx={{
           position: "fixed",
@@ -1062,7 +1057,6 @@ export default function PlayerEdit() {
           </Tooltip>
         )}
       </Box>
-
       <Dialog
         open={isSpecialSkillsModalOpen}
         onClose={() => setIsSpecialSkillsModalOpen(false)}
@@ -1097,7 +1091,9 @@ export default function PlayerEdit() {
                 );
               })
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("No special skills found in class definitions.")}
               </Typography>
             )}
@@ -1107,7 +1103,6 @@ export default function PlayerEdit() {
           <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <Dialog
         open={isOptionalRulesModalOpen}
         onClose={() => setIsOptionalRulesModalOpen(false)}
@@ -1162,7 +1157,6 @@ export default function PlayerEdit() {
           <Button onClick={() => setIsOptionalRulesModalOpen(false)}>{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}
@@ -1209,14 +1203,14 @@ const Tab = styled(BaseTab)(({ theme }) => ({
   },
 }));
 
-const TabPanel = styled(BaseTabPanel)(({ theme }) => ({
+const TabPanel = styled(BaseTabPanel)(() => ({
   width: "100%",
   fontFamily: "IBM Plex Sans, sans-serif",
   fontSize: "0.875rem",
 }));
 
 const TabsList = styled(BaseTabsList)(
-  ({ primary, secondary, ternary }) => `
+  ({ primary, _secondary, _ternary }) => `
     min-width: 400px;
     background-color: ${primary};
     border-radius: 12px;

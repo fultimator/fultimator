@@ -9,7 +9,7 @@ import {
   Slide,
   Tooltip,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { ArrowBack, Search } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
@@ -73,17 +73,15 @@ const AppBar: React.FC<AppBarProps> = ({
           })}
         >
           <Container>
-            <Grid container alignItems="center" justifyContent="space-between">
+            <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }}>
               <Grid
-                item
-                xs={2}
-                textAlign="left"
+                size={2}
                 sx={{
+                  textAlign: "left",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
-                }}
-              >
+                }}>
                 {showGoBackButton && (
                   <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
@@ -93,17 +91,15 @@ const AppBar: React.FC<AppBarProps> = ({
 
               {!isNpcEdit && (
                 <Grid
-                  item
-                  xs={8}
-                  textAlign="center"
+                  size={8}
                   sx={{
+                    textAlign: "center",
                     height: "60px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "4px 0 0",
-                  }}
-                >
+                  }}>
                   <RouterLink
                     to="/"
                     style={{
@@ -112,7 +108,7 @@ const AppBar: React.FC<AppBarProps> = ({
                       textAlign: "center",
                     }}
                   >
-                    <Typography textAlign="center">
+                    <Typography sx={{ textAlign: "center" }}>
                       <img
                         style={{ height: "100%", maxHeight: "60px" }}
                         src={isSmallViewport ? logo929 : undefined}
@@ -129,7 +125,7 @@ const AppBar: React.FC<AppBarProps> = ({
                 </Grid>
               )}
 
-              <Grid item xs={2} sx={{ textAlign: "right" }}>
+              <Grid  sx={{ textAlign: "right" }} size={2}>
                 <Grid
                   container
                   sx={{
@@ -158,6 +154,9 @@ const AppBar: React.FC<AppBarProps> = ({
       <CompendiumViewerModal
         open={modalOpen}
         onClose={closeCompendiumModal}
+        onAddItem={() => {}}
+        context="appbar"
+        restrictToTypes={[]}
         viewOnly
       />
     </>

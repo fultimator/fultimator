@@ -23,7 +23,7 @@ import {
   // MenuItem,
   Fab,
 } from "@mui/material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router";
 import SettingsIcon from "@mui/icons-material/Settings";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
@@ -38,7 +38,7 @@ import EncounterCard from "../../components/combatSim/EncounterCard";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { SignIn } from "../../components/auth";
 import DriveSync from "../../components/DriveSync";
-import { useDatabaseContext } from "../../context/DatabaseContext";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
 const MAX_ENCOUNTERS = 3;
@@ -300,11 +300,17 @@ const CombatSimEncounters = () => {
         />
 
         <div style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <Typography variant="h6" gutterBottom color="text.primary">
+          <Typography variant="h6" gutterBottom sx={{
+            color: "text.primary"
+          }}>
             {t("combat_sim_new_encounter")}
           </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 8
+              }}>
               <TextField
                 label={t("combat_sim_encounter_name")}
                 variant="outlined"
@@ -312,11 +318,17 @@ const CombatSimEncounters = () => {
                 value={encounterName}
                 onKeyDown={handleKeyDown}
                 onChange={handleEncounterNameChange}
-                inputProps={{ maxLength: 200 }}
                 disabled={dbMode === "cloud" && !cloudUser}
+                slotProps={{
+                  htmlInput: { maxLength: 200 }
+                }}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 4
+              }}>
               <Button
                 variant="contained"
                 color="primary"
@@ -331,12 +343,11 @@ const CombatSimEncounters = () => {
           </Grid>
           <Box
             sx={{
+              mt: 2,
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
-            }}
-            mt={2}
-          >
+              alignItems: "center"
+            }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ToggleButtonGroup
                 value={dbMode}
@@ -354,7 +365,9 @@ const CombatSimEncounters = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
               {dbMode === "local" && <DriveSync />}
-              <Typography variant="h5" color="text.primary">
+              <Typography variant="h5" sx={{
+                color: "text.primary"
+              }}>
                 {t("combat_sim_saved_encounters")}{" "}
                 {dbMode === "cloud"
                   ? `(${encounters.length}/${MAX_ENCOUNTERS})`
@@ -386,7 +399,9 @@ const CombatSimEncounters = () => {
           {/* Select mode action bar */}
           <Collapse in={selectMode}>
             <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -404,31 +419,31 @@ const CombatSimEncounters = () => {
           </Collapse>
         </div>
       </Paper>
-
       {dbMode === "cloud" && !cloudUser && (
         <Paper
           elevation={3}
           sx={{ p: 2, mt: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
         >
           <CloudIcon color="primary" />
-          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200
+            }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
         </Paper>
       )}
-
       <Grid container spacing={3} sx={{ marginTop: 2 }}>
         {loading ? (
-          <Grid
-            item
-            xs={12}
-            sx={{ display: "flex", justifyContent: "center", py: 4 }}
-          >
+          <Grid sx={{ display: "flex", justifyContent: "center", py: 4 }} size={12}>
             <CircularProgress color="primary" />
           </Grid>
         ) : encounters.length === 0 ? (
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Paper
               sx={{
                 p: 3,
@@ -438,17 +453,27 @@ const CombatSimEncounters = () => {
                 border: `1px dashed ${theme.palette.divider}`,
               }}
             >
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{
+                color: "text.secondary"
+              }}>
                 {t("combat_sim_no_encounters")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("combat_sim_create_first_encounter")}
               </Typography>
             </Paper>
           </Grid>
         ) : (
           encounters.map((encounter) => (
-            <Grid item xs={12} sm={6} md={4} key={encounter.id}>
+            <Grid
+              key={encounter.id}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 4
+              }}>
               <EncounterCard
                 encounter={encounter}
                 onDelete={handleDeleteEncounter}
@@ -461,7 +486,6 @@ const CombatSimEncounters = () => {
           ))
         )}
       </Grid>
-
       {/* Settings Dialog */}
       <SettingsDialog
         open={settingsOpen}
@@ -472,7 +496,6 @@ const CombatSimEncounters = () => {
         storeSettings={settingsStore.settings}
         resetToDefaults={settingsStore.resetToDefaults}
       />
-
       {/* Notifications */}
       <Snackbar
         open={notification.open}

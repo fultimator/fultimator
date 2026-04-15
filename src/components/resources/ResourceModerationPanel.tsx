@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -70,7 +70,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   // Check if user is moderator
   const isModerator = user && moderators.includes(user.uid);
 
-  const fetchPendingSubmissions = async () => {
+  const fetchPendingSubmissions = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -90,13 +90,13 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     if (open && isModerator) {
       fetchPendingSubmissions();
     }
-  }, [open, isModerator]);
+  }, [open, isModerator, fetchPendingSubmissions]);
 
   const approveSubmission = async (submission: PendingSubmission) => {
     if (!isModerator) return;
@@ -275,8 +275,10 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      PaperProps={{
-        sx: { minHeight: '70vh' }
+      slotProps={{
+        paper: {
+          sx: { minHeight: '70vh' }
+        }
       }}
     >
       <DialogTitle>
@@ -285,10 +287,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
           {t("resources_review_pending")}
         </Typography>
       </DialogTitle>
-
       <DialogContent>
         {loading ? (
-          <Box display="flex" justifyContent="center" p={4}>
+          <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
             <CircularProgress />
           </Box>
         ) : pendingSubmissions.length === 0 ? (
@@ -304,11 +305,11 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
             {pendingSubmissions.map((submission) => (
               <Card key={submission.id} sx={{ mb: 2, border: '1px solid #ddd' }}>
                 <CardContent>
-                  <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                     <Typography variant="h6" component="div">
                       {submission.title}
                     </Typography>
-                    <Box display="flex" gap={1}>
+                    <Box sx={{ display: "flex", gap: 1 }}>
                       <Chip
                         label={submission.type}
                         size="small"
@@ -324,15 +325,17 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                     </Box>
                   </Box>
 
-                  <Typography color="text.secondary" gutterBottom>
+                  <Typography gutterBottom sx={{
+                    color: "text.secondary"
+                  }}>
                     <strong>{t("resources_author")}:</strong> {submission.author}
                   </Typography>
 
-                  <Typography variant="body2" paragraph>
+                  <Typography variant="body2">
                     {submission.descr_short}
                   </Typography>
 
-                  <Box mb={2}>
+                  <Box sx={{ mb: 2 }}>
                     <Link
                       href={submission.url}
                       target="_blank"
@@ -345,7 +348,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                   </Box>
 
                   {submission.additional_notes && (
-                    <Box mb={2}>
+                    <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" component="div" sx={{
                         whiteSpace: 'pre-line',
                         backgroundColor: 'rgba(0,0,0,0.05)',
@@ -361,7 +364,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
 
                   <Divider sx={{ my: 2 }} />
 
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{
+                    color: "text.secondary"
+                  }}>
                     <strong>Submitted:</strong> {new Date(submission.created_at).toLocaleString()} <br />
                     <strong>Pricing:</strong> {submission.pricing_type || "Not specified"} <br />
                     <strong>AI Content:</strong> {submission.uses_ai_content ? "Yes" : "No"} <br />
@@ -369,7 +374,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                     <strong>Status:</strong> Pending Approval
                   </Typography>
 
-                  <Box display="flex" gap={2} justifyContent="flex-end" mt={2}>
+                  <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}>
                     <Button
                       variant="outlined"
                       color="error"
@@ -395,7 +400,6 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
           </Box>
         )}
       </DialogContent>
-
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
       </DialogActions>

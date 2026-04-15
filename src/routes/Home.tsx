@@ -14,7 +14,7 @@ import {
   Alert,
   AlertTitle,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
 import { useTranslate } from "../translation/translate";
@@ -37,7 +37,6 @@ import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
 import EmailIcon from "@mui/icons-material/Email";
 import powered_by_fu from "./powered_by_fu.png";
 import LanguageIcon from "@mui/icons-material/Language";
-import { IS_ELECTRON } from "../platform";
 
 function Home() {
   const theme = useCustomTheme();
@@ -145,7 +144,11 @@ function Home() {
         }}
       >
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -200,7 +203,11 @@ function Home() {
               </Button>
             </Paper>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -258,7 +265,11 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -328,7 +339,11 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Paper
               elevation={3}
               sx={{
@@ -362,7 +377,7 @@ function Home() {
               <Typography variant="body1" sx={{ mb: 2 }}>
                 {t("feedback_description")}
               </Typography>
-              <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
                 <Button
                   variant="outlined"
                   href="mailto:fultimator@gmail.com"
@@ -399,7 +414,7 @@ function Home() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Paper
               elevation={3}
               sx={{
@@ -453,7 +468,7 @@ function Home() {
               </Box>
             </Paper>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Divider sx={{ marginBottom: 3 }} />
             <Box
               sx={{

@@ -24,14 +24,14 @@ export default function EditExtra({ npc, setNpc }) {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Stack spacing={1}>
             <Defenses npc={npc} setNpc={setNpc} />
             <SelectArmor npc={npc} setNpc={setNpc} />
             <SelectShield npc={npc} setNpc={setNpc} />
           </Stack>
         </Grid>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Stack spacing={1}>
             <Init npc={npc} setNpc={setNpc} />
             <Precision npc={npc} setNpc={setNpc} />
@@ -43,10 +43,10 @@ export default function EditExtra({ npc, setNpc }) {
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Immunities npc={npc} setNpc={setNpc} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid  size={6}>
           <Overrides npc={npc} setNpc={setNpc} />
         </Grid>
       </Grid>
@@ -132,14 +132,14 @@ const Immunities = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
 
   // List of all immunities from NpcImmunities
-  const allImmunities = {
+  const allImmunities = useMemo(() => ({
     slow: false,
     dazed: false,
     weak: false,
     shaken: false,
     enraged: false,
     poisoned: false,
-  };
+  }), []);
 
   const freeImmunities = useMemo(() => {
     const free = { ...allImmunities };
@@ -152,7 +152,7 @@ const Immunities = React.memo(({ npc, setNpc }) => {
       free.enraged = true;
     }
     return free;
-  }, [npc.species]);
+  }, [npc.species, allImmunities]);
 
   const immunities = { ...allImmunities, ...(npc.immunities || {}) };
 
@@ -310,10 +310,12 @@ const HP = React.memo(({ npc, setNpc }) => {
       <TextField
         id="HP"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
         label={t("Extra HP:")}
         value={npc.extra?.hp || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+        }}
       ></TextField>
     </FormControl>
   );
@@ -333,10 +335,12 @@ const MP = React.memo(({ npc, setNpc }) => {
       <TextField
         id="mp"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*", step: 10 }}
         label={t("Extra MP:")}
         value={npc.extra?.mp || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+        }}
       ></TextField>
     </FormControl>
   );
@@ -376,10 +380,12 @@ const ExtraInit = React.memo(({ npc, setNpc }) => {
       <TextField
         id="extrainit"
         type="number"
-        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
         label={t("Extra Init:")}
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
+        slotProps={{
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+        }}
       ></TextField>
     </FormControl>
   );

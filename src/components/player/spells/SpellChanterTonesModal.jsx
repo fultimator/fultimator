@@ -2,9 +2,6 @@ import UnifiedSpellModal from "./modals/UnifiedSpellModal";
 import GeneralSection from "./sections/GeneralSection";
 import MagichantKeysContentSection from "./sections/MagichantKeysContentSection";
 import MagichantTonesContentSection from "./sections/MagichantTonesContentSection";
-import { availableMagichantTones } from "./spellOptionData";
-
-export const availableTones = availableMagichantTones;
 
 export default function SpellChanterTonesModal({
   open,

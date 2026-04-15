@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Paper,
   Typography,
@@ -25,10 +25,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { useTheme } from "@mui/material/styles";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../../components/common/DeleteConfirmationDialog";
 
 const StyledTableCellHeader = styled(TableCell)({
@@ -72,16 +72,18 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [draftBond, setDraftBond] = useState(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
-  const bonds = player.info?.bonds ?? [];
+  const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   useEffect(() => {
     if (editBondIndex !== null && bonds[editBondIndex]) {
       setDraftBond({ ...bonds[editBondIndex] });
     }
-  }, [editBondIndex]);
+  }, [editBondIndex, bonds]);
 
   const closeModal = () => {
     setEditBondIndex(null);
@@ -159,14 +161,16 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
               <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                 {isEditMode && (
                   <Tooltip title={t("Add Bond")}>
-                    <IconButton
-                      size="small"
-                      onClick={addNewBond}
-                      disabled={bonds.length >= 6}
-                      sx={{ color: "#fff", p: 0.5 }}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={addNewBond}
+                        disabled={bonds.length >= 6}
+                        sx={{ color: "#fff", p: 0.5 }}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 )}
               </StyledTableCellHeader>
@@ -186,9 +190,13 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   <StyledTableCell sx={{ minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
-                      sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word", fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                      }}>
                       {highlightMatch(bond.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -215,7 +223,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                   <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 0.5 }}>
                       {strength > 0 && (
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                           ★{strength}
                         </Typography>
                       )}
@@ -232,7 +240,6 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </TableBody>
         </Table>
       </TableContainer>
-
       {editBondIndex !== null && draftBond && (
         <Dialog open onClose={closeModal} fullWidth maxWidth="sm">
           <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
@@ -247,13 +254,15 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </DialogTitle>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <TextField
                   fullWidth
                   label={t("Bond Name")}
                   value={draftBond.name}
                   onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
-                  inputProps={{ maxLength: 50 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50 }
+                  }}
                 />
               </Grid>
               {[
@@ -264,7 +273,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
                 { key: "mistrust", label: t("Mistrust"), color: negativeColor },
                 { key: "hatred", label: t("Hatred"), color: negativeColor },
               ].map(({ key, label, color }) => (
-                <Grid item xs={4} key={key}>
+                <Grid  key={key} size={4}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -282,7 +291,7 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
             <Button
               variant="contained"
               color="error"
-              onClick={() => setDeleteDialogOpen(true)}
+              onClick={handleDelete}
             >
               {t("Delete")}
             </Button>
@@ -293,10 +302,9 @@ export default function PlayerBonds({ player, setPlayer, isEditMode, searchQuery
           </DialogActions>
         </Dialog>
       )}
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => deleteBond(editBondIndex)}
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to remove this bond?")}

@@ -2440,6 +2440,13 @@ export const spellList = [
   },
 ];
 
+// Memoized spell index by class O(1) lookup
+export const spellsByClass = spellList.reduce((acc, spell) => {
+  if (!acc[spell.class]) acc[spell.class] = [];
+  acc[spell.class].push(spell);
+  return acc;
+}, {});
+
 export const arcanumList = [
   {
     name: "Arcanum of the Forge",

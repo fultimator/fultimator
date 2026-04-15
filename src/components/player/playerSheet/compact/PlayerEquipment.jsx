@@ -17,23 +17,23 @@ import types from "../../../../libs/types";
 import attributes from "../../../../libs/attributes";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
-import { Casino, RadioButtonUnchecked, RadioButtonChecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
+import { Casino, RadioButtonChecked, SwapHoriz, Edit, Add, Search as SearchIcon } from "@mui/icons-material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute, calculateCustomWeaponStats } from "../../common/playerCalculations";
-import { isItemEquipped, validateSlots, deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
+import {   deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({ padding: "4px 8px", color: "#fff" });
 const StyledTableCell = styled(TableCell)({ padding: "4px 8px" });
 
 const StyledMarkdown = ({ children, ...props }) => (
-  <div style={{ whiteSpace: "pre-line", display: "inline" }}>
+  <div sx={{ whiteSpace: "pre-line", display: "inline" }}>
     <ReactMarkdown
       {...props}
       rehypePlugins={[rehypeRaw]}
       components={{
-        p: (p) => <p style={{ margin: 0, display: "inline" }} {...p} />,
+        p: (p) => <p sx={{ margin: 0, display: "inline" }} {...p} />,
         ul: (p) => <ul style={{ margin: 0 }} {...p} />,
         li: (p) => <li style={{ margin: 0 }} {...p} />,
         strong: (p) => <strong style={{ fontWeight: "bold" }} {...p} />,
@@ -78,7 +78,7 @@ export default function PlayerEquipment({
   searchQuery = '',
   onAddWeapon,
   onEditWeapon,
-  onAddCustomWeapon,
+  _onAddCustomWeapon,
   onEditCustomWeapon,
   onAddArmor,
   onEditArmor,
@@ -115,7 +115,7 @@ export default function PlayerEquipment({
     )
   );
 
-  const twinShields = {
+  const twinShields = useMemo(() => ({
     base: {
       category: "Brawling",
       name: "Twin Shields",
@@ -155,7 +155,7 @@ export default function PlayerEquipment({
     defModifier: 0,
     mDefModifier: 0,
     isEquipped: true,
-  };
+  }), [defensiveMasteryBonus, t]);
 
   const inv = player.equipment?.[0];
 
@@ -207,7 +207,7 @@ export default function PlayerEquipment({
     (inv.accessories || []).forEach((acc, i) => items.push({ ...acc, equipType: 'accessory', originalIndex: i }));
 
     return items;
-  }, [inv, player.classes]);
+  }, [inv]);
 
   const equippedShields = useMemo(() => allEquipment.filter(it => it.equipType === 'shield' && it.isEquipped), [allEquipment]);
 
@@ -229,7 +229,7 @@ export default function PlayerEquipment({
       });
     }
     return items;
-  }, [allEquipment, isMainTab, searchQuery, hasDualShieldBearer, equippedShields, t]);
+  }, [allEquipment, isMainTab, searchQuery, hasDualShieldBearer, equippedShields, twinShields, t]);
 
   const groupedItems = useMemo(() => {
     const groups = [
@@ -450,11 +450,11 @@ export default function PlayerEquipment({
 
     const content = (
       <Grid container spacing={2} sx={{ textAlign: "center" }}>
-        <Grid item xs={6}><Typography variant="h3">{t("Accuracy")}</Typography><Typography variant="h1">{acc}</Typography></Grid>
-        <Grid item xs={6}><Typography variant="h3">{t("Damage")}</Typography><Typography variant="h1">{dmg}</Typography><Typography variant="h6">{t(weapon.type)}</Typography></Grid>
-        <Grid item xs={12} sx={{ mt: 2 }}>
+        <Grid  size={6}><Typography variant="h3">{t("Accuracy")}</Typography><Typography variant="h1">{acc}</Typography></Grid>
+        <Grid  size={6}><Typography variant="h3">{t("Damage")}</Typography><Typography variant="h1">{dmg}</Typography><Typography variant="h6">{t(weapon.type)}</Typography></Grid>
+        <Grid  sx={{ mt: 2 }} size={12}>
           <Typography>{`${d1} [${attributes[weapon.att1].shortcaps}] + ${d2} [${attributes[weapon.att2].shortcaps}] ${weapon.prec !== 0 ? (weapon.prec > 0 ? "+" : "") + weapon.prec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : (precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : "")}`}</Typography>
-          <Typography fontWeight="bold">{t("Damage")}: {`max(${d1}, ${d2}) + ${weapon.damage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : (damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : "")}`}</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{t("Damage")}: {`max(${d1}, ${d2}) + ${weapon.damage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : (damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : "")}`}</Typography>
         </Grid>
       </Grid>
     );
@@ -503,10 +503,10 @@ export default function PlayerEquipment({
                   <Typography variant="h4" sx={{ textTransform: "uppercase", color: "#fff", textAlign: "center" }}>{group.label}</Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader sx={{ width: { xs: 70, sm: 120 }, textAlign: "center" }}>
-                  <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{group.col1}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{group.col1}</Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader sx={{ width: { xs: 70, sm: 120 }, textAlign: "center" }}>
-                  <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{group.col2}</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{group.col2}</Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}>
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 0.5 }}>
@@ -516,7 +516,7 @@ export default function PlayerEquipment({
                         <Tooltip title={t("Search Compendium")}><IconButton size="small" onClick={() => setCompendiumType(group.compendium)} sx={{ color: '#fff', p: 0 }}><SearchIcon fontSize="small" /></IconButton></Tooltip>
                       </>
                     )}
-                    {!isEditMode && <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>}
+                    {!isEditMode && <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>}
                   </Box>
                 </StyledTableCellHeader>
               </TableRow>
@@ -544,17 +544,15 @@ export default function PlayerEquipment({
           </Table>
         </TableContainer>
       ))}
-
       {!isMainTab && (precMeleeModifier !== 0 || precRangedModifier !== 0 || damageMeleeModifier !== 0 || damageRangedModifier !== 0) && (
         <Box sx={{ p: 1 }}>
-          <Typography variant="h5" fontWeight="bold">{t("Modifiers")}</Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>{t("Modifiers")}</Typography>
           {precMeleeModifier !== 0 && <Typography variant="h6">{t("Melee Accuracy Bonus")}: {precMeleeModifier}</Typography>}
           {precRangedModifier !== 0 && <Typography variant="h6">{t("Ranged Accuracy Bonus")}: {precRangedModifier}</Typography>}
           {damageMeleeModifier !== 0 && <Typography variant="h6">{t("Melee Damage Bonus")}: {damageMeleeModifier}</Typography>}
           {damageRangedModifier !== 0 && <Typography variant="h6">{t("Ranged Damage Bonus")}: {damageRangedModifier}</Typography>}
         </Box>
       )}
-
       <Menu open={Boolean(slotMenuAnchor)} onClose={() => setSlotMenuAnchor(null)} anchorReference="anchorPosition" anchorPosition={slotMenuAnchor ?? undefined}>
         <MenuItem onClick={() => handleWeaponSlotSelect('mainHand')}>{t("Main Hand")}</MenuItem>
         <MenuItem onClick={() => handleWeaponSlotSelect('offHand')}>{t("Off Hand")}</MenuItem>
@@ -564,7 +562,6 @@ export default function PlayerEquipment({
         <MenuItem onClick={() => handleShieldSlotSelect('offHand')}>{t("Off Hand")}</MenuItem>
       </Menu>
       <CompendiumViewerModal open={compendiumType !== null} onClose={() => setCompendiumType(null)} onAddItem={handleImportFromCompendium} initialType={compendiumType ?? "weapons"} restrictToTypes={compendiumType ? [compendiumType] : undefined} context="player" />
-      
       {martialWarning && (
         <Dialog open onClose={() => setMartialWarning(null)} maxWidth="xs" fullWidth>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}><WarningAmberIcon fontSize="small" />{t('Not Proficient')}</DialogTitle>
@@ -575,7 +572,9 @@ export default function PlayerEquipment({
           <DialogActions><Button onClick={() => setMartialWarning(null)}>{t('Cancel')}</Button><Button color="warning" variant="contained" onClick={() => { handleEquipment(martialWarning.item, martialWarning.event); setMartialWarning(null); }}>{t('Equip Anyway')}</Button></DialogActions>
         </Dialog>
       )}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} slotProps={{
+        paper: { sx: { width: { xs: "90%", md: "30%" } } }
+      }}>
         <DialogTitle variant="h3" sx={{ backgroundColor: dialogSeverity === "error" ? "#bb2124" : dialogSeverity === "success" ? "#22bb33" : "#aaaaaa" }}>{t("Result")}</DialogTitle>
         <DialogContent sx={{ mt: 2 }}>{dialogMessage}</DialogContent>
         <DialogActions><Button onClick={() => setDialogOpen(false)}>{t("Close")}</Button><Button onClick={() => handleDiceRoll(currentWeapon)}>{t("Re-roll")}</Button></DialogActions>
@@ -610,10 +609,10 @@ function EquipmentRow({ item, player, isEditMode, searchQuery, handleEquipment, 
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
-            <Typography variant="body2" fontWeight="bold" textAlign="center" sx={{ fontSize: { xs: '0.65rem', sm: '0.875rem' } }}><OpenBracket />{`${attributes[item.att1].shortcaps} + ${attributes[item.att2].shortcaps}`}<CloseBracket />{item.prec !== 0 ? (item.prec > 0 ? "+" : "") + item.prec : ""}</Typography>
+            <Typography sx={{ textAlign: "center" }}><OpenBracket />{`${attributes[item.att1].shortcaps} + ${attributes[item.att2].shortcaps}`}<CloseBracket />{item.prec !== 0 ? (item.prec > 0 ? "+" : "") + item.prec : ""}</Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
-            <Typography variant="body2" fontWeight="bold" textAlign="center" sx={{ fontSize: { xs: '0.65rem', sm: '0.875rem' } }}><OpenBracket />{t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}<CloseBracket />{types[item.type].long}</Typography>
+            <Typography sx={{ textAlign: "center" }}><OpenBracket />{t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}<CloseBracket />{types[item.type].long}</Typography>
           </StyledTableCell>
         </>
       );
@@ -622,13 +621,13 @@ function EquipmentRow({ item, player, isEditMode, searchQuery, handleEquipment, 
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
-            <Typography variant="body2" fontWeight="bold" textAlign="center" sx={{ fontSize: { xs: '0.65rem', sm: '0.875rem' } }}>
+            <Typography sx={{ textAlign: "center" }}>
               {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("DEF")}:</Box> */}
               {item.equipType === 'shield' ? `+${item.def + (item.defModifier || 0)}` : (item.martial ? item.def + (item.defModifier || 0) : (item.def + (item.defModifier || 0) === 0 ? t("DEX die") : `${t("DEX die")} + ${item.def + (item.defModifier || 0)}`))}
             </Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
-            <Typography variant="body2" fontWeight="bold" textAlign="center" sx={{ fontSize: { xs: '0.65rem', sm: '0.875rem' } }}>
+            <Typography sx={{ textAlign: "center" }}>
               {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("M.DEF")}:</Box> */}
               {item.equipType === 'shield' ? `+${item.mdef + (item.mDefModifier || 0)}` : (item.mdef + (item.mDefModifier || 0) === 0 ? t("INS die") : `${t("INS die")} + ${item.mdef + (item.mDefModifier || 0)}`)}
             </Typography>
@@ -638,7 +637,7 @@ function EquipmentRow({ item, player, isEditMode, searchQuery, handleEquipment, 
     }
     return (
       <>
-        <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}><Typography variant="body2" fontWeight="bold" textAlign="center" sx={{ fontSize: { xs: '0.65rem', sm: '0.875rem' } }}>{`${item.cost}z`}</Typography></StyledTableCell>
+        <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}><Typography sx={{ textAlign: "center" }}>{`${item.cost}z`}</Typography></StyledTableCell>
         <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }} />
       </>
     );
@@ -654,7 +653,7 @@ function EquipmentRow({ item, player, isEditMode, searchQuery, handleEquipment, 
         </StyledTableCell>
         <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow(rowKey); }} sx={{ cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis" }}>
           <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-            <Typography variant="body2" fontWeight="bold" noWrap sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{highlightMatch(t(item.name), searchQuery)}</Typography>
+            <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: { xs: '0.75rem', sm: '0.875rem' } }} noWrap>{highlightMatch(t(item.name), searchQuery)}</Typography>
             {item.martial && <Martial />}
           </Box>
         </StyledTableCell>

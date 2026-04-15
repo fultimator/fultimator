@@ -54,7 +54,7 @@ function ThemedSpellChanter({
   };
 
   const components = {
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   return (
@@ -82,10 +82,8 @@ function ThemedSpellChanter({
       </Accordion>
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -131,15 +129,13 @@ function ThemedSpellChanter({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={3}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -151,14 +147,12 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography
               variant="h3"
               sx={{
@@ -169,14 +163,12 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={7}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={7}>
             <Typography
               variant="h3"
               sx={{
@@ -188,12 +180,10 @@ function ThemedSpellChanter({
           </Grid>
         </Grid>
       </div>
-
       {volumes.map((volume, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -203,46 +193,39 @@ function ThemedSpellChanter({
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs={3}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size={3}>
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                }}
-              >
+                  fontWeight: "bold",
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
+                }}>
                 {t(volume.name)}
               </Typography>
             </Grid>
             <Grid
-              item
-              xs={2}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={2}>
               <ReactMarkdown components={components}>
                 {volume.mp + ""}
               </ReactMarkdown>
             </Grid>
             <Grid
-              item
-              xs={7}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={7}>
               <ReactMarkdown components={components}>
                 {t(volume.target)}
               </ReactMarkdown>
@@ -267,15 +250,13 @@ function ThemedSpellChanter({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={3}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -287,15 +268,15 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
-            sm={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 2,
+              sm: 3
+            }}>
             <Typography
               variant="h3"
               sx={{
@@ -306,14 +287,12 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography
               variant="h3"
               sx={{
@@ -324,15 +303,15 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={3}
-            sm={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={{
+              xs: 3,
+              sm: 2
+            }}>
             <Typography
               variant="h3"
               sx={{
@@ -343,14 +322,12 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography
               variant="h3"
               sx={{
@@ -362,7 +339,6 @@ function ThemedSpellChanter({
           </Grid>
         </Grid>
       </div>
-
       {magichant.keys.length === 0 ? (
         <Typography
           sx={{
@@ -378,9 +354,8 @@ function ThemedSpellChanter({
       ) : (
         magichant.keys.map((chantKey, i) => (
           <Grid
-            container
-            justifyContent="flex-start"
-            sx={{
+            container sx={{
+              justifyContent: "flex-start",
               background: "transparent",
               padding: "3px 17px",
               marginBottom: "6px",
@@ -390,36 +365,33 @@ function ThemedSpellChanter({
           >
             <Grid container style={{ flexGrow: 1 }}>
               <Grid
-                item
-                xs={3}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left",
                 }}
-              >
+                size={3}>
                 <Typography
-                  fontWeight="bold"
                   style={{ flexGrow: 1, marginRight: "5px" }}
                   sx={{
-                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                  }}
-                >
+                    fontWeight: "bold",
+                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" }
+                  }}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.customName
                     : t(chantKey.name)}
                 </Typography>
               </Grid>
               <Grid
-                item
-                xs={2}
-                sm={3}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-              >
+                size={{
+                  xs: 2,
+                  sm: 3
+                }}>
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.type
@@ -427,14 +399,12 @@ function ThemedSpellChanter({
                 </ReactMarkdown>
               </Grid>
               <Grid
-                item
-                xs={2}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-              >
+                size={2}>
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.status
@@ -442,15 +412,15 @@ function ThemedSpellChanter({
                 </ReactMarkdown>
               </Grid>
               <Grid
-                item
-                xs={3}
-                sm={2}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-              >
+                size={{
+                  xs: 3,
+                  sm: 2
+                }}>
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.attribute
@@ -458,14 +428,12 @@ function ThemedSpellChanter({
                 </ReactMarkdown>
               </Grid>
               <Grid
-                item
-                xs={2}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
-              >
+                size={2}>
                 <ReactMarkdown components={components}>
                   {chantKey.name === "magichant_custom_name"
                     ? chantKey.recovery
@@ -476,7 +444,6 @@ function ThemedSpellChanter({
           </Grid>
         ))
       )}
-
       {/* TONES */}
       <div
         style={{
@@ -494,15 +461,13 @@ function ThemedSpellChanter({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={3}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={3}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -515,7 +480,6 @@ function ThemedSpellChanter({
           </Grid>
         </Grid>
       </div>
-
       {magichant.tones.length === 0 ? (
         <Typography
           sx={{
@@ -543,18 +507,18 @@ function ThemedSpellChanter({
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs
                   flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size="grow">
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {tone.name === "magichant_custom_name"
                       ? tone.customName
@@ -564,21 +528,18 @@ function ThemedSpellChanter({
               </Grid>
               {isEditMode && (
                 <Grid
-                  item
-                  xs
                   style={{
                     display: "flex",
                     alignItems: "center",
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                ></Grid>
+                  size="grow"></Grid>
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -587,14 +548,12 @@ function ThemedSpellChanter({
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs={12}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={12}>
                   <ReactMarkdown components={components}>
                     {tone.name === "magichant_custom_name"
                       ? tone.effect

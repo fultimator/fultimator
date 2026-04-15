@@ -17,7 +17,7 @@ import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 
-export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
+export default function PlayerSymbol({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -26,7 +26,7 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedSymbol, setSelectedSymbol] = useState(null);
-  const [selectedSymbolSpell, setSelectedSymbolSpell] = useState(null);
+  const [_selectedSymbolSpell, setSelectedSymbolSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (symbolSpell, sym) => {
@@ -86,21 +86,22 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
             >
               {t("symbol_symbols")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {symbolSpells.map((symbolSpell, ssIndex) => (
                 <React.Fragment key={ssIndex}>
                   {/* Individual Symbols */}
                   {symbolSpell.symbols &&
                     symbolSpell.symbols.map((sym, sIndex) => (
                       <Grid
-                        item
-                        container
-                        xs={12}
-                        md={6}
-                        key={`${ssIndex}-${sIndex}`}
-                        sx={{ display: "flex", alignItems: "stretch" }}
-                      >
-                        <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`${ssIndex}-${sIndex}`}
+                        sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                        size={{
+                          xs: 12,
+                          md: 6
+                        }}>
+                        <Grid  sx={{ display: "flex" }} size={10}>
                           <Typography
                             id="spell-left-name"
                             variant="h2"
@@ -122,11 +123,7 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
                               : t(sym.name)}
                           </Typography>
                         </Grid>
-                        <Grid
-                          item
-                          xs={2}
-                          sx={{ display: "flex", alignItems: "stretch" }}
-                        >
+                        <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                           <div
                             id="spell-right-controls"
                             style={{
@@ -158,7 +155,9 @@ export default function PlayerSymbol({ player, setPlayer, isEditMode }) {
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSymbol && (

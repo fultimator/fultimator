@@ -35,13 +35,13 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -55,10 +55,9 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
       <Stack>
         {showHeader && (
           <Grid
-            container
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
+            container sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
               p: 0.5,
               background: `${theme.primary}`,
               color: "#ffffff",
@@ -68,29 +67,29 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
               },
             }}
           >
-            <Grid item xs={3}>
-              <Typography variant="h4" textAlign="left">
+            <Grid  size={3}>
+              <Typography sx={{ textAlign: "left" }}>
                 {t(category)}
               </Typography>
             </Grid>
-            <Grid item xs={1}>
-              <Typography variant="h4" textAlign="center">
+            <Grid  size={1}>
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Cost")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
-              <Typography variant="h4" textAlign="center">
+            <Grid  size={2}>
+              <Typography sx={{ textAlign: "center" }}>
                 {t("Defense")}
               </Typography>
             </Grid>
-            <Grid item xs={2}>
-              <Typography variant="h4" textAlign="center">
+            <Grid  size={2}>
+              <Typography sx={{ textAlign: "center" }}>
                 {t("M. Defense")}
               </Typography>
             </Grid>
             {!armor.rework && (
-              <Grid item xs={2}>
-                <Typography variant="h4" textAlign="center">
+              <Grid  size={2}>
+                <Typography sx={{ textAlign: "center" }}>
                   {t("Initiative")}
                 </Typography>
               </Grid>
@@ -98,36 +97,29 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
           </Grid>
         )}
         <Grid container>
-          <Grid container direction="column" item xs>
+          <Grid container direction="column"  size="grow">
             {/* First Row */}
             <Grid
-              container
-              justifyContent="space-between"
-              item
-              sx={{
+              container sx={{
+                justifyContent: "space-between",
                 background,
                 borderBottom: `1px solid ${theme.secondary}`,
                 padding: "2px 5px",
                 "& .MuiTypography-root": {
                   fontSize: { xs: "0.7rem", sm: "1.0rem" },
                 },
-              }}
-            >
-              <Grid
-                item
-                xs={3}
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Typography fontWeight="bold" sx={{ marginRight: "4px" }}>
+              }}>
+              <Grid sx={{ display: "flex", alignItems: "center" }} size={3}>
+                <Typography sx={{ fontWeight: "bold", marginRight: "4px" }}>
                   {t(armor.name)}
                 </Typography>
                 {armor.martial && <Martial />}
               </Grid>
-              <Grid item xs={1}>
-                <Typography textAlign="center">{`${armor.cost}z`}</Typography>
+              <Grid  size={1}>
+                <Typography sx={{ textAlign: "center" }}>{`${armor.cost}z`}</Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Typography fontWeight="bold" textAlign="center">
+              <Grid  size={2}>
+                <Typography sx={{ textAlign: "center" }}>
                   {category === "Shield"
                     ? "+" + parseInt(def + (armor.defModifier || 0))
                     : ""}
@@ -141,8 +133,8 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
                     : ""}
                 </Typography>
               </Grid>
-              <Grid item xs={2}>
-                <Typography fontWeight="bold" textAlign="center">
+              <Grid  size={2}>
+                <Typography sx={{ textAlign: "center" }}>
                   {category === "Shield"
                     ? "+" + parseInt(mdef + (armor.mDefModifier || 0))
                     : ""}
@@ -154,8 +146,8 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
                 </Typography>
               </Grid>
               {!armor.rework && (
-                <Grid item xs={2}>
-                  <Typography fontWeight="bold" textAlign="center">
+                <Grid  size={2}>
+                  <Typography sx={{ textAlign: "center" }}>
                     {category === "Armor" || category === "Shield"
                       ? armor.init + (armor.initModifier || 0) === 0
                         ? "-"
@@ -179,10 +171,10 @@ export default function PrettyArmor({ armor, isCharacterSheet, showCard = true, 
               {!armor.quality}{" "}
               <StyledMarkdown
                 components={{
-                  strong: (props) => (
+                  strong: ({ _node, ...props }) => (
                     <strong style={{ fontWeight: "bold" }} {...props} />
                   ),
-                  em: (props) => (
+                  em: ({ _node, ...props }) => (
                     <em style={{ fontStyle: "italic" }} {...props} />
                   ),
                 }}

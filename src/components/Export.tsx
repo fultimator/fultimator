@@ -8,7 +8,7 @@ import { buildItemText } from "../libs/buildItemText";
 type Props = {
   name?: string;
   dataType: string;
-  data?: any;
+  data?: Record<string, unknown>;
   size?: "small" | "medium" | "large";
 };
 

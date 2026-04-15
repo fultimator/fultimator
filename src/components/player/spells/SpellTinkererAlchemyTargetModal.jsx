@@ -97,11 +97,13 @@ export default function SpellTinkererAlchemyTargetModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -122,8 +124,8 @@ export default function SpellTinkererAlchemyTargetModal({
       <DialogContent>
         <Grid container spacing={2}>
           {targets.map((target, index) => (
-            <Grid item xs={12} key={index} container spacing={2}>
-              <Grid item xs={2}>
+            <Grid  key={index} container spacing={2} size={12}>
+              <Grid  size={2}>
                 <FormControl fullWidth>
                   <InputLabel id={`range-from-label-${index}`}>{t("Range From")}</InputLabel>
                   <Select
@@ -143,7 +145,7 @@ export default function SpellTinkererAlchemyTargetModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={2}>
+              <Grid  size={2}>
                 <FormControl fullWidth>
                   <InputLabel id={`range-to-label-${index}`}>{t("Range To")}</InputLabel>
                   <Select
@@ -163,7 +165,7 @@ export default function SpellTinkererAlchemyTargetModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={7}>
+              <Grid  size={7}>
                 <TextField
                   label={t("Effect")}
                   value={target.effect}
@@ -173,7 +175,7 @@ export default function SpellTinkererAlchemyTargetModal({
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={1}>
+              <Grid  size={1}>
                 <Button
                 sx={{height: "100%"}}
                   variant="contained"
@@ -185,13 +187,13 @@ export default function SpellTinkererAlchemyTargetModal({
               </Grid>
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Button variant="contained" onClick={handleAddTarget}>
               {t("Add Target")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +14,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Delete, Close } from "@mui/icons-material";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function EditFreeBenefitsModal({
   open,
@@ -28,11 +29,15 @@ export default function EditFreeBenefitsModal({
   onRemoveCustomBenefit,
   t,
 }) {
+  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
+      slotProps={{
+        paper: { sx: { width: "80%", maxWidth: "lg" } }
+      }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Edit Benefits")}
@@ -51,7 +56,7 @@ export default function EditFreeBenefitsModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("HP Modifier")}
               type="number"
@@ -62,7 +67,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("MP Modifier")}
               type="number"
@@ -73,7 +78,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid  size={4}>
             <TextField
               label={t("IP Modifier")}
               type="number"
@@ -84,7 +89,7 @@ export default function EditFreeBenefitsModal({
               }
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -105,7 +110,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -122,7 +127,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -141,7 +146,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -160,7 +165,7 @@ export default function EditFreeBenefitsModal({
               />
             </FormGroup>
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <FormGroup>
               <FormControlLabel
                 control={
@@ -181,20 +186,22 @@ export default function EditFreeBenefitsModal({
         {benefits.custom.length > 0 && (
           <>
             <Grid
-              item
-              xs={12}
               sx={{ marginTop: "20px", fontWeight: "bold", fontSize: "1.2rem" }}
-            >
+              size={12}>
               {t("Custom Benefits")}
             </Grid>
             {benefits.custom.map((custombenefit, index) => (
               <Grid container sx={{ marginTop: "10px" }} key={index}>
-                <Grid item xs={2} sm={1}>
-                  <IconButton onClick={() => onRemoveCustomBenefit(index)}>
+                <Grid
+                  size={{
+                    xs: 2,
+                    sm: 1
+                  }}>
+                  <IconButton onClick={() => setCustomBenefitToDelete(index)}>
                     <Delete />
                   </IconButton>
                 </Grid>
-                <Grid item xs={10} sx={11}>
+                <Grid  sx={11} size={10}>
                   <TextField
                     sx={{ width: "100%" }}
                     label={t("Custom Benefit") + " " + (index + 1)}
@@ -202,7 +209,9 @@ export default function EditFreeBenefitsModal({
                     onChange={(e) =>
                       onCustomBenefitChange(index, e.target.value)
                     }
-                    inputProps={{ maxLength: 1000 }}
+                    slotProps={{
+                      htmlInput: { maxLength: 1000 }
+                    }}
                   />
                 </Grid>
               </Grid>
@@ -222,6 +231,24 @@ export default function EditFreeBenefitsModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={customBenefitToDelete !== null}
+        onClose={() => setCustomBenefitToDelete(null)}
+        onConfirm={() => {
+          if (customBenefitToDelete !== null) {
+            onRemoveCustomBenefit(customBenefitToDelete);
+          }
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this custom benefit?")}
+        itemPreview={
+          customBenefitToDelete !== null ? (
+            <Typography variant="h4">
+              {benefits.custom[customBenefitToDelete] || t("Custom Benefit")}
+            </Typography>
+          ) : null
+        }
+      />
     </Dialog>
   );
 }

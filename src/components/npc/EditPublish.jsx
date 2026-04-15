@@ -146,7 +146,7 @@ export default function EditPublish({
             value={npc.language || ""}
             onChange={(evt) => setNpc({ ...npc, language: evt.target.value })}
             fullWidth
-            disabled={user.uid !== npc.uid && !isModerator}
+            disabled={!user || (user.uid !== npc.uid && !isModerator)}
           >
             {languageOptions.map((option) => (
               <MenuItem key={option.code} value={option.code}>
@@ -219,7 +219,9 @@ export default function EditPublish({
               <Dialog
                 open={rulesDialogOpen}
                 onClose={handleDialogClose}
-                PaperProps={{ sx: { width: "80%", maxWidth: "lg" } }}
+                slotProps={{
+                  paper: { sx: { width: "80%", maxWidth: "lg" } }
+                }}
               >
                 <DialogTitle variant="h3">
                   {t("submission_rule_title")}

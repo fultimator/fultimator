@@ -6,6 +6,7 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const QUIRK_SUBTYPES = ["quirk"];
@@ -15,7 +16,14 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          setPlayer((prev) => ({
+            ...prev,
+            quirk: { name: "", description: "", effect: "" },
+          }));
+        },
+  });;
 
   const onChangeQuirk = useCallback(
     (key) => (value) => {
@@ -55,42 +63,57 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Quirk")}
             showIconButton={false}
           />
         </Grid>
-        <Grid container spacing={1} sx={{ py: 1 }} alignItems="center">
-          <Grid item xs={10} sm={11}>
+        <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
+          <Grid
+            size={{
+              xs: 10,
+              sm: 11
+            }}>
             <TextField
               id="name"
               label={t("Quirk Name") + ":"}
               value={player.quirk?.name || ""}
               onChange={(e) => onChangeQuirk("name")(e.target.value)}
-              inputProps={{ maxLength: 50 }}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
               fullWidth
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </Grid>
           {isEditMode && (
-            <Grid item xs={2} sm={1} sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+            <Grid
+              sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
+              size={{
+                xs: 2,
+                sm: 1
+              }}>
               <Tooltip title={t("Replace from Compendium")}>
                 <IconButton size="small" onClick={() => setCompendiumOpen(true)}>
                   <SearchIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip title={t("Remove")}>
-                <IconButton size="small" color="error" onClick={() => setDeleteDialogOpen(true)}>
+                <IconButton size="small" color="error" onClick={handleDelete}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Grid>
           )}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               id="description"
               label={t("Description") + ":"}
@@ -101,7 +124,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
               readOnly={!isEditMode}
             />
           </Grid>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <CustomTextarea
               id="effect"
               label={t("Effect") + ":"}
@@ -114,7 +141,6 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           </Grid>
         </Grid>
       </Grid>
-
       {isEditMode && (
         <CompendiumViewerModal
           open={compendiumOpen}
@@ -127,7 +153,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
       )}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={setDeleteDialogOpen}
         onConfirm={() => {
           setPlayer((prev) => ({
             ...prev,

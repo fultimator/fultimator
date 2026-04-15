@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /** Returns true if any modifier field on the item is non-zero. */
 function hasAnyModifier(item) {
@@ -65,10 +65,10 @@ export function useEquipmentForm(item) {
   }, [item]);
 
   /** Force-expand the accordion (e.g. after JSON upload sets a modifier). */
-  const expandModifiers = () => setModifiersExpanded(true);
+  const expandModifiers = useCallback(() => setModifiersExpanded(true), []);
 
   /** Returns all modifier values as parsed integers, ready to spread into a saved item. */
-  const modifiers = () => ({
+  const modifiers = useCallback(() => ({
     defModifier: parseInt(defModifier),
     mDefModifier: parseInt(mDefModifier),
     initModifier: parseInt(initModifier),
@@ -78,10 +78,10 @@ export function useEquipmentForm(item) {
     damageRangedModifier: parseInt(damageRangedModifier),
     damageModifier: parseInt(damageModifier),
     isEquipped,
-  });
+  }), [defModifier, mDefModifier, initModifier, magicModifier, precModifier, damageMeleeModifier, damageRangedModifier, damageModifier, isEquipped]);
 
   /** Resets all modifier fields to zero and collapses the accordion. */
-  const clearModifiers = () => {
+  const clearModifiers = useCallback(() => {
     setDefModifier(0);
     setMDefModifier(0);
     setInitModifier(0);
@@ -92,7 +92,7 @@ export function useEquipmentForm(item) {
     setDamageModifier(0);
     setIsEquipped(false);
     setModifiersExpanded(false);
-  };
+  }, []);
 
   return {
     defModifier, setDefModifier,

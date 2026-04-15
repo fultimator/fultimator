@@ -119,7 +119,7 @@ export default function PlayerCustomWeapons({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {customWeapons.map((customWeapon, index) => {
             // Check if weapon has transforming customization
             const hasTransforming = customWeapon.customizations && customWeapon.customizations.some(
@@ -128,7 +128,7 @@ export default function PlayerCustomWeapons({
 
             return (
               <React.Fragment key={index}>
-                <Grid item xs={12} sx={{ mb: 2 }}>
+                <Grid  sx={{ mb: 2 }} size={12}>
                   {/* Primary Weapon */}
                   <Box sx={{ opacity: customWeapon.activeForm === "secondary" ? 0.6 : 1 }}>
                     <PrettyCustomWeapon 
@@ -193,57 +193,61 @@ export default function PlayerCustomWeapons({
                               : t("Equip Weapon") + ` (${t("Main Hand")} + ${t("Off Hand")})`
                           }
                         >
-                          <Badge
+                          <span>
+                            <Badge
                             badgeContent="M+O"
                             color="primary"
                             invisible={!customWeapon.isEquipped}
                             sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
-                          >
+                            >
+                              <IconButton
+                                onClick={() => handleEquipClick(index)}
+                                disabled={!isEditMode}
+                                size="small"
+                                sx={{
+                                  backgroundColor: customWeapon.isEquipped
+                                    ? theme.palette.ternary.main
+                                    : theme.palette.background.paper,
+                                  "&:hover": {
+                                    backgroundColor: customWeapon.isEquipped
+                                      ? theme.palette.quaternary.main
+                                      : theme.palette.secondary.main,
+                                  },
+                                  transition: "background-color 0.3s",
+                                  p: 0.5,
+                                  border: `1px solid ${theme.palette.divider}`
+                                }}
+                              >
+                                <Equip
+                                  color={
+                                    customWeapon.isEquipped
+                                      ? theme.palette.mode === "dark"
+                                        ? theme.palette.white.main
+                                        : theme.palette.primary.main
+                                      : theme.palette.text.secondary
+                                  }
+                                  strokeColor={
+                                    customWeapon.isEquipped &&
+                                    theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.secondary.main
+                                  }
+                                />
+                              </IconButton>
+                            </Badge>
+                          </span>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title={t("Not proficient  -  martial item")}>
+                          <span>
                             <IconButton
                               onClick={() => handleEquipClick(index)}
                               disabled={!isEditMode}
                               size="small"
-                              sx={{
-                                backgroundColor: customWeapon.isEquipped
-                                  ? theme.palette.ternary.main
-                                  : theme.palette.background.paper,
-                                "&:hover": {
-                                  backgroundColor: customWeapon.isEquipped
-                                    ? theme.palette.quaternary.main
-                                    : theme.palette.secondary.main,
-                                },
-                                transition: "background-color 0.3s",
-                                p: 0.5,
-                                border: `1px solid ${theme.palette.divider}`
-                              }}
                             >
-                              <Equip
-                                color={
-                                  customWeapon.isEquipped
-                                    ? theme.palette.mode === "dark"
-                                      ? theme.palette.white.main
-                                      : theme.palette.primary.main
-                                    : theme.palette.text.secondary
-                                }
-                                strokeColor={
-                                  customWeapon.isEquipped &&
-                                  theme.palette.mode === "dark"
-                                    ? theme.palette.white.main
-                                    : theme.palette.secondary.main
-                                }
-                              />
+                              <WarningAmber color="warning" fontSize="small" />
                             </IconButton>
-                          </Badge>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title={t("Not proficient  -  martial item")}>
-                          <IconButton
-                            onClick={() => handleEquipClick(index)}
-                            disabled={!isEditMode}
-                            size="small"
-                          >
-                            <WarningAmber color="warning" fontSize="small" />
-                          </IconButton>
+                          </span>
                         </Tooltip>
                       )}
                     </Box>
@@ -251,21 +255,23 @@ export default function PlayerCustomWeapons({
                     {hasTransforming && (
                       <Box sx={{ ml: 0.5 }}>
                         <Tooltip title={t("weapon_customization_swap_form")}>
-                          <IconButton
-                            onClick={() => handleSwapForm(index)}
-                            disabled={!isEditMode}
-                            size="small"
-                            sx={{
-                              backgroundColor: theme.palette.background.paper,
-                              "&:hover": {
-                                backgroundColor: theme.palette.secondary.main,
-                              },
-                              p: 0.5,
-                              border: `1px solid ${theme.palette.divider}`
-                            }}
-                          >
-                            <SwapHoriz fontSize="small" />
-                          </IconButton>
+                          <span>
+                            <IconButton
+                              onClick={() => handleSwapForm(index)}
+                              disabled={!isEditMode}
+                              size="small"
+                              sx={{
+                                backgroundColor: theme.palette.background.paper,
+                                "&:hover": {
+                                  backgroundColor: theme.palette.secondary.main,
+                                },
+                                p: 0.5,
+                                border: `1px solid ${theme.palette.divider}`
+                              }}
+                            >
+                              <SwapHoriz fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </Box>
                     )}
@@ -280,7 +286,7 @@ export default function PlayerCustomWeapons({
                     </Box>
                   </Box>
                 </Grid>
-            </React.Fragment>
+              </React.Fragment>
             );
           })}
         </Grid>

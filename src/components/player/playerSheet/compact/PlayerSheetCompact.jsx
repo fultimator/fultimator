@@ -1,12 +1,11 @@
-import React, { Fragment, useState } from "react";
-import { Paper, Grid, Typography, Divider, Card, Box, Dialog, DialogTitle, DialogContent, ButtonGroup, Button, Tabs, Tab, TextField, TableHead, TableRow, InputBase, IconButton, TableCell, Select, MenuItem, Tooltip, Menu } from "@mui/material";
+import {  useState } from "react";
+import {  Grid, Typography, Card, Box, Dialog, DialogTitle, DialogContent, Tabs, Tab, TextField, InputBase, IconButton, Select, MenuItem, Tooltip, Menu } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import avatar_image from "../../../avatar.jpg";
 import Diamond from "../../../Diamond";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import { ArrowDropDown, Search, Clear, Add, Remove, Lock, LockOpen } from "@mui/icons-material";
+import {  Search, Clear, Add, Remove, Lock, LockOpen } from "@mui/icons-material";
 import PlayerWeaponModal from "../../equipment/weapons/PlayerWeaponModal";
 import PlayerCustomWeaponModal from "../../equipment/customWeapons/PlayerCustomWeaponModal";
 import PlayerArmorModal from "../../equipment/armor/PlayerArmorModal";
@@ -40,7 +39,7 @@ import MagichantKeysContentSection from "../../spells/sections/MagichantKeysCont
 import MagichantTonesContentSection from "../../spells/sections/MagichantTonesContentSection";
 import PlayerNoteModal from "../../informations/PlayerNoteModal";
 import ReactMarkdown from "react-markdown";
-import { fontSize, styled, width } from "@mui/system";
+import {  styled } from "@mui/system";
 import { TypeAffinity } from "../../../types";
 import PlayerEquipment from "./PlayerEquipment";
 import PlayerClasses from "./PlayerClasses";
@@ -59,8 +58,8 @@ import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { calculateAttribute } from "../../common/playerCalculations";
 
 // Styled Components
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0 });
+// const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
+// const StyledTableCell = styled(TableCell)({ padding: 0 });
 
 const AffinityGrid = styled(Grid)(({ theme }) => ({
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -74,25 +73,25 @@ const AffinityGrid = styled(Grid)(({ theme }) => ({
 export default function PlayerCardSheet({
     player,
     setPlayer,
-    isMainTab,
+    _isMainTab,
     isEditMode,
-    isCharacterSheet,
+    _isCharacterSheet,
     optionalRules = { quirks: false, campActivities: false, zeroPower: false, technospheres: false },
     characterImage,
     id,
     updateMaxStats,
     onToggleEditMode,
-    onAddClass,
-    onAddFeature,
+    _onAddClass,
+    _onAddFeature,
 }) {
     const { t } = useTranslate();
     const theme = useCustomTheme();
     const muiTheme = useTheme();
-    const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+    const _isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
     const [value, setValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
 
-    // ── Equipment modal state ──────────────────────────────────────────────
+    // Equipment modal state
     const [openNewWeapon, setOpenNewWeapon] = useState(false);
     const [editWeaponIndex, setEditWeaponIndex] = useState(null);
     const [weapon, setWeapon] = useState(null);
@@ -119,7 +118,7 @@ export default function PlayerCardSheet({
 
     const [equipMenuAnchor, setEquipMenuAnchor] = useState(null);
 
-    // ── Equipment helpers (mirrors EditPlayerEquipment) ────────────────────
+    // Equipment helpers (mirrors EditPlayerEquipment)
     const patchInv = (p, source, updater) => {
         const eq0 = { ...(p.equipment?.[0] ?? {}), [source]: updater(p.equipment?.[0]?.[source] ?? []) };
         const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
@@ -216,7 +215,7 @@ export default function PlayerCardSheet({
         setOpenNoteModal(true);
     };
 
-    // ── Class management ──────────────────────────────────────────────────────
+    // Class management
     const [editClassIndex, setEditClassIndex] = useState(null);
     const [openClassCard, setOpenClassCard] = useState(false);
 
@@ -291,7 +290,7 @@ export default function PlayerCardSheet({
         setPlayer(prev => ({ ...prev, classes: prev.classes.map((c, i) => i === classIdx ? { ...c, companion } : c) }));
     };
 
-    // ── Skill modal (standalone, from compact classes view) ──────────────────
+    // Skill modal (standalone, from compact classes view)
     const [openSkillModal, setOpenSkillModal] = useState(false);
     const [editSkillClassIdx, setEditSkillClassIdx] = useState(null);
     const [editSkillIdx, setEditSkillIdx] = useState(null);
@@ -329,7 +328,7 @@ export default function PlayerCardSheet({
         setOpenSkillModal(false);
     };
 
-    // ── Spell modals ─────────────────────────────────────────────────────────
+    // Spell modals
     const { isOpen: isSpellOpen, openModal: openSpellModal, closeModal: closeSpellModal, spellBeingEdited, editingSpellClass, editingSpellIndex } = useSpellModals();
 
     const handleEditSpell = (classIdx, spellIdx, spell) => {
@@ -940,11 +939,9 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
     };
 
     return (
-        <Grid container alignItems="stretch">
-            <Grid container>
+        <Grid container sx={{ alignItems: "stretch" }}>
+            <Grid container size={12}>
                 <Grid
-                    item
-                    xs
                     sx={{
                         background,
                         borderRight,
@@ -952,12 +949,11 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         display: "flex",
                         alignItems: "center",
                     }}
-                >
+                    size="grow">
                     {isEditMode ? (
                         <TextField
                             value={player.name}
                             onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
-                            inputProps={{ maxLength: 50 }}
                             variant="standard"
                             size="small"
                             sx={{
@@ -972,21 +968,24 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                                 "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
                                 "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
                             }}
+                            slotProps={{
+                                htmlInput: { maxLength: 50 }
+                            }}
                         />
                     ) : (
                         <Typography
-                            color="white.main"
-                            fontFamily="Antonio"
-                            fontSize="1.5rem"
-                            fontWeight="medium"
-                            sx={{ textTransform: "uppercase" }}
-                        >
+                            sx={{
+                                color: "white.main",
+                                fontFamily: "Antonio",
+                                fontSize: "1.5rem",
+                                fontWeight: "medium",
+                                textTransform: "uppercase"
+                            }}>
                             {player.name}
                         </Typography>
                     )}
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         px: 1,
                         py: 0.5,
@@ -995,19 +994,31 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         borderImage: borderImage,
                         display: "flex",
                         alignItems: "center",
-                    }}
-                >
+                    }}>
                     {isEditMode ? (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
                             {player.info.pronouns && (
-                                <Typography fontFamily="Antonio" fontSize="1rem" sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                                <Typography
+                                    sx={{
+                                        fontFamily: "Antonio",
+                                        fontSize: "1rem",
+                                        textTransform: "uppercase",
+                                        mr: 0.5
+                                    }}>
                                     {player.info.pronouns} <Diamond />
                                 </Typography>
                             )}
                             <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); if (updateMaxStats) updateMaxStats(); }}>
                                 <Remove fontSize="small" />
                             </IconButton>
-                            <Typography fontFamily="Antonio" fontSize="1.1rem" fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.25 }}>
+                            <Typography
+                                sx={{
+                                    fontFamily: "Antonio",
+                                    fontSize: "1.1rem",
+                                    fontWeight: "medium",
+                                    textTransform: "uppercase",
+                                    mx: 0.25
+                                }}>
                                 {t("Lvl")} {player.lvl}
                             </Typography>
                             <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); if (updateMaxStats) updateMaxStats(); }}>
@@ -1016,11 +1027,12 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                         </Box>
                     ) : (
                         <Typography
-                            fontFamily="Antonio"
-                            fontSize="1.25rem"
-                            fontWeight="medium"
-                            sx={{ textTransform: "uppercase" }}
-                        >
+                            sx={{
+                                fontFamily: "Antonio",
+                                fontSize: "1.25rem",
+                                fontWeight: "medium",
+                                textTransform: "uppercase"
+                            }}>
                             {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}
                         </Typography>
                     )}
@@ -1125,9 +1137,10 @@ function Header({ player, characterImage, isEditMode, setPlayer, updateMaxStats 
                             }}
                         >
                             <Typography
-                                fontFamily="body1"
-                                fontSize="0.80rem"
-                            >
+                                sx={{
+                                    fontFamily: "body1",
+                                    fontSize: "0.80rem"
+                                }}>
                                 <RenderTraits player={player} />
                             </Typography>
                         </Box>
@@ -1151,16 +1164,16 @@ function RenderTraits({ player }) {
         <Grid container>
             {/* Iterate over traits */}
             {traits.map(({ label, value }) => value && (
-                <Grid item xs={12} key={label} sx={{ marginTop: 0.5 }}>
-                    <Grid container alignItems="center" spacing={1}>
+                <Grid  key={label} sx={{ marginTop: 0.5 }} size={12}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={1}>
                         {/* Label */}
-                        <Grid item xs={3}>
+                        <Grid  size={3}>
                             <Typography variant="body2" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
                                 {label}:
                             </Typography>
                         </Grid>
                         {/* Value */}
-                        <Grid item xs={9}>
+                        <Grid  size={9}>
                             <Typography align="left">
                                 {value}
                             </Typography>
@@ -1199,14 +1212,14 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
     return (
         <Typography
             component="div"
-            fontFamily="Antonio"
-            fontWeight="bold"
-            textAlign="center"
-            fontSize={isMobile ? "0.74rem" : "0.9rem"}
-        >
+            sx={{
+                fontFamily: "Antonio",
+                fontWeight: "bold",
+                textAlign: "center",
+                fontSize: isMobile ? "0.74rem" : "0.9rem"
+            }}>
             <Grid container>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1215,9 +1228,8 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         mr: isMobile ? "1px" : "2px",
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
-                    }}
-                >
-                    <Grid container alignItems="stretch" justifyContent="space-between">
+                    }}>
+                    <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
                         {[
                             { key: "dexterity", label: t("DEX"), curr: currDex, bg: { dark: '#1E2122', light: '#efecf5' }, border: true },
                             { key: "insight",   label: t("INS"), curr: currInsight, bg: { dark: '#1E2122', light: '#f3f0f7' }, border: true },
@@ -1226,14 +1238,12 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         ].map(({ key, label, curr, bg, border }) => (
                             <Grid
                                 key={key}
-                                item
-                                xs
                                 sx={{
                                     bgcolor: custom.mode === 'dark' ? bg.dark : bg.light,
                                     borderRight: border ? (custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff') : undefined,
                                     py: 0.4,
                                 }}
-                            >
+                                size="grow">
                                 {isEditMode ? (
                                     <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0 }}>
                                         <Typography component="span" style={{ fontFamily: "'Antonio', fantasy, sans-serif", fontSize: "0.875rem" }}>
@@ -1271,7 +1281,6 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                     </Grid>
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1280,45 +1289,39 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         ml: isMobile ? "1px" : "2px",
                         my: "2px",
                         flexBasis: "calc(50% - 2px)",
-                    }}
-                >
-                    <Grid container alignItems="stretch" justifyContent="space-between">
-                        <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+                    }}>
+                    <Grid container sx={{ alignItems: "stretch", justifyContent: "space-between" }}>
+                        <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
                             {t("HP")}
                         </Grid>
                         <Grid
-                            item
                             sx={{
                                 py: 0.4,
                                 px: isMobile ? 0.75 : 1.5,
                                 color: "white.main",
                                 bgcolor: "red.main",
-                            }}
-                        >
+                            }}>
                             {player.stats?.hp.max} <Diamond color="white.main" />{" "}
                             {Math.floor(player.stats?.hp.max / 2)}
                         </Grid>
-                        <Grid item sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
+                        <Grid  sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>
                             {t("MP")}
                         </Grid>
                         <Grid
-                            item
                             sx={{
                                 px: isMobile ? 0.75 : 1.5,
                                 py: 0.4,
                                 color: "white.main",
                                 bgcolor: "cyan.main",
-                            }}
-                        >
+                            }}>
                             {player.stats?.mp.max}
                         </Grid>
-                        <Grid item xs sx={{ py: 0.4 }}>
+                        <Grid  sx={{ py: 0.4 }} size="grow">
                             {t("Init.")} {currInit}
                         </Grid>
                     </Grid>
                 </Grid>
                 <Grid
-                    item
                     sx={{
                         borderBottom: "1px solid #281127",
                         borderTop: "1px solid #281127",
@@ -1326,18 +1329,17 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         borderImage,
                         mr: isMobile ? "1px" : "2px",
                         flexBasis: "calc(25% - 2px)",
-                    }}
-                >
-                    <Grid container justifyItems="space-between">
+                    }}>
+                    <Grid container sx={{
+                        justifyItems: "space-between"
+                    }}>
                         <Grid
-                            item
-                            xs
                             sx={{
                                 bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#efecf5',
                                 borderRight: custom.mode === 'dark' ? '1px solid #42484B' : '1px solid #ffffff',
                                 py: 0.4,
                             }}
-                        >
+                            size="grow">
                             <Typography
                                 component="span"
                                 variant="body2"
@@ -1350,13 +1352,11 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                             </Typography>
                         </Grid>
                         <Grid
-                            item
-                            xs
                             sx={{
                                 bgcolor: custom.mode === 'dark' ? '#1B1D1E' : '#efecf5',
                                 py: 0.4,
                             }}
-                        >
+                            size="grow">
                             <Typography
                                 component="span"
                                 variant="body2"
@@ -1370,7 +1370,7 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item xs>
+                <Grid  size="grow">
                     <AffinityGrid container>
                         {[
                             "physical",
@@ -1384,14 +1384,12 @@ function Stats({ player, currDex, currInsight, currMight, currWillpower, currDef
                             "poison",
                         ].map((type) => (
                             <Grid
-                                item
-                                xs
                                 key={type}
                                 sx={{
                                     py: 0.4,
                                     borderRight: `1px solid ${theme.palette.divider}`,
                                 }}
-                            >
+                                size="grow">
                                 <TypeAffinity
                                     type={type}
                                     affinity={player.affinities?.[type] || ""}

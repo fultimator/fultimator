@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useDatabaseContext } from "../../context/DatabaseContext";
-import { Grid, Button, Typography, Stack, IconButton, Fab, Box, useMediaQuery, Divider, Tooltip } from "@mui/material";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
+import { Grid, Button, Typography, Stack, IconButton, Fab, Box, useMediaQuery, Tooltip } from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
-import PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
+import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
 import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
@@ -138,8 +138,12 @@ export default function CharacterSheet() {
   const updateMaxStats = useCallback(() => {
     if (player) {
       setPlayer((prevPlayer) => {
-        const baseMaxHP = prevPlayer.lvl + (prevPlayer.attributes?.might || 0) * 5;
-        const baseMaxMP = prevPlayer.lvl + (prevPlayer.attributes?.willpower || 0) * 5;
+        const lvl = Number(prevPlayer.lvl) || 0;
+        const might = Number(prevPlayer.attributes?.might) || 0;
+        const willpower = Number(prevPlayer.attributes?.will) || 0;
+
+        const baseMaxHP = lvl + might * 5;
+        const baseMaxMP = lvl + willpower * 5;
 
         let hpBonus = 0;
         let mpBonus = 0;
@@ -162,13 +166,13 @@ export default function CharacterSheet() {
         const fortressBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Fortress")
-          .reduce((acc, skill) => acc + (skill.currentLvl * 3), 0);
+          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
         hpBonus += fortressBonus;
 
         const focusedBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Focused")
-          .reduce((acc, skill) => acc + (skill.currentLvl * 3), 0);
+          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
         mpBonus += focusedBonus;
 
         const maxHP = baseMaxHP + hpBonus;
@@ -292,7 +296,7 @@ export default function CharacterSheet() {
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
-        <Grid item xs={isMobile ? 8 : 10}>
+        <Grid  size={isMobile ? 8 : 10}>
           <Button
             variant="contained"
             color="primary"
@@ -303,8 +307,8 @@ export default function CharacterSheet() {
             {t("Download Character Sheet")}
           </Button>
         </Grid>
-        <Grid item xs={isMobile ? 4 : 2}>
-          <Stack direction="row" spacing={1} alignItems="center">
+        <Grid  size={isMobile ? 4 : 2}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <Button
               variant="outlined"
               color="primary"
@@ -332,7 +336,7 @@ export default function CharacterSheet() {
             )}
 
             {isOwner && (
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 {isUpdated && (
                   <Tooltip title={t("Save Changes")}>
                     <IconButton
@@ -351,8 +355,14 @@ export default function CharacterSheet() {
       </Grid>
       {fullCharacterSheet ? (
         <Grid container spacing={2} sx={{ padding: 1 }} id="character-sheet">
-          <Grid container item xs={12} md={6} spacing={2}>
-            <Grid item xs={12}>
+          <Grid
+            container
+            spacing={2}
+            size={{
+              xs: 12,
+              md: 6
+            }}>
+            <Grid  size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerCard
                   player={player}
@@ -433,8 +443,14 @@ export default function CharacterSheet() {
               </Stack>
             </Grid>
           </Grid>
-          <Grid container item xs={12} md={6} spacing={2}>
-            <Grid item xs={12}>
+          <Grid
+            container
+            spacing={2}
+            size={{
+              xs: 12,
+              md: 6
+            }}>
+            <Grid  size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerClasses
                   player={player}
@@ -450,11 +466,11 @@ export default function CharacterSheet() {
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <PlayerCompanion player={player} setPlayer={handleSetPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
           </Grid>
-          <Grid container item xs={12}>
-            <Grid item xs={4}>
+          <Grid container  size={12}>
+            <Grid  size={4}>
               <img
                 src={powered_by_fu}
                 alt="Powered by Fu"
@@ -462,7 +478,7 @@ export default function CharacterSheet() {
                 onLoad={() => setImagesLoaded(true)}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid  size={4}>
               <Typography variant="h4" align="center">
                 <span
                   style={{
@@ -481,10 +497,11 @@ export default function CharacterSheet() {
       ) : (
         <Grid
           container
-          sx={{ padding: 1 }}
-          justifyContent={"center"}
-        >
-          <Grid container item xs={12}>
+          sx={{
+            justifyContent: "center",
+            padding: 1
+          }}>
+          <Grid container  size={12}>
             <PlayerCardSheet
               player={player}
               setPlayer={handleSetPlayer}
@@ -498,7 +515,6 @@ export default function CharacterSheet() {
           </Grid>
         </Grid>
       )}
-
       {isOwner && (
         <Box
           sx={{

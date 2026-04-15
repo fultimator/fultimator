@@ -20,6 +20,8 @@ import {
 import { Close, Delete } from "@mui/icons-material"; // Import Delete icon
 import { useTranslate } from "../../../translation/translate";
 import attributes from "../../../libs/attributes";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const secondEffectsOptions = [
   { dieValue: 1, effect: "Wind" },
@@ -41,6 +43,9 @@ export default function SpellEntropistGambleModal({
   const [editedGamble, setEditedGamble] = useState(gamble || {});
   const [targets, setTargets] = useState(gamble?.targets || []);
   const [validationError, setValidationError] = useState("");
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   useEffect(() => {
     if (gamble) {
@@ -225,20 +230,17 @@ export default function SpellEntropistGambleModal({
       onSave(editedGamble.index, { ...editedGamble, targets: sortedTargets });
     }
   };
-
-  const handleDelete = () => {
-    onDelete(editedGamble.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -258,17 +260,23 @@ export default function SpellEntropistGambleModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <TextField
               label={t("Spell Name")}
               variant="outlined"
               fullWidth
               value={editedGamble.spellName}
               onChange={(e) => handleChange("spellName", e.target.value)}
-              inputProps={{ maxLength: 50 }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <TextField
               type="number"
               label={t("MP x Dice")}
@@ -299,7 +307,11 @@ export default function SpellEntropistGambleModal({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <TextField
               type="number"
               label={t("Max Throwable Dices")}
@@ -334,7 +346,11 @@ export default function SpellEntropistGambleModal({
               }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <FormControl fullWidth>
               <InputLabel id="attr-label">{t("Attribute")}</InputLabel>
               <Select
@@ -353,14 +369,16 @@ export default function SpellEntropistGambleModal({
           </Grid>
           {targets.map((target, index) => (
             <Grid
-              item
-              xs={12}
               key={index}
               container
               spacing={2}
               sx={{ mt: 2, pt: 2, borderTop: "1px solid #e0e0e0" }}
-            >
-              <Grid item xs={12} sm={2}>
+              size={12}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel id={`range-from-label-${index}`}>
                     {t("Range From")}
@@ -384,7 +402,11 @@ export default function SpellEntropistGambleModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth>
                   <InputLabel id={`range-to-label-${index}`}>
                     {t("Range To")}
@@ -408,7 +430,11 @@ export default function SpellEntropistGambleModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 4
+                }}>
                 <TextField
                   label={t("Effect")}
                   value={target.effect}
@@ -416,10 +442,16 @@ export default function SpellEntropistGambleModal({
                     handleTargetChange(index, "effect", e.target.value)
                   }
                   fullWidth
-                  inputProps={{ maxLength: 200 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 200 }
+                  }}
                 />
               </Grid>
-              <Grid item xs={12} sm={3}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 3
+                }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -437,7 +469,12 @@ export default function SpellEntropistGambleModal({
                   label={t("Second Roll")}
                 />
               </Grid>
-              <Grid item xs={12} sm={1} sx={{ mt: 2 }}>
+              <Grid
+                sx={{ mt: 2 }}
+                size={{
+                  xs: 12,
+                  sm: 1
+                }}>
                 <IconButton
                   aria-label="remove"
                   onClick={() => handleRemoveTarget(index)}
@@ -447,10 +484,14 @@ export default function SpellEntropistGambleModal({
                 </IconButton>
               </Grid>
               {target.secondRoll && (
-                <Grid item xs={12} sx={{ mt: 2 }}>
+                <Grid  sx={{ mt: 2 }} size={12}>
                   {target.secondEffects.map((effect, effectIndex) => (
                     <Grid container spacing={2} key={effectIndex}>
-                      <Grid item xs={5} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 5,
+                          sm: 3
+                        }}>
                         <FormControl fullWidth sx={{ mb: 2 }}>
                           <InputLabel
                             id={`die-value-label-${index}-${effectIndex}`}
@@ -478,7 +519,11 @@ export default function SpellEntropistGambleModal({
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={5} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 5,
+                          sm: 6
+                        }}>
                         <TextField
                           label={t("Effect")}
                           value={effect.effect}
@@ -491,10 +536,16 @@ export default function SpellEntropistGambleModal({
                             )
                           }
                           fullWidth
-                          inputProps={{ maxLength: 200 }}
+                          slotProps={{
+                            htmlInput: { maxLength: 200 }
+                          }}
                         />
                       </Grid>
-                      <Grid item xs={2} sm={3}>
+                      <Grid
+                        size={{
+                          xs: 2,
+                          sm: 3
+                        }}>
                         <Button
                           variant="contained"
                           color="error"
@@ -520,21 +571,25 @@ export default function SpellEntropistGambleModal({
               )}
             </Grid>
           ))}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Divider sx={{ my: 2 }} />
           </Grid>
-          <Grid item xs={12} sx={{ mt: 2 }}>
+          <Grid  sx={{ mt: 2 }} size={12}>
             <Button variant="contained" onClick={handleAddTarget}>
               {t("Add Target")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid item xs={12} sx={{ mt: 2 }}>
+            <Grid  sx={{ mt: 2 }} size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}
         </Grid>
-        <Grid item xs={12} sm={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <FormControlLabel
             sx={{ mt: 4 }}
             control={
@@ -548,7 +603,11 @@ export default function SpellEntropistGambleModal({
             label={t("Show in Character Sheet")}
           />
         </Grid>
-        <Grid item xs={12} sm={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <FormControlLabel
             control={
               <Switch
@@ -573,6 +632,13 @@ export default function SpellEntropistGambleModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(editedGamble.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this spell?")}
+      />
     </Dialog>
   );
 }

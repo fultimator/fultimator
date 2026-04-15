@@ -16,9 +16,8 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import CardLoadout from "./CardLoadout";
-
-// ─── Styled Components ────────────────────────────────────────────────────────
-
+// Styled Components
+// Sub-components
 const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }) => ({
   height: 18,
   [theme.breakpoints.down("sm")]: {
@@ -35,7 +34,7 @@ const GradientLinearProgress = styled(LinearProgress)(({ theme, color1, color2 }
     transition: "width 1s ease-in-out",
   },
 }));
-
+// Main Component
 const StatBarWrapper = styled(Box)(({ theme }) => ({
   position: "relative",
   "& .stat-label": {
@@ -107,8 +106,7 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   flex: 1,
 }));
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
+// Sub-components
 function StatBar({ label, value, max, color1, color2, trackColor }) {
   return (
     <StatBarWrapper sx={{ background: trackColor }}>
@@ -161,8 +159,7 @@ function CombatStat({ icon, label, value, theme }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
+// Main Component
 export default function PlayerCardGallery({ player, setPlayer, isExpanded = false }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -403,7 +400,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         overflow: "hidden",
       }}
     >
-      {/* ── Header ── */}
+      {/* Header */}
       <Box sx={{ display: "flex", alignItems: "stretch" }}>
         <Box
           sx={{
@@ -416,12 +413,13 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           }}
         >
           <Typography
-            color="#fff"
-            fontFamily="Antonio"
-            fontSize={{ xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" }}
-            fontWeight="medium"
-            sx={{ textTransform: "uppercase" }}
-          >
+            sx={{
+              color: "#fff",
+              fontFamily: "Antonio",
+              fontSize: { xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" },
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {player.name}
           </Typography>
         </Box>
@@ -435,14 +433,19 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             alignItems: "center",
           }}
         >
-          <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
+          <Typography
+            sx={{
+              fontFamily: "Antonio",
+              fontSize: { xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" },
+              fontWeight: "medium",
+              textTransform: "uppercase"
+            }}>
             {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
             {t("Lvl")} {player.lvl}
           </Typography>
         </Box>
       </Box>
-
-      {/* ── Body ── */}
+      {/* Body */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
 
         {/* Avatar + Stat Bars */}
@@ -622,7 +625,6 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
         </Box>
 
       </Box>
-
       {isExpanded && (
         <Box
           sx={{
@@ -642,7 +644,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
             <Box sx={{ px: 1, py: { xs: "6px", sm: "8px" } }}>
               <Typography
                 sx={{
-                  fontFamily: "Antonio",
+                  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
                   fontSize: { xs: "0.82rem", sm: "0.92rem", md: "0.98rem" },
                   lineHeight: 1.45,
                   whiteSpace: "pre-line",
@@ -719,8 +721,7 @@ export default function PlayerCardGallery({ player, setPlayer, isExpanded = fals
           </Box>
         </Box>
       )}
-
-      {/* ── Affinity Strip ── */}
+      {/* Affinity Strip */}
       <AffinityStrip>
         {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
           <AffinityCell key={type}>

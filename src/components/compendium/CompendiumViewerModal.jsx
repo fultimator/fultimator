@@ -34,13 +34,16 @@ import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import {
   CompendiumSidebar,
   ItemCard,
+} from "../../routes/compendium/compendium";
+import {
   ITEM_TYPES,
   VIEWER_TO_PACK_TYPE,
   getItems,
   getItemSearchText,
+  toSlug,
   makeId,
   getNonStaticSpellItems,
-} from "../../routes/compendium/compendium";
+} from "../../libs/compendium";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
@@ -51,8 +54,8 @@ import classList, { spellList } from "../../libs/classes";
 import { getDelicacyEffects } from "../../libs/gourmetCookingData";
 import useDownloadImage from "../../hooks/useDownloadImage";
 
-const NPC_TYPES    = ["spells", "attacks", "special", "actions"];
-const PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
+const _NPC_TYPES    = ["spells", "attacks", "special", "actions"];
+const _PLAYER_TYPES = ["weapons", "armor", "shields", "custom-weapons", "accessories", "player-spells", "qualities", "classes", "heroics"];
 
 const SIDEBAR_WIDTH = 300;
 
@@ -332,14 +335,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
   const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
   const [downloadSelectedImage] = useDownloadImage(selectedItem?.name ?? "item", selectedCardRef);
 
-  const toSlug = (value = "") =>
-    value
-      .toString()
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
   const handleShareUrl = useCallback(async () => {
     const url = new URL(window.location.href);
     url.searchParams.set("type", selectedType);
@@ -568,7 +563,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
       maxWidth="xl"
       fullWidth
       fullScreen={!isDesktop}
-      PaperProps={{ sx: isDesktop ? { height: "90vh" } : {} }}
+      slotProps={{
+        paper: { sx: isDesktop ? { height: "90vh" } : {} }
+      }}
     >
       <DialogTitle
         sx={{
@@ -593,7 +590,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ display: "flex", p: 0, overflow: "hidden" }}>
         {/* Desktop sidebar */}
         {isDesktop && (
@@ -639,20 +635,29 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           {/* Mobile type label */}
           {!isDesktop && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-              <Typography variant="subtitle1" fontWeight="bold">
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 ({filteredItems.length})
               </Typography>
             </Box>
           )}
           {filteredItems.length === 0 ? (
-            <Typography color="text.secondary">{t("No items found.")}</Typography>
+            <Typography sx={{
+              color: "text.secondary"
+            }}>{t("No items found.")}</Typography>
           ) : (
             <Grid container spacing={2}>
               {filteredItems.map((item, idx) => (
-                <Grid item xs={12} lg={selectedType === "classes" ? 12 : 6} key={itemIds[idx]}>
+                <Grid
+                  key={itemIds[idx]}
+                  size={{
+                    xs: 12,
+                    lg: selectedType === "classes" ? 12 : 6
+                  }}>
                   <Box
                     ref={idx === selectedIdx ? selectedCardRef : null}
                     sx={{
@@ -674,7 +679,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
                     <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5, mt: 0.5 }}>
                       <Tooltip title={t("Share URL")}>
                         <IconButton size="small" onClick={handleShareUrl}>
-                          <LinkIcon fontSize="small" />
+                          <LinkIcon sx={{
+                            fontSize: "small"
+                          }} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t("Download as Image")}>
@@ -726,7 +733,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
         </Box>
       </DialogContent>
-
       {!viewOnly && (
         <>
           <Divider />
@@ -740,7 +746,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
               gap: { xs: 1, sm: 0 },
             }}
           >
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               <strong>{t("Disclaimer")}:</strong>{" "}
               {t("For personal use only; do not share exported data on official channels.")}
             </Typography>
@@ -765,7 +773,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </DialogActions>
         </>
       )}
-
       {/* Manage Modules modal */}
       <ManageModulesModal
         open={manageModulesOpen}
@@ -775,14 +782,12 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           handleCompendiumChange(id);
         }}
       />
-
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
         lockedToViewerType={restrictToTypes?.length ? selectedType : undefined}
       />
-
       {/* Create item dialog */}
       {activePack && (
         <CompendiumItemCreateDialog
@@ -792,7 +797,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           packId={activePack.id}
         />
       )}
-
       {/* Edit pack item dialog */}
       {activePack && editPackItem && (
         <CompendiumItemCreateDialog
@@ -804,7 +808,6 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           editItemId={editPackItem.packItemId}
         />
       )}
-
       <DeleteConfirmationDialog
         open={Boolean(deletePackItem)}
         onClose={() => setDeletePackItem(null)}
@@ -819,27 +822,30 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           deletePackItem?.item ? (
             <Box>
               <Typography variant="h4">{deletePackItem.item.name}</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t(selectedType)}
               </Typography>
             </Box>
           ) : null
         }
       />
-
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
         onClose={() => setNewPackDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -874,20 +880,21 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Manage Pack dialog */}
       <Dialog
         open={manageDialogOpen}
         onClose={() => !exporting && setManageDialogOpen(false)}
         maxWidth="sm"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -929,7 +936,13 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
             size="small"
           />
           <Divider>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: "uppercase", letterSpacing: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: 1
+              }}>
               {t("Module Export")}
             </Typography>
           </Divider>
@@ -1012,20 +1025,21 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           </Box>
         </DialogActions>
       </Dialog>
-
       {/* Import Pack dialog */}
       <Dialog
         open={importDialogOpen}
         onClose={() => !importing && setImportDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        TransitionProps={{
-          onExited: () => {
-            if (pendingNavPackId) {
-              handleCompendiumChange(pendingNavPackId);
-              setPendingNavPackId(null);
-            }
-          },
+        slotProps={{
+          transition: {
+            onExited: () => {
+              if (pendingNavPackId) {
+                handleCompendiumChange(pendingNavPackId);
+                setPendingNavPackId(null);
+              }
+            },
+          }
         }}
       >
         <DialogTitle
@@ -1043,11 +1057,15 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
         <DialogContent sx={{ pt: "8px !important", display: "flex", flexDirection: "column", gap: 2 }}>
           <Tabs value={importTab} onChange={(_, v) => { setImportTab(v); setImportError(""); }}>
             <Tab label={t("Upload .fcp file")} />
-            <Tab label={t("From URL")} icon={<LinkIcon fontSize="small" />} iconPosition="end" />
+            <Tab label={t("From URL")} icon={<LinkIcon sx={{
+              fontSize: "small"
+            }} />} iconPosition="end" />
           </Tabs>
           {importTab === 0 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("Select a .fcp file exported from Fultimator.")}
               </Typography>
               <Button
@@ -1079,7 +1097,9 @@ const CompendiumViewerModal = ({ open, onClose, onAddItem, initialType = "spells
           )}
           {importTab === 1 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 {t("Paste a manifest.json URL to download and import the pack.")}
               </Typography>
               <TextField

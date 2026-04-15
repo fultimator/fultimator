@@ -55,7 +55,7 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQuery = "" }) {
+export default function PlayerZeroPower({ player, setPlayer, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -77,15 +77,23 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
   };
 
   const increment = () => {
-    const next = [...clockState];
-    const i = next.indexOf(false);
-    if (i !== -1) { next[i] = true; updateClock(next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled < sections) {
+      const next = new Array(sections).fill(false);
+      for (let i = 0; i <= currentFilled; i++) {
+        next[i] = true;
+      }
+      updateClock(next);
+    }
   };
 
   const decrement = () => {
-    const next = [...clockState];
-    const i = next.lastIndexOf(true);
-    if (i !== -1) { next[i] = false; updateClock(next); }
+    const currentFilled = clockState.filter(Boolean).length;
+    if (currentFilled > 0) {
+      const next = [...clockState];
+      next[currentFilled - 1] = false;
+      updateClock(next);
+    }
   };
 
   const reset = () => updateClock(new Array(sections).fill(false));
@@ -159,14 +167,17 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
               ) : null}
             </StyledTableCell>
             <StyledTableCell
-              onClick={(e) => { e.stopPropagation(); hasDetails && toggleRow('zeroPower', zeroPowerKey); }}
+              onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('zeroPower', zeroPowerKey); }}
               sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
             >
               <Typography
                 variant="body2"
-                fontWeight="bold"
-                sx={{ textTransform: "uppercase", wordBreak: "break-word", overflowWrap: "break-word" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word"
+                }}>
                 {highlightMatch(zeroPower.name, searchQuery)}
               </Typography>
             </StyledTableCell>
@@ -192,7 +203,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode, searchQ
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ width: 80, textAlign: "center" }}>
-              <Typography variant="body2" fontWeight="bold" fontSize="0.8rem">
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: "0.8rem",
+                  fontWeight: "bold"
+                }}>
                 {filled}/{sections}
               </Typography>
             </StyledTableCell>

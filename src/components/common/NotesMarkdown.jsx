@@ -89,7 +89,7 @@ const NotesMarkdown = ({ children, ...props }) => {
       rehypePlugins={[rehypeRaw, rehypeReact]}
       components={{
         // Custom styling for paragraphs (p)
-        p: ({ ...props }) => (
+        p: ({ _node, ...props }) => (
           <Typography
             variant="body1"
             sx={{
@@ -142,7 +142,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h2 headers
-        h2: ({ ...props }) => (
+        h2: ({ _node, ...props }) => (
           <Typography
             variant="h4"
             sx={{
@@ -163,7 +163,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h3 headers
-        h3: ({ ...props }) => (
+        h3: ({ _node, ...props }) => (
           <Typography
             variant="h5"
             sx={{
@@ -186,7 +186,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h4 headers
-        h4: ({ ...props }) => (
+        h4: ({ _node, ...props }) => (
           <Typography
             variant="h6"
             sx={{
@@ -205,7 +205,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h5 headers
-        h5: ({ ...props }) => (
+        h5: ({ _node, ...props }) => (
           <Typography
             variant="h6"
             sx={{
@@ -224,7 +224,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for strong (bold) text
-        strong: ({ ...props }) => (
+        strong: ({ _node, ...props }) => (
           <strong
             style={{
               color: theme.palette.text.primary,
@@ -235,7 +235,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for emphasized (italic) text
-        em: ({ ...props }) => (
+        em: ({ _node, ...props }) => (
           <em
             style={{
               color: theme.palette.text.secondary,
@@ -246,7 +246,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for highlighted text (search matches)
-        mark: ({ ...props }) => (
+        mark: ({ _node, ...props }) => (
           <mark
             style={{
               backgroundColor: "#ffeb3b",
@@ -334,7 +334,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for tables
-        table: ({ ...props }) => (
+        table: ({ _node, ...props }) => (
           <table
             style={{
               fontFamily: "'PT Sans Narrow', sans-serif",
@@ -348,7 +348,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for table headers (th)
-        th: ({ ...props }) => (
+        th: ({ _node, ...props }) => (
           <th
             style={{
               textAlign: "left",
@@ -362,7 +362,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for table data (td)
-        td: ({ ...props }) => (
+        td: ({ _node, ...props }) => (
           <td
             style={{
               padding: "8px 12px",
@@ -376,7 +376,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for links
-        a: ({ ...props }) => (
+        a: ({ _node, ...props }) => (
           <Link
             style={{
               color: isDark
@@ -462,7 +462,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for spans (used for icons)
-        span: ({ ...props }) => {
+        span: ({ _node, ...props }) => {
           if (props.className === "type-icon" && props["data-type"]) {
             return (
               <TypeIcon

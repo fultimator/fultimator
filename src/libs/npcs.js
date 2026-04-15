@@ -1,4 +1,5 @@
 export function calcHP(npc) {
+  if (!npc || !npc.attributes) return 0;
   let hp = 2 * npc.lvl + 5 * npc.attributes.might;
 
   // Skill Extra HP
@@ -46,6 +47,7 @@ export function calcHP(npc) {
 }
 
 export function calcMP(npc) {
+  if (!npc || !npc.attributes) return 0;
   let mp = npc.lvl + 5 * npc.attributes.will;
   // Skill Extra MP
   if (npc.extra?.mp) {
@@ -67,6 +69,7 @@ export function calcMP(npc) {
 }
 
 export function calcInit(npc) {
+  if (!npc || !npc.attributes) return 0;
   let init = (npc.attributes.dexterity + npc.attributes.insight) / 2;
 
   // Skill Extra Init

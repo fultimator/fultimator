@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableMagichantKeys } from "../spellOptionData";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function MagichantKeyItem({
   item,
@@ -37,6 +39,9 @@ export default function MagichantKeyItem({
   const isCustom =
     item.name === "magichant_custom_name" ||
     !availableMagichantKeys.find((k) => k.name === item.name);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -51,11 +56,18 @@ export default function MagichantKeyItem({
     });
   };
 
+  const itemDisplayName = item.customName || t(item.name || "magichant_custom_name");
+
   return (
+    <>
     <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Grid container spacing={2} alignItems="flex-start">
-          <Grid item xs={12} sm={5}>
+        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 5
+            }}>
             <FormControl fullWidth>
               <InputLabel>{t("magichant_key")}</InputLabel>
               <Select
@@ -72,58 +84,92 @@ export default function MagichantKeyItem({
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={7}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <TextField
               fullWidth
               label={t("magichant_name")}
               value={isCustom ? (item.customName || "") : t(item.name || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "customName", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_type")}
               value={isCustom ? (item.type || "") : t(item.type || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "type", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_status_effect")}
               value={isCustom ? (item.status || "") : t(item.status || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "status", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_attribute")}
               value={isCustom ? (item.attribute || "") : t(item.attribute || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "attribute", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <TextField
               fullWidth
               label={t("magichant_recovery")}
               value={isCustom ? (item.recovery || "") : t(item.recovery || "")}
               onChange={(e) => isCustom && onItemChange(itemIndex, "recovery", e.target.value)}
-              InputProps={{ readOnly: !isCustom }}
+              slotProps={{
+                input: { readOnly: !isCustom }
+              }}
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 fullWidth
-                onClick={() => onDeleteItem(itemIndex)}
+                onClick={handleDelete}
                 variant="outlined"
                 color="error"
                 startIcon={<Delete />}
@@ -143,5 +189,14 @@ export default function MagichantKeyItem({
         </Grid>
       </CardContent>
     </Card>
+    <DeleteConfirmationDialog
+      open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+      onConfirm={() => onDeleteItem(itemIndex)}
+      title={t("Delete")}
+      message={t("Are you sure you want to delete this item?")}
+      itemPreview={<Box sx={{ fontWeight: "bold" }}>{itemDisplayName}</Box>}
+    />
+    </>
   );
 }

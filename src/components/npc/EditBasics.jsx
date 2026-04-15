@@ -121,10 +121,14 @@ export default function EditBasics({ npc, setNpc }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <CustomHeader type="top" headerText={t("Basic Information")} showIconButton={false} />
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 4
+        }}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -134,7 +138,11 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={8}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="traits"
@@ -144,10 +152,10 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid item xs={4}>
+      <Grid  size={4}>
         <EditLevel npc={npc} setnpc={setNpc} />
       </Grid>
-      <Grid item xs={4}>
+      <Grid  size={4}>
         <FormControl fullWidth>
           <InputLabel id="species">{t("Species:")}</InputLabel>
           <Select
@@ -169,7 +177,7 @@ export default function EditBasics({ npc, setNpc }) {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={4}>
+      <Grid  size={4}>
         <Stack spacing={1}>
           <FormControl fullWidth>
             <InputLabel id="rank">{t("Rank:")}</InputLabel>
@@ -194,9 +202,8 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Stack>
       </Grid>
-
       {/* Villain & Phase Section*/}
-      <Grid item xs={4}>
+      <Grid  size={4}>
         <FormControl fullWidth>
           <TextField
             labelid="phases"
@@ -208,9 +215,8 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-
       {npc.rank !== "companion" && (
-        <Grid item xs={8}>
+        <Grid  size={8}>
           <FormControl fullWidth>
             <InputLabel id="villain">{t("Villain:")}</InputLabel>
             <Select
@@ -228,9 +234,8 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Grid>
       )}
-
       {npc.rank === "companion" && (
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl fullWidth>
             <InputLabel id="companionlvl">{t("Skill Level:")}</InputLabel>
             <Select
@@ -249,9 +254,8 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Grid>
       )}
-
       {npc.rank === "companion" && (
-        <Grid item xs={4}>
+        <Grid  size={4}>
           <FormControl variant="standard" fullWidth>
             <TextField
               labelid="companionpclvl"
@@ -264,8 +268,7 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Grid>
       )}
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
@@ -282,10 +285,9 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-
       {npc.rank === "groupvehicle" && (
-        <Grid item xs={12} container>
-          <Grid item xs={4}>
+        <Grid  container size={12}>
+          <Grid  size={4}>
             <FormControl fullWidth>
               <InputLabel id="sizes">{t("Vehicle Size:")}</InputLabel>
               <Select
@@ -304,7 +306,11 @@ export default function EditBasics({ npc, setNpc }) {
           </Grid>
         </Grid>
       )}
-      <Grid item xs={12} sm={8}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         <TextField
           id="imgurl"
           label={t("Image URL") + ":"}
@@ -321,7 +327,11 @@ export default function EditBasics({ npc, setNpc }) {
           }
         />
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <Button
           variant="contained"
           onClick={() => {
@@ -349,7 +359,11 @@ export default function EditBasics({ npc, setNpc }) {
           message={t("Image uploaded successfully!")}
         />
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <Button
           variant="outlined"
           onClick={() => {
@@ -367,7 +381,7 @@ export default function EditBasics({ npc, setNpc }) {
           {t("Remove Image")}
         </Button>
       </Grid>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="Description"
@@ -386,12 +400,19 @@ export default function EditBasics({ npc, setNpc }) {
           />
         </FormControl>
       </Grid>
-
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <EditAttributes npc={npc} setNpc={setNpc} />
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <Grid item>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
+        <Grid >
           <Card
             sx={{
               p: 1.61,
@@ -425,16 +446,19 @@ export default function EditBasics({ npc, setNpc }) {
           </Card>
         </Grid>
       </Grid>
-
       {/* DEF/M.DEF Override Section */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <CustomHeader
           type="top"
           headerText={t("Defense Override")}
           showIconButton={false}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Card
           sx={{
             p: 2,
@@ -502,7 +526,11 @@ export default function EditBasics({ npc, setNpc }) {
           )}
         </Card>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 6
+        }}>
         <Card
           sx={{
             p: 2,
@@ -609,26 +637,28 @@ function EditLevel({ npc, setnpc }) {
         min={5}
         max={60}
         value={npc.lvl}
-        InputProps={{
-          readOnly: true,
-          startAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="start"
-              onClick={onLowerLevel}
-            >
-              <Remove />
-            </IconButton>
-          ),
-          endAdornment: (
-            <IconButton
-              aria-label="toggle password visibility"
-              edge="end"
-              onClick={onRaiseLevel}
-            >
-              <Add />
-            </IconButton>
-          ),
+        slotProps={{
+          input: {
+            readOnly: true,
+            startAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                edge="start"
+                onClick={onLowerLevel}
+              >
+                <Remove />
+              </IconButton>
+            ),
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                edge="end"
+                onClick={onRaiseLevel}
+              >
+                <Add />
+              </IconButton>
+            ),
+          }
         }}
       />
     </FormControl>

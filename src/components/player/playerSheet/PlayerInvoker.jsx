@@ -27,7 +27,7 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { NonStaticSpellCard } from "../../compendium/ItemCards";
 import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
-export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
+export default function PlayerInvoker({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
@@ -36,7 +36,7 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
   const ternary = theme.palette.ternary.main;
 
   const [selectedInvocation, setSelectedInvocation] = useState(null);
-  const [selectedInvokerSpell, setSelectedInvokerSpell] = useState(null);
+  const [_selectedInvokerSpell, setSelectedInvokerSpell] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = (invokerSpell, invocation) => {
@@ -143,145 +143,143 @@ export default function PlayerInvoker({ player, setPlayer, isEditMode }) {
             >
               {t("Invoker")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {invokerSpells.map((invokerSpell, isIndex) => {
                 const availableInvocations =
                   invokerSpell.availableInvocations && invokerSpell.availableInvocations.length > 0
                     ? invokerSpell.availableInvocations
                     : buildInvokerAvailableInvocations(invokerSpell.skillLevel);
                 return (
-                <React.Fragment key={isIndex}>
-                  {/* Wellspring Selection Section */}
-                  <Grid item xs={12} sx={{ mb: 2 }}>
-                    <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {t("invoker_invocation_active_wellspring")} - {t(invokerSpell.className)}
-                    </Typography>
-                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                      {wellspringList.map((wellspring) => {
-                        const wellspringColor = getWellspringColor(wellspring.name);
-                        const isActive = invokerSpell.activeWellsprings?.includes(wellspring.name) || false;
-                        const isInnerWellspring = invokerSpell.innerWellspring && invokerSpell.chosenWellspring === wellspring.name;
-                        const IconComponent = wellspring.icon;
+                  <React.Fragment key={isIndex}>
+                    {/* Wellspring Selection Section */}
+                    <Grid  sx={{ mb: 2 }} size={12}>
+                      <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
+                        {t("invoker_invocation_active_wellspring")} - {t(invokerSpell.className)}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                        {wellspringList.map((wellspring) => {
+                          const wellspringColor = getWellspringColor(wellspring.name);
+                          const isActive = invokerSpell.activeWellsprings?.includes(wellspring.name) || false;
+                          const isInnerWellspring = invokerSpell.innerWellspring && invokerSpell.chosenWellspring === wellspring.name;
+                          const IconComponent = wellspring.icon;
 
-                        return (
-                          <Chip
-                            key={wellspring.name}
-                            label={t(`invoker_${wellspring.name.toLowerCase()}`)}
-                            icon={<IconComponent />}
-                            onClick={isInnerWellspring || !setPlayer ? undefined : () => handleWellspringToggle(invokerSpell, wellspring.name)}
-                            variant={isActive || isInnerWellspring ? "filled" : "outlined"}
-                            sx={{
-                              backgroundColor: isActive || isInnerWellspring ? wellspringColor : "transparent",
-                              color: (isActive || isInnerWellspring) 
-                                ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black !important' : 'white !important') 
-                                : theme.palette.text.primary,
-                              borderColor: isInnerWellspring ? "#4CAF50" : wellspringColor,
-                              borderWidth: isActive || isInnerWellspring ? "2px" : "1px",
-                              fontWeight: isActive || isInnerWellspring ? "bold" : "normal",
-                              cursor: isInnerWellspring || !setPlayer ? "default" : "pointer",
-                              "& .MuiChip-icon": {
-                                color: (isActive || isInnerWellspring) ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black' : 'white') : wellspringColor,
-                              },
-                              "&:hover": {
-                                backgroundColor: isInnerWellspring ? wellspringColor : isActive ? wellspringColor : `${wellspringColor}20`,
+                          return (
+                            <Chip
+                              key={wellspring.name}
+                              label={t(`invoker_${wellspring.name.toLowerCase()}`)}
+                              icon={<IconComponent />}
+                              onClick={isInnerWellspring || !setPlayer ? undefined : () => handleWellspringToggle(invokerSpell, wellspring.name)}
+                              variant={isActive || isInnerWellspring ? "filled" : "outlined"}
+                              sx={{
+                                backgroundColor: isActive || isInnerWellspring ? wellspringColor : "transparent",
                                 color: (isActive || isInnerWellspring) 
                                   ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black !important' : 'white !important') 
                                   : theme.palette.text.primary,
-                              },
-                              ...(isInnerWellspring && {
-                                boxShadow: `0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)`,
-                                border: "2px solid #2E7D32",
-                              }),
-                            }}
-                          />
-                        );
-                      })}
-                    </Box>
-                  </Grid>
-
-                  {/* Available Invocations */}
-                  {availableInvocations.length === 0 ? (
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
-                        {t("invoker_no_invocation_warning")}
-                      </Typography>
+                                borderColor: isInnerWellspring ? "#4CAF50" : wellspringColor,
+                                borderWidth: isActive || isInnerWellspring ? "2px" : "1px",
+                                fontWeight: isActive || isInnerWellspring ? "bold" : "normal",
+                                cursor: isInnerWellspring || !setPlayer ? "default" : "pointer",
+                                "& .MuiChip-icon": {
+                                  color: (isActive || isInnerWellspring) ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black' : 'white') : wellspringColor,
+                                },
+                                "&:hover": {
+                                  backgroundColor: isInnerWellspring ? wellspringColor : isActive ? wellspringColor : `${wellspringColor}20`,
+                                  color: (isActive || isInnerWellspring) 
+                                    ? (wellspring.name === 'Air' || wellspring.name === 'Lightning' ? 'black !important' : 'white !important') 
+                                    : theme.palette.text.primary,
+                                },
+                                ...(isInnerWellspring && {
+                                  boxShadow: `0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)`,
+                                  border: "2px solid #2E7D32",
+                                }),
+                              }}
+                            />
+                          );
+                        })}
+                      </Box>
                     </Grid>
-                  ) : (
-                    availableInvocations
-                      .filter((invocation) => {
-                        if (invokerSpell.activeWellsprings?.includes(invocation.wellspring)) return true;
-                        if (invokerSpell.innerWellspring && invokerSpell.chosenWellspring === invocation.wellspring) return true;
-                        return false;
-                      })
-                      .map((invocation, iIndex) => (
-                        <Grid
-                          item
-                          container
-                          xs={12}
-                          md={6}
-                          key={`${isIndex}-${iIndex}`}
-                          sx={{ display: "flex", alignItems: "stretch" }}
-                        >
-                          <Grid item xs={10} sx={{ display: "flex" }}>
-                            <Typography
-                              id="spell-left-name"
-                              variant="h2"
-                              sx={{
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                                backgroundColor: primary,
-                                padding: "5px",
-                                paddingLeft: "10px",
-                                color: "#fff",
-                                borderRadius: "8px 0 0 8px",
-                                borderLeft: `6px solid ${getWellspringColor(invocation.wellspring)}`,
-                                display: "flex",
-                                alignItems: "center",
-                                width: "100%",
-                              }}
-                            >
-                              {t(invocation.name)}
-                            </Typography>
-                          </Grid>
+                    {/* Available Invocations */}
+                    {availableInvocations.length === 0 ? (
+                      <Grid  size={12}>
+                        <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
+                          {t("invoker_no_invocation_warning")}
+                        </Typography>
+                      </Grid>
+                    ) : (
+                      availableInvocations
+                        .filter((invocation) => {
+                          if (invokerSpell.activeWellsprings?.includes(invocation.wellspring)) return true;
+                          if (invokerSpell.innerWellspring && invokerSpell.chosenWellspring === invocation.wellspring) return true;
+                          return false;
+                        })
+                        .map((invocation, iIndex) => (
                           <Grid
-                            item
-                            xs={2}
-                            sx={{ display: "flex", alignItems: "stretch" }}
-                          >
-                            <div
-                              id="spell-right-controls"
-                              style={{
-                                padding: "10px",
-                                backgroundColor: ternary,
-                                borderRadius: "0 8px 8px 0",
-                                marginRight: "15px",
-                                display: "flex",
-                                alignItems: "center",
-                                flexDirection: "row",
-                              }}
-                              className="spell-right-controls"
-                            >
-                              <Tooltip title={t("Info")}>
-                                <IconButton
-                                  sx={{ padding: "0px" }}
-                                  onClick={() => handleOpenModal(invokerSpell, invocation)}
-                                >
-                                  <Info />
-                                </IconButton>
-                              </Tooltip>
-                            </div>
+                  container
+                  spacing={0}
+                  key={`${isIndex}-${iIndex}`}
+                            sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                            size={{
+                              xs: 12,
+                              md: 6
+                            }}>
+                            <Grid  sx={{ display: "flex" }} size={10}>
+                              <Typography
+                                id="spell-left-name"
+                                variant="h2"
+                                sx={{
+                                  fontWeight: "bold",
+                                  textTransform: "uppercase",
+                                  backgroundColor: primary,
+                                  padding: "5px",
+                                  paddingLeft: "10px",
+                                  color: "#fff",
+                                  borderRadius: "8px 0 0 8px",
+                                  borderLeft: `6px solid ${getWellspringColor(invocation.wellspring)}`,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  width: "100%",
+                                }}
+                              >
+                                {t(invocation.name)}
+                              </Typography>
+                            </Grid>
+                            <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                              <div
+                                id="spell-right-controls"
+                                style={{
+                                  padding: "10px",
+                                  backgroundColor: ternary,
+                                  borderRadius: "0 8px 8px 0",
+                                  marginRight: "15px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  flexDirection: "row",
+                                }}
+                                className="spell-right-controls"
+                              >
+                                <Tooltip title={t("Info")}>
+                                  <IconButton
+                                    sx={{ padding: "0px" }}
+                                    onClick={() => handleOpenModal(invokerSpell, invocation)}
+                                  >
+                                    <Info />
+                                  </IconButton>
+                                </Tooltip>
+                              </div>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                      ))
-                  )}
-                </React.Fragment>
+                        ))
+                    )}
+                  </React.Fragment>
                 );
               })}
             </Grid>
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
-              PaperProps={{ sx: { width: { xs: "90%", md: "80%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+              }}
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedInvocation && (

@@ -35,7 +35,7 @@ export default function SpellDance({ spell }) {
               {dance.name === "dance_custom_name" ? dance.duration : t(dance.duration)}
             </StyledTableCell>
             <StyledTableCell sx={{ width: "50%", fontSize: "0.75rem" }}>
-              <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+              <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                 {dance.name === "dance_custom_name" ? dance.effect : t(dance.effect)}
               </ReactMarkdown>
             </StyledTableCell>

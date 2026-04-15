@@ -45,7 +45,7 @@ export default function SpellGourmet({ spell }) {
       }
     });
     
-    return <ReactMarkdown components={{ p: props => <span {...props} /> }}>{displayText}</ReactMarkdown>;
+    return <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>{displayText}</ReactMarkdown>;
   };
 
   // Convert cookbook effects to array
@@ -89,7 +89,13 @@ export default function SpellGourmet({ spell }) {
         {spell.ingredientInventory && spell.ingredientInventory.some(i => i.quantity > 0) && (
           <TableRow>
             <StyledTableCell colSpan={2} sx={{ pt: 1 }}>
-              <Typography variant="caption" fontWeight="bold" display="block" sx={{ mb: 0.5 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  fontWeight: "bold",
+                  mb: 0.5
+                }}>
                 {t("gourmet_ingredient_inventory")}:
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

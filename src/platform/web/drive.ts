@@ -20,7 +20,9 @@ function getStoredToken(): string | null {
 export function storeAccessToken(token: string): void {
   try {
     sessionStorage.setItem(DRIVE_TOKEN_KEY, token);
-  } catch {}
+  } catch {
+    // sessionStorage not available
+  }
 }
 
 /** Re-sign-in with Google to obtain a fresh access token (includes drive.file scope). */

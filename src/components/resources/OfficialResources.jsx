@@ -61,7 +61,13 @@ export default function OfficialResources({ groupedOfficialResources }) {
 
             <Grid container spacing={3}>
               {langData.resources.map((resource, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
+                <Grid
+                  key={index}
+                  size={{
+                    xs: 12,
+                    md: 6,
+                    lg: 4
+                  }}>
                   <ResourceCard resource={resource} />
                 </Grid>
               ))}

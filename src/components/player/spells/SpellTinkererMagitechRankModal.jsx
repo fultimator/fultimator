@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Grid,
   FormControl,
   InputLabel,
   Select,
@@ -16,6 +15,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
+import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 export default function SpellTinkererMagitechRankModal({
   open,
@@ -32,6 +33,9 @@ export default function SpellTinkererMagitechRankModal({
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
     magitech?.showInPlayerSheet !== false
   );
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   // Update state if magitech prop changes
   useEffect(() => {
@@ -50,20 +54,17 @@ export default function SpellTinkererMagitechRankModal({
       showInPlayerSheet: showInPlayerSheet,
     });
   };
-
-  const handleDelete = () => {
-    onDelete(magitech.index);
-  };
-
-  return (
+return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -87,8 +88,10 @@ export default function SpellTinkererMagitechRankModal({
           label={t("Magitech Name")}
           value={spellName}
           onChange={(e) => setSpellName(e.target.value)}
-          inputProps={{ maxLength: 50 }}
           margin="normal"
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
         <FormControl fullWidth sx={{ mt: 2 }}>
           <InputLabel>{t("Select Rank")}</InputLabel>
@@ -121,6 +124,13 @@ export default function SpellTinkererMagitechRankModal({
           {t("Save Changes")}
         </Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(magitech.index)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this magitech entry?")}
+      />
     </Dialog>
   );
 }

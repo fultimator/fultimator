@@ -114,13 +114,14 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
       <Grid
         container
         spacing={{ xs: 1, md: 2 }}
-        sx={{ padding: "1em" }}
-        alignItems="center"
-        justifyContent="center"
-        direction={{ xs: "row", md: "row" }}
+        sx={{ padding: "1em", alignItems: "center", width: "100%" }}
       >
         {/* Fabula Points */}
-        <Grid item xs={4} md={4}>
+        <Grid
+          size={{
+            xs: 4,
+            md: 4
+          }}>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
               <Typography variant="h6" sx={{ fontSize: { xs: "0.8rem", md: "1rem" }, fontWeight: "bold", textTransform: "uppercase" }}>
@@ -136,7 +137,9 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
                   onChange={(e) => handleUpdate("fabulapoints", parseInt(e.target.value, 10) || 0)}
                   size="small"
                   variant="standard"
-                  inputProps={{ style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }}
+                  slotProps={{
+                    htmlInput: { style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }
+                  }}
                 />
                 <IconButton size="small" onClick={() => handleIncrement("fabulapoints", 1)}><Add fontSize="small" /></IconButton>
               </Box>
@@ -147,7 +150,11 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
         </Grid>
 
         {/* EXP */}
-        <Grid item xs={4} md={4}>
+        <Grid
+          size={{
+            xs: 4,
+            md: 4
+          }}>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}>
               <Typography variant="h6" sx={{ fontSize: { xs: "0.8rem", md: "1rem" }, fontWeight: "bold", textTransform: "uppercase" }}>
@@ -163,7 +170,9 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
                   onChange={(e) => handleUpdate("exp", parseInt(e.target.value, 10) || 0)}
                   size="small"
                   variant="standard"
-                  inputProps={{ style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }}
+                  slotProps={{
+                    htmlInput: { style: { textAlign: "center", width: "40px", fontWeight: "bold", fontSize: "1.2rem" } }
+                  }}
                 />
                 <IconButton size="small" onClick={() => handleIncrement("exp", 1)}><Add fontSize="small" /></IconButton>
               </Box>
@@ -174,7 +183,11 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
         </Grid>
 
         {/* Zenit */}
-        <Grid item xs={4} md={4}>
+        <Grid
+          size={{
+            xs: 4,
+            md: 4
+          }}>
           <Box 
             sx={{ display: "flex", flexDirection: "column", alignItems: "center", cursor: isOwner ? "pointer" : "default" }}
             onClick={isOwner ? () => setZenitOpen(true) : undefined}
@@ -189,7 +202,6 @@ export default function PlayerNumbers({ player, setPlayer, isEditMode, isOwner, 
           </Box>
         </Grid>
       </Grid>
-
       <ZenitDialog
         open={zenitOpen}
         handleClose={() => setZenitOpen(false)}

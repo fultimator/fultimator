@@ -4,13 +4,13 @@ import {
   CardContent,
   CardActions,
   Typography,
+  Button,
   IconButton,
   Box,
   Tooltip,
   Chip,
   Divider,
   useTheme,
-  Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -19,10 +19,15 @@ import UpdateIcon from "@mui/icons-material/Update";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { t } from "../../translation/translate";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSelected = false, onToggleSelect }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete: _handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {},
+  });;
 
   // Format dates in a more readable way
   const formatDate = (dateString) => {
@@ -39,39 +44,45 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
     }
   };
 
+  const openDeleteDialog = (event) => {
+    event.stopPropagation();
+    setDeleteDialogOpen(true);
+  };
+
   return (
-    <Card
-      elevation={isDarkMode ? 4 : 2}
-      onClick={handleCardClick}
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        borderRadius: 2,
-        transition: "all 0.25s ease-in-out",
-        backgroundColor: isDarkMode
-          ? theme.palette.grey[900]
-          : theme.palette.background.paper,
-        border: isSelected
-          ? `3px solid ${theme.palette.primary.main}`
-          : `1px solid ${isDarkMode ? theme.palette.grey[800] : theme.palette.grey[200]}`,
-        cursor: selectMode ? "pointer" : "default",
-        outline: selectMode && !isSelected ? `1px dashed ${theme.palette.divider}` : "none",
-        "&:hover": {
-          transform: "translateY(-4px)",
+    <>
+      <Card
+        elevation={isDarkMode ? 4 : 2}
+        onClick={handleCardClick}
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: 2,
+          transition: "all 0.25s ease-in-out",
+          backgroundColor: isDarkMode
+            ? theme.palette.grey[900]
+            : theme.palette.background.paper,
           border: isSelected
             ? `3px solid ${theme.palette.primary.main}`
-            : isDarkMode
-            ? `1px solid ${theme.palette.primary.dark}`
-            : `1px solid ${theme.palette.primary.light}`,
-          "& .header-box": {
-            borderTopColor: theme.palette.primary.main,
+            : `1px solid ${isDarkMode ? theme.palette.grey[800] : theme.palette.grey[200]}`,
+          cursor: selectMode ? "pointer" : "default",
+          outline: selectMode && !isSelected ? `1px dashed ${theme.palette.divider}` : "none",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            border: isSelected
+              ? `3px solid ${theme.palette.primary.main}`
+              : isDarkMode
+              ? `1px solid ${theme.palette.primary.dark}`
+              : `1px solid ${theme.palette.primary.light}`,
+            "& .header-box": {
+              borderTopColor: theme.palette.primary.main,
+            },
           },
-        },
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
       {/* Card header with round indicator */}
       <Box
         className="header-box"
@@ -114,14 +125,15 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
           sx={{ fontWeight: "bold", flexShrink: 0 }}
         />
       </Box>
-
       <CardContent sx={{ flexGrow: 1, pt: 2, pb: 1 }}>
         <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
           <CalendarTodayIcon
             fontSize="small"
             sx={{ color: theme.palette.text.secondary, mr: 1 }}
           />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {t("combat_sim_created")}: {formatDate(encounter.createdAt)}
           </Typography>
         </Box>
@@ -131,14 +143,14 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
             fontSize="small"
             sx={{ color: theme.palette.text.secondary, mr: 1 }}
           />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {t("combat_sim_last_updated")}: {formatDate(encounter.updatedAt)}
           </Typography>
         </Box>
       </CardContent>
-
       <Divider />
-
       <CardActions sx={{ justifyContent: "space-between", p: 1 }}>
         <Tooltip title={t("combat_sim_continue")}>
           <span>
@@ -166,26 +178,38 @@ const EncounterCard = ({ encounter, onDelete, onClick, selectMode = false, isSel
         </Tooltip>
 
         <Tooltip title={t("Delete")}>
-          <IconButton
-            size="small"
-            disabled={selectMode}
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(encounter.id);
-            }}
-            sx={{
-              color: theme.palette.error.main,
-              "&:hover": {
-                backgroundColor: theme.palette.error.light,
-                color: theme.palette.error.dark,
-              },
-            }}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
+          <span>
+            <IconButton
+              size="small"
+              disabled={selectMode}
+              onClick={openDeleteDialog}
+              sx={{
+                color: theme.palette.error.main,
+                "&:hover": {
+                  backgroundColor: theme.palette.error.light,
+                  color: theme.palette.error.dark,
+                },
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </span>
         </Tooltip>
       </CardActions>
-    </Card>
+      </Card>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => onDelete(encounter.id)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this encounter?")}
+        itemPreview={
+          <Typography variant="h4">
+            {encounter.name}
+          </Typography>
+        }
+      />
+    </>
   );
 };
 

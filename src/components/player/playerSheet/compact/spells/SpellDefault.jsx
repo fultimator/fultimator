@@ -4,46 +4,14 @@ import {
   Table,
   TableBody,
   TableRow,
-  TableCell,
   Box,
 } from "@mui/material";
-import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "../../../../icons";
 import attributes from "../../../../../libs/attributes";
 import { CloseBracket, OpenBracket } from "../../../../Bracket";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-
-const StyledTableCell = styled(TableCell)({ 
-  padding: "4px 8px",
-  fontSize: "0.85rem",
-  borderBottom: "1px solid rgba(224, 224, 224, 1)"
-});
-
-const StyledMarkdown = ({ children, ...props }) => {
-  return (
-    <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 0 }}>
-      <ReactMarkdown
-        {...props}
-        rehypePlugins={[rehypeRaw]}
-        components={{
-          p: (props) => <p style={{ margin: 0, padding: 0, fontSize: "0.8rem" }} {...props} />,
-          ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-          li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-          strong: (props) => (
-            <strong style={{ fontWeight: "bold" }} {...props} />
-          ),
-          em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
-          mark: (props) => <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />,
-        }}
-      >
-        {children}
-      </ReactMarkdown>
-    </div>
-  );
-};
+import { StyledTableCell, StyledMarkdown } from "./StyledSpellComponents";
 
 export default function SpellDefault({
   spellName,
@@ -55,7 +23,7 @@ export default function SpellDefault({
   isOffensive,
   attr1,
   attr2,
-  isMagisphere,
+  _isMagisphere,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -71,11 +39,17 @@ export default function SpellDefault({
           }}
         >
           <StyledTableCell sx={{ width: "40%" }}>
-            <Box display="flex" alignItems="center" gap={0.5}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 0.5,
+                alignItems: "center"
+              }}>
               <Typography
-                fontWeight="bold"
-                sx={{ fontSize: "0.85rem" }}
-              >
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "0.85rem"
+                }}>
                 {spellName}
               </Typography>
               {isOffensive && <OffensiveSpellIcon sx={{ fontSize: "0.85rem" }} />}

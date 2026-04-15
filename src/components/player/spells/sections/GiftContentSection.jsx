@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import GiftItem from "./GiftItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableGifts } from "../spellOptionData";
 
 export default function GiftContentSection({ formState, setFormState, t }) {
-  const currentGifts = formState.gifts || [];
+  const currentGifts = useMemo(() => formState.gifts || [], [formState.gifts]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankGift = useCallback(() => {

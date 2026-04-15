@@ -92,11 +92,11 @@ export default function PlayerAccessories({
         openCompendium={isEditMode ? onOpenCompendium : undefined}
       />
       <AccordionDetails>
-        <Grid container justifyContent="flex-end" spacing={2}>
+        <Grid container sx={{ justifyContent: "flex-end" }} spacing={2}>
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {accessories.map((accessory, index) => (
             <React.Fragment key={index}>
-              <Grid item xs={12} sx={{ mb: 1 }}>
+              <Grid  sx={{ mb: 1 }} size={12}>
                 <Box>
                   <PrettyAccessory accessory={accessory} />
                 </Box>
@@ -119,59 +119,63 @@ export default function PlayerAccessories({
                             : t("Equip Accessory")
                         }
                       >
-                        <Badge
+                        <span>
+                          <Badge
                           badgeContent="E"
                           color="primary"
                           invisible={!accessory.isEquipped}
                           sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
-                        >
-                          <IconButton
-                            onClick={() => onEquipAccessory(index)}
-
-                            disabled={!isEditMode}
-                            size="small"
-                            sx={{
-                              backgroundColor: accessory.isEquipped
-                                ? theme.palette.ternary.main
-                                : theme.palette.background.paper,
-                              "&:hover": {
-                                backgroundColor: accessory.isEquipped
-                                  ? theme.palette.quaternary.main
-                                  : theme.palette.secondary.main,
-                              },
-                              transition: "background-color 0.3s",
-                              p: 0.5,
-                              border: `1px solid ${theme.palette.divider}`
-                            }}
                           >
-                            <Equip
-                              size={18}
-                              color={
-                                accessory.isEquipped
-                                  ? theme.palette.mode === "dark"
+                            <IconButton
+                              onClick={() => onEquipAccessory(index)}
+
+                              disabled={!isEditMode}
+                              size="small"
+                              sx={{
+                                backgroundColor: accessory.isEquipped
+                                  ? theme.palette.ternary.main
+                                  : theme.palette.background.paper,
+                                "&:hover": {
+                                  backgroundColor: accessory.isEquipped
+                                    ? theme.palette.quaternary.main
+                                    : theme.palette.secondary.main,
+                                },
+                                transition: "background-color 0.3s",
+                                p: 0.5,
+                                border: `1px solid ${theme.palette.divider}`
+                              }}
+                            >
+                              <Equip
+                                size={18}
+                                color={
+                                  accessory.isEquipped
+                                    ? theme.palette.mode === "dark"
+                                      ? theme.palette.white.main
+                                      : theme.palette.primary.main
+                                    : theme.palette.text.secondary
+                                }
+                                strokeColor={
+                                  accessory.isEquipped &&
+                                  theme.palette.mode === "dark"
                                     ? theme.palette.white.main
-                                    : theme.palette.primary.main
-                                  : theme.palette.text.secondary
-                              }
-                              strokeColor={
-                                accessory.isEquipped &&
-                                theme.palette.mode === "dark"
-                                  ? theme.palette.white.main
-                                  : theme.palette.secondary.main
-                              }
-                            />
-                          </IconButton>
-                        </Badge>
+                                    : theme.palette.secondary.main
+                                }
+                              />
+                            </IconButton>
+                          </Badge>
+                        </span>
                       </Tooltip>
                     ) : (
                       <Tooltip title={t("Not proficient  -  martial item")}>
-                        <IconButton
-                          onClick={() => onEquipAccessory(index)}
-                          disabled={!isEditMode}
-                          size="small"
-                        >
-                          <WarningAmber color="warning" fontSize="small" />
-                        </IconButton>
+                        <span>
+                          <IconButton
+                            onClick={() => onEquipAccessory(index)}
+                            disabled={!isEditMode}
+                            size="small"
+                          >
+                            <WarningAmber color="warning" fontSize="small" />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     )}
                   </Box>

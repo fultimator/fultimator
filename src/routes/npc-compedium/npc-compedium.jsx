@@ -49,7 +49,7 @@ import {
   KeyboardArrowUp,
 } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import allToken from "../icons/All-token.webp";
 import beastToken from "../icons/Beast-token.webp";
@@ -73,20 +73,24 @@ export default function NpcCompedium() {
   return (
     <Layout>
       {loading && <Skeleton />}
-
       {!loading && !user && (
         <Paper
           elevation={3}
           sx={{ p: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
         >
           <CloudIcon color="primary" />
-          <Typography variant="body2" color="text.primary" sx={{ flex: 1, minWidth: 200 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200
+            }}>
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
         </Paper>
       )}
-
       {user && <Personal user={user} />}
     </Layout>
   );
@@ -241,19 +245,16 @@ function Personal({ user }) {
   const enemyType = (token, name, label) => {
     const isMobile = window.innerWidth < 900;
     return (
-      <Grid
-        item
-        xs={4}
-        md={1.3}
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          display: "flex",
-          flexDirection: "column",
+      <Grid sx={{
           alignItems: "center",
           justifyContent: "center",
+          display: "flex",
+          flexDirection: "column",
         }}
-      >
+        size={{
+          xs: 4,
+          md: 1.3
+        }}>
         <Avatar
           alt="icon"
           src={token}
@@ -340,7 +341,7 @@ function Personal({ user }) {
   return (
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+        <Grid container spacing={1} sx={{ py: 1, justifyContent: "center" }}>
           {enemyType(allToken, "All", t("All"))}
           {enemyType(beastToken, "Beast", t("Beast"))}
           {enemyType(constructToken, "Construct", t("Construct"))}
@@ -352,16 +353,13 @@ function Personal({ user }) {
           {enemyType(undeadToken, "Undead", t("Undead"))}
         </Grid>
 
-        <Grid container spacing={1} sx={{ py: 0 }} justifyContent="center">
-          <Grid
-            item
-            xs={12}
-            md={3}
-            lg={4}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
+        <Grid container spacing={1} sx={{ py: 0, justifyContent: "center" }}>
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+            size={{
+              xs: 12,
+              md: 3,
+              lg: 4
+            }}>
             <TextField
               id="outlined-basic"
               label={t("Adversary Name")}
@@ -375,14 +373,11 @@ function Personal({ user }) {
             />
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            md={3}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex", marginLeft: 5, marginRight: 5 }}
-          >
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex", marginLeft: 5, marginRight: 5 }}
+            size={{
+              xs: 12,
+              md: 3
+            }}>
             <Slider
               getAriaLabel={() => "Level"}
               value={levels}
@@ -400,14 +395,11 @@ function Personal({ user }) {
               }}
             />
           </Grid>
-          <Grid
-            item
-            xs={6}
-            md={2}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
-          >
+          <Grid sx={{ alignItems: "center", justifyContent: "center", display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel id="rank">{t("Rank:")}</InputLabel>
               <Select
@@ -415,7 +407,7 @@ function Personal({ user }) {
                 id="select-rank"
                 value={rank}
                 label={t("Rank:")}
-                onChange={(evt, val2) => {
+                onChange={(evt, _val2) => {
                   setRank(evt.target.value);
                 }}
               >
@@ -434,7 +426,11 @@ function Personal({ user }) {
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid sx={{ alignItems: "center", display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <FormControl fullWidth size="small">
               <InputLabel id="Language">{t("Language:")}</InputLabel>
               <Select
@@ -454,7 +450,11 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid sx={{ alignItems: "center", display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <Button
               variant="outlined"
               fullWidth
@@ -466,13 +466,11 @@ function Personal({ user }) {
             </Button>
           </Grid>
           <Grid
-            item
-            xs={6}
-            md={2}
-            sx={{}}
-            alignItems="center"
-            justifyContent="center"
-          >
+            sx={{ alignItems: "center", justifyContent: "center" }}
+            size={{
+              xs: 6,
+              md: 2
+            }}>
             <Button
               fullWidth
               variant="contained"
@@ -494,7 +492,6 @@ function Personal({ user }) {
           </Grid>
         </Grid>
       </Paper>
-
       {isMobile ? (
         <div>
           {personalList?.map((npc, i) => {
@@ -558,7 +555,6 @@ function Personal({ user }) {
           </div>
         </div>
       )}
-
       <div
         style={{
           display: "flex",
@@ -595,7 +591,11 @@ function Personal({ user }) {
               </>
             ) : (
               <div style={{ textAlign: "center" }}>
-                <Typography fontWeight={700} marginBottom={4}>
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    marginBottom: 4
+                  }}>
                   {t(" No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
@@ -628,7 +628,6 @@ function Personal({ user }) {
           <CircularProgress />
         )}
       </div>
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
@@ -665,7 +664,12 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const [collapse, setCollapse] = useState(false);
 
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
+    <Grid
+      sx={{ marginBottom: 3 }}
+      size={{
+        xs: 12,
+        md: 12
+      }}>
       <NpcPretty
         npc={npc}
         ref={ref}

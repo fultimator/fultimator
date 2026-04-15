@@ -36,19 +36,18 @@ export default function EditManualStats({
     setPlayer((prevPlayer) => ({
       ...prevPlayer,
       modifiers: {
-        hp: parseInt(hpModifier),
-        mp: parseInt(mpModifier),
-        ip: parseInt(ipModifier),
-        def: parseInt(defModifier),
-        mdef: parseInt(mdefModifier),
-        init: parseInt(initModifier),
-        meleePrec: parseInt(meleePrecModifier),
-        rangedPrec: parseInt(rangedPrecModifier),
-        magicPrec: parseInt(magicPrecModifier),
+        hp: parseInt(hpModifier) || 0,
+        mp: parseInt(mpModifier) || 0,
+        ip: parseInt(ipModifier) || 0,
+        def: parseInt(defModifier) || 0,
+        mdef: parseInt(mdefModifier) || 0,
+        init: parseInt(initModifier) || 0,
+        meleePrec: parseInt(meleePrecModifier) || 0,
+        rangedPrec: parseInt(rangedPrecModifier) || 0,
+        magicPrec: parseInt(magicPrecModifier) || 0,
       },
     }));
     updateMaxStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     hpModifier,
     mpModifier,
@@ -59,6 +58,8 @@ export default function EditManualStats({
     meleePrecModifier,
     rangedPrecModifier,
     magicPrecModifier,
+    setPlayer,
+    updateMaxStats,
   ]);
 
   return (
@@ -72,14 +73,19 @@ export default function EditManualStats({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader
             type="top"
             headerText={t("Edit Stats Manually")}
             showIconButton={false}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max HP Modifier")}
             type="number"
@@ -90,12 +96,19 @@ export default function EditManualStats({
               hpModifier > 0 ? "success" : hpModifier < 0 ? "error" : "primary"
             }
             focused={hpModifier > 0 || hpModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max MP Modifier")}
             type="number"
@@ -106,12 +119,19 @@ export default function EditManualStats({
               mpModifier > 0 ? "success" : mpModifier < 0 ? "error" : "primary"
             }
             focused={mpModifier > 0 || mpModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max IP Modifier")}
             type="number"
@@ -122,12 +142,19 @@ export default function EditManualStats({
               ipModifier > 0 ? "success" : ipModifier < 0 ? "error" : "primary"
             }
             focused={ipModifier > 0 || ipModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max DEF Modifier")}
             type="number"
@@ -142,12 +169,19 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={defModifier > 0 || defModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max MDEF Modifier")}
             type="number"
@@ -162,12 +196,19 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={mdefModifier > 0 || mdefModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Max INIT Modifier")}
             type="number"
@@ -182,12 +223,19 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={initModifier > 0 || initModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Melee Accuracy Modifier")}
             type="number"
@@ -202,12 +250,19 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={meleePrecModifier > 0 || meleePrecModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Ranged Accuracy Modifier")}
             type="number"
@@ -222,12 +277,19 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={rangedPrecModifier > 0 || rangedPrecModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <TextField
             label={t("Magic Precision Modifier")}
             type="number"
@@ -242,8 +304,10 @@ export default function EditManualStats({
                 : "primary"
             }
             focused={magicPrecModifier > 0 || magicPrecModifier < 0}
-            InputProps={{
-              readOnly: !isEditMode,
+            slotProps={{
+              input: {
+                readOnly: !isEditMode,
+              }
             }}
           />
         </Grid>

@@ -58,11 +58,13 @@ export default function EditSkillModal({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
@@ -82,22 +84,29 @@ export default function EditSkillModal({
       </IconButton>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
-          <Grid item sm={10} xs={12}>
+          <Grid
+            size={{
+              sm: 10,
+              xs: 12
+            }}>
             <TextField
               label={t("Skill Name")}
               value={skill.skillName}
               onChange={(e) => setSkill({ ...skill, skillName: e.target.value })}
               fullWidth
-              inputProps={{ maxLength: 100 }}
+              slotProps={{
+                htmlInput: { maxLength: 100 }
+              }}
             />
           </Grid>
-          <Grid item sm={2} xs={12}>
+          <Grid
+            size={{
+              sm: 2,
+              xs: 12
+            }}>
             <TextField
               label={t("Max Level")}
               type="number"
-              InputProps={{
-                inputProps: { min: 1, max: 10 },
-              }}
               fullWidth
               value={(skill.maxLvl ?? 1).toString()}
               onChange={(e) => {
@@ -106,9 +115,14 @@ export default function EditSkillModal({
                   setSkill({ ...skill, maxLvl: value === "" ? 1 : parseInt(value, 10) });
                 }
               }}
+              slotProps={{
+                input: {
+                  inputProps: { min: 1, max: 10 },
+                }
+              }}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -118,7 +132,7 @@ export default function EditSkillModal({
               maxRows={10}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography>
               {t("Special Skill Effect")}
               <IconButton

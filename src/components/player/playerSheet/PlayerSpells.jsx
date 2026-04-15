@@ -15,14 +15,12 @@ import {
   Checkbox,
   Tooltip,
   Divider,
-  Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, Info, SettingsSuggest } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
-import { OpenBracket, CloseBracket } from "../../Bracket";
 import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
@@ -220,8 +218,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               </Typography>
             )}
             <Grid container spacing={2} sx={{ textAlign: "center" }}>
-              <Grid item container xs={6}>
-                <Grid item xs={12}>
+              <Grid  container size={6}>
+                <Grid  size={12}>
                   <Typography
                     variant="h3"
                     sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -233,8 +231,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid item container xs={6}>
-                <Grid item xs={12}>
+              <Grid  container size={6}>
+                <Grid  size={12}>
                   <Typography
                     variant="h3"
                     sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -246,7 +244,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid item xs={12} sx={{ marginTop: "20px" }}>
+              <Grid  sx={{ marginTop: "20px" }} size={12}>
                 <Typography component="span">
                   {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`}{" "}
                   {precBonus !== 0 ? " + " + precBonus : ""}
@@ -342,7 +340,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
       // display of the gamble results
       setDialogMessage(
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="body1">
               {t("Choose one of the following effects") + ": "}
             </Typography>
@@ -443,17 +441,18 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
             >
               {t("Spells")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {defaultSpells.map((spell, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -479,11 +478,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {spell.isOffensive && <OffensiveSpellIcon />}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -524,14 +519,15 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               ))}
               {gambleSpells.map((gamble, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -556,11 +552,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {gamble.spellName}
                     </Typography>
                   </Grid>
-                  <Grid
-                    item
-                    xs={2}
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                     <div
                       id="spell-right-controls"
                       style={{
@@ -600,7 +592,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 </Grid>
               ))}
               {magicModifier !== 0 && (
-                <Grid item xs={12} sx={{ marginTop: "20px" }}>
+                <Grid  sx={{ marginTop: "20px" }} size={12}>
                   <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                     {t("Modifiers")}
                   </Typography>
@@ -640,7 +632,9 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               onClose={handleDialogClose}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { width: { xs: "90%", md: "50%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "50%" } } }
+              }}
             >
               <DialogTitle
                 variant="h3"
@@ -659,8 +653,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               <DialogContent sx={{ marginTop: "10px" }}>
                 <DialogContent id="alert-dialog-description">
                   {!isRolling ? (
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item xs={12}>
+                    <Grid container sx={{ alignItems: "center" }} spacing={1}>
+                      <Grid  size={12}>
                         <Typography variant="body1">
                           {selectedSpell?.spellType === "default" && t("Select number of targets from 1 to")}
                           {selectedSpell?.spellType === "gamble" && t("Select number of dices you want to throw")}
@@ -668,7 +662,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           {selectedSpell?.maxTargets || 1}:
                         </Typography>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Select
                           value={targets}
                           onChange={(e) =>
@@ -716,7 +710,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           </>
                         )}
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -728,7 +722,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         />
                       </Grid>
                       {selectedSpell?.isMagisphere && (
-                        <Grid item xs={12}>
+                        <Grid  size={12}>
                           <FormControlLabel
                             control={
                               <Checkbox

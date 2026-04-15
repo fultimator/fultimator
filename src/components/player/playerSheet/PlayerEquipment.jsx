@@ -11,17 +11,15 @@ import {
   Button,
   Tooltip,
   Divider,
-  Card,
-  Stack,
   Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
 import { WeaponCard, ArmorCard, CustomWeaponCard, AccessoryCard } from "../../compendium/ItemCards";
-import { OpenBracket, CloseBracket } from "../../Bracket";
+// import { OpenBracket, CloseBracket } from "../../Bracket";
 import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
+// import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
@@ -130,30 +128,30 @@ export default function PlayerEquipment({
     : [];
 
   // Find all pilot-vehicle spells
-  const pilotSpells = (player.classes || [])
-    .flatMap((c) => c.spells || [])
-    .filter(
-      (spell) =>
-        spell &&
-        spell.spellType === "pilot-vehicle" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
-    );
+  // const pilotSpells = (player.classes || [])
+  //   .flatMap((c) => c.spells || [])
+  //   .filter(
+  //     (spell) =>
+  //       spell &&
+  //       spell.spellType === "pilot-vehicle" &&
+  //       (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+  //   );
 
   // Find the enabled vehicle
-  const activeVehicle = pilotSpells
-    .flatMap((s) => s.vehicles || [])
-    .find((v) => v.enabled);
+  // const activeVehicle = pilotSpells
+  //   .flatMap((s) => s.vehicles || [])
+  //   .find((v) => v.enabled);
 
-  const equippedModules = activeVehicle?.modules
-    ? activeVehicle.modules.filter((m) => m.equipped)
-    : [];
+  // const equippedModules = activeVehicle?.modules
+  //   ? activeVehicle.modules.filter((m) => m.equipped)
+  //   : [];
 
-  const hasArmorModule = equippedModules.some(
-    (m) => m.type === "pilot_module_armor"
-  );
-  const hasWeaponModule = equippedModules.some(
-    (m) => m.type === "pilot_module_weapon"
-  );
+  // const hasArmorModule = equippedModules.some(
+  //   (m) => m.type === "pilot_module_armor"
+  // );
+  // const hasWeaponModule = equippedModules.some(
+  //   (m) => m.type === "pilot_module_weapon"
+  // );
 
   // Helper function to format custom weapon for display
   const formatCustomWeaponForDisplay = (customWeapon) => {
@@ -388,8 +386,8 @@ export default function PlayerEquipment({
     const dialogContent = (
       <>
         <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -401,8 +399,8 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -420,7 +418,7 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={12} sx={{ marginTop: "20px" }}>
+          <Grid  sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
               {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${attributes[att2].shortcaps
                 }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${weapon.melee
@@ -545,45 +543,39 @@ export default function PlayerEquipment({
                 )}
               </Box>
             ) : (
-              <Box sx={{ backgroundColor: primary, display: "flex", flexDirection: "column", alignItems: "center", py: 1, position: "relative", borderRadius: "8px 0 0 8px" }}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    writingMode: "vertical-lr",
-                    textTransform: "uppercase",
-                    color: custom.white,
-                    transform: "rotate(180deg)",
-                    fontSize: "2em",
-                    minHeight: "100px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {t("Equipment")}
-                </Typography>
-                {isEditMode && (
-                  <IconButton
-                    size="small"
-                    onClick={() => setOpenEdit(true)}
-                    sx={{ mt: 1, color: custom.white }}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                )}
-              </Box>
+              <Typography
+                variant="h1"
+                sx={{
+                  writingMode: "vertical-lr",
+                  textTransform: "uppercase",
+                  marginLeft: "-1px",
+                  marginRight: "10px",
+                  marginTop: "-1px",
+                  marginBottom: "-1px",
+                  paddingY: "10px",
+                  backgroundColor: primary,
+                  color: custom.white,
+                  borderRadius: "0 8px 8px 0",
+                  transform: "rotate(180deg)",
+                  fontSize: "2em",
+                }}
+                align="center"
+              >
+                {t("Equipment")}
+              </Typography>
             )}
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
               {allEquippedWeapons.map((weapon, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -602,7 +594,7 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -638,14 +630,15 @@ export default function PlayerEquipment({
               ))}
               {equippedArmor.map((armor, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={`armor-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -664,7 +657,7 @@ export default function PlayerEquipment({
                       {armor.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -687,14 +680,15 @@ export default function PlayerEquipment({
               ))}
               {equippedShields.map((shield, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={`shield-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -713,7 +707,7 @@ export default function PlayerEquipment({
                       {shield.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -736,14 +730,15 @@ export default function PlayerEquipment({
               ))}
               {equippedAccessories.map((accessory, index) => (
                 <Grid
-                  item
                   container
-                  xs={12}
-                  md={6}
+                  spacing={0}
                   key={`accessory-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch" }}
-                >
-                  <Grid item xs={10} sx={{ display: "flex" }}>
+                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  size={{
+                    xs: 12,
+                    md: 6
+                  }}>
+                  <Grid  sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -762,7 +757,7 @@ export default function PlayerEquipment({
                       {accessory.name}
                     </Typography>
                   </Grid>
-                  <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
                     <Box
                       sx={{
                         padding: "5px",
@@ -787,7 +782,7 @@ export default function PlayerEquipment({
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
                 damageRangedModifier !== 0) && (
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                       {t("Modifiers")}
                     </Typography>
@@ -819,7 +814,9 @@ export default function PlayerEquipment({
               onClose={handleDialogClose}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-              PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+              slotProps={{
+                paper: { sx: { width: { xs: "90%", md: "30%" } } }
+              }}
             >
               <DialogTitle
                 id="alert-dialog-title"
@@ -857,7 +854,6 @@ export default function PlayerEquipment({
           </Paper>
         </>
       )}
-
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
         <DialogContent sx={{ p: 0 }}>
           <EditPlayerEquipment player={player} setPlayer={setPlayer} isEditMode={true} />
@@ -866,7 +862,6 @@ export default function PlayerEquipment({
           <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
         </DialogActions>
       </Dialog>
-
       <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
         <DialogContent sx={{ p: 0 }}>
           {selectedItem && (

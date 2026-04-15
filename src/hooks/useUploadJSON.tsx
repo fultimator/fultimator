@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function useUploadJSON(onUpload: (data: any) => void) {
+function useUploadJSON(onUpload: (data: Record<string, unknown>) => void) {
   const [error, setError] = useState<string | null>(null);
 
   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -16,7 +16,7 @@ function useUploadJSON(onUpload: (data: any) => void) {
       try {
         const data = JSON.parse(e.target.result as string);
         onUpload(data);
-      } catch (err) {
+      } catch {
         setError("Invalid JSON file");
       }
     };

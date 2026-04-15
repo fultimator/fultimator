@@ -41,8 +41,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   };
 
   const components = {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    p: ({ node, ...props }) => <p style={inlineStyles} {...props} />,
+    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
   // Convert clock value to clock state array for Clock component
@@ -99,10 +98,8 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       </Accordion>
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -119,7 +116,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           )}
         </Grid>
       )}
-
       {/* GIFTS AND CLOCK HEADER */}
       <div
         style={{
@@ -137,15 +133,13 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -157,15 +151,13 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyPosition: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -178,7 +170,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           </Grid>
         </Grid>
       </div>
-
       {/* CLOCK SECTION */}
       <div
         style={{
@@ -193,28 +184,24 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             <Typography variant="body2">
               {t("esper_brainwave_clock")}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "flex-start",
             }}
-          >
+            size={6}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               {/* Brainwave Clock Visual */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -275,7 +262,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           </Grid>
         </Grid>
       </div>
-
       {/* GIFTS HEADER */}
       <div
         style={{
@@ -292,15 +278,13 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={8}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={8}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -312,15 +296,13 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={4}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={4}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -333,7 +315,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           </Grid>
         </Grid>
       </div>
-
       {gift.gifts && gift.gifts.length === 0 ? (
         <Typography
           sx={{
@@ -362,17 +343,17 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs={8}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={8}>
                   <Typography
-                    fontWeight="bold"
                     style={{ flexGrow: 1, marginRight: "5px" }}
+                    sx={{
+                      fontWeight: "bold"
+                    }}
                   >
                     {gft.name === "esper_gift_custom_name"
                       ? gft.customName
@@ -380,14 +361,12 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   </Typography>
                 </Grid>
                 <Grid
-                  item
-                  xs={4}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={4}>
                   <ReactMarkdown components={components}>
                     {gft.name === "gift_custom_name"
                       ? gft.event
@@ -399,21 +378,18 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
               </Grid>
               {isEditMode && (
                 <Grid
-                  item
-                  xs
                   style={{
                     display: "flex",
                     alignItems: "center",
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                ></Grid>
+                  size="grow"></Grid>
               )}
             </div>
             <Grid
-              container
-              justifyContent="flex-start"
-              sx={{
+              container sx={{
+                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 marginBottom: "6px",
@@ -422,14 +398,12 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  item
-                  xs={12}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                >
+                  size={12}>
                   <ReactMarkdown components={components}>
                     {gft.name === "gift_custom_name"
                       ? gft.effect

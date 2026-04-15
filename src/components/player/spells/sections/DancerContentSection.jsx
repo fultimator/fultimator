@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import ContentSection from "./ContentSection";
 import DancerItem from "./DancerItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableDances } from "../spellOptionData";
 
 export default function DancerContentSection({ formState, setFormState, t }) {
-  const currentDances = formState.dances || [];
+  const currentDances = useMemo(() => formState.dances || [], [formState.dances]);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankDance = useCallback(() => {

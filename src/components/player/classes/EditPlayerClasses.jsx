@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
@@ -112,15 +111,15 @@ export default function EditPlayerClasses({
     fileInputRef.current.value = null;
   });
 
-  const handleAddClass = () => {
-    if (selectedClass) {
-      if (selectedClass.name === "Blank Class") {
-        setDialogOpen(true);
-      } else {
-        addClassToPlayer(selectedClass.name, false);
-      }
-    }
-  };
+  // const handleAddClass = () => {
+  //   if (selectedClass) {
+  //     if (selectedClass.name === "Blank Class") {
+  //       setDialogOpen(true);
+  //     } else {
+  //       addClassToPlayer(selectedClass.name, false);
+  //     }
+  //   }
+  // };
 
   const addClassToPlayer = (name, isHomebrew) => {
     // Check if the selected class type already exists in player's classes
@@ -425,7 +424,7 @@ export default function EditPlayerClasses({
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-  const filteredClasses = selectedBook
+  const _filteredClasses = selectedBook
     ? classList.filter((cls) => cls.book === selectedBook)
     : classList;
 
@@ -443,7 +442,7 @@ export default function EditPlayerClasses({
             }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Classes")}
@@ -455,13 +454,13 @@ export default function EditPlayerClasses({
                 />
               </Grid>
               {warnings.map((warning, index) => (
-                <Grid item xs={12} key={index}>
+                <Grid  key={index} size={12}>
                   <Alert variant="filled" severity="warning">
                     {t(warning)}
                   </Alert>
                 </Grid>
               ))}
-              {/* <Grid item xs={12} sm={4}>
+              {/* <Grid size={12} sm={4}>
                 <Autocomplete
                   id="book-select"
                   options={Object.values(classList)
@@ -493,7 +492,7 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={5}>
+              <Grid size={{ xs: 12, sm: 5 }}>
                 <Autocomplete
                   id="class-select"
                   options={
@@ -527,7 +526,7 @@ export default function EditPlayerClasses({
                   )}
                 />
               </Grid>
-              <Grid item xs={10} sm={2}>
+              <Grid size={{ xs: 10, sm: 2 }}>
                 <Button
                   variant="contained"
                   onClick={handleAddClass}
@@ -541,7 +540,7 @@ export default function EditPlayerClasses({
                   {t("Add")}
                 </Button>
               </Grid>
-              <Grid item xs={2} sm={1}>
+              <Grid size={{ xs: 2, sm: 1 }}>
                 <Button
                   variant="outlined"
                   onClick={() => fileInputRef.current.click()}
@@ -572,7 +571,7 @@ export default function EditPlayerClasses({
             borderColor: secondary,
           }}
         >
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Typography variant="h3" align="center">
               {t("No classes added yet")}
             </Typography>
@@ -611,7 +610,6 @@ export default function EditPlayerClasses({
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
         ))}
-
       <CompendiumViewerModal
         open={compendiumOpen}
         onClose={() => setCompendiumOpen(false)}
@@ -620,7 +618,6 @@ export default function EditPlayerClasses({
         restrictToTypes={["classes"]}
         context="player"
       />
-
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle variant="h3">{t("Enter Class Name")}</DialogTitle>
         <DialogContent>

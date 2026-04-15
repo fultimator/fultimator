@@ -58,7 +58,9 @@ export default function InstallContentTab({ onImportFile, onImportUrl, onImportS
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="subtitle2">{t("Upload .fcp file")}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           {t("Select a .fcp file exported from Fultimator.")}
         </Typography>
         <Button
@@ -82,12 +84,12 @@ export default function InstallContentTab({ onImportFile, onImportUrl, onImportS
           />
         </Button>
       </Box>
-
       <Divider />
-
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="subtitle2">{t("From URL")}</Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           {t("Paste a manifest.json URL to download and import the pack.")}
         </Typography>
         <TextField
@@ -110,14 +112,12 @@ export default function InstallContentTab({ onImportFile, onImportUrl, onImportS
           {t("Import")}
         </Button>
       </Box>
-
       {importing && (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <CircularProgress size={16} />
           <Typography variant="body2">{t("Importing…")}</Typography>
         </Box>
       )}
-
       {error && <Alert severity="error">{error}</Alert>}
     </Box>
   );

@@ -89,13 +89,10 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           <ReactMarkdown>{t("floralist_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      
       {isEditMode && (
         <Grid
-          item
-          xs
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-        >
+          size="grow">
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -119,7 +116,6 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           )}
         </Grid>
       )}
-
       {/* GARDEN */}
       <div
         style={{
@@ -137,15 +133,13 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -157,15 +151,13 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
               minHeight: "40px",
             }}
-          >
+            size={6}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -178,7 +170,6 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           </Grid>
         </Grid>
       </div>
-
       {/* Garden State and Growth Clock */}
       <div
         style={{
@@ -192,17 +183,15 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             {currentMagiseed ? (
               <div>
-                <Typography fontWeight="bold" style={{ marginBottom: "4px" }}>
+                <Typography sx={{ fontWeight: "bold" }} style={{ marginBottom: "4px" }}>
                   {currentMagiseed.customName || t(currentMagiseed.name)}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.75em" }}>
@@ -216,14 +205,12 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
             )}
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
               <Typography variant="body2" sx={{ marginRight: 1 }}>
                 {growthClock}/4
@@ -272,7 +259,6 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           </Grid>
         </Grid>
       </div>
-
       {/* Current Effect */}
       {currentMagiseed && growthClock > 0 && (
         <>
@@ -299,7 +285,7 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
               borderLeft: `4px solid ${theme.primary}`,
             }}
           >
-            <Typography fontWeight="bold" sx={{ marginBottom: 1 }}>
+            <Typography sx={{ fontWeight: "bold", marginBottom: 1 }}>
               {currentMagiseed.customName || t(currentMagiseed.name)}
             </Typography>
             <div style={{ fontSize: "0.95em" }}>
@@ -321,7 +307,6 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
           </div>
         </>
       )}
-
       {/* Available Magiseeds */}
       {floralist.magiseeds && floralist.magiseeds.length > 0 && (
         <>
@@ -351,16 +336,18 @@ function ThemedSpellFloralist({ floralist, onEditMagiseeds, isEditMode, onEdit, 
                 borderLeft: magiseed === currentMagiseed ? `4px solid ${theme.primary}` : "none",
               }}
             >
-              <Grid container alignItems="center">
-                <Grid item xs={8}>
-                  <Typography fontWeight={magiseed === currentMagiseed ? "bold" : "normal"}>
+              <Grid container sx={{ alignItems: "center" }}>
+                <Grid  size={8}>
+                  <Typography sx={{
+                    fontWeight: magiseed === currentMagiseed ? "bold" : "normal"
+                  }}>
                     {magiseed.customName || t(magiseed.name)}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "text.secondary" }}>
                     {t(`floralist_magiseed_type_${magiseed.type || 'custom'}`)}
                   </Typography>
                 </Grid>
-                <Grid item xs={4} style={{ textAlign: 'right' }}>
+                <Grid  style={{ textAlign: 'right' }} size={4}>
                   {isEditMode && (
                     <Button
                       size="small"

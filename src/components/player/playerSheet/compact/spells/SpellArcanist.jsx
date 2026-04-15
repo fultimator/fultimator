@@ -61,7 +61,11 @@ export default function SpellArcanist({ arcana, rework }) {
         {/* Description Row */}
           <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
           <StyledTableCell>
-            <Typography fontStyle="italic" sx={{ fontSize: "0.8rem" }}>
+            <Typography
+              sx={{
+                fontStyle: "italic",
+                fontSize: "0.8rem"
+              }}>
               {!arcana.description ? (
                 t("No Description")
               ) : (

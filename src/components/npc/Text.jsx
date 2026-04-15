@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
 import { Fragment } from "react";
 import { calcDef, calcHP, calcInit, calcMDef, calcMP } from "../../libs/npcs";
-import { typeList, TypeName } from "../types";
+import { TypeName } from "../types";
+import { typeList } from "../typeConstants";
 
 export default function NpcText({ npc }) {
   return (

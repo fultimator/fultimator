@@ -165,12 +165,16 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
   return (
     <Grid container spacing={2}>
       {/* Cookbook Effects */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Cookbook Effects")} ({cookbookEffects.length})
         </Typography>
         {cookbookEffects.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No cookbook effects yet")}
           </Typography>
         ) : (
@@ -226,20 +230,23 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           </TableContainer>
         )}
       </Grid>
-
       {/* Ingredient Inventory */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Typography variant="h6" gutterBottom>
           {t("Ingredient Inventory")} ({ingredientInventory.length})
         </Typography>
         {ingredientInventory.length === 0 ? (
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No ingredients in inventory")}
           </Typography>
         ) : (
           <Grid container spacing={1}>
             {ingredientInventory.map((ingredient, idx) => (
-              <Grid item key={idx}>
+              <Grid  key={idx}>
                 <Chip
                   label={`${ingredient.name} (x${ingredient.quantity || 1})`}
                   onDelete={() => handleDeleteIngredient(idx)}
@@ -250,9 +257,8 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           </Grid>
         )}
       </Grid>
-
       {/* Info Box */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Card sx={{ backgroundColor: "info.lighter", border: "1px solid" }}>
           <CardContent>
             <Typography variant="body2">
@@ -261,7 +267,6 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           </CardContent>
         </Card>
       </Grid>
-
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{t("Edit Effect")}</DialogTitle>
         <DialogContent>

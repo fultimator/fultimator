@@ -92,6 +92,25 @@
         font-family: 'Fantasy';
         src: local('fantasy'), local('Cursive'), local('serif'); /* local fallback for fantasy fonts */
       }
+      /* Force Antonio font display for MUI v9 compatibility */
+      /* Match any case variation of fontFamily attribute */
+      [fontfamily="Antonio"],
+      [fontFamily="Antonio"],
+      [font-family="Antonio"],
+      .MuiTypography-h1,
+      .MuiTypography-h2,
+      .MuiTypography-h3,
+      .MuiTypography-h4,
+      .MuiTypography-h5,
+      .MuiTypography-h6 {
+        font-family: Antonio, sans-serif !important;
+      }
+      /* Catch any attribute with Antonio in it */
+      [fontfamily*="Antonio"],
+      [fontFamily*="Antonio"],
+      *[style*="Antonio"] {
+        font-family: Antonio, sans-serif !important;
+      }
     </style>
   </head>
   <body>

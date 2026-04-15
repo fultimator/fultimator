@@ -61,7 +61,6 @@ function ThemedSpellTinkererAlchemy({
         </AccordionDetails>
       </Accordion>
       {/* MIX Row 1 */}
-
       <div
         style={{
           backgroundColor: theme.primary,
@@ -77,15 +76,13 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -94,43 +91,36 @@ function ThemedSpellTinkererAlchemy({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography variant="h3">{t("IP Cost")}</Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             <Typography variant="h3">{t("Description")}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
             }}
-          >
+            size="grow">
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
       </div>
-
       {/* MIX Row 2 */}
       <div
         style={{
@@ -144,42 +134,38 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {ranks[alchemy.rank - 1]}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={2}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={2}>
             <Typography>{alchemy.rank + 2}</Typography>
           </Grid>
           <Grid
-            item
-            xs={6}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={6}>
             <Typography>
               {alchemy.rank === 1
                 ? t("Roll two d20s and assign one to target and one to effect.")
@@ -197,10 +183,8 @@ function ThemedSpellTinkererAlchemy({
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             {!showInPlayerSheet && (
               <Tooltip title={t("Alchemy not shown in player sheet")}>
                 <Icon>
@@ -214,9 +198,7 @@ function ThemedSpellTinkererAlchemy({
           </Grid>
         )}
       </div>
-
       {/* TARGETS Row 1 */}
-
       <div
         style={{
           backgroundColor: theme.primary,
@@ -233,15 +215,13 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -252,19 +232,16 @@ function ThemedSpellTinkererAlchemy({
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
             }}
-          >
+            size="grow">
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
       </div>
-
       {/* TARGETS Row 2 */}
       <div
         style={{
@@ -278,40 +255,36 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {t("Die")}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={8}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={8}>
             <Typography>{t("The potions affects...")}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             <IconButton size="small" onClick={onEditTargets}>
               <Edit style={{ color:  iconColor }} />
             </IconButton>
@@ -321,9 +294,8 @@ function ThemedSpellTinkererAlchemy({
       {/* TARGETS Row 3 */}
       {alchemy.targets.map((target, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -333,39 +305,35 @@ function ThemedSpellTinkererAlchemy({
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {target.rangeFrom + " - " + target.rangeTo}
               </Typography>
             </Grid>
             <Grid
-              item
-              xs={8}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={8}>
               <Typography>{target.effect}</Typography>
             </Grid>
           </Grid>
         </Grid>
       ))}
-
       {/* EFFECTS Row 1 */}
-
       <div
         style={{
           backgroundColor: theme.primary,
@@ -382,15 +350,13 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -401,19 +367,16 @@ function ThemedSpellTinkererAlchemy({
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
             }}
-          >
+            size="grow">
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
       </div>
-
       {/* EFFECTS Row 2 */}
       <div
         style={{
@@ -427,31 +390,29 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            item
-            xs
             flexGrow
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "left",
             }}
-          >
+            size="grow">
             <Typography
-              fontWeight="bold"
               style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold"
+              }}
             >
               {t("Die")}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={8}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-          >
+            size={8}>
             <Typography>
               {t("Each creature affected by the potion...")}
             </Typography>
@@ -459,10 +420,8 @@ function ThemedSpellTinkererAlchemy({
         </Grid>
         {isEditMode && (
           <Grid
-            item
-            xs
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          >
+            size="grow">
             <IconButton size="small" onClick={onEditEffects}>
               <Edit style={{ color:  iconColor }} />
             </IconButton>
@@ -472,9 +431,8 @@ function ThemedSpellTinkererAlchemy({
       {/* EFFECTS Row 3 */}
       {alchemy.effects.map((effect, i) => (
         <Grid
-          container
-          justifyContent="flex-start"
-          sx={{
+          container sx={{
+            justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
             marginBottom: "6px",
@@ -484,31 +442,29 @@ function ThemedSpellTinkererAlchemy({
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              item
-              xs
               flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "left",
               }}
-            >
+              size="grow">
               <Typography
-                fontWeight="bold"
                 style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{
+                  fontWeight: "bold"
+                }}
               >
                 {effect.dieValue === 0 ? t("Any") : effect.dieValue}
               </Typography>
             </Grid>
             <Grid
-              item
-              xs={8}
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-            >
+              size={8}>
               <Typography>{effect.effect}</Typography>
             </Grid>
           </Grid>

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
 import {
-  Grid,
   Typography,
   LinearProgress,
   FormControlLabel,
@@ -21,7 +20,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
-import { Add, Remove, Casino, SwapHoriz, Edit } from "@mui/icons-material";
+import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "../../avatar.jpg";
@@ -125,10 +124,12 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
 
 const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
   whiteSpace: "pre-line",
+  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
   "& p": {
     margin: "4px 0",
     fontSize: "0.8rem",
     lineHeight: 1.45,
+    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
     [theme.breakpoints.up("sm")]: {
       fontSize: "0.9rem",
     },
@@ -495,7 +496,6 @@ export default function PlayerCard({
             <TextField
               value={player.name}
               onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
-              inputProps={{ maxLength: 50 }}
               variant="standard"
               size="small"
               sx={{
@@ -510,15 +510,19 @@ export default function PlayerCard({
                 "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
                 "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
               }}
+              slotProps={{
+                htmlInput: { maxLength: 50 }
+              }}
             />
           ) : (
             <Typography
-              color="#fff"
-              fontFamily="Antonio"
-              fontSize={{ xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" }}
-              fontWeight="medium"
-              sx={{ textTransform: "uppercase" }}
-            >
+              sx={{
+                color: "#fff",
+                fontFamily: "Antonio",
+                fontSize: { xs: "1.15rem", sm: "1.5rem", md: "1.7rem", lg: "1.85rem" },
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {player.name}
             </Typography>
           )}
@@ -537,14 +541,27 @@ export default function PlayerCard({
           {isEditMode ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {player.info.pronouns && (
-                <Typography fontFamily="Antonio" fontSize={{ xs: "0.78rem", sm: "1rem", md: "1.08rem" }} sx={{ textTransform: "uppercase", mr: 0.5 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontSize: { xs: "0.78rem", sm: "1rem", md: "1.08rem" },
+                    textTransform: "uppercase",
+                    mr: 0.5
+                  }}>
                   {player.info.pronouns} <Diamond color={primary} />
                 </Typography>
               )}
               <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) })); updateMaxStats?.(); }}>
                 <Remove fontSize="small" />
               </IconButton>
-              <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase", mx: 0.5 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: { xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" },
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                  mx: 0.5
+                }}>
                 {t("Lvl")} {player.lvl}
               </Typography>
               <IconButton size="small" onClick={() => { setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) })); updateMaxStats?.(); }}>
@@ -552,14 +569,19 @@ export default function PlayerCard({
               </IconButton>
             </Box>
           ) : (
-            <Typography fontFamily="Antonio" fontSize={{ xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" }} fontWeight="medium" sx={{ textTransform: "uppercase" }}>
+            <Typography
+              sx={{
+                fontFamily: "Antonio",
+                fontSize: { xs: "0.96rem", sm: "1.25rem", md: "1.35rem", lg: "1.45rem" },
+                fontWeight: "medium",
+                textTransform: "uppercase"
+              }}>
               {player.info.pronouns && <>{player.info.pronouns} <Diamond color={primary} />{" "}</>}
               {t("Lvl")} {player.lvl}
             </Typography>
           )}
         </Box>
       </Box>
-
       {/* Body  */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(80px, 32%) 1fr", sm: "minmax(140px, 35%) 1fr", md: "minmax(170px, 34%) 1fr", lg: "minmax(200px, 32%) 1fr" }, alignItems: "stretch" }}>
         {/* Left column */}
@@ -670,7 +692,9 @@ export default function PlayerCard({
                     variant="standard"
                     value={player.info.identity}
                     onChange={(e) => setPlayer(p => ({ ...p, info: { ...p.info, identity: e.target.value } }))}
-                    inputProps={{ maxLength: 300, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                    slotProps={{
+                      htmlInput: { maxLength: 300, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }
+                    }}
                   />
                 ) : (
                   <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -694,7 +718,9 @@ export default function PlayerCard({
                       {...params}
                       label={t("Theme")}
                       variant="standard"
-                      inputProps={{ ...params.inputProps, maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                      slotProps={{
+                        htmlInput: { ...params.inputProps, maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }
+                      }}
                     />
                   )}
                 />
@@ -711,7 +737,9 @@ export default function PlayerCard({
                   variant="standard"
                   value={player.info.origin}
                   onChange={(e) => setPlayer(p => ({ ...p, info: { ...p.info, origin: e.target.value } }))}
-                  inputProps={{ maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }}
+                  slotProps={{
+                    htmlInput: { maxLength: 50, style: { fontFamily: "Antonio", fontSize: "0.9rem", textTransform: "uppercase" } }
+                  }}
                 />
               ) : (
                 <Typography sx={{ fontFamily: "Antonio", fontSize: { xs: "0.85rem", sm: "0.9rem", md: "0.96rem", lg: "1rem" }, textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -857,8 +885,7 @@ export default function PlayerCard({
           </Box>
         </Box>
       </Box>
-
-      {/* ── Affinity Strip ── */}
+      {/* Affinity Strip */}
       <AffinityStrip>
         {["physical", "wind", "bolt", "dark", "earth", "fire", "ice", "light", "poison"].map((type) => (
           <AffinityCell key={type}>
@@ -866,7 +893,6 @@ export default function PlayerCard({
           </AffinityCell>
         ))}
       </AffinityStrip>
-
       <StatChangeDialog
         open={!!statDialog}
         handleClose={() => setStatChangeDialog(null)}
@@ -876,6 +902,6 @@ export default function PlayerCard({
         onApply={handleStatApply}
         t={t}
       />
-      </Card>
-      );
+    </Card>
+  );
       }

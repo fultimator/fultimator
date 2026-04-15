@@ -14,11 +14,6 @@ import {
   Collapse,
   Typography,
   Chip,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -27,6 +22,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { CompendiumPack } from "../../types/CompendiumPack";
 import { useTranslate } from "../../translation/translate";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 interface ContentPacksTabProps {
   packs: CompendiumPack[];
@@ -56,7 +53,11 @@ function PackRow({ pack, onSetActive, onDelete }: {
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const { isOpen: confirmDeleteOpen, closeDialog: setConfirmDeleteOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: async () => {
+      await onDelete(pack.id);
+    },
+  });
   const isActive = pack.active !== false;
 
   return (
@@ -80,7 +81,7 @@ function PackRow({ pack, onSetActive, onDelete }: {
 
         {/* Name */}
         <TableCell>
-          <Typography variant="body2" fontWeight={600}>{pack.name}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>{pack.name}</Typography>
           {pack.type === "supplement" && (
             <Chip label="supplement" size="small" color="secondary" sx={{ mt: 0.25, fontSize: "0.65rem", height: 16 }} />
           )}
@@ -88,26 +89,32 @@ function PackRow({ pack, onSetActive, onDelete }: {
 
         {/* Author */}
         <TableCell>
-          <Typography variant="body2" color="text.secondary">{pack.author ?? "—"}</Typography>
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>{pack.author ?? "—"}</Typography>
         </TableCell>
 
         {/* Version */}
         <TableCell>
-          <Typography variant="body2" color="text.secondary">{pack.version ?? "—"}</Typography>
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>{pack.version ?? "—"}</Typography>
         </TableCell>
 
         {/* Actions */}
         <TableCell sx={{ width: 96 }}>
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title={t("Delete")}>
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => setConfirmDeleteOpen(true)}
-                disabled={pack.isPersonal || pack.locked}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={handleDelete}
+                  disabled={pack.isPersonal || pack.locked}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title={t("More actions (coming soon)")}>
               <span>
@@ -119,7 +126,6 @@ function PackRow({ pack, onSetActive, onDelete }: {
           </Box>
         </TableCell>
       </TableRow>
-
       {/* Expanded metadata row */}
       <TableRow>
         <TableCell colSpan={6} sx={{ p: 0 }}>
@@ -128,29 +134,35 @@ function PackRow({ pack, onSetActive, onDelete }: {
               {pack.description && (
                 <Typography variant="body2">{pack.description}</Typography>
               )}
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 <strong>{t("Items")}:</strong> {itemCountSummary(pack)}
               </Typography>
-              {(pack as any).fultimatorMinVersion && (
-                <Typography variant="caption" color="text.secondary">
-                  <strong>{t("Min version")}:</strong> {(pack as any).fultimatorMinVersion}
+              {pack.fultimatorMinVersion && (
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
+                  <strong>{t("Min version")}:</strong> {pack.fultimatorMinVersion}
                 </Typography>
               )}
-              {(pack as any).homepageUrl && (
+              {pack.homepageUrl && (
                 <Typography variant="caption">
                   <strong>{t("Homepage")}:</strong>{" "}
                   <a
-                    href={(pack as any).homepageUrl}
+                    href={pack.homepageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ display: "inline-flex", alignItems: "center", gap: 2 }}
                   >
-                    {(pack as any).homepageUrl}
+                    {pack.homepageUrl}
                     <OpenInNewIcon sx={{ fontSize: 12, ml: 0.25 }} />
                   </a>
                 </Typography>
               )}
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 <strong>{t("Added")}:</strong> {formatDate(pack.createdAt)}
                 {" · "}
                 <strong>{t("Updated")}:</strong> {formatDate(pack.updatedAt)}
@@ -159,30 +171,16 @@ function PackRow({ pack, onSetActive, onDelete }: {
           </Collapse>
         </TableCell>
       </TableRow>
-
-      {/* Delete confirmation */}
-      <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{t("Delete module")}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t("Delete")} <strong>{pack.name}</strong>?{" "}
-            {t("This cannot be undone.")}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDeleteOpen(false)}>{t("Cancel")}</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={async () => {
-              await onDelete(pack.id);
-              setConfirmDeleteOpen(false);
-            }}
-          >
-            {t("Delete")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteConfirmationDialog
+        open={confirmDeleteOpen}
+        onClose={setConfirmDeleteOpen}
+        onConfirm={async () => {
+          await onDelete(pack.id);
+        }}
+        title={t("Delete module")}
+        message={t("This cannot be undone.")}
+        itemPreview={<Typography variant="h4">{pack.name}</Typography>}
+      />
     </>
   );
 }
@@ -194,7 +192,9 @@ export default function ContentPacksTab({ packs, onSetActive, onDelete }: Conten
   if (managedPacks.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: "center" }}>
-        <Typography color="text.secondary">{t("No modules installed. Use the Install Content tab to add one.")}</Typography>
+        <Typography sx={{
+          color: "text.secondary"
+        }}>{t("No modules installed. Use the Install Content tab to add one.")}</Typography>
       </Box>
     );
   }

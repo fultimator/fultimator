@@ -54,7 +54,7 @@ import SpellDeck from "./SpellDeck";
 import SpellDeckModal from "./SpellDeckModal";
 import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
-import { syncSlots, deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
+import { deriveVehicleSlots } from '../equipment/slots/equipmentSlots';
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
@@ -1076,7 +1076,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             }}
           >
             <Grid container>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Spells")}
@@ -1084,7 +1084,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 4
+                  }}>
                   <Autocomplete
                     options={player.classes
                       .filter(
@@ -1113,7 +1117,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 4
+                  }}>
                   <Autocomplete
                     options={filteredSpells}
                     value={selectedSpell}
@@ -1129,7 +1137,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     disabled={!selectedClass}
                   />
                 </Grid>
-                <Grid item xs={6} sm={2}>
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 2
+                  }}>
                   <Button
                     variant="contained"
                     sx={{ width: "100%", height: "100%" }}
@@ -1139,7 +1151,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     {t("Add Blank Spell")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={2}>
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 2
+                  }}>
                   <Button
                     variant="outlined"
                     sx={{ width: "100%", height: "100%" }}
@@ -1194,14 +1210,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 }}
               >
                 <Grid container>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomHeader
                       type="top"
                       headerText={t("Spells") + " - " + t(cls.name)}
                       showIconButton={false}
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     {cls.spells
                       .sort((a, b) => a.spellType.localeCompare(b.spellType))
                       .map((spell, index) => (

@@ -17,7 +17,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Add, ExpandMore, Delete, ErrorOutline, Search, ContentCopy } from "@mui/icons-material";
+import { Add, ExpandMore, Delete, ErrorOutlined, Search, ContentCopy } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import VehicleModule from "../VehicleModule";
@@ -30,7 +30,10 @@ import ReactMarkdown from "react-markdown";
  * Manages vehicles/modules directly from shared UnifiedSpellModal form state.
  */
 export default function PilotContentSection({ formState, setFormState, t }) {
-  const vehicles = formState?.vehicles || formState?.currentVehicles || [];
+  const vehicles = useMemo(
+    () => formState?.vehicles || formState?.currentVehicles || [],
+    [formState?.vehicles, formState?.currentVehicles]
+  );
 
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     open: false,
@@ -188,8 +191,8 @@ export default function PilotContentSection({ formState, setFormState, t }) {
   // Memoize ReactMarkdown components to prevent recreation on every render
   const markdownComponents = useMemo(
     () => ({
-      p: (props) => <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />,
-      strong: (props) => <strong style={{ fontWeight: "bold" }} {...props} />,
+      p: ({ _node, ...props }) => <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />,
+      strong: ({ _node, ...props }) => <strong style={{ fontWeight: "bold" }} {...props} />,
     }),
     []
   );
@@ -559,7 +562,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
   );
 
   const handleCompendiumVehicleImport = useCallback(
-    (item) => {
+    () => {
       handleAddVehicle();
       setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }));
     },
@@ -605,7 +608,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
           <Tooltip title={t("Browse Compendium")}>
             <IconButton
@@ -621,10 +624,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           </Button>
         </Box>
       </Grid>
-
       {Array.isArray(vehicles) && vehicles.length > 0 ? (
         vehicles.map((vehicle, vehicleIndex) => (
-          <Grid item xs={12} key={vehicleIndex}>
+          <Grid  key={vehicleIndex} size={12}>
             <Accordion defaultExpanded={vehicleIndex === 0}>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography>
@@ -633,7 +635,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={8}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 8
+                    }}>
                     <TextField
                       fullWidth
                       label={t("pilot_vehicles_name")}
@@ -644,8 +650,16 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={4}>
-                    <Box display="flex" gap={1}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4
+                    }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 1
+                      }}>
                       <Button
                         onClick={() => handleDeleteVehicleClick(vehicleIndex)}
                         variant="outlined"
@@ -676,7 +690,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     </Box>
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <CustomTextarea
                       label={t("pilot_vehicles_description")}
                       value={vehicle.description || ""}
@@ -686,10 +700,14 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Typography variant="h6">{t("pilot_vehicles_frame")}</Typography>
                     <Grid container spacing={2} sx={{ mt: 1, mb: 2 }}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         <FormControl fullWidth>
                           <InputLabel>{t("pilot_frame_type")}</InputLabel>
                           <Select
@@ -707,7 +725,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                         </FormControl>
                       </Grid>
 
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         {(() => {
                           const currentFrame = availableFrames.find(
                             (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton")
@@ -732,7 +754,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                         })()}
                       </Grid>
 
-                      <Grid item xs={12} sm={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6
+                        }}>
                         {(() => {
                           const totalSlots = (vehicle.modules || []).reduce((count, m) => {
                             if (!m.equipped) return count;
@@ -769,7 +795,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     </Grid>
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid  size={12}>
                     <Typography variant="h6" sx={{ mb: 1 }}>
                       {t("pilot_modules")}
                     </Typography>
@@ -811,7 +837,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                   </Grid>
 
                   {(vehicle.modules || []).map((module, moduleIndex) => (
-                    <Grid item xs={12} key={moduleIndex}>
+                    <Grid  key={moduleIndex} size={12}>
                       <VehicleModule
                         module={module}
                         moduleIndex={moduleIndex}
@@ -830,14 +856,21 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           </Grid>
         ))
       ) : (
-        <Grid item xs={12}>
-          <Typography color="text.secondary" sx={{ fontStyle: "italic" }}>
+        <Grid  size={12}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic"
+            }}>
             {t("No vehicles added")}
           </Typography>
         </Grid>
       )}
-
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <FormControlLabel
           control={
             <Switch
@@ -853,16 +886,14 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           label={t("Show in Character Sheet")}
         />
       </Grid>
-
       {isAnyVehicleIllegal && (
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <Typography color="error" variant="caption" sx={{ display: "flex", alignItems: "center" }}>
-            <ErrorOutline sx={{ fontSize: 16, mr: 0.5 }} />
+            <ErrorOutlined sx={{ fontSize: 16, mr: 0.5 }} />
             {t("Illegal module configuration detected")}
           </Typography>
         </Grid>
       )}
-
       <DeleteConfirmationDialog
         open={deleteConfirmation.open}
         onClose={() =>
@@ -880,10 +911,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             : handleConfirmDeleteModule
         }
         title={t("Delete")}
-        message={`${t("Are you sure you want to delete")} \"${deleteConfirmation.name}\"?`}
+        message={`${t("Are you sure you want to delete")} "${deleteConfirmation.name}"?`}
         itemPreview={deleteConfirmation.name}
       />
-
       <CompendiumViewerModal
         open={compendiumState.vehiclesOpen}
         onClose={() => setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }))}
@@ -892,7 +922,6 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         restrictToTypes={["player-spells"]}
         initialSpellClass="Pilot"
       />
-
       <CompendiumViewerModal
         open={compendiumState.modulesOpen}
         onClose={() =>

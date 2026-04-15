@@ -1,14 +1,14 @@
 // Hook for managing Compendium Packs stored in IndexedDB ("compendium-packs" store).
 // Always local — never synced to Firestore, but included in Drive backup via STORES.
-
+  // Pack CRUD
 import { useState, useEffect, useCallback } from "react";
 import { getDb, notifyListeners, subscribeToStore } from "../platform/idb";
 import type { CompendiumPack, CompendiumItem, CompendiumItemType, PackType } from "../types/CompendiumPack";
 import { validateManifest } from "../utils/validateCompendiumPack";
-
+  // Item operations
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
-
+  // Module I/O
 async function getAllPacks(): Promise<CompendiumPack[]> {
   const db = await getDb();
   return db.getAll(STORE) as Promise<CompendiumPack[]>;
@@ -37,8 +37,7 @@ export function useCompendiumPacks() {
 
   const personalPack = packs.find((p) => p.id === PERSONAL_ID) ?? null;
 
-  // ── Pack CRUD ─────────────────────────────────────────────────────────────
-
+  //  Pack CRUD
   const ensurePersonalPack = useCallback(async (): Promise<CompendiumPack> => {
     const all = await getAllPacks();
     const existing = all.find((p) => p.id === PERSONAL_ID);
@@ -117,8 +116,7 @@ export function useCompendiumPacks() {
     notifyListeners(STORE);
   }, []);
 
-  // ── Item operations ───────────────────────────────────────────────────────
-
+  // Item operations
   const addItem = useCallback(
     async (packId: string, type: CompendiumItemType, data: unknown): Promise<void> => {
       const targetId = packId === PERSONAL_ID ? PERSONAL_ID : packId;
@@ -200,8 +198,7 @@ export function useCompendiumPacks() {
     []
   );
 
-  // ── Module I/O ────────────────────────────────────────────────────────────
-
+  // Module I/O 
   const exportAsModule = useCallback(
     async (
       packId: string,

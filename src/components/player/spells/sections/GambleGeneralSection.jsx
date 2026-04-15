@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Grid,
   TextField,
@@ -6,7 +6,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Typography,
   Button,
   IconButton,
   FormControlLabel,
@@ -17,56 +16,75 @@ import {
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import attributes from "../../../../libs/attributes";
+import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 const SECOND_EFFECT_DICE = [1, 2, 3, 4, 5, 6];
 const TARGET_DICE = Array.from({ length: 12 }, (_, i) => i + 1);
 
+const ERROR_MESSAGES = {
+  INSUFFICIENT_TARGETS: "At least two targets are required.",
+  INVALID_RANGE: "Each target range must be valid.",
+  OVERLAPPING_RANGES: "Ranges cannot overlap.",
+  INCOMPLETE_COVERAGE: "All 12 die faces must be covered without overlap.",
+  MISSING_EFFECT: "All target effect fields must be filled out.",
+  INCOMPLETE_SECOND_EFFECTS: "All 6 die values for second effects must be covered.",
+  MISSING_SECOND_EFFECT: "All second effect fields must be filled out.",
+};
+
+const validateTargets = (targets) => {
+  if (targets.length < 2) return "INSUFFICIENT_TARGETS";
+
+  const normalized = targets
+    .map((target) => ({
+      from: Number(target?.rangeFrom),
+      to: Number(target?.rangeTo),
+      effect: String(target?.effect || "").trim(),
+    }))
+    .sort((a, b) => a.from - b.from);
+
+  if (normalized.some((target) => !target.from || !target.to || target.from > target.to)) {
+    return "INVALID_RANGE";
+  }
+
+  for (let i = 0; i < normalized.length - 1; i += 1) {
+    if (normalized[i].to >= normalized[i + 1].from) {
+      return "OVERLAPPING_RANGES";
+    }
+  }
+
+  const covered = new Set();
+  normalized.forEach((target) => {
+    for (let value = target.from; value <= target.to; value += 1) covered.add(value);
+  });
+  if (covered.size !== 12) return "INCOMPLETE_COVERAGE";
+  if (normalized.some((target) => !target.effect)) return "MISSING_EFFECT";
+
+  for (const target of targets) {
+    if (!target?.secondRoll) continue;
+    const secondEffects = Array.isArray(target.secondEffects) ? target.secondEffects : [];
+    if (secondEffects.length !== 6) return "INCOMPLETE_SECOND_EFFECTS";
+    const secondCovered = new Set(secondEffects.map((entry) => Number(entry?.dieValue)));
+    if (secondCovered.size !== 6 || SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))) {
+      return "INCOMPLETE_SECOND_EFFECTS";
+    }
+    if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
+      return "MISSING_SECOND_EFFECT";
+    }
+  }
+
+  return null;
+};
+
 export default function GambleGeneralSection({ formState, setFormState, t }) {
-  const targets = Array.isArray(formState.targets) ? formState.targets : [];
+  const [pendingDelete, setPendingDelete] = useState(null);
 
-  const validationError = useMemo(() => {
-    if (targets.length < 2) return t("At least two targets are required.");
+  const targets = useMemo(
+    () => (Array.isArray(formState.targets) ? formState.targets : []),
+    [formState.targets]
+  );
 
-    const normalized = targets
-      .map((target) => ({
-        from: Number(target?.rangeFrom),
-        to: Number(target?.rangeTo),
-        effect: String(target?.effect || "").trim(),
-      }))
-      .sort((a, b) => a.from - b.from);
-
-    if (normalized.some((target) => !target.from || !target.to || target.from > target.to)) {
-      return t("Each target range must be valid.");
-    }
-
-    for (let i = 0; i < normalized.length - 1; i += 1) {
-      if (normalized[i].to >= normalized[i + 1].from) {
-        return t("Ranges cannot overlap.");
-      }
-    }
-
-    const covered = new Set();
-    normalized.forEach((target) => {
-      for (let value = target.from; value <= target.to; value += 1) covered.add(value);
-    });
-    if (covered.size !== 12) return t("All 12 die faces must be covered without overlap.");
-    if (normalized.some((target) => !target.effect)) return t("All target effect fields must be filled out.");
-
-    for (const target of targets) {
-      if (!target?.secondRoll) continue;
-      const secondEffects = Array.isArray(target.secondEffects) ? target.secondEffects : [];
-      if (secondEffects.length !== 6) return t("All 6 die values for second effects must be covered.");
-      const secondCovered = new Set(secondEffects.map((entry) => Number(entry?.dieValue)));
-      if (secondCovered.size !== 6 || SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))) {
-        return t("All 6 die values for second effects must be covered.");
-      }
-      if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
-        return t("All second effect fields must be filled out.");
-      }
-    }
-
-    return "";
-  }, [targets, t]);
+  const validationErrorKey = useMemo(() => validateTargets(targets), [targets]);
+  const validationError = validationErrorKey ? t(ERROR_MESSAGES[validationErrorKey]) : "";
 
   const updateField = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -138,18 +156,34 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
     });
   };
 
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    if (pendingDelete.type === "target") {
+      removeTarget(pendingDelete.targetIndex);
+    } else if (pendingDelete.type === "secondEffect") {
+      removeSecondEffect(pendingDelete.targetIndex, pendingDelete.effectIndex);
+    }
+    setPendingDelete(null);
+  };
+
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <TextField
           label={t("Spell Name")}
           fullWidth
           value={formState.spellName || ""}
           onChange={(e) => updateField("spellName", e.target.value)}
-          inputProps={{ maxLength: 50 }}
+          slotProps={{
+            htmlInput: { maxLength: 50 }
+          }}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <TextField
           type="number"
           label={t("MP x Dice")}
@@ -158,7 +192,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           onChange={(e) => updateField("mp", Math.max(0, Number(e.target.value) || 0))}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <TextField
           type="number"
           label={t("Max Throwable Dices")}
@@ -167,7 +205,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           onChange={(e) => updateField("maxTargets", Math.max(0, Number(e.target.value) || 0))}
         />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4
+        }}>
         <FormControl fullWidth>
           <InputLabel>{t("Attribute")}</InputLabel>
           <Select
@@ -183,16 +225,18 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Select>
         </FormControl>
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Divider />
       </Grid>
-
       {targets.map((target, targetIndex) => (
-        <Grid item xs={12} key={`target-${targetIndex}`}>
+        <Grid  key={`target-${targetIndex}`} size={12}>
           <Box sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}>
-            <Grid container spacing={1.5} alignItems="center">
-              <Grid item xs={12} sm={2}>
+            <Grid container spacing={1.5} sx={{ alignItems: "center" }}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range From")}</InputLabel>
                   <Select
@@ -206,7 +250,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Range To")}</InputLabel>
                   <Select
@@ -220,17 +268,27 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={5}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 5
+                }}>
                 <TextField
                   label={t("Effect")}
                   fullWidth
                   size="small"
                   value={target.effect || ""}
                   onChange={(e) => updateTarget(targetIndex, { effect: e.target.value })}
-                  inputProps={{ maxLength: 200 }}
+                  slotProps={{
+                    htmlInput: { maxLength: 200 }
+                  }}
                 />
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2
+                }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -246,19 +304,30 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                   label={t("Second Roll")}
                 />
               </Grid>
-              <Grid item xs={12} sm={1}>
-                <IconButton color="error" onClick={() => removeTarget(targetIndex)}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 1
+                }}>
+                <IconButton
+                  color="error"
+                  onClick={() => setPendingDelete({ type: "target", targetIndex })}
+                >
                   <Delete />
                 </IconButton>
               </Grid>
 
               {target.secondRoll && (
-                <Grid item xs={12}>
+                <Grid  size={12}>
                   <Grid container spacing={1}>
                     {(target.secondEffects || []).map((entry, effectIndex) => (
-                      <Grid item xs={12} key={`target-${targetIndex}-effect-${effectIndex}`}>
-                        <Grid container spacing={1} alignItems="center">
-                          <Grid item xs={4} sm={2}>
+                      <Grid  key={`target-${targetIndex}-effect-${effectIndex}`} size={12}>
+                        <Grid container spacing={1} sx={{ alignItems: "center" }}>
+                          <Grid
+                            size={{
+                              xs: 4,
+                              sm: 2
+                            }}>
                             <FormControl fullWidth size="small">
                               <InputLabel>{t("Die")}</InputLabel>
                               <Select
@@ -274,7 +343,11 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               </Select>
                             </FormControl>
                           </Grid>
-                          <Grid item xs={8} sm={9}>
+                          <Grid
+                            size={{
+                              xs: 8,
+                              sm: 9
+                            }}>
                             <TextField
                               label={t("Effect")}
                               fullWidth
@@ -283,11 +356,26 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                               onChange={(e) =>
                                 updateSecondEffect(targetIndex, effectIndex, { effect: e.target.value })
                               }
-                              inputProps={{ maxLength: 200 }}
+                              slotProps={{
+                                htmlInput: { maxLength: 200 }
+                              }}
                             />
                           </Grid>
-                          <Grid item xs={12} sm={1}>
-                            <IconButton color="error" onClick={() => removeSecondEffect(targetIndex, effectIndex)}>
+                          <Grid
+                            size={{
+                              xs: 12,
+                              sm: 1
+                            }}>
+                            <IconButton
+                              color="error"
+                              onClick={() =>
+                                setPendingDelete({
+                                  type: "secondEffect",
+                                  targetIndex,
+                                  effectIndex,
+                                })
+                              }
+                            >
                               <Delete />
                             </IconButton>
                           </Grid>
@@ -295,7 +383,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
                       </Grid>
                     ))}
                     {(target.secondEffects || []).length < 6 && (
-                      <Grid item xs={12}>
+                      <Grid  size={12}>
                         <Button size="small" variant="outlined" onClick={() => addSecondEffect(targetIndex)}>
                           {t("Add Second Effect")}
                         </Button>
@@ -308,20 +396,17 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           </Box>
         </Grid>
       ))}
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <Button variant="contained" onClick={addTarget}>
           {t("Add Target")}
         </Button>
       </Grid>
-
       {validationError ? (
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <FormHelperText error>{validationError}</FormHelperText>
         </Grid>
       ) : null}
-
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -332,7 +417,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           label={t("Show in Character Sheet")}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -343,6 +428,13 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
           label={t("Is a Magisphere?")}
         />
       </Grid>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this entry?")}
+      />
     </Grid>
   );
 }

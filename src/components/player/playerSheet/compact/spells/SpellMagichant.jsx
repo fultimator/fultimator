@@ -69,7 +69,7 @@ export default function SpellMagichant({ spell }) {
           <TableRow key={`tone-${i}`}>
             <StyledTableCell sx={{ fontWeight: 'bold' }}>{tone.name === "magichant_custom_name" ? tone.customName : t(tone.name)}</StyledTableCell>
             <StyledTableCell colSpan={3} sx={{ fontSize: '0.75rem' }}>
-              <ReactMarkdown components={{ p: props => <span {...props} /> }}>
+              <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
                 {tone.name === "magichant_custom_name" ? tone.effect : t(tone.effect)}
               </ReactMarkdown>
             </StyledTableCell>

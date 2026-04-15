@@ -29,7 +29,7 @@ import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
-import { syncSlots, deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
+import { deriveVehicleSlots, validateSlots } from './slots/equipmentSlots';
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -578,15 +578,20 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid  size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Equipment")}
                   showIconButton={false}
                 />
               </Grid>
-              <Grid container justifyContent="center" spacing={2}>
-                <Grid item xs={6} sm={2.4} container justifyContent="center">
+              <Grid container sx={{ justifyContent: "center" }} spacing={2}>
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: 2.4
+                  }}>
                   <Button
                     variant="contained"
                     onClick={handleOpenNewWeapon}
@@ -596,7 +601,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Weapon")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={2.4} container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: 2.4
+                  }}>
                   <Button
                     variant="contained"
                     onClick={handleOpenNewCustomWeapon}
@@ -606,7 +616,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Custom Weapon")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={2.4} container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: 2.4
+                  }}>
                   <Button
                     variant="contained"
                     onClick={handleOpenNewArmor}
@@ -617,7 +632,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Armor")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={2.4} container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: 2.4
+                  }}>
                   <Button
                     variant="contained"
                     onClick={handleOpenNewShield}
@@ -628,7 +648,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Shield")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm={2.4} container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: 2.4
+                  }}>
                   <Button
                     variant="contained"
                     onClick={handleOpenNewAccessory}
@@ -641,7 +666,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Accessory")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm="auto" container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: "auto"
+                  }}>
                   <Button
                     variant="outlined"
                     onClick={handleUploadJSON}
@@ -651,7 +681,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid item xs={6} sm="auto" container justifyContent="center">
+                <Grid
+                  container sx={{ justifyContent: "center" }}
+                  size={{
+                    xs: 6,
+                    sm: "auto"
+                  }}>
                   <Button
                     variant="outlined"
                     onClick={() => setOpenEquipmentCompendium(true)}
@@ -674,7 +709,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
-
       <PlayerWeapons
         player={player}
         weapons={inv.weapons || []}
@@ -686,7 +720,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
         onOpenCompendium={isEditMode ? () => setOpenWeaponCompendium(true) : undefined}
       />
-
       <PlayerCustomWeapons
         player={player}
         customWeapons={inv.customWeapons || []}
@@ -699,7 +732,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onOpenCompendium={isEditMode ? () => setOpenCustomWeaponCompendium(true) : undefined}
         isEditMode={isEditMode}
       />
-
       <PlayerArmor
         player={player}
         armor={inv.armor || []}
@@ -710,7 +742,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
         onOpenCompendium={isEditMode ? () => setOpenArmorCompendium(true) : undefined}
       />
-
       <PlayerShields
         player={player}
         shields={inv.shields || []}
@@ -722,7 +753,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
         onOpenCompendium={isEditMode ? () => setOpenShieldCompendium(true) : undefined}
       />
-
       <PlayerAccessories
         player={player}
         accessories={inv.accessories || []}
@@ -733,7 +763,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onOpenCompendium={isEditMode ? () => setOpenAccessoryCompendium(true) : undefined}
         isEditMode={isEditMode}
       />
-
       {/* Modals */}
       <PlayerWeaponModal
         open={openNewWeapon}
@@ -771,7 +800,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onAddShield={handleSaveShield}
         onDeleteShield={handleDeleteShield}
       />
-
       <PlayerAccessoryModal
         open={openNewAccessory}
         onClose={handleCloseNewAccessory}
@@ -780,7 +808,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         onAddAccessory={handleSaveAccessory}
         onDeleteAccessory={handleDeleteAccessory}
       />
-
       <CompendiumViewerModal
         open={openEquipmentCompendium}
         onClose={() => setOpenEquipmentCompendium(false)}
@@ -838,7 +865,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         restrictToTypes={["accessories"]}
         context="player"
       />
-
       {martialWarning && (
         <Dialog open onClose={() => setMartialWarning(null)} maxWidth="xs" fullWidth>
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>

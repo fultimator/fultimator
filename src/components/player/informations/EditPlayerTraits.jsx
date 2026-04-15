@@ -75,26 +75,36 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid  size={12}>
           <CustomHeader type="top" headerText={t("Traits")}
             showIconButton={false}
           />
         </Grid>
-        <Grid item xs={12} sm={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="identity"
               label={t("Identity") + ":"}
               value={player.info.identity}
               onChange={onChangeInfo("identity")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 300 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 300 }
+              }} />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Autocomplete
             id="theme-autocomplete"
             options={themes}
@@ -108,23 +118,31 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
                 {...params}
                 label={t("Theme") + ":"}
                 fullWidth
-                inputProps={{ ...params.inputProps, maxLength: 50 }}
+                slotProps={{
+                  htmlInput: { ...params.inputProps, maxLength: 50 }
+                }}
               />
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <FormControl variant="standard" fullWidth>
             <TextField
               id="origin"
               label={t("Origin") + ":"}
               value={player.info.origin}
               onChange={onChangeInfo("origin")}
-              InputProps={{
-                readOnly: !isEditMode,
-              }}
-              inputProps={{ maxLength: 50 }}
-            />
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+
+                htmlInput: { maxLength: 50 }
+              }} />
           </FormControl>
         </Grid>
       </Grid>

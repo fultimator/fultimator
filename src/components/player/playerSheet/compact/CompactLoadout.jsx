@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, ButtonBase, Collapse, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid,
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText,
-  Radio, Checkbox, Chip, Divider,
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText, Checkbox, Chip, Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -36,7 +35,7 @@ import SlotPickerDialog from '../../equipment/slots/SlotPickerDialog';
 import SpellPilotVehiclesModal from '../../spells/SpellPilotVehiclesModal';
 import PlayerEquipment from './PlayerEquipment';
 
-const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
+// const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -83,20 +82,20 @@ function hasTransforming(resolved) {
   return resolved.item?.customizations?.some(c => c.name === 'weapon_customization_transforming') ?? false;
 }
 
-function moduleStatLine(module) {
-  if (!module) return '-';
-  if (module.type === 'pilot_module_weapon') {
-    if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
-    const hands = module.cumbersome ? '2H' : '1H';
-    return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
-  }
-  if (module.type === 'pilot_module_armor') {
-    return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-  }
-  return module.description ? module.description.slice(0, 40) : '-';
-}
+// function moduleStatLine(module) {
+//   if (!module) return '-';
+//   if (module.type === 'pilot_module_weapon') {
+//     if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+//     const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
+//     const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
+//     const hands = module.cumbersome ? '2H' : '1H';
+//     return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
+//   }
+//   if (module.type === 'pilot_module_armor') {
+//     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+//   }
+//   return module.description ? module.description.slice(0, 40) : '-';
+// }
 
 export default function CompactLoadout({
   player,
@@ -116,7 +115,7 @@ export default function CompactLoadout({
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer]);
+  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
 
   // Attributes
   const getAttrDie = (key) => {
@@ -133,7 +132,7 @@ export default function CompactLoadout({
 
   // Vehicle / selectors
   const activeVehicle = getActiveVehicle(player);
-  const vs = player?.vehicleSlots;
+  // const vs = player?.vehicleSlots;
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
   const pilotSpellInfo = getPilotSpellInfo(player);
@@ -248,7 +247,6 @@ export default function CompactLoadout({
           </IconButton>
         )}
       </Box>
-
       {/* Main 4 slots + aux */}
       <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {allSlots.map(({ slot, resolved, locked, isAux }) => {
@@ -312,7 +310,6 @@ export default function CompactLoadout({
           );
         })}
       </Box>
-
       {/* Vehicle support slots */}
       {activeVehicle && supportSlots.length > 0 && (
         <>
@@ -365,14 +362,12 @@ export default function CompactLoadout({
           </Box>
         </>
       )}
-
       {/* Collapsible equipment list */}
       {withEquipment && (
         <Collapse in={equipOpen}>
           <PlayerEquipment player={player} setPlayer={setPlayer} isEditMode={isEditMode} isCharacterSheet isMainTab={isMainTab} searchQuery={searchQuery} />
         </Collapse>
       )}
-
       {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
@@ -392,7 +387,6 @@ export default function CompactLoadout({
           }
         />
       )}
-
       {/* Support module picker */}
       <Dialog open={supportPickerOpen} onClose={() => setSupportPickerOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -401,10 +395,18 @@ export default function CompactLoadout({
         </DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
           {equippedSupportModules.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">{t('No support modules installed on this vehicle.')}</Typography>
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>{t('No support modules installed on this vehicle.')}</Typography>
           ) : (
             <>
-              <Typography variant="caption" color="text.secondary" gutterBottom display="block">{t('Enable or disable support modules:')}</Typography>
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block"
+                }}>{t('Enable or disable support modules:')}</Typography>
               <List dense>
                 {equippedSupportModules.map((m) => (
                   <ListItem key={m.originalIndex} disablePadding>
@@ -429,32 +431,37 @@ export default function CompactLoadout({
           <Button size="small" onClick={() => setSupportPickerOpen(false)}>{t('Done')}</Button>
         </DialogActions>
       </Dialog>
-
       {/* Roll result dialog */}
       {rollDialog && (
-        <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { width: { xs: '90%', md: '30%' } } }}>
+        <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth slotProps={{
+          paper: { sx: { width: { xs: '90%', md: '30%' } } }
+        }}>
           <DialogTitle variant="h3" sx={{ backgroundColor: rollDialog.isCritFail ? '#bb2124' : rollDialog.isCritSuccess ? '#22bb33' : '#aaaaaa' }}>
             {rollDialog.isCritFail ? t('Critical Failure!') : rollDialog.isCritSuccess ? t('Critical Success!') : t('Result')}
           </DialogTitle>
           <DialogContent sx={{ mt: 1 }}>
             <Grid container spacing={2} sx={{ textAlign: 'center', pt: 1 }}>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Accuracy')}</Typography>
                 <Typography variant="h1">{rollDialog.accuracy}</Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid  size={6}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Damage')}</Typography>
                 <Typography variant="h1">{rollDialog.damageRoll}</Typography>
                 {rollDialog.type && <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>}
               </Grid>
-              <Grid item xs={12} sx={{ mt: 1 }}>
-                <Typography variant="body2" color="text.secondary">
+              <Grid  sx={{ mt: 1 }} size={12}>
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
                   {' + '}
                   {rollDialog.r2} [{attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
                   {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ''}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {t('Damage')}: {Math.max(rollDialog.r1, rollDialog.r2)} + {rollDialog.damage}
                 </Typography>
               </Grid>
@@ -466,7 +473,6 @@ export default function CompactLoadout({
           </DialogActions>
         </Dialog>
       )}
-
       {/* Vehicle swap modal */}
       {vehicleModalOpen && pilotSpellInfo && (
         <SpellPilotVehiclesModal

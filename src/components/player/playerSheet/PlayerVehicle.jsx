@@ -11,8 +11,6 @@ import {
   Button,
   Tooltip,
   Divider,
-  Stack,
-  Card,
   Box,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -20,12 +18,7 @@ import { useTranslate } from "../../../translation/translate";
 import { Casino, Info } from "@mui/icons-material";
 import { VehicleModuleCard } from "../../compendium/ItemCards";
 import attributes from "../../../libs/attributes";
-import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
-import { Martial } from "../../icons";
-import { OpenBracket, CloseBracket } from "../../Bracket";
-import Diamond from "../../Diamond";
 import { availableFrames } from "../../../libs/pilotVehicleData";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 import { calculateAttribute } from "../common/playerCalculations";
@@ -33,7 +26,6 @@ import { calculateAttribute } from "../common/playerCalculations";
 export default function PlayerVehicle({
   player,
   setPlayer,
-  isEditMode,
   isCharacterSheet,
 }) {
   const { t } = useTranslate();
@@ -49,11 +41,6 @@ export default function PlayerVehicle({
   const [openEditModal, setOpenEditModal] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
-
-  const background =
-    custom.mode === "dark"
-      ? `linear-gradient(90deg, ${custom.ternary}, rgba(24, 26, 27, 0) 100%)`
-      : `linear-gradient(90deg, ${custom.ternary} 0%, #ffffff 100%)`;
 
   // Find all pilot-vehicle spells
   const pilotSpells = (player.classes || [])
@@ -172,8 +159,8 @@ export default function PlayerVehicle({
     const dialogContent = (
       <>
         <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -185,8 +172,8 @@ export default function PlayerVehicle({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item container xs={6}>
-            <Grid item xs={12}>
+          <Grid  container size={6}>
+            <Grid  size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -204,7 +191,7 @@ export default function PlayerVehicle({
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={12} sx={{ marginTop: "20px" }}>
+          <Grid  sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
               {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
                 attributes[att2].shortcaps
@@ -269,27 +256,6 @@ export default function PlayerVehicle({
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-  };
-
-  const StyledMarkdown = ({ children, ...props }) => {
-    return (
-      <div style={{ whiteSpace: "pre-line", margin: 0, padding: 0 }}>
-        <ReactMarkdown
-          {...props}
-          components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
-              <strong style={{ fontWeight: "bold" }} {...props} />
-            ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
-          }}
-        >
-          {children}
-        </ReactMarkdown>
-      </div>
-    );
   };
 
   const handleSaveVehicles = (spellIndex, updatedPilot) => {
@@ -372,16 +338,17 @@ export default function PlayerVehicle({
             {t("pilot_vehicle")}
           </Typography>
         )}
-        <Grid container spacing={1} sx={{ padding: "1em" }}>
+        <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
           {frame && (
             <Grid
-              item
               container
-              xs={12}
-              md={6}
-              sx={{ display: "flex", alignItems: "stretch" }}
-            >
-              <Grid item xs={10} sx={{ display: "flex" }}>
+              spacing={0}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
+              <Grid  sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -400,7 +367,7 @@ export default function PlayerVehicle({
                   {t(frame.name)}
                 </Typography>
               </Grid>
-              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -424,14 +391,15 @@ export default function PlayerVehicle({
 
           {armorModules.map((module, index) => (
             <Grid
-              item
-              container
-              xs={12}
-              md={6}
-              key={`armor-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
-            >
-              <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`armor-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
+              <Grid  sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -452,7 +420,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -476,14 +444,15 @@ export default function PlayerVehicle({
 
           {weaponModules.map((module, index) => (
             <Grid
-              item
-              container
-              xs={12}
-              md={6}
-              key={`weapon-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
-            >
-              <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`weapon-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
+              <Grid  sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -504,7 +473,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -538,14 +507,15 @@ export default function PlayerVehicle({
 
           {supportModules.map((module, index) => (
             <Grid
-              item
-              container
-              xs={12}
-              md={6}
-              key={`support-${index}`}
-              sx={{ display: "flex", alignItems: "stretch" }}
-            >
-              <Grid item xs={10} sx={{ display: "flex" }}>
+                  container
+                  spacing={0}
+                  key={`support-${index}`}
+              sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
+              <Grid  sx={{ display: "flex" }} size={10}>
                 <Typography
                   variant="h2"
                   sx={{
@@ -566,7 +536,7 @@ export default function PlayerVehicle({
                     : t(module.name)}
                 </Typography>
               </Grid>
-              <Grid item xs={2} sx={{ display: "flex", alignItems: "stretch" }}>
+              <Grid  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
                 <Box
                   sx={{
                     padding: "5px",
@@ -591,7 +561,9 @@ export default function PlayerVehicle({
         <Dialog
           open={dialogOpen}
           onClose={handleDialogClose}
-          PaperProps={{ sx: { width: { xs: "90%", md: "30%" } } }}
+          slotProps={{
+            paper: { sx: { width: { xs: "90%", md: "30%" } } }
+          }}
         >
           <DialogTitle
             variant="h3"

@@ -25,6 +25,7 @@ import PrettyAccessory from "./PrettyAccessory";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 
 export default function PlayerAccessoryModal({
@@ -51,7 +52,7 @@ export default function PlayerAccessoryModal({
     precModifier, setPrecModifier,
     damageMeleeModifier, setDamageMeleeModifier,
     damageRangedModifier, setDamageRangedModifier,
-    isEquipped, setIsEquipped,
+    _isEquipped, _setIsEquipped,
     modifiersExpanded, setModifiersExpanded,
     expandModifiers,
     modifiers,
@@ -60,7 +61,14 @@ export default function PlayerAccessoryModal({
 
   const fileInputRef = useRef(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+    onConfirm: () => {
+          if (editAccIndex !== null) {
+            onDeleteAccessory(editAccIndex);
+          }
+          onClose();
+        },
+  });;
 
   useEffect(() => {
     setName(accessory?.name || "");
@@ -132,214 +140,243 @@ export default function PlayerAccessoryModal({
 
     onAddAccessory(updatedAccessory);
   };
-
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  return (
+return (
     <>
-    <Dialog
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "lg",
-        },
-      }}
-    >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-        {t("Add Accessory")}
-      </DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
+      <Dialog
+        open={open}
+        onClose={onClose}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "100%",
+              maxWidth: "lg",
+            },
+          }
         }}
       >
-        <Close />
-      </IconButton>
-      <DialogContent>
-        <Grid container spacing={2} alignItems="center">
-          {/* Form */}
+        <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
+          {t("Add Accessory")}
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <Close />
+        </IconButton>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            {/* Form */}
 
-          {/* Change Base */}
-          <Grid item xs={6}>
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            {/* Change Base */}
+            <Grid  size={6}>
+              <ChangeName
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Grid>
+            <Grid  size={6}>
+              <SelectQuality
+                quality={selectedQuality}
+                setQuality={(e) => {
+                  const quality = qualities.find(
+                    (el) => el.name === e.target.value
+                  );
+                  setSelectedQuality(quality.name);
+                  setQuality(quality.quality);
+                  setQualityCost(quality.cost);
+                }}
+              />
+            </Grid>
+            <Grid  size={12}>
+              <ChangeQuality
+                quality={quality}
+                setQuality={(e) => setQuality(e.target.value)}
+                qualityCost={qualityCost}
+                setQualityCost={(e) => setQualityCost(e.target.value)}
+              />
+              <Divider />
+            </Grid>
+            <Accordion
+              sx={{ width: "100%", marginLeft: "10px" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"DEF Modifier"}
+                      value={defModifier}
+                      onChange={(e) => setDefModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"MDEF Modifier"}
+                      value={mDefModifier}
+                      onChange={(e) => setMDefModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"INIT Modifier"}
+                      value={initModifier}
+                      onChange={(e) => setInitModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"Magic Modifier"}
+                      value={magicModifier}
+                      onChange={(e) => setMagicModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"Precision Modifier"}
+                      value={precModifier}
+                      onChange={(e) => setPrecModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"Damage (Melee) Modifier"}
+                      value={damageMeleeModifier}
+                      onChange={(e) => setDamageMeleeModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 6,
+                      md: 4
+                    }}>
+                    <ChangeModifiers
+                      label={"Damage (Ranged) Modifier"}
+                      value={damageRangedModifier}
+                      onChange={(e) => setDamageRangedModifier(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Grid  size={12}>
+              <Divider />
+            </Grid>
+            <Grid  sx={{ py: 0 }} size={12}>
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                <Grid >
+                  <Button
+                    variant="outlined"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    {t("Upload JSON")}
+                  </Button>
+                </Grid>
+                <Grid >
+                  <Button variant="outlined" onClick={handleClearFields}>
+                    {t("Clear All Fields")}
+                  </Button>
+                </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+              </Grid>
+            </Grid>
+            <Grid  size={12}>
+              <Divider sx={{ my: 2 }} />
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <SelectQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const quality = qualities.find(
-                  (el) => el.name === e.target.value
-                );
-                setSelectedQuality(quality.name);
-                setQuality(quality.quality);
-                setQualityCost(quality.cost);
+          {/* Pretty */}
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
+            <PrettyAccessory
+              accessory={{
+                name: name,
+                cost: cost,
+                quality: quality,
               }}
             />
           </Grid>
-          <Grid item xs={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-            <Divider />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
+        </DialogContent>
+        <DialogActions>
+          {editAccIndex !== null && (
+            <Button onClick={handleDelete} color="error" variant="contained" >
+              {t("Delete")}
+            </Button>
+          )}
+          <Button
+            onClick={handleSave}
+            color= "primary"
+            variant="contained"
           >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"DEF Modifier"}
-                    value={defModifier}
-                    onChange={(e) => setDefModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"MDEF Modifier"}
-                    value={mDefModifier}
-                    onChange={(e) => setMDefModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"INIT Modifier"}
-                    value={initModifier}
-                    onChange={(e) => setInitModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"Magic Modifier"}
-                    value={magicModifier}
-                    onChange={(e) => setMagicModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"Precision Modifier"}
-                    value={precModifier}
-                    onChange={(e) => setPrecModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"Damage (Melee) Modifier"}
-                    value={damageMeleeModifier}
-                    onChange={(e) => setDamageMeleeModifier(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={6} md={4}>
-                  <ChangeModifiers
-                    label={"Damage (Ranged) Modifier"}
-                    value={damageRangedModifier}
-                    onChange={(e) => setDamageRangedModifier(e.target.value)}
-                  />
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid item xs={12}>
-            <Divider />
-          </Grid>
-          <Grid item xs={12} sx={{ py: 0 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  {t("Upload JSON")}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button variant="outlined" onClick={handleClearFields}>
-                  {t("Clear All Fields")}
-                </Button>
-              </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-              />
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <Divider sx={{ my: 2 }} />
-          </Grid>
-        </Grid>
-        {/* Pretty */}
-        <Grid item xs={12} sm={6}>
-          <PrettyAccessory
-            accessory={{
-              name: name,
-              cost: cost,
-              quality: quality,
-            }}
-          />
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        {editAccIndex !== null && (
-          <Button onClick={handleDelete} color="error" variant="contained" >
-            {t("Delete")}
+            {t("Save Changes")}
           </Button>
-        )}
-        <Button
-          onClick={handleSave}
-          color= "primary"
-          variant="contained"
-        >
-          {t("Save Changes")}
-        </Button>
-      </DialogActions>
-    </Dialog>
-    <DeleteConfirmationDialog
-      open={deleteDialogOpen}
-      onClose={() => setDeleteDialogOpen(false)}
-      onConfirm={() => {
-        if (editAccIndex !== null) {
-          onDeleteAccessory(editAccIndex);
+        </DialogActions>
+      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={setDeleteDialogOpen}
+        onConfirm={() => {
+          if (editAccIndex !== null) {
+            onDeleteAccessory(editAccIndex);
+          }
+          onClose();
+        }}
+        title={t("Confirm Deletion")}
+        message={t("Are you sure you want to delete this accessory?")}
+        itemPreview={
+          <Box>
+            <Typography variant="h4">{name}</Typography>
+            <Typography variant="body2">
+              {cost} {t("zenit")}
+            </Typography>
+          </Box>
         }
-        onClose();
-      }}
-      title={t("Confirm Deletion")}
-      message={t("Are you sure you want to delete this accessory?")}
-      itemPreview={
-        <Box>
-          <Typography variant="h4">{name}</Typography>
-          <Typography variant="body2">
-            {cost} {t("zenit")}
-          </Typography>
-        </Box>
-      }
-    />
+      />
     </>
   );
 }

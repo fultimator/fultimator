@@ -1,4 +1,4 @@
-import { RemoveCircleOutline } from "@mui/icons-material";
+import { RemoveCircleOutlined } from "@mui/icons-material";
 
 import {
   Grid,
@@ -12,10 +12,13 @@ import CustomTextarea from '../common/CustomTextarea';
 import CustomHeader from '../common/CustomHeader';
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 export default function EditActions({ npc, setNpc }) {
   const { t } = useTranslate();
   const [modalOpen, setModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pendingActionIndex, setPendingActionIndex] = useState(null);
   const onChangeActions = (i, key, value) => {
     setNpc((prevState) => {
       const newState = Object.assign({}, prevState);
@@ -25,27 +28,28 @@ export default function EditActions({ npc, setNpc }) {
   };
 
   const addActions = () => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      if (!newState.actions) {
-        newState.actions = [];
-      }
-      newState.actions.push({
+    setNpc((prevState) => ({
+      ...prevState,
+      actions: [
+        ...(prevState.actions || []),
+        {
         name: "",
         effect: "",
-      });
-      return newState;
-    });
+        },
+      ],
+    }));
   };
 
   const removeActions = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = Object.assign({}, prevState);
-        newState.actions.splice(i, 1);
-        return newState;
-      });
-    };
+    setNpc((prevState) => ({
+      ...prevState,
+      actions: (prevState.actions || []).filter((_, index) => index !== i),
+    }));
+  };
+
+  const openDeleteDialog = (index) => {
+    setPendingActionIndex(index);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -54,12 +58,12 @@ export default function EditActions({ npc, setNpc }) {
       {npc.actions?.map((actions, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid item sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={removeActions(i)}>
-                <RemoveCircleOutline />
+            <Grid  sx={{ p: 0, m: 0 }}>
+              <IconButton onClick={() => openDeleteDialog(i)}>
+                <RemoveCircleOutlined />
               </IconButton>
             </Grid>
-            <Grid item xs>
+            <Grid  size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -72,20 +76,22 @@ export default function EditActions({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid item xs={3}>
+            <Grid  size={3}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="spCost"
                   label={t("SP Cost:")}
                   type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   value={actions?.spCost ?? 1}
                   onChange={(e) => onChangeActions(i, "spCost", e.target.value)}
                   size="small"
+                  slotProps={{
+                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+                  }}
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid  size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={actions.effect}
                   onChange={(e) => {
@@ -114,13 +120,34 @@ export default function EditActions({ npc, setNpc }) {
         context="npc"
         initialType="actions"
         onAddItem={(item) => {
-          setNpc((prev) => {
-            const newState = { ...prev };
-            if (!newState.actions) newState.actions = [];
-            newState.actions.push({ name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 });
-            return newState;
-          });
+          setNpc((prev) => ({
+            ...prev,
+            actions: [
+              ...(prev.actions || []),
+              { name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 },
+            ],
+          }));
         }}
+      />
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingActionIndex(null);
+        }}
+        onConfirm={() => {
+          if (pendingActionIndex === null) return;
+          removeActions(pendingActionIndex);
+          setIsDeleteDialogOpen(false);
+          setPendingActionIndex(null);
+        }}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          pendingActionIndex !== null
+            ? npc.actions?.[pendingActionIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );

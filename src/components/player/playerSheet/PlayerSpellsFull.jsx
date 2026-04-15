@@ -129,7 +129,7 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
           {player.classes
             .filter((c) => c.spells && c.spells.length > 0)
             .map((c, classIndex) => (
-              <Grid item xs={12} key={classIndex}>
+              <Grid  key={classIndex} size={12}>
                 <Paper
                   elevation={3}
                   sx={
@@ -316,7 +316,6 @@ export default function PlayerSpellsFull({ player, setPlayer, isEditMode, isChar
             ))}
         </Grid>
       )}
-
       {canEdit && spellBeingEdited && (
         <>
           <SpellDefaultModal

@@ -220,7 +220,6 @@ export default function CommunityResources({
           </Alert>
         </Box>
       </Paper>
-
       {/* Content Grid */}
       {filteredResources.length === 0 ? (
         <Paper
@@ -298,7 +297,13 @@ export default function CommunityResources({
       ) : (
         <Grid container spacing={3}>
           {filteredResources.map((content, index) => (
-            <Grid item xs={12} md={6} lg={4} key={index}>
+            <Grid
+              key={index}
+              size={{
+                xs: 12,
+                md: 6,
+                lg: 4
+              }}>
               <ResourceCard resource={content} isHomebrew />
             </Grid>
           ))}

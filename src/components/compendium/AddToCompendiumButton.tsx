@@ -42,7 +42,7 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
 
   const personalPack = packs.find((p) => p.isPersonal && p.id !== excludePackId) ?? null;
   const nonPersonalPacks = packs.filter((p) => !p.isPersonal && p.id !== excludePackId);
-  const hasMultiplePacks = nonPersonalPacks.length > 0 || personalPack !== null;
+  // const hasMultiplePacks = nonPersonalPacks.length > 0 || personalPack !== null;
 
   // All available targets (personal first, then others), minus excluded pack
   const allTargets = [...(personalPack ? [personalPack] : []), ...nonPersonalPacks];

@@ -124,11 +124,13 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "sm",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: "sm",
+          },
+        }
       }}
     >
       <DialogTitle variant="h3">{t(title)}</DialogTitle>
@@ -141,8 +143,10 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           fullWidth
           value={discordAccount}
           onChange={(e) => setDiscordAccount(e.target.value)}
-          inputProps={{
-            maxLength: 100,
+          slotProps={{
+            htmlInput: {
+              maxLength: 100,
+            }
           }}
         />
         <Typography variant="body2" sx={{ mt: 1 }}>
@@ -157,8 +161,10 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          inputProps={{
-            maxLength: 5000,
+          slotProps={{
+            htmlInput: {
+              maxLength: 5000,
+            }
           }}
         />
         {errorMessage && (

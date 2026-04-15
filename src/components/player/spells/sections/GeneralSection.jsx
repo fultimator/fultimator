@@ -19,7 +19,7 @@ export default function GeneralSection({
   customFields = [],
 }) {
   const markdownComponents = {
-    p: ({ ...props }) => <p style={{ margin: 0 }} {...props} />,
+    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
   };
 
   const handleShowInPlayerSheetChange = (checked) => {
@@ -29,7 +29,7 @@ export default function GeneralSection({
   return (
     <Grid container spacing={3}>
       {/* Show in Player Sheet */}
-      <Grid item xs={12}>
+      <Grid  size={12}>
         <FormControlLabel
           control={
             <Switch
@@ -40,13 +40,12 @@ export default function GeneralSection({
           label={t("Show in Character Sheet")}
         />
       </Grid>
-
       {/* Custom Fields */}
       {customFields.map((field) => {
         const value = formState[field.name];
 
         return (
-          <Grid item xs={12} key={field.name}>
+          <Grid  key={field.name} size={12}>
             {field.type === "toggle" && (
               <FormControlLabel
                 control={
@@ -63,7 +62,6 @@ export default function GeneralSection({
                 label={t(field.label)}
               />
             )}
-
             {field.type === "slider" && (
               <>
                 <Typography variant="h6" gutterBottom>
@@ -88,7 +86,6 @@ export default function GeneralSection({
                 </Box>
               </>
             )}
-
             {field.type === "textarea" && (
               <>
                 <Typography variant="h6" gutterBottom>
@@ -107,7 +104,13 @@ export default function GeneralSection({
                   rows={field.rows || 3}
                 />
                 {field.helpText && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }} component="div">
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{
+                      color: "text.secondary",
+                      mt: 1
+                    }}>
                     <ReactMarkdown components={markdownComponents}>
                       {t(field.helpText)}
                     </ReactMarkdown>

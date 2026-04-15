@@ -111,13 +111,13 @@ const StyledMarkdown = ({ children, ...props }) => {
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
+            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
+            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
           }}
         >
           {children}
@@ -138,17 +138,19 @@ const StyledMarkdown = ({ children, ...props }) => {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: "80%",
-          maxWidth: "lg",
-        },
+      slotProps={{
+        paper: {
+          sx: {
+            width: "80%",
+            maxWidth: "lg",
+          },
+        }
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container alignItems="center" justifyContent="space-between" spacing={1}>
+        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
           {source === "official" && (
-            <Grid item xs>
+            <Grid  size="grow">
               <Select
                 value={selectedClass}
                 onChange={handleClassChange}
@@ -165,7 +167,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </Grid>
           )}
           {source === "packs" && (
-            <Grid item xs>
+            <Grid  size="grow">
               <Select
                 value={selectedPackId}
                 onChange={(e) => setSelectedPackId(e.target.value)}
@@ -180,7 +182,7 @@ const StyledMarkdown = ({ children, ...props }) => {
               </Select>
             </Grid>
           )}
-          <Grid item>
+          <Grid >
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -192,7 +194,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </IconButton>
           </Grid>
           {/* Source selector row */}
-          <Grid item xs={12}>
+          <Grid  size={12}>
             <Select
               value={source}
               onChange={(e) => setSource(e.target.value)}
@@ -211,7 +213,7 @@ const StyledMarkdown = ({ children, ...props }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid item xs={4} sx={{ maxHeight: "40vh", overflowY: "auto" }}>
+          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
               <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
                 {source === "packs"
@@ -239,11 +241,7 @@ const StyledMarkdown = ({ children, ...props }) => {
               </List>
             )}
           </Grid>
-          <Grid
-            item
-            xs={8}
-            sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }}
-          >
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto", px: 2 }} size={8}>
             {selectedItem && selectedItem.spellType === "default" && (
               <div>
                 <Typography variant="h3">
@@ -254,7 +252,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   {selectedItem.mp}{" "}
                   {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                   {t("MP")}
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -263,7 +263,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -288,7 +290,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                   {t("Up to")} {selectedItem.mp * selectedItem.maxTargets} {t("MP")}
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -297,7 +301,9 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" mx={1}>
+                  <Box component="span" sx={{
+                    mx: 1
+                  }}>
                     <Diamond />
                   </Box>
                   <StyledMarkdown
