@@ -33,11 +33,12 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
   const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
   const [replaceIndex, setReplaceIndex] = useState(null);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } = useDeleteConfirmation({
-    onConfirm: () => {
-          if (deleteIndex !== null) handleRemove(deleteIndex);
-        },
-  });;
+  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } =
+    useDeleteConfirmation({
+      onConfirm: () => {
+        if (deleteIndex !== null) handleRemove(deleteIndex);
+      },
+    });
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const others = player.others ?? [];
@@ -50,7 +51,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         return { ...prev, others: updated };
       });
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleAdd = useCallback(() => {
@@ -68,7 +69,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         return { ...prev, others: updated };
       });
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleReplaceFromCompendium = useCallback(
@@ -83,15 +84,17 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                 name: item.name ?? "",
                 description: item.description ?? "",
                 effect: item.effect ?? "",
-                ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : { clock: undefined }),
+                ...(item.clock?.sections
+                  ? { clock: { sections: item.clock.sections } }
+                  : { clock: undefined }),
               }
-            : other
+            : other,
         ),
       }));
       setReplaceCompendiumOpen(false);
       setReplaceIndex(null);
     },
-    [replaceIndex, setPlayer]
+    [replaceIndex, setPlayer],
   );
 
   return (
@@ -105,7 +108,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Other Optionals")}
@@ -117,7 +120,7 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         </Grid>
 
         {others.length === 0 && (
-          <Grid  sx={{ py: 2 }} size={12}>
+          <Grid sx={{ py: 2 }} size={12}>
             <Typography sx={{ textAlign: "center" }}>
               {t("No optional entries yet.")}
             </Typography>
@@ -127,16 +130,21 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
         {others.map((other, index) => (
           <React.Fragment key={index}>
             {index > 0 && (
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider sx={{ my: 1 }} />
               </Grid>
             )}
-            <Grid container spacing={1} sx={{ py: 1, alignItems: "flex-start" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ py: 1, alignItems: "flex-start" }}
+            >
               <Grid
                 size={{
                   xs: 9,
-                  sm: 10
-                }}>
+                  sm: 10,
+                }}
+              >
                 <TextField
                   label={t("Name") + ":"}
                   value={other.name ?? ""}
@@ -145,16 +153,18 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   size="small"
                   slotProps={{
                     input: { readOnly: !isEditMode },
-                    htmlInput: { maxLength: 100 }
-                  }} />
+                    htmlInput: { maxLength: 100 },
+                  }}
+                />
               </Grid>
               {isEditMode && (
                 <Grid
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
                   size={{
                     xs: 3,
-                    sm: 2
-                  }}>
+                    sm: 2,
+                  }}
+                >
                   <Tooltip title={t("Replace from Compendium")}>
                     <IconButton
                       size="small"
@@ -180,21 +190,25 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   </Tooltip>
                 </Grid>
               )}
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomTextarea
                   label={t("Description") + ":"}
                   value={other.description ?? ""}
-                  onChange={(e) => onChangeOther(index, "description")(e.target.value)}
+                  onChange={(e) =>
+                    onChangeOther(index, "description")(e.target.value)
+                  }
                   maxLength={5000}
                   maxRows={8}
                   readOnly={!isEditMode}
                 />
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomTextarea
                   label={t("Effect") + ":"}
                   value={other.effect ?? ""}
-                  onChange={(e) => onChangeOther(index, "effect")(e.target.value)}
+                  onChange={(e) =>
+                    onChangeOther(index, "effect")(e.target.value)
+                  }
                   maxLength={5000}
                   maxRows={8}
                   readOnly={!isEditMode}
@@ -203,8 +217,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 {isEditMode ? (
                   <FormControlLabel
                     control={
@@ -226,9 +241,12 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                   />
                 ) : (
                   other.clock?.sections && (
-                    <Typography variant="body2" sx={{
-                      color: "text.secondary"
-                    }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
                       {t("Clock")}: {other.clock.sections}
                     </Typography>
                   )
@@ -238,15 +256,19 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                 <Grid
                   size={{
                     xs: 12,
-                    sm: 6
-                  }}>
+                    sm: 6,
+                  }}
+                >
                   <TextField
                     label={t("Clock Sections") + ":"}
                     value={other.clock.sections}
                     onChange={(e) => {
                       setPlayer((prev) => {
                         const updated = [...(prev.others ?? [])];
-                        updated[index] = { ...updated[index], clock: { sections: Number(e.target.value) || 6 } };
+                        updated[index] = {
+                          ...updated[index],
+                          clock: { sections: Number(e.target.value) || 6 },
+                        };
                         return { ...prev, others: updated };
                       });
                     }}
@@ -255,8 +277,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                     size="small"
                     slotProps={{
                       input: { readOnly: !isEditMode },
-                      htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
-                    }} />
+                      htmlInput: { min: 2, max: 12, readOnly: !isEditMode },
+                    }}
+                  />
                 </Grid>
               )}
             </Grid>

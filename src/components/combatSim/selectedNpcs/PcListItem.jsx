@@ -37,15 +37,17 @@ export default function PcListItem({
   return (
     <ListItem
       button
-      onClick={(e) => e.target.type !== "checkbox" && handleListItemClick(pc.combatId)}
+      onClick={(e) =>
+        e.target.type !== "checkbox" && handleListItemClick(pc.combatId)
+      }
       sx={{
         border: isDarkMode
           ? selectedPcID === pc.combatId
             ? "1px solid #fff"
             : "1px solid #555"
           : selectedPcID === pc.combatId
-          ? "1px solid " + primary
-          : "1px solid #ddd",
+            ? "1px solid " + primary
+            : "1px solid #ddd",
         marginY: 1,
         borderRadius: 1,
         display: "flex",
@@ -56,16 +58,16 @@ export default function PcListItem({
             ? "#5c1010"
             : "#2a2a4a"
           : currentHp === 0
-          ? "#ffe6e6"
-          : "#f0f0ff",
+            ? "#ffe6e6"
+            : "#f0f0ff",
         "&:hover": {
           backgroundColor: isDarkMode
             ? currentHp === 0
               ? "#6f0000"
               : "#3a3a5c"
             : currentHp === 0
-            ? "#ffcccc"
-            : "#e0e0ff",
+              ? "#ffcccc"
+              : "#e0e0ff",
         },
         paddingY: 1,
         flexDirection: "row",
@@ -101,7 +103,12 @@ export default function PcListItem({
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem", lg: "1rem" },
+              fontSize: {
+                xs: "0.7rem",
+                sm: "0.8rem",
+                md: "0.9rem",
+                lg: "1rem",
+              },
             }}
           >
             {currentHp === 0 ? (
@@ -116,7 +123,10 @@ export default function PcListItem({
               <Typography
                 component="span"
                 variant="h5"
-                sx={{ color: isDarkMode ? secondary : primary, fontWeight: "bold" }}
+                sx={{
+                  color: isDarkMode ? secondary : primary,
+                  fontWeight: "bold",
+                }}
               >
                 {"【" + pc.combatStats.combatNotes + "】"}
               </Typography>
@@ -125,16 +135,24 @@ export default function PcListItem({
         }
         secondary={
           <>
-            <Tooltip title={t("combat_sim_edit_hp")} enterDelay={500} enterNextDelay={500}>
+            <Tooltip
+              title={t("combat_sim_edit_hp")}
+              enterDelay={500}
+              enterNextDelay={500}
+            >
               <Typography
                 component="span"
                 variant="h5"
                 sx={{
-                  color: currentHp <= Math.floor(maxHp / 2) ? "#D32F2F" : "#4CAF50",
+                  color:
+                    currentHp <= Math.floor(maxHp / 2) ? "#D32F2F" : "#4CAF50",
                   fontWeight: "bold",
                   transition: "color 0.2s ease-in-out",
                   "&:hover": {
-                    color: currentHp <= Math.floor(maxHp / 2) ? "#B71C1C" : "#388E3C",
+                    color:
+                      currentHp <= Math.floor(maxHp / 2)
+                        ? "#B71C1C"
+                        : "#388E3C",
                     textDecoration: "underline",
                   },
                 }}
@@ -152,7 +170,11 @@ export default function PcListItem({
               </Typography>
             </Tooltip>
             {" | "}
-            <Tooltip title={t("combat_sim_edit_mp")} enterDelay={500} enterNextDelay={500}>
+            <Tooltip
+              title={t("combat_sim_edit_mp")}
+              enterDelay={500}
+              enterNextDelay={500}
+            >
               <Typography
                 component="span"
                 variant="h5"
@@ -185,7 +207,11 @@ export default function PcListItem({
           zIndex: 5,
         }}
       >
-        <Tooltip title={t("combat_sim_check_turn")} enterDelay={500} enterNextDelay={500}>
+        <Tooltip
+          title={t("combat_sim_check_turn")}
+          enterDelay={500}
+          enterNextDelay={500}
+        >
           <Checkbox
             checked={pc.combatStats?.turns?.[0] ?? false}
             onChange={(e) => {
@@ -205,7 +231,11 @@ export default function PcListItem({
           }}
           sx={{ padding: 1 }}
         >
-          <Tooltip title={t("combat_sim_delete")} enterDelay={500} enterNextDelay={500}>
+          <Tooltip
+            title={t("combat_sim_delete")}
+            enterDelay={500}
+            enterNextDelay={500}
+          >
             <Delete fontSize="small" />
           </Tooltip>
         </IconButton>

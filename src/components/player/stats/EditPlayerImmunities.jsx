@@ -1,11 +1,21 @@
 import React, { useEffect } from "react";
-import { Grid, Paper, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 import ReactMarkdown from "react-markdown";
 
-export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) {
+export default function EditPlayerImmunities({
+  player,
+  setPlayer,
+  isEditMode,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -60,7 +70,7 @@ export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) 
         borderColor: secondary,
       }}
     >
-      <Grid  size={12}>
+      <Grid size={12}>
         <CustomHeader
           type="top"
           headerText={t("Status Effect Immunities")}
@@ -73,8 +83,9 @@ export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) 
             key={status}
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <FormControlLabel
               control={
                 <Checkbox
@@ -86,7 +97,11 @@ export default function EditPlayerImmunities({ player, setPlayer, isEditMode }) 
               label={t(status.charAt(0).toUpperCase() + status.slice(1))}
               sx={{ marginRight: 2 }}
             />
-            <Typography variant="body2" component="span" sx={{ fontSize: "0.8em" }}>
+            <Typography
+              variant="body2"
+              component="span"
+              sx={{ fontSize: "0.8em" }}
+            >
               <ReactMarkdown
                 allowedElements={["strong"]}
                 unwrapDisallowed={true}

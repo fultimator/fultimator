@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Divider,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Divider, Grid, Paper, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -23,7 +18,7 @@ export default function PlayerDeck({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "deck" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     );
 
   const handleDeckUpdate = (deckSpell, updatedDeck) => {
@@ -80,18 +75,24 @@ export default function PlayerDeck({ player, setPlayer, isEditMode }) {
 
             <Grid container spacing={1} sx={{ padding: "1em" }}>
               {deckSpells.map((deckSpell, index) => (
-                <Grid  key={index} size={12}>
+                <Grid key={index} size={12}>
                   {deckSpells.length > 1 && (
                     <Typography
                       variant="h3"
-                      sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        mb: 1,
+                      }}
                     >
                       {t(deckSpell.className)}
                     </Typography>
                   )}
                   <SpellDeck
                     deck={deckSpell}
-                    onDeckUpdate={(updatedDeck) => handleDeckUpdate(deckSpell, updatedDeck)}
+                    onDeckUpdate={(updatedDeck) =>
+                      handleDeckUpdate(deckSpell, updatedDeck)
+                    }
                     isEditMode={isEditMode}
                   />
                 </Grid>

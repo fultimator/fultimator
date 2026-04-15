@@ -7,7 +7,7 @@ import { useMarkdown } from "../../../../../hooks/useMarkdown";
 export const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
-  borderBottom: "1px solid rgba(224, 224, 224, 1)"
+  borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
 export const StyledMarkdown = ({ children, ...props }) => {

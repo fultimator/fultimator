@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { TypePlayer } from '../types/Players';
+import { create } from "zustand";
+import { TypePlayer } from "../types/Players";
 import {
   equipItemToSlot,
   clearSlotAction,
@@ -10,8 +10,8 @@ import {
   saveVehiclesAction,
   swapTransformingWeaponForm,
   type PickerCandidate,
-} from '../components/player/equipment/slots/loadoutActions';
-import { getPilotSpellInfo } from '../components/player/equipment/slots/loadoutSelectors';
+} from "../components/player/equipment/slots/loadoutActions";
+import { getPilotSpellInfo } from "../components/player/equipment/slots/loadoutSelectors";
 
 // Types
 
@@ -41,7 +41,10 @@ interface LoadoutStore {
 
   // Vehicle enter / exit
   toggleVehicle: () => void;
-  saveVehicles: (updatedPilot: { vehicles: unknown[]; showInPlayerSheet?: boolean }) => void;
+  saveVehicles: (updatedPilot: {
+    vehicles: unknown[];
+    showInPlayerSheet?: boolean;
+  }) => void;
 
   // Transforming weapon
   swapForm: (slot: string) => void;
@@ -72,17 +75,17 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   // Item equip / unequip
 
   equipItem: (slot, candidate) => {
-    get()._setPlayer?.(player => equipItemToSlot(player, slot, candidate));
+    get()._setPlayer?.((player) => equipItemToSlot(player, slot, candidate));
   },
 
   clearSlot: (slot) => {
-    get()._setPlayer?.(player => clearSlotAction(player, slot));
+    get()._setPlayer?.((player) => clearSlotAction(player, slot));
   },
 
   // Vehicle module management
 
   selectModule: (slot, moduleIndex) => {
-    get()._setPlayer?.(player => {
+    get()._setPlayer?.((player) => {
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return selectModuleForSlot(player, pilotInfo, slot, moduleIndex);
@@ -90,7 +93,7 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   },
 
   disableModule: (slot) => {
-    get()._setPlayer?.(player => {
+    get()._setPlayer?.((player) => {
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return disableModuleForSlot(player, pilotInfo, slot);
@@ -98,7 +101,7 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   },
 
   toggleSupportModule: (moduleIndex) => {
-    get()._setPlayer?.(player => {
+    get()._setPlayer?.((player) => {
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return toggleSupportModuleAction(player, pilotInfo, moduleIndex);
@@ -108,7 +111,7 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   // Vehicle enter / exit
 
   toggleVehicle: () => {
-    get()._setPlayer?.(player => {
+    get()._setPlayer?.((player) => {
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return toggleActiveVehicle(player, pilotInfo);
@@ -116,7 +119,7 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   },
 
   saveVehicles: (updatedPilot) => {
-    get()._setPlayer?.(player => {
+    get()._setPlayer?.((player) => {
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return saveVehiclesAction(player, pilotInfo, updatedPilot);
@@ -126,6 +129,6 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   // Transforming weapon
 
   swapForm: (slot) => {
-    get()._setPlayer?.(player => swapTransformingWeaponForm(player, slot));
+    get()._setPlayer?.((player) => swapTransformingWeaponForm(player, slot));
   },
 }));

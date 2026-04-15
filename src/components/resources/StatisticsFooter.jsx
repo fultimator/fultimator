@@ -6,7 +6,10 @@ import LanguageIcon from "@mui/icons-material/Language";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 
-export default function StatisticsFooter({ allResources = {}, uniqueLanguages = [] }) {
+export default function StatisticsFooter({
+  allResources = {},
+  uniqueLanguages = [],
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";

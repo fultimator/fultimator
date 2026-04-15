@@ -1,5 +1,11 @@
-import React from 'react';
-import { Box, Typography, Divider, useMediaQuery, useTheme } from '@mui/material';
+import React from "react";
+import {
+  Box,
+  Typography,
+  Divider,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 
 interface SettingRowProps {
   label: string;
@@ -9,16 +15,16 @@ interface SettingRowProps {
 
 const SettingRow: React.FC<SettingRowProps> = ({ label, hint, children }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: isMobile ? 'flex-start' : 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "flex-start" : "center",
+          justifyContent: "space-between",
           py: 1.5,
           px: 1,
           gap: 2,
@@ -29,17 +35,20 @@ const SettingRow: React.FC<SettingRowProps> = ({ label, hint, children }) => {
             {label}
           </Typography>
           {hint && (
-            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "text.secondary", display: "block", mt: 0.5 }}
+            >
               {hint}
             </Typography>
           )}
         </Box>
         <Box
           sx={{
-            minWidth: isMobile ? '100%' : '150px',
-            display: 'flex',
-            justifyContent: isMobile ? 'flex-start' : 'flex-end',
-            alignItems: 'center',
+            minWidth: isMobile ? "100%" : "150px",
+            display: "flex",
+            justifyContent: isMobile ? "flex-start" : "flex-end",
+            alignItems: "center",
           }}
         >
           {children}

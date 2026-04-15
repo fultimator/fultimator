@@ -68,8 +68,9 @@ export default function EmptyList({ isMobile, showIcon = true }) {
           userSelect: "none",
           WebkitUserSelect: "none",
           MozUserSelect: "none",
-          msUserSelect: "none"
-        }}>
+          msUserSelect: "none",
+        }}
+      >
         {t("combat_sim_no_npc_selected")}
       </Typography>
       <Typography
@@ -80,8 +81,9 @@ export default function EmptyList({ isMobile, showIcon = true }) {
           userSelect: "none",
           WebkitUserSelect: "none",
           MozUserSelect: "none",
-          msUserSelect: "none"
-        }}>
+          msUserSelect: "none",
+        }}
+      >
         {isMobile
           ? t("combat_sim_no_npc_selected_helper_mobile")
           : t("combat_sim_no_npc_selected_helper_desktop")}

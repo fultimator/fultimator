@@ -5,7 +5,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import {
   calcAvailableSkills,
@@ -38,12 +38,13 @@ export default function ExplainSkills({ npc }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   return (
-    <Card                   
+    <Card
       sx={{
-      borderRadius: "8px",
-      border: "2px solid ",
-      borderColor: secondary,
-    }}>
+        borderRadius: "8px",
+        border: "2px solid ",
+        borderColor: secondary,
+      }}
+    >
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -202,7 +203,9 @@ export default function ExplainSkills({ npc }) {
           )}
           {calcUsedSkillsFromStatusImmunity(npc) > 0 && (
             <TableRow>
-              <TableCell>{t("Used skills from Status Effect Immunity")}</TableCell>
+              <TableCell>
+                {t("Used skills from Status Effect Immunity")}
+              </TableCell>
               <TableCell>{calcUsedSkillsFromStatusImmunity(npc)}</TableCell>
             </TableRow>
           )}

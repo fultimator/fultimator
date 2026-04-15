@@ -28,11 +28,7 @@ import { getIngredientTastes } from "../../../../libs/gourmetCookingData";
 /**
  * GourmetInventoryTab - Manage ingredient inventory
  */
-export default function GourmetInventoryTab({
-  formState,
-  setFormState,
-  t,
-}) {
+export default function GourmetInventoryTab({ formState, setFormState, t }) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [formData, setFormData] = useState({
@@ -83,7 +79,9 @@ export default function GourmetInventoryTab({
   const handleDeleteIngredient = (index) => {
     setFormState((prev) => ({
       ...prev,
-      ingredientInventory: prev.ingredientInventory.filter((_, i) => i !== index),
+      ingredientInventory: prev.ingredientInventory.filter(
+        (_, i) => i !== index,
+      ),
     }));
   };
 
@@ -128,7 +126,9 @@ export default function GourmetInventoryTab({
           const index = combinedMap.get(key);
           combined[index] = {
             ...combined[index],
-            quantity: (Number(combined[index].quantity) || 0) + (Number(ingredient.quantity) || 0),
+            quantity:
+              (Number(combined[index].quantity) || 0) +
+              (Number(ingredient.quantity) || 0),
           };
         }
       });
@@ -157,7 +157,7 @@ export default function GourmetInventoryTab({
   return (
     <Grid container spacing={2}>
       {/* Add Ingredient Button */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="contained"
@@ -176,7 +176,7 @@ export default function GourmetInventoryTab({
         </Box>
       </Grid>
       {/* Inventory Table */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <Typography variant="h6" gutterBottom>
           {t("gourmet_ingredient_inventory")} ({ingredientInventory.length})
         </Typography>
@@ -185,8 +185,9 @@ export default function GourmetInventoryTab({
           <Typography
             sx={{
               color: "text.secondary",
-              fontStyle: "italic"
-            }}>
+              fontStyle: "italic",
+            }}
+          >
             {t("gourmet_no_ingredients_available")}
           </Typography>
         ) : (
@@ -219,7 +220,14 @@ export default function GourmetInventoryTab({
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 0.5,
+                        }}
+                      >
                         <IconButton
                           size="small"
                           onClick={() => handleAdjustQuantity(idx, -1)}
@@ -227,7 +235,14 @@ export default function GourmetInventoryTab({
                         >
                           <Remove fontSize="small" />
                         </IconButton>
-                        <Typography variant="body2" sx={{ fontWeight: "bold", minWidth: "24px", textAlign: "center" }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: "bold",
+                            minWidth: "24px",
+                            textAlign: "center",
+                          }}
+                        >
                           {ingredient.quantity}
                         </Typography>
                         <IconButton
@@ -240,7 +255,13 @@ export default function GourmetInventoryTab({
                       </Box>
                     </TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 0.5,
+                          justifyContent: "center",
+                        }}
+                      >
                         <IconButton
                           size="small"
                           onClick={() => handleOpenEditDialog(idx)}
@@ -273,11 +294,13 @@ export default function GourmetInventoryTab({
         fullWidth
       >
         <DialogTitle sx={{ fontWeight: "bold" }}>
-          {editingIndex !== null ? t("Edit Ingredient") : t("gourmet_ingredient_add")}
+          {editingIndex !== null
+            ? t("Edit Ingredient")
+            : t("gourmet_ingredient_add")}
         </DialogTitle>
         <DialogContent sx={{ pt: "16px !important" }}>
           <Grid container spacing={2}>
-            <Grid  size={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 size="small"
@@ -289,7 +312,7 @@ export default function GourmetInventoryTab({
                 placeholder={t("e.g., Fresh Herb")}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("gourmet_taste")}</InputLabel>
                 <Select
@@ -313,7 +336,7 @@ export default function GourmetInventoryTab({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 size="small"
@@ -327,7 +350,7 @@ export default function GourmetInventoryTab({
                   }))
                 }
                 slotProps={{
-                  htmlInput: { min: 0 }
+                  htmlInput: { min: 0 },
                 }}
               />
             </Grid>

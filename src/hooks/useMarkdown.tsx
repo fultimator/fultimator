@@ -12,10 +12,7 @@ interface MarkdownComponentProps {
 }
 
 export const useMarkdown = (config: MarkdownConfig = {}) => {
-  const {
-    fontSize = "0.8rem",
-    whiteSpace = "pre-line",
-  } = config;
+  const { fontSize = "0.8rem", whiteSpace = "pre-line" } = config;
 
   return useMemo(
     () => ({
@@ -25,19 +22,32 @@ export const useMarkdown = (config: MarkdownConfig = {}) => {
           <p style={{ margin: 0, padding: 0, fontSize }} {...props} />
         ),
         ul: (props: MarkdownComponentProps) => (
-          <ul style={{ margin: 0, padding: 0, paddingLeft: "1.5em" }} {...props} />
+          <ul
+            style={{ margin: 0, padding: 0, paddingLeft: "1.5em" }}
+            {...props}
+          />
         ),
-        li: (props: MarkdownComponentProps) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+        li: (props: MarkdownComponentProps) => (
+          <li style={{ margin: 0, padding: 0 }} {...props} />
+        ),
         strong: (props: MarkdownComponentProps) => (
           <strong style={{ fontWeight: "bold" }} {...props} />
         ),
-        em: (props: MarkdownComponentProps) => <em style={{ fontStyle: "italic" }} {...props} />,
+        em: (props: MarkdownComponentProps) => (
+          <em style={{ fontStyle: "italic" }} {...props} />
+        ),
         mark: (props: MarkdownComponentProps) => (
-          <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />
+          <mark
+            style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }}
+            {...props}
+          />
         ),
         br: (props: MarkdownComponentProps) => <br {...props} />,
         a: (props: MarkdownComponentProps) => (
-          <a style={{ color: "inherit", textDecoration: "underline" }} {...props} />
+          <a
+            style={{ color: "inherit", textDecoration: "underline" }}
+            {...props}
+          />
         ),
       },
       containerStyle: {
@@ -47,7 +57,7 @@ export const useMarkdown = (config: MarkdownConfig = {}) => {
         padding: 0,
       } as React.CSSProperties,
     }),
-    [fontSize, whiteSpace]
+    [fontSize, whiteSpace],
   );
 };
 

@@ -5,7 +5,10 @@ import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableTherioforms } from "../spellOptionData";
 
 export default function MutantContentSection({ formState, setFormState, t }) {
-  const currentTherioforms = useMemo(() => formState.therioforms || [], [formState.therioforms]);
+  const currentTherioforms = useMemo(
+    () => formState.therioforms || [],
+    [formState.therioforms],
+  );
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankTherioform = useCallback(() => {
@@ -23,31 +26,29 @@ export default function MutantContentSection({ formState, setFormState, t }) {
       .filter((name) => name !== "mutant_therioform_custom");
     return availableTherioforms.filter(
       (preset) =>
-        preset.name !== "mutant_therioform_custom" && !addedNames.includes(preset.name)
+        preset.name !== "mutant_therioform_custom" &&
+        !addedNames.includes(preset.name),
     );
   }, [currentTherioforms]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setFormState) => {
-        const preset = availableTherioforms.find((t) => t.name === presetName);
-        if (!preset) return;
-        setFormState((prev) => ({
-          ...prev,
-          therioforms: [
-            ...(prev.therioforms || []),
-            {
-              name: preset.name,
-              genoclepsis: preset.genoclepsis,
-              description: preset.description,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setFormState) => {
+      const preset = availableTherioforms.find((t) => t.name === presetName);
+      if (!preset) return;
+      setFormState((prev) => ({
+        ...prev,
+        therioforms: [
+          ...(prev.therioforms || []),
+          {
+            name: preset.name,
+            genoclepsis: preset.genoclepsis,
+            description: preset.description,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -70,7 +71,7 @@ export default function MutantContentSection({ formState, setFormState, t }) {
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

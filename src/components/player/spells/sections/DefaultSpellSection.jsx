@@ -26,11 +26,7 @@ import attributes from "../../../../libs/attributes";
 //   "Special",
 // ];
 
-export default function DefaultSpellSection({
-  formState,
-  setFormState,
-  t,
-}) {
+export default function DefaultSpellSection({ formState, setFormState, t }) {
   const [inputDuration, setInputDuration] = useState(formState.duration || "");
   const [inputTarget, setInputTarget] = useState(formState.targetDesc || "");
 
@@ -70,8 +66,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 7
-        }}>
+          sm: 7,
+        }}
+      >
         <TextField
           label={t("Spell Name")}
           variant="outlined"
@@ -79,26 +76,21 @@ export default function DefaultSpellSection({
           value={formState.name || ""}
           onChange={(e) => handleChange("name", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 1
-        }}>
-        <FormControl
-          variant="standard"
-          fullWidth
-          style={{ height: "100%" }}
-        >
+          sm: 1,
+        }}
+      >
+        <FormControl variant="standard" fullWidth style={{ height: "100%" }}>
           <ToggleButton
             value={formState.isOffensive || false}
             selected={formState.isOffensive}
-            onChange={() =>
-              handleChange("isOffensive", !formState.isOffensive)
-            }
+            onChange={() => handleChange("isOffensive", !formState.isOffensive)}
             aria-label="offensive-toggle"
             style={{
               height: "100%",
@@ -111,8 +103,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 6,
-          sm: 2
-        }}>
+          sm: 2,
+        }}
+      >
         <TextField
           type="number"
           label={t("MP x Target")}
@@ -146,16 +139,16 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 6,
-          sm: 2
-        }}>
+          sm: 2,
+        }}
+      >
         <TextField
           type="number"
           label={t("Max Targets")}
           variant="outlined"
           fullWidth
           value={
-            formState.maxTargets === null ||
-            formState.maxTargets === undefined
+            formState.maxTargets === null || formState.maxTargets === undefined
               ? ""
               : formState.maxTargets.toString()
           }
@@ -167,7 +160,7 @@ export default function DefaultSpellSection({
             ) {
               handleChange(
                 "maxTargets",
-                value === "" ? 0 : parseInt(value, 10)
+                value === "" ? 0 : parseInt(value, 10),
               );
             }
           }}
@@ -185,8 +178,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           id="target-autocomplete"
           options={target}
@@ -203,7 +197,7 @@ export default function DefaultSpellSection({
               label={t("Target Description")}
               fullWidth
               slotProps={{
-                htmlInput: { ...params.inputProps, maxLength: 100 }
+                htmlInput: { ...params.inputProps, maxLength: 100 },
               }}
             />
           )}
@@ -212,8 +206,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           id="duration-autocomplete"
           options={duration}
@@ -230,7 +225,7 @@ export default function DefaultSpellSection({
               label={t("Duration")}
               fullWidth
               slotProps={{
-                htmlInput: { ...params.inputProps, maxLength: 50 }
+                htmlInput: { ...params.inputProps, maxLength: 50 },
               }}
             />
           )}
@@ -241,8 +236,9 @@ export default function DefaultSpellSection({
           <Grid
             size={{
               xs: 6,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <Select
               fullWidth
               value={formState.attr1 || "dexterity"}
@@ -257,16 +253,15 @@ export default function DefaultSpellSection({
               <MenuItem value={"might"}>
                 {attributes["might"].shortcaps}
               </MenuItem>
-              <MenuItem value={"will"}>
-                {attributes["will"].shortcaps}
-              </MenuItem>
+              <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
             </Select>
           </Grid>
           <Grid
             size={{
               xs: 6,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <Select
               fullWidth
               value={formState.attr2 || "dexterity"}
@@ -281,9 +276,7 @@ export default function DefaultSpellSection({
               <MenuItem value={"might"}>
                 {attributes["might"].shortcaps}
               </MenuItem>
-              <MenuItem value={"will"}>
-                {attributes["will"].shortcaps}
-              </MenuItem>
+              <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
             </Select>
           </Grid>
         </>
@@ -291,8 +284,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <CustomTextarea
           label={t("Description")}
           fullWidth
@@ -305,8 +299,9 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <FormControlLabel
           control={
             <Switch
@@ -326,15 +321,14 @@ export default function DefaultSpellSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <FormControlLabel
           control={
             <Switch
               checked={formState.isMagisphere || false}
-              onChange={(e) =>
-                handleChange("isMagisphere", e.target.checked)
-              }
+              onChange={(e) => handleChange("isMagisphere", e.target.checked)}
             />
           }
           label={t("Is a Magisphere?")}

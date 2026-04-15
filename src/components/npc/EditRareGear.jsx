@@ -1,14 +1,9 @@
 import { RemoveCircleOutlined } from "@mui/icons-material";
 
-import {
-  Grid,
-  FormControl,
-  IconButton,
-  TextField,
-} from "@mui/material";
+import { Grid, FormControl, IconButton, TextField } from "@mui/material";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useState } from "react";
@@ -31,8 +26,8 @@ export default function EditRareGear({ npc, setNpc }) {
       raregear: [
         ...(prevState.raregear || []),
         {
-        name: "",
-        effect: "",
+          name: "",
+          effect: "",
         },
       ],
     }));
@@ -52,16 +47,21 @@ export default function EditRareGear({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="middle"addItem={addRareGear} headerText={t("Rare Equipment")} icon={Add} />
+      <CustomHeader
+        type="middle"
+        addItem={addRareGear}
+        headerText={t("Rare Equipment")}
+        icon={Add}
+      />
       {npc.raregear?.map((raregear, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid  sx={{ p: 0, m: 0 }}>
+            <Grid sx={{ p: 0, m: 0 }}>
               <IconButton onClick={() => openDeleteDialog(i)}>
                 <RemoveCircleOutlined />
               </IconButton>
             </Grid>
-            <Grid  size="grow">
+            <Grid size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -74,7 +74,7 @@ export default function EditRareGear({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} ={raregear.effect}
                   onChange={(e) => {

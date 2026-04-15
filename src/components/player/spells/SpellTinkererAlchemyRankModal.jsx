@@ -11,7 +11,7 @@ import {
   Select,
   MenuItem,
   FormControlLabel,
-  Switch
+  Switch,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
@@ -26,15 +26,19 @@ export default function SpellTinkererAlchemyRankModal({
   alchemy,
 }) {
   const { t } = useTranslate();
-  
+
   // Initialize state variables
   const [selectedRank, setSelectedRank] = useState(alchemy?.rank || 1);
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
-    alchemy ? !!alchemy.showInPlayerSheet : true
+    alchemy ? !!alchemy.showInPlayerSheet : true,
   );
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   // Update showInPlayerSheet state if alchemy prop changes
   useEffect(() => {
@@ -50,7 +54,7 @@ export default function SpellTinkererAlchemyRankModal({
       showInPlayerSheet: showInPlayerSheet,
     });
   };
-return (
+  return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -60,7 +64,7 @@ return (
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -80,7 +84,7 @@ return (
       </Button>
       <DialogContent>
         <Grid container spacing={2}>
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormControl fullWidth>
               <InputLabel id="rank-select-label">{t("Select Rank")}</InputLabel>
               <Select
@@ -100,8 +104,9 @@ return (
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <FormControlLabel
               control={
                 <Switch

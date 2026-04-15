@@ -4,7 +4,11 @@ import { Close } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import PlayerCardSheet from "../player/playerSheet/compact/PlayerSheetCompact";
 
-export default function PCDetail({ selectedPC, setSelectedPC, npcDetailWidth }) {
+export default function PCDetail({
+  selectedPC,
+  setSelectedPC,
+  npcDetailWidth,
+}) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 

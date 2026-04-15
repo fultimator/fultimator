@@ -51,7 +51,7 @@ export default function ShareLink({ scope }) {
                 </CopyToClipboard>
               </InputAdornment>
             ),
-          }
+          },
         }}
       />
       <Snackbar

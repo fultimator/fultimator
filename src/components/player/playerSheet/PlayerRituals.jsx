@@ -74,42 +74,42 @@ export default function PlayerRituals({
   }
 
   const hasRitualism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.ritualism
+    (playerClass) => playerClass.benefits.rituals.ritualism,
   );
 
   const hasSpiritism = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Spiritism"
-    )
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Spiritism",
+    ),
   );
 
   const hasArcanism = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Arcanism"
-    )
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Arcanism",
+    ),
   );
 
   const hasElementalism = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Elementalism"
-    )
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Elementalism",
+    ),
   );
 
   const hasEntropism = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Entropism"
-    )
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Entropism",
+    ),
   );
 
   const hasChimerism = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Chimerism"
-    )
+        skill.currentLvl > 0 && skill.specialSkill === "Ritual Chimerism",
+    ),
   );
 
   const resetClock = () => {
@@ -197,15 +197,20 @@ export default function PlayerRituals({
           key={label}
           size={{
             xs: 4,
-            md: 2
-          }}>
+            md: 2,
+          }}
+        >
           <FormControlLabel
             sx={compact ? { margin: 0 } : undefined}
             control={
               <Checkbox
                 checked={checked}
                 size={compact ? "small" : "medium"}
-                sx={{ pointerEvents: "none", opacity: 1, ...(compact && { p: "2px" }) }}
+                sx={{
+                  pointerEvents: "none",
+                  opacity: 1,
+                  ...(compact && { p: "2px" }),
+                }}
               />
             }
             label={
@@ -218,12 +223,17 @@ export default function PlayerRituals({
       ))}
 
       {isEditMode && (
-        <Grid container spacing={compact ? 1 : 2} sx={{ padding: compact ? "0.4em" : "1em" }}>
+        <Grid
+          container
+          spacing={compact ? 1 : 2}
+          sx={{ padding: compact ? "0.4em" : "1em" }}
+        >
           <Grid
             size={{
               xs: 12,
-              md: 8
-            }}>
+              md: 8,
+            }}
+          >
             <RitualsCalculator
               compact={compact}
               power={power}
@@ -245,11 +255,17 @@ export default function PlayerRituals({
           </Grid>
 
           <Grid
-            container sx={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}
+            container
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: "center",
+            }}
             size={{
               xs: 12,
-              md: 4
-            }}>
+              md: 4,
+            }}
+          >
             <Clock
               numSections={clockSections}
               size={compact ? 140 : 200}
@@ -261,8 +277,9 @@ export default function PlayerRituals({
           <Grid
             size={{
               xs: 12,
-              md: 8
-            }}>
+              md: 8,
+            }}
+          >
             <Button
               variant="contained"
               size={compact ? "small" : "medium"}
@@ -275,7 +292,7 @@ export default function PlayerRituals({
           <Grid
             size={{
               xs: 12,
-              md: 4
+              md: 4,
             }}
             container
             sx={{ justifyContent: "center", gap: compact ? 0.5 : 1 }}
@@ -454,7 +471,7 @@ function RitualsCalculator({
       }}
     >
       <Grid container>
-        <Grid  size={4}>
+        <Grid size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Potency")}
@@ -481,7 +498,7 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid  size={4}>
+        <Grid size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Area")}
@@ -508,20 +525,30 @@ function RitualsCalculator({
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid  size={4}>
+        <Grid size={4}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
               {t("Reductions")}
             </FormLabel>
 
             {[
-              { value: ingredient, onChange: setIngredient, label: "Using special ingredient" },
-              { value: itemHeld, onChange: setItemHeld, label: "Relevant item held" },
+              {
+                value: ingredient,
+                onChange: setIngredient,
+                label: "Using special ingredient",
+              },
+              {
+                value: itemHeld,
+                onChange: setItemHeld,
+                label: "Relevant item held",
+              },
             ].map(({ value, onChange, label }) => (
               <FormControlLabel
                 key={label}
                 sx={compact ? { margin: 0 } : undefined}
-                control={<Checkbox value={value} size={controlSize} sx={controlSx} />}
+                control={
+                  <Checkbox value={value} size={controlSize} sx={controlSx} />
+                }
                 onChange={(e) => onChange(e.target.checked)}
                 label={
                   <Typography sx={{ fontSize: labelFontSize }}>
@@ -532,7 +559,10 @@ function RitualsCalculator({
             ))}
             {itemHeld && (
               <FormControl variant="standard" fullWidth>
-                <InputLabel htmlFor="dlReduction" sx={{ fontSize: labelFontSize }}>
+                <InputLabel
+                  htmlFor="dlReduction"
+                  sx={{ fontSize: labelFontSize }}
+                >
                   {t("DL Reduction")}
                 </InputLabel>
                 <Input
@@ -547,7 +577,13 @@ function RitualsCalculator({
 
             <FormControlLabel
               sx={compact ? { margin: 0 } : undefined}
-              control={<Checkbox value={fastRitual} size={controlSize} sx={controlSx} />}
+              control={
+                <Checkbox
+                  value={fastRitual}
+                  size={controlSize}
+                  sx={controlSx}
+                />
+              }
               onChange={(e) => setFastRitual(e.target.checked)}
               label={
                 <Typography sx={{ fontSize: labelFontSize }}>
@@ -560,30 +596,33 @@ function RitualsCalculator({
       </Grid>
       <Divider />
       <Grid container sx={{ m: compact ? 0.5 : 1 }}>
-        <Grid  size={4}>
+        <Grid size={4}>
           <Typography
             sx={{
               fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold"
-            }}>
+              fontWeight: "bold",
+            }}
+          >
             {calcPM} {t("MP")}
           </Typography>
         </Grid>
-        <Grid  size={4}>
+        <Grid size={4}>
           <Typography
             sx={{
               fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold"
-            }}>
+              fontWeight: "bold",
+            }}
+          >
             {calcLD} {t("DL")}
           </Typography>
         </Grid>
-        <Grid  size={4}>
+        <Grid size={4}>
           <Typography
             sx={{
               fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold"
-            }}>
+              fontWeight: "bold",
+            }}
+          >
             {t("Clock")} {calcClock}
           </Typography>
         </Grid>

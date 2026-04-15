@@ -22,7 +22,7 @@ function SelectQuality({ quality, setQuality }) {
       options.push(
         <MenuItem key={quality.name} value={quality.name}>
           {quality.name} ({quality.cost}z)
-        </MenuItem>
+        </MenuItem>,
       );
     }
   }

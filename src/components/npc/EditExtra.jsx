@@ -24,14 +24,14 @@ export default function EditExtra({ npc, setNpc }) {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid  size={6}>
+        <Grid size={6}>
           <Stack spacing={1}>
             <Defenses npc={npc} setNpc={setNpc} />
             <SelectArmor npc={npc} setNpc={setNpc} />
             <SelectShield npc={npc} setNpc={setNpc} />
           </Stack>
         </Grid>
-        <Grid  size={6}>
+        <Grid size={6}>
           <Stack spacing={1}>
             <Init npc={npc} setNpc={setNpc} />
             <Precision npc={npc} setNpc={setNpc} />
@@ -43,10 +43,10 @@ export default function EditExtra({ npc, setNpc }) {
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid  size={6}>
+        <Grid size={6}>
           <Immunities npc={npc} setNpc={setNpc} />
         </Grid>
-        <Grid  size={6}>
+        <Grid size={6}>
           <Overrides npc={npc} setNpc={setNpc} />
         </Grid>
       </Grid>
@@ -66,7 +66,11 @@ const Overrides = React.memo(({ npc, setNpc }) => {
       enraged: false,
       poisoned: false,
     };
-    if (npc.species === "Construct" || npc.species === "Elemental" || npc.species === "Undead") {
+    if (
+      npc.species === "Construct" ||
+      npc.species === "Elemental" ||
+      npc.species === "Undead"
+    ) {
       free.poisoned = true;
     }
     if (npc.species === "Plant") {
@@ -100,7 +104,7 @@ const Overrides = React.memo(({ npc, setNpc }) => {
         extra: { ...prevState.extra, statusImmunity: value },
       }));
     },
-    [setNpc]
+    [setNpc],
   );
 
   return (
@@ -114,7 +118,8 @@ const Overrides = React.memo(({ npc, setNpc }) => {
             htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
             formHelperText: {
               sx: {
-                color: totalPicked > totalAllotted ? "red !important" : "inherit",
+                color:
+                  totalPicked > totalAllotted ? "red !important" : "inherit",
               },
             },
           }}
@@ -132,18 +137,25 @@ const Immunities = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
 
   // List of all immunities from NpcImmunities
-  const allImmunities = useMemo(() => ({
-    slow: false,
-    dazed: false,
-    weak: false,
-    shaken: false,
-    enraged: false,
-    poisoned: false,
-  }), []);
+  const allImmunities = useMemo(
+    () => ({
+      slow: false,
+      dazed: false,
+      weak: false,
+      shaken: false,
+      enraged: false,
+      poisoned: false,
+    }),
+    [],
+  );
 
   const freeImmunities = useMemo(() => {
     const free = { ...allImmunities };
-    if (npc.species === "Construct" || npc.species === "Elemental" || npc.species === "Undead") {
+    if (
+      npc.species === "Construct" ||
+      npc.species === "Elemental" ||
+      npc.species === "Undead"
+    ) {
       free.poisoned = true;
     }
     if (npc.species === "Plant") {
@@ -167,7 +179,7 @@ const Immunities = React.memo(({ npc, setNpc }) => {
         },
       }));
     },
-    [setNpc]
+    [setNpc],
   );
 
   return (
@@ -186,7 +198,12 @@ const Immunities = React.memo(({ npc, setNpc }) => {
               />
             }
             label={
-              <Typography sx={{ color: isFree ? "green" : "inherit", fontWeight: isFree ? "bold" : "inherit" }}>
+              <Typography
+                sx={{
+                  color: isFree ? "green" : "inherit",
+                  fontWeight: isFree ? "bold" : "inherit",
+                }}
+              >
                 {t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}
               </Typography>
             }
@@ -234,7 +251,7 @@ const Defenses = React.memo(({ npc, setNpc }) => {
         return newState;
       });
     },
-    [setNpc]
+    [setNpc],
   );
 
   const from = useMemo(() => {
@@ -298,12 +315,18 @@ const Defenses = React.memo(({ npc, setNpc }) => {
 
 const HP = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, hp: e.target.value } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, hp: e.target.value },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormControl variant="standard" fullWidth>
@@ -314,7 +337,7 @@ const HP = React.memo(({ npc, setNpc }) => {
         value={npc.extra?.hp || 0}
         onChange={onChange}
         slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 },
         }}
       ></TextField>
     </FormControl>
@@ -323,12 +346,18 @@ const HP = React.memo(({ npc, setNpc }) => {
 
 const MP = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, mp: e.target.value } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, mp: e.target.value },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormControl variant="standard" fullWidth>
@@ -339,7 +368,7 @@ const MP = React.memo(({ npc, setNpc }) => {
         value={npc.extra?.mp || 0}
         onChange={onChange}
         slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 }
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 },
         }}
       ></TextField>
     </FormControl>
@@ -348,18 +377,30 @@ const MP = React.memo(({ npc, setNpc }) => {
 
 const Init = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, init: e.target.checked } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, init: e.target.checked },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormGroup>
       <FormLabel id="extra-defenses">{t("Bonuses")}</FormLabel>
       <FormControlLabel
-        control={<Checkbox checked={npc.extra?.init} value={npc.extra?.init} onChange={onChange} />}
+        control={
+          <Checkbox
+            checked={npc.extra?.init}
+            value={npc.extra?.init}
+            onChange={onChange}
+          />
+        }
         label={`+4 ${t("Initiative", true)}`}
       />
     </FormGroup>
@@ -368,12 +409,18 @@ const Init = React.memo(({ npc, setNpc }) => {
 
 const ExtraInit = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, extrainit: e.target.value } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, extrainit: e.target.value },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormControl variant="standard" fullWidth>
@@ -384,7 +431,7 @@ const ExtraInit = React.memo(({ npc, setNpc }) => {
         value={npc.extra?.extrainit || 0}
         onChange={onChange}
         slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
         }}
       ></TextField>
     </FormControl>
@@ -393,17 +440,29 @@ const ExtraInit = React.memo(({ npc, setNpc }) => {
 
 const Precision = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, precision: e.target.checked } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, precision: e.target.checked },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormGroup>
       <FormControlLabel
-        control={<Checkbox checked={npc.extra?.precision} value={npc.extra?.precision} onChange={onChange} />}
+        control={
+          <Checkbox
+            checked={npc.extra?.precision}
+            value={npc.extra?.precision}
+            onChange={onChange}
+          />
+        }
         label={`+3 ${t("bonus to all Accuracy Checks", true)}`}
       />
     </FormGroup>
@@ -412,17 +471,29 @@ const Precision = React.memo(({ npc, setNpc }) => {
 
 const Magic = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    setNpc((prevState) => {
-      const newState = { ...prevState, extra: { ...prevState.extra, magic: e.target.checked } };
-      return newState;
-    });
-  }, [setNpc]);
+  const onChange = useCallback(
+    (e) => {
+      setNpc((prevState) => {
+        const newState = {
+          ...prevState,
+          extra: { ...prevState.extra, magic: e.target.checked },
+        };
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   return (
     <FormGroup>
       <FormControlLabel
-        control={<Checkbox checked={npc.extra?.magic} value={npc.extra?.magic} onChange={onChange} />}
+        control={
+          <Checkbox
+            checked={npc.extra?.magic}
+            value={npc.extra?.magic}
+            onChange={onChange}
+          />
+        }
         label={`+3 ${t("bonus to all Magic Checks", true)}`}
       />
     </FormGroup>
@@ -431,17 +502,20 @@ const Magic = React.memo(({ npc, setNpc }) => {
 
 const SelectArmor = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    const armor = baseArmors.find((armor) => armor.name === e.target.value);
+  const onChange = useCallback(
+    (e) => {
+      const armor = baseArmors.find((armor) => armor.name === e.target.value);
 
-    setNpc((prevState) => {
-      const newState = { ...prevState, armor };
-      if (!newState.extra) {
-        newState.extra = {};
-      }
-      return newState;
-    });
-  }, [setNpc]);
+      setNpc((prevState) => {
+        const newState = { ...prevState, armor };
+        if (!newState.extra) {
+          newState.extra = {};
+        }
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   const options = useMemo(() => {
     const opts = [<MenuItem key={1} value="" disabled />];
@@ -450,7 +524,7 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
         <MenuItem key={armor.name} value={armor.name}>
           {armor.name}
           {armor.martial && <Martial />}{" "}
-        </MenuItem>
+        </MenuItem>,
       );
     }
     return opts;
@@ -483,17 +557,22 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
 
 const SelectShield = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const onChange = useCallback((e) => {
-    const shield = baseShields.find((shield) => shield.name === e.target.value);
+  const onChange = useCallback(
+    (e) => {
+      const shield = baseShields.find(
+        (shield) => shield.name === e.target.value,
+      );
 
-    setNpc((prevState) => {
-      const newState = { ...prevState, shield };
-      if (!newState.extra) {
-        newState.extra = {};
-      }
-      return newState;
-    });
-  }, [setNpc]);
+      setNpc((prevState) => {
+        const newState = { ...prevState, shield };
+        if (!newState.extra) {
+          newState.extra = {};
+        }
+        return newState;
+      });
+    },
+    [setNpc],
+  );
 
   const options = useMemo(() => {
     const opts = [<MenuItem key={1} value="" disabled />];
@@ -502,7 +581,7 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
         <MenuItem key={shield.name} value={shield.name}>
           {shield.name}
           {shield.martial && <Martial />}{" "}
-        </MenuItem>
+        </MenuItem>,
       );
     }
     return opts;

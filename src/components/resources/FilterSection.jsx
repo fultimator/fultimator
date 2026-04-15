@@ -17,7 +17,7 @@ import {
   getTypeIcon,
   useTypeLabel,
   getTypeColor,
-  languages
+  languages,
 } from "./resourceUtils";
 
 export default function FilterSection({
@@ -49,8 +49,9 @@ export default function FilterSection({
         <Grid
           size={{
             xs: 12,
-            md: 6
-          }}>
+            md: 6,
+          }}
+        >
           <TextField
             fullWidth
             variant="outlined"
@@ -69,7 +70,7 @@ export default function FilterSection({
                     <SearchIcon color="action" />
                   </InputAdornment>
                 ),
-              }
+              },
             }}
           />
         </Grid>
@@ -77,8 +78,9 @@ export default function FilterSection({
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <FormControl fullWidth>
             <InputLabel>{t("resources_filter_by_type")}</InputLabel>
             <Select
@@ -87,7 +89,9 @@ export default function FilterSection({
               onChange={(e) => setTypeFilter(e.target.value)}
               sx={{ borderRadius: "12px" }}
             >
-              <MenuItem value="all">{t("resources_filter_by_type_all")}</MenuItem>
+              <MenuItem value="all">
+                {t("resources_filter_by_type_all")}
+              </MenuItem>
               {uniqueTypes.map((type) => (
                 <MenuItem key={type} value={type}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -105,8 +109,9 @@ export default function FilterSection({
           size={{
             xs: 12,
             sm: 6,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <FormControl fullWidth>
             <InputLabel>{t("resources_filter_by_language")}</InputLabel>
             <Select
@@ -115,7 +120,9 @@ export default function FilterSection({
               onChange={(e) => setLanguageFilter(e.target.value)}
               sx={{ borderRadius: "12px" }}
             >
-              <MenuItem value="all">{t("resources_filter_by_language_all")}</MenuItem>
+              <MenuItem value="all">
+                {t("resources_filter_by_language_all")}
+              </MenuItem>
               {uniqueLanguages.map((language) => (
                 <MenuItem key={language} value={language}>
                   {languages[language]?.lang}

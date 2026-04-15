@@ -33,8 +33,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -50,7 +57,7 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
-  const quirkKey = 'quirk-0';
+  const quirkKey = "quirk-0";
 
   const quirk = player.quirk;
   if (!quirk?.name) return null;
@@ -92,7 +99,13 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
           <TableRow>
             <StyledTableCell sx={{ width: 36 }}>
               {hasDetails && (
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleRow('quirk', quirkKey); }}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleRow("quirk", quirkKey);
+                  }}
+                >
                   {isOpen ? (
                     <KeyboardArrowUp fontSize="small" />
                   ) : (
@@ -103,8 +116,15 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
             </StyledTableCell>
             <StyledTableCell
               colSpan={4}
-              onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('quirk', quirkKey); }}
-              sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasDetails) toggleRow("quirk", quirkKey);
+              }}
+              sx={{
+                cursor: hasDetails ? "pointer" : "default",
+                minWidth: { xs: 60, sm: 100 },
+                wordBreak: "break-word",
+              }}
             >
               <Typography
                 variant="body2"
@@ -112,8 +132,9 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
                   fontWeight: "bold",
                   textTransform: "uppercase",
                   wordBreak: "break-word",
-                  overflowWrap: "break-word"
-                }}>
+                  overflowWrap: "break-word",
+                }}
+              >
                 {highlightMatch(quirk.name, searchQuery)}
               </Typography>
             </StyledTableCell>
@@ -125,7 +146,9 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
                 <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <Box sx={{ px: 2, py: 1 }}>
                     {quirk.description && (
-                      <NotesMarkdown sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
+                      <NotesMarkdown
+                        sx={{ fontSize: "0.85rem", fontStyle: "italic" }}
+                      >
                         {highlightMarkdownText(quirk.description, searchQuery)}
                       </NotesMarkdown>
                     )}

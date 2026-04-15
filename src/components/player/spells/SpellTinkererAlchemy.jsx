@@ -25,8 +25,8 @@ function ThemedSpellTinkererAlchemy({
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? '#ffffff' : '#000000';
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const iconColor = isDarkMode ? "#ffffff" : "#000000";
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const ranks = [t("Basic"), t("Advanced"), t("Superior")];
 
@@ -45,17 +45,17 @@ function ThemedSpellTinkererAlchemy({
         <AccordionDetails>
           <ReactMarkdown>
             {t(
-              "You may perform the **Inventory** action to rapidly craft a **potion** with powerful but somewhat unpredictable effects. When you do so, choose one type of **mix** among those you have unlocked (**basic**, **advanced** or **superior**) and spend the appropriate amount of Inventory Points."
+              "You may perform the **Inventory** action to rapidly craft a **potion** with powerful but somewhat unpredictable effects. When you do so, choose one type of **mix** among those you have unlocked (**basic**, **advanced** or **superior**) and spend the appropriate amount of Inventory Points.",
             )}
           </ReactMarkdown>
           <ReactMarkdown>
             {t(
-              "When you create a mix, roll the amount of twenty-sided dice indicated by that mix, then assign one of those rolls to the **target** table and one to the **effect** table . Discard all remaining dice, then describe the effects of the mix!"
+              "When you create a mix, roll the amount of twenty-sided dice indicated by that mix, then assign one of those rolls to the **target** table and one to the **effect** table . Discard all remaining dice, then describe the effects of the mix!",
             )}
           </ReactMarkdown>
           <ReactMarkdown>
             {t(
-              'Effects marked with "**Any**" on the **effect** table are always available and can be chosen if none of the available effects appeal to you.'
+              'Effects marked with "**Any**" on the **effect** table are always available and can be chosen if none of the available effects appeal to you.',
             )}
           </ReactMarkdown>
         </AccordionDetails>
@@ -82,7 +82,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -96,7 +97,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
+            size={2}
+          >
             <Typography variant="h3">{t("IP Cost")}</Typography>
           </Grid>
           <Grid
@@ -105,7 +107,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography variant="h3">{t("Description")}</Typography>
           </Grid>
         </Grid>
@@ -116,7 +119,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               flexShrink: 0,
             }}
-            size="grow">
+            size="grow"
+          >
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
@@ -140,11 +144,12 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               {ranks[alchemy.rank - 1]}
@@ -156,7 +161,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
+            size={2}
+          >
             <Typography>{alchemy.rank + 2}</Typography>
           </Grid>
           <Grid
@@ -165,26 +171,28 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={6}>
+            size={6}
+          >
             <Typography>
               {alchemy.rank === 1
                 ? t("Roll two d20s and assign one to target and one to effect.")
                 : alchemy.rank === 2
-                ? t(
-                    "Roll three d20s and assign one to target and one to effect."
-                  )
-                : alchemy.rank === 3
-                ? t(
-                    "Roll four d20s and assign one to target and one to effect."
-                  )
-                : null}
+                  ? t(
+                      "Roll three d20s and assign one to target and one to effect.",
+                    )
+                  : alchemy.rank === 3
+                    ? t(
+                        "Roll four d20s and assign one to target and one to effect.",
+                      )
+                    : null}
             </Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow">
+            size="grow"
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("Alchemy not shown in player sheet")}>
                 <Icon>
@@ -193,7 +201,7 @@ function ThemedSpellTinkererAlchemy({
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEditRank}>
-              <Edit style={{ color:  iconColor }} />
+              <Edit style={{ color: iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -221,7 +229,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -237,7 +246,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               flexShrink: 0,
             }}
-            size="grow">
+            size="grow"
+          >
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
@@ -261,11 +271,12 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               {t("Die")}
@@ -277,16 +288,18 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={8}>
+            size={8}
+          >
             <Typography>{t("The potions affects...")}</Typography>
           </Grid>
         </Grid>
         {isEditMode && (
           <Grid
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow">
+            size="grow"
+          >
             <IconButton size="small" onClick={onEditTargets}>
-              <Edit style={{ color:  iconColor }} />
+              <Edit style={{ color: iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -294,7 +307,8 @@ function ThemedSpellTinkererAlchemy({
       {/* TARGETS Row 3 */}
       {alchemy.targets.map((target, i) => (
         <Grid
-          container sx={{
+          container
+          sx={{
             justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
@@ -311,11 +325,12 @@ function ThemedSpellTinkererAlchemy({
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontWeight: "bold"
+                  fontWeight: "bold",
                 }}
               >
                 {target.rangeFrom + " - " + target.rangeTo}
@@ -327,7 +342,8 @@ function ThemedSpellTinkererAlchemy({
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              size={8}>
+              size={8}
+            >
               <Typography>{target.effect}</Typography>
             </Grid>
           </Grid>
@@ -356,7 +372,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -372,7 +389,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               flexShrink: 0,
             }}
-            size="grow">
+            size="grow"
+          >
             <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
           </Grid>
         )}
@@ -396,11 +414,12 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               {t("Die")}
@@ -412,7 +431,8 @@ function ThemedSpellTinkererAlchemy({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={8}>
+            size={8}
+          >
             <Typography>
               {t("Each creature affected by the potion...")}
             </Typography>
@@ -421,9 +441,10 @@ function ThemedSpellTinkererAlchemy({
         {isEditMode && (
           <Grid
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow">
+            size="grow"
+          >
             <IconButton size="small" onClick={onEditEffects}>
-              <Edit style={{ color:  iconColor }} />
+              <Edit style={{ color: iconColor }} />
             </IconButton>
           </Grid>
         )}
@@ -431,7 +452,8 @@ function ThemedSpellTinkererAlchemy({
       {/* EFFECTS Row 3 */}
       {alchemy.effects.map((effect, i) => (
         <Grid
-          container sx={{
+          container
+          sx={{
             justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
@@ -448,11 +470,12 @@ function ThemedSpellTinkererAlchemy({
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontWeight: "bold"
+                  fontWeight: "bold",
                 }}
               >
                 {effect.dieValue === 0 ? t("Any") : effect.dieValue}
@@ -464,7 +487,8 @@ function ThemedSpellTinkererAlchemy({
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              size={8}>
+              size={8}
+            >
               <Typography>{effect.effect}</Typography>
             </Grid>
           </Grid>

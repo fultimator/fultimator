@@ -25,90 +25,131 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
   const MarkdownComponents = {
     p: (props) => <span style={{ margin: 0, padding: 0 }} {...props} />,
     strong: (props) => <strong {...props} />,
-    em: (props) => <em {...props} />
+    em: (props) => <em {...props} />,
   };
 
   // Helper function to get effect choices
   const getEffectChoices = (effectText, t) => {
     const choices = [];
-    
+
     // Safety check: ensure effectText is a string
-    if (!effectText || typeof effectText !== 'string') {
+    if (!effectText || typeof effectText !== "string") {
       return choices;
     }
-    
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_all_statuses"))) {
       choices.push({ type: "statusEffect", options: getStatusEffects(t) });
-    } else if (effectText.includes(t("gourmet_delicacy_effect_choose_some_statuses"))) {
-      choices.push({ type: "statusEffect", options: [t("dazed"), t("shaken"), t("slow"), t("weak")] });
+    } else if (
+      effectText.includes(t("gourmet_delicacy_effect_choose_some_statuses"))
+    ) {
+      choices.push({
+        type: "statusEffect",
+        options: [t("dazed"), t("shaken"), t("slow"), t("weak")],
+      });
     }
-    
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_damage_type"))) {
       choices.push({ type: "damageType", options: getDamageTypes(t) });
     }
-    
+
     if (effectText.includes(t("gourmet_delicacy_effect_choose_attributte"))) {
       choices.push({ type: "attribute", options: getAttributes(t) });
     }
-    
+
     return choices;
   };
 
   // Helper function to render effect with custom choices
   const renderEffectWithChoices = (effect, t) => {
     const choices = getEffectChoices(effect.effect, t);
-    
+
     let displayText = effect.effect;
-    
+
     // Replace choice placeholders with selected values
-    choices.forEach(choice => {
+    choices.forEach((choice) => {
       const selectedValue = effect.customChoices[choice.type];
       if (selectedValue) {
         if (choice.type === "statusEffect") {
-          displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_all_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
-          ).replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_some_statuses").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
-          );
+          displayText = displayText
+            .replace(
+              new RegExp(
+                t("gourmet_delicacy_effect_choose_all_statuses").replace(
+                  /[.*+?^${}()|[\]\\]/g,
+                  "\\$&",
+                ),
+                "g",
+              ),
+              selectedValue,
+            )
+            .replace(
+              new RegExp(
+                t("gourmet_delicacy_effect_choose_some_statuses").replace(
+                  /[.*+?^${}()|[\]\\]/g,
+                  "\\$&",
+                ),
+                "g",
+              ),
+              selectedValue,
+            );
         } else if (choice.type === "damageType") {
           displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_damage_type").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_damage_type").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            selectedValue,
           );
         } else if (choice.type === "attribute") {
           displayText = displayText.replace(
-            new RegExp(t("gourmet_delicacy_effect_choose_attributte").replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-            selectedValue
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_attributte").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            selectedValue,
           );
         }
       }
     });
-    
+
     // Return ReactMarkdown component for proper rendering of markdown syntax
-    return <ReactMarkdown components={MarkdownComponents}>{displayText}</ReactMarkdown>;
+    return (
+      <ReactMarkdown components={MarkdownComponents}>
+        {displayText}
+      </ReactMarkdown>
+    );
   };
 
   // Memoize spell data to prevent unnecessary re-renders
   const spellData = useMemo(() => {
     if (!spell) return null;
-    
+
     // Convert cookbook effects from object format to array for display
     let cookbookEffectsArray = [];
     if (spell.cookbookEffects) {
-      cookbookEffectsArray = Object.entries(spell.cookbookEffects).map(([key, data]) => ({
-        tasteCombination: data.taste1 && data.taste2 
-          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
-          : key.split('_').map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(' + '),
-        effect: data.effect,
-        customChoices: data.customChoices || {},
-        taste1: data.taste1,
-        taste2: data.taste2,
-        key: key
-      }));
+      cookbookEffectsArray = Object.entries(spell.cookbookEffects).map(
+        ([key, data]) => ({
+          tasteCombination:
+            data.taste1 && data.taste2
+              ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+              : key
+                  .split("_")
+                  .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
+                  .join(" + "),
+          effect: data.effect,
+          customChoices: data.customChoices || {},
+          taste1: data.taste1,
+          taste2: data.taste2,
+          key: key,
+        }),
+      );
     }
-    
+
     return {
       name: spell.spellName || "Unnamed Cooking Spell",
       cookbookEffects: cookbookEffectsArray,
@@ -122,11 +163,10 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
   }
 
   const handleEdit = () => {
-    if (onEdit && typeof onEdit === 'function') {
+    if (onEdit && typeof onEdit === "function") {
       onEdit();
     }
   };
-
 
   return (
     <Paper
@@ -168,9 +208,7 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
             {t("gourmet_delicacy")}
           </Typography>
         </Box>
-        {isEditMode && (
-          <Box sx={{ width: 40, height: 40 }} />
-        )}
+        {isEditMode && <Box sx={{ width: 40, height: 40 }} />}
       </Box>
 
       {/* Spell Info */}
@@ -204,11 +242,20 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
           </Box>
         </Box>
         {isEditMode && (
-          <Box sx={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            sx={{
+              width: 40,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
               {!spellData.showInPlayerSheet && (
                 <Tooltip title={t("Spell not shown in player sheet")}>
-                  <VisibilityOff sx={{ fontSize: "1rem", color: "text.secondary" }} />
+                  <VisibilityOff
+                    sx={{ fontSize: "1rem", color: "text.secondary" }}
+                  />
                 </Tooltip>
               )}
               <IconButton size="small" onClick={handleEdit}>
@@ -278,7 +325,6 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
           </Box>
         )}
       </Box>
-
     </Paper>
   );
 }

@@ -60,8 +60,9 @@ export function TypeAffinity({ type, affinity }) {
         fontFamily: "inherit",
         textAlign: "left",
         textTransform: "uppercase",
-        px: 0.2
-      }}>
+        px: 0.2,
+      }}
+    >
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
       {/* Affinity */} {affinity}

@@ -80,7 +80,13 @@ export default function CommunityResources({
               </Typography>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, flexDirection: isMobile ? "column" : "row" }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
               <Button
                 variant="contained"
                 size="large"
@@ -127,7 +133,9 @@ export default function CommunityResources({
                     color: isDarkMode ? "#ff9800" : "#ff6f00",
                     "&:hover": {
                       borderColor: isDarkMode ? "#ffb74d" : "#e65100",
-                      backgroundColor: isDarkMode ? "rgba(255, 152, 0, 0.1)" : "rgba(255, 111, 0, 0.1)",
+                      backgroundColor: isDarkMode
+                        ? "rgba(255, 152, 0, 0.1)"
+                        : "rgba(255, 111, 0, 0.1)",
                       transform: "translateY(-1px)",
                     },
                     transition: "all 0.3s ease",
@@ -181,8 +189,9 @@ export default function CommunityResources({
               <Box
                 sx={{
                   pt: 2,
-                  borderTop: `1px solid ${isDarkMode ? "#3f51b530" : "#2196f330"
-                    }`,
+                  borderTop: `1px solid ${
+                    isDarkMode ? "#3f51b530" : "#2196f330"
+                  }`,
                 }}
               >
                 <Typography variant="body2" sx={{ mb: 2 }}>
@@ -265,7 +274,7 @@ export default function CommunityResources({
             sx={{ mb: 4, maxWidth: "400px", mx: "auto" }}
           >
             {t(
-              "Be the first to contribute! Try adjusting your search criteria or request a new resource."
+              "Be the first to contribute! Try adjusting your search criteria or request a new resource.",
             )}
           </Typography>
 
@@ -302,8 +311,9 @@ export default function CommunityResources({
               size={{
                 xs: 12,
                 md: 6,
-                lg: 4
-              }}>
+                lg: 4,
+              }}
+            >
               <ResourceCard resource={content} isHomebrew />
             </Grid>
           ))}

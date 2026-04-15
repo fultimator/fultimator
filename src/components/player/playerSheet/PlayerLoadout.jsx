@@ -1,23 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Paper, Grid, Typography, Card, CardActionArea, CardContent,
-  Box, Chip, Divider, Tooltip, Button, Checkbox, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  List, ListItem, ListItemButton, ListItemIcon, ListItemText
-} from '@mui/material';
-import ReactMarkdown from 'react-markdown';
-import LockIcon from '@mui/icons-material/Lock';
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
-import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
-import SyncAltIcon from '@mui/icons-material/SyncAlt';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import CasinoIcon from '@mui/icons-material/Casino';
-import { SwapHoriz } from '@mui/icons-material';
-import { useTranslate } from '../../../translation/translate';
-import { useCustomTheme } from '../../../hooks/useCustomTheme';
-import attributes from '../../../libs/attributes';
-import { resolveEffectiveSlot, getActiveVehicle } from '../equipment/slots/equipmentSlots';
-import { calculateAttribute, calculateCustomWeaponStats } from '../common/playerCalculations';
+  Paper,
+  Grid,
+  Typography,
+  Card,
+  CardActionArea,
+  CardContent,
+  Box,
+  Chip,
+  Divider,
+  Tooltip,
+  Button,
+  Checkbox,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import LockIcon from "@mui/icons-material/Lock";
+import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import CasinoIcon from "@mui/icons-material/Casino";
+import { SwapHoriz } from "@mui/icons-material";
+import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import attributes from "../../../libs/attributes";
+import {
+  resolveEffectiveSlot,
+  getActiveVehicle,
+} from "../equipment/slots/equipmentSlots";
+import {
+  calculateAttribute,
+  calculateCustomWeaponStats,
+} from "../common/playerCalculations";
 import {
   getSlotLocks,
   getEquippedModulesForSlot,
@@ -26,62 +50,82 @@ import {
   getEquippedSupportModules,
   getSupportSlots,
   getAuxHandItem,
-} from '../equipment/slots/loadoutSelectors';
-import { useLoadoutStore } from '../../../store/playerLoadoutStore';
-import SlotPickerDialog from '../equipment/slots/SlotPickerDialog';
-import SpellPilotVehiclesModal from '../spells/SpellPilotVehiclesModal';
+} from "../equipment/slots/loadoutSelectors";
+import { useLoadoutStore } from "../../../store/playerLoadoutStore";
+import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
+import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 
 // Stat line helpers
 
 function weaponStatLine(item) {
-  if (!item) return '-';
-  if ((item.att1 && item.att2) || (item.accuracyCheck?.att1 && item.accuracyCheck?.att2)) {
-    const a1 = attributes[item.att1 ?? item.accuracyCheck?.att1]?.shortcaps ?? (item.att1 ?? item.accuracyCheck?.att1);
-    const a2 = attributes[item.att2 ?? item.accuracyCheck?.att2]?.shortcaps ?? (item.att2 ?? item.accuracyCheck?.att2);
-    const hands = (item.hands === 2 || item.isTwoHand) ? '2H' : '1H';
-    return `${a1}+${a2} / ${item.dmg ?? item.damage ?? '?'} ${item.type ?? ''} / ${hands}`.trim();
+  if (!item) return "-";
+  if (
+    (item.att1 && item.att2) ||
+    (item.accuracyCheck?.att1 && item.accuracyCheck?.att2)
+  ) {
+    const a1 =
+      attributes[item.att1 ?? item.accuracyCheck?.att1]?.shortcaps ??
+      item.att1 ??
+      item.accuracyCheck?.att1;
+    const a2 =
+      attributes[item.att2 ?? item.accuracyCheck?.att2]?.shortcaps ??
+      item.att2 ??
+      item.accuracyCheck?.att2;
+    const hands = item.hands === 2 || item.isTwoHand ? "2H" : "1H";
+    return `${a1}+${a2} / ${item.dmg ?? item.damage ?? "?"} ${item.type ?? ""} / ${hands}`.trim();
   }
-  return item.quality || '-';
+  return item.quality || "-";
 }
 
 function shieldStatLine(item) {
-  if (!item) return '-';
+  if (!item) return "-";
   return `DEF +${item.def}  MDEF +${item.mdef}`;
 }
 
 function armorStatLine(item) {
-  if (!item) return '-';
+  if (!item) return "-";
   const init = item.init >= 0 ? `+${item.init}` : `${item.init}`;
   return `DEF +${item.def}  MDEF +${item.mdef}  INIT ${init}`;
 }
 
 function moduleStatLine(module) {
-  if (!module) return '-';
-  if (module.type === 'pilot_module_weapon') {
-    if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+  if (!module) return "-";
+  if (module.type === "pilot_module_weapon") {
+    if (module.isShield)
+      return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
     const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
     const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
-    const hands = module.cumbersome ? '2H' : '1H';
-    return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
+    const hands = module.cumbersome ? "2H" : "1H";
+    return `${a1}+${a2} / ${module.damage ?? "?"} ${module.damageType ?? ""} / ${hands}`.trim();
   }
-  if (module.type === 'pilot_module_armor') {
+  if (module.type === "pilot_module_armor") {
     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
   }
-  return module.description ? module.description.slice(0, 40) : '-';
+  return module.description ? module.description.slice(0, 40) : "-";
 }
 
 // SlotCard
 
-function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onRoll, onSwap, isAux }) {
+function SlotCard({
+  label,
+  resolved,
+  locked,
+  isEditMode,
+  onClick,
+  hasModule,
+  onRoll,
+  onSwap,
+  isAux,
+}) {
   const { t } = useTranslate();
-  const isVehicle = resolved?.kind === 'vehicleModule';
+  const isVehicle = resolved?.kind === "vehicleModule";
   const isEmpty = !resolved;
 
   const itemName = (() => {
     if (isVehicle) return resolved.module.customName || t(resolved.module.name);
     const item = resolved?.item;
     if (!item) return null;
-    if ('accuracyCheck' in item && item.activeForm === 'secondary') {
+    if ("accuracyCheck" in item && item.activeForm === "secondary") {
       return item.secondWeaponName || `${item.name} (Alt)`;
     }
     return item.name ?? null;
@@ -92,33 +136,46 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
     if (isVehicle) return moduleStatLine(resolved.module);
     const item = resolved.item;
     // Custom weapon: respect active form
-    if ('accuracyCheck' in item) {
-      const isSecondary = item.activeForm === 'secondary';
-      const acc = isSecondary ? item.secondSelectedAccuracyCheck : item.accuracyCheck;
+    if ("accuracyCheck" in item) {
+      const isSecondary = item.activeForm === "secondary";
+      const acc = isSecondary
+        ? item.secondSelectedAccuracyCheck
+        : item.accuracyCheck;
       if (acc?.att1 && acc?.att2) {
         const a1 = attributes[acc.att1]?.shortcaps ?? acc.att1;
         const a2 = attributes[acc.att2]?.shortcaps ?? acc.att2;
         const stats = calculateCustomWeaponStats(item, isSecondary);
         const type = isSecondary ? item.secondSelectedType : item.type;
-        return `${a1}+${a2} / ${stats.damage} ${type ?? ''} / 2H`.trim();
+        return `${a1}+${a2} / ${stats.damage} ${type ?? ""} / 2H`.trim();
       }
     }
-    if ('att1' in item && 'att2' in item) return weaponStatLine(item);
-    if ('def' in item && 'mdef' in item && !('init' in item)) return shieldStatLine(item);
-    if ('def' in item && 'mdef' in item && 'init' in item) return armorStatLine(item);
-    return item.quality || '-';
+    if ("att1" in item && "att2" in item) return weaponStatLine(item);
+    if ("def" in item && "mdef" in item && !("init" in item))
+      return shieldStatLine(item);
+    if ("def" in item && "mdef" in item && "init" in item)
+      return armorStatLine(item);
+    return item.quality || "-";
   })();
 
   // A slot is weapon-type if it has rollable att1+att2+damage stats
-  const isWeaponType = !isEmpty && (
-    isVehicle
-      ? resolved.module.type === 'pilot_module_weapon' && !resolved.module.isShield
-      : ('att1' in resolved.item && 'att2' in resolved.item) || (resolved.item?.accuracyCheck?.att1 && resolved.item?.accuracyCheck?.att2)
-  );
+  const isWeaponType =
+    !isEmpty &&
+    (isVehicle
+      ? resolved.module.type === "pilot_module_weapon" &&
+        !resolved.module.isShield
+      : ("att1" in resolved.item && "att2" in resolved.item) ||
+        (resolved.item?.accuracyCheck?.att1 &&
+          resolved.item?.accuracyCheck?.att2));
 
   const clickable = !locked && isEditMode && !!onClick && !isAux;
   const showRoll = !!onRoll && isWeaponType && !isEmpty;
-  const showSwap = !!onSwap && !isEmpty && !isVehicle && resolved.item?.customizations?.some(c => c.name === 'weapon_customization_transforming');
+  const showSwap =
+    !!onSwap &&
+    !isEmpty &&
+    !isVehicle &&
+    resolved.item?.customizations?.some(
+      (c) => c.name === "weapon_customization_transforming",
+    );
 
   const cardInner = (
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
@@ -127,31 +184,37 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
           display: "flex",
           gap: 0.5,
           mb: 0.5,
-          alignItems: "center"
-        }}>
+          alignItems: "center",
+        }}
+      >
         <Typography
           variant="caption"
           sx={{
             color: "text.secondary",
             fontWeight: 800,
             letterSpacing: 0.4,
-            fontSize: { xs: "0.68rem", sm: "0.72rem" }
-          }}>
+            fontSize: { xs: "0.68rem", sm: "0.72rem" },
+          }}
+        >
           {label}
         </Typography>
         {isAux && (
-          <Tooltip title={t('Auto-generated')}>
-            <AutoFixHighIcon sx={{ fontSize: 12, color: 'warning.main' }} />
+          <Tooltip title={t("Auto-generated")}>
+            <AutoFixHighIcon sx={{ fontSize: 12, color: "warning.main" }} />
           </Tooltip>
         )}
         {isVehicle && !isAux && (
           <Tooltip title={resolved.vehicle.customName}>
-            <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
+            <PrecisionManufacturingIcon
+              sx={{ fontSize: 12, color: "success.main" }}
+            />
           </Tooltip>
         )}
         {hasModule && !isVehicle && !isEmpty && !isAux && (
-          <Tooltip title={t('Vehicle module available')}>
-            <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.light', opacity: 0.6 }} />
+          <Tooltip title={t("Vehicle module available")}>
+            <PrecisionManufacturingIcon
+              sx={{ fontSize: 12, color: "success.light", opacity: 0.6 }}
+            />
           </Tooltip>
         )}
       </Box>
@@ -160,9 +223,10 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
           variant="body2"
           sx={{
             color: "text.disabled",
-            fontStyle: "italic"
-          }}>
-          {t('- Empty -')}
+            fontStyle: "italic",
+          }}
+        >
+          {t("- Empty -")}
         </Typography>
       ) : (
         <>
@@ -171,8 +235,9 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
             noWrap
             sx={{
               fontWeight: 700,
-              fontSize: { xs: "0.84rem", sm: "0.9rem" }
-            }}>
+              fontSize: { xs: "0.84rem", sm: "0.9rem" },
+            }}
+          >
             {itemName}
           </Typography>
           {statLine && (
@@ -185,8 +250,9 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2
-              }}>
+                lineHeight: 1.2,
+              }}
+            >
               {statLine}
             </Typography>
           )}
@@ -200,14 +266,26 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
       elevation={1}
       sx={{
         opacity: locked ? 0.45 : 1,
-        position: 'relative',
-        height: '100%',
-        minWidth: '100%',
-        border: isAux ? '1px dashed' : isVehicle ? '1px solid' : (hasModule && !isVehicle && !isEmpty) ? '1px dashed' : undefined,
-        borderColor: isAux ? 'warning.main' : isVehicle ? 'success.main' : (hasModule && !isVehicle && !isEmpty) ? 'success.light' : undefined,
+        position: "relative",
+        height: "100%",
+        minWidth: "100%",
+        border: isAux
+          ? "1px dashed"
+          : isVehicle
+            ? "1px solid"
+            : hasModule && !isVehicle && !isEmpty
+              ? "1px dashed"
+              : undefined,
+        borderColor: isAux
+          ? "warning.main"
+          : isVehicle
+            ? "success.main"
+            : hasModule && !isVehicle && !isEmpty
+              ? "success.light"
+              : undefined,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'stretch', height: '100%' }}>
+      <Box sx={{ display: "flex", alignItems: "stretch", height: "100%" }}>
         {clickable ? (
           <CardActionArea onClick={onClick} sx={{ flex: 1 }}>
             {cardInner}
@@ -216,17 +294,39 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
           <Box sx={{ flex: 1 }}>{cardInner}</Box>
         )}
         {(showRoll || showSwap) && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderLeft: '1px solid', borderColor: 'divider', px: 0.5, justifyContent: 'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              borderLeft: "1px solid",
+              borderColor: "divider",
+              px: 0.5,
+              justifyContent: "center",
+            }}
+          >
             {showSwap && (
-              <Tooltip title={t('weapon_customization_swap_form')}>
-                <IconButton size="small" onClick={(e) => { e.stopPropagation(); onSwap(); }}>
+              <Tooltip title={t("weapon_customization_swap_form")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSwap();
+                  }}
+                >
                   <SwapHoriz fontSize="small" />
                 </IconButton>
               </Tooltip>
             )}
             {showRoll && (
-              <Tooltip title={t('Roll')}>
-                <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRoll(); }}>
+              <Tooltip title={t("Roll")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRoll();
+                  }}
+                >
                   <CasinoIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -239,9 +339,10 @@ function SlotCard({ label, resolved, locked, isEditMode, onClick, hasModule, onR
           sx={{
             position: "absolute",
             top: 4,
-            right: 4
-          }}>
-          <LockIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+            right: 4,
+          }}
+        >
+          <LockIcon sx={{ fontSize: 14, color: "text.disabled" }} />
         </Box>
       )}
     </Card>
@@ -262,24 +363,33 @@ function VehicleSupportCard({ label, module, isEditMode, onClick }) {
               display: "flex",
               gap: 0.5,
               mb: 0.5,
-              alignItems: "center"
-            }}>
+              alignItems: "center",
+            }}
+          >
             <Typography
               variant="caption"
               sx={{
                 color: "text.secondary",
                 fontWeight: 800,
-                fontSize: { xs: "0.68rem", sm: "0.72rem" }
-              }}>{label}</Typography>
-            <PrecisionManufacturingIcon sx={{ fontSize: 12, color: 'success.main' }} />
+                fontSize: { xs: "0.68rem", sm: "0.72rem" },
+              }}
+            >
+              {label}
+            </Typography>
+            <PrecisionManufacturingIcon
+              sx={{ fontSize: 12, color: "success.main" }}
+            />
           </Box>
           <Typography
             variant="body2"
             noWrap
             sx={{
               fontWeight: 700,
-              fontSize: { xs: "0.84rem", sm: "0.9rem" }
-            }}>{module.customName || t(module.name)}</Typography>
+              fontSize: { xs: "0.84rem", sm: "0.9rem" },
+            }}
+          >
+            {module.customName || t(module.name)}
+          </Typography>
           {module.description && (
             <Typography
               variant="caption"
@@ -291,10 +401,16 @@ function VehicleSupportCard({ label, module, isEditMode, onClick }) {
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2
-              }}>
-              <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                {(module.name === 'pilot_custom_support' ? module.description : t(module.description))}
+                lineHeight: 1.2,
+              }}
+            >
+              <ReactMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed
+              >
+                {module.name === "pilot_custom_support"
+                  ? module.description
+                  : t(module.description)}
               </ReactMarkdown>
             </Typography>
           )}
@@ -305,14 +421,20 @@ function VehicleSupportCard({ label, module, isEditMode, onClick }) {
             variant="caption"
             sx={{
               color: "text.secondary",
-              fontWeight: 700
-            }}>{label}</Typography>
+              fontWeight: 700,
+            }}
+          >
+            {label}
+          </Typography>
           <Typography
             variant="body2"
             sx={{
               color: "text.disabled",
-              fontStyle: "italic"
-            }}>{t('- Empty -')}</Typography>
+              fontStyle: "italic",
+            }}
+          >
+            {t("- Empty -")}
+          </Typography>
         </>
       )}
     </CardContent>
@@ -322,15 +444,17 @@ function VehicleSupportCard({ label, module, isEditMode, onClick }) {
     <Card
       elevation={1}
       sx={{
-        height: '100%',
+        height: "100%",
         minWidth: !module ? 120 : 0,
-        maxWidth: '100%',
-        border: module ? '1px solid' : undefined,
-        borderColor: module ? 'success.main' : undefined,
+        maxWidth: "100%",
+        border: module ? "1px solid" : undefined,
+        borderColor: module ? "success.main" : undefined,
       }}
     >
       {clickable ? (
-        <CardActionArea onClick={onClick} sx={{ height: '100%' }}>{content}</CardActionArea>
+        <CardActionArea onClick={onClick} sx={{ height: "100%" }}>
+          {content}
+        </CardActionArea>
       ) : (
         content
       )}
@@ -340,7 +464,13 @@ function VehicleSupportCard({ label, module, isEditMode, onClick }) {
 
 // PlayerLoadout
 
-export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharacterSheet, isOwner }) {
+export default function PlayerLoadout({
+  player,
+  setPlayer,
+  isEditMode,
+  isCharacterSheet,
+  isOwner,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const primary = theme.primary;
@@ -348,58 +478,67 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   const canClickSlot = isEditMode || (isCharacterSheet && !!isOwner);
 
   const [pickerSlot, setPickerSlot] = useState(null);
-  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] = useState(false);
+  const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =
+    useState(false);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null);
 
   const store = useLoadoutStore();
-  useEffect(() => { store.init(setPlayer); }, [setPlayer, store]);
+  useEffect(() => {
+    store.init(setPlayer);
+  }, [setPlayer, store]);
 
   // Shared selectors
   const auxHandItem = getAuxHandItem(player);
 
   // Roll
   const getAttrDie = (key) => {
-    const normKey = key === 'will' ? 'willpower' : key;
+    const normKey = key === "will" ? "willpower" : key;
     const base = player?.attributes?.[normKey] ?? 8;
     const cfg = {
       dexterity: [["slow", "enraged"], ["dexUp"]],
-      insight:   [["dazed", "enraged"], ["insUp"]],
-      might:     [["weak",  "poisoned"], ["migUp"]],
-      willpower: [["shaken","poisoned"], ["wlpUp"]],
+      insight: [["dazed", "enraged"], ["insUp"]],
+      might: [["weak", "poisoned"], ["migUp"]],
+      willpower: [["shaken", "poisoned"], ["wlpUp"]],
     }[normKey] ?? [[], []];
     return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
   };
 
   const handleRollSlot = (slot) => {
-    const resolved = slot === 'aux'
-      ? (auxHandItem ? { kind: 'playerItem', item: auxHandItem } : null)
-      : resolveEffectiveSlot(player, slot);
+    const resolved =
+      slot === "aux"
+        ? auxHandItem
+          ? { kind: "playerItem", item: auxHandItem }
+          : null
+        : resolveEffectiveSlot(player, slot);
     if (!resolved) return;
 
     let att1, att2, prec, damage, type;
-    if (resolved.kind === 'vehicleModule') {
+    if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
-      if (m.type !== 'pilot_module_weapon' || m.isShield) return;
-      att1 = m.att1; att2 = m.att2;
-      prec = m.prec ?? 0; damage = m.damage ?? 0; type = m.damageType ?? '';
+      if (m.type !== "pilot_module_weapon" || m.isShield) return;
+      att1 = m.att1;
+      att2 = m.att2;
+      prec = m.prec ?? 0;
+      damage = m.damage ?? 0;
+      type = m.damageType ?? "";
     } else {
       const item = resolved.item;
       att1 = item.att1 ?? item.accuracyCheck?.att1;
       att2 = item.att2 ?? item.accuracyCheck?.att2;
       if (!att1 || !att2) return;
-      if ('accuracyCheck' in item) {
+      if ("accuracyCheck" in item) {
         // Custom weapon: derive stats from customizations
-        const isSecondary = item.activeForm === 'secondary';
+        const isSecondary = item.activeForm === "secondary";
         const stats = calculateCustomWeaponStats(item, isSecondary);
         prec = stats.precision;
         damage = stats.damage;
-        type = (isSecondary ? item.secondSelectedType : item.type) ?? '';
+        type = (isSecondary ? item.secondSelectedType : item.type) ?? "";
       } else {
         prec = item.prec ?? 0;
         damage = item.damage ?? item.dmg ?? 0;
-        type = item.type ?? '';
+        type = item.type ?? "";
       }
     }
 
@@ -408,7 +547,16 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
     const r1 = Math.floor(Math.random() * die1) + 1;
     const r2 = Math.floor(Math.random() * die2) + 1;
     setRollDialog({
-      slot, att1, att2, die1, die2, r1, r2, prec, damage, type,
+      slot,
+      att1,
+      att2,
+      die1,
+      die2,
+      r1,
+      r2,
+      prec,
+      damage,
+      type,
       accuracy: r1 + r2 + prec,
       damageRoll: Math.max(r1, r2) + damage,
       isCritSuccess: r1 >= 6 && r2 >= 6 && r1 === r2,
@@ -416,12 +564,14 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
     });
   };
 
-  const handleSwapSlot = (slot) => { store.swapForm(slot); };
+  const handleSwapSlot = (slot) => {
+    store.swapForm(slot);
+  };
 
-  const mainHandResolved  = resolveEffectiveSlot(player, 'mainHand');
-  const offHandResolved   = resolveEffectiveSlot(player, 'offHand');
-  const armorResolved     = resolveEffectiveSlot(player, 'armor');
-  const accessoryResolved = resolveEffectiveSlot(player, 'accessory');
+  const mainHandResolved = resolveEffectiveSlot(player, "mainHand");
+  const offHandResolved = resolveEffectiveSlot(player, "offHand");
+  const armorResolved = resolveEffectiveSlot(player, "armor");
+  const accessoryResolved = resolveEffectiveSlot(player, "accessory");
 
   const activeVehicle = getActiveVehicle(player);
   const vs = player?.vehicleSlots;
@@ -433,116 +583,158 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
   const pilotSpellInfo = (() => {
     for (const [ci, cls] of (player.classes ?? []).entries()) {
       for (const [si, spell] of (cls.spells ?? []).entries()) {
-        if (spell.spellType === 'pilot-vehicle') return { spell, classIndex: ci, spellIndex: si };
+        if (spell.spellType === "pilot-vehicle")
+          return { spell, classIndex: ci, spellIndex: si };
       }
     }
     return null;
   })();
 
-  const handleToggleVehicle = () => { store.toggleVehicle(); };
+  const handleToggleVehicle = () => {
+    store.toggleVehicle();
+  };
   const handleSaveVehicles = (_, updatedPilot) => {
     store.saveVehicles(updatedPilot);
     setVehicleModalOpen(false);
   };
 
   const handleSlotClick = (slot) => {
-    const hasModuleCandidates = ['mainHand', 'offHand', 'armor'].includes(slot)
-      && Boolean(activeVehicle)
-      && getEquippedModulesForSlot(player, slot).length > 0;
+    const hasModuleCandidates =
+      ["mainHand", "offHand", "armor"].includes(slot) &&
+      Boolean(activeVehicle) &&
+      getEquippedModulesForSlot(player, slot).length > 0;
     setPickerOpenModuleOverride(hasModuleCandidates);
     setPickerSlot(slot);
   };
 
   const vehicleAccessoryModule = vs?.accessory
-    ? activeVehicle?.modules.find(m => m.name === vs.accessory.moduleName && m.enabled) ?? null
+    ? (activeVehicle?.modules.find(
+        (m) => m.name === vs.accessory.moduleName && m.enabled,
+      ) ?? null)
     : null;
 
   const slotCards = [
-    { slot: 'mainHand',  label: t('Main Hand'),  resolved: mainHandResolved,  locked: mainHandLocked },
-    { slot: 'offHand',   label: t('Off Hand'),   resolved: offHandResolved,   locked: offHandLocked },
-    { slot: 'armor',     label: t('Armor'),      resolved: armorResolved,     locked: false },
-    { slot: 'accessory', label: t('Accessory'),  resolved: accessoryResolved, locked: false },
+    {
+      slot: "mainHand",
+      label: t("Main Hand"),
+      resolved: mainHandResolved,
+      locked: mainHandLocked,
+    },
+    {
+      slot: "offHand",
+      label: t("Off Hand"),
+      resolved: offHandResolved,
+      locked: offHandLocked,
+    },
+    {
+      slot: "armor",
+      label: t("Armor"),
+      resolved: armorResolved,
+      locked: false,
+    },
+    {
+      slot: "accessory",
+      label: t("Accessory"),
+      resolved: accessoryResolved,
+      locked: false,
+    },
   ];
 
   return (
     <Paper
       elevation={3}
       sx={{
-        borderRadius: '8px',
-        border: '2px solid',
+        borderRadius: "8px",
+        border: "2px solid",
         borderColor: secondary,
-        display: 'flex',
-        flexDirection: isCharacterSheet ? 'column' : 'row',
+        display: "flex",
+        flexDirection: isCharacterSheet ? "column" : "row",
       }}
     >
       {/* Section header */}
       <Typography
         variant="h1"
-        sx={isCharacterSheet ? {
-          textTransform: "uppercase",
-          padding: "5px",
-          backgroundColor: primary,
-          color: '#fff',
-          borderRadius: '8px 8px 0 0',
-          fontSize: '1.5em',
-        } : {
-          writingMode: 'vertical-lr',
-          textTransform: "uppercase",
-          transform: 'rotate(180deg)',
-          ml: '-1px',
-          mr: '10px',
-          mt: '-1px',
-          mb: '-1px',
-          paddingY: '10px',
-          backgroundColor: primary,
-          color: '#fff',
-          borderRadius: '0 8px 8px 0',
-          fontSize: '2em',
-        }}
+        sx={
+          isCharacterSheet
+            ? {
+                textTransform: "uppercase",
+                padding: "5px",
+                backgroundColor: primary,
+                color: "#fff",
+                borderRadius: "8px 8px 0 0",
+                fontSize: "1.5em",
+              }
+            : {
+                writingMode: "vertical-lr",
+                textTransform: "uppercase",
+                transform: "rotate(180deg)",
+                ml: "-1px",
+                mr: "10px",
+                mt: "-1px",
+                mb: "-1px",
+                paddingY: "10px",
+                backgroundColor: primary,
+                color: "#fff",
+                borderRadius: "0 8px 8px 0",
+                fontSize: "2em",
+              }
+        }
         align="center"
       >
-        {t('Loadout')}
+        {t("Loadout")}
       </Typography>
       <Box sx={{ p: 1.5, flexGrow: 1 }}>
-
         {/* Vehicle enter/exit + swap: shown when a pilot-vehicle spell exists */}
         {(isOwner || isEditMode) && pilotSpellInfo && (
-          
           <>
             <Box
               sx={{
                 display: "flex",
                 gap: 1,
                 mb: 1.5,
-                alignItems: "center"
-              }}>
-              <PrecisionManufacturingIcon sx={{ fontSize: 16, color: activeVehicle ? 'success.main' : 'text.disabled' }} />
-              <Typography variant="caption" color={activeVehicle ? 'success.main' : 'text.secondary'} sx={{
-                fontWeight: 700
-              }}>
-                {activeVehicle ? (activeVehicle.customName || t('Vehicle')) : t('No vehicle active')}
+                alignItems: "center",
+              }}
+            >
+              <PrecisionManufacturingIcon
+                sx={{
+                  fontSize: 16,
+                  color: activeVehicle ? "success.main" : "text.disabled",
+                }}
+              />
+              <Typography
+                variant="caption"
+                color={activeVehicle ? "success.main" : "text.secondary"}
+                sx={{
+                  fontWeight: 700,
+                }}
+              >
+                {activeVehicle
+                  ? activeVehicle.customName || t("Vehicle")
+                  : t("No vehicle active")}
               </Typography>
-              <Box sx={{
-                flex: 1
-              }} />
+              <Box
+                sx={{
+                  flex: 1,
+                }}
+              />
               <Button
                 size="small"
-                variant={activeVehicle ? 'outlined' : 'contained'}
-                color={activeVehicle ? 'error' : 'success'}
+                variant={activeVehicle ? "outlined" : "contained"}
+                color={activeVehicle ? "error" : "success"}
                 startIcon={<DirectionsWalkIcon />}
                 onClick={handleToggleVehicle}
-                sx={{ fontSize: '0.7rem', py: 0.25 }}
+                sx={{ fontSize: "0.7rem", py: 0.25 }}
               >
-                {activeVehicle ? t('Exit Vehicle') : t('Enter Vehicle')}
+                {activeVehicle ? t("Exit Vehicle") : t("Enter Vehicle")}
               </Button>
               <Button
                 size="small"
                 variant="outlined"
                 startIcon={<SyncAltIcon />}
                 onClick={() => setVehicleModalOpen(true)}
-                sx={{ fontSize: '0.7rem', py: 0.25 }}
+                sx={{ fontSize: "0.7rem", py: 0.25 }}
               >
-                {t('Swap Vehicle')}
+                {t("Swap Vehicle")}
               </Button>
             </Box>
             <Divider sx={{ mb: 1.5 }} />
@@ -554,12 +746,13 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           {slotCards.map(({ slot, label, resolved, locked }) => (
             <Grid
               key={slot}
-              sx={{ display: 'flex' }}
+              sx={{ display: "flex" }}
               size={{
                 xs: 6,
                 sm: 3,
-                md: 3
-              }}>
+                md: 3,
+              }}
+            >
               <SlotCard
                 label={label}
                 resolved={resolved}
@@ -567,26 +760,35 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 isEditMode={canClickSlot}
                 hasModule={!!getEquippedModuleForSlot(player, slot)}
                 onClick={() => handleSlotClick(slot)}
-                onRoll={(slot === 'mainHand' || slot === 'offHand') ? () => handleRollSlot(slot) : undefined}
-                onSwap={(slot === 'mainHand' || slot === 'offHand') ? () => handleSwapSlot(slot) : undefined}
+                onRoll={
+                  slot === "mainHand" || slot === "offHand"
+                    ? () => handleRollSlot(slot)
+                    : undefined
+                }
+                onSwap={
+                  slot === "mainHand" || slot === "offHand"
+                    ? () => handleSwapSlot(slot)
+                    : undefined
+                }
               />
             </Grid>
           ))}
           {auxHandItem && (
             <Grid
-              sx={{ display: 'flex' }}
+              sx={{ display: "flex" }}
               size={{
                 xs: 6,
                 sm: 3,
-                md: 3
-              }}>
+                md: 3,
+              }}
+            >
               <SlotCard
-                label={t('Aux Hand')}
-                resolved={{ kind: 'playerItem', item: auxHandItem }}
+                label={t("Aux Hand")}
+                resolved={{ kind: "playerItem", item: auxHandItem }}
                 locked={false}
                 isEditMode={canClickSlot}
                 isAux
-                onRoll={() => handleRollSlot('aux')}
+                onRoll={() => handleRollSlot("aux")}
               />
             </Grid>
           )}
@@ -596,33 +798,34 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         {activeVehicle && (
           <>
             <Divider sx={{ my: 1.5 }}>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 <Chip
                   icon={<PrecisionManufacturingIcon />}
-                  label={activeVehicle.customName || t('Vehicle')}
+                  label={activeVehicle.customName || t("Vehicle")}
                   size="small"
                   color="success"
                   variant="outlined"
                 />
-                {vehicleModuleUsage && [
-                  { key: 'weapon', label: t('Weapon') },
-                  { key: 'armor', label: t('Armor') },
-                  { key: 'support', label: t('Support') },
-                ].map(({ key, label }) => {
-                  const used = vehicleModuleUsage.counts[key];
-                  const max = vehicleModuleUsage.limits[key];
-                  const over = max !== -1 && used > max;
-                  return (
-                    <Chip
-                      key={key}
-                      label={`${label}: ${used}/${max === -1 ? '∞' : max}`}
-                      size="small"
-                      color={over ? 'error' : 'success'}
-                      variant={over ? 'filled' : 'outlined'}
-                      sx={{ fontSize: '0.7rem', height: 22 }}
-                    />
-                  );
-                })}
+                {vehicleModuleUsage &&
+                  [
+                    { key: "weapon", label: t("Weapon") },
+                    { key: "armor", label: t("Armor") },
+                    { key: "support", label: t("Support") },
+                  ].map(({ key, label }) => {
+                    const used = vehicleModuleUsage.counts[key];
+                    const max = vehicleModuleUsage.limits[key];
+                    const over = max !== -1 && used > max;
+                    return (
+                      <Chip
+                        key={key}
+                        label={`${label}: ${used}/${max === -1 ? "∞" : max}`}
+                        size="small"
+                        color={over ? "error" : "success"}
+                        variant={over ? "filled" : "outlined"}
+                        sx={{ fontSize: "0.7rem", height: 22 }}
+                      />
+                    );
+                  })}
               </Box>
             </Divider>
             <Grid container spacing={1}>
@@ -631,10 +834,11 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                   size={{
                     xs: 6,
                     sm: 3,
-                    md: 3
-                  }}>
+                    md: 3,
+                  }}
+                >
                   <VehicleSupportCard
-                    label={t('Accessory')}
+                    label={t("Accessory")}
                     module={vehicleAccessoryModule}
                     vehicle={activeVehicle}
                   />
@@ -646,14 +850,19 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                   size={{
                     xs: 6,
                     sm: 3,
-                    md: 3
-                  }}>
+                    md: 3,
+                  }}
+                >
                   <VehicleSupportCard
-                    label={`${t('Support')} ${i + 1}`}
+                    label={`${t("Support")} ${i + 1}`}
                     module={entry.module}
                     vehicle={activeVehicle}
                     isEditMode={canClickSlot}
-                    onClick={canClickSlot ? () => setSupportPickerOpen(true) : undefined}
+                    onClick={
+                      canClickSlot
+                        ? () => setSupportPickerOpen(true)
+                        : undefined
+                    }
                   />
                 </Grid>
               ))}
@@ -663,14 +872,19 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                   size={{
                     xs: 6,
                     sm: 3,
-                    md: 3
-                  }}>
+                    md: 3,
+                  }}
+                >
                   <VehicleSupportCard
-                    label={`${t('Support')} 1`}
+                    label={`${t("Support")} 1`}
                     module={null}
                     vehicle={activeVehicle}
                     isEditMode={canClickSlot}
-                    onClick={canClickSlot ? () => setSupportPickerOpen(true) : undefined}
+                    onClick={
+                      canClickSlot
+                        ? () => setSupportPickerOpen(true)
+                        : undefined
+                    }
                   />
                 </Grid>
               )}
@@ -680,49 +894,101 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       </Box>
       {/* Roll result dialog */}
       {rollDialog && (
-        <Dialog open onClose={() => setRollDialog(null)} maxWidth="xs" fullWidth
+        <Dialog
+          open
+          onClose={() => setRollDialog(null)}
+          maxWidth="xs"
+          fullWidth
           slotProps={{
-            paper: { sx: { width: { xs: '90%', md: '30%' } } }
+            paper: { sx: { width: { xs: "90%", md: "30%" } } },
           }}
         >
-          <DialogTitle variant="h3" sx={{
-            backgroundColor: rollDialog.isCritFail ? '#bb2124' : rollDialog.isCritSuccess ? '#22bb33' : '#aaaaaa',
-          }}>
-            {rollDialog.isCritFail ? t('Critical Failure!') : rollDialog.isCritSuccess ? t('Critical Success!') : t('Result')}
+          <DialogTitle
+            variant="h3"
+            sx={{
+              backgroundColor: rollDialog.isCritFail
+                ? "#bb2124"
+                : rollDialog.isCritSuccess
+                  ? "#22bb33"
+                  : "#aaaaaa",
+            }}
+          >
+            {rollDialog.isCritFail
+              ? t("Critical Failure!")
+              : rollDialog.isCritSuccess
+                ? t("Critical Success!")
+                : t("Result")}
           </DialogTitle>
           <DialogContent sx={{ mt: 1 }}>
-            <Grid container spacing={2} sx={{ textAlign: 'center', pt: 1 }}>
-              <Grid  size={6}>
-                <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Accuracy')}</Typography>
+            <Grid container spacing={2} sx={{ textAlign: "center", pt: 1 }}>
+              <Grid size={6}>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                >
+                  {t("Accuracy")}
+                </Typography>
                 <Typography variant="h1">{rollDialog.accuracy}</Typography>
               </Grid>
-              <Grid  size={6}>
-                <Typography variant="h3" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t('Damage')}</Typography>
+              <Grid size={6}>
+                <Typography
+                  variant="h3"
+                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                >
+                  {t("Damage")}
+                </Typography>
                 <Typography variant="h1">{rollDialog.damageRoll}</Typography>
                 {rollDialog.type && (
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{t(rollDialog.type)}</Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                  >
+                    {t(rollDialog.type)}
+                  </Typography>
                 )}
               </Grid>
-              <Grid  sx={{ mt: 1 }} size={12}>
-                <Typography variant="body2" sx={{
-                  color: "text.secondary"
-                }}>
-                  {rollDialog.r1} [{attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
-                  {' + '}
-                  {rollDialog.r2} [{attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
-                  {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ''}
+              <Grid sx={{ mt: 1 }} size={12}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
+                  {rollDialog.r1} [
+                  {attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
+                  {" + "}
+                  {rollDialog.r2} [
+                  {attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
+                  {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ""}
                 </Typography>
-                <Typography variant="body2" sx={{
-                  color: "text.secondary"
-                }}>
-                  {t('Damage')}: {Math.max(rollDialog.r1, rollDialog.r2)} + {rollDialog.damage}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
+                  {t("Damage")}: {Math.max(rollDialog.r1, rollDialog.r2)} +{" "}
+                  {rollDialog.damage}
                 </Typography>
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setRollDialog(null)} color="secondary" variant="contained">{t('Close')}</Button>
-            <Button onClick={() => handleRollSlot(rollDialog.slot)} color="primary" variant="contained" autoFocus>{t('Re-roll')}</Button>
+            <Button
+              onClick={() => setRollDialog(null)}
+              color="secondary"
+              variant="contained"
+            >
+              {t("Close")}
+            </Button>
+            <Button
+              onClick={() => handleRollSlot(rollDialog.slot)}
+              color="primary"
+              variant="contained"
+              autoFocus
+            >
+              {t("Re-roll")}
+            </Button>
           </DialogActions>
         </Dialog>
       )}
@@ -730,17 +996,28 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
       {pickerSlot && (
         <SlotPickerDialog
           open={Boolean(pickerSlot)}
-          onClose={() => { setPickerSlot(null); setPickerOpenModuleOverride(false); }}
+          onClose={() => {
+            setPickerSlot(null);
+            setPickerOpenModuleOverride(false);
+          }}
           slot={pickerSlot}
           player={player}
           setPlayer={setPlayer}
-          vehicleModules={activeVehicle && ['mainHand', 'offHand', 'armor'].includes(pickerSlot) ? getEquippedModulesForSlot(player, pickerSlot) : []}
+          vehicleModules={
+            activeVehicle &&
+            ["mainHand", "offHand", "armor"].includes(pickerSlot)
+              ? getEquippedModulesForSlot(player, pickerSlot)
+              : []
+          }
           onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
           onDisableModule={() => store.disableModule(pickerSlot)}
           openModuleOverride={pickerOpenModuleOverride}
           onClearOtherHandModule={
-            activeVehicle && ['mainHand', 'offHand'].includes(pickerSlot)
-              ? () => store.disableModule(pickerSlot === 'mainHand' ? 'offHand' : 'mainHand')
+            activeVehicle && ["mainHand", "offHand"].includes(pickerSlot)
+              ? () =>
+                  store.disableModule(
+                    pickerSlot === "mainHand" ? "offHand" : "mainHand",
+                  )
               : undefined
           }
         />
@@ -752,16 +1029,19 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <PrecisionManufacturingIcon color="success" fontSize="small" />
-          {t('Support Modules')}
+          {t("Support Modules")}
         </DialogTitle>
         <DialogContent sx={{ pb: 1 }}>
           {equippedSupportModules.length === 0 ? (
-            <Typography variant="body2" sx={{
-              color: "text.secondary"
-            }}>
-              {t('No support modules installed on this vehicle.')}
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
+              {t("No support modules installed on this vehicle.")}
             </Typography>
           ) : (
             <>
@@ -770,14 +1050,17 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                 gutterBottom
                 sx={{
                   color: "text.secondary",
-                  display: "block"
-                }}>
-                {t('Enable or disable support modules:')}
+                  display: "block",
+                }}
+              >
+                {t("Enable or disable support modules:")}
               </Typography>
               <List dense>
                 {equippedSupportModules.map((m) => (
                   <ListItem key={m.originalIndex} disablePadding>
-                    <ListItemButton onClick={() => store.toggleSupportModule(m.originalIndex)}>
+                    <ListItemButton
+                      onClick={() => store.toggleSupportModule(m.originalIndex)}
+                    >
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <Checkbox
                           edge="start"
@@ -790,19 +1073,35 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
                       <ListItemText
                         primary={m.customName || t(m.name)}
                         secondary={
-                          <Box sx={{ color: "text.secondary", fontSize: "0.75rem" }}>
+                          <Box
+                            sx={{
+                              color: "text.secondary",
+                              fontSize: "0.75rem",
+                            }}
+                          >
                             {m.isComplex && (
-                              <Typography variant="caption" sx={{ fontWeight: 700, mr: 0.5 }}>
-                                {t('Complex')} -{' '}
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 700, mr: 0.5 }}
+                              >
+                                {t("Complex")} -{" "}
                               </Typography>
                             )}
-                            <ReactMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
-                              {m.name === 'pilot_custom_support' ? m.description : t(m.description || '')}
+                            <ReactMarkdown
+                              allowedElements={["strong", "em"]}
+                              unwrapDisallowed
+                            >
+                              {m.name === "pilot_custom_support"
+                                ? m.description
+                                : t(m.description || "")}
                             </ReactMarkdown>
                           </Box>
                         }
-                        primaryTypographyProps={{ variant: 'body2', fontWeight: m.enabled ? 700 : 400 }}
-                        secondaryTypographyProps={{ component: 'div' }}
+                        primaryTypographyProps={{
+                          variant: "body2",
+                          fontWeight: m.enabled ? 700 : 400,
+                        }}
+                        secondaryTypographyProps={{ component: "div" }}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -812,7 +1111,9 @@ export default function PlayerLoadout({ player, setPlayer, isEditMode, isCharact
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button size="small" onClick={() => setSupportPickerOpen(false)}>{t('Done')}</Button>
+          <Button size="small" onClick={() => setSupportPickerOpen(false)}>
+            {t("Done")}
+          </Button>
         </DialogActions>
       </Dialog>
       {/* Vehicle swap modal */}

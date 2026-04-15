@@ -23,7 +23,7 @@ export default function PlayerCompanion({
     .flatMap((cls) => cls.skills)
     .filter(
       (skill) =>
-        skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0
+        skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0,
     );
 
   // Assume you want to get the first companion found in any class
@@ -105,13 +105,14 @@ export default function PlayerCompanion({
             )}
             <Grid container spacing={2} sx={{ padding: "0.7em" }}>
               {!isCharacterSheet && (
-                <Grid  size={12}>
+                <Grid size={12}>
                   <Typography
                     variant="h3"
                     sx={{
                       fontWeight: "bold",
-                      textTransform: "uppercase"
-                    }}>
+                      textTransform: "uppercase",
+                    }}
+                  >
                     {t("Faithful Companion") +
                       " - " +
                       t("SL") +
@@ -120,7 +121,7 @@ export default function PlayerCompanion({
                   </Typography>
                 </Grid>
               )}
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Pretty npc={companion} collapse={true} />
               </Grid>
               {isEditMode && (
@@ -128,18 +129,19 @@ export default function PlayerCompanion({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 4
-                    }}>
+                      sm: 4,
+                    }}
+                  >
                     <Button
                       variant="contained"
                       color="primary"
-                      onClick={() => navigate(`/npc-gallery/${companion.id}`,
-                        {
+                      onClick={() =>
+                        navigate(`/npc-gallery/${companion.id}`, {
                           state: {
                             from: `/pc-gallery/${player.id}`,
-                          }
-                        }
-                      )}
+                          },
+                        })
+                      }
                       sx={{ marginTop: 2 }}
                     >
                       {t("View Companion")}
@@ -148,11 +150,12 @@ export default function PlayerCompanion({
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 8
-                    }}>
+                      sm: 8,
+                    }}
+                  >
                     <Typography variant="body2" sx={{ marginTop: 2 }}>
                       {t(
-                        "If you edit the Companion, remember to select it again in the corrisponding class page."
+                        "If you edit the Companion, remember to select it again in the corrisponding class page.",
                       )}
                     </Typography>
                   </Grid>

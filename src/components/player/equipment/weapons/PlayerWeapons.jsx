@@ -59,13 +59,17 @@ export default function PlayerWeapons({
     const slots = player.equippedSlots;
     if (!slots) return null;
     const isMain =
-      slots.mainHand?.source === 'weapons' &&
-      (slots.mainHand?.index !== undefined ? slots.mainHand.index === index : slots.mainHand?.name === weapon.name);
-    if (isMain) return 'mainHand';
+      slots.mainHand?.source === "weapons" &&
+      (slots.mainHand?.index !== undefined
+        ? slots.mainHand.index === index
+        : slots.mainHand?.name === weapon.name);
+    if (isMain) return "mainHand";
     const isOff =
-      slots.offHand?.source === 'weapons' &&
-      (slots.offHand?.index !== undefined ? slots.offHand.index === index : slots.offHand?.name === weapon.name);
-    if (isOff) return 'offHand';
+      slots.offHand?.source === "weapons" &&
+      (slots.offHand?.index !== undefined
+        ? slots.offHand.index === index
+        : slots.offHand?.name === weapon.name);
+    if (isOff) return "offHand";
     return null;
   };
 
@@ -77,7 +81,7 @@ export default function PlayerWeapons({
     }
     const isTwoHand = weapon.hands === 2 || weapon.isTwoHand;
     if (isTwoHand) {
-      onEquipWeapon(index, 'mainHand');
+      onEquipWeapon(index, "mainHand");
     } else {
       setSlotMenuAnchor(event.currentTarget);
       setSlotMenuIndex(index);
@@ -100,7 +104,7 @@ export default function PlayerWeapons({
     setExpanded(!expanded);
   };
 
-  const slotLabels = { mainHand: t('Main Hand'), offHand: t('Off Hand') };
+  const slotLabels = { mainHand: t("Main Hand"), offHand: t("Off Hand") };
   const mainHandOccupant = player.equippedSlots?.mainHand?.name;
   const offHandOccupant = player.equippedSlots?.offHand?.name;
   const offHandLocked = isTwoHandedEquipped(player);
@@ -132,41 +136,60 @@ export default function PlayerWeapons({
             const equippedSlot = getWeaponSlot(weapon, index);
             const isTwoHand = weapon.hands === 2 || weapon.isTwoHand;
             const tooltipTitle = weapon.isEquipped
-              ? `${t('Unequip Weapon')}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ''}`
+              ? `${t("Unequip Weapon")}${equippedSlot ? ` (${slotLabels[equippedSlot]})` : ""}`
               : isTwoHand
-                ? `${t('Equip Weapon')} (${slotLabels.mainHand})`
-                : t('Equip Weapon');
+                ? `${t("Equip Weapon")} (${slotLabels.mainHand})`
+                : t("Equip Weapon");
 
             return (
               <React.Fragment key={index}>
-                <Grid  sx={{ mb: 2 }} size={12}>
+                <Grid sx={{ mb: 2 }} size={12}>
                   <Box>
                     <PrettyWeapon weapon={weapon} />
                   </Box>
-                  
-                  <Box sx={{ 
-                    display: "flex", 
-                    justifyContent: "flex-end", 
-                    alignItems: "center",
-                    mt: 0.25
-                  }}>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      mt: 0.25,
+                    }}
+                  >
                     {isEditMode && (
                       <Tooltip title={t("Edit")}>
-                        <IconButton onClick={() => onEditWeapon(index)} size="small">
+                        <IconButton
+                          onClick={() => onEditWeapon(index)}
+                          size="small"
+                        >
                           <Edit fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}
-                    
+
                     <Box sx={{ ml: 0.5 }}>
                       {checkIfEquippable(weapon) ? (
                         <Tooltip title={tooltipTitle}>
                           <span>
                             <Badge
-                            badgeContent={equippedSlot === 'mainHand' ? (isTwoHand ? 'M+O' : 'M') : equippedSlot === 'offHand' ? 'O' : null}
-                            color="primary"
-                            invisible={!weapon.isEquipped || !equippedSlot}
-                            sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                              badgeContent={
+                                equippedSlot === "mainHand"
+                                  ? isTwoHand
+                                    ? "M+O"
+                                    : "M"
+                                  : equippedSlot === "offHand"
+                                    ? "O"
+                                    : null
+                              }
+                              color="primary"
+                              invisible={!weapon.isEquipped || !equippedSlot}
+                              sx={{
+                                "& .MuiBadge-badge": {
+                                  fontSize: "0.6rem",
+                                  height: 14,
+                                  minWidth: 14,
+                                },
+                              }}
                             >
                               <IconButton
                                 onClick={(e) => handleEquipClick(e, index)}
@@ -183,7 +206,7 @@ export default function PlayerWeapons({
                                   },
                                   transition: "background-color 0.3s",
                                   p: 0.5,
-                                  border: `1px solid ${theme.palette.divider}`
+                                  border: `1px solid ${theme.palette.divider}`,
                                 }}
                               >
                                 <Equip
@@ -195,7 +218,8 @@ export default function PlayerWeapons({
                                       : theme.palette.text.secondary
                                   }
                                   strokeColor={
-                                    weapon.isEquipped && theme.palette.mode === "dark"
+                                    weapon.isEquipped &&
+                                    theme.palette.mode === "dark"
                                       ? theme.palette.white.main
                                       : theme.palette.secondary.main
                                   }
@@ -218,7 +242,7 @@ export default function PlayerWeapons({
                         </Tooltip>
                       )}
                     </Box>
-                    
+
                     <Box sx={{ ml: 0.5 }}>
                       <Export
                         name={weapon.name}
@@ -239,16 +263,23 @@ export default function PlayerWeapons({
         open={Boolean(slotMenuAnchor)}
         onClose={() => setSlotMenuAnchor(null)}
       >
-        <MenuItem onClick={() => handleSlotSelect('mainHand')}>
+        <MenuItem onClick={() => handleSlotSelect("mainHand")}>
           <ListItemText
-            primary={t('Main Hand')}
+            primary={t("Main Hand")}
             secondary={mainHandOccupant ?? undefined}
           />
         </MenuItem>
-        <MenuItem onClick={() => handleSlotSelect('offHand')} disabled={offHandLocked}>
+        <MenuItem
+          onClick={() => handleSlotSelect("offHand")}
+          disabled={offHandLocked}
+        >
           <ListItemText
-            primary={t('Off Hand')}
-            secondary={offHandLocked ? t('Locked by two-handed weapon') : (offHandOccupant ?? undefined)}
+            primary={t("Off Hand")}
+            secondary={
+              offHandLocked
+                ? t("Locked by two-handed weapon")
+                : (offHandOccupant ?? undefined)
+            }
           />
         </MenuItem>
       </Menu>

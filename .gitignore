@@ -12,6 +12,7 @@
 
 # ide
 .idea
+.vscode/settings.json
 
 # production
 /build

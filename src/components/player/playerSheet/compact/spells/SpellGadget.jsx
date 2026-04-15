@@ -11,33 +11,52 @@ import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
 
-const StyledTableCell = styled(TableCell)({ 
+const StyledTableCell = styled(TableCell)({
   padding: "2px 4px",
   fontSize: "0.8rem",
-  borderBottom: "1px solid rgba(224, 224, 224, 1)"
+  borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
 export default function SpellGadget({ spell }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
   const ranks = [t("Basic"), t("Advanced"), t("Superior")];
 
   const renderAlchemy = () => (
     <>
-      <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+      <TableRow
+        sx={{
+          backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+        }}
+      >
         <StyledTableCell colSpan={2}>
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-            {t("Mix")}: {ranks[spell.rank - 1]} ({t("IP Cost")}: {spell.rank + 2})
+            {t("Mix")}: {ranks[spell.rank - 1]} ({t("IP Cost")}:{" "}
+            {spell.rank + 2})
           </Typography>
         </StyledTableCell>
       </TableRow>
       <TableRow sx={{ backgroundColor: theme.secondary }}>
-        <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.75rem", py: 0 }}>
+        <StyledTableCell
+          sx={{
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+            py: 0,
+          }}
+        >
           {t("Targets")}
         </StyledTableCell>
-        <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.75rem", py: 0 }}>
+        <StyledTableCell
+          sx={{
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+            py: 0,
+          }}
+        >
           {t("The potions affects...")}
         </StyledTableCell>
       </TableRow>
@@ -52,10 +71,24 @@ export default function SpellGadget({ spell }) {
         </TableRow>
       ))}
       <TableRow sx={{ backgroundColor: theme.secondary }}>
-        <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.75rem", py: 0 }}>
+        <StyledTableCell
+          sx={{
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+            py: 0,
+          }}
+        >
           {t("Die")}
         </StyledTableCell>
-        <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.75rem", py: 0 }}>
+        <StyledTableCell
+          sx={{
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+            py: 0,
+          }}
+        >
           {t("Effect")}
         </StyledTableCell>
       </TableRow>
@@ -74,7 +107,11 @@ export default function SpellGadget({ spell }) {
 
   const renderInfusion = () => (
     <>
-      <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+      <TableRow
+        sx={{
+          backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+        }}
+      >
         <StyledTableCell colSpan={2}>
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
@@ -87,7 +124,9 @@ export default function SpellGadget({ spell }) {
             {effect.name}
           </StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
-            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
+            <ReactMarkdown
+              components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+            >
               {effect.effect}
             </ReactMarkdown>
           </StyledTableCell>
@@ -98,7 +137,11 @@ export default function SpellGadget({ spell }) {
 
   const renderMagitech = () => (
     <>
-      <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+      <TableRow
+        sx={{
+          backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+        }}
+      >
         <StyledTableCell colSpan={2}>
           <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("Current Rank")}: {ranks[spell.rank - 1]}
@@ -107,9 +150,13 @@ export default function SpellGadget({ spell }) {
       </TableRow>
       {spell.rank >= 1 && (
         <TableRow>
-          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magitech Override")}</StyledTableCell>
+          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>
+            {t("Magitech Override")}
+          </StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
+            <ReactMarkdown
+              components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+            >
               {t("MagitechOverride_desc")}
             </ReactMarkdown>
           </StyledTableCell>
@@ -117,9 +164,13 @@ export default function SpellGadget({ spell }) {
       )}
       {spell.rank >= 2 && (
         <TableRow>
-          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magicannon")}</StyledTableCell>
+          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>
+            {t("Magicannon")}
+          </StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
+            <ReactMarkdown
+              components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+            >
               {t("Magicannon_desc1")}
             </ReactMarkdown>
           </StyledTableCell>
@@ -127,9 +178,13 @@ export default function SpellGadget({ spell }) {
       )}
       {spell.rank >= 3 && (
         <TableRow>
-          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>{t("Magispheres")}</StyledTableCell>
+          <StyledTableCell sx={{ fontWeight: "bold", width: "30%" }}>
+            {t("Magispheres")}
+          </StyledTableCell>
           <StyledTableCell sx={{ width: "70%", fontSize: "0.7rem" }}>
-            <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
+            <ReactMarkdown
+              components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+            >
               {t("Magispheres_desc1")}
             </ReactMarkdown>
           </StyledTableCell>
@@ -140,10 +195,14 @@ export default function SpellGadget({ spell }) {
 
   const getTitle = () => {
     switch (spell.spellType) {
-      case "tinkerer-alchemy": return t("Alchemy");
-      case "tinkerer-infusion": return t("Infusion");
-      case "tinkerer-magitech": return t("Magitech");
-      default: return t("Gadget");
+      case "tinkerer-alchemy":
+        return t("Alchemy");
+      case "tinkerer-infusion":
+        return t("Infusion");
+      case "tinkerer-magitech":
+        return t("Magitech");
+      default:
+        return t("Gadget");
     }
   };
 
@@ -152,7 +211,10 @@ export default function SpellGadget({ spell }) {
       <TableBody>
         {/* Header Row */}
         <TableRow sx={{ backgroundColor: theme.primary }}>
-          <StyledTableCell colSpan={2} sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}>
+          <StyledTableCell
+            colSpan={2}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
+          >
             {getTitle()} - {t(spell.className)}
           </StyledTableCell>
         </TableRow>

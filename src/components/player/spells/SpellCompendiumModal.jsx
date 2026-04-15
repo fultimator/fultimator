@@ -48,7 +48,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   useEffect(() => {
     if (source !== "official") return;
     const spellsForClass = spellList.filter(
-      (spell) => spell.class === selectedClass
+      (spell) => spell.class === selectedClass,
     );
     setFilteredSpells(spellsForClass);
     setSelectedItem(spellsForClass.length > 0 ? spellsForClass[0] : null);
@@ -59,7 +59,9 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     if (source !== "packs" || !selectedPackId) return [];
     const pack = packs.find((p) => p.id === selectedPackId);
     if (!pack) return [];
-    return pack.items.filter((i) => i.type === "player-spell").map((i) => i.data);
+    return pack.items
+      .filter((i) => i.type === "player-spell")
+      .map((i) => i.data);
   }, [source, selectedPackId, packs]);
 
   // Reset selection when pack spells change
@@ -105,19 +107,34 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
     setSelectedItem(item);
   };
 
-const StyledMarkdown = ({ children, ...props }) => {
+  const StyledMarkdown = ({ children, ...props }) => {
     return (
-      <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 1 }}>
+      <div
+        style={{
+          whiteSpace: "pre-line",
+          display: "inline",
+          margin: 0,
+          padding: 1,
+        }}
+      >
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -144,13 +161,17 @@ const StyledMarkdown = ({ children, ...props }) => {
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-        <Grid container sx={{ alignItems: "center", justifyContent: "space-between" }} spacing={1}>
+        <Grid
+          container
+          sx={{ alignItems: "center", justifyContent: "space-between" }}
+          spacing={1}
+        >
           {source === "official" && (
-            <Grid  size="grow">
+            <Grid size="grow">
               <Select
                 value={selectedClass}
                 onChange={handleClassChange}
@@ -167,7 +188,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </Grid>
           )}
           {source === "packs" && (
-            <Grid  size="grow">
+            <Grid size="grow">
               <Select
                 value={selectedPackId}
                 onChange={(e) => setSelectedPackId(e.target.value)}
@@ -182,7 +203,7 @@ const StyledMarkdown = ({ children, ...props }) => {
               </Select>
             </Grid>
           )}
-          <Grid >
+          <Grid>
             <IconButton
               aria-label="close"
               onClick={onClose}
@@ -194,7 +215,7 @@ const StyledMarkdown = ({ children, ...props }) => {
             </IconButton>
           </Grid>
           {/* Source selector row */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Select
               value={source}
               onChange={(e) => setSource(e.target.value)}
@@ -213,9 +234,12 @@ const StyledMarkdown = ({ children, ...props }) => {
       <Divider />
       <DialogContent>
         <Grid container>
-          <Grid  sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
+          <Grid sx={{ maxHeight: "40vh", overflowY: "auto" }} size={4}>
             {displayItems.length === 0 ? (
-              <Typography variant="body2" sx={{ p: 1, color: "text.secondary" }}>
+              <Typography
+                variant="body2"
+                sx={{ p: 1, color: "text.secondary" }}
+              >
                 {source === "packs"
                   ? t("No player spells in this pack.")
                   : t("No spells available.")}
@@ -252,9 +276,12 @@ const StyledMarkdown = ({ children, ...props }) => {
                   {selectedItem.mp}{" "}
                   {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                   {t("MP")}
-                  <Box component="span" sx={{
-                    mx: 1
-                  }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      mx: 1,
+                    }}
+                  >
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -263,9 +290,12 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" sx={{
-                    mx: 1
-                  }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      mx: 1,
+                    }}
+                  >
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -285,14 +315,16 @@ const StyledMarkdown = ({ children, ...props }) => {
             )}
             {selectedItem && selectedItem.spellType === "gamble" && (
               <div>
-                <Typography variant="h3">
-                  {t(selectedItem.name)}
-                </Typography>
+                <Typography variant="h3">{t(selectedItem.name)}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  {t("Up to")} {selectedItem.mp * selectedItem.maxTargets} {t("MP")}
-                  <Box component="span" sx={{
-                    mx: 1
-                  }}>
+                  {t("Up to")} {selectedItem.mp * selectedItem.maxTargets}{" "}
+                  {t("MP")}
+                  <Box
+                    component="span"
+                    sx={{
+                      mx: 1,
+                    }}
+                  >
                     <Diamond />
                   </Box>
                   <StyledMarkdown
@@ -301,9 +333,12 @@ const StyledMarkdown = ({ children, ...props }) => {
                   >
                     {t(selectedItem.targetDesc)}
                   </StyledMarkdown>
-                  <Box component="span" sx={{
-                    mx: 1
-                  }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      mx: 1,
+                    }}
+                  >
                     <Diamond />
                   </Box>
                   <StyledMarkdown

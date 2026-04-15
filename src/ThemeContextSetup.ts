@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext } from "react";
 
 export interface ThemeContextProps {
   selectedTheme: ThemeValue;
@@ -7,6 +7,14 @@ export interface ThemeContextProps {
   toggleDarkMode: () => void;
 }
 
-export type ThemeValue = "Fabula" | "High" | "Techno" | "Natural" | "Bravely" | "Obscura";
+export type ThemeValue =
+  | "Fabula"
+  | "High"
+  | "Techno"
+  | "Natural"
+  | "Bravely"
+  | "Obscura";
 
-export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextProps | undefined>(
+  undefined,
+);

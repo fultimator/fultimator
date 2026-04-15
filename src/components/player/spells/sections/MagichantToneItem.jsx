@@ -37,9 +37,13 @@ export default function MagichantToneItem({
   const isCustom =
     item.name === "magichant_custom_name" ||
     !availableMagichantTones.find((entry) => entry.name === item.name);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -51,92 +55,100 @@ export default function MagichantToneItem({
     });
   };
 
-  const itemDisplayName = item.customName || t(item.name || "magichant_custom_name");
+  const itemDisplayName =
+    item.customName || t(item.name || "magichant_custom_name");
 
   return (
     <>
-    <Card sx={{ mb: 2 }}>
-      <CardContent>
-        <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 5
-            }}>
-            <FormControl fullWidth>
-              <InputLabel>{t("magichant_tone")}</InputLabel>
-              <Select
-                value={item.name || "magichant_custom_name"}
-                onChange={(e) => handleNameChange(e.target.value)}
-                label={t("magichant_tone")}
-              >
-                {availableMagichantTones.map((option) => (
-                  <MenuItem key={option.name} value={option.name}>
-                    {t(option.name)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid
-            size={{
-              xs: 12,
-              sm: 7
-            }}>
-            <TextField
-              fullWidth
-              label={t("magichant_name")}
-              value={isCustom ? (item.customName || "") : t(item.name || "")}
-              onChange={(e) => isCustom && onItemChange(itemIndex, "customName", e.target.value)}
-              slotProps={{
-                input: { readOnly: !isCustom }
+      <Card sx={{ mb: 2 }}>
+        <CardContent>
+          <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 5,
               }}
-            />
-          </Grid>
+            >
+              <FormControl fullWidth>
+                <InputLabel>{t("magichant_tone")}</InputLabel>
+                <Select
+                  value={item.name || "magichant_custom_name"}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  label={t("magichant_tone")}
+                >
+                  {availableMagichantTones.map((option) => (
+                    <MenuItem key={option.name} value={option.name}>
+                      {t(option.name)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
 
-          <Grid  size={12}>
-            <CustomTextarea
-              label={t("magichant_tone_effect")}
-              value={isCustom ? (item.effect || "") : t(item.effect || "")}
-              onChange={(e) => isCustom && onItemChange(itemIndex, "effect", e.target.value)}
-              readOnly={!isCustom}
-              rows={3}
-            />
-          </Grid>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 7,
+              }}
+            >
+              <TextField
+                fullWidth
+                label={t("magichant_name")}
+                value={isCustom ? item.customName || "" : t(item.name || "")}
+                onChange={(e) =>
+                  isCustom &&
+                  onItemChange(itemIndex, "customName", e.target.value)
+                }
+                slotProps={{
+                  input: { readOnly: !isCustom },
+                }}
+              />
+            </Grid>
 
-          <Grid  size={12}>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                fullWidth
-                onClick={handleDelete}
-                variant="outlined"
-                color="error"
-                startIcon={<Delete />}
-              >
-                {t("Delete")}
-              </Button>
-              <Button
-                fullWidth
-                onClick={handleCloneToCustom}
-                variant="outlined"
-                startIcon={<ContentCopy />}
-              >
-                {t("Clone to Custom")}
-              </Button>
-            </Box>
+            <Grid size={12}>
+              <CustomTextarea
+                label={t("magichant_tone_effect")}
+                value={isCustom ? item.effect || "" : t(item.effect || "")}
+                onChange={(e) =>
+                  isCustom && onItemChange(itemIndex, "effect", e.target.value)
+                }
+                readOnly={!isCustom}
+                rows={3}
+              />
+            </Grid>
+
+            <Grid size={12}>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  fullWidth
+                  onClick={handleDelete}
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Delete />}
+                >
+                  {t("Delete")}
+                </Button>
+                <Button
+                  fullWidth
+                  onClick={handleCloneToCustom}
+                  variant="outlined"
+                  startIcon={<ContentCopy />}
+                >
+                  {t("Clone to Custom")}
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
-    <DeleteConfirmationDialog
-      open={deleteDialogOpen}
+        </CardContent>
+      </Card>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
         onClose={setDeleteDialogOpen}
-      onConfirm={() => onDeleteItem(itemIndex)}
-      title={t("Delete")}
-      message={t("Are you sure you want to delete this item?")}
-      itemPreview={<Box sx={{ fontWeight: "bold" }}>{itemDisplayName}</Box>}
-    />
+        onConfirm={() => onDeleteItem(itemIndex)}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this item?")}
+        itemPreview={<Box sx={{ fontWeight: "bold" }}>{itemDisplayName}</Box>}
+      />
     </>
   );
 }

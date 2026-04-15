@@ -4,8 +4,15 @@ import SymbolistItem from "./SymbolistItem";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableSymbols } from "../spellOptionData";
 
-export default function SymbolistContentSection({ formState, setFormState, t }) {
-  const currentSymbols = useMemo(() => formState.symbols || [], [formState.symbols]);
+export default function SymbolistContentSection({
+  formState,
+  setFormState,
+  t,
+}) {
+  const currentSymbols = useMemo(
+    () => formState.symbols || [],
+    [formState.symbols],
+  );
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankSymbol = useCallback(() => {
@@ -22,30 +29,28 @@ export default function SymbolistContentSection({ formState, setFormState, t }) 
       .filter((name) => name !== "symbol_custom_name");
     return availableSymbols.filter(
       (preset) =>
-        preset.name !== "symbol_custom_name" && !addedNames.includes(preset.name)
+        preset.name !== "symbol_custom_name" &&
+        !addedNames.includes(preset.name),
     );
   }, [currentSymbols]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setFormState) => {
-        const preset = availableSymbols.find((s) => s.name === presetName);
-        if (!preset) return;
-        setFormState((prev) => ({
-          ...prev,
-          symbols: [
-            ...(prev.symbols || []),
-            {
-              name: preset.name,
-              effect: preset.effect,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setFormState) => {
+      const preset = availableSymbols.find((s) => s.name === presetName);
+      if (!preset) return;
+      setFormState((prev) => ({
+        ...prev,
+        symbols: [
+          ...(prev.symbols || []),
+          {
+            name: preset.name,
+            effect: preset.effect,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -67,7 +72,7 @@ export default function SymbolistContentSection({ formState, setFormState, t }) 
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

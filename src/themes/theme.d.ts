@@ -1,7 +1,7 @@
-import { PaletteColor, PaletteColorOptions } from '@mui/material/styles';
+import { PaletteColor, PaletteColorOptions } from "@mui/material/styles";
 
 // Extend the Palette and PaletteOptions interfaces
-declare module '@mui/material/styles' {
+declare module "@mui/material/styles" {
   interface Palette {
     ternary: PaletteColor;
     quaternary: PaletteColor;

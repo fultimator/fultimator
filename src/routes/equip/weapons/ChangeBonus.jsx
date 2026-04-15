@@ -10,7 +10,7 @@ function ChangeBonus({
   setDamageBonus,
   setDamageReworkBonus,
   rework,
-  totalBonus
+  totalBonus,
 }) {
   const { t } = useTranslate();
   const handlePrecChange = (e) => {
@@ -37,7 +37,9 @@ function ChangeBonus({
       )}
       {!rework && (
         <FormControlLabel
-          control={<Checkbox checked={damageBonus} onChange={handleDamageChange} />}
+          control={
+            <Checkbox checked={damageBonus} onChange={handleDamageChange} />
+          }
           label={"+4 " + t("Damage", true)}
           size="small"
           sx={{ mt: -1 }}
@@ -45,7 +47,12 @@ function ChangeBonus({
       )}
       {rework && (
         <FormControlLabel
-          control={<Checkbox checked={damageReworkBonus} onChange={handleDamageReworkChange} />}
+          control={
+            <Checkbox
+              checked={damageReworkBonus}
+              onChange={handleDamageReworkChange}
+            />
+          }
           label={"+" + totalBonus + " " + t("Damage", true)}
           size="small"
           sx={{ mt: -1 }}

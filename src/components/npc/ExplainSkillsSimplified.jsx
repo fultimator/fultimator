@@ -94,14 +94,24 @@ export default function ExplainSkillsSimplified({ npc }) {
             borderBottom: open ? `1px solid ${primary}` : "none",
             "&:hover": {
               backgroundColor: hoverPrimary,
-            }
+            },
           }}
         >
-          <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="h3"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             {t("Available:")} {totalAvailableSkills}
           </Typography>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1, background: "white" }} />
-          <Typography variant="h3" sx={{ display: "flex", alignItems: "center" }}>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ mx: 1, background: "white" }}
+          />
+          <Typography
+            variant="h3"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             {t("Used:")} {totalUsedSkills}
           </Typography>
           <ExpandMoreIcon sx={{ color: "white" }} />
@@ -146,7 +156,7 @@ export default function ExplainSkillsSimplified({ npc }) {
                     label={innerLabel}
                     value={calculator(npc)}
                   />
-                )
+                ),
             )}
           </TableBody>
           <TableHead>
@@ -181,7 +191,7 @@ export default function ExplainSkillsSimplified({ npc }) {
                     label={innerLabel}
                     value={calculator(npc)}
                   />
-                )
+                ),
             )}
           </TableBody>
         </Table>

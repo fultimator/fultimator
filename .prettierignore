@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+dist-electron/
+data/
+*.lock
+*.min.js
+.git/
+.next/
+.nuxt/
+coverage/
+.env
+.env.local

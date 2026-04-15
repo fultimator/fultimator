@@ -47,9 +47,10 @@ function PrettySingle({ weapon, showActions }) {
   const theme = useCustomTheme();
   const [showImage, setShowImage] = useState(false);
 
-  const background = theme.mode === 'dark'
-    ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
-    : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(90deg, ${theme.ternary}, rgba(24, 26, 27, 0) 100%)` // Dark mode gradient with black end
+      : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`; // Light mode gradient
 
   const imageBackground = theme.mode === "dark" ? "#181a1b" : "white";
 
@@ -63,9 +64,7 @@ function PrettySingle({ weapon, showActions }) {
   return (
     <>
       <Card>
-        <div
-          ref={ref}
-        >
+        <div ref={ref}>
           <Stack>
             <Grid
               container
@@ -89,22 +88,50 @@ function PrettySingle({ weapon, showActions }) {
               />
               <Grid container sx={{ flex: 1, pl: 1 }}>
                 <Grid size={3}>
-                  <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Weapon")}
                   </Typography>
                 </Grid>
                 <Grid size={1}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Cost")}
                   </Typography>
                 </Grid>
                 <Grid size={4}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Accuracy")}
                   </Typography>
                 </Grid>
                 <Grid size={4}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Damage")}
                   </Typography>
                 </Grid>
@@ -133,7 +160,8 @@ function PrettySingle({ weapon, showActions }) {
               {/* Content Column - contains both rows */}
               <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
                 {/* First Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -142,25 +170,67 @@ function PrettySingle({ weapon, showActions }) {
                     pl: 1,
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                    <Typography sx={{ fontWeight: "bold", marginRight: "4px", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        marginRight: "4px",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {weapon.name ? t(weapon.name) : t("No Name")}
                     </Typography>
                     {weapon.martial && <Martial />}
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={1}>
-                    <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>{`${weapon.cost}z`}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={1}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >{`${weapon.cost}z`}</Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       <OpenBracket />
                       {`${attributes[weapon.att1].shortcaps} + ${attributes[weapon.att2].shortcaps}`}
                       <CloseBracket />
                       {weapon.prec !== 0 ? `+${weapon.prec}` : ""}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       <OpenBracket />
                       {t("HR +")} {weapon.damage}
                       <CloseBracket />
@@ -170,7 +240,8 @@ function PrettySingle({ weapon, showActions }) {
                 </Grid>
 
                 {/* Second Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background: "transparent",
                     pl: 1,
@@ -178,23 +249,66 @@ function PrettySingle({ weapon, showActions }) {
                     alignItems: "center",
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>{t(weapon.category)}</Typography>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}
+                    >
+                      {t(weapon.category)}
+                    </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 0 }} size={1}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      p: 0,
+                    }}
+                    size={1}
+                  >
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {weapon.hands === 1 && t("One-handed")}
                       {weapon.hands === 2 && t("Two-handed")}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 0 }} size={1}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      p: 0,
+                    }}
+                    size={1}
+                  >
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                    <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {weapon.melee && t("Melee")}
                       {weapon.ranged && t("Ranged")}
                     </Typography>
@@ -224,8 +338,13 @@ function PrettySingle({ weapon, showActions }) {
               />
               <Grid sx={{ p: "5px", textAlign: "left" }} size={12}>
                 <Typography sx={{ lineHeight: 1, margin: 0 }}>
-                  {!weapon.quality ? t("No Description") : (
-                    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed={true}>
+                  {!weapon.quality ? (
+                    t("No Description")
+                  ) : (
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed={true}
+                    >
                       {weapon.quality}
                     </StyledMarkdown>
                   )}
@@ -247,7 +366,12 @@ function PrettySingle({ weapon, showActions }) {
             <AddToCompendiumButton itemType="weapon" data={weapon} />
           </div>
           <FormControlLabel
-            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            control={
+              <Checkbox
+                checked={showImage}
+                onChange={(e) => setShowImage(e.target.checked)}
+              />
+            }
             label={t("Add Image")}
           />
         </div>

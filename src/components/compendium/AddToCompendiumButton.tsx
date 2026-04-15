@@ -29,7 +29,13 @@ interface Props {
   tooltipOverride?: string;
 }
 
-export default function AddToCompendiumButton({ itemType, data, size = "small", excludePackId, tooltipOverride }: Props) {
+export default function AddToCompendiumButton({
+  itemType,
+  data,
+  size = "small",
+  excludePackId,
+  tooltipOverride,
+}: Props) {
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [adding, setAdding] = useState(false);
@@ -40,12 +46,18 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
     severity: "success" | "error";
   }>({ open: false, message: "", severity: "success" });
 
-  const personalPack = packs.find((p) => p.isPersonal && p.id !== excludePackId) ?? null;
-  const nonPersonalPacks = packs.filter((p) => !p.isPersonal && p.id !== excludePackId);
+  const personalPack =
+    packs.find((p) => p.isPersonal && p.id !== excludePackId) ?? null;
+  const nonPersonalPacks = packs.filter(
+    (p) => !p.isPersonal && p.id !== excludePackId,
+  );
   // const hasMultiplePacks = nonPersonalPacks.length > 0 || personalPack !== null;
 
   // All available targets (personal first, then others), minus excluded pack
-  const allTargets = [...(personalPack ? [personalPack] : []), ...nonPersonalPacks];
+  const allTargets = [
+    ...(personalPack ? [personalPack] : []),
+    ...nonPersonalPacks,
+  ];
   const unlockedTargets = allTargets.filter((p) => !p.locked);
 
   const doAdd = async (packId: string) => {
@@ -54,7 +66,11 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
       await addItem(packId, itemType, data);
       setJustAdded(packId);
       setTimeout(() => setJustAdded(null), 2000);
-      setSnackbar({ open: true, message: "Added to compendium", severity: "success" });
+      setSnackbar({
+        open: true,
+        message: "Added to compendium",
+        severity: "success",
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to add item";
       setSnackbar({ open: true, message: msg, severity: "error" });
@@ -81,7 +97,7 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
     }
   };
 
-  const renderIcon = (pack: typeof allTargets[number], id: string) => {
+  const renderIcon = (pack: (typeof allTargets)[number], id: string) => {
     if (justAdded === id) return <CheckIcon fontSize="small" color="success" />;
     if (pack.locked) return <LockIcon fontSize="small" color="disabled" />;
     if (pack.isPersonal) return <StarIcon fontSize="small" color="warning" />;
@@ -115,7 +131,11 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
               const p = await ensurePersonalPack();
               doAdd(p.id);
             }}
-            sx={personalPack.locked ? { opacity: 0.4, filter: "blur(0.5px)" } : undefined}
+            sx={
+              personalPack.locked
+                ? { opacity: 0.4, filter: "blur(0.5px)" }
+                : undefined
+            }
           >
             <ListItemIcon>
               {renderIcon(personalPack, personalPack.id)}
@@ -128,12 +148,14 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
           <MenuItem
             key={pack.id}
             disabled={!!pack.locked}
-            onClick={() => { if (!pack.locked) doAdd(pack.id); }}
-            sx={pack.locked ? { opacity: 0.4, filter: "blur(0.5px)" } : undefined}
+            onClick={() => {
+              if (!pack.locked) doAdd(pack.id);
+            }}
+            sx={
+              pack.locked ? { opacity: 0.4, filter: "blur(0.5px)" } : undefined
+            }
           >
-            <ListItemIcon>
-              {renderIcon(pack, pack.id)}
-            </ListItemIcon>
+            <ListItemIcon>{renderIcon(pack, pack.id)}</ListItemIcon>
             <ListItemText>{pack.name}</ListItemText>
           </MenuItem>
         ))}
@@ -145,7 +167,11 @@ export default function AddToCompendiumButton({ itemType, data, size = "small", 
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

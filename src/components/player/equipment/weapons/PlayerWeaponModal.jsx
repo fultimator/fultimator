@@ -57,7 +57,7 @@ export default function PlayerWeaponModal({
   const [martial, setMartial] = useState(weapon?.martial || false);
   const [damageBonus, setDamageBonus] = useState(weapon?.damageBonus || false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(
-    weapon?.damageReworkBonus || false
+    weapon?.damageReworkBonus || false,
   );
   const [precBonus, setPrecBonus] = useState(weapon?.precBonus || false);
   const [rework, setRework] = useState(weapon?.rework || false);
@@ -65,29 +65,39 @@ export default function PlayerWeaponModal({
   const [qualityCost, setQualityCost] = useState(weapon?.qualityCost || 0);
   const [totalBonus, setTotalBonus] = useState(weapon?.totalBonus || 0);
   const [selectedQuality, setSelectedQuality] = useState(
-    weapon?.selectedQuality || ""
+    weapon?.selectedQuality || "",
   );
   const {
-    precModifier, setPrecModifier,
-    damageModifier, setDamageModifier,
-    defModifier, setDefModifier,
-    mDefModifier, setMDefModifier,
-    isEquipped, _setIsEquipped,
-    modifiersExpanded, setModifiersExpanded,
+    precModifier,
+    setPrecModifier,
+    damageModifier,
+    setDamageModifier,
+    defModifier,
+    setDefModifier,
+    mDefModifier,
+    setMDefModifier,
+    isEquipped,
+    _setIsEquipped,
+    modifiersExpanded,
+    setModifiersExpanded,
     expandModifiers,
     modifiers,
     clearModifiers,
   } = useEquipmentForm(weapon);
   const fileInputRef = useRef(null);
 
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {
-          if (editWeaponIndex !== null) {
-            onDeleteWeapon(editWeaponIndex);
-          }
-          onClose();
-        },
-  });;
+      if (editWeaponIndex !== null) {
+        onDeleteWeapon(editWeaponIndex);
+      }
+      onClose();
+    },
+  });
 
   useEffect(() => {
     setBase(weapon?.base || weapons[0]);
@@ -178,10 +188,22 @@ export default function PlayerWeaponModal({
       if (rework) {
         setRework(rework);
       }
-      if (defModifier) { setDefModifier(defModifier); expandModifiers(); }
-      if (mDefModifier) { setMDefModifier(mDefModifier); expandModifiers(); }
-      if (precModifier) { setPrecModifier(precModifier); expandModifiers(); }
-      if (damageModifier) { setDamageModifier(damageModifier); expandModifiers(); }
+      if (defModifier) {
+        setDefModifier(defModifier);
+        expandModifiers();
+      }
+      if (mDefModifier) {
+        setMDefModifier(mDefModifier);
+        expandModifiers();
+      }
+      if (precModifier) {
+        setPrecModifier(precModifier);
+        expandModifiers();
+      }
+      if (damageModifier) {
+        setDamageModifier(damageModifier);
+        expandModifiers();
+      }
     }
     fileInputRef.current.value = null;
   };
@@ -301,7 +323,7 @@ export default function PlayerWeaponModal({
     };
     onAddWeapon(updatedWeapon);
   };
-const handleClearFields = () => {
+  const handleClearFields = () => {
     setBase(weapons[0]);
     setName(weapons[0].name);
     setCategory(weapons[0].category);
@@ -342,7 +364,7 @@ const handleClearFields = () => {
               width: "100%",
               maxWidth: "lg",
             },
-          }
+          },
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -366,8 +388,9 @@ const handleClearFields = () => {
             <Grid
               size={{
                 xs: 10,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeBase
                 value={base.name}
                 onChange={(e) => {
@@ -388,15 +411,16 @@ const handleClearFields = () => {
               />
             </Grid>
             {/* Change Martial */}
-            <Grid  size={2}>
+            <Grid size={2}>
               <ChangeMartial martial={martial} setMartial={setMartial} />
             </Grid>
             {/* Change Name */}
             <Grid
               size={{
                 xs: 12,
-                md: 6
-              }}>
+                md: 6,
+              }}
+            >
               <ChangeName
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -406,13 +430,14 @@ const handleClearFields = () => {
             <Grid
               size={{
                 xs: 12,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeCategory
                 value={category}
                 onChange={(e) => {
                   const category = weaponCategories.find(
-                    (el) => el === e.target.value
+                    (el) => el === e.target.value,
                   );
                   setCategory(category);
                 }}
@@ -422,8 +447,9 @@ const handleClearFields = () => {
             <Grid
               size={{
                 xs: 6,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeType
                 value={type}
                 onChange={(e) => setType(e.target.value)}
@@ -433,8 +459,9 @@ const handleClearFields = () => {
             <Grid
               size={{
                 xs: 6,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <ChangeHands
                 value={hands}
                 onChange={(e) => setHands(e.target.value)}
@@ -444,8 +471,9 @@ const handleClearFields = () => {
             <Grid
               size={{
                 xs: 12,
-                md: 12
-              }}>
+                md: 12,
+              }}
+            >
               <ChangeAttr
                 att1={att1}
                 att2={att2}
@@ -454,12 +482,12 @@ const handleClearFields = () => {
               />
             </Grid>
             {/* Change Quality */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <SelectQuality
                 quality={selectedQuality}
                 setQuality={(e) => {
                   const quality = qualities.find(
-                    (el) => el.name === e.target.value
+                    (el) => el.name === e.target.value,
                   );
                   setSelectedQuality(quality.name);
                   setQuality(quality.quality);
@@ -468,7 +496,7 @@ const handleClearFields = () => {
               />
             </Grid>
             {/* Change Bonus */}
-            <Grid  size={6}>
+            <Grid size={6}>
               <ChangeBonus
                 basePrec={base.prec}
                 precBonus={precBonus}
@@ -481,7 +509,7 @@ const handleClearFields = () => {
                 totalBonus={totalBonus}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <ChangeQuality
                 quality={quality}
                 setQuality={(e) => setQuality(e.target.value)}
@@ -503,28 +531,28 @@ const handleClearFields = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid  size={6}>
+                  <Grid size={6}>
                     <ChangeModifiers
                       label={"Damage Modifier"}
                       value={damageModifier}
                       onChange={(e) => setDamageModifier(e.target.value)}
                     />
                   </Grid>
-                  <Grid  size={6}>
+                  <Grid size={6}>
                     <ChangeModifiers
                       label={"Precision Modifier"}
                       value={precModifier}
                       onChange={(e) => setPrecModifier(e.target.value)}
                     />
                   </Grid>
-                  <Grid  size={6}>
+                  <Grid size={6}>
                     <ChangeModifiers
                       label={"DEF Modifier"}
                       value={defModifier}
                       onChange={(e) => setDefModifier(e.target.value)}
                     />
                   </Grid>
-                  <Grid  size={6}>
+                  <Grid size={6}>
                     <ChangeModifiers
                       label={"MDEF Modifier"}
                       value={mDefModifier}
@@ -534,12 +562,12 @@ const handleClearFields = () => {
                 </Grid>
               </AccordionDetails>
             </Accordion>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Grid container spacing={1} sx={{ alignItems: "center" }}>
-                <Grid >
+                <Grid>
                   <Button
                     variant="outlined"
                     onClick={() => fileInputRef.current.click()}
@@ -547,13 +575,13 @@ const handleClearFields = () => {
                     {t("Upload JSON")}
                   </Button>
                 </Grid>
-                <Grid >
+                <Grid>
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
                 {/* Rework */}
-                <Grid  size="grow">
+                <Grid size="grow">
                   <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
                 <input
@@ -575,7 +603,7 @@ const handleClearFields = () => {
                 />
               </Grid>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
             </Grid>
           </Grid>
@@ -583,8 +611,9 @@ const handleClearFields = () => {
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <PrettyWeapon
               weapon={{
                 base: base,
@@ -612,11 +641,7 @@ const handleClearFields = () => {
         </DialogContent>
         <DialogActions>
           {editWeaponIndex !== null && (
-            <Button
-              onClick={handleDelete}
-              color="error"
-              variant="contained"
-            >
+            <Button onClick={handleDelete} color="error" variant="contained">
               {t("Delete")}
             </Button>
           )}

@@ -31,7 +31,12 @@ import Layout from "../../components/Layout";
 import { useTheme } from "@mui/material/styles";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import SettingsDialog from "../../components/combatSim/SettingsDialog";
-import { Delete, /*DriveFileMove, FileCopy,*/ LibraryAddCheck, SportsMartialArts, KeyboardArrowUp } from "@mui/icons-material";
+import {
+  Delete,
+  /*DriveFileMove, FileCopy,*/ LibraryAddCheck,
+  SportsMartialArts,
+  KeyboardArrowUp,
+} from "@mui/icons-material";
 import { t } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import EncounterCard from "../../components/combatSim/EncounterCard";
@@ -79,7 +84,9 @@ const CombatSimEncounters = () => {
     try {
       const constraints =
         dbMode === "cloud" ? [db.where("uid", "==", cloudUser.uid)] : [];
-      const docs = await db.getDocs(db.query(db.collection("encounters"), ...constraints));
+      const docs = await db.getDocs(
+        db.query(db.collection("encounters"), ...constraints),
+      );
       setEncountersList(docs ?? []);
     } catch (e) {
       console.error("Error loading encounters:", e);
@@ -129,7 +136,7 @@ const CombatSimEncounters = () => {
   useEffect(() => {
     if (!loading && encountersList) {
       const sortedEncounters = [...encountersList].sort(
-        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
       );
       setEncounters(sortedEncounters);
     }
@@ -177,7 +184,8 @@ const CombatSimEncounters = () => {
     setEncounterName(event.target.value);
   };
 
-  const isAtCloudLimit = dbMode === "cloud" && encounters.length >= MAX_ENCOUNTERS;
+  const isAtCloudLimit =
+    dbMode === "cloud" && encounters.length >= MAX_ENCOUNTERS;
 
   const handleSaveEncounter = async () => {
     if (!encounterName || isAtCloudLimit) return;
@@ -208,13 +216,15 @@ const CombatSimEncounters = () => {
 
   const handleDeleteEncounter = async (id) => {
     const confirmDelete = await globalConfirm(
-      t("combat_sim_delete_encounter_confirm")
+      t("combat_sim_delete_encounter_confirm"),
     );
     if (!confirmDelete) return;
 
     try {
       await db.deleteDoc(db.doc("encounters", id));
-      setEncountersList((prev) => prev.filter((encounter) => encounter.id !== id));
+      setEncountersList((prev) =>
+        prev.filter((encounter) => encounter.id !== id),
+      );
       setEncounters((prev) => prev.filter((encounter) => encounter.id !== id));
       fetchEncounters();
       showNotification(t("combat_sim_encounter_deleted"));
@@ -244,22 +254,27 @@ const CombatSimEncounters = () => {
   const toggleSelectEncounter = (id) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
   const deleteSelectedEncounters = async () => {
     const confirmDelete = await globalConfirm(
-      `${t("combat_sim_delete_encounter_confirm")} (${selectedIds.size})`
+      `${t("combat_sim_delete_encounter_confirm")} (${selectedIds.size})`,
     );
     if (!confirmDelete) return;
     const idsToDelete = new Set(selectedIds);
     for (const id of idsToDelete) {
       await db.deleteDoc(db.doc("encounters", id));
     }
-    setEncountersList((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
-    setEncounters((prev) => prev.filter((encounter) => !idsToDelete.has(encounter.id)));
+    setEncountersList((prev) =>
+      prev.filter((encounter) => !idsToDelete.has(encounter.id)),
+    );
+    setEncounters((prev) =>
+      prev.filter((encounter) => !idsToDelete.has(encounter.id)),
+    );
     fetchEncounters();
     setSelectedIds(new Set());
   };
@@ -300,17 +315,22 @@ const CombatSimEncounters = () => {
         />
 
         <div style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <Typography variant="h6" gutterBottom sx={{
-            color: "text.primary"
-          }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              color: "text.primary",
+            }}
+          >
             {t("combat_sim_new_encounter")}
           </Typography>
           <Grid container spacing={2}>
             <Grid
               size={{
                 xs: 12,
-                sm: 8
-              }}>
+                sm: 8,
+              }}
+            >
               <TextField
                 label={t("combat_sim_encounter_name")}
                 variant="outlined"
@@ -320,15 +340,16 @@ const CombatSimEncounters = () => {
                 onChange={handleEncounterNameChange}
                 disabled={dbMode === "cloud" && !cloudUser}
                 slotProps={{
-                  htmlInput: { maxLength: 200 }
+                  htmlInput: { maxLength: 200 },
                 }}
               />
             </Grid>
             <Grid
               size={{
                 xs: 12,
-                sm: 4
-              }}>
+                sm: 4,
+              }}
+            >
               <Button
                 variant="contained"
                 color="primary"
@@ -346,8 +367,9 @@ const CombatSimEncounters = () => {
               mt: 2,
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center"
-            }}>
+              alignItems: "center",
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ToggleButtonGroup
                 value={dbMode}
@@ -365,9 +387,12 @@ const CombatSimEncounters = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
               {dbMode === "local" && <DriveSync />}
-              <Typography variant="h5" sx={{
-                color: "text.primary"
-              }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "text.primary",
+                }}
+              >
                 {t("combat_sim_saved_encounters")}{" "}
                 {dbMode === "cloud"
                   ? `(${encounters.length}/${MAX_ENCOUNTERS})`
@@ -375,7 +400,11 @@ const CombatSimEncounters = () => {
               </Typography>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Tooltip title={selectMode ? t("Exit Select Mode") : t("Select Encounters")}>
+              <Tooltip
+                title={
+                  selectMode ? t("Exit Select Mode") : t("Select Encounters")
+                }
+              >
                 <Button
                   variant={selectMode ? "contained" : "outlined"}
                   size="small"
@@ -398,10 +427,24 @@ const CombatSimEncounters = () => {
 
           {/* Select mode action bar */}
           <Collapse in={selectMode}>
-            <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mt: 0.75, pt: 0.75, borderTop: 1, borderColor: "divider" }}>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+                mt: 0.75,
+                pt: 0.75,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {selectedIds.size} {t("selected")}
               </Typography>
               <Box sx={{ flex: 1 }} />
@@ -410,7 +453,11 @@ const CombatSimEncounters = () => {
               {/* <Button size="small" variant="outlined" startIcon={<DriveFileMove />} onClick={(e) => setMoveAnchor(e.currentTarget)}>{t("Move")}</Button> */}
               <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
                 <span>
-                  <IconButton onClick={deleteSelectedEncounters} disabled={selectedIds.size === 0} color="error">
+                  <IconButton
+                    onClick={deleteSelectedEncounters}
+                    disabled={selectedIds.size === 0}
+                    color="error"
+                  >
                     <Delete />
                   </IconButton>
                 </span>
@@ -422,7 +469,16 @@ const CombatSimEncounters = () => {
       {dbMode === "cloud" && !cloudUser && (
         <Paper
           elevation={3}
-          sx={{ p: 2, mt: 2, mb: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap" }}
+          sx={{
+            p: 2,
+            mt: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
           <CloudIcon color="primary" />
           <Typography
@@ -430,8 +486,9 @@ const CombatSimEncounters = () => {
             sx={{
               color: "text.primary",
               flex: 1,
-              minWidth: 200
-            }}>
+              minWidth: 200,
+            }}
+          >
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
@@ -439,11 +496,14 @@ const CombatSimEncounters = () => {
       )}
       <Grid container spacing={3} sx={{ marginTop: 2 }}>
         {loading ? (
-          <Grid sx={{ display: "flex", justifyContent: "center", py: 4 }} size={12}>
+          <Grid
+            sx={{ display: "flex", justifyContent: "center", py: 4 }}
+            size={12}
+          >
             <CircularProgress color="primary" />
           </Grid>
         ) : encounters.length === 0 ? (
-          <Grid  size={12}>
+          <Grid size={12}>
             <Paper
               sx={{
                 p: 3,
@@ -453,14 +513,21 @@ const CombatSimEncounters = () => {
                 border: `1px dashed ${theme.palette.divider}`,
               }}
             >
-              <Typography variant="h6" gutterBottom sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("combat_sim_no_encounters")}
               </Typography>
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("combat_sim_create_first_encounter")}
               </Typography>
             </Paper>
@@ -472,8 +539,9 @@ const CombatSimEncounters = () => {
               size={{
                 xs: 12,
                 sm: 6,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <EncounterCard
                 encounter={encounter}
                 onDelete={handleDeleteEncounter}

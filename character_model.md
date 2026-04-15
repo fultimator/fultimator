@@ -3,22 +3,27 @@
 ## Fields
 
 ### `uid`
+
 - **Type:** String
 - **Description:** Unique identifier for the user.
 
 ### `id`
+
 - **Type:** String
 - **Description:** Unique identifier for the character.
 
 ### `name`
+
 - **Type:** String
 - **Description:** Name of the character.
 
 ### `lvl`
+
 - **Type:** Integer
 - **Description:** Level of the character.
 
 ### `info`
+
 - **Type:** Object
 - **Description:** Additional information about the character.
   - **`pronouns`**: String, Pronouns used for the character.
@@ -33,13 +38,14 @@
   - **`bonds`**: Array of Objects, Bonds the character has.
     - **`name`**: String, Name of the bond.
     - **`admiration`**: Boolean, Indicates if characters feels admiration for the bond.
-    - **`loyality`**: Boolean, Indicates if characters feels loyality for the bond. 
+    - **`loyality`**: Boolean, Indicates if characters feels loyality for the bond.
     - **`affection`**: Boolean, Indicates if characters feels affection for the bond.
     - **`inferiority`**: Boolean, Indicates if characters feels inferiority for the bond.
     - **`mistrust`**: Boolean, Indicates if characters feels mistrust for the bond.
     - **`hatred`**: Boolean, Indicates if characters feels hatred for the bond.
 
 ### `attributes`
+
 - **Type:** Object
 - **Description:** Attributes of the character.
   - **`dexterity`**: Integer, Dexterity of the character.
@@ -48,6 +54,7 @@
   - **`willpower`**: Integer, Willpower of the character.
 
 ### `stats`
+
 - **Type:** Object
 - **Description:** Stats of the character.
   - **`hp`**: Object, Hit points.
@@ -61,9 +68,10 @@
     - **`max`**: Integer, Maximum inventory points.
 
 ### `statuses`
+
 - **Type:** Object
 - **Description:** Status effects affecting the character.
-  - **`slow`**: Boolean, Indicates if the character is slowed. 
+  - **`slow`**: Boolean, Indicates if the character is slowed.
   - **`dazed`**: Boolean, Indicates if the character is dazed.
   - **`enraged`**: Boolean, Indicates if the character is enraged.
   - **`weak`**: Boolean, Indicates if the character is weak.
@@ -75,6 +83,7 @@
   - **`wlpUp`**: Boolean, Indicates if the character's willpower is increased.
 
 ### `modifiers`
+
 - **Type:** Object
 - **Description:** Various modifiers that affect the character's stats.
   - **`hp`**: Integer, Hit points modifier.
@@ -88,6 +97,7 @@
   - **`magicPrec`**: Integer, Magic precision modifier.
 
 ### `classes`
+
 - **Type:** Array of Objects
 - **Description:** Classes the character has.
   - **`name`**: String, Name of the class.
@@ -132,6 +142,7 @@
     - **`index`**: Integer, Index of the spell in the list.
 
 ### `weapons`
+
 - **Type:** Array of Objects
 - **Description:** List of weapons the character possesses.
   - **`base`**: Object, Reference of the base weapon.
@@ -146,7 +157,7 @@
     - **`martial`**: Boolean, Indicates if the base weapon is martial.
     - **`att1`**: String, Primary attribute used by the base weapon.
     - **`att2`**: String, Secondary attribute used by the base weapon.
-    - **`cost`**: Integer, Base cost of the weapon. 
+    - **`cost`**: Integer, Base cost of the weapon.
   - **`category`**: String, Category of the weapon.
   - **`name`**: String, Name of the weapon.
   - **`type`**: String, Type of damage dealt by the weapon.
@@ -170,6 +181,7 @@
   - **`isEquipped`**: Boolean, Indicates if the weapon is equipped.
 
 ### `armor`
+
 - **Type:** Array of Objects
 - **Description:** List of armor the character possesses.
   - **`base`**: Object, Base stats of the armor.
@@ -201,6 +213,7 @@
   - **`isEquipped`**: Boolean, Indicates if the armor is equipped.
 
 ### `shields`
+
 - **Type:** Array of Objects
 - **Description:** List of shields the character possesses.
   - **`base`**: Object, Base stats of the shield.
@@ -232,6 +245,7 @@
   - **`isEquipped`**: Boolean, Indicates if the shield is equipped.
 
 ### `accessories`
+
 - **Type:** Array of Objects
 - **Description:** List of accessories the character possesses.
   - **`name`**: String, Name of the accessory.
@@ -249,11 +263,13 @@
   - **`isEquipped`**: Boolean, Indicates if the accessory is equipped.
 
 ### `notes`
+
 - **Type:** Array of Objects
 - **Description:** Notes associated with the character.
   - **`name`**: String, Name of the note.
   - **`description`**: String, Description of the note.
 
 ### `published`
+
 - **Type:** Boolean
 - **Description:** Indicates whether the character has been published.

@@ -39,8 +39,8 @@ function ThemedSpellDefault({
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? '#ffffff' : '#000000';
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const iconColor = isDarkMode ? "#ffffff" : "#000000";
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   return (
     <>
@@ -67,7 +67,8 @@ function ThemedSpellDefault({
                 alignItems: "center",
                 justifyContent: "left",
               }}
-              size="grow">
+              size="grow"
+            >
               <Typography
                 variant="h3"
                 style={{ flexGrow: 1, marginRight: "5px" }}
@@ -81,7 +82,8 @@ function ThemedSpellDefault({
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              size={2}>
+              size={2}
+            >
               <Typography variant="h3">{t("MP")}</Typography>
             </Grid>
             <Grid
@@ -92,8 +94,9 @@ function ThemedSpellDefault({
               }}
               size={{
                 xs: 3,
-                sm: 4
-              }}>
+                sm: 4,
+              }}
+            >
               <Typography variant="h3">{t("Target")}</Typography>
             </Grid>
             <Grid
@@ -104,8 +107,9 @@ function ThemedSpellDefault({
               }}
               size={{
                 xs: 4,
-                sm: 3
-              }}>
+                sm: 3,
+              }}
+            >
               <Typography variant="h3">{t("Duration")}</Typography>
             </Grid>
           </Grid>
@@ -116,7 +120,8 @@ function ThemedSpellDefault({
                 alignItems: "center",
                 flexShrink: 0,
               }}
-              size="grow">
+              size="grow"
+            >
               <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
             </Grid>
           )}
@@ -141,13 +146,15 @@ function ThemedSpellDefault({
               alignItems: "center",
               justifyContent: "left",
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
                 fontWeight: "bold",
-                fontSize: { xs: "0.8rem", sm: "1rem" }
-              }}>
+                fontSize: { xs: "0.8rem", sm: "1rem" },
+              }}
+            >
               {isMagisphere && (
                 <Tooltip title={t("Magisphere")}>
                   <SettingsSuggest sx={{ fontSize: "1rem" }} />
@@ -162,10 +169,13 @@ function ThemedSpellDefault({
               alignItems: "center",
               justifyContent: "center",
             }}
-            size={2}>
-            <Typography sx={{
-              fontSize: { xs: "0.7rem", sm: "1rem" }
-            }}>
+            size={2}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "1rem" },
+              }}
+            >
               {mp}
               {maxTargets !== 1 ? " × " + t("T") : ""}
             </Typography>
@@ -178,11 +188,14 @@ function ThemedSpellDefault({
             }}
             size={{
               xs: 3,
-              sm: 4
-            }}>
-            <Typography sx={{
-              fontSize: { xs: "0.7rem", sm: "1rem" }
-            }}>
+              sm: 4,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "1rem" },
+              }}
+            >
               {targetDesc}
             </Typography>
           </Grid>
@@ -194,11 +207,14 @@ function ThemedSpellDefault({
             }}
             size={{
               xs: 4,
-              sm: 3
-            }}>
-            <Typography sx={{
-              fontSize: { xs: "0.7rem", sm: "1rem" }
-            }}>
+              sm: 3,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: "0.7rem", sm: "1rem" },
+              }}
+            >
               {duration}
             </Typography>
           </Grid>
@@ -206,7 +222,8 @@ function ThemedSpellDefault({
         {isEditMode && (
           <Grid
             style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow">
+            size="grow"
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
                 <Icon>
@@ -215,14 +232,15 @@ function ThemedSpellDefault({
               </Tooltip>
             )}
             <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color:  iconColor }} />
+              <Edit style={{ color: iconColor }} />
             </IconButton>
           </Grid>
         )}
       </div>
       {/* Row 3 */}
       <Grid
-        container sx={{
+        container
+        sx={{
           justifyContent: "flex-start",
           background: "transparent",
           padding: "3px 17px",
@@ -230,7 +248,7 @@ function ThemedSpellDefault({
           borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
-        <Grid  size={12}>
+        <Grid size={12}>
           <Typography component={"div"} sx={{ minHeight: "30px" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {description}
@@ -238,7 +256,7 @@ function ThemedSpellDefault({
           </Typography>
         </Grid>
         {isOffensive && (
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography
               variant="body1"
               style={{

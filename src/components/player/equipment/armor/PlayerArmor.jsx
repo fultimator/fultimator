@@ -96,20 +96,30 @@ export default function PlayerArmor({
           {/* map the weapons and display them with a PrettyWeapon component if they exist */}
           {armor.map((armorItem, index) => (
             <React.Fragment key={index}>
-              <Grid  sx={{ mb: 2 }} size={12}>
+              <Grid sx={{ mb: 2 }} size={12}>
                 <Box>
                   <PrettyArmor armor={armorItem} />
                 </Box>
 
-                <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mt: 0.25 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    mt: 0.25,
+                  }}
+                >
                   {isEditMode && (
                     <Tooltip title={t("Edit")}>
-                      <IconButton onClick={() => onEditArmor(index)} size="small">
+                      <IconButton
+                        onClick={() => onEditArmor(index)}
+                        size="small"
+                      >
                         <Edit fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   )}
-                  
+
                   <Box sx={{ ml: 0.5 }}>
                     {checkIfEquippable(armorItem) ? (
                       <Tooltip
@@ -121,14 +131,19 @@ export default function PlayerArmor({
                       >
                         <span>
                           <Badge
-                          badgeContent="E"
-                          color="primary"
-                          invisible={!armorItem.isEquipped}
-                          sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}
+                            badgeContent="E"
+                            color="primary"
+                            invisible={!armorItem.isEquipped}
+                            sx={{
+                              "& .MuiBadge-badge": {
+                                fontSize: "0.6rem",
+                                height: 14,
+                                minWidth: 14,
+                              },
+                            }}
                           >
                             <IconButton
                               onClick={() => onEquipArmor(index)}
-
                               disabled={!isEditMode}
                               size="small"
                               sx={{
@@ -142,7 +157,7 @@ export default function PlayerArmor({
                                 },
                                 transition: "background-color 0.3s",
                                 p: 0.5,
-                                border: `1px solid ${theme.palette.divider}`
+                                border: `1px solid ${theme.palette.divider}`,
                               }}
                             >
                               <Equip

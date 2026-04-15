@@ -36,10 +36,10 @@ export default function EditClassNameModal({
             width: { xs: "80%", md: "40%" },
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold"}}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Edit Class Name")}
       </DialogTitle>
       <IconButton
@@ -61,7 +61,7 @@ export default function EditClassNameModal({
           value={className}
           onChange={(e) => setClassName(e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </DialogContent>

@@ -43,7 +43,7 @@ export default function SelectCompanionModal({
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -62,8 +62,14 @@ export default function SelectCompanionModal({
         <Close />
       </IconButton>
       <DialogContent>
-        <Typography>{t("List of Companions created in the NPC Designer.")}</Typography>
-        <Typography>{t("If you changed your Companion in the NPC Designer, select it again.")}</Typography>
+        <Typography>
+          {t("List of Companions created in the NPC Designer.")}
+        </Typography>
+        <Typography>
+          {t(
+            "If you changed your Companion in the NPC Designer, select it again.",
+          )}
+        </Typography>
         <Autocomplete
           options={companionList}
           getOptionLabel={(option) => option.name}

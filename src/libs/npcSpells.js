@@ -13,7 +13,7 @@ export const npcSpells = [
     target: t("Special"),
     duration: t("Instantaneous"),
     effect: t("AreaStatus_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -27,7 +27,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("Breath_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -41,7 +41,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("Curse_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -55,7 +55,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("CurseXL_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -69,7 +69,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("CursedBreath_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -83,7 +83,7 @@ export const npcSpells = [
     target: t("Special"),
     duration: t("Instantaneous"),
     effect: t("Devastation_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -97,7 +97,7 @@ export const npcSpells = [
     target: t("Self"),
     duration: t("Instantaneous"),
     effect: t("LickWounds_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -111,7 +111,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("LifeTheft_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -125,7 +125,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("MindTheft_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -139,7 +139,7 @@ export const npcSpells = [
     target: t("Up to three creatures"),
     duration: t("Instantaneous"),
     effect: t("Poison_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -153,7 +153,7 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Instantaneous"),
     effect: t("Quicken_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -167,7 +167,7 @@ export const npcSpells = [
     target: t("Up to three creatures"),
     duration: t("Instantaneous"),
     effect: t("Rage_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -181,7 +181,7 @@ export const npcSpells = [
     target: t("Self"),
     duration: t("Scene"),
     effect: t("Shell_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -195,7 +195,7 @@ export const npcSpells = [
     target: t("Up to three creatures"),
     duration: t("Scene"),
     effect: t("WarCry_desc", true),
-    special: []
+    special: [],
   },
   {
     itemType: "spell",
@@ -209,6 +209,6 @@ export const npcSpells = [
     target: t("One creature"),
     duration: t("Scene"),
     effect: t("Weaken_desc", true),
-    special: []
+    special: [],
   },
 ];

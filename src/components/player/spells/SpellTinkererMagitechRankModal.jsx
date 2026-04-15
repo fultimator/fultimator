@@ -31,11 +31,15 @@ export default function SpellTinkererMagitechRankModal({
   const [selectedRank, setSelectedRank] = useState(magitech?.rank || 1);
   const [spellName, setSpellName] = useState(magitech?.spellName || "");
   const [showInPlayerSheet, setShowInPlayerSheet] = useState(
-    magitech?.showInPlayerSheet !== false
+    magitech?.showInPlayerSheet !== false,
   );
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
 
   // Update state if magitech prop changes
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function SpellTinkererMagitechRankModal({
       showInPlayerSheet: showInPlayerSheet,
     });
   };
-return (
+  return (
     <Dialog
       open={open}
       onClose={onClose}
@@ -64,7 +68,7 @@ return (
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -90,7 +94,7 @@ return (
           onChange={(e) => setSpellName(e.target.value)}
           margin="normal"
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
         <FormControl fullWidth sx={{ mt: 2 }}>

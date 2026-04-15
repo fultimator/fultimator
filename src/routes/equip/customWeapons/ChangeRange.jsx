@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { range } from "./libs.jsx";
 

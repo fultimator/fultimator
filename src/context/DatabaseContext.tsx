@@ -1,15 +1,13 @@
-import {
-  useState,
-  useEffect,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase";
 import { IS_ELECTRON } from "../platform";
 import { CloudAdapter } from "../adapters/CloudAdapter";
 import { LocalAdapter } from "../adapters/LocalAdapter";
-import { DatabaseContext, type DatabaseContextValue } from "./useDatabaseContext";
+import {
+  DatabaseContext,
+  type DatabaseContextValue,
+} from "./useDatabaseContext";
 import type { DbMode } from "../types/Database";
 
 const DB_MODE_KEY = "fultimator_db_mode";
@@ -54,7 +52,8 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const localAdapter = useMemo(() => LocalAdapter, []);
 
   const activeAdapter = dbMode === "cloud" ? cloudAdapter : localAdapter;
-  const activeUid = dbMode === "cloud" && cloudUser ? cloudUser.uid : "local-user";
+  const activeUid =
+    dbMode === "cloud" && cloudUser ? cloudUser.uid : "local-user";
 
   const value = useMemo<DatabaseContextValue>(
     () => ({
@@ -69,7 +68,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
       activeAdapter,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dbMode, cloudUser, authLoading, activeUid, activeAdapter]
+    [dbMode, cloudUser, authLoading, activeUid, activeAdapter],
   );
 
   return (

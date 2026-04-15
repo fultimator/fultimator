@@ -42,8 +42,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -63,11 +70,12 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
 
   const others = (player.others ?? [])
     .filter((o) => o?.name)
-    .filter((other) =>
-      !normalizedQuery ||
-      other.name?.toLowerCase().includes(normalizedQuery) ||
-      other.description?.toLowerCase().includes(normalizedQuery) ||
-      other.effect?.toLowerCase().includes(normalizedQuery)
+    .filter(
+      (other) =>
+        !normalizedQuery ||
+        other.name?.toLowerCase().includes(normalizedQuery) ||
+        other.description?.toLowerCase().includes(normalizedQuery) ||
+        other.effect?.toLowerCase().includes(normalizedQuery),
     );
   if (others.length === 0) return null;
 
@@ -145,7 +153,13 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                 <TableRow>
                   <StyledTableCell sx={{ width: 36 }}>
                     {hasDetails ? (
-                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleRow('others', otherKey); }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow("others", otherKey);
+                        }}
+                      >
                         {isOpen ? (
                           <KeyboardArrowUp fontSize="small" />
                         ) : (
@@ -162,8 +176,15 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('others', otherKey); }}
-                    sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (hasDetails) toggleRow("others", otherKey);
+                    }}
+                    sx={{
+                      cursor: hasDetails ? "pointer" : "default",
+                      minWidth: { xs: 60, sm: 100 },
+                      wordBreak: "break-word",
+                    }}
                   >
                     <Typography
                       variant="body2"
@@ -171,13 +192,24 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                         fontWeight: "bold",
                         textTransform: "uppercase",
                         wordBreak: "break-word",
-                        overflowWrap: "break-word"
-                      }}>
+                        overflowWrap: "break-word",
+                      }}
+                    >
                       {highlightMatch(other.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
-                  <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                  <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 55, sm: 80 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCell
+                    sx={{
+                      width: { xs: 65, sm: 90 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
                   <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
                 </TableRow>
                 {/* Clock row */}
@@ -197,19 +229,39 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                         {t("Clock")}
                       </Typography>
                     </StyledTableCell>
-                    <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' }, textAlign: "center" }}>
+                    <StyledTableCell
+                      sx={{
+                        width: { xs: 55, sm: 80 },
+                        display: { xs: "none", sm: "table-cell" },
+                        textAlign: "center",
+                      }}
+                    >
                       <Typography
                         variant="body2"
                         sx={{
                           fontSize: "0.8rem",
-                          fontWeight: "bold"
-                        }}>
+                          fontWeight: "bold",
+                        }}
+                      >
                         {filled}/{sections}
                       </Typography>
                     </StyledTableCell>
-                    <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                    <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
-                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                    <StyledTableCell
+                      sx={{
+                        width: { xs: 65, sm: 90 },
+                        display: { xs: "none", sm: "table-cell" },
+                      }}
+                    />
+                    <StyledTableCell
+                      sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                        }}
+                      >
                         <IconButton
                           size="small"
                           disabled={filled === 0}
@@ -246,12 +298,19 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 2, py: 1 }}>
                           {other.description && (
-                            <NotesMarkdown sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
-                              {highlightMarkdownText(other.description, searchQuery)}
+                            <NotesMarkdown
+                              sx={{ fontSize: "0.85rem", fontStyle: "italic" }}
+                            >
+                              {highlightMarkdownText(
+                                other.description,
+                                searchQuery,
+                              )}
                             </NotesMarkdown>
                           )}
                           {other.effect && (
-                            <NotesMarkdown sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                            <NotesMarkdown
+                              sx={{ fontSize: "0.85rem", mt: 0.5 }}
+                            >
                               {highlightMarkdownText(other.effect, searchQuery)}
                             </NotesMarkdown>
                           )}

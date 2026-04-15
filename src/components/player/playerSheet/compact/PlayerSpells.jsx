@@ -1,6 +1,28 @@
 import React, { useState } from "react";
-import { Paper, Typography, Box, Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Collapse, IconButton, Tooltip, Menu, MenuItem } from "@mui/material";
-import { KeyboardArrowDown, KeyboardArrowUp, MoreVert, Edit, Add, Search } from "@mui/icons-material";
+import {
+  Paper,
+  Typography,
+  Box,
+  Table,
+  TableHead,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Collapse,
+  IconButton,
+  Tooltip,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import {
+  KeyboardArrowDown,
+  KeyboardArrowUp,
+  MoreVert,
+  Edit,
+  Add,
+  Search,
+} from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
@@ -41,7 +63,10 @@ import GourmetInventoryTab from "../../spells/sections/GourmetInventoryTab";
 import GourmetCookingTab from "../../spells/sections/GourmetCookingTab";
 import GambleGeneralSection from "../../spells/sections/GambleGeneralSection";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
-import classList, { tinkererAlchemy, tinkererInfusion } from "../../../../libs/classes";
+import classList, {
+  tinkererAlchemy,
+  tinkererInfusion,
+} from "../../../../libs/classes";
 import SpellTinkererMagitechRankModal from "../../spells/SpellTinkererMagitechRankModal";
 
 // Styled Components
@@ -166,12 +191,18 @@ function createBlankSpellForType(spellType) {
     };
   }
 
-  if (spellType === "magichant") return { spellType, showInPlayerSheet: true, keys: [], tones: [] };
-  if (spellType === "symbol") return { spellType, showInPlayerSheet: true, symbols: [] };
-  if (spellType === "dance") return { spellType, showInPlayerSheet: true, dances: [] };
-  if (spellType === "gift") return { spellType, showInPlayerSheet: true, gifts: [], clock: 0 };
-  if (spellType === "therioform") return { spellType, showInPlayerSheet: true, therioforms: [] };
-  if (spellType === "pilot-vehicle") return { spellType, showInPlayerSheet: true, vehicles: [] };
+  if (spellType === "magichant")
+    return { spellType, showInPlayerSheet: true, keys: [], tones: [] };
+  if (spellType === "symbol")
+    return { spellType, showInPlayerSheet: true, symbols: [] };
+  if (spellType === "dance")
+    return { spellType, showInPlayerSheet: true, dances: [] };
+  if (spellType === "gift")
+    return { spellType, showInPlayerSheet: true, gifts: [], clock: 0 };
+  if (spellType === "therioform")
+    return { spellType, showInPlayerSheet: true, therioforms: [] };
+  if (spellType === "pilot-vehicle")
+    return { spellType, showInPlayerSheet: true, vehicles: [] };
   if (spellType === "magiseed") {
     return {
       spellType,
@@ -182,13 +213,31 @@ function createBlankSpellForType(spellType) {
       gardenDescription: "",
     };
   }
-  if (spellType === "cooking") return { spellType, spellName: "Cookbook", cookbookEffects: [], showInPlayerSheet: true };
-  if (spellType === "invocation") return { spellType, spellName: "Invocation", invocations: [], activeWellsprings: [], showInPlayerSheet: true };
+  if (spellType === "cooking")
+    return {
+      spellType,
+      spellName: "Cookbook",
+      cookbookEffects: [],
+      showInPlayerSheet: true,
+    };
+  if (spellType === "invocation")
+    return {
+      spellType,
+      spellName: "Invocation",
+      invocations: [],
+      activeWellsprings: [],
+      showInPlayerSheet: true,
+    };
   if (spellType === "deck") {
     return {
       spellType: "deck",
       spellName: "Ace of Cards Deck",
-      suitConfiguration: { Air: "air", Earth: "earth", Fire: "fire", Ice: "ice" },
+      suitConfiguration: {
+        Air: "air",
+        Earth: "earth",
+        Fire: "fire",
+        Ice: "ice",
+      },
       cardsInDeck: 30,
       hand: [],
       discardPile: [],
@@ -223,71 +272,213 @@ function collectStringValues(value, bag = []) {
 function getSpellModalSections(spellType) {
   const sectionMap = {
     default: [
-      { id: "general", title: "settings", component: DefaultSpellSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: DefaultSpellSection,
+        props: {},
+      },
     ],
     magiseed: [
-      { id: "general", title: "settings", component: MagiseedGeneralSection, props: {} },
-      { id: "content", title: "content", component: MagiseedContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: MagiseedGeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: MagiseedContentSection,
+        props: {},
+      },
     ],
     gift: [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
-      { id: "content", title: "content", component: GiftContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: GiftContentSection,
+        props: {},
+      },
     ],
     dance: [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
-      { id: "content", title: "content", component: DancerContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: DancerContentSection,
+        props: {},
+      },
     ],
     symbol: [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
-      { id: "content", title: "content", component: SymbolistContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: SymbolistContentSection,
+        props: {},
+      },
     ],
     therioform: [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
-      { id: "content", title: "content", component: MutantContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: MutantContentSection,
+        props: {},
+      },
     ],
     "pilot-vehicle": [
-      { id: "general", title: "settings", component: PilotGeneralSection, props: {} },
-      { id: "content", title: "content", component: PilotContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: PilotGeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: PilotContentSection,
+        props: {},
+      },
     ],
     invocation: [
-      { id: "general", title: "settings", component: InvokerGeneralSection, props: {} },
-      { id: "content", title: "content", component: InvokerContentSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: InvokerGeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: InvokerContentSection,
+        props: {},
+      },
     ],
     cooking: [
-      { id: "general", title: "settings", component: GourmetGeneralSection, props: {} },
-      { id: "content", title: "content", component: GourmetContentSection, props: {} },
-      { id: "inventory", title: "inventory", component: GourmetInventoryTab, props: {} },
-      { id: "cooking", title: "cooking", component: GourmetCookingTab, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GourmetGeneralSection,
+        props: {},
+      },
+      {
+        id: "content",
+        title: "content",
+        component: GourmetContentSection,
+        props: {},
+      },
+      {
+        id: "inventory",
+        title: "inventory",
+        component: GourmetInventoryTab,
+        props: {},
+      },
+      {
+        id: "cooking",
+        title: "cooking",
+        component: GourmetCookingTab,
+        props: {},
+      },
     ],
     gamble: [
-      { id: "general", title: "settings", component: GambleGeneralSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GambleGeneralSection,
+        props: {},
+      },
     ],
     magichant: [
-      { id: "keys", title: "magichant_edit_keys_button", component: MagichantKeysContentSection, props: {} },
-      { id: "tones", title: "magichant_edit_tones_button", component: MagichantTonesContentSection, props: {} },
-      { id: "general", title: "magichant_settings_button", component: GeneralSection, props: { customFields: [] } },
+      {
+        id: "keys",
+        title: "magichant_edit_keys_button",
+        component: MagichantKeysContentSection,
+        props: {},
+      },
+      {
+        id: "tones",
+        title: "magichant_edit_tones_button",
+        component: MagichantTonesContentSection,
+        props: {},
+      },
+      {
+        id: "general",
+        title: "magichant_settings_button",
+        component: GeneralSection,
+        props: { customFields: [] },
+      },
     ],
     deck: [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
     ],
     arcanist: [
-      { id: "general", title: "settings", component: ArcanistGeneralSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: ArcanistGeneralSection,
+        props: {},
+      },
     ],
     "arcanist-rework": [
-      { id: "general", title: "settings", component: ArcanistGeneralSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: ArcanistGeneralSection,
+        props: {},
+      },
     ],
   };
 
   // Handle tinkerer types
   if (spellType?.startsWith("tinkerer-")) {
     return [
-      { id: "general", title: "settings", component: GeneralSection, props: {} },
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
     ];
   }
 
-  return sectionMap[spellType] || [
-    { id: "general", title: "settings", component: GeneralSection, props: {} },
-  ];
+  return (
+    sectionMap[spellType] || [
+      {
+        id: "general",
+        title: "settings",
+        component: GeneralSection,
+        props: {},
+      },
+    ]
+  );
 }
 
 function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
@@ -340,12 +531,17 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
         />
       );
     default:
-      if (spell.spellType?.startsWith("tinkerer-")) return <SpellGadget spell={spell} />;
+      if (spell.spellType?.startsWith("tinkerer-"))
+        return <SpellGadget spell={spell} />;
       return null;
   }
 }
 
-export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }) {
+export default function PlayerSpellsFull({
+  player,
+  setPlayer,
+  searchQuery = "",
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -399,10 +595,14 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
   };
 
   const getClassSpellTypes = (cls) => {
-    const direct = Array.isArray(cls?.benefits?.spellClasses) ? cls.benefits.spellClasses : [];
+    const direct = Array.isArray(cls?.benefits?.spellClasses)
+      ? cls.benefits.spellClasses
+      : [];
     if (direct.length > 0) return direct;
     const base = classList.find((baseClass) => baseClass.name === cls?.name);
-    return Array.isArray(base?.benefits?.spellClasses) ? base.benefits.spellClasses : [];
+    return Array.isArray(base?.benefits?.spellClasses)
+      ? base.benefits.spellClasses
+      : [];
   };
 
   const canAddSpellTypeToClass = (cls, spellType) => {
@@ -439,7 +639,9 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
   const addSubItemToSingletonSpell = (classIndex, spellType, subType) => {
     const cls = player.classes?.[classIndex];
     if (!cls) return;
-    const spellIndex = (cls.spells || []).findIndex((spell) => spell.spellType === spellType);
+    const spellIndex = (cls.spells || []).findIndex(
+      (spell) => spell.spellType === spellType,
+    );
     if (spellIndex < 0) return;
 
     const addByType = {
@@ -557,11 +759,16 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
 
   const getSpellTypeDisplayName = (spellType) => {
     switch (spellType) {
-      case "default": return t("Spell");
-      case "arcanist": return t("Arcanist");
-      case "arcanist-rework": return t("Arcanist-Rework");
-      case "pilot-vehicle": return t("Pilot Vehicle");
-      default: return t(spellType);
+      case "default":
+        return t("Spell");
+      case "arcanist":
+        return t("Arcanist");
+      case "arcanist-rework":
+        return t("Arcanist-Rework");
+      case "pilot-vehicle":
+        return t("Pilot Vehicle");
+      default:
+        return t(spellType);
     }
   };
 
@@ -570,7 +777,9 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
     const actions = [];
 
     spellTypes.forEach((spellType) => {
-      const existingIndex = (cls.spells || []).findIndex((spell) => spell.spellType === spellType);
+      const existingIndex = (cls.spells || []).findIndex(
+        (spell) => spell.spellType === spellType,
+      );
       const hasExisting = existingIndex >= 0;
 
       if (!hasExisting || !SINGLE_INSTANCE_SPELL_TYPES.has(spellType)) {
@@ -586,17 +795,28 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
         actions.push({
           id: "magichant-key",
           label: t("magichant_add_key"),
-          onClick: () => addSubItemToSingletonSpell(classIndex, "magichant", "key"),
+          onClick: () =>
+            addSubItemToSingletonSpell(classIndex, "magichant", "key"),
         });
         actions.push({
           id: "magichant-tone",
           label: t("magichant_add_tone"),
-          onClick: () => addSubItemToSingletonSpell(classIndex, "magichant", "tone"),
+          onClick: () =>
+            addSubItemToSingletonSpell(classIndex, "magichant", "tone"),
         });
         return;
       }
 
-      if (["pilot-vehicle", "symbol", "dance", "gift", "therioform", "magiseed"].includes(spellType)) {
+      if (
+        [
+          "pilot-vehicle",
+          "symbol",
+          "dance",
+          "gift",
+          "therioform",
+          "magiseed",
+        ].includes(spellType)
+      ) {
         const labelMap = {
           "pilot-vehicle": t("pilot_vehicles_add"),
           symbol: t("Add Symbol"),
@@ -607,7 +827,9 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
         };
         actions.push({
           id: `${spellType}-content`,
-          label: labelMap[spellType] || `${t("Add")} ${getSpellTypeDisplayName(spellType)}`,
+          label:
+            labelMap[spellType] ||
+            `${t("Add")} ${getSpellTypeDisplayName(spellType)}`,
           onClick: () => addSubItemToSingletonSpell(classIndex, spellType),
         });
       }
@@ -708,12 +930,15 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
     return {
       ...cloned,
       showInPlayerSheet:
-        cloned.showInPlayerSheet === undefined ? true : cloned.showInPlayerSheet,
+        cloned.showInPlayerSheet === undefined
+          ? true
+          : cloned.showInPlayerSheet,
     };
   };
 
   const handleImportFromCompendium = (item, selectedType) => {
-    if (importTargetClassIndex === null || selectedType !== "player-spells") return;
+    if (importTargetClassIndex === null || selectedType !== "player-spells")
+      return;
     const classRef = player.classes?.[importTargetClassIndex];
     if (!classRef) return;
     if (!canAddSpellTypeToClass(classRef, item?.spellType)) return;
@@ -726,21 +951,23 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
       classes: prev.classes.map((cls, index) =>
         index === importTargetClassIndex
           ? { ...cls, spells: [...(cls.spells || []), imported] }
-          : cls
+          : cls,
       ),
     }));
   };
 
   const highlightMatch = (text, query) => {
     if (!query) return text;
-    const regex = new RegExp(`(${query})`, 'ig');
+    const regex = new RegExp(`(${query})`, "ig");
     const parts = String(text).split(regex);
     return parts.map((part, idx) =>
       regex.test(part) ? (
-        <span key={idx} style={{ backgroundColor: 'yellow' }}>{part}</span>
+        <span key={idx} style={{ backgroundColor: "yellow" }}>
+          {part}
+        </span>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -760,143 +987,267 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
   const getSpellName = (spell) => {
     const name = spell.name || spell.spellName;
     if (name && name !== t("Unnamed Spell")) return name;
-    
-    switch(spell.spellType) {
-      case "magiseed": return t("magiseed_garden");
-      case "cooking": return t("Gourmet");
-      case "invocation": return t("Invoker");
-      case "deck": return t("ace_deck_management");
-      case "tinkerer-alchemy": return t("Alchemy");
-      case "tinkerer-infusion": return t("Infusion");
-      case "tinkerer-magitech": return t("Magitech");
-      case "magichant": return t("Magichant");
-      case "symbol": return t("Symbol");
-      case "dance": return t("Dance");
-      case "gift": return t("Gift");
-      case "therioform": return t("Therioform");
-      case "pilot-vehicle": return t("Pilot Vehicle");
-      case "arcanist": return t("Arcanist");
-      case "arcanist-rework": return t("Arcanist-Rework");
-      default: return t("Unnamed Spell");
+
+    switch (spell.spellType) {
+      case "magiseed":
+        return t("magiseed_garden");
+      case "cooking":
+        return t("Gourmet");
+      case "invocation":
+        return t("Invoker");
+      case "deck":
+        return t("ace_deck_management");
+      case "tinkerer-alchemy":
+        return t("Alchemy");
+      case "tinkerer-infusion":
+        return t("Infusion");
+      case "tinkerer-magitech":
+        return t("Magitech");
+      case "magichant":
+        return t("Magichant");
+      case "symbol":
+        return t("Symbol");
+      case "dance":
+        return t("Dance");
+      case "gift":
+        return t("Gift");
+      case "therioform":
+        return t("Therioform");
+      case "pilot-vehicle":
+        return t("Pilot Vehicle");
+      case "arcanist":
+        return t("Arcanist");
+      case "arcanist-rework":
+        return t("Arcanist-Rework");
+      default:
+        return t("Unnamed Spell");
     }
   };
 
   if (!player.classes?.length) return null;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {player.classes
-        .map((c, classIndex) => {
-          const spellsInClass = c.spells
-            .map(s => ({ ...s, className: c.name }))
-            .filter(spell => (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined));
-          
-          const filteredSpells = filterSpells(spellsInClass, searchQuery);
-          const addActions = getAddActionsForClass(c, classIndex);
-          const addDisabled = addActions.length === 0;
-          
-          if (filteredSpells.length === 0) return null;
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {player.classes.map((c, classIndex) => {
+        const spellsInClass = c.spells
+          .map((s) => ({ ...s, className: c.name }))
+          .filter(
+            (spell) =>
+              spell.showInPlayerSheet || spell.showInPlayerSheet === undefined,
+          );
 
-          return (
-            <TableContainer key={classIndex} component={Paper} sx={{ overflowX: "auto" }}>
-              <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
-                <TableHead>
-                  <TableRow sx={{ background: theme.primary }}>
-                    <StyledTableCellHeader sx={{ width: 36 }} />
-                    <StyledTableCellHeader>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Typography variant="h4" sx={{ textTransform: "uppercase", color: "white" }}>
-                          {t("Spells") + " - " + t(c.name)}
-                        </Typography>
-                      </Box>
-                    </StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                    <StyledTableCellHeader sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                    <StyledTableCellHeader sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
-                      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 0.5 }}>
-                        <Tooltip title={addDisabled ? t("Cannot add more of this spell type") : t("Add New Spell")}>
-                          <span>
-                            <IconButton
-                              size="small"
-                              onClick={(event) => handleOpenAddMenu(event, classIndex)}
-                              disabled={addDisabled}
-                              sx={{ color: "#fff", p: 0 }}
-                            >
-                              <Add fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title={t("Search Compendium")}>
+        const filteredSpells = filterSpells(spellsInClass, searchQuery);
+        const addActions = getAddActionsForClass(c, classIndex);
+        const addDisabled = addActions.length === 0;
+
+        if (filteredSpells.length === 0) return null;
+
+        return (
+          <TableContainer
+            key={classIndex}
+            component={Paper}
+            sx={{ overflowX: "auto" }}
+          >
+            <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+              <TableHead>
+                <TableRow sx={{ background: theme.primary }}>
+                  <StyledTableCellHeader sx={{ width: 36 }} />
+                  <StyledTableCellHeader>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography
+                        variant="h4"
+                        sx={{ textTransform: "uppercase", color: "white" }}
+                      >
+                        {t("Spells") + " - " + t(c.name)}
+                      </Typography>
+                    </Box>
+                  </StyledTableCellHeader>
+                  <StyledTableCellHeader
+                    sx={{
+                      width: { xs: 55, sm: 80 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCellHeader
+                    sx={{
+                      width: { xs: 65, sm: 90 },
+                      display: { xs: "none", sm: "table-cell" },
+                    }}
+                  />
+                  <StyledTableCellHeader
+                    sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                        gap: 0.5,
+                      }}
+                    >
+                      <Tooltip
+                        title={
+                          addDisabled
+                            ? t("Cannot add more of this spell type")
+                            : t("Add New Spell")
+                        }
+                      >
+                        <span>
                           <IconButton
                             size="small"
-                            onClick={() => handleOpenImportModal(classIndex)}
+                            onClick={(event) =>
+                              handleOpenAddMenu(event, classIndex)
+                            }
+                            disabled={addDisabled}
                             sx={{ color: "#fff", p: 0 }}
                           >
-                            <Search fontSize="small" />
+                            <Add fontSize="small" />
                           </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </StyledTableCellHeader>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredSpells.map((spell, spellIndex) => {
-                    const spellKey = `spell-${classIndex}-${spellIndex}`;
-                    const spellName = getSpellName(spell, t);
-                    
-                    return (
-                      <React.Fragment key={spellKey}>
-                        <TableRow sx={{ backgroundColor: openRows.spells[spellKey] ? 'rgba(0,0,0,0.02)' : 'inherit' }}>
-                          <StyledTableCell sx={{ width: 36 }}>
-                            <IconButton onClick={(e) => { e.stopPropagation(); toggleRow('spells', spellKey); }} size="small" sx={{ p: 0.5 }}>
-                              {openRows.spells[spellKey] ? <KeyboardArrowUp fontSize="small" /> : <KeyboardArrowDown fontSize="small" />}
-                            </IconButton>
-                          </StyledTableCell>
-                          <StyledTableCell onClick={(e) => { e.stopPropagation(); toggleRow('spells', spellKey); }} sx={{ cursor: "pointer", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}>
-                            <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0.5 }}>
-                              <Typography variant="body2" sx={{ fontWeight: "bold", mr: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' }, wordBreak: "break-word", overflowWrap: "break-word" }}>
-                                {highlightMatch(spellName, searchQuery)}
-                              </Typography>
-                              <Tooltip title={t("Spell")}>
-                                <MoreVert sx={{ color: theme.secondary, fontSize: '1rem' }} />
-                              </Tooltip>
-                            </Box>
-                          </StyledTableCell>
-                          <StyledTableCell sx={{ width: { xs: 55, sm: 80 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                          <StyledTableCell sx={{ width: { xs: 65, sm: 90 }, display: { xs: 'none', sm: 'table-cell' } }} />
-                          <StyledTableCell sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}>
-                            <Tooltip title={t("Edit")}>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditSpell(spell, spellIndex, classIndex);
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("Search Compendium")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenImportModal(classIndex)}
+                          sx={{ color: "#fff", p: 0 }}
+                        >
+                          <Search fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </StyledTableCellHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredSpells.map((spell, spellIndex) => {
+                  const spellKey = `spell-${classIndex}-${spellIndex}`;
+                  const spellName = getSpellName(spell, t);
+
+                  return (
+                    <React.Fragment key={spellKey}>
+                      <TableRow
+                        sx={{
+                          backgroundColor: openRows.spells[spellKey]
+                            ? "rgba(0,0,0,0.02)"
+                            : "inherit",
+                        }}
+                      >
+                        <StyledTableCell sx={{ width: 36 }}>
+                          <IconButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleRow("spells", spellKey);
+                            }}
+                            size="small"
+                            sx={{ p: 0.5 }}
+                          >
+                            {openRows.spells[spellKey] ? (
+                              <KeyboardArrowUp fontSize="small" />
+                            ) : (
+                              <KeyboardArrowDown fontSize="small" />
+                            )}
+                          </IconButton>
+                        </StyledTableCell>
+                        <StyledTableCell
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleRow("spells", spellKey);
+                          }}
+                          sx={{
+                            cursor: "pointer",
+                            minWidth: { xs: 60, sm: 100 },
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              flexWrap: "wrap",
+                              gap: 0.5,
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontWeight: "bold",
+                                mr: 0.5,
+                                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                                wordBreak: "break-word",
+                                overflowWrap: "break-word",
+                              }}
+                            >
+                              {highlightMatch(spellName, searchQuery)}
+                            </Typography>
+                            <Tooltip title={t("Spell")}>
+                              <MoreVert
+                                sx={{
+                                  color: theme.secondary,
+                                  fontSize: "1rem",
                                 }}
-                                sx={{ p: 0.5 }}
-                              >
-                                <Edit fontSize="small" />
-                              </IconButton>
+                              />
                             </Tooltip>
-                          </StyledTableCell>
-                        </TableRow>
-                        
-                        <TableRow>
-                          <StyledTableCell colSpan={5} sx={{ p: 0 }}>
-                            <Collapse in={openRows.spells[spellKey]} timeout="auto" unmountOnExit>
-                              <Box sx={{ p: 1, ml: { xs: 1, sm: 4 } }}>
-                                {renderSpellContent(spell, setPlayer, searchQuery, highlightMatch)}
-                              </Box>
-                            </Collapse>
-                          </StyledTableCell>
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          );
-        })}
+                          </Box>
+                        </StyledTableCell>
+                        <StyledTableCell
+                          sx={{
+                            width: { xs: 55, sm: 80 },
+                            display: { xs: "none", sm: "table-cell" },
+                          }}
+                        />
+                        <StyledTableCell
+                          sx={{
+                            width: { xs: 65, sm: 90 },
+                            display: { xs: "none", sm: "table-cell" },
+                          }}
+                        />
+                        <StyledTableCell
+                          sx={{
+                            width: { xs: 110, sm: 110 },
+                            textAlign: "right",
+                          }}
+                        >
+                          <Tooltip title={t("Edit")}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditSpell(spell, spellIndex, classIndex);
+                              }}
+                              sx={{ p: 0.5 }}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </StyledTableCell>
+                      </TableRow>
+
+                      <TableRow>
+                        <StyledTableCell colSpan={5} sx={{ p: 0 }}>
+                          <Collapse
+                            in={openRows.spells[spellKey]}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box sx={{ p: 1, ml: { xs: 1, sm: 4 } }}>
+                              {renderSpellContent(
+                                spell,
+                                setPlayer,
+                                searchQuery,
+                                highlightMatch,
+                              )}
+                            </Box>
+                          </Collapse>
+                        </StyledTableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        );
+      })}
 
       <Menu
         anchorEl={addMenuAnchor}
@@ -906,7 +1257,10 @@ export default function PlayerSpellsFull({ player, setPlayer, searchQuery = '' }
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         {(addMenuClassIndex !== null
-          ? getAddActionsForClass(player.classes?.[addMenuClassIndex], addMenuClassIndex)
+          ? getAddActionsForClass(
+              player.classes?.[addMenuClassIndex],
+              addMenuClassIndex,
+            )
           : []
         ).map((action) => (
           <MenuItem

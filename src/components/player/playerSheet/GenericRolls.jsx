@@ -47,7 +47,8 @@ export default function GenericRolls({ player }) {
     // Check for critical failure
     const isCriticalFailure = diceRoll1 === 1 && diceRoll2 === 1;
     // Check for critical success
-    const isCriticalSuccess = diceRoll1 >= 6 && diceRoll2 >= 6 && diceRoll1 === diceRoll2;
+    const isCriticalSuccess =
+      diceRoll1 >= 6 && diceRoll2 >= 6 && diceRoll1 === diceRoll2;
 
     if (isCriticalFailure) {
       setIsCritFailure(true);
@@ -83,7 +84,7 @@ export default function GenericRolls({ player }) {
     ["slow", "enraged"],
     ["dexUp"],
     6,
-    12
+    12,
   );
   const currInsight = calculateAttribute(
     player,
@@ -91,7 +92,7 @@ export default function GenericRolls({ player }) {
     ["dazed", "enraged"],
     ["insUp"],
     6,
-    12
+    12,
   );
   const currMight = calculateAttribute(
     player,
@@ -99,7 +100,7 @@ export default function GenericRolls({ player }) {
     ["weak", "poisoned"],
     ["migUp"],
     6,
-    12
+    12,
   );
   const currWillpower = calculateAttribute(
     player,
@@ -107,7 +108,7 @@ export default function GenericRolls({ player }) {
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
-    12
+    12,
   );
 
   return (
@@ -120,18 +121,22 @@ export default function GenericRolls({ player }) {
       >
         {t("Roll")}
       </Button>
-      <Dialog open={open} onClose={handleClose} slotProps={{
-        paper: {
-          sx: {
-            width: "80%",
-            maxWidth: "lg",
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "80%",
+              maxWidth: "lg",
+            },
           },
-        }
-      }}>
+        }}
+      >
         <DialogTitle variant="h3">{t("Choose Attributes to Roll")}</DialogTitle>
-        <DialogContent >
-          <Grid container spacing={2} sx={{marginTop: "10px"}}>
-            <Grid  size={6}>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ marginTop: "10px" }}>
+            <Grid size={6}>
               <FormControl fullWidth sx={{ marginBottom: "10px" }}>
                 <InputLabel>{t("Die 1")}</InputLabel>
                 <Select
@@ -147,7 +152,7 @@ export default function GenericRolls({ player }) {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid  size={6}>
+            <Grid size={6}>
               <FormControl fullWidth>
                 <InputLabel>{t("Die 2")}</InputLabel>
                 <Select
@@ -170,13 +175,15 @@ export default function GenericRolls({ player }) {
             </Typography>
           )}
           {result1 !== null && (
-            <Typography variant="h5">{t("Die 1") +  ": "  + result1}</Typography>
+            <Typography variant="h5">{t("Die 1") + ": " + result1}</Typography>
           )}
           {result2 !== null && (
-            <Typography variant="h5">{t("Die 2") + ": "  + result2}</Typography>
+            <Typography variant="h5">{t("Die 2") + ": " + result2}</Typography>
           )}
           {sumResult !== null && (
-            <Typography variant="h3">{t(`Result`) + ": " + sumResult}</Typography>
+            <Typography variant="h3">
+              {t(`Result`) + ": " + sumResult}
+            </Typography>
           )}
           {isCritFailure && (
             <Typography variant="h3" sx={{ color: "#bb2124" }}>
@@ -190,7 +197,9 @@ export default function GenericRolls({ player }) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="contained" color="secondary" >{t("Close")}</Button>
+          <Button onClick={handleClose} variant="contained" color="secondary">
+            {t("Close")}
+          </Button>
           <Button
             onClick={handleRollDice}
             disabled={!attribute1 || !attribute2}

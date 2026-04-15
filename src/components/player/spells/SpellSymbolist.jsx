@@ -49,7 +49,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -89,7 +90,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={3}>
+            size={3}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -135,11 +137,12 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size="grow">
+                  size="grow"
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {sym.name === "symbol_custom_name"
@@ -156,11 +159,13 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                  size="grow"></Grid>
+                  size="grow"
+                ></Grid>
               )}
             </div>
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -175,7 +180,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <ReactMarkdown components={components}>
                     {sym.name === "symbol_custom_name"
                       ? sym.effect

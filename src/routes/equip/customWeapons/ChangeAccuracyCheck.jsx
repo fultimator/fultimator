@@ -1,12 +1,7 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { accuracyChecks } from "./libs.jsx";
-import {attrNoTranslation} from "../../../libs/attributes";
+import { attrNoTranslation } from "../../../libs/attributes";
 
 function ChangeAccuracyCheck({ value, onChange }) {
   const { t } = useTranslate();

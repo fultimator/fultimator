@@ -23,7 +23,14 @@ import EditHeroicSkillModal from "./EditHeroicSkillModal";
 import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
-import { firestore, query, orderBy, collection, where, getDocs } from "@platform/db";
+import {
+  firestore,
+  query,
+  orderBy,
+  collection,
+  where,
+  getDocs,
+} from "@platform/db";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
@@ -44,7 +51,7 @@ export default function PlayerClassCard({
   editClassName,
   editHeroic,
   userId,
-  isHomebrew
+  isHomebrew,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -71,9 +78,13 @@ export default function PlayerClassCard({
   const [specialSkill, setSpecialSkill] = useState("");
   const [warnings, setWarnings] = useState([]);
 
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: onRemove,
-  });;
+  });
 
   const [heroic, setHeroic] = useState({
     name: classItem.heroic ? classItem.heroic.name : "",
@@ -83,7 +94,7 @@ export default function PlayerClassCard({
   const [className, setClassName] = useState(classItem.name);
 
   const [selectedCompanion, setSelectedCompanion] = useState(
-    classItem.companion ? classItem.companion : null
+    classItem.companion ? classItem.companion : null,
   );
 
   const [companionList, setCompanionList] = useState([]);
@@ -101,11 +112,11 @@ export default function PlayerClassCard({
 
     const sumOfSkillLevels = classItem.skills.reduce(
       (acc, skill) => acc + skill.currentLvl,
-      0
+      0,
     );
     if (sumOfSkillLevels !== classItem.lvl) {
       warnings.push(
-        t("The sum of the skill levels is different from the class level")
+        t("The sum of the skill levels is different from the class level"),
       );
       setWarnings(warnings);
     }
@@ -242,7 +253,7 @@ export default function PlayerClassCard({
         skillName,
         maxLevel,
         description,
-        specialSkill
+        specialSkill,
       );
     } else {
       // Add new skill
@@ -251,7 +262,7 @@ export default function PlayerClassCard({
         skillName,
         maxLevel,
         description,
-        specialSkill
+        specialSkill,
       );
     }
 
@@ -310,7 +321,7 @@ export default function PlayerClassCard({
   // Determine if there is exactly one "Faithful Companion" skill with currentLvl > 0 in classItem
   const faithfulCompanionSkillsInClassItem = classItem.skills.filter(
     (skill) =>
-      skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0
+      skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0,
   );
 
   const hasSingleFaithfulCompanionSkill =
@@ -330,7 +341,7 @@ export default function PlayerClassCard({
         where("uid", "==", userId),
         where("rank", "==", "companion"),
         orderBy("lvl", "asc"),
-        orderBy("name", "asc")
+        orderBy("name", "asc"),
       );
 
       const fetchCompanions = async () => {
@@ -364,7 +375,7 @@ export default function PlayerClassCard({
       }}
     >
       <Grid container spacing={1}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeaderClasses
             type="top"
             headerText={t(classItem.name)}
@@ -377,7 +388,7 @@ export default function PlayerClassCard({
           />
         </Grid>
         {warnings.map((warning, index) => (
-          <Grid  key={index} size={12}>
+          <Grid key={index} size={12}>
             <Alert variant="filled" severity="warning">
               {warning}
             </Alert>
@@ -385,7 +396,7 @@ export default function PlayerClassCard({
         ))}
         {classItem.benefits && (
           <>
-            <Grid  size={12}>
+            <Grid size={12}>
               <CustomHeader2
                 headerText={`${t(classItem.name)} ${t("Free Benefits")} `}
                 buttonText={t("Edit Benefits")}
@@ -393,7 +404,7 @@ export default function PlayerClassCard({
                 isEditMode={isEditMode}
               />
             </Grid>
-            <Grid  style={{ margin: "-20px 0 0 0" }} size={12}>
+            <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
               <ul>
                 {classItem.benefits.hpplus !== 0 && (
                   <li>
@@ -415,7 +426,7 @@ export default function PlayerClassCard({
                   <li>
                     <Typography>
                       {t(
-                        "Permanently increase your maximum Inventory Points by"
+                        "Permanently increase your maximum Inventory Points by",
                       )}{" "}
                       {classItem.benefits.ipplus}.
                     </Typography>
@@ -427,7 +438,7 @@ export default function PlayerClassCard({
                       <li>
                         <Typography>
                           {t(
-                            "You may perform Rituals whose effects fall within the Ritualism discipline."
+                            "You may perform Rituals whose effects fall within the Ritualism discipline.",
                           )}
                         </Typography>
                       </li>
@@ -440,7 +451,7 @@ export default function PlayerClassCard({
                       <li>
                         <Typography>
                           {t(
-                            "Gain the ability to equip martial melee weapons."
+                            "Gain the ability to equip martial melee weapons.",
                           )}
                         </Typography>
                       </li>
@@ -449,7 +460,7 @@ export default function PlayerClassCard({
                       <li>
                         <Typography>
                           {t(
-                            "Gain the ability to equip martial ranged weapons."
+                            "Gain the ability to equip martial ranged weapons.",
                           )}
                         </Typography>
                       </li>
@@ -478,12 +489,12 @@ export default function PlayerClassCard({
                 )}
               </ul>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider />
             </Grid>
           </>
         )}
-        <Grid  size={12}>
+        <Grid size={12}>
           {classItem.skills.length < 5 ? (
             <CustomHeader2
               headerText={t("Skills")}
@@ -497,7 +508,7 @@ export default function PlayerClassCard({
         </Grid>
         {classItem.skills &&
           classItem.skills.map((skill, index) => (
-            <Grid  key={index} size={12}>
+            <Grid key={index} size={12}>
               <CustomHeader3
                 headerText={isHomebrew ? skill.skillName : t(skill.skillName)}
                 currentLvl={skill.currentLvl}
@@ -523,10 +534,10 @@ export default function PlayerClassCard({
           ))}
         {classItem.lvl === 10 && (
           <>
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <CustomHeader2
                 headerText={t("Heroic Skill")}
                 //buttonText={t("Edit Benefits")}
@@ -534,7 +545,7 @@ export default function PlayerClassCard({
                 isEditMode={false}
               />
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <CustomHeader3
                 headerText={classItem.heroic.name}
                 currentLvl={0}
@@ -542,7 +553,9 @@ export default function PlayerClassCard({
                 onIncrease={() => {}}
                 onDecrease={() => {}}
                 onEdit={() => handleEditHeroicSkill()}
-                onOpenCompendium={isEditMode ? () => setHeroicCompendiumOpen(true) : undefined}
+                onOpenCompendium={
+                  isEditMode ? () => setHeroicCompendiumOpen(true) : undefined
+                }
                 isEditMode={isEditMode}
                 isHeroicSkill={true}
               />
@@ -563,7 +576,7 @@ export default function PlayerClassCard({
         {faithfulCompanionSkills.length ===
         0 ? null : hasMultipleFaithfulCompanionSkills &&
           faithfulCompanionSkillsInClassItem.length > 0 ? (
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography>
               {t("Error: There are too many Faithful Companion skills")}
             </Typography>
@@ -571,10 +584,10 @@ export default function PlayerClassCard({
         ) : (
           hasSingleFaithfulCompanionSkill && (
             <>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider />
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomHeader2
                   headerText={t("Faithful Companion")}
                   isEditMode={isEditMode}
@@ -611,12 +624,13 @@ export default function PlayerClassCard({
           )
         )}
         {isEditMode && (
-          <Grid  size={12}>
+          <Grid size={12}>
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between"
-              }}>
+                justifyContent: "space-between",
+              }}
+            >
               <Button
                 variant="contained"
                 color="secondary"
@@ -637,7 +651,7 @@ export default function PlayerClassCard({
             </Box>
           </Grid>
         )}
-        <Grid  size={12}>
+        <Grid size={12}>
           <Export name={classItem.name} dataType="class" data={classItem} />
         </Grid>
       </Grid>

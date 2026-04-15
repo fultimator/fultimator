@@ -103,7 +103,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(
-          "There was a problem with the fetch operation: " + error.message
+          "There was a problem with the fetch operation: " + error.message,
         );
       } else {
         setErrorMessage("An unknown error occurred");
@@ -130,7 +130,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
             width: "100%",
             maxWidth: "sm",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3">{t(title)}</DialogTitle>
@@ -146,7 +146,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           slotProps={{
             htmlInput: {
               maxLength: 100,
-            }
+            },
           }}
         />
         <Typography variant="body2" sx={{ mt: 1 }}>
@@ -164,7 +164,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           slotProps={{
             htmlInput: {
               maxLength: 5000,
-            }
+            },
           }}
         />
         {errorMessage && (
@@ -174,7 +174,12 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleClose} disabled={isSubmitting}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleClose}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button

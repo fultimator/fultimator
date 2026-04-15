@@ -75,7 +75,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             if (index !== noteIndex) return note;
             return {
               ...note,
-              clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
+              clocks: (note.clocks || []).filter(
+                (_, idx) => idx !== clockIndex,
+              ),
             };
           });
           return { ...prevState, notes };
@@ -87,7 +89,10 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   });
 
   const [noteToDeleteIndex, setNoteToDeleteIndex] = useState(null);
-  const [clockToDelete, setClockToDelete] = useState({ noteIndex: null, clockIndex: null });
+  const [clockToDelete, setClockToDelete] = useState({
+    noteIndex: null,
+    clockIndex: null,
+  });
   const isSubmittingRef = useRef(false);
   const isAddingNoteRef = useRef(false);
 
@@ -95,7 +100,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     const value = e.target.value;
     setPlayer((prevState) => {
       const notes = prevState.notes.map((note, index) =>
-        index === key ? { ...note, name: value } : note
+        index === key ? { ...note, name: value } : note,
       );
       return { ...prevState, notes };
     });
@@ -105,7 +110,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
     const value = e.target.value;
     setPlayer((prevState) => {
       const notes = prevState.notes.map((note, index) =>
-        index === key ? { ...note, description: value } : note
+        index === key ? { ...note, description: value } : note,
       );
       return { ...prevState, notes };
     });
@@ -184,7 +189,11 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
             if (clockSections !== clock.sections) {
               newState = new Array(clockSections).fill(false);
               // Copy over old state as much as possible
-              for (let i = 0; i < Math.min(clock.sections, clockSections); i++) {
+              for (
+                let i = 0;
+                i < Math.min(clock.sections, clockSections);
+                i++
+              ) {
                 newState[i] = clock.state[i];
               }
             }
@@ -243,7 +252,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
 
   const resetClockState = (noteIndex, clockIndex) => {
     const resetState = new Array(
-      player.notes[noteIndex].clocks[clockIndex].sections
+      player.notes[noteIndex].clocks[clockIndex].sections,
     ).fill(false);
     handleClockStateChange(noteIndex, clockIndex, resetState);
   };
@@ -343,7 +352,11 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 {isEditMode && (
                   <Grid
                     size={{ xs: 12, sm: 1 }}
-                    sx={{ display: "flex", justifyContent: { xs: "flex-end", sm: "center" }, alignItems: "center" }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: { xs: "flex-end", sm: "center" },
+                      alignItems: "center",
+                    }}
                   >
                     <IconButton onClick={removeItem(index)}>
                       <RemoveCircleOutlined />
@@ -362,7 +375,10 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                   />
                 </Grid>
                 {isEditMode && (
-                  <Grid size={12} sx={{ display: "flex", justifyContent: "flex-start" }}>
+                  <Grid
+                    size={12}
+                    sx={{ display: "flex", justifyContent: "flex-start" }}
+                  >
                     <Button
                       variant="contained"
                       onClick={() => handleAddClock(index)}
@@ -415,7 +431,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               {isEditMode && (
                                 <Box>
                                   <IconButton
-                                    onClick={() => handleEditClock(index, clockIndex)}
+                                    onClick={() =>
+                                      handleEditClock(index, clockIndex)
+                                    }
                                     size="small"
                                     sx={{
                                       p: 0,
@@ -443,7 +461,11 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               size={100}
                               state={clock.state}
                               setState={(newState) =>
-                                handleClockStateChange(index, clockIndex, newState)
+                                handleClockStateChange(
+                                  index,
+                                  clockIndex,
+                                  newState,
+                                )
                               }
                             />
 
@@ -451,7 +473,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               <Tooltip title={t("Decrement")}>
                                 <IconButton
                                   size="small"
-                                  onClick={() => decrementClockState(index, clockIndex)}
+                                  onClick={() =>
+                                    decrementClockState(index, clockIndex)
+                                  }
                                 >
                                   <RemoveIcon fontSize="small" />
                                 </IconButton>
@@ -459,7 +483,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               <Tooltip title={t("Reset")}>
                                 <IconButton
                                   size="small"
-                                  onClick={() => resetClockState(index, clockIndex)}
+                                  onClick={() =>
+                                    resetClockState(index, clockIndex)
+                                  }
                                 >
                                   <RestartAltIcon fontSize="small" />
                                 </IconButton>
@@ -467,7 +493,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               <Tooltip title={t("Increment")}>
                                 <IconButton
                                   size="small"
-                                  onClick={() => incrementClockState(index, clockIndex)}
+                                  onClick={() =>
+                                    incrementClockState(index, clockIndex)
+                                  }
                                 >
                                   <AddIcon fontSize="small" />
                                 </IconButton>
@@ -485,7 +513,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         ))}
       </Grid>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle variant="h3">{selectedClockIndex !== null ? t("Edit Clock") : t("Add Clock")}</DialogTitle>
+        <DialogTitle variant="h3">
+          {selectedClockIndex !== null ? t("Edit Clock") : t("Add Clock")}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             {t("Enter the clock details below:")}
@@ -507,7 +537,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
               }
             }}
             slotProps={{
-              htmlInput: { maxLength: 30 }
+              htmlInput: { maxLength: 30 },
             }}
           />
           <TextField
@@ -529,7 +559,7 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
               }
             }}
             slotProps={{
-              htmlInput: { min: 2, max: 30 }
+              htmlInput: { min: 2, max: 30 },
             }}
           />
         </DialogContent>
@@ -582,7 +612,9 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                 if (index !== noteIndex) return note;
                 return {
                   ...note,
-                  clocks: (note.clocks || []).filter((_, idx) => idx !== clockIndex),
+                  clocks: (note.clocks || []).filter(
+                    (_, idx) => idx !== clockIndex,
+                  ),
                 };
               });
               return { ...prevState, notes };
@@ -595,10 +627,13 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
         title={t("Confirm Deletion")}
         message={t("Are you sure you want to delete this clock?")}
         itemPreview={
-          clockToDelete.noteIndex !== null && clockToDelete.clockIndex !== null && (
+          clockToDelete.noteIndex !== null &&
+          clockToDelete.clockIndex !== null && (
             <Box>
               <Typography variant="h4">
-                {player.notes[clockToDelete.noteIndex].clocks[clockToDelete.clockIndex].name || t("Untitled Clock")}
+                {player.notes[clockToDelete.noteIndex].clocks[
+                  clockToDelete.clockIndex
+                ].name || t("Untitled Clock")}
               </Typography>
             </Box>
           )

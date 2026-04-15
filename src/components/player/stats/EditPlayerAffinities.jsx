@@ -14,10 +14,7 @@ import CustomHeader from "../../common/CustomHeader";
 import { TypeIcon, TypeName } from "../../types";
 import { typeList } from "../../typeConstants";
 
-export default function EditPlayerAffinities({
-  player,
-  setPlayer
-}) {
+export default function EditPlayerAffinities({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -80,7 +77,7 @@ export default function EditPlayerAffinities({
       }}
     >
       <Grid container>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Affinity")}
@@ -91,8 +88,9 @@ export default function EditPlayerAffinities({
         <Grid
           size={{
             xs: 12,
-            sm: 10
-          }}>
+            sm: 10,
+          }}
+        >
           <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
             {Object.keys(typeList).map((type, i, arr) => {
               const marks =
@@ -100,7 +98,14 @@ export default function EditPlayerAffinities({
                   ? [
                       {
                         value: 0,
-                        label: <Typography variant="body2" sx={{fontSize:{xs:"12px",sm:"18px"}}}>{t("Vulnerability")}</Typography>,
+                        label: (
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: { xs: "12px", sm: "18px" } }}
+                          >
+                            {t("Vulnerability")}
+                          </Typography>
+                        ),
                       },
                       {
                         value: 1,
@@ -108,15 +113,36 @@ export default function EditPlayerAffinities({
                       },
                       {
                         value: 2,
-                        label: <Typography variant="body2" sx={{fontSize:{xs:"12px",sm:"18px"}}}>{t("Resistance")}</Typography>,
+                        label: (
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: { xs: "12px", sm: "18px" } }}
+                          >
+                            {t("Resistance")}
+                          </Typography>
+                        ),
                       },
                       {
                         value: 3,
-                        label: <Typography variant="body2" sx={{fontSize:{xs:"12px",sm:"18px"}}}>{t("Immunity")}</Typography>,
+                        label: (
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: { xs: "12px", sm: "18px" } }}
+                          >
+                            {t("Immunity")}
+                          </Typography>
+                        ),
                       },
                       {
                         value: 4,
-                        label: <Typography variant="body2" sx={{fontSize:{xs:"12px",sm:"18px"}}}>{t("Absorption")}</Typography>,
+                        label: (
+                          <Typography
+                            variant="body2"
+                            sx={{ fontSize: { xs: "12px", sm: "18px" } }}
+                          >
+                            {t("Absorption")}
+                          </Typography>
+                        ),
                       },
                     ]
                   : true;
@@ -126,15 +152,18 @@ export default function EditPlayerAffinities({
 
               return (
                 <Fragment key={i}>
-                  <Grid  size={3}>
+                  <Grid size={3}>
                     <InputLabel
                       id={typeKey}
-                      sx={{ fontSize: { xs: "16px", sm: "20px" }, fontWeight: 400 }}
+                      sx={{
+                        fontSize: { xs: "16px", sm: "20px" },
+                        fontWeight: 400,
+                      }}
                     >
                       <TypeIcon type={typeKey} /> <TypeName type={typeKey} />
                     </InputLabel>
                   </Grid>
-                  <Grid  size={9}>
+                  <Grid size={9}>
                     <FormControl variant="standard" fullWidth>
                       <Slider
                         marks={marks}

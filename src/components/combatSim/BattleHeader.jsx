@@ -93,7 +93,7 @@ export default function BattleHeader({
             }
             sx={{ width: "100%" }}
             slotProps={{
-              htmlInput: { maxLength: 100 }
+              htmlInput: { maxLength: 100 },
             }}
           />
         ) : (
@@ -206,7 +206,7 @@ export default function BattleHeader({
               />
             </Tooltip>
           )}
-          
+
           {/* Save time text */}
           {isAutoSaveEnabled && lastAutoSaved > lastManualSaved ? (
             <>
@@ -215,22 +215,26 @@ export default function BattleHeader({
                   variant="caption"
                   sx={{
                     color: "text.secondary",
-                    whiteSpace: "nowrap"
-                  }}>
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {autoSaveTimeText}
                 </Typography>
               )}
             </>
           ) : (
             // Show manual save time only if autosave is OFF and it's been saved before
-            (timeAgo !== "Not saved yet" && (<Typography
-            variant="caption"
-            sx={{
-              color: "text.secondary",
-              whiteSpace: "nowrap"
-            }}>
-              {timeAgo}
-            </Typography>))
+            timeAgo !== "Not saved yet" && (
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {timeAgo}
+              </Typography>
+            )
           )}
         </Box>
 

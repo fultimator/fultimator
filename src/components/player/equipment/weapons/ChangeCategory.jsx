@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import weaponCategories from "../../../../libs/weaponCategories";
 
 import { useTranslate } from "../../../../translation/translate";
@@ -17,7 +12,7 @@ function ChangeCategory({ value, onChange }) {
     options.push(
       <MenuItem key={category} value={category}>
         {t(category)}
-      </MenuItem>
+      </MenuItem>,
     );
   }
 

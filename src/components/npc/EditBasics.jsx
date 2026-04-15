@@ -15,7 +15,7 @@ import {
   TextField,
   Typography,
   Button,
-  Snackbar
+  Snackbar,
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
 import ReactMarkdown from "react-markdown";
@@ -27,9 +27,10 @@ import { useCustomTheme } from "../../hooks/useCustomTheme";
 export default function EditBasics({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const background = theme.mode === 'dark'
-  ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
-  : `linear-gradient(to right, ${theme.ternary}, transparent)`;
+  const background =
+    theme.mode === "dark"
+      ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
+      : `linear-gradient(to right, ${theme.ternary}, transparent)`;
 
   const [imgUrlTemp, setImgUrlTemp] = React.useState(npc.imgurl || "");
 
@@ -48,7 +49,7 @@ export default function EditBasics({ npc, setNpc }) {
         [key]: value,
       }));
     },
-    [setNpc]
+    [setNpc],
   );
 
   const onChangeSpecies = useCallback(
@@ -56,7 +57,7 @@ export default function EditBasics({ npc, setNpc }) {
       const value = e.target.value;
       setNpc((prevNpc) => {
         let affinities = {};
-        let immunities = {}
+        let immunities = {};
 
         if (value === "Construct") {
           affinities = { poison: "im", earth: "rs" };
@@ -65,7 +66,7 @@ export default function EditBasics({ npc, setNpc }) {
           affinities = { poison: "im" };
           immunities = { poisoned: true };
         } else if (value === "Plant") {
-          immunities = { dazed: true, shaken: true, enraged: true, };
+          immunities = { dazed: true, shaken: true, enraged: true };
         } else if (value === "Undead") {
           affinities = { dark: "im", poison: "im", light: "vu" };
           immunities = { poisoned: true };
@@ -79,14 +80,14 @@ export default function EditBasics({ npc, setNpc }) {
         };
       });
     },
-    [setNpc]
+    [setNpc],
   );
 
   const handleDescriptionChange = useCallback(
     (e) => {
       onChange("description", e.target.value);
     },
-    [onChange]
+    [onChange],
   );
 
   const checkImageSize = useCallback(async (imageUrl) => {
@@ -95,10 +96,10 @@ export default function EditBasics({ npc, setNpc }) {
       if (!response.ok) {
         setIsImageError(true);
         setErrorMessage(
-          `Failed to fetch image: ${response.status} ${response.statusText}`
+          `Failed to fetch image: ${response.status} ${response.statusText}`,
         );
         throw new Error(
-          `Failed to fetch image: ${response.status} ${response.statusText}`
+          `Failed to fetch image: ${response.status} ${response.statusText}`,
         );
       }
       const blob = await response.blob();
@@ -121,14 +122,19 @@ export default function EditBasics({ npc, setNpc }) {
 
   return (
     <Grid container spacing={2}>
-      <Grid  size={12}>
-        <CustomHeader type="top" headerText={t("Basic Information")} showIconButton={false} />
+      <Grid size={12}>
+        <CustomHeader
+          type="top"
+          headerText={t("Basic Information")}
+          showIconButton={false}
+        />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 4
-        }}>
+          sm: 4,
+        }}
+      >
         <FormControl variant="standard" fullWidth>
           <TextField
             id="name"
@@ -141,8 +147,9 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 12,
-          sm: 8
-        }}>
+          sm: 8,
+        }}
+      >
         <FormControl variant="standard" fullWidth>
           <TextField
             id="traits"
@@ -152,10 +159,10 @@ export default function EditBasics({ npc, setNpc }) {
           ></TextField>
         </FormControl>
       </Grid>
-      <Grid  size={4}>
+      <Grid size={4}>
         <EditLevel npc={npc} setnpc={setNpc} />
       </Grid>
-      <Grid  size={4}>
+      <Grid size={4}>
         <FormControl fullWidth>
           <InputLabel id="species">{t("Species:")}</InputLabel>
           <Select
@@ -173,11 +180,13 @@ export default function EditBasics({ npc, setNpc }) {
             <MenuItem value={"Plant"}>{t("Plant")}</MenuItem>
             <MenuItem value={"Undead"}>{t("Undead")}</MenuItem>
             <MenuItem value={"Humanoid"}>{t("Humanoid")}</MenuItem>
-            <MenuItem value={"Variant Humanoid"}>{t("Variant Humanoid")}</MenuItem>
+            <MenuItem value={"Variant Humanoid"}>
+              {t("Variant Humanoid")}
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>
-      <Grid  size={4}>
+      <Grid size={4}>
         <Stack spacing={1}>
           <FormControl fullWidth>
             <InputLabel id="rank">{t("Rank:")}</InputLabel>
@@ -203,7 +212,7 @@ export default function EditBasics({ npc, setNpc }) {
         </Stack>
       </Grid>
       {/* Villain & Phase Section*/}
-      <Grid  size={4}>
+      <Grid size={4}>
         <FormControl fullWidth>
           <TextField
             labelid="phases"
@@ -216,7 +225,7 @@ export default function EditBasics({ npc, setNpc }) {
         </FormControl>
       </Grid>
       {npc.rank !== "companion" && (
-        <Grid  size={8}>
+        <Grid size={8}>
           <FormControl fullWidth>
             <InputLabel id="villain">{t("Villain:")}</InputLabel>
             <Select
@@ -235,7 +244,7 @@ export default function EditBasics({ npc, setNpc }) {
         </Grid>
       )}
       {npc.rank === "companion" && (
-        <Grid  size={4}>
+        <Grid size={4}>
           <FormControl fullWidth>
             <InputLabel id="companionlvl">{t("Skill Level:")}</InputLabel>
             <Select
@@ -255,7 +264,7 @@ export default function EditBasics({ npc, setNpc }) {
         </Grid>
       )}
       {npc.rank === "companion" && (
-        <Grid  size={4}>
+        <Grid size={4}>
           <FormControl variant="standard" fullWidth>
             <TextField
               labelid="companionpclvl"
@@ -268,7 +277,7 @@ export default function EditBasics({ npc, setNpc }) {
           </FormControl>
         </Grid>
       )}
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControl variant="standard" fullWidth>
           <TextField
             id="multipart"
@@ -278,16 +287,16 @@ export default function EditBasics({ npc, setNpc }) {
             helperText={
               npc.multipart
                 ? t(
-                  "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!"
-                )
+                    "If this adversary is multipart, its best to put the share links of the other parts to the notes section when published!",
+                  )
                 : ""
             }
           ></TextField>
         </FormControl>
       </Grid>
       {npc.rank === "groupvehicle" && (
-        <Grid  container size={12}>
-          <Grid  size={4}>
+        <Grid container size={12}>
+          <Grid size={4}>
             <FormControl fullWidth>
               <InputLabel id="sizes">{t("Vehicle Size:")}</InputLabel>
               <Select
@@ -309,8 +318,9 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 12,
-          sm: 8
-        }}>
+          sm: 8,
+        }}
+      >
         <TextField
           id="imgurl"
           label={t("Image URL") + ":"}
@@ -323,15 +333,20 @@ export default function EditBasics({ npc, setNpc }) {
           fullWidth
           error={imgUrlTemp.length > 0 && isImageError}
           helperText={
-            isImageError && imgUrlTemp.length > 0 ? errorMessage : t("Please ensure to credit the artist in the description or notes section.")
+            isImageError && imgUrlTemp.length > 0
+              ? errorMessage
+              : t(
+                  "Please ensure to credit the artist in the description or notes section.",
+                )
           }
         />
       </Grid>
       <Grid
         size={{
           xs: 6,
-          sm: 2
-        }}>
+          sm: 2,
+        }}
+      >
         <Button
           variant="contained"
           onClick={() => {
@@ -362,8 +377,9 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 6,
-          sm: 2
-        }}>
+          sm: 2,
+        }}
+      >
         <Button
           variant="outlined"
           onClick={() => {
@@ -381,7 +397,7 @@ export default function EditBasics({ npc, setNpc }) {
           {t("Remove Image")}
         </Button>
       </Grid>
-      <Grid  size={12}>
+      <Grid size={12}>
         <FormControl variant="standard" fullWidth>
           {/* <TextField
             id="Description"
@@ -403,16 +419,18 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <EditAttributes npc={npc} setNpc={setNpc} />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
-        <Grid >
+          sm: 6,
+        }}
+      >
+        <Grid>
           <Card
             sx={{
               p: 1.61,
@@ -439,7 +457,7 @@ export default function EditBasics({ npc, setNpc }) {
               >
                 {t(
                   "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-                  true
+                  true,
                 )}
               </ReactMarkdown>
             </Typography>
@@ -447,7 +465,7 @@ export default function EditBasics({ npc, setNpc }) {
         </Grid>
       </Grid>
       {/* DEF/M.DEF Override Section */}
-      <Grid  size={12}>
+      <Grid size={12}>
         <CustomHeader
           type="top"
           headerText={t("Defense Override")}
@@ -457,8 +475,9 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Card
           sx={{
             p: 2,
@@ -479,8 +498,10 @@ export default function EditBasics({ npc, setNpc }) {
                       extra: {
                         ...prevNpc.extra,
                         defOverride: e.target.checked,
-                        def: e.target.checked ? (prevNpc.extra?.def || 0) : undefined
-                      }
+                        def: e.target.checked
+                          ? prevNpc.extra?.def || 0
+                          : undefined,
+                      },
                     }));
                   }}
                 />
@@ -499,8 +520,8 @@ export default function EditBasics({ npc, setNpc }) {
                     ...prevNpc,
                     extra: {
                       ...prevNpc.extra,
-                      def: parseInt(e.target.value) || 0
-                    }
+                      def: parseInt(e.target.value) || 0,
+                    },
                   }));
                 }}
               />
@@ -517,8 +538,8 @@ export default function EditBasics({ npc, setNpc }) {
                     ...prevNpc,
                     extra: {
                       ...prevNpc.extra,
-                      def: parseInt(e.target.value) || 0
-                    }
+                      def: parseInt(e.target.value) || 0,
+                    },
                   }));
                 }}
               />
@@ -529,8 +550,9 @@ export default function EditBasics({ npc, setNpc }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Card
           sx={{
             p: 2,
@@ -551,8 +573,10 @@ export default function EditBasics({ npc, setNpc }) {
                       extra: {
                         ...prevNpc.extra,
                         mDefOverride: e.target.checked,
-                        mDef: e.target.checked ? (prevNpc.extra?.mDef || 0) : undefined
-                      }
+                        mDef: e.target.checked
+                          ? prevNpc.extra?.mDef || 0
+                          : undefined,
+                      },
                     }));
                   }}
                 />
@@ -571,8 +595,8 @@ export default function EditBasics({ npc, setNpc }) {
                     ...prevNpc,
                     extra: {
                       ...prevNpc.extra,
-                      mDef: parseInt(e.target.value) || 0
-                    }
+                      mDef: parseInt(e.target.value) || 0,
+                    },
                   }));
                 }}
               />
@@ -589,8 +613,8 @@ export default function EditBasics({ npc, setNpc }) {
                     ...prevNpc,
                     extra: {
                       ...prevNpc.extra,
-                      mDef: parseInt(e.target.value) || 0
-                    }
+                      mDef: parseInt(e.target.value) || 0,
+                    },
                   }));
                 }}
               />
@@ -658,7 +682,7 @@ function EditLevel({ npc, setnpc }) {
                 <Add />
               </IconButton>
             ),
-          }
+          },
         }}
       />
     </FormControl>

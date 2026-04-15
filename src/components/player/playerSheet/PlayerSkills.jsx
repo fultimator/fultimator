@@ -40,13 +40,13 @@ export default function PlayerSkills({ player }) {
                   className: c.name,
                 },
               ]
-            : []
+            : [],
         )
         .map((skill) => ({
           ...skill,
           className: c.name,
           isHomebrew: c.isHomebrew === undefined ? true : c.isHomebrew,
-        }))
+        })),
     )
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
@@ -98,18 +98,27 @@ export default function PlayerSkills({ player }) {
             >
               {t("Skills")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {allSkills.map((skill, index) => (
                 <Grid
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="skill-left-name"
                       variant="h2"
@@ -129,7 +138,14 @@ export default function PlayerSkills({ player }) {
                       {skill.isHomebrew ? skill.skillName : t(skill.skillName)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="skill-right-controls"
                       style={{
@@ -166,7 +182,12 @@ export default function PlayerSkills({ player }) {
                 {selectedSkill && <SkillCard skill={selectedSkill} />}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleOK} fullWidth>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOK}
+                  fullWidth
+                >
                   {t("Close")}
                 </Button>
               </DialogActions>

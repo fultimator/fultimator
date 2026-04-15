@@ -8,7 +8,7 @@ function useDownload() {
     a.click();
   }
 
-  return [download]
+  return [download];
 }
 
-export default useDownload
+export default useDownload;

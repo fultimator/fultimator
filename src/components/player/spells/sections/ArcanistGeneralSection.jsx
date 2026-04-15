@@ -1,11 +1,7 @@
 import { Grid, TextField, FormControlLabel, Switch } from "@mui/material";
 import CustomTextarea from "../../../common/CustomTextarea";
 
-export default function ArcanistGeneralSection({
-  formState,
-  setFormState,
-  t,
-}) {
+export default function ArcanistGeneralSection({ formState, setFormState, t }) {
   const isRework = formState.spellType === "arcanist-rework";
 
   const handleChange = (field, value) => {
@@ -17,8 +13,9 @@ export default function ArcanistGeneralSection({
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <TextField
           label={t("Arcana Name")}
           variant="outlined"
@@ -26,15 +23,16 @@ export default function ArcanistGeneralSection({
           value={formState.name || ""}
           onChange={(e) => handleChange("name", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <TextField
           label={t("Domain")}
           variant="outlined"
@@ -42,15 +40,16 @@ export default function ArcanistGeneralSection({
           value={formState.domain || ""}
           onChange={(e) => handleChange("domain", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <TextField
           label={t("Arcana Description")}
           variant="outlined"
@@ -58,15 +57,16 @@ export default function ArcanistGeneralSection({
           value={formState.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <CustomTextarea
           label={t("Domain Description")}
           fullWidth
@@ -79,8 +79,9 @@ export default function ArcanistGeneralSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <TextField
           label={t("Merge Name")}
           variant="outlined"
@@ -88,15 +89,16 @@ export default function ArcanistGeneralSection({
           value={formState.merge || ""}
           onChange={(e) => handleChange("merge", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <CustomTextarea
           label={t("Merge Description")}
           fullWidth
@@ -111,8 +113,9 @@ export default function ArcanistGeneralSection({
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <TextField
               label={t("Pulse Name")}
               variant="outlined"
@@ -120,15 +123,16 @@ export default function ArcanistGeneralSection({
               value={formState.pulse || ""}
               onChange={(e) => handleChange("pulse", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               label={t("Pulse Description")}
               fullWidth
@@ -143,8 +147,9 @@ export default function ArcanistGeneralSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <TextField
           label={t("Dismiss Name")}
           variant="outlined"
@@ -152,15 +157,16 @@ export default function ArcanistGeneralSection({
           value={formState.dismiss || ""}
           onChange={(e) => handleChange("dismiss", e.target.value)}
           slotProps={{
-            htmlInput: { maxLength: 50 }
+            htmlInput: { maxLength: 50 },
           }}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <CustomTextarea
           label={t("Dismiss Description")}
           fullWidth
@@ -173,8 +179,9 @@ export default function ArcanistGeneralSection({
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <FormControlLabel
           control={
             <Switch

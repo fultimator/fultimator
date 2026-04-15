@@ -87,8 +87,9 @@ export default function ResourceCard({
           variant="body2"
           sx={{
             color: "text.secondary",
-            mb: 2
-          }}>
+            mb: 2,
+          }}
+        >
           {t("resources_choose_reseller")}
         </Typography>
         <List>
@@ -464,8 +465,8 @@ export default function ResourceCard({
               {resource.type === "coming_soon" || resource.url === "#"
                 ? t("resources_coming_soon")
                 : activeTab === 0
-                ? t("resources_access_resource")
-                : t("resources_view_content")}
+                  ? t("resources_access_resource")
+                  : t("resources_view_content")}
             </Button>
           )}
         </CardActions>
@@ -477,7 +478,7 @@ export default function ResourceCard({
         () => setDigitalDialogOpen(false),
         digitalOptions,
         "Digital Options",
-        <CloudDownloadIcon />
+        <CloudDownloadIcon />,
       )}
 
       {/* Physical Options Dialog */}
@@ -486,7 +487,7 @@ export default function ResourceCard({
         () => setPhysicalDialogOpen(false),
         physicalOptions,
         "Physical Options",
-        <LocalShippingIcon />
+        <LocalShippingIcon />,
       )}
     </>
   );

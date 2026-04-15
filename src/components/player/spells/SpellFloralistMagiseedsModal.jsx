@@ -28,7 +28,10 @@ export default function SpellFloralistMagiseedsModal({
   useEffect(() => {
     if (floralist) {
       setCurrentMagiseeds(floralist.magiseeds || []);
-      setShowInPlayerSheet(!!floralist.showInPlayerSheet || floralist.showInPlayerSheet === undefined);
+      setShowInPlayerSheet(
+        !!floralist.showInPlayerSheet ||
+          floralist.showInPlayerSheet === undefined,
+      );
     }
   }, [floralist]);
 
@@ -42,27 +45,27 @@ export default function SpellFloralistMagiseedsModal({
         1: "",
         2: "",
         3: "",
-        4: ""
+        4: "",
       },
       endOfTurnEffect: false,
-      passive: false
+      passive: false,
     };
-    setCurrentMagiseeds(prev => [...prev, newMagiseed]);
+    setCurrentMagiseeds((prev) => [...prev, newMagiseed]);
   }, []);
 
   const handleMagiseedChange = useCallback((index, field, value) => {
-    setCurrentMagiseeds(prev => {
+    setCurrentMagiseeds((prev) => {
       const newMagiseeds = [...prev];
       newMagiseeds[index] = {
         ...newMagiseeds[index],
-        [field]: value
+        [field]: value,
       };
       return newMagiseeds;
     });
   }, []);
 
   const handleDeleteMagiseed = useCallback((index) => {
-    setCurrentMagiseeds(prev => prev.filter((_, i) => i !== index));
+    setCurrentMagiseeds((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
   const handleCloneMagiseed = useCallback((index, clonedMagiseed) => {
@@ -86,15 +89,15 @@ export default function SpellFloralistMagiseedsModal({
   }, []);
 
   const handleAddPresetMagiseed = useCallback((presetName) => {
-    const preset = magiseeds.find(m => m.name === presetName);
+    const preset = magiseeds.find((m) => m.name === presetName);
     if (!preset) return;
 
     const newMagiseed = {
       ...preset,
       customName: "", // Allow custom naming even for presets
-      description: preset.description
+      description: preset.description,
     };
-    setCurrentMagiseeds(prev => [...prev, newMagiseed]);
+    setCurrentMagiseeds((prev) => [...prev, newMagiseed]);
   }, []);
 
   const handleSave = useCallback(() => {
@@ -110,10 +113,13 @@ export default function SpellFloralistMagiseedsModal({
 
   // Get available preset magiseeds that haven't been added yet
   const getAvailablePresets = () => {
-    const addedPresetNames = currentMagiseeds.map(m => m.name).filter(name => name !== "floralist_custom_magiseed");
-    return magiseeds.filter(preset => 
-      preset.name !== "floralist_custom_magiseed" && 
-      !addedPresetNames.includes(preset.name)
+    const addedPresetNames = currentMagiseeds
+      .map((m) => m.name)
+      .filter((name) => name !== "floralist_custom_magiseed");
+    return magiseeds.filter(
+      (preset) =>
+        preset.name !== "floralist_custom_magiseed" &&
+        !addedPresetNames.includes(preset.name),
     );
   };
 
@@ -122,7 +128,7 @@ export default function SpellFloralistMagiseedsModal({
       open={open}
       onClose={onClose}
       slotProps={{
-        paper: { sx: { width: "90%", maxWidth: "xl" } }
+        paper: { sx: { width: "90%", maxWidth: "xl" } },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -143,12 +149,12 @@ export default function SpellFloralistMagiseedsModal({
       <DialogContent>
         <Grid container spacing={2}>
           {/* Add Magiseed Buttons */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h6" gutterBottom>
               {t("magiseed_add_magiseed")}
             </Typography>
             <Grid container spacing={1} sx={{ mb: 2 }}>
-              <Grid >
+              <Grid>
                 <Button
                   variant="outlined"
                   startIcon={<Add />}
@@ -158,7 +164,7 @@ export default function SpellFloralistMagiseedsModal({
                 </Button>
               </Grid>
               {getAvailablePresets().map((preset) => (
-                <Grid  key={preset.name}>
+                <Grid key={preset.name}>
                   <Button
                     variant="outlined"
                     startIcon={<Add />}
@@ -172,14 +178,14 @@ export default function SpellFloralistMagiseedsModal({
           </Grid>
 
           {/* Magiseeds List */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h6" gutterBottom>
               {t("magiseed_available_magiseeds")} ({currentMagiseeds.length})
             </Typography>
           </Grid>
 
           {currentMagiseeds.length === 0 ? (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Typography
                 sx={{
                   padding: "20px",
@@ -195,7 +201,7 @@ export default function SpellFloralistMagiseedsModal({
             </Grid>
           ) : (
             currentMagiseeds.map((magiseed, index) => (
-              <Grid  key={index} size={12}>
+              <Grid key={index} size={12}>
                 <MagiseedItem
                   magiseed={magiseed}
                   magiseedIndex={index}
@@ -208,7 +214,7 @@ export default function SpellFloralistMagiseedsModal({
           )}
 
           {/* Show in Player Sheet Toggle */}
-          <Grid  size={12}>
+          <Grid size={12}>
             <FormControlLabel
               control={
                 <Switch

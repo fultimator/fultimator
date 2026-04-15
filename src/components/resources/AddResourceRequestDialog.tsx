@@ -111,8 +111,10 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
         if (author.is_banned) {
           setErrorMessage(
             author.ban_reason
-              ? t("submitting_resources_ban_reason", { reason: author.ban_reason })
-              : t("submitting_resources_ban")
+              ? t("submitting_resources_ban_reason", {
+                  reason: author.ban_reason,
+                })
+              : t("submitting_resources_ban"),
           );
           return;
         }
@@ -183,15 +185,11 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
       return false;
     }
     if (!formData.contactConsent) {
-      setErrorMessage(
-        t("resources_contact_consent_required")
-      );
+      setErrorMessage(t("resources_contact_consent_required"));
       return false;
     }
     if (!formData.licenseAccepted) {
-      setErrorMessage(
-        t("resources_license_required")
-      );
+      setErrorMessage(t("resources_license_required"));
       return false;
     }
     return true;
@@ -227,15 +225,20 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
             terms_accepted: formData.termsAccepted,
             contact_consent: formData.contactConsent,
             license_accepted: formData.licenseAccepted,
-            status: 'pending'
-          }
+            status: "pending",
+          },
         ])
         .select();
 
       if (error) {
         // Handle rate limiting errors specifically
-        if (error.message && error.message.includes('new row violates row-level security policy')) {
-          throw new Error('Rate limit exceeded. Please wait before submitting again. (Max 3 per hour, 10 per day)');
+        if (
+          error.message &&
+          error.message.includes("new row violates row-level security policy")
+        ) {
+          throw new Error(
+            "Rate limit exceeded. Please wait before submitting again. (Max 3 per hour, 10 per day)",
+          );
         }
         throw new Error(`Submission failed: ${error.message}`);
       }
@@ -243,15 +246,16 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
       // Try to update author info if possible
       if (user?.uid) {
         try {
-          await supabase
-            .from("authors")
-            .upsert({
+          await supabase.from("authors").upsert(
+            {
               uuid: user.uid,
               name: user.displayName || formData.author,
               contact: userEmail,
-            }, {
-              onConflict: 'uuid'
-            });
+            },
+            {
+              onConflict: "uuid",
+            },
+          );
         } catch (authorError) {
           console.warn("Could not update author info:", authorError);
         }
@@ -328,7 +332,9 @@ To approve this resource, accept it through moderate submissions dialog or manua
         });
 
         if (!response.ok) {
-          throw new Error(`Discord notification failed: HTTP ${response.status}`);
+          throw new Error(
+            `Discord notification failed: HTTP ${response.status}`,
+          );
         }
       }
 
@@ -426,7 +432,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             width: "100%",
             maxWidth: "md",
           },
-        }
+        },
       }}
     >
       <DialogContent>
@@ -448,13 +454,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             required
             value={formData.resourceName}
             onChange={(e) => handleInputChange("resourceName", e.target.value)}
-            helperText={t(
-              "resources_resource_name_helper"
-            )}
+            helperText={t("resources_resource_name_helper")}
             slotProps={{
               htmlInput: {
                 maxLength: 200,
-              }
+              },
             }}
           />
 
@@ -469,7 +473,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             slotProps={{
               htmlInput: {
                 maxLength: 500,
-              }
+              },
             }}
           />
 
@@ -529,13 +533,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             required
             value={formData.author}
             onChange={(e) => handleInputChange("author", e.target.value)}
-            helperText={t(
-              "resources_author_helper"
-            )}
+            helperText={t("resources_author_helper")}
             slotProps={{
               htmlInput: {
                 maxLength: 100,
-              }
+              },
             }}
           />
 
@@ -547,13 +549,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
-            helperText={t(
-              "resources_description_helper"
-            )}
+            helperText={t("resources_description_helper")}
             slotProps={{
               htmlInput: {
                 maxLength: 1000,
-              }
+              },
             }}
           />
 
@@ -565,13 +565,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             onChange={(e) =>
               handleInputChange("discordAccount", e.target.value)
             }
-            helperText={t(
-              "resources_discord_username_helper"
-            )}
+            helperText={t("resources_discord_username_helper")}
             slotProps={{
               htmlInput: {
                 maxLength: 100,
-              }
+              },
             }}
           />
 
@@ -584,13 +582,11 @@ To approve this resource, accept it through moderate submissions dialog or manua
             onChange={(e) =>
               handleInputChange("additionalNotes", e.target.value)
             }
-            helperText={t(
-              "resources_additional_notes_helper"
-            )}
+            helperText={t("resources_additional_notes_helper")}
             slotProps={{
               htmlInput: {
                 maxLength: 500,
-              }
+              },
             }}
           />
 
@@ -628,9 +624,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             }
             label={
               <Typography variant="body2">
-                {t(
-                  "resources_terms_accepted"
-                )}
+                {t("resources_terms_accepted")}
               </Typography>
             }
           />
@@ -647,9 +641,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             }
             label={
               <Typography variant="body2">
-                {t(
-                  "resources_license_accepted"
-                )}
+                {t("resources_license_accepted")}
               </Typography>
             }
           />
@@ -665,9 +657,7 @@ To approve this resource, accept it through moderate submissions dialog or manua
             }
             label={
               <Typography variant="body2">
-                {t(
-                  "resources_contact_consent"
-                )}
+                {t("resources_contact_consent")}
               </Typography>
             }
           />
@@ -675,13 +665,9 @@ To approve this resource, accept it through moderate submissions dialog or manua
           <Alert severity="info" sx={{ mt: 2 }}>
             <Typography variant="body2">
               <strong>{t("Important:")}</strong>{" "}
-              {t(
-                "resources_content_removal_info"
-              )}{" "}
+              {t("resources_content_removal_info")}{" "}
               <strong>fultimator@gmail.com</strong>.{" "}
-              {t(
-                "resources_include_submission_details"
-              )}
+              {t("resources_include_submission_details")}
             </Typography>
           </Alert>
 

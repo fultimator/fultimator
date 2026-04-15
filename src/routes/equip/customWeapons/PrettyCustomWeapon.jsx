@@ -24,7 +24,11 @@ import AddToCompendiumButton from "../../../components/compendium/AddToCompendiu
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
-function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride = undefined }) {
+function PrettyCustomWeapon({
+  weaponData,
+  showActions = true,
+  showImageOverride = undefined,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const [showImage, setShowImage] = useState(false);
@@ -44,7 +48,7 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
   const ref = useRef();
   const [downloadImage, downloadSnackbar] = useDownloadImage(
     weaponData.name || "Custom Weapon",
-    ref
+    ref,
   );
 
   const StyledMarkdown = ({ children, ...props }) => {
@@ -53,13 +57,21 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -122,12 +134,13 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
       martial: isMartial,
       // Include defensive modifiers for display
       defModifier: parseInt(weaponData.defModifier || 0),
-      mDefModifier: parseInt(weaponData.mDefModifier || 0)
+      mDefModifier: parseInt(weaponData.mDefModifier || 0),
     };
   };
 
   const stats = getWeaponStats();
-  const effectiveShowImage = showImageOverride !== undefined ? showImageOverride : showImage;
+  const effectiveShowImage =
+    showImageOverride !== undefined ? showImageOverride : showImage;
 
   return (
     <ThemeProvider theme={theme}>
@@ -156,22 +169,50 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
               />
               <Grid container sx={{ flex: 1, pl: 1 }}>
                 <Grid size={3}>
-                  <Typography variant="h4" sx={{ textAlign: "left", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "left",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Weapon")}
                   </Typography>
                 </Grid>
                 <Grid size={1}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Cost")}
                   </Typography>
                 </Grid>
                 <Grid size={3}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Accuracy")}
                   </Typography>
                 </Grid>
                 <Grid size={4}>
-                  <Typography variant="h4" sx={{ textAlign: "center", fontSize: "1rem", fontWeight: 600 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      textAlign: "center",
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                    }}
+                  >
                     {t("Damage")}
                   </Typography>
                 </Grid>
@@ -200,7 +241,8 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
               {/* Content Column - contains both rows */}
               <Grid container direction="column" sx={{ flex: 1, minWidth: 0 }}>
                 {/* First Data Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background,
                     borderBottom: `1px solid ${theme.secondary}`,
@@ -213,42 +255,74 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
                     },
                   }}
                 >
-                <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                      marginRight: "4px",
-                      lineHeight: 1,
-                      fontSize: { xs: "0.9rem", sm: "1.15rem" },
-                    }}
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
                   >
-                    {weaponData.name || "Custom Weapon"}
-                  </Typography>
-                  {stats.martial && <Martial />}
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        marginRight: "4px",
+                        lineHeight: 1,
+                        fontSize: { xs: "0.9rem", sm: "1.15rem" },
+                      }}
+                    >
+                      {weaponData.name || "Custom Weapon"}
+                    </Typography>
+                    {stats.martial && <Martial />}
+                  </Grid>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={1}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >{`${stats.cost}z`}</Typography>
+                  </Grid>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <OpenBracket />
+                      {`${attrNoTranslation[weaponData.accuracyCheck?.att1]?.shortcaps || "DEX"} + ${attrNoTranslation[weaponData.accuracyCheck?.att2]?.shortcaps || "MIG"}`}
+                      <CloseBracket />
+                      {stats.precision !== 0 ? `+${stats.precision}` : ""}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <OpenBracket />
+                      {t("HR +")} {stats.damage}
+                      <CloseBracket />
+                      {t(stats.damageType)}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={1}>
-                  <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>{`${stats.cost}z`}</Typography>
-                </Grid>
-                <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                  <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}>
-                    <OpenBracket />
-                    {`${attrNoTranslation[weaponData.accuracyCheck?.att1]?.shortcaps || "DEX"} + ${attrNoTranslation[weaponData.accuracyCheck?.att2]?.shortcaps || "MIG"}`}
-                    <CloseBracket />
-                    {stats.precision !== 0 ? `+${stats.precision}` : ""}
-                  </Typography>
-                </Grid>
-                <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={4}>
-                  <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}>
-                    <OpenBracket />
-                    {t("HR +")} {stats.damage}
-                    <CloseBracket />
-                    {t(stats.damageType)}
-                  </Typography>
-                </Grid>
-              </Grid>
 
                 {/* Category/Details Row */}
-                <Grid container
+                <Grid
+                  container
                   sx={{
                     background: "transparent",
                     p: 0,
@@ -260,24 +334,65 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
                     },
                   }}
                 >
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                    <Typography sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{ fontWeight: "bold", lineHeight: 1, margin: 0 }}
+                    >
                       {t(weaponData.category)}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 0 }} size={1}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      p: 0,
+                    }}
+                    size={1}
+                  >
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={3}>
-                    <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={3}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {t("Two-handed")}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 0 }} size={1}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      p: 0,
+                    }}
+                    size={1}
+                  >
                     <Diamond color={theme.primary} />
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "center", p: 0 }} size={4}>
-                    <Typography sx={{ textAlign: "center", width: "100%", lineHeight: 1, margin: 0 }}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "center", p: 0 }}
+                    size={4}
+                  >
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        width: "100%",
+                        lineHeight: 1,
+                        margin: 0,
+                      }}
+                    >
                       {t(weaponData.range)}
                     </Typography>
                   </Grid>
@@ -303,48 +418,79 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
                   overflow: "hidden",
                 }}
               />
-              <Grid sx={{ textAlign: "left", color: "inherit", p: "5px" }} size={12}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+              <Grid
+                sx={{ textAlign: "left", color: "inherit", p: "5px" }}
+                size={12}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
                   {(() => {
                     const allItems = [];
 
                     // Add customizations
-                    if (weaponData.customizations && weaponData.customizations.length > 0) {
+                    if (
+                      weaponData.customizations &&
+                      weaponData.customizations.length > 0
+                    ) {
                       weaponData.customizations.forEach((custom, index) => {
                         allItems.push(
                           <Typography key={`custom-${index}`} component="span">
                             {t(custom.name)}
-                          </Typography>
+                          </Typography>,
                         );
-                        allItems.push(<Diamond key={`diamond-custom-${index}`} color={theme.primary} />);
+                        allItems.push(
+                          <Diamond
+                            key={`diamond-custom-${index}`}
+                            color={theme.primary}
+                          />,
+                        );
                       });
                     } else {
                       allItems.push(
                         <Typography key="no-custom" component="span">
                           {t("No Customizations")}
-                        </Typography>
+                        </Typography>,
                       );
-                      allItems.push(<Diamond key="diamond-no-custom" color={theme.primary} />);
+                      allItems.push(
+                        <Diamond
+                          key="diamond-no-custom"
+                          color={theme.primary}
+                        />,
+                      );
                     }
 
                     // Add qualities
                     allItems.push(
                       <Typography key="qualities" component="span">
-                        {!stats.qualities ? t("No Description") : (
+                        {!stats.qualities ? (
+                          t("No Description")
+                        ) : (
                           <StyledMarkdown
                             components={{
                               strong: ({ _node, ...props }) => (
-                                <strong style={{ fontWeight: "bold" }} {...props} />
+                                <strong
+                                  style={{ fontWeight: "bold" }}
+                                  {...props}
+                                />
                               ),
                               em: ({ _node, ...props }) => (
-                                <em style={{ fontStyle: "italic" }} {...props} />
+                                <em
+                                  style={{ fontStyle: "italic" }}
+                                  {...props}
+                                />
                               ),
                             }}
                           >
                             {stats.qualities}
                           </StyledMarkdown>
                         )}
-                      </Typography>
+                      </Typography>,
                     );
 
                     return allItems;
@@ -371,7 +517,12 @@ function PrettyCustomWeapon({ weaponData, showActions = true, showImageOverride 
             <AddToCompendiumButton itemType="custom-weapon" data={weaponData} />
           </div>
           <FormControlLabel
-            control={<Checkbox checked={showImage} onChange={(e) => setShowImage(e.target.checked)} />}
+            control={
+              <Checkbox
+                checked={showImage}
+                onChange={(e) => setShowImage(e.target.checked)}
+              />
+            }
             label={t("Add Image")}
           />
         </div>

@@ -29,22 +29,17 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   onLevelChange,
   isEditMode,
 }) => {
-
   const theme = useCustomTheme();
-  
-  const color = theme.mode === 'dark'
-  ? `#ffffff`
-  : `#000000`;
 
-  const background = theme.mode === 'dark'
-  ? `#212425`
-  : `#ffffff`;
+  const color = theme.mode === "dark" ? `#ffffff` : `#000000`;
+
+  const background = theme.mode === "dark" ? `#212425` : `#ffffff`;
 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslate();
 
   return (
-    <Grid  sx={{ width: "100%", margin: "15px" }} size={12}>
+    <Grid sx={{ width: "100%", margin: "15px" }} size={12}>
       <Typography
         variant="h2"
         component="legend"
@@ -63,15 +58,23 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           textAlign: "center",
         }}
       >
-        {isEditMode && <Tooltip title={t("Edit Class Name")}>
-          <IconButton
-            sx={{ px: 1, "&:hover": { color: theme.primary } }}
-            onClick={editClassName}
-          >
-            <Edit fontSize="large" style={{ color: "white" }}/>
-          </IconButton>
-        </Tooltip>}
-        <div style={{ flex: 1, textAlign: "left", paddingLeft: isEditMode ? 0 : 10 }}>
+        {isEditMode && (
+          <Tooltip title={t("Edit Class Name")}>
+            <IconButton
+              sx={{ px: 1, "&:hover": { color: theme.primary } }}
+              onClick={editClassName}
+            >
+              <Edit fontSize="large" style={{ color: "white" }} />
+            </IconButton>
+          </Tooltip>
+        )}
+        <div
+          style={{
+            flex: 1,
+            textAlign: "left",
+            paddingLeft: isEditMode ? 0 : 10,
+          }}
+        >
           {headerText}
         </div>
         <div
@@ -82,9 +85,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             gap: "2px",
           }}
         >
-          <div style={{ marginRight: "10px" }}>
-            {rightHeaderText}
-          </div>
+          <div style={{ marginRight: "10px" }}>{rightHeaderText}</div>
           <TextField
             // Ensure the value is a string
             value={editableNumber.toString()}
@@ -117,14 +118,19 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             }}
             slotProps={{
               input: {
-                inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
+                inputProps: {
+                  min: 1,
+                  max: 10,
+                  readOnly: !isEditMode,
+                  style: { textAlign: "center" },
+                },
                 style: {
                   color: color,
                   fontFamily: "inherit",
                   fontSize: "inherit",
                   backgroundColor: background,
                 },
-              }
+              },
             }}
           />
           {" / "}
@@ -140,14 +146,19 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
             }}
             slotProps={{
               input: {
-                inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
+                inputProps: {
+                  min: 1,
+                  max: 10,
+                  readOnly: true,
+                  style: { textAlign: "center" },
+                },
                 style: {
                   color: color,
                   fontFamily: "inherit",
                   fontSize: "inherit",
                   backgroundColor: background,
                 },
-              }
+              },
             }}
           />
         </div>

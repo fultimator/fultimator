@@ -120,7 +120,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container spacing={2}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Bonds")}
@@ -130,25 +130,29 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
           />
         </Grid>
         {player.info.bonds.map((bond, index) => (
-          <Grid  key={index} size={12}>
+          <Grid key={index} size={12}>
             <Grid container spacing={2} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
-                  md: 4
-                }}>
+                  md: 4,
+                }}
+              >
                 <Box
                   sx={{
                     display: "flex",
-                    alignItems: "center"
-                  }}>
-                  {isEditMode ? <IconButton
-                    aria-label="delete"
-                    onClick={() => openDeleteDialog(index)}
-                    sx={{ ml: 1 }}
-                  >
-                    <RemoveCircleOutlined />
-                  </IconButton> : null}
+                    alignItems: "center",
+                  }}
+                >
+                  {isEditMode ? (
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => openDeleteDialog(index)}
+                      sx={{ ml: 1 }}
+                    >
+                      <RemoveCircleOutlined />
+                    </IconButton>
+                  ) : null}
                   <TextField
                     fullWidth
                     label={t("Bond Name")}
@@ -159,17 +163,19 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         readOnly: !isEditMode,
                       },
 
-                      htmlInput: { maxLength: 50 }
-                    }} />
+                      htmlInput: { maxLength: 50 },
+                    }}
+                  />
                 </Box>
               </Grid>
               <Grid
                 size={{
                   xs: 12,
-                  md: 8
-                }}>
+                  md: 8,
+                }}
+              >
                 <Grid container spacing={1}>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -179,13 +185,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Admiration")}
                         </Typography>
                       }
                     />
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -195,13 +201,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Loyality")}
                         </Typography>
                       }
                     />
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -211,13 +217,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Affection")}
                         </Typography>
                       }
                     />
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -227,13 +233,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Inferiority")}
                         </Typography>
                       }
                     />
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -243,13 +249,13 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Mistrust")}
                         </Typography>
                       }
                     />
                   </Grid>
-                  <Grid  size={4}>
+                  <Grid size={4}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -259,7 +265,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                         />
                       }
                       label={
-                        <Typography sx={{ fontSize: '14px' }}>
+                        <Typography sx={{ fontSize: "14px" }}>
                           {t("Hatred")}
                         </Typography>
                       }
@@ -269,7 +275,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
               </Grid>
             </Grid>
             {index < player.info.bonds.length - 1 && (
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Divider />
               </Grid>
             )}

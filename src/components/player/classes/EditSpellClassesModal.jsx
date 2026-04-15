@@ -33,10 +33,10 @@ export default function EditSpellClassesModal({
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold"}}>
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {t("Edit Class Spell Types")}
       </DialogTitle>
       <IconButton

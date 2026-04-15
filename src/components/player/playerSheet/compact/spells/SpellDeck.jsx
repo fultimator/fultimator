@@ -69,17 +69,17 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
   }, []);
 
   const getSuitIcon = (suit) =>
-    ({ Air: "♢", Earth: "♣", Fire: "♡", Ice: "♠" }[suit] || "?");
+    ({ Air: "♢", Earth: "♣", Fire: "♡", Ice: "♠" })[suit] || "?";
 
   const getSuitColor = (suit) =>
-    ({ Air: "#87CEEB", Earth: "#8B4513", Fire: "#FF4500", Ice: "#4682B4" }[
+    ({ Air: "#87CEEB", Earth: "#8B4513", Fire: "#FF4500", Ice: "#4682B4" })[
       suit
-    ] || theme.primary);
+    ] || theme.primary;
 
   const getSuitMuiIcon = (suit) =>
-    ({ Air: Air, Earth: Terrain, Fire: LocalFireDepartment, Ice: AcUnit }[
+    ({ Air: Air, Earth: Terrain, Fire: LocalFireDepartment, Ice: AcUnit })[
       suit
-    ] || Casino);
+    ] || Casino;
 
   // derived state
 
@@ -104,13 +104,13 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           return {
             ...cls,
             spells: cls.spells.map((s) =>
-              s.spellType === "deck" ? { ...s, ...patch } : s
+              s.spellType === "deck" ? { ...s, ...patch } : s,
             ),
           };
         }),
       }));
     },
-    [spell.className, setPlayer]
+    [spell.className, setPlayer],
   );
 
   const drawCards = (num = 1) => {
@@ -146,12 +146,21 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    handleUpdate({ fullDeck: shuffled, cardsInDeck: shuffled.length, discardPile: [] });
+    handleUpdate({
+      fullDeck: shuffled,
+      cardsInDeck: shuffled.length,
+      discardPile: [],
+    });
   };
 
   const resetDeck = () => {
     const fresh = generateShuffledDeck();
-    handleUpdate({ fullDeck: fresh, cardsInDeck: 30, hand: [], discardPile: [] });
+    handleUpdate({
+      fullDeck: fresh,
+      cardsInDeck: 30,
+      hand: [],
+      discardPile: [],
+    });
     setCombatLog([]);
   };
 
@@ -173,7 +182,9 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
       discardPile: [...discardPile, revealed],
     });
 
-    const resultLabel = revealed.isJoker ? t("ace_joker_abbr") : `${revealed.value}${getSuitIcon(revealed.suit)}`;
+    const resultLabel = revealed.isJoker
+      ? t("ace_joker_abbr")
+      : `${revealed.value}${getSuitIcon(revealed.suit)}`;
     setCombatLog((prev) => [
       {
         id: Date.now(),
@@ -187,28 +198,33 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     ]);
   };
 
-
   const detectSet = useCallback((cards) => {
     if (!cards || cards.length < 2) return null;
     const sorted = [...cards].sort((a, b) => {
-      const av = a.isJoker ? (a.jokerValue || 1) : a.value;
-      const bv = b.isJoker ? (b.jokerValue || 1) : b.value;
+      const av = a.isJoker ? a.jokerValue || 1 : a.value;
+      const bv = b.isJoker ? b.jokerValue || 1 : b.value;
       return av - bv;
     });
     const valueGroups = {};
     const suitGroups = {};
     sorted.forEach((card) => {
-      const v = card.isJoker ? (card.jokerValue || 1) : card.value;
-      const s = card.isJoker ? (card.jokerSuit || "Air") : card.suit;
+      const v = card.isJoker ? card.jokerValue || 1 : card.value;
+      const s = card.isJoker ? card.jokerSuit || "Air" : card.suit;
       if (!valueGroups[v]) valueGroups[v] = [];
       if (!suitGroups[s]) suitGroups[s] = [];
       valueGroups[v].push(card);
       suitGroups[s].push(card);
     });
-    const values = Object.keys(valueGroups).map(Number).sort((a, b) => a - b);
+    const values = Object.keys(valueGroups)
+      .map(Number)
+      .sort((a, b) => a - b);
     const valueCounts = Object.values(valueGroups).map((g) => g.length);
     const suits = Object.keys(suitGroups);
-    if (cards.length === 4 && valueCounts.includes(4) && !cards.some((c) => c.isJoker))
+    if (
+      cards.length === 4 &&
+      valueCounts.includes(4) &&
+      !cards.some((c) => c.isJoker)
+    )
       return { type: "Jackpot", cards: sorted };
     if (cards.length === 4 && suits.length === 1 && areConsecutive(values))
       return { type: "Magic Flush", cards: sorted };
@@ -216,7 +232,8 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
       return { type: "Blinding Flush", cards: sorted };
     if (cards.length === 5) {
       const counts = valueCounts.slice().sort((a, b) => b - a);
-      if (counts[0] === 3 && counts[1] === 2) return { type: "Full Status", cards: sorted };
+      if (counts[0] === 3 && counts[1] === 2)
+        return { type: "Full Status", cards: sorted };
     }
     if (cards.length === 3 && valueCounts.includes(3))
       return { type: "Triple Support", cards: sorted };
@@ -230,26 +247,47 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
   }, []);
 
   const getSetEffect = (setType, cards) => {
-    const totalValue = cards.reduce((sum, card) => sum + (card.isJoker ? (card.jokerValue || 1) : card.value), 0);
-    const highestValue = Math.max(...cards.map((card) => card.isJoker ? (card.jokerValue || 1) : card.value));
+    const totalValue = cards.reduce(
+      (sum, card) => sum + (card.isJoker ? card.jokerValue || 1 : card.value),
+      0,
+    );
+    const highestValue = Math.max(
+      ...cards.map((card) =>
+        card.isJoker ? card.jokerValue || 1 : card.value,
+      ),
+    );
     switch (setType) {
-      case "Jackpot": return t("ace_jackpot_enriched");
+      case "Jackpot":
+        return t("ace_jackpot_enriched");
       case "Magic Flush": {
-        const suit = cards[0].isJoker ? (cards[0].jokerSuit || "Air") : cards[0].suit;
-        return t("ace_magic_flush_enriched", [25 + totalValue, suit.toLowerCase()]);
+        const suit = cards[0].isJoker
+          ? cards[0].jokerSuit || "Air"
+          : cards[0].suit;
+        return t("ace_magic_flush_enriched", [
+          25 + totalValue,
+          suit.toLowerCase(),
+        ]);
       }
       case "Blinding Flush": {
         const isEven = totalValue % 2 === 0;
-        return isEven ? t("ace_blinding_flush_desc_light_enriched", [15 + totalValue]) : t("ace_blinding_flush_desc_dark_enriched", [15 + totalValue]);
+        return isEven
+          ? t("ace_blinding_flush_desc_light_enriched", [15 + totalValue])
+          : t("ace_blinding_flush_desc_dark_enriched", [15 + totalValue]);
       }
       case "Full Status": {
         const isEven = highestValue % 2 === 0;
-        return isEven ? t("ace_effect_full_status_even_enriched", [highestValue]) : t("ace_effect_full_status_odd_enriched", [highestValue]);
+        return isEven
+          ? t("ace_effect_full_status_even_enriched", [highestValue])
+          : t("ace_effect_full_status_odd_enriched", [highestValue]);
       }
-      case "Triple Support": return t("ace_triple_support_enriched", [totalValue * 3]);
-      case "Double Trouble": return t("ace_double_trouble_enriched", [10 + highestValue]);
-      case "Magic Pair": return t("ace_magic_pair_enriched");
-      default: return t("ace_unknown_effect");
+      case "Triple Support":
+        return t("ace_triple_support_enriched", [totalValue * 3]);
+      case "Double Trouble":
+        return t("ace_double_trouble_enriched", [10 + highestValue]);
+      case "Magic Pair":
+        return t("ace_magic_pair_enriched");
+      default:
+        return t("ace_unknown_effect");
     }
   };
 
@@ -330,7 +368,10 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           const sorted = [...combo].sort((a, b) => a.value - b.value);
           let consecutive = true;
           for (let i = 1; i < sorted.length; i++) {
-            if (sorted[i].value !== sorted[i - 1].value + 1) { consecutive = false; break; }
+            if (sorted[i].value !== sorted[i - 1].value + 1) {
+              consecutive = false;
+              break;
+            }
           }
           if (consecutive) sequences.push(sorted);
         });
@@ -342,8 +383,12 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     Object.entries(valueGroups).forEach(([value, cards]) => {
       if (cards.length >= 4 && value !== "joker") {
         generateCardCombinations(cards, 4).forEach((combo) => {
-          allSuggestions.push({ type: "Jackpot", cards: combo, priority: 6,
-            id: `jackpot-${value}-${combo.map((c) => c.handIndex).join("-")}` });
+          allSuggestions.push({
+            type: "Jackpot",
+            cards: combo,
+            priority: 6,
+            id: `jackpot-${value}-${combo.map((c) => c.handIndex).join("-")}`,
+          });
         });
       }
     });
@@ -352,18 +397,28 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     Object.entries(suitGroups).forEach(([suit, cards]) => {
       if (cards.length >= 4 && suit !== "joker") {
         findAllConsecutiveSequences(cards, 4).forEach((seq, i) => {
-          allSuggestions.push({ type: "Magic Flush", cards: seq, priority: 5,
-            id: `magic-flush-${suit}-${i}-${seq.map((c) => c.handIndex).join("-")}` });
+          allSuggestions.push({
+            type: "Magic Flush",
+            cards: seq,
+            priority: 5,
+            id: `magic-flush-${suit}-${i}-${seq.map((c) => c.handIndex).join("-")}`,
+          });
         });
       }
     });
 
     // Blinding Flush
-    const allNonJokers = currentHand.map((card, index) => ({ ...card, handIndex: index })).filter((c) => !c.isJoker);
+    const allNonJokers = currentHand
+      .map((card, index) => ({ ...card, handIndex: index }))
+      .filter((c) => !c.isJoker);
     if (allNonJokers.length >= 4) {
       findAllConsecutiveSequences(allNonJokers, 4).forEach((seq, i) => {
-        allSuggestions.push({ type: "Blinding Flush", cards: seq, priority: 4,
-          id: `blinding-flush-${i}-${seq.map((c) => c.handIndex).join("-")}` });
+        allSuggestions.push({
+          type: "Blinding Flush",
+          cards: seq,
+          priority: 4,
+          id: `blinding-flush-${i}-${seq.map((c) => c.handIndex).join("-")}`,
+        });
       });
     }
 
@@ -373,9 +428,13 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     Object.entries(valueGroups).forEach(([value, cards]) => {
       if (value !== "joker") {
         if (cards.length >= 3)
-          generateCardCombinations(cards, 3).forEach((combo) => allTriples.push({ value, cards: combo }));
+          generateCardCombinations(cards, 3).forEach((combo) =>
+            allTriples.push({ value, cards: combo }),
+          );
         if (cards.length >= 2)
-          generateCardCombinations(cards, 2).forEach((combo) => allPairs.push({ value, cards: combo }));
+          generateCardCombinations(cards, 2).forEach((combo) =>
+            allPairs.push({ value, cards: combo }),
+          );
       }
     });
     allTriples.forEach((triple) => {
@@ -385,8 +444,12 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           const pi = pair.cards.map((c) => c.handIndex);
           if (!ti.some((i) => pi.includes(i))) {
             const cards = [...triple.cards, ...pair.cards];
-            allSuggestions.push({ type: "Full Status", cards, priority: 3,
-              id: `full-status-${triple.value}-${pair.value}-${cards.map((c) => c.handIndex).join("-")}` });
+            allSuggestions.push({
+              type: "Full Status",
+              cards,
+              priority: 3,
+              id: `full-status-${triple.value}-${pair.value}-${cards.map((c) => c.handIndex).join("-")}`,
+            });
           }
         }
       });
@@ -396,8 +459,12 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     Object.entries(valueGroups).forEach(([value, cards]) => {
       if (cards.length >= 3 && value !== "joker") {
         generateCardCombinations(cards, 3).forEach((combo) => {
-          allSuggestions.push({ type: "Triple Support", cards: combo, priority: 3,
-            id: `triple-${value}-${combo.map((c) => c.handIndex).join("-")}` });
+          allSuggestions.push({
+            type: "Triple Support",
+            cards: combo,
+            priority: 3,
+            id: `triple-${value}-${combo.map((c) => c.handIndex).join("-")}`,
+          });
         });
       }
     });
@@ -405,14 +472,19 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     // Double Trouble
     for (let i = 0; i < allPairs.length; i++) {
       for (let j = i + 1; j < allPairs.length; j++) {
-        const p1 = allPairs[i], p2 = allPairs[j];
+        const p1 = allPairs[i],
+          p2 = allPairs[j];
         if (p1.value !== p2.value) {
           const i1 = p1.cards.map((c) => c.handIndex);
           const i2 = p2.cards.map((c) => c.handIndex);
           if (!i1.some((x) => i2.includes(x))) {
             const cards = [...p1.cards, ...p2.cards];
-            allSuggestions.push({ type: "Double Trouble", cards, priority: 2,
-              id: `double-${p1.value}-${p2.value}-${cards.map((c) => c.handIndex).join("-")}` });
+            allSuggestions.push({
+              type: "Double Trouble",
+              cards,
+              priority: 2,
+              id: `double-${p1.value}-${p2.value}-${cards.map((c) => c.handIndex).join("-")}`,
+            });
           }
         }
       }
@@ -422,8 +494,12 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     Object.entries(valueGroups).forEach(([value, cards]) => {
       if (cards.length >= 2 && value !== "joker") {
         generateCardCombinations(cards, 2).forEach((combo) => {
-          allSuggestions.push({ type: "Magic Pair", cards: combo, priority: 1,
-            id: `pair-${value}-${combo.map((c) => c.handIndex).join("-")}` });
+          allSuggestions.push({
+            type: "Magic Pair",
+            cards: combo,
+            priority: 1,
+            id: `pair-${value}-${combo.map((c) => c.handIndex).join("-")}`,
+          });
         });
       }
     });
@@ -432,7 +508,10 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
     const seen = new Set();
     return allSuggestions
       .filter((s) => {
-        const key = `${s.type}-${s.cards.map((c) => c.handIndex).sort().join("-")}`;
+        const key = `${s.type}-${s.cards
+          .map((c) => c.handIndex)
+          .sort()
+          .join("-")}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
@@ -466,7 +545,14 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
               </Typography>
             </StyledTableCell>
             <StyledTableCell sx={{ textAlign: "center" }}>
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 0.5,
+                }}
+              >
                 <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                   {t("ace_discard_pile")}: {discardPile.length}
                 </Typography>
@@ -481,9 +567,13 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           {hand.length > 0 && (
             <TableRow>
               <StyledTableCell colSpan={3}>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}>
+                <Box
+                  sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, py: 0.5 }}
+                >
                   {hand.map((card, i) => {
-                    const isSelected = selectedCards.some((c) => c.uniqueId === i);
+                    const isSelected = selectedCards.some(
+                      (c) => c.uniqueId === i,
+                    );
                     const isRed = ["Fire"].includes(card.suit);
                     return (
                       <Box
@@ -495,10 +585,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                           borderRadius: 0.5,
                           border: "2px solid",
                           borderColor: isSelected ? "primary.main" : "divider",
-                          backgroundColor: isSelected ? "primary.main" : theme.ternary + "10",
+                          backgroundColor: isSelected
+                            ? "primary.main"
+                            : theme.ternary + "10",
                           fontSize: "0.75rem",
                           fontWeight: "bold",
-                          color: isSelected ? "primary.contrastText" : (isRed ? "error.main" : "text.primary"),
+                          color: isSelected
+                            ? "primary.contrastText"
+                            : isRed
+                              ? "error.main"
+                              : "text.primary",
                           cursor: "pointer",
                           transition: "all 0.15s ease",
                           userSelect: "none",
@@ -523,17 +619,21 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           {potentialSet && (
             <TableRow>
               <StyledTableCell colSpan={3} sx={{ p: 0 }}>
-                <Box sx={{
-                  backgroundColor: "success.main",
-                  px: 1,
-                  py: 0.75,
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 1,
-                  flexWrap: "wrap",
-                }}>
+                <Box
+                  sx={{
+                    backgroundColor: "success.main",
+                    px: 1,
+                    py: 0.75,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Chip
-                    icon={<AutoFixHigh sx={{ fontSize: "0.8rem !important" }} />}
+                    icon={
+                      <AutoFixHigh sx={{ fontSize: "0.8rem !important" }} />
+                    }
                     label={potentialSet.type}
                     size="small"
                     onClick={resolveSet}
@@ -545,24 +645,42 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                       cursor: "pointer",
                       flexShrink: 0,
                       animation: "pulse 2s infinite",
-                      "@keyframes pulse": { "0%": { opacity: 1 }, "50%": { opacity: 0.75 }, "100%": { opacity: 1 } },
+                      "@keyframes pulse": {
+                        "0%": { opacity: 1 },
+                        "50%": { opacity: 0.75 },
+                        "100%": { opacity: 1 },
+                      },
                       "&:hover": { backgroundColor: "grey.100" },
                     }}
                   />
-                  <Typography variant="caption" sx={{
-                    color: "white",
-                    fontStyle: "italic",
-                    lineHeight: 1.4,
-                    flex: 1,
-                    minWidth: 0,
-                  }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "white",
+                      fontStyle: "italic",
+                      lineHeight: 1.4,
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
                     {getSetEffect(potentialSet.type, selectedCards)}
                   </Typography>
                   <Chip
                     label="✗"
                     size="small"
-                    onClick={() => { setSelectedCards([]); setPotentialSet(null); }}
-                    sx={{ fontSize: "0.65rem", height: 18, minWidth: 0, cursor: "pointer", backgroundColor: "rgba(255,255,255,0.3)", color: "white", flexShrink: 0 }}
+                    onClick={() => {
+                      setSelectedCards([]);
+                      setPotentialSet(null);
+                    }}
+                    sx={{
+                      fontSize: "0.65rem",
+                      height: 18,
+                      minWidth: 0,
+                      cursor: "pointer",
+                      backgroundColor: "rgba(255,255,255,0.3)",
+                      color: "white",
+                      flexShrink: 0,
+                    }}
                   />
                 </Box>
               </StyledTableCell>
@@ -570,92 +688,176 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
           )}
 
           {/* Quick Sets Row */}
-          {hand.length > 1 && (() => {
-            const suggestions = detectPossibleSets(hand);
-            if (suggestions.length === 0) return null;
-            return (
-              <TableRow>
-                <StyledTableCell colSpan={3} sx={{ py: 0.5 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
-                    <Lightbulb sx={{ fontSize: "0.9rem", color: "warning.main" }} />
-                    <Typography variant="caption" sx={{ fontWeight: "bold", mr: 0.5 }}>
-                      {t("ace_quick_sets")} ({suggestions.length}):
-                    </Typography>
-                    {suggestions.map((suggestion, index) => (
-                      <Chip
-                        key={index}
-                        label={suggestion.type}
-                        size="small"
-                        clickable
-                        icon={<CheckCircle sx={{ fontSize: "0.8rem !important" }} />}
-                        onClick={() => {
-                          const cards = suggestion.cards.map((c) => ({ ...c, uniqueId: c.handIndex }));
-                          setSelectedCards(cards);
-                          setPotentialSet(detectSet(cards));
-                        }}
-                        sx={{
-                          fontSize: "0.65rem",
-                          height: 20,
-                          backgroundColor: "primary.main",
-                          color: "primary.contrastText",
-                          "& .MuiChip-icon": { color: "primary.contrastText" },
-                          "&:hover": { backgroundColor: "primary.dark" },
-                        }}
+          {hand.length > 1 &&
+            (() => {
+              const suggestions = detectPossibleSets(hand);
+              if (suggestions.length === 0) return null;
+              return (
+                <TableRow>
+                  <StyledTableCell colSpan={3} sx={{ py: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <Lightbulb
+                        sx={{ fontSize: "0.9rem", color: "warning.main" }}
                       />
-                    ))}
-                    {selectedCards.length > 0 && (
-                      <>
-                        <Box sx={{ display: "flex", gap: 0.25, flexWrap: "wrap", ml: 0.5 }}>
-                          {selectedCards.map((card, i) => (
-                            <Typography key={i} variant="caption" sx={{
-                              backgroundColor: "success.main", color: "white",
-                              px: 0.5, borderRadius: 0.5, fontSize: "0.65rem", fontWeight: "bold",
-                            }}>
-                              {card.isJoker ? t("ace_joker_abbr") : `${card.value}${getSuitIcon(card.suit)}`}
-                            </Typography>
-                          ))}
-                        </Box>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: "bold", mr: 0.5 }}
+                      >
+                        {t("ace_quick_sets")} ({suggestions.length}):
+                      </Typography>
+                      {suggestions.map((suggestion, index) => (
                         <Chip
-                          label="✗"
+                          key={index}
+                          label={suggestion.type}
                           size="small"
-                          onClick={() => setSelectedCards([])}
-                          sx={{ fontSize: "0.65rem", height: 18, minWidth: 0, cursor: "pointer" }}
+                          clickable
+                          icon={
+                            <CheckCircle
+                              sx={{ fontSize: "0.8rem !important" }}
+                            />
+                          }
+                          onClick={() => {
+                            const cards = suggestion.cards.map((c) => ({
+                              ...c,
+                              uniqueId: c.handIndex,
+                            }));
+                            setSelectedCards(cards);
+                            setPotentialSet(detectSet(cards));
+                          }}
+                          sx={{
+                            fontSize: "0.65rem",
+                            height: 20,
+                            backgroundColor: "primary.main",
+                            color: "primary.contrastText",
+                            "& .MuiChip-icon": {
+                              color: "primary.contrastText",
+                            },
+                            "&:hover": { backgroundColor: "primary.dark" },
+                          }}
                         />
-                      </>
-                    )}
-                  </Box>
-                </StyledTableCell>
-              </TableRow>
-            );
-          })()}
+                      ))}
+                      {selectedCards.length > 0 && (
+                        <>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 0.25,
+                              flexWrap: "wrap",
+                              ml: 0.5,
+                            }}
+                          >
+                            {selectedCards.map((card, i) => (
+                              <Typography
+                                key={i}
+                                variant="caption"
+                                sx={{
+                                  backgroundColor: "success.main",
+                                  color: "white",
+                                  px: 0.5,
+                                  borderRadius: 0.5,
+                                  fontSize: "0.65rem",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                {card.isJoker
+                                  ? t("ace_joker_abbr")
+                                  : `${card.value}${getSuitIcon(card.suit)}`}
+                              </Typography>
+                            ))}
+                          </Box>
+                          <Chip
+                            label="✗"
+                            size="small"
+                            onClick={() => setSelectedCards([])}
+                            sx={{
+                              fontSize: "0.65rem",
+                              height: 18,
+                              minWidth: 0,
+                              cursor: "pointer",
+                            }}
+                          />
+                        </>
+                      )}
+                    </Box>
+                  </StyledTableCell>
+                </TableRow>
+              );
+            })()}
 
           {/* Combat Log Row */}
           {combatLog.length > 0 && (
             <TableRow>
               <StyledTableCell colSpan={3}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25, py: 0.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.25,
+                    py: 0.5,
+                  }}
+                >
                   {combatLog.map((entry) => (
-                    <Box key={entry.id} sx={{ display: "flex", alignItems: "center", gap: 0.5, flexWrap: "wrap" }}>
+                    <Box
+                      key={entry.id}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        flexWrap: "wrap",
+                      }}
+                    >
                       <Chip
                         label={entry.setType}
                         size="small"
-                        color={entry.isTrap ? (entry.success ? "success" : "error") : "success"}
+                        color={
+                          entry.isTrap
+                            ? entry.success
+                              ? "success"
+                              : "error"
+                            : "success"
+                        }
                         sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
                       />
                       <Box sx={{ display: "flex", gap: 0.25 }}>
                         {entry.cards.map((card, ci) => (
-                          <Typography key={ci} variant="caption" sx={{
-                            backgroundColor: "primary.main", color: "primary.contrastText",
-                            px: 0.4, borderRadius: 0.5, fontSize: "0.65rem", fontWeight: "bold",
-                          }}>
-                            {card.isJoker ? t("ace_joker_abbr") : `${card.value}${getSuitIcon(card.suit)}`}
+                          <Typography
+                            key={ci}
+                            variant="caption"
+                            sx={{
+                              backgroundColor: "primary.main",
+                              color: "primary.contrastText",
+                              px: 0.4,
+                              borderRadius: 0.5,
+                              fontSize: "0.65rem",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {card.isJoker
+                              ? t("ace_joker_abbr")
+                              : `${card.value}${getSuitIcon(card.suit)}`}
                           </Typography>
                         ))}
                       </Box>
-                      <Typography variant="caption" sx={{
-                        color: "text.secondary", fontSize: "0.65rem", fontStyle: "italic",
-                        flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                      }} title={entry.effect}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "text.secondary",
+                          fontSize: "0.65rem",
+                          fontStyle: "italic",
+                          flex: 1,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        title={entry.effect}
+                      >
                         {entry.effect}
                       </Typography>
                     </Box>
@@ -678,11 +880,23 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                           size="small"
                           variant="contained"
                           color="success"
-                          startIcon={<AutoFixHigh sx={{ fontSize: "0.8rem !important" }} />}
+                          startIcon={
+                            <AutoFixHigh
+                              sx={{ fontSize: "0.8rem !important" }}
+                            />
+                          }
                           onClick={resolveSet}
-                          sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0,
+                          sx={{
+                            fontSize: "0.65rem",
+                            py: 0.25,
+                            px: 0.75,
+                            minWidth: 0,
                             animation: "pulse 2s infinite",
-                            "@keyframes pulse": { "0%": { opacity: 1 }, "50%": { opacity: 0.7 }, "100%": { opacity: 1 } },
+                            "@keyframes pulse": {
+                              "0%": { opacity: 1 },
+                              "50%": { opacity: 0.7 },
+                              "100%": { opacity: 1 },
+                            },
                           }}
                         >
                           {potentialSet.type}
@@ -694,8 +908,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                           size="small"
                           variant="outlined"
                           color="inherit"
-                          onClick={() => { setSelectedCards([]); setPotentialSet(null); }}
-                          sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                          onClick={() => {
+                            setSelectedCards([]);
+                            setPotentialSet(null);
+                          }}
+                          sx={{
+                            fontSize: "0.65rem",
+                            py: 0.25,
+                            px: 0.75,
+                            minWidth: 0,
+                          }}
                         >
                           {t("Clear")}
                         </Button>
@@ -705,10 +927,17 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="contained"
                         color="primary"
-                        startIcon={<GetApp sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <GetApp sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={() => drawCards(1)}
                         disabled={cardsInDeck <= 0}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("ace_draw_card")} ({cardsInDeck})
                       </Button>
@@ -718,10 +947,17 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="contained"
                         color="secondary"
-                        startIcon={<NewReleases sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <NewReleases sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={() => setTrapCardDialogOpen(true)}
                         disabled={cardsInDeck <= 0}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("ace_trap_card")}
                       </Button>
@@ -732,9 +968,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                           size="small"
                           variant="contained"
                           color="warning"
-                          startIcon={<Shuffle sx={{ fontSize: "0.8rem !important" }} />}
+                          startIcon={
+                            <Shuffle sx={{ fontSize: "0.8rem !important" }} />
+                          }
                           onClick={shuffleDeck}
-                          sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                          sx={{
+                            fontSize: "0.65rem",
+                            py: 0.25,
+                            px: 0.75,
+                            minWidth: 0,
+                          }}
                         >
                           {t("ace_shuffle")}
                         </Button>
@@ -745,9 +988,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="contained"
                         color="warning"
-                        startIcon={<Delete sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <Delete sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={discardHand}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("ace_discard_all")}
                       </Button>
@@ -759,10 +1009,17 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="contained"
                         color="primary"
-                        startIcon={<GetApp sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <GetApp sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={() => drawCards(5)}
                         disabled={cardsInDeck < 5}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("ace_deck_conflict_start")} (5)
                       </Button>
@@ -772,10 +1029,17 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="outlined"
                         color="primary"
-                        startIcon={<GetApp sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <GetApp sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={() => drawCards(1)}
                         disabled={cardsInDeck <= 0}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("ace_draw_1_card")}
                       </Button>
@@ -786,9 +1050,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                           size="small"
                           variant="contained"
                           color="warning"
-                          startIcon={<Shuffle sx={{ fontSize: "0.8rem !important" }} />}
+                          startIcon={
+                            <Shuffle sx={{ fontSize: "0.8rem !important" }} />
+                          }
                           onClick={shuffleDeck}
-                          sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                          sx={{
+                            fontSize: "0.65rem",
+                            py: 0.25,
+                            px: 0.75,
+                            minWidth: 0,
+                          }}
                         >
                           {t("ace_shuffle")} ({discardPile.length})
                         </Button>
@@ -799,9 +1070,16 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                         size="small"
                         variant="contained"
                         color="error"
-                        startIcon={<Refresh sx={{ fontSize: "0.8rem !important" }} />}
+                        startIcon={
+                          <Refresh sx={{ fontSize: "0.8rem !important" }} />
+                        }
                         onClick={resetDeck}
-                        sx={{ fontSize: "0.65rem", py: 0.25, px: 0.75, minWidth: 0 }}
+                        sx={{
+                          fontSize: "0.65rem",
+                          py: 0.25,
+                          px: 0.75,
+                          minWidth: 0,
+                        }}
                       >
                         {t("Reset")}
                       </Button>

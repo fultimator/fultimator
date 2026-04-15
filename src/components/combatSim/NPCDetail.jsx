@@ -161,7 +161,7 @@ const NPCDetail = ({
             selectedNPC.name +
               (selectedNPC?.combatStats?.combatNotes
                 ? "【" + selectedNPC.combatStats.combatNotes + "】"
-                : "")
+                : ""),
           );
         }, 100);
       }
@@ -173,7 +173,7 @@ const NPCDetail = ({
             selectedNPC.name +
               (selectedNPC?.combatStats?.combatNotes
                 ? "【" + selectedNPC.combatStats.combatNotes + "】"
-                : "")
+                : ""),
           );
         }, 100);
       }
@@ -190,7 +190,7 @@ const NPCDetail = ({
           {
             effect: showSpellEffect && spellData.effect ? spellData.effect : "",
             markdown: true,
-          }
+          },
         );
       }
     }
@@ -250,8 +250,8 @@ const NPCDetail = ({
               ? attack.special[0]
               : ""
             : showWeaponAttackEffect && attack.special[0]
-            ? attack.special[0]
-            : "",
+              ? attack.special[0]
+              : "",
       });
     }
 
@@ -262,7 +262,7 @@ const NPCDetail = ({
           selectedNPC.name +
             (selectedNPC?.combatStats?.combatNotes
               ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : "")
+              : ""),
         );
       }, 100);
     }
@@ -274,7 +274,7 @@ const NPCDetail = ({
           selectedNPC.name +
             (selectedNPC?.combatStats?.combatNotes
               ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : "")
+              : ""),
         );
       }, 100);
     }
@@ -314,8 +314,8 @@ const NPCDetail = ({
                 currentMp: npc.combatStats.currentMp - mpCost,
               },
             }
-          : npc
-      )
+          : npc,
+      ),
     );
   }
 
@@ -402,7 +402,7 @@ const NPCDetail = ({
     const totalHitScore = roll1 + roll2;
 
     console.log(
-      `Rolling ${attr1label} (${roll1}) + ${attr2label} (${roll2}) = ${totalHitScore}`
+      `Rolling ${attr1label} (${roll1}) + ${attr2label} (${roll2}) = ${totalHitScore}`,
     );
 
     if (logStandardRoll) {
@@ -428,7 +428,7 @@ const NPCDetail = ({
           selectedNPC.name +
             (selectedNPC?.combatStats?.combatNotes
               ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : "")
+              : ""),
         );
       }, 100);
     }
@@ -440,7 +440,7 @@ const NPCDetail = ({
           selectedNPC.name +
             (selectedNPC?.combatStats?.combatNotes
               ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : "")
+              : ""),
         );
       }, 100);
     }
@@ -471,7 +471,9 @@ const NPCDetail = ({
 
     setSelectedNPC(updatedNPC);
     setSelectedNPCs((prev) =>
-      prev.map((npc) => (npc.combatId === updatedNPC.combatId ? updatedNPC : npc))
+      prev.map((npc) =>
+        npc.combatId === updatedNPC.combatId ? updatedNPC : npc,
+      ),
     );
   };
 
@@ -814,7 +816,7 @@ const NPCDetail = ({
       <DialogActions sx={{ p: 0 }}>
         <Grid container spacing={0}>
           {tabIndex === 0 && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <Box
                 sx={{
                   display: "flex",
@@ -872,7 +874,7 @@ const NPCDetail = ({
             </Grid>
           )}
           {tabIndex === 2 && !hideLogs && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <StandardRollsSection
                 selectedNPC={selectedNPC}
                 calcAttr={calcAttr}
@@ -880,7 +882,7 @@ const NPCDetail = ({
               />
             </Grid>
           )}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Box sx={{ width: "100%" }}>
               <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
             </Box>

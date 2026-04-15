@@ -1,5 +1,14 @@
 import React, { useCallback, useState } from "react";
-import { Grid, TextField, useTheme, Paper, IconButton, Tooltip, Box, Typography } from "@mui/material";
+import {
+  Grid,
+  TextField,
+  useTheme,
+  Paper,
+  IconButton,
+  Tooltip,
+  Box,
+  Typography,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslate } from "../../../translation/translate";
@@ -16,14 +25,18 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {
-          setPlayer((prev) => ({
-            ...prev,
-            quirk: { name: "", description: "", effect: "" },
-          }));
-        },
-  });;
+      setPlayer((prev) => ({
+        ...prev,
+        quirk: { name: "", description: "", effect: "" },
+      }));
+    },
+  });
 
   const onChangeQuirk = useCallback(
     (key) => (value) => {
@@ -35,7 +48,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleAddFromCompendium = useCallback(
@@ -49,7 +62,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   return (
@@ -63,7 +76,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Quirk")}
@@ -74,8 +87,9 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           <Grid
             size={{
               xs: 10,
-              sm: 11
-            }}>
+              sm: 11,
+            }}
+          >
             <TextField
               id="name"
               label={t("Quirk Name") + ":"}
@@ -87,18 +101,23 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                   readOnly: !isEditMode,
                 },
 
-                htmlInput: { maxLength: 50 }
-              }} />
+                htmlInput: { maxLength: 50 },
+              }}
+            />
           </Grid>
           {isEditMode && (
             <Grid
               sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
               size={{
                 xs: 2,
-                sm: 1
-              }}>
+                sm: 1,
+              }}
+            >
               <Tooltip title={t("Replace from Compendium")}>
-                <IconButton size="small" onClick={() => setCompendiumOpen(true)}>
+                <IconButton
+                  size="small"
+                  onClick={() => setCompendiumOpen(true)}
+                >
                   <SearchIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -112,8 +131,9 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               id="description"
               label={t("Description") + ":"}
@@ -127,8 +147,9 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               id="effect"
               label={t("Effect") + ":"}
@@ -164,7 +185,9 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
         message={t("Are you sure you want to delete this quirk?")}
         itemPreview={
           <Box>
-            <Typography variant="h4">{player.quirk?.name || t("Quirk")}</Typography>
+            <Typography variant="h4">
+              {player.quirk?.name || t("Quirk")}
+            </Typography>
           </Box>
         }
       />

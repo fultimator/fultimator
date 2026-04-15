@@ -20,30 +20,28 @@ import LoadingPage from "./components/common/LoadingPage";
 
 const NpcGallery = React.lazy(() => import("./routes/npc-gallery/npc-gallery"));
 const NpcEdit = React.lazy(() => import("./routes/npc-edit/npc-edit"));
-const NpcCompedium = React.lazy(() =>
-  import("./routes/npc-compedium/npc-compedium")
+const NpcCompedium = React.lazy(
+  () => import("./routes/npc-compedium/npc-compedium"),
 );
 const PlayerEdit = React.lazy(() => import("./routes/player-edit/player-edit"));
-const PlayerGallery = React.lazy(() =>
-  import("./routes/player-gallery/player-gallery")
+const PlayerGallery = React.lazy(
+  () => import("./routes/player-gallery/player-gallery"),
 );
-const CharacterSheet = React.lazy(() =>
-  import("./routes/character-sheet/character-sheet")
+const CharacterSheet = React.lazy(
+  () => import("./routes/character-sheet/character-sheet"),
 );
-const CombatSimulator = React.lazy(() =>
-  import("./routes/combat/combatSimulator")
+const CombatSimulator = React.lazy(
+  () => import("./routes/combat/combatSimulator"),
 );
-const CombatSimulatorEncounters = React.lazy(() =>
-  import("./routes/combat/combatSimulatorEncounters")
+const CombatSimulatorEncounters = React.lazy(
+  () => import("./routes/combat/combatSimulatorEncounters"),
 );
 const Generator = React.lazy(() => import("./routes/generator/generator"));
 const Roller = React.lazy(() => import("./routes/roller/roller"));
 const RollerScoped = React.lazy(() => import("./routes/roller/roller-scoped"));
-const Resources = React.lazy(() =>
-  import("./routes/resources/resources")
-);
-const CompendiumViewer = React.lazy(() =>
-  import("./routes/compendium/compendium")
+const Resources = React.lazy(() => import("./routes/resources/resources"));
+const CompendiumViewer = React.lazy(
+  () => import("./routes/compendium/compendium"),
 );
 
 const themes = {

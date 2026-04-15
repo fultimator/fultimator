@@ -17,7 +17,7 @@ export default function SelectedNpcsHeader({
   const isDarkMode = theme.palette.mode === "dark";
 
   const isAllTurnsChecked = selectedNPCs?.every((npc) =>
-    npc.combatStats.turns?.every(Boolean)
+    npc.combatStats.turns?.every(Boolean),
   );
 
   // Calculate the highest initiative for the selected NPCs
@@ -25,7 +25,7 @@ export default function SelectedNpcsHeader({
     ...selectedNPCs
       .filter((npc) => npc.id !== undefined && npc.attributes !== undefined)
       .map((npc) => calcInit(npc))
-      .concat([0]) // Add a default value in case the array is empty
+      .concat([0]), // Add a default value in case the array is empty
   );
   return (
     <Box
@@ -145,8 +145,8 @@ export default function SelectedNpcsHeader({
                   ? "inherit"
                   : "white"
                 : isDarkMode
-                ? "inherit"
-                : "primary"
+                  ? "inherit"
+                  : "primary"
             }
             onClick={handleResetTurns}
             disabled={selectedNPCs.length === 0}

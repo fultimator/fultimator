@@ -1,7 +1,9 @@
-import React, { ReactNode, useState } from 'react';
-import { ThemeContext, type ThemeValue } from './ThemeContextSetup';
+import React, { ReactNode, useState } from "react";
+import { ThemeContext, type ThemeValue } from "./ThemeContextSetup";
 
-export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeValue>(() => {
     return (localStorage.getItem("selectedTheme") as ThemeValue) || "Fabula";
   });
@@ -22,7 +24,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const toggleDarkMode = () => {
-    setIsDarkMode(prevMode => {
+    setIsDarkMode((prevMode) => {
       const newMode = !prevMode;
       localStorage.setItem("isDarkMode", JSON.stringify(newMode));
       return newMode;
@@ -30,7 +32,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   return (
-    <ThemeContext.Provider value={{ selectedTheme, setTheme, isDarkMode, toggleDarkMode }}>
+    <ThemeContext.Provider
+      value={{ selectedTheme, setTheme, isDarkMode, toggleDarkMode }}
+    >
       {children}
     </ThemeContext.Provider>
   );

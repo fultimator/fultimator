@@ -22,7 +22,7 @@ function SelectBase({ value, onChange }) {
       options.push(
         <MenuItem key={quality.name} value={quality.name}>
           {t(quality.name)} ({quality.cost}z)
-        </MenuItem>
+        </MenuItem>,
       );
     }
   }

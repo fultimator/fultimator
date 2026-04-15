@@ -98,13 +98,21 @@ const RollsTab = ({
         <ReactMarkdown
           {...props}
           components={{
-            p: ({ _node, ...props }) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: ({ _node, ...props }) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: ({ _node, ...props }) => <li style={{ margin: 0, padding: 0 }} {...props} />,
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
             strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: ({ _node, ...props }) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -211,7 +219,7 @@ const RollsTab = ({
                           {t(
                             damageTypeLabels[
                               type === "Attack" ? data.type : data.weapon.type
-                            ]
+                            ],
                           )}
                         </StyledMarkdown>
                       </span>
@@ -242,8 +250,9 @@ const RollsTab = ({
                   sx={{
                     color: "text.secondary",
                     whiteSpace: "pre-wrap",
-                    my: -1
-                  }}>
+                    my: -1,
+                  }}
+                >
                   <StyledMarkdown>{extra}</StyledMarkdown>
                 </Typography>
               </Box>
@@ -271,8 +280,8 @@ const RollsTab = ({
                       type === "Attack"
                         ? "attack"
                         : type === "Weapon Attack"
-                        ? "weapon"
-                        : "spell"
+                          ? "weapon"
+                          : "spell",
                     );
                   }
                 }}

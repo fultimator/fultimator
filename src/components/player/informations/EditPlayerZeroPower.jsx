@@ -23,7 +23,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const onChangeTrigger = useCallback(
@@ -39,7 +39,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const onChangeEffect = useCallback(
@@ -55,7 +55,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const handleAddFromCompendium = useCallback(
@@ -87,18 +87,18 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
         const triggerName =
           typeof item.zeroTrigger === "string"
             ? item.zeroTrigger
-            : item.zeroTrigger?.name ?? "";
+            : (item.zeroTrigger?.name ?? "");
         const triggerDesc =
           typeof item.zeroTrigger === "object"
-            ? item.zeroTrigger?.description ?? ""
+            ? (item.zeroTrigger?.description ?? "")
             : "";
         const effectName =
           typeof item.zeroEffect === "string"
             ? item.zeroEffect
-            : item.zeroEffect?.name ?? "";
+            : (item.zeroEffect?.name ?? "");
         const effectDesc =
           typeof item.zeroEffect === "object"
-            ? item.zeroEffect?.description ?? ""
+            ? (item.zeroEffect?.description ?? "")
             : "";
 
         setPlayer((prev) => ({
@@ -112,7 +112,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
         }));
       }
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const zeroPower = player.zeroPower ?? {};
@@ -133,20 +133,23 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
       }}
     >
       <Grid container>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Zero Power")}
             showIconButton={false}
-            openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
+            openCompendium={
+              isEditMode ? () => setCompendiumOpen(true) : undefined
+            }
           />
         </Grid>
         <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
           <Grid
             size={{
               xs: 12,
-              sm: 8
-            }}>
+              sm: 8,
+            }}
+          >
             <TextField
               label={t("Zero Power Name") + ":"}
               value={zeroPower.name ?? ""}
@@ -154,14 +157,16 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
               slotProps={{
                 input: { readOnly: !isEditMode },
-                htmlInput: { maxLength: 100 }
-              }} />
+                htmlInput: { maxLength: 100 },
+              }}
+            />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 4
-            }}>
+              sm: 4,
+            }}
+          >
             <TextField
               label={t("Clock Sections") + ":"}
               value={clockSections}
@@ -178,15 +183,17 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
               slotProps={{
                 input: { readOnly: !isEditMode },
-                htmlInput: { min: 2, max: 12, readOnly: !isEditMode }
-              }} />
+                htmlInput: { min: 2, max: 12, readOnly: !isEditMode },
+              }}
+            />
           </Grid>
 
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <TextField
               label={t("Trigger Name") + ":"}
               value={triggerName}
@@ -194,14 +201,16 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
               slotProps={{
                 input: { readOnly: !isEditMode },
-                htmlInput: { maxLength: 100 }
-              }} />
+                htmlInput: { maxLength: 100 },
+              }}
+            />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <CustomTextarea
               label={t("Trigger Description") + ":"}
               value={triggerDesc}
@@ -215,8 +224,9 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <TextField
               label={t("Effect Name") + ":"}
               value={effectName}
@@ -224,14 +234,16 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
               fullWidth
               slotProps={{
                 input: { readOnly: !isEditMode },
-                htmlInput: { maxLength: 100 }
-              }} />
+                htmlInput: { maxLength: 100 },
+              }}
+            />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             <CustomTextarea
               label={t("Effect Description") + ":"}
               value={effectDesc}

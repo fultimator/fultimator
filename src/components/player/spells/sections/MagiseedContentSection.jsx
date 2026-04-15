@@ -9,7 +9,10 @@ import { magiseeds } from "../../../../libs/floralistMagiseedData";
  * Manages the array of magiseeds with add/edit/delete
  */
 export default function MagiseedContentSection({ formState, setFormState, t }) {
-  const currentMagiseeds = useMemo(() => formState.magiseeds || [], [formState.magiseeds]);
+  const currentMagiseeds = useMemo(
+    () => formState.magiseeds || [],
+    [formState.magiseeds],
+  );
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   // Function to create a new blank magiseed
@@ -37,31 +40,28 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
     return magiseeds.filter(
       (preset) =>
         preset.name !== "magiseed_custom" &&
-        !addedPresetNames.includes(preset.name)
+        !addedPresetNames.includes(preset.name),
     );
   }, [currentMagiseeds]);
 
   // Handle adding a preset magiseed
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setFormState) => {
-        const preset = magiseeds.find((m) => m.name === presetName);
-        if (!preset) return;
+  const handleAddPreset = useCallback((presetName) => {
+    return (setFormState) => {
+      const preset = magiseeds.find((m) => m.name === presetName);
+      if (!preset) return;
 
-        const newMagiseed = {
-          ...preset,
-          customName: "",
-          description: preset.description,
-        };
-
-        setFormState((prev) => ({
-          ...prev,
-          magiseeds: [...(prev.magiseeds || []), newMagiseed],
-        }));
+      const newMagiseed = {
+        ...preset,
+        customName: "",
+        description: preset.description,
       };
-    },
-    []
-  );
+
+      setFormState((prev) => ({
+        ...prev,
+        magiseeds: [...(prev.magiseeds || []), newMagiseed],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -91,7 +91,7 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

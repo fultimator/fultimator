@@ -33,11 +33,15 @@ export default function SpellDefaultModal({
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {},
-  });;
+  });
   const [inputDuration, setInputDuration] = useState(
-    editedSpell.duration || ""
+    editedSpell.duration || "",
   );
   const [inputTarget, setInputTarget] = useState(editedSpell.targetDesc || "");
 
@@ -73,7 +77,7 @@ export default function SpellDefaultModal({
   const handleSave = () => {
     onSave(spell.index, editedSpell);
   };
-const handleDurationChange = (event, newValue) => {
+  const handleDurationChange = (event, newValue) => {
     setInputDuration(newValue);
     handleChange("duration", newValue);
   };
@@ -103,7 +107,7 @@ const handleDurationChange = (event, newValue) => {
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -126,8 +130,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 7
-            }}>
+              sm: 7,
+            }}
+          >
             <TextField
               label={t("Spell Name")}
               variant="outlined"
@@ -135,15 +140,16 @@ const handleDurationChange = (event, newValue) => {
               value={editedSpell.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
               slotProps={{
-                htmlInput: { maxLength: 50 }
+                htmlInput: { maxLength: 50 },
               }}
             />
           </Grid>
           <Grid
             size={{
               xs: 12,
-              sm: 1
-            }}>
+              sm: 1,
+            }}
+          >
             <FormControl
               variant="standard"
               fullWidth
@@ -167,8 +173,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 6,
-              sm: 2
-            }}>
+              sm: 2,
+            }}
+          >
             <TextField
               type="number"
               label={t("MP x Target")}
@@ -202,8 +209,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 6,
-              sm: 2
-            }}>
+              sm: 2,
+            }}
+          >
             <TextField
               type="number"
               label={t("Max Targets")}
@@ -223,7 +231,7 @@ const handleDurationChange = (event, newValue) => {
                 ) {
                   handleChange(
                     "maxTargets",
-                    value === "" ? 0 : parseInt(value, 10)
+                    value === "" ? 0 : parseInt(value, 10),
                   );
                 }
               }}
@@ -241,8 +249,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             {/* <TextField
               label={t("Target Description")}
               variant="outlined"
@@ -264,7 +273,7 @@ const handleDurationChange = (event, newValue) => {
                   label={t("Target Description")}
                   fullWidth
                   slotProps={{
-                    htmlInput: { ...params.inputProps, maxLength: 100 }
+                    htmlInput: { ...params.inputProps, maxLength: 100 },
                   }}
                 />
               )}
@@ -273,8 +282,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 6
-            }}>
+              sm: 6,
+            }}
+          >
             {/* <TextField
               label={t("Duration")}
               variant="outlined"
@@ -296,7 +306,7 @@ const handleDurationChange = (event, newValue) => {
                   label={t("Duration")}
                   fullWidth
                   slotProps={{
-                    htmlInput: { ...params.inputProps, maxLength: 50 }
+                    htmlInput: { ...params.inputProps, maxLength: 50 },
                   }}
                 />
               )}
@@ -307,8 +317,9 @@ const handleDurationChange = (event, newValue) => {
               <Grid
                 size={{
                   xs: 6,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <Select
                   fullWidth
                   value={editedSpell.attr1 || "dexterity"}
@@ -331,8 +342,9 @@ const handleDurationChange = (event, newValue) => {
               <Grid
                 size={{
                   xs: 6,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <Select
                   fullWidth
                   value={editedSpell.attr2 || "dexterity"}
@@ -357,8 +369,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <CustomTextarea
               label={t("Description")}
               fullWidth
@@ -371,8 +384,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <FormControlLabel
               control={
                 <Switch
@@ -392,8 +406,9 @@ const handleDurationChange = (event, newValue) => {
           <Grid
             size={{
               xs: 12,
-              sm: 12
-            }}>
+              sm: 12,
+            }}
+          >
             <FormControlLabel
               control={
                 <Switch

@@ -42,7 +42,7 @@ export default function PlayerQuirk({ player }) {
 
             <Grid container>
               {player.quirk.description && (
-                <Grid  size={12}>
+                <Grid size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",
@@ -53,14 +53,12 @@ export default function PlayerQuirk({ player }) {
                       padding: "5px 10px",
                     }}
                   >
-                    <ReactMarkdown>
-                      {player.quirk.description}
-                    </ReactMarkdown>
+                    <ReactMarkdown>{player.quirk.description}</ReactMarkdown>
                   </div>
                 </Grid>
               )}
               {player.quirk.effect && (
-                <Grid  size={12}>
+                <Grid size={12}>
                   <div
                     style={{
                       whiteSpace: "pre-line",
@@ -69,9 +67,7 @@ export default function PlayerQuirk({ player }) {
                       padding: "5px 10px",
                     }}
                   >
-                    <ReactMarkdown>
-                      {player.quirk.effect}
-                    </ReactMarkdown>
+                    <ReactMarkdown>{player.quirk.effect}</ReactMarkdown>
                   </div>
                 </Grid>
               )}

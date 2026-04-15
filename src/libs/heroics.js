@@ -815,7 +815,13 @@ const heroics = [
     quote: t("duel_master_quote", true),
     description: t("duel_master_desc", true),
     source: t("duel_master_source", true),
-    applicableTo: ["Ace of Cards", "Fury", "Rogue", "Sharpshooter", "Weaponmaster"],
+    applicableTo: [
+      "Ace of Cards",
+      "Fury",
+      "Rogue",
+      "Sharpshooter",
+      "Weaponmaster",
+    ],
     book: "bonus",
   },
   {

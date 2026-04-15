@@ -23,7 +23,7 @@ export function calculateAttribute(
   debuffStatuses,
   buffStatuses,
   min,
-  max
+  max,
 ) {
   let value = attributeValue;
 

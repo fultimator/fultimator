@@ -62,21 +62,27 @@ function QualitiesGenerator({ onGenerate }) {
               prefixes.push(item.Conditions.replace("{type}", type));
             });
           } else
-            prefixes.push(item.Conditions.replace("{type}", selectedDamageType));
+            prefixes.push(
+              item.Conditions.replace("{type}", selectedDamageType),
+            );
         } else if (item.Conditions.includes("{species}")) {
           if (selectedSpecies === "All") {
             species.forEach((speciesGet) => {
               prefixes.push(item.Conditions.replace("{species}", speciesGet));
             });
           } else
-            prefixes.push(item.Conditions.replace("{species}", selectedSpecies));
+            prefixes.push(
+              item.Conditions.replace("{species}", selectedSpecies),
+            );
         } else if (item.Conditions.includes("{status}")) {
           if (selectedStatuses === "All") {
             statuses.forEach((status) => {
               prefixes.push(item.Conditions.replace("{status}", status));
             });
           } else
-            prefixes.push(item.Conditions.replace("{status}", selectedStatuses));
+            prefixes.push(
+              item.Conditions.replace("{status}", selectedStatuses),
+            );
         } else {
           prefixes.push(item.Conditions);
         }
@@ -117,7 +123,7 @@ function QualitiesGenerator({ onGenerate }) {
             });
           } else
             prefixes.push(
-              item.Effects.replace("{attribute}", selectedAttributes)
+              item.Effects.replace("{attribute}", selectedAttributes),
             );
         } else {
           prefixes.push(item.Effects);
@@ -165,8 +171,9 @@ function QualitiesGenerator({ onGenerate }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           disablePortal
           fullWidth
@@ -179,14 +186,17 @@ function QualitiesGenerator({ onGenerate }) {
               setSelectedDamageType(val2);
             } else setSelectedDamageType("All");
           }}
-          renderInput={(params) => <TextField {...params} label="Damage Type" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Damage Type" />
+          )}
         />
       </Grid>
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           disablePortal
           fullWidth
@@ -204,8 +214,9 @@ function QualitiesGenerator({ onGenerate }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           disablePortal
           fullWidth
@@ -223,8 +234,9 @@ function QualitiesGenerator({ onGenerate }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6
-        }}>
+          sm: 6,
+        }}
+      >
         <Autocomplete
           disablePortal
           fullWidth
@@ -239,7 +251,7 @@ function QualitiesGenerator({ onGenerate }) {
           renderInput={(params) => <TextField {...params} label="Statuses" />}
         />
       </Grid>
-      <Grid  size={12}>
+      <Grid size={12}>
         <Paper
           sx={{
             background,

@@ -3,7 +3,17 @@ import { useLocation, useParams } from "react-router";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
-import { Grid, Button, Typography, Stack, IconButton, Fab, Box, useMediaQuery, Tooltip } from "@mui/material";
+import {
+  Grid,
+  Button,
+  Typography,
+  Stack,
+  IconButton,
+  Fab,
+  Box,
+  useMediaQuery,
+  Tooltip,
+} from "@mui/material";
 import html2canvas from "html2canvas";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
@@ -23,16 +33,25 @@ import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
-import { Download, Lock, LockOpen, Save, KeyboardArrowUp } from "@mui/icons-material";
+import {
+  Download,
+  Lock,
+  LockOpen,
+  Save,
+  KeyboardArrowUp,
+} from "@mui/icons-material";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 // import { getPc } from "../../utility/db";
 import { useTheme } from "@mui/material/styles";
-import { FullscreenTwoTone, FullscreenExitTwoTone } from '@mui/icons-material';
+import { FullscreenTwoTone, FullscreenExitTwoTone } from "@mui/icons-material";
 import useDownload from "../../hooks/useDownload";
 import { fixVerticalLabels } from "../../utility/screenshotFix";
 import deepEqual from "deep-equal";
 import { usePrompt } from "../../hooks/usePrompt";
-import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
+import {
+  applyPreSaveTransforms,
+  applyPostLoadTransforms,
+} from "../../components/player/playerTransforms";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
@@ -41,8 +60,11 @@ export default function CharacterSheet() {
   const location = useLocation();
   const { cloudUser: user, dbMode } = useDatabaseContext();
   let params = useParams();
-  const isMobile = useMediaQuery('(max-width:600px)');
-  const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);
+  const isMobile = useMediaQuery("(max-width:600px)");
+  const isLocalPlayer =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      params.playerId,
+    );
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
   const localRef = localDb.doc("player-personal", params.playerId);
@@ -90,7 +112,9 @@ export default function CharacterSheet() {
 
   useEffect(() => {
     if (playerData) {
-      setPlayer(applyPostLoadTransforms(JSON.parse(JSON.stringify(playerData))));
+      setPlayer(
+        applyPostLoadTransforms(JSON.parse(JSON.stringify(playerData))),
+      );
       setIsUpdated(false);
     }
   }, [playerData]);
@@ -100,7 +124,7 @@ export default function CharacterSheet() {
   const playerDataBaseline = useMemo(() => {
     if (!playerData) return null;
     return applyPreSaveTransforms(
-      applyPostLoadTransforms(JSON.parse(JSON.stringify(playerData)))
+      applyPostLoadTransforms(JSON.parse(JSON.stringify(playerData))),
     );
   }, [playerData]);
 
@@ -116,15 +140,18 @@ export default function CharacterSheet() {
 
   usePrompt(
     "You have unsaved changes. Are you sure you want to leave?",
-    isUpdated
+    isUpdated,
   );
 
-  const isOwner = isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
+  const isOwner =
+    isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
   const isEditMode = isOwner && isSheetEditMode;
 
   const handleSetPlayer = useCallback((newPlayerOrFn) => {
     setPlayer((prev) => {
-      return typeof newPlayerOrFn === "function" ? newPlayerOrFn(prev) : newPlayerOrFn;
+      return typeof newPlayerOrFn === "function"
+        ? newPlayerOrFn(prev)
+        : newPlayerOrFn;
     });
   }, []);
 
@@ -166,13 +193,13 @@ export default function CharacterSheet() {
         const fortressBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Fortress")
-          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
+          .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
         hpBonus += fortressBonus;
 
         const focusedBonus = prevPlayer.classes
           .flatMap((cls) => cls.skills || [])
           .filter((skill) => skill.specialSkill === "Focused")
-          .reduce((acc, skill) => acc + (Number(skill.currentLvl) * 3), 0);
+          .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
         mpBonus += focusedBonus;
 
         const maxHP = baseMaxHP + hpBonus;
@@ -197,7 +224,7 @@ export default function CharacterSheet() {
 
   const [ritualClockSections, setRitualClockSections] = useState(4);
   const [ritualClockState, setRitualClockState] = useState(
-    new Array(4).fill(false)
+    new Array(4).fill(false),
   );
 
   useEffect(() => {
@@ -210,7 +237,7 @@ export default function CharacterSheet() {
         promises.push(
           new Promise((resolve) => {
             image.onload = resolve;
-          })
+          }),
         );
       }
     });
@@ -234,7 +261,7 @@ export default function CharacterSheet() {
     }
 
     const element = document.getElementById(
-      fullCharacterSheet ? "character-sheet" : "character-sheet-short"
+      fullCharacterSheet ? "character-sheet" : "character-sheet-short",
     );
 
     if (!element) return;
@@ -258,11 +285,14 @@ export default function CharacterSheet() {
         allowTaint: true,
         logging: false,
         scale: 2,
-        backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.default : "#ffffff",
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? theme.palette.background.default
+            : "#ffffff",
         windowWidth: fullCharacterSheet ? 1400 : 600,
         onclone: (clonedDoc) => {
           fixVerticalLabels(element, clonedDoc);
-        }
+        },
       });
       const imgData = canvas.toDataURL("image/png");
 
@@ -296,7 +326,7 @@ export default function CharacterSheet() {
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
       <Grid container spacing={1} sx={{ paddingX: 1 }}>
-        <Grid  size={isMobile ? 8 : 10}>
+        <Grid size={isMobile ? 8 : 10}>
           <Button
             variant="contained"
             color="primary"
@@ -307,7 +337,7 @@ export default function CharacterSheet() {
             {t("Download Character Sheet")}
           </Button>
         </Grid>
-        <Grid  size={isMobile ? 4 : 2}>
+        <Grid size={isMobile ? 4 : 2}>
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <Button
               variant="outlined"
@@ -325,7 +355,7 @@ export default function CharacterSheet() {
             {isMobile && (
               <IconButton
                 onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
-                style={{ marginBottom: '16px' }}
+                style={{ marginBottom: "16px" }}
               >
                 {fullCharacterSheet ? (
                   <FullscreenExitTwoTone />
@@ -341,7 +371,7 @@ export default function CharacterSheet() {
                   <Tooltip title={t("Save Changes")}>
                     <IconButton
                       onClick={handleSave}
-                      style={{ marginBottom: '16px' }}
+                      style={{ marginBottom: "16px" }}
                       color="secondary"
                     >
                       <Save />
@@ -360,9 +390,10 @@ export default function CharacterSheet() {
             spacing={2}
             size={{
               xs: 12,
-              md: 6
-            }}>
-            <Grid  size={12}>
+              md: 6,
+            }}
+          >
+            <Grid size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerCard
                   player={player}
@@ -435,11 +466,19 @@ export default function CharacterSheet() {
                   isEditMode={isEditMode}
                   isCharacterSheet={true}
                 />
-                <PlayerNotes player={player} setPlayer={handleSetPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
-                
-            <PlayerSpellsFull player={player} setPlayer={handleSetPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
-        
-             
+                <PlayerNotes
+                  player={player}
+                  setPlayer={handleSetPlayer}
+                  isEditMode={isEditMode}
+                  isCharacterSheet={true}
+                />
+
+                <PlayerSpellsFull
+                  player={player}
+                  setPlayer={handleSetPlayer}
+                  isEditMode={isEditMode}
+                  isCharacterSheet={true}
+                />
               </Stack>
             </Grid>
           </Grid>
@@ -448,9 +487,10 @@ export default function CharacterSheet() {
             spacing={2}
             size={{
               xs: 12,
-              md: 6
-            }}>
-            <Grid  size={12}>
+              md: 6,
+            }}
+          >
+            <Grid size={12}>
               <Stack direction="column" spacing={2}>
                 <PlayerClasses
                   player={player}
@@ -460,17 +500,26 @@ export default function CharacterSheet() {
                   updateMaxStats={updateMaxStats}
                 />
                 {optionalRules.quirks && (
-                  <PlayerQuirk player={player} isEditMode={isEditMode} isCharacterSheet={true} />
+                  <PlayerQuirk
+                    player={player}
+                    isEditMode={isEditMode}
+                    isCharacterSheet={true}
+                  />
                 )}
               </Stack>
             </Grid>
           </Grid>
 
-          <Grid  size={12}>
-            <PlayerCompanion player={player} setPlayer={handleSetPlayer} isEditMode={isEditMode} isCharacterSheet={true} />
+          <Grid size={12}>
+            <PlayerCompanion
+              player={player}
+              setPlayer={handleSetPlayer}
+              isEditMode={isEditMode}
+              isCharacterSheet={true}
+            />
           </Grid>
-          <Grid container  size={12}>
-            <Grid  size={4}>
+          <Grid container size={12}>
+            <Grid size={4}>
               <img
                 src={powered_by_fu}
                 alt="Powered by Fu"
@@ -478,7 +527,7 @@ export default function CharacterSheet() {
                 onLoad={() => setImagesLoaded(true)}
               />
             </Grid>
-            <Grid  size={4}>
+            <Grid size={4}>
               <Typography variant="h4" align="center">
                 <span
                   style={{
@@ -499,9 +548,10 @@ export default function CharacterSheet() {
           container
           sx={{
             justifyContent: "center",
-            padding: 1
-          }}>
-          <Grid container  size={12}>
+            padding: 1,
+          }}
+        >
+          <Grid container size={12}>
             <PlayerCardSheet
               player={player}
               setPlayer={handleSetPlayer}
@@ -538,13 +588,24 @@ export default function CharacterSheet() {
               </Fab>
             </Tooltip>
           )}
-          <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")} placement="left">
+          <Tooltip
+            title={
+              isSheetEditMode
+                ? t("Switch to Preview Mode")
+                : t("Switch to Edit Mode")
+            }
+            placement="left"
+          >
             <Fab
               color="primary"
               size="medium"
               onClick={() => setIsSheetEditMode(!isSheetEditMode)}
             >
-              {isSheetEditMode ? <LockOpen fontSize="medium" /> : <Lock fontSize="medium" />}
+              {isSheetEditMode ? (
+                <LockOpen fontSize="medium" />
+              ) : (
+                <Lock fontSize="medium" />
+              )}
             </Fab>
           </Tooltip>
         </Box>

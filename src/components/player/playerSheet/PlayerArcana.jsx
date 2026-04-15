@@ -18,7 +18,7 @@ export default function PlayerArcana({ player }) {
         spell !== undefined &&
         (spell.spellType === "arcanist" ||
           spell.spellType === "arcanist-rework") &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -63,8 +63,9 @@ export default function PlayerArcana({ player }) {
                   key={index}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <SpellArcanist
                     arcana={spell}
                     isEditMode={false}

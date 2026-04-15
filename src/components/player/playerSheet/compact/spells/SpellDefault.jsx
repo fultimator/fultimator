@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Typography,
-  Table,
-  TableBody,
-  TableRow,
-  Box,
-} from "@mui/material";
+import { Typography, Table, TableBody, TableRow, Box } from "@mui/material";
 import { OffensiveSpellIcon } from "../../../../icons";
 import attributes from "../../../../../libs/attributes";
 import { CloseBracket, OpenBracket } from "../../../../Bracket";
@@ -28,14 +22,14 @@ export default function SpellDefault({
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   return (
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
       <TableBody>
         <TableRow
           sx={{
-            backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`, 
+            backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           }}
         >
           <StyledTableCell sx={{ width: "40%" }}>
@@ -43,16 +37,20 @@ export default function SpellDefault({
               sx={{
                 display: "flex",
                 gap: 0.5,
-                alignItems: "center"
-              }}>
+                alignItems: "center",
+              }}
+            >
               <Typography
                 sx={{
                   fontWeight: "bold",
-                  fontSize: "0.85rem"
-                }}>
+                  fontSize: "0.85rem",
+                }}
+              >
                 {spellName}
               </Typography>
-              {isOffensive && <OffensiveSpellIcon sx={{ fontSize: "0.85rem" }} />}
+              {isOffensive && (
+                <OffensiveSpellIcon sx={{ fontSize: "0.85rem" }} />
+              )}
             </Box>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "15%" }}>
@@ -62,21 +60,23 @@ export default function SpellDefault({
             </Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "20%" }}>
-            <Typography sx={{ fontSize: "0.8rem" }}>
-              {targetDesc}
-            </Typography>
+            <Typography sx={{ fontSize: "0.8rem" }}>{targetDesc}</Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "25%" }}>
-            <Typography sx={{ fontSize: "0.8rem" }}>
-              {duration}
-            </Typography>
+            <Typography sx={{ fontSize: "0.8rem" }}>{duration}</Typography>
           </StyledTableCell>
         </TableRow>
         <TableRow>
           <StyledTableCell colSpan={4}>
             <Box sx={{ padding: "4px 0" }}>
-              <Typography component="div" sx={{ fontSize: "0.8rem", marginBottom: 0.5 }}>
-                <StyledMarkdown allowedElements={["p", "ul", "li", "strong", "em", "mark"]} unwrapDisallowed>
+              <Typography
+                component="div"
+                sx={{ fontSize: "0.8rem", marginBottom: 0.5 }}
+              >
+                <StyledMarkdown
+                  allowedElements={["p", "ul", "li", "strong", "em", "mark"]}
+                  unwrapDisallowed
+                >
                   {description}
                 </StyledMarkdown>
               </Typography>

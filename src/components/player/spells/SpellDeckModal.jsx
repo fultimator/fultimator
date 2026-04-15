@@ -24,7 +24,13 @@ import { useTranslate } from "../../../translation/translate";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
-export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }) {
+export default function SpellDeckModal({
+  open,
+  onClose,
+  onSave,
+  onDelete,
+  deck,
+}) {
   const { t } = useTranslate();
 
   const [editedDeck, setEditedDeck] = useState({
@@ -34,10 +40,10 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
 
     // Deck configuration
     suitConfiguration: {
-      Air: 'air',
-      Earth: 'earth', 
-      Fire: 'fire',
-      Ice: 'ice'
+      Air: "air",
+      Earth: "earth",
+      Fire: "fire",
+      Ice: "ice",
     },
 
     // Current deck state (only available during conflict)
@@ -48,28 +54,52 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
     // Deck composition (for reference)
     deckComposition: [
       // Jokers
-      { type: 'joker', count: 2 },
+      { type: "joker", count: 2 },
       // Air suit (1-7)
-      ...Array.from({length: 7}, (_, i) => ({ type: 'card', suit: 'Air', value: i + 1, count: 1 })),
-      // Earth suit (1-7)  
-      ...Array.from({length: 7}, (_, i) => ({ type: 'card', suit: 'Earth', value: i + 1, count: 1 })),
+      ...Array.from({ length: 7 }, (_, i) => ({
+        type: "card",
+        suit: "Air",
+        value: i + 1,
+        count: 1,
+      })),
+      // Earth suit (1-7)
+      ...Array.from({ length: 7 }, (_, i) => ({
+        type: "card",
+        suit: "Earth",
+        value: i + 1,
+        count: 1,
+      })),
       // Fire suit (1-7)
-      ...Array.from({length: 7}, (_, i) => ({ type: 'card', suit: 'Fire', value: i + 1, count: 1 })),
+      ...Array.from({ length: 7 }, (_, i) => ({
+        type: "card",
+        suit: "Fire",
+        value: i + 1,
+        count: 1,
+      })),
       // Ice suit (1-7)
-      ...Array.from({length: 7}, (_, i) => ({ type: 'card', suit: 'Ice', value: i + 1, count: 1 })),
-    ]
+      ...Array.from({ length: 7 }, (_, i) => ({
+        type: "card",
+        suit: "Ice",
+        value: i + 1,
+        count: 1,
+      })),
+    ],
   });
 
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: setDeleteDialogOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: () => {
-          onDelete(deck?.index || 0);
-          onClose();
-        },
-  });;
+      onDelete(deck?.index || 0);
+      onClose();
+    },
+  });
 
   useEffect(() => {
     if (deck) {
-      setEditedDeck(prev => ({
+      setEditedDeck((prev) => ({
         ...prev,
         ...deck,
         suitConfiguration: deck.suitConfiguration || prev.suitConfiguration,
@@ -84,13 +114,13 @@ export default function SpellDeckModal({ open, onClose, onSave, onDelete, deck }
   const handleSave = () => {
     onSave(deck?.index || 0, editedDeck);
   };
-const handleSuitConfigChange = (suit, damageType) => {
-    setEditedDeck(prev => ({
+  const handleSuitConfigChange = (suit, damageType) => {
+    setEditedDeck((prev) => ({
       ...prev,
       suitConfiguration: {
         ...prev.suitConfiguration,
-        [suit]: damageType
-      }
+        [suit]: damageType,
+      },
     }));
   };
 
@@ -98,16 +128,19 @@ const handleSuitConfigChange = (suit, damageType) => {
     const newDeck = [];
 
     // Add 2 jokers
-    newDeck.push({ type: 'joker', isJoker: true }, { type: 'joker', isJoker: true });
+    newDeck.push(
+      { type: "joker", isJoker: true },
+      { type: "joker", isJoker: true },
+    );
 
     // Add cards for each suit (1-7)
-    ['Air', 'Earth', 'Fire', 'Ice'].forEach(suit => {
+    ["Air", "Earth", "Fire", "Ice"].forEach((suit) => {
       for (let value = 1; value <= 7; value++) {
-        newDeck.push({ 
-          type: 'card', 
-          suit: suit, 
-          value: value, 
-          isJoker: false 
+        newDeck.push({
+          type: "card",
+          suit: suit,
+          value: value,
+          isJoker: false,
         });
       }
     });
@@ -118,12 +151,12 @@ const handleSuitConfigChange = (suit, damageType) => {
       [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
     }
 
-    setEditedDeck(prev => ({
+    setEditedDeck((prev) => ({
       ...prev,
       cardsInDeck: 30,
       hand: [],
       discardPile: [],
-      fullDeck: newDeck
+      fullDeck: newDeck,
     }));
   };
 
@@ -134,51 +167,56 @@ const handleSuitConfigChange = (suit, damageType) => {
 
     // For simulation purposes, generate random cards
     for (let i = 0; i < actualDraw; i++) {
-      const suits = ['Air', 'Earth', 'Fire', 'Ice'];
+      const suits = ["Air", "Earth", "Fire", "Ice"];
       const isJoker = Math.random() < 0.067; // ~2/30 chance
 
       if (isJoker) {
-        newHand.push({ type: 'joker', isJoker: true });
+        newHand.push({ type: "joker", isJoker: true });
       } else {
         const suit = suits[Math.floor(Math.random() * suits.length)];
         const value = Math.floor(Math.random() * 7) + 1;
-        newHand.push({ type: 'card', suit, value, isJoker: false });
+        newHand.push({ type: "card", suit, value, isJoker: false });
       }
     }
 
-    setEditedDeck(prev => ({
+    setEditedDeck((prev) => ({
       ...prev,
       hand: newHand,
-      cardsInDeck: remaining - actualDraw
+      cardsInDeck: remaining - actualDraw,
     }));
   };
 
   const discardHand = () => {
-    const newDiscard = [...(editedDeck.discardPile || []), ...(editedDeck.hand || [])];
-    setEditedDeck(prev => ({
+    const newDiscard = [
+      ...(editedDeck.discardPile || []),
+      ...(editedDeck.hand || []),
+    ];
+    setEditedDeck((prev) => ({
       ...prev,
       hand: [],
-      discardPile: newDiscard
+      discardPile: newDiscard,
     }));
   };
 
   const resetForNewConflict = () => {
-    setEditedDeck(prev => ({
+    setEditedDeck((prev) => ({
       ...prev,
       cardsInDeck: 30,
       hand: [],
-      discardPile: []
+      discardPile: [],
     }));
   };
 
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>{deck ? t("ace_deck_edit") : t("ace_deck_add")}</DialogTitle>
+        <DialogTitle>
+          {deck ? t("ace_deck_edit") : t("ace_deck_add")}
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
             {/* Basic Information */}
-            <Grid  size={12}>
+            <Grid size={12}>
               <Typography variant="h6" gutterBottom>
                 {t("Basic Information")}
               </Typography>
@@ -187,8 +225,9 @@ const handleSuitConfigChange = (suit, damageType) => {
             <Grid
               size={{
                 xs: 12,
-                sm: 6
-              }}>
+                sm: 6,
+              }}
+            >
               <TextField
                 fullWidth
                 label={t("ace_deck_name")}
@@ -202,8 +241,9 @@ const handleSuitConfigChange = (suit, damageType) => {
             <Grid
               size={{
                 xs: 12,
-                sm: 6
-              }}>
+                sm: 6,
+              }}
+            >
               <FormControlLabel
                 control={
                   <Switch
@@ -220,43 +260,58 @@ const handleSuitConfigChange = (suit, damageType) => {
               />
             </Grid>
 
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("ace_suit_configuration")}
               </Typography>
-              <Typography variant="body2" gutterBottom sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("ace_suit_configuration_hint")}
               </Typography>
             </Grid>
 
             {/* Suit Configuration */}
-            {['Air', 'Earth', 'Fire', 'Ice'].map((suit) => (
+            {["Air", "Earth", "Fire", "Ice"].map((suit) => (
               <Grid
                 key={suit}
                 size={{
                   xs: 12,
-                  sm: 6
-                }}>
+                  sm: 6,
+                }}
+              >
                 <FormControl fullWidth>
-                  <InputLabel>{suit} {t("ace_suit")}</InputLabel>
+                  <InputLabel>
+                    {suit} {t("ace_suit")}
+                  </InputLabel>
                   <Select
-                    value={editedDeck.suitConfiguration?.[suit] || suit.toLowerCase()}
-                    onChange={(e) => handleSuitConfigChange(suit, e.target.value)}
+                    value={
+                      editedDeck.suitConfiguration?.[suit] || suit.toLowerCase()
+                    }
+                    onChange={(e) =>
+                      handleSuitConfigChange(suit, e.target.value)
+                    }
                     label={`${suit} ${t("ace_suit")}`}
                   >
                     <MenuItem value="air">{t("ace_suit_damage_air")}</MenuItem>
-                    <MenuItem value="earth">{t("ace_suit_damage_earth")}</MenuItem>
-                    <MenuItem value="fire">{t("ace_suit_damage_fire")}</MenuItem>
+                    <MenuItem value="earth">
+                      {t("ace_suit_damage_earth")}
+                    </MenuItem>
+                    <MenuItem value="fire">
+                      {t("ace_suit_damage_fire")}
+                    </MenuItem>
                     <MenuItem value="ice">{t("ace_suit_damage_ice")}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
             ))}
 
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("ace_deck_management")} ({t("ace_deck_conflict_only")})
@@ -267,12 +322,15 @@ const handleSuitConfigChange = (suit, damageType) => {
             <Grid
               size={{
                 xs: 12,
-                sm: 4
-              }}>
+                sm: 4,
+              }}
+            >
               <Card>
                 <CardContent>
                   <Typography variant="h6">{t("ace_cards_in_deck")}</Typography>
-                  <Typography variant="h4">{editedDeck.cardsInDeck || 0}</Typography>
+                  <Typography variant="h4">
+                    {editedDeck.cardsInDeck || 0}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -280,12 +338,15 @@ const handleSuitConfigChange = (suit, damageType) => {
             <Grid
               size={{
                 xs: 12,
-                sm: 4
-              }}>
+                sm: 4,
+              }}
+            >
               <Card>
                 <CardContent>
                   <Typography variant="h6">{t("ace_hand_size")}</Typography>
-                  <Typography variant="h4">{editedDeck.hand ? editedDeck.hand.length : 0}</Typography>
+                  <Typography variant="h4">
+                    {editedDeck.hand ? editedDeck.hand.length : 0}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -293,19 +354,22 @@ const handleSuitConfigChange = (suit, damageType) => {
             <Grid
               size={{
                 xs: 12,
-                sm: 4
-              }}>
+                sm: 4,
+              }}
+            >
               <Card>
                 <CardContent>
                   <Typography variant="h6">{t("ace_discard_pile")}</Typography>
-                  <Typography variant="h4">{editedDeck.discardPile ? editedDeck.discardPile.length : 0}</Typography>
+                  <Typography variant="h4">
+                    {editedDeck.discardPile ? editedDeck.discardPile.length : 0}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
             {/* Deck Actions */}
-            <Grid  size={12}>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 2 }}>
+            <Grid size={12}>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 2 }}>
                 <Button
                   variant="outlined"
                   onClick={() => drawCards(1)}
@@ -348,19 +412,39 @@ const handleSuitConfigChange = (suit, damageType) => {
             </Grid>
 
             {/* Card Set Reference */}
-            <Grid  size={12}>
+            <Grid size={12}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 {t("ace_card_set_reference")}
               </Typography>
-              <Box sx={{ fontSize: '0.9em' }}>
-                <Typography variant="body2"><strong>{t("ace_jackpot")}</strong> {t("ace_jackpot_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_magic_flush")}</strong> {t("ace_magic_flush_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_blinding_flush")}</strong> {t("ace_blinding_flush_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_full_status")}</strong> {t("ace_full_status_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_triple_support")}</strong> {t("ace_triple_support_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_double_trouble")}</strong> {t("ace_double_trouble_desc")}</Typography>
-                <Typography variant="body2"><strong>{t("ace_magic_pair")}</strong> {t("ace_magic_pair_desc")}</Typography>
+              <Box sx={{ fontSize: "0.9em" }}>
+                <Typography variant="body2">
+                  <strong>{t("ace_jackpot")}</strong> {t("ace_jackpot_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_magic_flush")}</strong>{" "}
+                  {t("ace_magic_flush_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_blinding_flush")}</strong>{" "}
+                  {t("ace_blinding_flush_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_full_status")}</strong>{" "}
+                  {t("ace_full_status_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_triple_support")}</strong>{" "}
+                  {t("ace_triple_support_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_double_trouble")}</strong>{" "}
+                  {t("ace_double_trouble_desc")}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>{t("ace_magic_pair")}</strong>{" "}
+                  {t("ace_magic_pair_desc")}
+                </Typography>
               </Box>
             </Grid>
           </Grid>

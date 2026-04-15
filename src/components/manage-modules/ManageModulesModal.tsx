@@ -21,9 +21,19 @@ interface ManageModulesModalProps {
   onImportSuccess?: (packId: string) => void;
 }
 
-export default function ManageModulesModal({ open, onClose, onImportSuccess }: ManageModulesModalProps) {
+export default function ManageModulesModal({
+  open,
+  onClose,
+  onImportSuccess,
+}: ManageModulesModalProps) {
   const { t } = useTranslate();
-  const { packs, setPackActive, deletePack, importFromFile, importFromManifestUrl } = useCompendiumPacks();
+  const {
+    packs,
+    setPackActive,
+    deletePack,
+    importFromFile,
+    importFromManifestUrl,
+  } = useCompendiumPacks();
   const [tab, setTab] = useState(0);
 
   const handleImportSuccess = (packId: string) => {

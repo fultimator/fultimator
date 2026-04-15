@@ -17,24 +17,24 @@ export type CompendiumItemType =
   | "optional";
 
 export interface CompendiumItem {
-  id: string;                          // crypto.randomUUID() — stable across edits
+  id: string; // crypto.randomUUID() — stable across edits
   type: CompendiumItemType;
-  data: Record<string, unknown>;       // narrowly typed at usage sites
-  addedAt: number;                     // Unix ms timestamp
+  data: Record<string, unknown>; // narrowly typed at usage sites
+  addedAt: number; // Unix ms timestamp
 }
 
 export interface CompendiumPack {
-  id: string;                          // "personal" for singleton; UUID for others
+  id: string; // "personal" for singleton; UUID for others
   name: string;
   description?: string;
   author?: string;
   type?: PackType;
-  version?: string;                    // from manifest on import; editable in-app
-  active?: boolean;                    // absent or true = visible in viewer; false = hidden
-  isPersonal: boolean;                 // cannot be deleted
-  locked?: boolean;                    // when true, destructive actions are hidden
-  fultimatorMinVersion?: string;       // minimum Fultimator version required
-  homepageUrl?: string;                // URL to pack's homepage or repository
+  version?: string; // from manifest on import; editable in-app
+  active?: boolean; // absent or true = visible in viewer; false = hidden
+  isPersonal: boolean; // cannot be deleted
+  locked?: boolean; // when true, destructive actions are hidden
+  fultimatorMinVersion?: string; // minimum Fultimator version required
+  homepageUrl?: string; // URL to pack's homepage or repository
   createdAt: number;
   updatedAt: number;
   items: CompendiumItem[];

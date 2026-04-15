@@ -16,17 +16,17 @@ import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
 import { magiseeds } from "../../../../../libs/floralistMagiseedData";
 
-const StyledTableCell = styled(TableCell)({ 
+const StyledTableCell = styled(TableCell)({
   padding: "2px 4px",
   fontSize: "0.8rem",
-  borderBottom: "1px solid rgba(224, 224, 224, 1)"
+  borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
 export default function SpellMagiseed({ spell, setPlayer }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const growthClock = spell.growthClock || 0;
   const currentMagiseed = spell.currentMagiseed;
@@ -37,7 +37,8 @@ export default function SpellMagiseed({ spell, setPlayer }) {
     const magiseedTemplate = magiseeds.find((m) => m.name === seed.name);
     if (!magiseedTemplate) return null;
     const effectKey = Math.min(clock, 3);
-    const effect = seed.effects?.[effectKey] || magiseedTemplate.effects?.[effectKey];
+    const effect =
+      seed.effects?.[effectKey] || magiseedTemplate.effects?.[effectKey];
     return effect ? t(effect) : null;
   };
 
@@ -65,9 +66,15 @@ export default function SpellMagiseed({ spell, setPlayer }) {
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
       <TableBody>
         {/* Clock Row */}
-        <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+        <TableRow
+          sx={{
+            backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+          }}
+        >
           <StyledTableCell colSpan={2}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}
+            >
               <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("magiseed_growth_clock")}: {growthClock}/4
               </Typography>
@@ -78,26 +85,35 @@ export default function SpellMagiseed({ spell, setPlayer }) {
                   sx={{ height: 6, borderRadius: 3 }}
                 />
               </Box>
-              <Box sx={{ display: 'flex' }}>
-                <IconButton 
-                  size="small" 
-                  onClick={(e) => { e.stopPropagation(); handleClockChange(0); }}
+              <Box sx={{ display: "flex" }}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockChange(0);
+                  }}
                   disabled={growthClock === 0 || !setPlayer}
                   sx={{ p: 0 }}
                 >
                   <RestartAlt fontSize="small" />
                 </IconButton>
-                <IconButton 
-                  size="small" 
-                  onClick={(e) => { e.stopPropagation(); handleClockChange(growthClock - 1); }}
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockChange(growthClock - 1);
+                  }}
                   disabled={growthClock <= 0 || !setPlayer}
                   sx={{ p: 0 }}
                 >
                   <Remove fontSize="small" />
                 </IconButton>
-                <IconButton 
-                  size="small" 
-                  onClick={(e) => { e.stopPropagation(); handleClockChange(growthClock + 1); }}
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockChange(growthClock + 1);
+                  }}
                   disabled={growthClock >= 4 || !setPlayer}
                   sx={{ p: 0 }}
                 >
@@ -112,17 +128,36 @@ export default function SpellMagiseed({ spell, setPlayer }) {
         <TableRow>
           <StyledTableCell colSpan={2}>
             <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-              {t("magiseed_current_effect")}: {currentMagiseed ? (currentMagiseed.customName || t(currentMagiseed.name)) : t("magiseed_no_magiseed")}
+              {t("magiseed_current_effect")}:{" "}
+              {currentMagiseed
+                ? currentMagiseed.customName || t(currentMagiseed.name)
+                : t("magiseed_no_magiseed")}
             </Typography>
             {currentMagiseed && getSeedEffect(currentMagiseed, growthClock) && (
-              <Box sx={{ mt: 0.5, p: 0.5, bgcolor: theme.ternary + "20", borderLeft: `3px solid ${theme.primary}` }}>
-                <Typography variant="caption" sx={{
-                  display: "block"
-                }}>
-                  <strong>{t("magiseed_current_effect")} (T={growthClock}):</strong>
+              <Box
+                sx={{
+                  mt: 0.5,
+                  p: 0.5,
+                  bgcolor: theme.ternary + "20",
+                  borderLeft: `3px solid ${theme.primary}`,
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                  }}
+                >
+                  <strong>
+                    {t("magiseed_current_effect")} (T={growthClock}):
+                  </strong>
                 </Typography>
                 <Typography variant="caption">
-                  <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ _node, ...props }) => <span {...props} />,
+                    }}
+                  >
                     {getSeedEffect(currentMagiseed, growthClock)}
                   </ReactMarkdown>
                 </Typography>
@@ -133,42 +168,68 @@ export default function SpellMagiseed({ spell, setPlayer }) {
 
         {/* Available Seeds Header */}
         <TableRow sx={{ backgroundColor: theme.secondary }}>
-          <StyledTableCell colSpan={2} sx={{ color: "white", fontWeight: "bold", fontSize: "0.75rem", py: 0 }}>
+          <StyledTableCell
+            colSpan={2}
+            sx={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "0.75rem",
+              py: 0,
+            }}
+          >
             {t("magiseed_available_magiseeds")}
           </StyledTableCell>
         </TableRow>
 
         {/* Seeds List */}
-        {spell.magiseeds?.filter(seed => {
-          const magiseedTemplate = magiseeds.find((m) => m.name === seed.name);
-          return seed.description || magiseedTemplate?.description;
-        }).map((seed, index) => (
-          <TableRow key={index}>
-            <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
-              {seed.customName || t(seed.name)}
-            </StyledTableCell>
-            <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
-              <Box>
-                {[0, 1, 2, 3].map(clockVal => {
-                  const effect = getSeedEffect(seed, clockVal);
-                  if (!effect) return null;
-                  return (
-                    <Box key={clockVal} sx={{ display: 'flex', gap: 0.5, mb: 0.25 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 'bold', color: theme.primary, minWidth: '25px' }}>
-                        T={clockVal}:
-                      </Typography>
-                      <Typography variant="caption">
-                        <ReactMarkdown components={{ p: ({ _node, ...props }) => <span {...props} /> }}>
-                          {effect}
-                        </ReactMarkdown>
-                      </Typography>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </StyledTableCell>
-          </TableRow>
-        ))}
+        {spell.magiseeds
+          ?.filter((seed) => {
+            const magiseedTemplate = magiseeds.find(
+              (m) => m.name === seed.name,
+            );
+            return seed.description || magiseedTemplate?.description;
+          })
+          .map((seed, index) => (
+            <TableRow key={index}>
+              <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
+                {seed.customName || t(seed.name)}
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
+                <Box>
+                  {[0, 1, 2, 3].map((clockVal) => {
+                    const effect = getSeedEffect(seed, clockVal);
+                    if (!effect) return null;
+                    return (
+                      <Box
+                        key={clockVal}
+                        sx={{ display: "flex", gap: 0.5, mb: 0.25 }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: "bold",
+                            color: theme.primary,
+                            minWidth: "25px",
+                          }}
+                        >
+                          T={clockVal}:
+                        </Typography>
+                        <Typography variant="caption">
+                          <ReactMarkdown
+                            components={{
+                              p: ({ _node, ...props }) => <span {...props} />,
+                            }}
+                          >
+                            {effect}
+                          </ReactMarkdown>
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </StyledTableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
   );

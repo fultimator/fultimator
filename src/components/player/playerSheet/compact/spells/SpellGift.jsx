@@ -36,7 +36,7 @@ export default function SpellGift({ spell, setPlayer }) {
       const newClasses = prevPlayer.classes.map((cls) => {
         if (cls.name !== spell.className) return cls;
         const newSpells = cls.spells.map((s) =>
-          s.spellType === "gift" ? { ...s, clock: clampedClock } : s
+          s.spellType === "gift" ? { ...s, clock: clampedClock } : s,
         );
         return { ...cls, spells: newSpells };
       });
@@ -50,9 +50,15 @@ export default function SpellGift({ spell, setPlayer }) {
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
       <TableBody>
         {/* Clock Row */}
-        <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+        <TableRow
+          sx={{
+            backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+          }}
+        >
           <StyledTableCell colSpan={3}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.5 }}
+            >
               <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                 {t("esper_brainwave_clock")}: {clock}/4
               </Typography>
@@ -66,7 +72,10 @@ export default function SpellGift({ spell, setPlayer }) {
               <Box sx={{ display: "flex" }}>
                 <IconButton
                   size="small"
-                  onClick={(e) => { e.stopPropagation(); handleClockReset(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockReset();
+                  }}
                   disabled={clock === 0 || !setPlayer}
                   sx={{ p: 0 }}
                 >
@@ -74,7 +83,10 @@ export default function SpellGift({ spell, setPlayer }) {
                 </IconButton>
                 <IconButton
                   size="small"
-                  onClick={(e) => { e.stopPropagation(); handleClockChange(clock - 1); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockChange(clock - 1);
+                  }}
                   disabled={clock <= 0 || !setPlayer}
                   sx={{ p: 0 }}
                 >
@@ -82,7 +94,10 @@ export default function SpellGift({ spell, setPlayer }) {
                 </IconButton>
                 <IconButton
                   size="small"
-                  onClick={(e) => { e.stopPropagation(); handleClockChange(clock + 1); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClockChange(clock + 1);
+                  }}
                   disabled={clock >= 4 || !setPlayer}
                   sx={{ p: 0 }}
                 >
@@ -105,18 +120,28 @@ export default function SpellGift({ spell, setPlayer }) {
             }}
           >
             <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
-              {gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
+              {gift.name === "esper_gift_custom_name"
+                ? gift.customName
+                : t(gift.name)}
             </StyledTableCell>
             <StyledTableCell sx={{ width: "20%", fontSize: "0.7rem" }}>
               {gift.event ? (
-                <ReactMarkdown components={{ p: (props) => <span {...props} /> }}>
-                  {gift.event.startsWith("esper_event_") ? t(gift.event) : gift.event}
+                <ReactMarkdown
+                  components={{ p: (props) => <span {...props} /> }}
+                >
+                  {gift.event.startsWith("esper_event_")
+                    ? t(gift.event)
+                    : gift.event}
                 </ReactMarkdown>
-              ) : "-"}
+              ) : (
+                "-"
+              )}
             </StyledTableCell>
             <StyledTableCell sx={{ width: "50%", fontSize: "0.75rem" }}>
               <ReactMarkdown components={{ p: (props) => <span {...props} /> }}>
-                {gift.name === "esper_gift_custom_name" ? gift.effect : t(gift.effect)}
+                {gift.name === "esper_gift_custom_name"
+                  ? gift.effect
+                  : t(gift.effect)}
               </ReactMarkdown>
             </StyledTableCell>
           </TableRow>

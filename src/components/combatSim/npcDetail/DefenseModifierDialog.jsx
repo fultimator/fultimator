@@ -1,33 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  Box, 
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
   Typography,
   TextField,
   ToggleButton,
-  ToggleButtonGroup
-} from '@mui/material';
+  ToggleButtonGroup,
+} from "@mui/material";
 import { t } from "../../../translation/translate";
 
-const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calcDef, calcMDef, calcAttr }) => {
+const DefenseModifierDialog = ({
+  open,
+  onClose,
+  defenseType,
+  npc,
+  onUpdate,
+  calcDef,
+  calcMDef,
+  calcAttr,
+}) => {
   const [upgradeDowngrade, setUpgradeDowngrade] = useState(null);
   const [upgradeAmount, setUpgradeAmount] = useState(1);
-  const [overrideValue, setOverrideValue] = useState('');
+  const [overrideValue, setOverrideValue] = useState("");
 
   // Reset state when dialog opens or defenseType changes
   useEffect(() => {
     if (open) {
-      const currentModifier = defenseType === 'DEF' 
-        ? npc.combatStats?.defenseModifier 
-        : npc.combatStats?.mdefenseModifier;
-      
-      const modifierSign = currentModifier > 0 ? 1 : currentModifier < 0 ? -1 : null;
+      const currentModifier =
+        defenseType === "DEF"
+          ? npc.combatStats?.defenseModifier
+          : npc.combatStats?.mdefenseModifier;
+
+      const modifierSign =
+        currentModifier > 0 ? 1 : currentModifier < 0 ? -1 : null;
       setUpgradeDowngrade(modifierSign);
-      setUpgradeAmount(currentModifier ? Math.max(1, Math.abs(currentModifier)) : 1);
+      setUpgradeAmount(
+        currentModifier ? Math.max(1, Math.abs(currentModifier)) : 1,
+      );
       const overrideMap = npc.combatStats?.defenseOverride || {};
       const savedOverride =
         defenseType === "MDEF" && overrideMap.MDEF === undefined
@@ -39,13 +52,23 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
 
   if (!defenseType) return null;
 
-  const baseValue = defenseType === 'DEF' 
-    ? (calcDef ? calcDef(npc) : 0)
-    : (calcMDef ? calcMDef(npc) : 0);
+  const baseValue =
+    defenseType === "DEF"
+      ? calcDef
+        ? calcDef(npc)
+        : 0
+      : calcMDef
+        ? calcMDef(npc)
+        : 0;
 
-  const attrValue = defenseType === "DEF"
-    ? (calcAttr ? calcAttr("Slow", "Enraged", "dexterity", npc) : 0)
-    : (calcAttr ? calcAttr("Dazed", "Enraged", "insight", npc) : 0);
+  const attrValue =
+    defenseType === "DEF"
+      ? calcAttr
+        ? calcAttr("Slow", "Enraged", "dexterity", npc)
+        : 0
+      : calcAttr
+        ? calcAttr("Dazed", "Enraged", "insight", npc)
+        : 0;
 
   // Calculate final value
   const getFinalValue = () => {
@@ -59,9 +82,9 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
     if (upgradeDowngrade === null) {
       defenseValue = baseValue;
     } else {
-      defenseValue = baseValue + (upgradeDowngrade * amount);
+      defenseValue = baseValue + upgradeDowngrade * amount;
     }
-    
+
     return defenseValue + (attrValue || 0);
   };
 
@@ -74,7 +97,7 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
 
   const handleOverrideChange = (event) => {
     const value = event.target.value;
-    if (value === '' || (!isNaN(value) && parseInt(value) >= 0)) {
+    if (value === "" || (!isNaN(value) && parseInt(value) >= 0)) {
       setOverrideValue(value);
     }
   };
@@ -82,9 +105,9 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
   const handleSave = () => {
     const updates = {};
     const amount = Math.max(1, Number.parseInt(upgradeAmount, 10) || 1);
-    
+
     // Handle upgrade/downgrade
-    if (defenseType === 'DEF') {
+    if (defenseType === "DEF") {
       updates.defenseModifier =
         upgradeDowngrade === null ? null : upgradeDowngrade * amount;
     } else {
@@ -93,10 +116,10 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
     }
 
     // Handle override
-    const override = overrideValue !== '' ? parseInt(overrideValue) : null;
+    const override = overrideValue !== "" ? parseInt(overrideValue) : null;
     updates.defenseOverride = {
       ...(npc.combatStats?.defenseOverride || {}),
-      [defenseType]: override
+      [defenseType]: override,
     };
 
     onUpdate(updates);
@@ -106,15 +129,19 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
   const handleClear = () => {
     setUpgradeDowngrade(null);
     setUpgradeAmount(1);
-    setOverrideValue('');
+    setOverrideValue("");
   };
 
   const hasOverride =
-    overrideValue !== "" && overrideValue !== null && overrideValue !== undefined;
+    overrideValue !== "" &&
+    overrideValue !== null &&
+    overrideValue !== undefined;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{t("Edit")} {t(defenseType)}</DialogTitle>
+      <DialogTitle>
+        {t("Edit")} {t(defenseType)}
+      </DialogTitle>
       <DialogContent>
         {/* Base Value */}
         <Typography variant="subtitle1" align="center" sx={{ mb: 2 }}>
@@ -134,20 +161,12 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
             exclusive
             onChange={handleUpgradeDowngradeChange}
             fullWidth
-            sx={{ display: 'flex', gap: 1 }}
+            sx={{ display: "flex", gap: 1 }}
           >
-            <ToggleButton 
-              value={1} 
-              color="success"
-              sx={{ flex: 1 }}
-            >
+            <ToggleButton value={1} color="success" sx={{ flex: 1 }}>
               {t("Upgrade")}
             </ToggleButton>
-            <ToggleButton 
-              value={-1} 
-              color="error"
-              sx={{ flex: 1 }}
-            >
+            <ToggleButton value={-1} color="error" sx={{ flex: 1 }}>
               {t("Downgrade")}
             </ToggleButton>
           </ToggleButtonGroup>
@@ -164,19 +183,30 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
               }}
               sx={{ mt: 1 }}
               slotProps={{
-                htmlInput: { min: 1 }
+                htmlInput: { min: 1 },
               }}
             />
           )}
           {upgradeDowngrade !== null && !hasOverride && (
-            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
-              {t("Modified Value")}: {baseValue + (upgradeDowngrade * Math.max(1, Number.parseInt(upgradeAmount, 10) || 1))}
+            <Typography variant="body2" sx={{ mt: 1, textAlign: "center" }}>
+              {t("Modified Value")}:{" "}
+              {baseValue +
+                upgradeDowngrade *
+                  Math.max(1, Number.parseInt(upgradeAmount, 10) || 1)}
             </Typography>
           )}
         </Box>
 
         {/* Override Section */}
-        <Box sx={{ my: 2, p: 2, border: '1px solid #ccc', borderRadius: 1, bgcolor: 'background.default' }}>
+        <Box
+          sx={{
+            my: 2,
+            p: 2,
+            border: "1px solid #ccc",
+            borderRadius: 1,
+            bgcolor: "background.default",
+          }}
+        >
           <Typography variant="h6" sx={{ mb: 1 }}>
             {t("Override")}
           </Typography>
@@ -184,17 +214,21 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
             variant="body2"
             sx={{
               color: "text.secondary",
-              mb: 1
-            }}>
-            {t("Set a specific value that overrides both base and upgrade/downgrade")}
+              mb: 1,
+            }}
+          >
+            {t(
+              "Set a specific value that overrides both base and upgrade/downgrade",
+            )}
           </Typography>
           <Typography
             variant="caption"
             sx={{
               color: "text.secondary",
               display: "block",
-              mb: 1
-            }}>
+              mb: 1,
+            }}
+          >
             {t("Final")} = {t("Override")}
           </Typography>
           <TextField
@@ -205,13 +239,21 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
             placeholder={t("Enter override value")}
             size="small"
             slotProps={{
-              htmlInput: { min: 0 }
+              htmlInput: { min: 0 },
             }}
           />
         </Box>
 
         {/* Final Value Display */}
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'primary.main', color: 'primary.contrastText', borderRadius: 1 }}>
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            borderRadius: 1,
+          }}
+        >
           <Typography variant="h6" align="center">
             {t("Final")} {t(defenseType)}: {getFinalValue()}
           </Typography>
@@ -221,9 +263,7 @@ const DefenseModifierDialog = ({ open, onClose, defenseType, npc, onUpdate, calc
         <Button onClick={handleClear} color="warning">
           {t("Clear All")}
         </Button>
-        <Button onClick={onClose}>
-          {t("Cancel")}
-        </Button>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button onClick={handleSave} variant="contained">
           {t("Save")}
         </Button>

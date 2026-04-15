@@ -1,6 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { IS_ELECTRON } from "./platform";
 
@@ -21,7 +26,9 @@ const app = initializeApp(firebaseConfig);
 let firestore;
 try {
   firestore = initializeFirestore(app, {
-    cache: persistentLocalCache(IS_ELECTRON ? {} : { tabManager: persistentMultipleTabManager() }),
+    cache: persistentLocalCache(
+      IS_ELECTRON ? {} : { tabManager: persistentMultipleTabManager() },
+    ),
   });
 } catch {
   firestore = getFirestore(app);

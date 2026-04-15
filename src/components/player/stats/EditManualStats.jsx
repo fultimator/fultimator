@@ -22,13 +22,13 @@ export default function EditManualStats({
   const [mdefModifier, setMdefModifier] = useState(player.modifiers?.mdef || 0);
   const [initModifier, setInitModifier] = useState(player.modifiers?.init || 0);
   const [meleePrecModifier, setMeleePrecModifier] = useState(
-    player.modifiers?.meleePrec || 0
+    player.modifiers?.meleePrec || 0,
   );
   const [rangedPrecModifier, setRangedPrecModifier] = useState(
-    player.modifiers?.rangedPrec || 0
+    player.modifiers?.rangedPrec || 0,
   );
   const [magicPrecModifier, setMagicPrecModifier] = useState(
-    player.modifiers?.magicPrec || 0
+    player.modifiers?.magicPrec || 0,
   );
 
   // Update player object with manual modifiers and trigger max stats update
@@ -73,7 +73,7 @@ export default function EditManualStats({
       }}
     >
       <Grid container spacing={2}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Edit Stats Manually")}
@@ -84,8 +84,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max HP Modifier")}
             type="number"
@@ -99,7 +100,7 @@ export default function EditManualStats({
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -107,8 +108,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max MP Modifier")}
             type="number"
@@ -122,7 +124,7 @@ export default function EditManualStats({
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -130,8 +132,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max IP Modifier")}
             type="number"
@@ -145,7 +148,7 @@ export default function EditManualStats({
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -153,8 +156,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max DEF Modifier")}
             type="number"
@@ -165,14 +169,14 @@ export default function EditManualStats({
               defModifier > 0
                 ? "success"
                 : defModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={defModifier > 0 || defModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -180,8 +184,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max MDEF Modifier")}
             type="number"
@@ -192,14 +197,14 @@ export default function EditManualStats({
               mdefModifier > 0
                 ? "success"
                 : mdefModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={mdefModifier > 0 || mdefModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -207,8 +212,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Max INIT Modifier")}
             type="number"
@@ -219,14 +225,14 @@ export default function EditManualStats({
               initModifier > 0
                 ? "success"
                 : initModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={initModifier > 0 || initModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -234,8 +240,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Melee Accuracy Modifier")}
             type="number"
@@ -246,14 +253,14 @@ export default function EditManualStats({
               meleePrecModifier > 0
                 ? "success"
                 : meleePrecModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={meleePrecModifier > 0 || meleePrecModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -261,8 +268,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Ranged Accuracy Modifier")}
             type="number"
@@ -273,14 +281,14 @@ export default function EditManualStats({
               rangedPrecModifier > 0
                 ? "success"
                 : rangedPrecModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={rangedPrecModifier > 0 || rangedPrecModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>
@@ -288,8 +296,9 @@ export default function EditManualStats({
           size={{
             xs: 12,
             sm: 6,
-            md: 4
-          }}>
+            md: 4,
+          }}
+        >
           <TextField
             label={t("Magic Precision Modifier")}
             type="number"
@@ -300,14 +309,14 @@ export default function EditManualStats({
               magicPrecModifier > 0
                 ? "success"
                 : magicPrecModifier < 0
-                ? "error"
-                : "primary"
+                  ? "error"
+                  : "primary"
             }
             focused={magicPrecModifier > 0 || magicPrecModifier < 0}
             slotProps={{
               input: {
                 readOnly: !isEditMode,
-              }
+              },
             }}
           />
         </Grid>

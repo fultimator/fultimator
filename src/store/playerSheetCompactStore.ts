@@ -1,18 +1,18 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export type CompactTabType =
-  | 'classes'
-  | 'spells'
-  | 'equipment'
-  | 'notes'
-  | 'bonds'
-  | 'companion'
-  | 'quirk'
-  | 'zeroPower'
-  | 'others'
-  | 'campActivities'
-  | 'rituals'
-  | 'vehicle';
+  | "classes"
+  | "spells"
+  | "equipment"
+  | "notes"
+  | "bonds"
+  | "companion"
+  | "quirk"
+  | "zeroPower"
+  | "others"
+  | "campActivities"
+  | "rituals"
+  | "vehicle";
 
 interface PlayerSheetCompactStore {
   /** Global open rows state: { tabName -> { rowKey -> isOpen } } */
@@ -38,22 +38,25 @@ interface PlayerSheetCompactStore {
 }
 
 const TABS: CompactTabType[] = [
-  'classes',
-  'spells',
-  'equipment',
-  'notes',
-  'bonds',
-  'companion',
-  'quirk',
-  'zeroPower',
-  'others',
-  'campActivities',
-  'rituals',
-  'vehicle',
+  "classes",
+  "spells",
+  "equipment",
+  "notes",
+  "bonds",
+  "companion",
+  "quirk",
+  "zeroPower",
+  "others",
+  "campActivities",
+  "rituals",
+  "vehicle",
 ];
 
 // Initialize with empty objects for each tab
-const initializeOpenRows = (): Record<CompactTabType, Record<string, boolean>> => {
+const initializeOpenRows = (): Record<
+  CompactTabType,
+  Record<string, boolean>
+> => {
   const result = {} as Record<CompactTabType, Record<string, boolean>>;
   TABS.forEach((tab) => {
     result[tab] = {};
@@ -70,49 +73,51 @@ const initializeOpenRows = (): Record<CompactTabType, Record<string, boolean>> =
  * Usage:
  *   const { openRows, searchQuery, toggleRow, setSearchQuery } = usePlayerSheetCompactStore();
  */
-export const usePlayerSheetCompactStore = create<PlayerSheetCompactStore>((set, get) => ({
-  openRows: initializeOpenRows(),
-  searchQuery: '',
+export const usePlayerSheetCompactStore = create<PlayerSheetCompactStore>(
+  (set, get) => ({
+    openRows: initializeOpenRows(),
+    searchQuery: "",
 
-  setSearchQuery: (query: string) => {
-    set({ searchQuery: query });
-  },
+    setSearchQuery: (query: string) => {
+      set({ searchQuery: query });
+    },
 
-  toggleRow: (tab: CompactTabType, rowKey: string) => {
-    set((state) => ({
-      openRows: {
-        ...state.openRows,
-        [tab]: {
-          ...state.openRows[tab],
-          [rowKey]: !state.openRows[tab][rowKey],
-        },
-      },
-    }));
-  },
-
-  setOpenRows: (tab: CompactTabType, rows: Record<string, boolean>) => {
-    set((state) => ({
-      openRows: {
-        ...state.openRows,
-        [tab]: rows,
-      },
-    }));
-  },
-
-  clearOpenRows: (tab?: CompactTabType) => {
-    if (tab) {
+    toggleRow: (tab: CompactTabType, rowKey: string) => {
       set((state) => ({
         openRows: {
           ...state.openRows,
-          [tab]: {},
+          [tab]: {
+            ...state.openRows[tab],
+            [rowKey]: !state.openRows[tab][rowKey],
+          },
         },
       }));
-    } else {
-      set({ openRows: initializeOpenRows() });
-    }
-  },
+    },
 
-  isRowOpen: (tab: CompactTabType, rowKey: string) => {
-    return get().openRows[tab]?.[rowKey] ?? false;
-  },
-}));
+    setOpenRows: (tab: CompactTabType, rows: Record<string, boolean>) => {
+      set((state) => ({
+        openRows: {
+          ...state.openRows,
+          [tab]: rows,
+        },
+      }));
+    },
+
+    clearOpenRows: (tab?: CompactTabType) => {
+      if (tab) {
+        set((state) => ({
+          openRows: {
+            ...state.openRows,
+            [tab]: {},
+          },
+        }));
+      } else {
+        set({ openRows: initializeOpenRows() });
+      }
+    },
+
+    isRowOpen: (tab: CompactTabType, rowKey: string) => {
+      return get().openRows[tab]?.[rowKey] ?? false;
+    },
+  }),
+);

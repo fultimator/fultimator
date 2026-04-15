@@ -19,10 +19,10 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import ZenitIcon  from "../../svgs/zenit.svg?react";
-import ExpIcon  from "../../svgs/exp.svg?react";
-import ExpDisabledIcon  from "../../svgs/exp_disabled.svg?react";
-import FabulaIcon  from "../../svgs/fabula.svg?react";
+import ZenitIcon from "../../svgs/zenit.svg?react";
+import ExpIcon from "../../svgs/exp.svg?react";
+import ExpDisabledIcon from "../../svgs/exp_disabled.svg?react";
+import FabulaIcon from "../../svgs/fabula.svg?react";
 import { Code } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import Confetti from "react-confetti";
@@ -56,7 +56,7 @@ export default function EditPlayerBasics({
         [key]: e.target.value,
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const onChangeInfo = useCallback(
@@ -69,7 +69,7 @@ export default function EditPlayerBasics({
         },
       }));
     },
-    [setPlayer]
+    [setPlayer],
   );
 
   const checkImageSize = useCallback(async (imageUrl) => {
@@ -78,10 +78,10 @@ export default function EditPlayerBasics({
       if (!response.ok) {
         setIsImageError(true);
         setErrorMessage(
-          `Failed to fetch image: ${response.status} ${response.statusText}`
+          `Failed to fetch image: ${response.status} ${response.statusText}`,
         );
         throw new Error(
-          `Failed to fetch image: ${response.status} ${response.statusText}`
+          `Failed to fetch image: ${response.status} ${response.statusText}`,
         );
       }
       const blob = await response.blob();
@@ -121,7 +121,7 @@ export default function EditPlayerBasics({
       }}
     >
       <Grid container spacing={2}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Basic Information")}
@@ -133,8 +133,9 @@ export default function EditPlayerBasics({
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="name"
@@ -146,15 +147,17 @@ export default function EditPlayerBasics({
                   readOnly: !isEditMode,
                 },
 
-                htmlInput: { maxLength: 50 }
-              }} />
+                htmlInput: { maxLength: 50 },
+              }}
+            />
           </FormControl>
         </Grid>
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="pronouns"
@@ -166,15 +169,17 @@ export default function EditPlayerBasics({
                   readOnly: !isEditMode,
                 },
 
-                htmlInput: { maxLength: 15 }
-              }} />
+                htmlInput: { maxLength: 15 },
+              }}
+            />
           </FormControl>
         </Grid>
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <EditPlayerLevel
             player={player}
             setPlayer={setPlayer}
@@ -182,7 +187,7 @@ export default function EditPlayerBasics({
             updateMaxStats={updateMaxStats}
           />
         </Grid>
-        <Grid  size={12}>
+        <Grid size={12}>
           <FormControl variant="standard" fullWidth>
             <CustomTextarea
               id="description"
@@ -198,8 +203,9 @@ export default function EditPlayerBasics({
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="fabulapoints"
@@ -212,7 +218,7 @@ export default function EditPlayerBasics({
                   (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
                 ) {
                   onChangeInfo("fabulapoints")(
-                    value === "" ? 0 : parseInt(value, 10)
+                    value === "" ? 0 : parseInt(value, 10),
                   );
                 }
               }}
@@ -236,7 +242,7 @@ export default function EditPlayerBasics({
                       </IconButton>
                     </InputAdornment>
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -244,8 +250,9 @@ export default function EditPlayerBasics({
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="exp"
@@ -281,7 +288,7 @@ export default function EditPlayerBasics({
                       onCloseLevelUp={handleCloseLevelUp}
                     />
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -289,8 +296,9 @@ export default function EditPlayerBasics({
         <Grid
           size={{
             xs: 12,
-            sm: 4
-          }}>
+            sm: 4,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="zenit"
@@ -316,7 +324,7 @@ export default function EditPlayerBasics({
                       </IconButton>
                     </InputAdornment>
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -326,8 +334,9 @@ export default function EditPlayerBasics({
             <Grid
               size={{
                 xs: 12,
-                sm: 8
-              }}>
+                sm: 8,
+              }}
+            >
               <TextField
                 id="imgurl"
                 label={t("Image URL") + ":"}
@@ -347,8 +356,9 @@ export default function EditPlayerBasics({
             <Grid
               size={{
                 xs: 6,
-                sm: 2
-              }}>
+                sm: 2,
+              }}
+            >
               <Button
                 variant="contained"
                 onClick={() => {
@@ -379,8 +389,9 @@ export default function EditPlayerBasics({
             <Grid
               size={{
                 xs: 6,
-                sm: 2
-              }}>
+                sm: 2,
+              }}
+            >
               <Button
                 variant="outlined"
                 onClick={() => {
@@ -455,7 +466,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
                 <Add />
               </IconButton>
             ),
-          }
+          },
         }}
       />
     </FormControl>
@@ -541,7 +552,7 @@ function ExpAdornment({
               width: "80%",
               maxWidth: "md",
             },
-          }
+          },
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -551,8 +562,16 @@ function ExpAdornment({
           <p>{t("Do you want to use 10 EXP to level up?")}</p>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={handleClose} color="error">{t("Cancel")}</Button>
-          <Button variant="contained" onClick={handleLevelUpConfirm} color= "primary">{t("Level Up")}</Button>
+          <Button variant="contained" onClick={handleClose} color="error">
+            {t("Cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleLevelUpConfirm}
+            color="primary"
+          >
+            {t("Level Up")}
+          </Button>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -564,7 +583,7 @@ function ExpAdornment({
               width: "80%",
               maxWidth: "lg",
             },
-          }
+          },
         }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
@@ -575,14 +594,14 @@ function ExpAdornment({
             <li>
               <ReactMarkdown>
                 {t(
-                  "You may change your character's **Identity** and/or **Theme**."
+                  "You may change your character's **Identity** and/or **Theme**.",
                 )}
               </ReactMarkdown>
             </li>
             <li>
               <ReactMarkdown>
                 {t(
-                  "Your maximum **Hit Points** and **Mind Points** has increased by **one** point each. Note that this does **not** affect your current Hit Points and Mind Points."
+                  "Your maximum **Hit Points** and **Mind Points** has increased by **one** point each. Note that this does **not** affect your current Hit Points and Mind Points.",
                 )}
               </ReactMarkdown>
             </li>
@@ -594,7 +613,7 @@ function ExpAdornment({
                     player.lvl +
                     "**. " +
                     t(
-                      "You may choose one of your **Attributes** and increase its base die size by one step, up to a maximum of **d12**."
+                      "You may choose one of your **Attributes** and increase its base die size by one step, up to a maximum of **d12**.",
                     )}
                 </ReactMarkdown>
               </li>
@@ -602,7 +621,7 @@ function ExpAdornment({
             <li>
               <ReactMarkdown>
                 {t(
-                  "You may increase the level of one of your character's Classes by one, or you gain your first level in a Class you didn't already have."
+                  "You may increase the level of one of your character's Classes by one, or you gain your first level in a Class you didn't already have.",
                 )}
               </ReactMarkdown>
             </li>
@@ -610,28 +629,30 @@ function ExpAdornment({
 
           <Typography>
             {t(
-              "There are, however, two important limitations when leveling up:"
+              "There are, however, two important limitations when leveling up:",
             )}
           </Typography>
           <ul>
             <li>
               <ReactMarkdown>
                 {t(
-                  "You can never have more than ten levels in a Class. Once you put the tenth level in a Class, that Class has been **mastered** (which grants you a **Heroic Skill**) and you can no longer invest levels into it."
+                  "You can never have more than ten levels in a Class. Once you put the tenth level in a Class, that Class has been **mastered** (which grants you a **Heroic Skill**) and you can no longer invest levels into it.",
                 )}
               </ReactMarkdown>
             </li>
             <li>
               <ReactMarkdown>
                 {t(
-                  "You can never have more than **three non-mastered Classes**. If you want to further diversify your character, you must first master some of the Classes you acquired."
+                  "You can never have more than **three non-mastered Classes**. If you want to further diversify your character, you must first master some of the Classes you acquired.",
                 )}
               </ReactMarkdown>
             </li>
           </ul>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={handleClose} color="primary" >{t("OK")}</Button>
+          <Button variant="contained" onClick={handleClose} color="primary">
+            {t("OK")}
+          </Button>
         </DialogActions>
       </Dialog>
       <style>

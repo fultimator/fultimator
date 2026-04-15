@@ -16,12 +16,20 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
-import { WeaponCard, ArmorCard, CustomWeaponCard, AccessoryCard } from "../../compendium/ItemCards";
+import {
+  WeaponCard,
+  ArmorCard,
+  CustomWeaponCard,
+  AccessoryCard,
+} from "../../compendium/ItemCards";
 // import { OpenBracket, CloseBracket } from "../../Bracket";
 import attributes from "../../../libs/attributes";
 // import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { calculateAttribute, calculateCustomWeaponStats } from "../common/playerCalculations";
+import {
+  calculateAttribute,
+  calculateCustomWeaponStats,
+} from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import EditPlayerEquipment from "../equipment/EditPlayerEquipment";
 
@@ -49,8 +57,8 @@ export default function PlayerEquipment({
   const hasDualShieldBearer = player.classes.some((playerClass) =>
     playerClass.skills.some(
       (skill) =>
-        skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-    )
+        skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1,
+    ),
   );
 
   // Guardian - Defensive Mastery
@@ -89,8 +97,9 @@ export default function PlayerEquipment({
     damageReworkBonus: false,
     precBonus: false,
     rework: false,
-    quality:
-      t("Deals extra damage equal to your【 **SL**】in **defensive mastery**."),
+    quality: t(
+      "Deals extra damage equal to your【 **SL**】in **defensive mastery**.",
+    ),
     qualityCost: "0",
     totalBonus: 0,
     selectedQuality: "",
@@ -156,9 +165,9 @@ export default function PlayerEquipment({
   // Helper function to format custom weapon for display
   const formatCustomWeaponForDisplay = (customWeapon) => {
     const isTransforming = customWeapon.customizations?.some(
-      (c) => c.name === "weapon_customization_transforming"
+      (c) => c.name === "weapon_customization_transforming",
     );
-    
+
     const isSecondaryForm = customWeapon.activeForm === "secondary";
 
     const baseData = {
@@ -166,31 +175,43 @@ export default function PlayerEquipment({
       isCustomWeapon: true,
       isTransforming: isTransforming,
       hands: 2, // Custom weapons are always two-handed
-      originalData: customWeapon // Preserve original reference
+      originalData: customWeapon, // Preserve original reference
     };
 
     if (isSecondaryForm) {
       return {
         ...baseData,
-        name: customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`,
-        category: customWeapon.secondSelectedCategory || "weapon_category_brawling",
+        name:
+          customWeapon.secondWeaponName ||
+          `${customWeapon.name} (Transforming)`,
+        category:
+          customWeapon.secondSelectedCategory || "weapon_category_brawling",
         range: customWeapon.secondSelectedRange || "weapon_range_melee",
-        accuracyCheck: customWeapon.secondSelectedAccuracyCheck || { att1: "dexterity", att2: "might" },
+        accuracyCheck: customWeapon.secondSelectedAccuracyCheck || {
+          att1: "dexterity",
+          att2: "might",
+        },
         type: customWeapon.secondSelectedType || "physical",
         customizations: customWeapon.secondCurrentCustomizations || [],
         quality: customWeapon.secondQuality || "",
         qualityCost: customWeapon.secondQualityCost || 0,
         isSecondaryForm: true,
-        melee: (customWeapon.secondSelectedRange || "weapon_range_melee") === "weapon_range_melee",
-        ranged: (customWeapon.secondSelectedRange || "weapon_range_melee") === "weapon_range_ranged"
+        melee:
+          (customWeapon.secondSelectedRange || "weapon_range_melee") ===
+          "weapon_range_melee",
+        ranged:
+          (customWeapon.secondSelectedRange || "weapon_range_melee") ===
+          "weapon_range_ranged",
       };
     }
 
     return {
       ...baseData,
       category: customWeapon.category || "weapon_category_brawling",
-      melee: (customWeapon.range || "weapon_range_melee") === "weapon_range_melee",
-      ranged: (customWeapon.range || "weapon_range_melee") === "weapon_range_ranged"
+      melee:
+        (customWeapon.range || "weapon_range_melee") === "weapon_range_melee",
+      ranged:
+        (customWeapon.range || "weapon_range_melee") === "weapon_range_ranged",
     };
   };
 
@@ -198,7 +219,9 @@ export default function PlayerEquipment({
   const allEquippedWeapons = [
     ...equippedWeapons,
     // Add custom weapons with proper formatting (showing only active form)
-    ...equippedCustomWeapons.map((customWeapon) => formatCustomWeaponForDisplay(customWeapon))
+    ...equippedCustomWeapons.map((customWeapon) =>
+      formatCustomWeaponForDisplay(customWeapon),
+    ),
   ];
 
   // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
@@ -227,11 +250,11 @@ export default function PlayerEquipment({
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.precModifier || 0),
-      0
+      0,
     ) +
     equippedAccessories.reduce(
       (total, accessory) => total + (accessory.precModifier || 0),
-      0
+      0,
     ) +
     meleeMasteryModifier;
 
@@ -240,11 +263,11 @@ export default function PlayerEquipment({
     (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.precModifier || 0),
-      0
+      0,
     ) +
     equippedAccessories.reduce(
       (total, accessory) => total + (accessory.precModifier || 0),
-      0
+      0,
     ) +
     rangedMasteryModifier;
 
@@ -252,11 +275,11 @@ export default function PlayerEquipment({
     (equippedArmor.length > 0 ? equippedArmor[0].damageMeleeModifier || 0 : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.damageMeleeModifier || 0),
-      0
+      0,
     ) +
     equippedAccessories.reduce(
       (total, accessory) => total + (accessory.damageMeleeModifier || 0),
-      0
+      0,
     );
 
   const damageRangedModifier =
@@ -265,11 +288,11 @@ export default function PlayerEquipment({
       : 0) +
     equippedShields.reduce(
       (total, shield) => total + (shield.damageRangedModifier || 0),
-      0
+      0,
     ) +
     equippedAccessories.reduce(
       (total, accessory) => total + (accessory.damageRangedModifier || 0),
-      0
+      0,
     );
 
   const currDex = calculateAttribute(
@@ -278,7 +301,7 @@ export default function PlayerEquipment({
     ["slow", "enraged"],
     ["dexUp"],
     6,
-    12
+    12,
   );
   const currInsight = calculateAttribute(
     player,
@@ -286,7 +309,7 @@ export default function PlayerEquipment({
     ["dazed", "enraged"],
     ["insUp"],
     6,
-    12
+    12,
   );
   const currMight = calculateAttribute(
     player,
@@ -294,7 +317,7 @@ export default function PlayerEquipment({
     ["weak", "poisoned"],
     ["migUp"],
     6,
-    12
+    12,
   );
   const currWillpower = calculateAttribute(
     player,
@@ -302,7 +325,7 @@ export default function PlayerEquipment({
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
-    12
+    12,
   );
 
   const attributeMap = {
@@ -318,12 +341,18 @@ export default function PlayerEquipment({
     const customWeapon = weapon.originalData;
     if (!customWeapon) return;
 
-    setPlayer(prevPlayer => {
+    setPlayer((prevPlayer) => {
       const customWeapons = prevPlayer.equipment?.[0]?.customWeapons ?? [];
-      const weaponIndex = customWeapons.findIndex(w => w === customWeapon);
+      const weaponIndex = customWeapons.findIndex((w) => w === customWeapon);
       if (weaponIndex === -1) return prevPlayer;
       const updated = customWeapons.map((cw, i) =>
-        i === weaponIndex ? { ...cw, activeForm: cw.activeForm === 'secondary' ? 'primary' : 'secondary' } : cw
+        i === weaponIndex
+          ? {
+              ...cw,
+              activeForm:
+                cw.activeForm === "secondary" ? "primary" : "secondary",
+            }
+          : cw,
       );
       const equipment = [
         { ...prevPlayer.equipment[0], customWeapons: updated },
@@ -352,7 +381,10 @@ export default function PlayerEquipment({
     let weaponDamage = weapon.damage || 5;
 
     if (weapon.isCustomWeapon) {
-      const stats = calculateCustomWeaponStats(weapon, weapon.activeForm === "secondary");
+      const stats = calculateCustomWeaponStats(
+        weapon,
+        weapon.activeForm === "secondary",
+      );
       weaponDamage = stats.damage;
       weaponPrec = stats.precision;
     }
@@ -386,8 +418,8 @@ export default function PlayerEquipment({
     const dialogContent = (
       <>
         <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid  container size={6}>
-            <Grid  size={12}>
+          <Grid container size={6}>
+            <Grid size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -399,8 +431,8 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid  container size={6}>
-            <Grid  size={12}>
+          <Grid container size={6}>
+            <Grid size={12}>
               <Typography
                 variant="h3"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -418,17 +450,19 @@ export default function PlayerEquipment({
               </Typography>
             </Grid>
           </Grid>
-          <Grid  sx={{ marginTop: "20px" }} size={12}>
+          <Grid sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
-              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${attributes[att2].shortcaps
-                }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${weapon.melee
+              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
+                attributes[att2].shortcaps
+              }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${
+                weapon.melee
                   ? meleeModifier !== 0
                     ? "+" + meleeModifier
                     : rangedModifier
                   : rangedModifier !== 0
                     ? "+" + rangedModifier
                     : ""
-                }`}
+              }`}
             </Typography>
             <br />
             <Typography
@@ -465,7 +499,7 @@ export default function PlayerEquipment({
             <br />
           </Typography>
           {dialogContent}
-        </>
+        </>,
       );
     } else if (isCriticalSuccess) {
       setDialogSeverity("success");
@@ -479,7 +513,7 @@ export default function PlayerEquipment({
             <br />
           </Typography>
           {dialogContent}
-        </>
+        </>,
       );
     } else {
       setDialogSeverity("info");
@@ -503,23 +537,32 @@ export default function PlayerEquipment({
             sx={
               isCharacterSheet
                 ? {
-                  borderRadius: "8px",
-                  border: "2px solid",
-                  borderColor: secondary,
-                  display: "flex",
-                  flexDirection: "column",
-                  boxShadow: "none",
-                }
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                    flexDirection: "column",
+                    boxShadow: "none",
+                  }
                 : {
-                  borderRadius: "8px",
-                  border: "2px solid",
-                  borderColor: secondary,
-                  display: "flex",
-                }
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                    display: "flex",
+                  }
             }
           >
             {isCharacterSheet ? (
-              <Box sx={{ backgroundColor: primary, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", borderRadius: "8px 8px 0 0" }}>
+              <Box
+                sx={{
+                  backgroundColor: primary,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  borderRadius: "8px 8px 0 0",
+                }}
+              >
                 <Typography
                   variant="h1"
                   sx={{
@@ -564,18 +607,27 @@ export default function PlayerEquipment({
                 {t("Equipment")}
               </Typography>
             )}
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {allEquippedWeapons.map((weapon, index) => (
                 <Grid
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -594,7 +646,10 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size={2}
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -609,18 +664,33 @@ export default function PlayerEquipment({
                     >
                       {weapon.isTransforming && isEditMode && (
                         <Tooltip title={t("weapon_customization_swap_form")}>
-                          <IconButton size="small" onClick={() => handleSwapForm(weapon)} sx={{ p: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleSwapForm(weapon)}
+                            sx={{ p: 0.5 }}
+                          >
                             <SwapHoriz fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       )}
                       <Tooltip title={t("Info")}>
-                        <IconButton size="small" onClick={() => { setSelectedItem(weapon); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedItem(weapon);
+                            setInfoModalOpen(true);
+                          }}
+                          sx={{ p: 0.5 }}
+                        >
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={t("Roll")}>
-                        <IconButton size="small" onClick={() => handleDiceRoll(weapon)} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDiceRoll(weapon)}
+                          sx={{ p: 0.5 }}
+                        >
                           <Casino fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -633,12 +703,17 @@ export default function PlayerEquipment({
                   container
                   spacing={0}
                   key={`armor-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -657,7 +732,10 @@ export default function PlayerEquipment({
                       {armor.name}
                     </Typography>
                   </Grid>
-                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size={2}
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -670,7 +748,14 @@ export default function PlayerEquipment({
                       }}
                     >
                       <Tooltip title={t("Info")}>
-                        <IconButton size="small" onClick={() => { setSelectedItem(armor); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedItem(armor);
+                            setInfoModalOpen(true);
+                          }}
+                          sx={{ p: 0.5 }}
+                        >
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -683,12 +768,17 @@ export default function PlayerEquipment({
                   container
                   spacing={0}
                   key={`shield-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -707,7 +797,10 @@ export default function PlayerEquipment({
                       {shield.name}
                     </Typography>
                   </Grid>
-                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size={2}
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -720,7 +813,14 @@ export default function PlayerEquipment({
                       }}
                     >
                       <Tooltip title={t("Info")}>
-                        <IconButton size="small" onClick={() => { setSelectedItem(shield); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedItem(shield);
+                            setInfoModalOpen(true);
+                          }}
+                          sx={{ p: 0.5 }}
+                        >
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -733,12 +833,17 @@ export default function PlayerEquipment({
                   container
                   spacing={0}
                   key={`accessory-${index}`}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       variant="h2"
                       sx={{
@@ -757,7 +862,10 @@ export default function PlayerEquipment({
                       {accessory.name}
                     </Typography>
                   </Grid>
-                  <Grid  sx={{ display: "flex", alignItems: "stretch" }} size={2}>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size={2}
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -770,7 +878,14 @@ export default function PlayerEquipment({
                       }}
                     >
                       <Tooltip title={t("Info")}>
-                        <IconButton size="small" onClick={() => { setSelectedItem(accessory); setInfoModalOpen(true); }} sx={{ p: 0.5 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedItem(accessory);
+                            setInfoModalOpen(true);
+                          }}
+                          sx={{ p: 0.5 }}
+                        >
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
@@ -782,32 +897,32 @@ export default function PlayerEquipment({
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
                 damageRangedModifier !== 0) && (
-                  <Grid  size={12}>
-                    <Typography variant="h3" sx={{ fontWeight: "bold" }}>
-                      {t("Modifiers")}
+                <Grid size={12}>
+                  <Typography variant="h3" sx={{ fontWeight: "bold" }}>
+                    {t("Modifiers")}
+                  </Typography>
+                  {precMeleeModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Melee Accuracy Bonus")}: {precMeleeModifier}
                     </Typography>
-                    {precMeleeModifier !== 0 && (
-                      <Typography variant="h4">
-                        {t("Melee Accuracy Bonus")}: {precMeleeModifier}
-                      </Typography>
-                    )}
-                    {precRangedModifier !== 0 && (
-                      <Typography variant="h4">
-                        {t("Ranged Accuracy Bonus")}: {precRangedModifier}
-                      </Typography>
-                    )}
-                    {damageMeleeModifier !== 0 && (
-                      <Typography variant="h4">
-                        {t("Melee Damage Bonus")}: {damageMeleeModifier}
-                      </Typography>
-                    )}
-                    {damageRangedModifier !== 0 && (
-                      <Typography variant="h4">
-                        {t("Ranged Damage Bonus")}: {damageRangedModifier}
-                      </Typography>
-                    )}
-                  </Grid>
-                )}
+                  )}
+                  {precRangedModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Ranged Accuracy Bonus")}: {precRangedModifier}
+                    </Typography>
+                  )}
+                  {damageMeleeModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Melee Damage Bonus")}: {damageMeleeModifier}
+                    </Typography>
+                  )}
+                  {damageRangedModifier !== 0 && (
+                    <Typography variant="h4">
+                      {t("Ranged Damage Bonus")}: {damageRangedModifier}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
             </Grid>
             <Dialog
               open={dialogOpen}
@@ -815,7 +930,7 @@ export default function PlayerEquipment({
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "30%" } } }
+                paper: { sx: { width: { xs: "90%", md: "30%" } } },
               }}
             >
               <DialogTitle
@@ -838,7 +953,11 @@ export default function PlayerEquipment({
                 </DialogContent>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleDialogClose} color="secondary" variant="contained">
+                <Button
+                  onClick={handleDialogClose}
+                  color="secondary"
+                  variant="contained"
+                >
                   {t("Close")}
                 </Button>
                 <Button
@@ -854,15 +973,35 @@ export default function PlayerEquipment({
           </Paper>
         </>
       )}
-      <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="lg">
+      <Dialog
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        fullWidth
+        maxWidth="lg"
+      >
         <DialogContent sx={{ p: 0 }}>
-          <EditPlayerEquipment player={player} setPlayer={setPlayer} isEditMode={true} />
+          <EditPlayerEquipment
+            player={player}
+            setPlayer={setPlayer}
+            isEditMode={true}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEdit(false)} variant="contained" color="primary">{t("Close")}</Button>
+          <Button
+            onClick={() => setOpenEdit(false)}
+            variant="contained"
+            color="primary"
+          >
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={infoModalOpen} onClose={() => setInfoModalOpen(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogContent sx={{ p: 0 }}>
           {selectedItem && (
             <>
@@ -881,7 +1020,13 @@ export default function PlayerEquipment({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setInfoModalOpen(false)} variant="contained" color="primary">{t("Close")}</Button>
+          <Button
+            onClick={() => setInfoModalOpen(false)}
+            variant="contained"
+            color="primary"
+          >
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

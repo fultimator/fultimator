@@ -16,15 +16,17 @@ const Study = ({ npc, study }) => {
               borderRight: "4px solid white",
               px: 2,
             }}
-            size="grow">
+            size="grow"
+          >
             <Typography
               sx={{
                 color: "white.main",
                 fontFamily: "Antonio",
                 fontSize: "1.5rem",
                 fontWeight: "medium",
-                textTransform: "uppercase"
-              }}>
+                textTransform: "uppercase",
+              }}
+            >
               {npc.name}
             </Typography>
           </Grid>
@@ -36,15 +38,18 @@ const Study = ({ npc, study }) => {
               borderLeft: "2px solid #b9a9be",
               borderBottom: "2px solid #b9a9be",
               borderImage: "linear-gradient(45deg, #b9a9be, #ffffff) 1;",
-            }}>
+            }}
+          >
             <Typography
               sx={{
                 fontFamily: "Antonio",
                 fontSize: "1.25rem",
                 fontWeight: "medium",
-                textTransform: "uppercase"
-              }}>
-              {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond /> {t(npc.species)}
+                textTransform: "uppercase",
+              }}
+            >
+              {t("Lvl")} {npc.lvl} <Rank npc={npc} /> <Diamond />{" "}
+              {t(npc.species)}
             </Typography>
           </Grid>
         </Grid>
@@ -57,7 +62,8 @@ const Study = ({ npc, study }) => {
               px: 2,
               py: 0.5,
             }}
-            size={12}>
+            size={12}
+          >
             <Typography>
               <strong>{t("Typical Traits:")} </strong>
               {npc.traits}
@@ -84,8 +90,9 @@ function Love({ npc, study }) {
         fontFamily: "Antonio",
         fontWeight: "bold",
         textAlign: "center",
-        fontSize: "0.9rem"
-      }}>
+        fontSize: "0.9rem",
+      }}
+    >
       <Grid container>
         {study >= 2 ? (
           <Stats npc={npc} study={study} />
@@ -102,31 +109,30 @@ function Love({ npc, study }) {
               px: 0.2,
               py: 0.2,
             }}
-            size={6}>
+            size={6}
+          >
             <Grid container sx={{ alignItems: "stretch" }}>
-              <Grid  sx={{ px: 1.5, py: 0.4 }}>
-                {t("HP")}
-              </Grid>
+              <Grid sx={{ px: 1.5, py: 0.4 }}>{t("HP")}</Grid>
               <Grid
                 sx={{
                   py: 0.4,
                   px: 1.5,
                   color: "white.main",
                   bgcolor: "red.main",
-                }}>
+                }}
+              >
                 {calcHP(npc)} <Diamond color="white.main" />{" "}
                 {Math.floor(calcHP(npc) / 2)}
               </Grid>
-              <Grid  sx={{ px: 1.5, py: 0.4 }}>
-                {t("MP")}
-              </Grid>
+              <Grid sx={{ px: 1.5, py: 0.4 }}>{t("MP")}</Grid>
               <Grid
                 sx={{
                   py: 0.4,
                   px: 1.5,
                   color: "white.main",
                   bgcolor: "cyan.main",
-                }}>
+                }}
+              >
                 {calcMP(npc)}
               </Grid>
             </Grid>

@@ -32,7 +32,11 @@ interface ContentPacksTabProps {
 }
 
 function formatDate(ms: number): string {
-  return new Date(ms).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(ms).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function itemCountSummary(pack: CompendiumPack): string {
@@ -46,14 +50,22 @@ function itemCountSummary(pack: CompendiumPack): string {
     .join(", ");
 }
 
-function PackRow({ pack, onSetActive, onDelete }: {
+function PackRow({
+  pack,
+  onSetActive,
+  onDelete,
+}: {
   pack: CompendiumPack;
   onSetActive: (id: string, active: boolean) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
-  const { isOpen: confirmDeleteOpen, closeDialog: setConfirmDeleteOpen, handleDelete } = useDeleteConfirmation({
+  const {
+    isOpen: confirmDeleteOpen,
+    closeDialog: setConfirmDeleteOpen,
+    handleDelete,
+  } = useDeleteConfirmation({
     onConfirm: async () => {
       await onDelete(pack.id);
     },
@@ -66,7 +78,11 @@ function PackRow({ pack, onSetActive, onDelete }: {
         {/* Expand */}
         <TableCell sx={{ width: 40, p: 0.5 }}>
           <IconButton size="small" onClick={() => setExpanded((v) => !v)}>
-            {expanded ? <KeyboardArrowDownIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
+            {expanded ? (
+              <KeyboardArrowDownIcon fontSize="small" />
+            ) : (
+              <KeyboardArrowRightIcon fontSize="small" />
+            )}
           </IconButton>
         </TableCell>
 
@@ -81,24 +97,41 @@ function PackRow({ pack, onSetActive, onDelete }: {
 
         {/* Name */}
         <TableCell>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>{pack.name}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {pack.name}
+          </Typography>
           {pack.type === "supplement" && (
-            <Chip label="supplement" size="small" color="secondary" sx={{ mt: 0.25, fontSize: "0.65rem", height: 16 }} />
+            <Chip
+              label="supplement"
+              size="small"
+              color="secondary"
+              sx={{ mt: 0.25, fontSize: "0.65rem", height: 16 }}
+            />
           )}
         </TableCell>
 
         {/* Author */}
         <TableCell>
-          <Typography variant="body2" sx={{
-            color: "text.secondary"
-          }}>{pack.author ?? "—"}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
+            {pack.author ?? "—"}
+          </Typography>
         </TableCell>
 
         {/* Version */}
         <TableCell>
-          <Typography variant="body2" sx={{
-            color: "text.secondary"
-          }}>{pack.version ?? "—"}</Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
+            {pack.version ?? "—"}
+          </Typography>
         </TableCell>
 
         {/* Actions */}
@@ -130,20 +163,36 @@ function PackRow({ pack, onSetActive, onDelete }: {
       <TableRow>
         <TableCell colSpan={6} sx={{ p: 0 }}>
           <Collapse in={expanded} unmountOnExit>
-            <Box sx={{ px: 3, py: 1.5, bgcolor: "action.hover", display: "flex", flexDirection: "column", gap: 0.75 }}>
+            <Box
+              sx={{
+                px: 3,
+                py: 1.5,
+                bgcolor: "action.hover",
+                display: "flex",
+                flexDirection: "column",
+                gap: 0.75,
+              }}
+            >
               {pack.description && (
                 <Typography variant="body2">{pack.description}</Typography>
               )}
-              <Typography variant="caption" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 <strong>{t("Items")}:</strong> {itemCountSummary(pack)}
               </Typography>
               {pack.fultimatorMinVersion && (
-                <Typography variant="caption" sx={{
-                  color: "text.secondary"
-                }}>
-                  <strong>{t("Min version")}:</strong> {pack.fultimatorMinVersion}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
+                  <strong>{t("Min version")}:</strong>{" "}
+                  {pack.fultimatorMinVersion}
                 </Typography>
               )}
               {pack.homepageUrl && (
@@ -153,16 +202,23 @@ function PackRow({ pack, onSetActive, onDelete }: {
                     href={pack.homepageUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: 2 }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
                   >
                     {pack.homepageUrl}
                     <OpenInNewIcon sx={{ fontSize: 12, ml: 0.25 }} />
                   </a>
                 </Typography>
               )}
-              <Typography variant="caption" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 <strong>{t("Added")}:</strong> {formatDate(pack.createdAt)}
                 {" · "}
                 <strong>{t("Updated")}:</strong> {formatDate(pack.updatedAt)}
@@ -185,16 +241,24 @@ function PackRow({ pack, onSetActive, onDelete }: {
   );
 }
 
-export default function ContentPacksTab({ packs, onSetActive, onDelete }: ContentPacksTabProps) {
+export default function ContentPacksTab({
+  packs,
+  onSetActive,
+  onDelete,
+}: ContentPacksTabProps) {
   const { t } = useTranslate();
   const managedPacks = packs.filter((p) => !p.isPersonal);
 
   if (managedPacks.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: "center" }}>
-        <Typography sx={{
-          color: "text.secondary"
-        }}>{t("No modules installed. Use the Install Content tab to add one.")}</Typography>
+        <Typography
+          sx={{
+            color: "text.secondary",
+          }}
+        >
+          {t("No modules installed. Use the Install Content tab to add one.")}
+        </Typography>
       </Box>
     );
   }

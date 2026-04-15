@@ -5,7 +5,10 @@ import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { availableDances } from "../spellOptionData";
 
 export default function DancerContentSection({ formState, setFormState, t }) {
-  const currentDances = useMemo(() => formState.dances || [], [formState.dances]);
+  const currentDances = useMemo(
+    () => formState.dances || [],
+    [formState.dances],
+  );
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const createBlankDance = useCallback(() => {
@@ -22,32 +25,28 @@ export default function DancerContentSection({ formState, setFormState, t }) {
       .map((d) => d.name)
       .filter((name) => name !== "dance_custom");
     return availableDances.filter(
-      (preset) =>
-        !addedNames.includes(preset.name)
+      (preset) => !addedNames.includes(preset.name),
     );
   }, [currentDances]);
 
-  const handleAddPreset = useCallback(
-    (presetName) => {
-      return (setFormState) => {
-        const preset = availableDances.find((d) => d.name === presetName);
-        if (!preset) return;
-        setFormState((prev) => ({
-          ...prev,
-          dances: [
-            ...(prev.dances || []),
-            {
-              name: preset.name,
-              effect: preset.effect,
-              duration: preset.duration,
-              customName: "",
-            },
-          ],
-        }));
-      };
-    },
-    []
-  );
+  const handleAddPreset = useCallback((presetName) => {
+    return (setFormState) => {
+      const preset = availableDances.find((d) => d.name === presetName);
+      if (!preset) return;
+      setFormState((prev) => ({
+        ...prev,
+        dances: [
+          ...(prev.dances || []),
+          {
+            name: preset.name,
+            effect: preset.effect,
+            duration: preset.duration,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
 
   const presetAddButtons = getAvailablePresets().map((preset) => ({
     label: t(preset.name),
@@ -70,7 +69,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
       }));
       setCompendiumOpen(false);
     },
-    [setFormState]
+    [setFormState],
   );
 
   return (

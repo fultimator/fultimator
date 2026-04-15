@@ -41,7 +41,7 @@ const DamageHealDialog = ({
   setIsHealing,
   damageType,
   setDamageType,
-  isGuarding,  
+  isGuarding,
   setIsGuarding,
   isIgnoreResistance,
   setIsIgnoreResistance,
@@ -58,7 +58,7 @@ const DamageHealDialog = ({
     damageType = "",
     isGuarding = false,
     isIgnoreResistance = false,
-    isIgnoreImmunity = false
+    isIgnoreImmunity = false,
   ) {
     const affinities = npc.affinities || {};
     const damage = parseInt(damageValue, 10) || 0;
@@ -253,62 +253,66 @@ const DamageHealDialog = ({
                   </Box>
                 }
               />
-              {(damageType !== "" || isGuarding) && <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isIgnoreResistance}
-                    onChange={(e) => {
-                      setIsIgnoreResistance(e.target.checked);
-                    }}
-                    sx={{
-                      mt: 0,
-                      "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
-                      "&.Mui-checked": {
-                        color: isDarkMode
-                          ? "white !important"
-                          : "primary !important",
-                      },
-                    }}
-                  />
-                }
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <GiPiercedHeart
-                      size={20}
-                      color={isIgnoreResistance ? "#cc0000" : "gray"}
+              {(damageType !== "" || isGuarding) && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isIgnoreResistance}
+                      onChange={(e) => {
+                        setIsIgnoreResistance(e.target.checked);
+                      }}
+                      sx={{
+                        mt: 0,
+                        "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
+                        "&.Mui-checked": {
+                          color: isDarkMode
+                            ? "white !important"
+                            : "primary !important",
+                        },
+                      }}
                     />
-                    {t("combat_sim_ignore_resistance")}
-                  </Box>
-                }
-              />}
-              {damageType !== "" && <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isIgnoreImmunity}
-                    onChange={(e) => {
-                      setIsIgnoreImmunity(e.target.checked);
-                    }}
-                    sx={{
-                      mt: 0,
-                      "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
-                      "&.Mui-checked": {
-                        color: isDarkMode
-                          ? "white !important"
-                          : "primary !important",
-                      },
-                    }}
-                  />
-                }
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <GiBrokenShield
-                      size={20}
-                      color={isIgnoreImmunity ? "#ffcc00" : "gray"}
+                  }
+                  label={
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <GiPiercedHeart
+                        size={20}
+                        color={isIgnoreResistance ? "#cc0000" : "gray"}
+                      />
+                      {t("combat_sim_ignore_resistance")}
+                    </Box>
+                  }
+                />
+              )}
+              {damageType !== "" && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={isIgnoreImmunity}
+                      onChange={(e) => {
+                        setIsIgnoreImmunity(e.target.checked);
+                      }}
+                      sx={{
+                        mt: 0,
+                        "& .MuiSvgIcon-root": { fontSize: "1.5rem" },
+                        "&.Mui-checked": {
+                          color: isDarkMode
+                            ? "white !important"
+                            : "primary !important",
+                        },
+                      }}
                     />
-                    {t("combat_sim_ignore_immunity")}
-                  </Box>
-                }
-              />}
+                  }
+                  label={
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <GiBrokenShield
+                        size={20}
+                        color={isIgnoreImmunity ? "#ffcc00" : "gray"}
+                      />
+                      {t("combat_sim_ignore_immunity")}
+                    </Box>
+                  }
+                />
+              )}
               {npcClicked &&
                 (damageType !== "" || isGuarding) &&
                 value !== "" && (
@@ -323,14 +327,16 @@ const DamageHealDialog = ({
                             damageType,
                             isGuarding,
                             isIgnoreResistance,
-                            isIgnoreImmunity
+                            isIgnoreImmunity,
                           );
                           return calculated < 0 ? "green" : "#cc0000";
                         })(),
                       }}
                     >
                       <ReactMarkdown
-                        components={{ p: ({ _node, ...props }) => <span {...props} /> }}
+                        components={{
+                          p: ({ _node, ...props }) => <span {...props} />,
+                        }}
                       >
                         {(() => {
                           const calculated = calculateDamage(
@@ -339,7 +345,7 @@ const DamageHealDialog = ({
                             damageType,
                             isGuarding,
                             isIgnoreResistance,
-                            isIgnoreImmunity
+                            isIgnoreImmunity,
                           );
                           return calculated < 0
                             ? `${Math.abs(calculated)} ${damageType} healing`

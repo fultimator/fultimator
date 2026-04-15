@@ -1,12 +1,20 @@
-import { TypePlayer, EquippedSlots, AnyEquipmentItem, PlayerClass, Spells, VehicleModule, Vehicle } from '../../../../types/Players';
-import { resolveEffectiveSlot, syncSlots } from './equipmentSlots';
-import type { PilotSpellInfo } from './loadoutSelectors';
+import {
+  TypePlayer,
+  EquippedSlots,
+  AnyEquipmentItem,
+  PlayerClass,
+  Spells,
+  VehicleModule,
+  Vehicle,
+} from "../../../../types/Players";
+import { resolveEffectiveSlot, syncSlots } from "./equipmentSlots";
+import type { PilotSpellInfo } from "./loadoutSelectors";
 
 // Types
 
 /** Candidate item from the slot picker. Matches the shape SlotPickerDialog builds. */
 export type PickerCandidate = {
-  source: 'weapons' | 'customWeapons' | 'armor' | 'shields' | 'accessories';
+  source: "weapons" | "customWeapons" | "armor" | "shields" | "accessories";
   /** Item display name (matches item.name). */
   label: string;
   index: number;
@@ -22,14 +30,18 @@ function patchInv(
 ): TypePlayer {
   const eq0 = {
     ...(player.equipment?.[0] ?? {}),
-    [source]: updater(((player.equipment?.[0] as Record<string, AnyEquipmentItem[]> | undefined)?.[source] ?? []) as AnyEquipmentItem[]),
+    [source]: updater(
+      ((
+        player.equipment?.[0] as Record<string, AnyEquipmentItem[]> | undefined
+      )?.[source] ?? []) as AnyEquipmentItem[],
+    ),
   };
   // Cast through any: the spread always preserves the required fields when
   // equipment[0] exists; the fallback `{}` case only arises for players with
   // no inventory, which is treated as an empty-but-valid entry.
   const equipment = (
     player.equipment ? [eq0, ...player.equipment.slice(1)] : [eq0]
-  ) as TypePlayer['equipment'];
+  ) as TypePlayer["equipment"];
   return { ...player, equipment };
 }
 
@@ -50,9 +62,13 @@ function applyModuleUpdater(
               : (() => {
                   const vehicles = Array.isArray(s.vehicles)
                     ? s.vehicles
-                    : (Array.isArray(s.currentVehicles) ? s.currentVehicles : []);
+                    : Array.isArray(s.currentVehicles)
+                      ? s.currentVehicles
+                      : [];
                   const updatedVehicles = vehicles.map((v: Vehicle) =>
-                    !v.enabled ? v : { ...v, modules: updaterFn(v.modules ?? []) },
+                    !v.enabled
+                      ? v
+                      : { ...v, modules: updaterFn(v.modules ?? []) },
                   );
                   return {
                     ...s,
@@ -79,30 +95,37 @@ export function equipItemToSlot(
   candidate: PickerCandidate,
 ): TypePlayer {
   const currentRef = player.equippedSlots?.[slot as keyof EquippedSlots];
-  const isCustom = candidate.source === 'customWeapons';
-  const isTwoHand = isCustom || (candidate.item?.hands === 2) || (candidate.item?.isTwoHand ?? false);
+  const isCustom = candidate.source === "customWeapons";
+  const isTwoHand =
+    isCustom ||
+    candidate.item?.hands === 2 ||
+    (candidate.item?.isTwoHand ?? false);
 
   let updated = player;
 
   // Un-equip the item currently in this slot
   if (currentRef) {
-    updated = patchInv(updated, currentRef.source, arr =>
+    updated = patchInv(updated, currentRef.source, (arr) =>
       arr.map((it: AnyEquipmentItem, idx: number) => {
         const match =
-          currentRef.index !== undefined ? idx === currentRef.index : it.name === currentRef.name;
+          currentRef.index !== undefined
+            ? idx === currentRef.index
+            : it.name === currentRef.name;
         return match ? { ...it, isEquipped: false } : it;
       }),
     );
   }
 
   // Two-handed to mainHand: also clear offHand
-  if (slot === 'mainHand' && isTwoHand) {
+  if (slot === "mainHand" && isTwoHand) {
     const offRef = updated.equippedSlots?.offHand;
     if (offRef) {
-      updated = patchInv(updated, offRef.source, arr =>
+      updated = patchInv(updated, offRef.source, (arr) =>
         arr.map((it: AnyEquipmentItem, idx: number) => {
           const match =
-            offRef.index !== undefined ? idx === offRef.index : it.name === offRef.name;
+            offRef.index !== undefined
+              ? idx === offRef.index
+              : it.name === offRef.name;
           return match ? { ...it, isEquipped: false } : it;
         }),
       );
@@ -110,10 +133,12 @@ export function equipItemToSlot(
   }
 
   // Equip the new item
-  updated = patchInv(updated, candidate.source, arr =>
+  updated = patchInv(updated, candidate.source, (arr) =>
     arr.map((it: AnyEquipmentItem, idx: number) => {
       const match =
-        candidate.index !== undefined ? idx === candidate.index : it.name === candidate.label;
+        candidate.index !== undefined
+          ? idx === candidate.index
+          : it.name === candidate.label;
       return match ? { ...it, isEquipped: true } : it;
     }),
   );
@@ -129,10 +154,12 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
   const currentRef = player.equippedSlots?.[slot as keyof EquippedSlots];
   if (!currentRef) return player;
 
-  const updated = patchInv(player, currentRef.source, arr =>
+  const updated = patchInv(player, currentRef.source, (arr) =>
     arr.map((it: AnyEquipmentItem, idx: number) => {
       const match =
-        currentRef.index !== undefined ? idx === currentRef.index : it.name === currentRef.name;
+        currentRef.index !== undefined
+          ? idx === currentRef.index
+          : it.name === currentRef.name;
       return match ? { ...it, isEquipped: false } : it;
     }),
   );
@@ -152,66 +179,80 @@ export function selectModuleForSlot(
   slot: string,
   moduleIndex: number,
 ): TypePlayer {
-  return applyModuleUpdater(player, pilotInfo, modules => {
-    const targetSlot = slot === 'armor' ? 'armor' : slot === 'mainHand' ? 'main' : 'off';
+  return applyModuleUpdater(player, pilotInfo, (modules) => {
+    const targetSlot =
+      slot === "armor" ? "armor" : slot === "mainHand" ? "main" : "off";
     const targetModule = modules[moduleIndex];
     if (!targetModule) return modules;
-    const selectingArmor = slot === 'armor';
-    const selectingWeapon = slot === 'mainHand' || slot === 'offHand';
+    const selectingArmor = slot === "armor";
+    const selectingWeapon = slot === "mainHand" || slot === "offHand";
 
-    const normalizeWeaponSlot = (raw: string | null | undefined, module: VehicleModule): 'main' | 'off' | 'both' => {
-      if (raw === 'both') return 'both';
-      if (raw === 'main' || raw === 'mainHand') return 'main';
-      if (raw === 'off' || raw === 'offHand') return 'off';
-      return module?.isShield ? 'off' : 'main';
+    const normalizeWeaponSlot = (
+      raw: string | null | undefined,
+      module: VehicleModule,
+    ): "main" | "off" | "both" => {
+      if (raw === "both") return "both";
+      if (raw === "main" || raw === "mainHand") return "main";
+      if (raw === "off" || raw === "offHand") return "off";
+      return module?.isShield ? "off" : "main";
     };
 
     const isWeaponActive = (m: VehicleModule): boolean =>
-      m.type === 'pilot_module_weapon' && (m.enabled || m.equipped);
+      m.type === "pilot_module_weapon" && (m.enabled || m.equipped);
 
-    const occupies = (m: VehicleModule, hand: 'main' | 'off'): boolean => {
+    const occupies = (m: VehicleModule, hand: "main" | "off"): boolean => {
       const s = normalizeWeaponSlot(m.equippedSlot, m);
-      return s === 'both' || s === hand;
+      return s === "both" || s === hand;
     };
 
-    const otherActiveWeapons = modules.filter((m: VehicleModule, idx: number) => idx !== moduleIndex && isWeaponActive(m));
+    const otherActiveWeapons = modules.filter(
+      (m: VehicleModule, idx: number) =>
+        idx !== moduleIndex && isWeaponActive(m),
+    );
 
-    let resolvedWeaponSlot: 'main' | 'off' | 'both' = targetSlot as 'main' | 'off' | 'both';
+    let resolvedWeaponSlot: "main" | "off" | "both" = targetSlot as
+      | "main"
+      | "off"
+      | "both";
     if (selectingWeapon) {
       if (targetModule.cumbersome) {
-        resolvedWeaponSlot = 'both';
+        resolvedWeaponSlot = "both";
       } else if (targetModule.isShield) {
-        const mainOccupied = otherActiveWeapons.some((m: VehicleModule) => occupies(m, 'main'));
-        const offOccupied = otherActiveWeapons.some((m: VehicleModule) => occupies(m, 'off'));
-        const offShieldExists = otherActiveWeapons.some(
-          (m: VehicleModule) => m.isShield && occupies(m, 'off'),
+        const mainOccupied = otherActiveWeapons.some((m: VehicleModule) =>
+          occupies(m, "main"),
         );
-        const requestedMain = targetSlot === 'main';
+        const offOccupied = otherActiveWeapons.some((m: VehicleModule) =>
+          occupies(m, "off"),
+        );
+        const offShieldExists = otherActiveWeapons.some(
+          (m: VehicleModule) => m.isShield && occupies(m, "off"),
+        );
+        const requestedMain = targetSlot === "main";
 
         if (requestedMain) {
           // Main-hand shield is legal only when another shield occupies off-hand.
           if (!(offShieldExists && !mainOccupied)) return modules;
-          resolvedWeaponSlot = 'main';
+          resolvedWeaponSlot = "main";
         } else {
           if (!offOccupied) {
-            resolvedWeaponSlot = 'off';
+            resolvedWeaponSlot = "off";
           } else if (offShieldExists && !mainOccupied) {
             // Second shield can move to main hand.
-            resolvedWeaponSlot = 'main';
+            resolvedWeaponSlot = "main";
           } else {
             return modules;
           }
         }
       } else {
-        resolvedWeaponSlot = targetSlot as 'main' | 'off';
+        resolvedWeaponSlot = targetSlot as "main" | "off";
       }
     }
 
     return modules.map((m: VehicleModule, idx: number) => {
       const isTarget = idx === moduleIndex;
       const isCorrectType =
-        (selectingArmor && m.type === 'pilot_module_armor') ||
-        (selectingWeapon && m.type === 'pilot_module_weapon');
+        (selectingArmor && m.type === "pilot_module_armor") ||
+        (selectingWeapon && m.type === "pilot_module_weapon");
       if (!isCorrectType) return m;
       if (isTarget) {
         return {
@@ -228,10 +269,18 @@ export function selectModuleForSlot(
       }
 
       // Weapon slot collision rules.
-      const takingMain = resolvedWeaponSlot === 'main' || resolvedWeaponSlot === 'both';
-      const takingOff = resolvedWeaponSlot === 'off' || resolvedWeaponSlot === 'both';
-      const wasInMain = m.equippedSlot === 'main' || m.equippedSlot === 'mainHand' || m.equippedSlot === 'both';
-      const wasInOff = m.equippedSlot === 'off' || m.equippedSlot === 'offHand' || m.equippedSlot === 'both';
+      const takingMain =
+        resolvedWeaponSlot === "main" || resolvedWeaponSlot === "both";
+      const takingOff =
+        resolvedWeaponSlot === "off" || resolvedWeaponSlot === "both";
+      const wasInMain =
+        m.equippedSlot === "main" ||
+        m.equippedSlot === "mainHand" ||
+        m.equippedSlot === "both";
+      const wasInOff =
+        m.equippedSlot === "off" ||
+        m.equippedSlot === "offHand" ||
+        m.equippedSlot === "both";
       if ((takingMain && wasInMain) || (takingOff && wasInOff)) {
         return { ...m, enabled: false };
       }
@@ -248,16 +297,20 @@ export function disableModuleForSlot(
   pilotInfo: PilotSpellInfo,
   slot: string,
 ): TypePlayer {
-  return applyModuleUpdater(player, pilotInfo, modules =>
+  return applyModuleUpdater(player, pilotInfo, (modules) =>
     modules.map((m: VehicleModule) => {
       const matches =
-        (slot === 'armor' && m.type === 'pilot_module_armor') ||
-        (slot === 'mainHand' &&
-          m.type === 'pilot_module_weapon' &&
-          (m.equippedSlot === 'main' || m.equippedSlot === 'mainHand' || m.equippedSlot === 'both')) ||
-        (slot === 'offHand' &&
-          m.type === 'pilot_module_weapon' &&
-          (m.equippedSlot === 'off' || m.equippedSlot === 'offHand' || m.equippedSlot === 'both'));
+        (slot === "armor" && m.type === "pilot_module_armor") ||
+        (slot === "mainHand" &&
+          m.type === "pilot_module_weapon" &&
+          (m.equippedSlot === "main" ||
+            m.equippedSlot === "mainHand" ||
+            m.equippedSlot === "both")) ||
+        (slot === "offHand" &&
+          m.type === "pilot_module_weapon" &&
+          (m.equippedSlot === "off" ||
+            m.equippedSlot === "offHand" ||
+            m.equippedSlot === "both"));
       return matches ? { ...m, enabled: false } : m;
     }),
   );
@@ -271,7 +324,7 @@ export function toggleSupportModuleAction(
   pilotInfo: PilotSpellInfo,
   moduleIndex: number,
 ): TypePlayer {
-  return applyModuleUpdater(player, pilotInfo, modules =>
+  return applyModuleUpdater(player, pilotInfo, (modules) =>
     modules.map((m: VehicleModule, idx: number) =>
       idx === moduleIndex ? { ...m, enabled: !m.enabled } : m,
     ),
@@ -292,10 +345,10 @@ export function toggleActiveVehicle(
   const spell = (player.classes ?? [])[classIndex]?.spells?.[spellIndex];
   const vehicles = Array.isArray(spell?.vehicles)
     ? spell.vehicles
-    : (Array.isArray(spell?.currentVehicles) ? spell.currentVehicles : []);
-  const isActive = vehicles.some(
-    (v: Vehicle) => v.enabled,
-  );
+    : Array.isArray(spell?.currentVehicles)
+      ? spell.currentVehicles
+      : [];
+  const isActive = vehicles.some((v: Vehicle) => v.enabled);
   const classes = (player.classes ?? []).map((cls: PlayerClass, ci: number) =>
     ci !== classIndex
       ? cls
@@ -305,11 +358,20 @@ export function toggleActiveVehicle(
             if (si !== spellIndex) return s;
             const baseVehicles = Array.isArray(s.vehicles)
               ? s.vehicles
-              : (Array.isArray(s.currentVehicles) ? s.currentVehicles : []);
-            const updatedVehicles = baseVehicles.map((v: Vehicle, vi: number) =>
-              isActive ? { ...v, enabled: false } : { ...v, enabled: vi === 0 },
+              : Array.isArray(s.currentVehicles)
+                ? s.currentVehicles
+                : [];
+            const updatedVehicles = baseVehicles.map(
+              (v: Vehicle, vi: number) =>
+                isActive
+                  ? { ...v, enabled: false }
+                  : { ...v, enabled: vi === 0 },
             );
-            return { ...s, vehicles: updatedVehicles, currentVehicles: updatedVehicles };
+            return {
+              ...s,
+              vehicles: updatedVehicles,
+              currentVehicles: updatedVehicles,
+            };
           }),
         },
   );
@@ -351,11 +413,20 @@ export function saveVehiclesAction(
  * Swap the active form (primary ↔ secondary) of a transforming custom weapon
  * in the given slot.
  */
-export function swapTransformingWeaponForm(player: TypePlayer, slot: string): TypePlayer {
+export function swapTransformingWeaponForm(
+  player: TypePlayer,
+  slot: string,
+): TypePlayer {
   const resolved = resolveEffectiveSlot(player, slot as keyof EquippedSlots);
-  if (resolved?.kind !== 'playerItem') return player;
+  if (resolved?.kind !== "playerItem") return player;
   const item = resolved.item as AnyEquipmentItem;
-  if (!('customizations' in item) || !item?.customizations?.some((c: Record<string, unknown>) => c.name === 'weapon_customization_transforming')) {
+  if (
+    !("customizations" in item) ||
+    !item?.customizations?.some(
+      (c: Record<string, unknown>) =>
+        c.name === "weapon_customization_transforming",
+    )
+  ) {
     return player;
   }
 
@@ -364,10 +435,20 @@ export function swapTransformingWeaponForm(player: TypePlayer, slot: string): Ty
 
   const customWeapons = (inv.customWeapons ?? []).map((cw: AnyEquipmentItem) =>
     cw.name === item.name
-      ? { ...cw, activeForm: ('activeForm' in cw ? cw.activeForm === 'secondary' ? 'primary' : 'secondary' : 'primary') }
+      ? {
+          ...cw,
+          activeForm:
+            "activeForm" in cw
+              ? cw.activeForm === "secondary"
+                ? "primary"
+                : "secondary"
+              : "primary",
+        }
       : cw,
   );
   const eq0 = { ...inv, customWeapons };
-  const equipment = player.equipment ? [eq0, ...player.equipment.slice(1)] : [eq0];
+  const equipment = player.equipment
+    ? [eq0, ...player.equipment.slice(1)]
+    : [eq0];
   return syncSlots({ ...player, equipment });
 }

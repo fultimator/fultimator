@@ -55,7 +55,7 @@ const mergedBlacklistNames = blacklist.flatMap((item) => Object.values(item));
 const isBlacklisted = (npcName) => {
   const lowerCaseNpcName = npcName.toLowerCase();
   return mergedBlacklistNames.some(
-    (blacklistedName) => blacklistedName.toLowerCase() === lowerCaseNpcName
+    (blacklistedName) => blacklistedName.toLowerCase() === lowerCaseNpcName,
   );
 };
 
@@ -70,7 +70,10 @@ export default function NpcEdit() {
 
   // UUIDs (crypto.randomUUID) come from IDB on both web and desktop.
   // Firestore auto-IDs are 20-char alphanumeric - never match the UUID pattern.
-  const isLocalNpc = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.npcId);
+  const isLocalNpc =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      params.npcId,
+    );
 
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
@@ -148,7 +151,7 @@ export default function NpcEdit() {
         activeSetDoc(ref, npcTemp);
       }
     },
-    [ref, npcTemp, activeSetDoc]
+    [ref, npcTemp, activeSetDoc],
   );
 
   // Effect for scroll and keyboard shortcuts
@@ -245,7 +248,7 @@ export default function NpcEdit() {
         \n🆔 **Author UUID:** ${npcTemp.uid}
         \n👮 **Moderator Review Needed!**
         \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npcTemp.id})`,
-        0xe74c3c // Red color
+        0xe74c3c, // Red color
       );
     }
   };
@@ -263,7 +266,7 @@ export default function NpcEdit() {
         \n🆔 **Author UUID:** ${npc.uid}
         \n📌 **Updated Content:** \`${npc.name} - ${npc.id}\` (NPC)
         \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npc.id})`,
-        0xf7a633 // Orange color
+        0xf7a633, // Orange color
       );
     }
   };
@@ -284,7 +287,7 @@ export default function NpcEdit() {
         \n🆔 **Unpublished NPC:** \`${npc.name} - ${npc.id}\`
         \n🚫 This NPC is no longer visible to the public.
         \n🔗 [View NPC](https://fabula-ultima-helper.web.app/npc-gallery/${npc.id})`,
-        0x2ecc71 // Green color
+        0x2ecc71, // Green color
       );
     }
   };
@@ -343,8 +346,9 @@ export default function NpcEdit() {
           <Grid
             size={{
               xs: 12,
-              md: 8
-            }}>
+              md: 8,
+            }}
+          >
             <NpcPretty
               npc={npcTemp}
               ref={prettyRef}
@@ -357,8 +361,9 @@ export default function NpcEdit() {
           <Grid
             size={{
               xs: 12,
-              md: 4
-            }}>
+              md: 4,
+            }}
+          >
             {/* Skill Points */}
             <ExplainSkills npc={npcTemp} />
             <Divider sx={{ my: 1 }} />
@@ -373,7 +378,10 @@ export default function NpcEdit() {
             {/* Share URL Button - local NPCs have no public URL */}
             <Tooltip title={t("Share URL")}>
               <span>
-                <IconButton onClick={() => shareNpc(npc.id)} disabled={isLocalNpc}>
+                <IconButton
+                  onClick={() => shareNpc(npc.id)}
+                  disabled={isLocalNpc}
+                >
                   <Share />
                 </IconButton>
               </span>
@@ -458,8 +466,9 @@ export default function NpcEdit() {
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <CustomHeader
                     type="top"
                     headerText={t("Affinity")}
@@ -471,8 +480,9 @@ export default function NpcEdit() {
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <CustomHeader
                     type={isSmallScreen ? "middle" : "top"}
                     headerText={t("Bonuses")}
@@ -495,10 +505,10 @@ export default function NpcEdit() {
               }}
             >
               <Grid container>
-                <Grid  size={12}>
+                <Grid size={12}>
                   <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
-                <Grid  size={12}>
+                <Grid size={12}>
                   <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
               </Grid>
@@ -534,32 +544,36 @@ export default function NpcEdit() {
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <EditActions npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Special Rules */}
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Rare Gear */}
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
                 {/* Edit Notes */}
                 <Grid
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
+                    md: 6,
+                  }}
+                >
                   <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
                 </Grid>
               </Grid>

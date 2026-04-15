@@ -59,7 +59,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
       d12,
       d20,
       bonus,
-      malus
+      malus,
     );
 
     if (dice.length > 0) {
@@ -88,7 +88,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
       d12,
       d20,
       bonus,
-      malus
+      malus,
     );
 
     if (dice.length > 0) {
@@ -103,7 +103,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         onRoll();
       }
     },
-    [onRoll] // Necessary so that roll keeps track of them
+    [onRoll], // Necessary so that roll keeps track of them
   );
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
   return (
     <Paper elevation={1} sx={{ p: 2, mx: "auto" }}>
       <Grid container spacing={2} sx={{ justifyContent: "center" }}>
-        <Grid  size={12}>
+        <Grid size={12}>
           <Card sx={{ p: 2, bgcolor: "background.default" }}>
             <Typography>
               {t("Left-click on a die to add it to your pool")}
@@ -128,7 +128,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
           </Card>
         </Grid>
         {/* Dice Row */}
-        <Grid  size={12}>
+        <Grid size={12}>
           <Grid container spacing={2} sx={{ justifyContent: "space-around" }}>
             {[
               { icon: <D4Icon />, count: d4, set: setd4 },
@@ -138,7 +138,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
               { icon: <D12Icon />, count: d12, set: setd12 },
               { icon: <D20Icon />, count: d20, set: setd20 },
             ].map(({ icon, count, set }, index) => (
-              <Grid  key={index}>
+              <Grid key={index}>
                 <IconButton
                   sx={{
                     fontSize: "3rem",
@@ -161,9 +161,9 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Modifiers */}
-        <Grid  size={12}>
+        <Grid size={12}>
           <Grid container spacing={2} sx={{ justifyContent: "center" }}>
-            <Grid >
+            <Grid>
               <IconButton
                 onClick={onRaise(setBonus)}
                 onContextMenu={onLower(setBonus)}
@@ -174,7 +174,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 </Badge>
               </IconButton>
             </Grid>
-            <Grid >
+            <Grid>
               <IconButton
                 onClick={onRaise(setMalus)}
                 onContextMenu={onLower(setMalus)}
@@ -189,7 +189,7 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Label */}
-        <Grid  size={12}>
+        <Grid size={12}>
           <TextField
             fullWidth
             label={t("Description")}
@@ -200,19 +200,27 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
         </Grid>
 
         {/* Buttons */}
-        <Grid  size={12}>
-          <Grid container spacing={2} sx={{ justifyContent: "center", flexWrap: "nowrap" }}>
-            <Grid >
+        <Grid size={12}>
+          <Grid
+            container
+            spacing={2}
+            sx={{ justifyContent: "center", flexWrap: "nowrap" }}
+          >
+            <Grid>
               <Button
                 variant="contained"
-                startIcon={<SouthWest sx={{ display: { xs: "none", sm: "inline-flex" } }} />}
+                startIcon={
+                  <SouthWest
+                    sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                  />
+                }
                 onClick={onRoll}
                 color="primary"
               >
                 {t("Roll")}
               </Button>
             </Grid>
-            <Grid >
+            <Grid>
               <Button
                 variant="outlined"
                 startIcon={<Close />}
@@ -222,10 +230,14 @@ export default function PrepareRoll({ savePreparedRoll, createRoll }) {
                 {t("Reset")}
               </Button>
             </Grid>
-            <Grid >
+            <Grid>
               <Button
                 variant="outlined"
-                startIcon={<SouthEast sx={{ display: { xs: "none", sm: "inline-flex" } }} />}
+                startIcon={
+                  <SouthEast
+                    sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                  />
+                }
                 onClick={onSave}
                 color="primary"
               >

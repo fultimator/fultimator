@@ -1,9 +1,9 @@
-import { TypePlayer } from '../../types/Players';
+import { TypePlayer } from "../../types/Players";
 import {
   syncSlots,
   validateSlots,
   rehydrateIsEquipped,
-} from './equipment/slots/equipmentSlots';
+} from "./equipment/slots/equipmentSlots";
 
 // Types
 
@@ -31,11 +31,13 @@ function stripRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
     equipment: [
       {
         ...inv,
-        weapons:       strip(inv.weapons       ?? []) as typeof inv.weapons,
-        shields:       strip(inv.shields       ?? []) as typeof inv.shields,
-        armor:         strip(inv.armor         ?? []) as typeof inv.armor,
-        accessories:   strip(inv.accessories   ?? []) as typeof inv.accessories,
-        customWeapons: strip((inv as Record<string, unknown>).customWeapons ?? []) as typeof inv.customWeapons,
+        weapons: strip(inv.weapons ?? []) as typeof inv.weapons,
+        shields: strip(inv.shields ?? []) as typeof inv.shields,
+        armor: strip(inv.armor ?? []) as typeof inv.armor,
+        accessories: strip(inv.accessories ?? []) as typeof inv.accessories,
+        customWeapons: strip(
+          (inv as Record<string, unknown>).customWeapons ?? [],
+        ) as typeof inv.customWeapons,
       },
       ...(player.equipment?.slice(1) ?? []),
     ],
@@ -61,7 +63,7 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
 
   const rawOverrides = settings.specialSkillOverrides ?? {};
   const specialSkillOverrides = Object.fromEntries(
-    Object.entries(rawOverrides).filter(([, value]) => value === true)
+    Object.entries(rawOverrides).filter(([, value]) => value === true),
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,8 +115,14 @@ function migrateEquippedSlots(player: TypePlayer): TypePlayer {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function migrateLegacyEquipment(player: Record<string, any>): TypePlayer {
-  const legacySources = ['weapons', 'shields', 'armor', 'accessories', 'customWeapons'];
-  const hasLegacyData = legacySources.some(key => Array.isArray(player[key]));
+  const legacySources = [
+    "weapons",
+    "shields",
+    "armor",
+    "accessories",
+    "customWeapons",
+  ];
+  const hasLegacyData = legacySources.some((key) => Array.isArray(player[key]));
 
   if (!hasLegacyData) return player;
 
@@ -122,7 +130,7 @@ function migrateLegacyEquipment(player: Record<string, any>): TypePlayer {
     ...(player.equipment?.[0] ?? {}),
   };
 
-  legacySources.forEach(key => {
+  legacySources.forEach((key) => {
     if (Array.isArray(player[key])) {
       eq0[key] = [...(eq0[key] ?? []), ...player[key]];
       delete player[key];
@@ -140,15 +148,16 @@ function migrateLegacyEquipment(player: Record<string, any>): TypePlayer {
  */
 function normalizeSkillLevels(player: TypePlayer): TypePlayer {
   if (!player.classes) return player;
-  const updatedClasses = player.classes.map(cls => ({
+  const updatedClasses = player.classes.map((cls) => ({
     ...cls,
-    skills: cls.skills?.map((sk: Record<string, unknown>) => {
-      if ('currentSL' in sk && sk.currentSL !== undefined) {
-        const { currentSL, ...rest } = sk;
-        return { ...rest, currentLvl: currentSL };
-      }
-      return sk;
-    }) ?? []
+    skills:
+      cls.skills?.map((sk: Record<string, unknown>) => {
+        if ("currentSL" in sk && sk.currentSL !== undefined) {
+          const { currentSL, ...rest } = sk;
+          return { ...rest, currentLvl: currentSL };
+        }
+        return sk;
+      }) ?? [],
   }));
   return { ...player, classes: updatedClasses };
 }
@@ -163,22 +172,23 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
   if (!Array.isArray(player.notes)) return { ...player, notes: [] };
 
   const normalized = player.notes.map((n: unknown): Record<string, unknown> => {
-    if (typeof n === 'string') return { name: '', description: n };
-    if (typeof n === 'object' && n !== null) {
+    if (typeof n === "string") return { name: "", description: n };
+    if (typeof n === "object" && n !== null) {
       const obj = n as Record<string, unknown>;
       const base: Record<string, unknown> = {
-        name: String(obj.name ?? ''),
-        description: String(obj.description ?? '')
+        name: String(obj.name ?? ""),
+        description: String(obj.description ?? ""),
       };
       // Preserve optional metadata fields used by sheet rendering
       if (obj.clocks !== undefined) base.clocks = obj.clocks;
-      if (obj.showInPlayerSheet !== undefined) base.showInPlayerSheet = obj.showInPlayerSheet;
+      if (obj.showInPlayerSheet !== undefined)
+        base.showInPlayerSheet = obj.showInPlayerSheet;
       return base;
     }
-    return { name: '', description: '' };
+    return { name: "", description: "" };
   });
 
-  return { ...player, notes: normalized as unknown as TypePlayer['notes'] };
+  return { ...player, notes: normalized as unknown as TypePlayer["notes"] };
 }
 
 /**
@@ -193,20 +203,26 @@ function migrateSlotIndexes(player: TypePlayer): TypePlayer {
 
   const inv = player.equipment?.[0];
 
-  const withIndex = (ref: Record<string, unknown> | undefined): Record<string, unknown> | undefined => {
+  const withIndex = (
+    ref: Record<string, unknown> | undefined,
+  ): Record<string, unknown> | undefined => {
     if (!ref || ref.index !== undefined) return ref;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const arr = (inv as Record<string, any> | undefined)?.[ref.source as string] as Array<Record<string, unknown>> | undefined;
-    const idx = arr?.findIndex((it: Record<string, unknown>) => it.name === ref.name) ?? -1;
+    const arr = (inv as Record<string, any> | undefined)?.[
+      ref.source as string
+    ] as Array<Record<string, unknown>> | undefined;
+    const idx =
+      arr?.findIndex((it: Record<string, unknown>) => it.name === ref.name) ??
+      -1;
     return idx >= 0 ? { ...ref, index: idx } : ref;
   };
 
   return {
     ...player,
     equippedSlots: {
-      mainHand:  withIndex(slots.mainHand),
-      offHand:   withIndex(slots.offHand),
-      armor:     withIndex(slots.armor),
+      mainHand: withIndex(slots.mainHand),
+      offHand: withIndex(slots.offHand),
+      armor: withIndex(slots.armor),
       accessory: withIndex(slots.accessory),
     },
   };
@@ -232,7 +248,7 @@ function normalizeRequiredFields(player: Record<string, any>): TypePlayer {
     ...player,
     info: {
       ...info,
-      bonds: Array.isArray(info.bonds) ? info.bonds : []
+      bonds: Array.isArray(info.bonds) ? info.bonds : [],
     },
     rituals: player.rituals ?? {
       ritualism: false,
@@ -240,13 +256,13 @@ function normalizeRequiredFields(player: Record<string, any>): TypePlayer {
       chimerism: false,
       elementalism: false,
       entropism: false,
-      spiritism: false
+      spiritism: false,
     },
     martials: player.martials ?? {
       armor: false,
       shields: false,
       melee: false,
-      ranged: false
+      ranged: false,
     },
     items: player.items ?? [],
     consumables: player.consumables ?? [],
@@ -260,7 +276,7 @@ function normalizeRequiredFields(player: Record<string, any>): TypePlayer {
       init: 0,
       meleePrec: 0,
       rangedPrec: 0,
-      magicPrec: 0
+      magicPrec: 0,
     },
     statuses: player.statuses ?? {
       slow: false,
@@ -272,7 +288,7 @@ function normalizeRequiredFields(player: Record<string, any>): TypePlayer {
       dexUp: false,
       insUp: false,
       migUp: false,
-      wlpUp: false
+      wlpUp: false,
     },
     immunities: player.immunities ?? {
       slow: false,
@@ -280,8 +296,8 @@ function normalizeRequiredFields(player: Record<string, any>): TypePlayer {
       enraged: false,
       weak: false,
       shaken: false,
-      poisoned: false
-    }
+      poisoned: false,
+    },
   } as TypePlayer;
 }
 
@@ -296,24 +312,25 @@ function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
 
   let changed = false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fix = (arr: Array<Record<string, any>>) => arr.map((item: Record<string, any>) => {
-    const patch: Record<string, unknown> = {};
-    if (!item.def) {
-      const v = (item.base?.def ?? 0) + (item.base?.defbonus ?? 0);
-      if (v) patch.def = v;
-    }
-    if (!item.mdef) {
-      const v = (item.base?.mdef ?? 0) + (item.base?.mdefbonus ?? 0);
-      if (v) patch.mdef = v;
-    }
-    if (Object.keys(patch).length) {
-      changed = true;
-      return { ...item, ...patch };
-    }
-    return item;
-  });
+  const fix = (arr: Array<Record<string, any>>) =>
+    arr.map((item: Record<string, any>) => {
+      const patch: Record<string, unknown> = {};
+      if (!item.def) {
+        const v = (item.base?.def ?? 0) + (item.base?.defbonus ?? 0);
+        if (v) patch.def = v;
+      }
+      if (!item.mdef) {
+        const v = (item.base?.mdef ?? 0) + (item.base?.mdefbonus ?? 0);
+        if (v) patch.mdef = v;
+      }
+      if (Object.keys(patch).length) {
+        changed = true;
+        return { ...item, ...patch };
+      }
+      return item;
+    });
 
-  const fixedArmor   = fix(inv.armor   ?? []);
+  const fixedArmor = fix(inv.armor ?? []);
   const fixedShields = fix(inv.shields ?? []);
 
   if (!changed) return player;
@@ -357,15 +374,30 @@ export function applyPostLoadTransforms(player: TypePlayer): TypePlayer {
  */
 export function playerNeedsMigration(player: TypePlayer): boolean {
   // Root-level equipment arrays need nesting into equipment[0]
-  const legacySources = ['weapons', 'shields', 'armor', 'accessories', 'customWeapons'] as const;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (legacySources.some(k => Array.isArray((player as Record<string, any>)[k]))) return true;
+  const legacySources = [
+    "weapons",
+    "shields",
+    "armor",
+    "accessories",
+    "customWeapons",
+  ] as const;
+
+  if (
+    legacySources.some((k) => Array.isArray((player as Record<string, any>)[k]))
+  )
+    return true;
 
   // Any skill still using deprecated currentSL
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((player as Record<string, any>).classes?.some((cls: Record<string, any>) =>
-    cls.skills?.some((sk: Record<string, unknown>) => 'currentSL' in sk && sk.currentSL !== undefined)
-  )) return true;
+
+  if (
+    (player as Record<string, any>).classes?.some((cls: Record<string, any>) =>
+      cls.skills?.some(
+        (sk: Record<string, unknown>) =>
+          "currentSL" in sk && sk.currentSL !== undefined,
+      ),
+    )
+  )
+    return true;
 
   const inv = player.equipment?.[0];
 
@@ -377,7 +409,9 @@ export function playerNeedsMigration(player: TypePlayer): boolean {
 
   // Has equippedSlots but isEquipped flags weren't stripped before the last save.
   if (!inv) return false;
-  return legacySources.some(k =>
-    ((inv as Record<string, unknown>)[k] ?? []).some((item: Record<string, unknown>) => 'isEquipped' in item)
+  return legacySources.some((k) =>
+    ((inv as Record<string, unknown>)[k] ?? []).some(
+      (item: Record<string, unknown>) => "isEquipped" in item,
+    ),
   );
 }

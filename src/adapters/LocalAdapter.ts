@@ -22,21 +22,22 @@ import type { DatabaseAdapter, DbError, WriteBatch } from "../types/Database";
 
 function normalizeError(err: unknown): DbError {
   if (err instanceof DOMException) {
-    if (err.name === "NotFoundError") return { code: "not-found", message: err.message, raw: err };
+    if (err.name === "NotFoundError")
+      return { code: "not-found", message: err.message, raw: err };
   }
   const message = err instanceof Error ? err.message : String(err);
   return { code: "unknown", message, raw: err };
 }
 
 function normalizeCollectionResult(
-  result: [unknown[], boolean, Error | undefined]
+  result: [unknown[], boolean, Error | undefined],
 ): [unknown[], boolean, DbError | null] {
   const [data, loading, err] = result;
   return [data, loading, err ? normalizeError(err) : null];
 }
 
 function normalizeDocumentResult(
-  result: [unknown, boolean, Error | undefined]
+  result: [unknown, boolean, Error | undefined],
 ): [unknown, boolean, DbError | null] {
   const [data, loading, err] = result;
   return [data, loading, err ? normalizeError(err) : null];
@@ -48,7 +49,10 @@ export const LocalAdapter: DatabaseAdapter = {
   doc: (path: string, id: string) => doc(null, path, id),
 
   query: (ref: unknown, ...constraints: unknown[]) =>
-    query(ref as Parameters<typeof query>[0], ...(constraints as Parameters<typeof query>[1][])),
+    query(
+      ref as Parameters<typeof query>[0],
+      ...(constraints as Parameters<typeof query>[1][]),
+    ),
 
   where: (field, op, value) => where(field, op as string, value),
 
@@ -69,7 +73,9 @@ export const LocalAdapter: DatabaseAdapter = {
 
   async getDocs(queryRef: unknown) {
     try {
-      const result = await idbGetDocs(queryRef as Parameters<typeof idbGetDocs>[0]);
+      const result = await idbGetDocs(
+        queryRef as Parameters<typeof idbGetDocs>[0],
+      );
       return result.docs.map((d) => ({ ...(d.data() as object), id: d.id }));
     } catch (err) {
       throw normalizeError(err);
@@ -101,7 +107,11 @@ export const LocalAdapter: DatabaseAdapter = {
   },
 
   writeBatch(): WriteBatch {
-    const ops: Array<{ type: "set" | "delete"; ref: unknown; data?: Record<string, unknown> }> = [];
+    const ops: Array<{
+      type: "set" | "delete";
+      ref: unknown;
+      data?: Record<string, unknown>;
+    }> = [];
     return {
       set(ref, data) {
         ops.push({ type: "set", ref, data: data as Record<string, unknown> });
@@ -112,7 +122,10 @@ export const LocalAdapter: DatabaseAdapter = {
       async commit() {
         for (const op of ops) {
           if (op.type === "set") {
-            await idbSetDoc(op.ref as Parameters<typeof idbSetDoc>[0], op.data!);
+            await idbSetDoc(
+              op.ref as Parameters<typeof idbSetDoc>[0],
+              op.data!,
+            );
           } else {
             await idbDeleteDoc(op.ref as Parameters<typeof idbDeleteDoc>[0]);
           }
@@ -123,13 +136,15 @@ export const LocalAdapter: DatabaseAdapter = {
 
   useCollectionData(queryRef: unknown) {
     return normalizeCollectionResult(
-      idbUseCollectionData(queryRef as Parameters<typeof idbUseCollectionData>[0])
+      idbUseCollectionData(
+        queryRef as Parameters<typeof idbUseCollectionData>[0],
+      ),
     );
   },
 
   useDocumentData(ref: unknown) {
     return normalizeDocumentResult(
-      idbUseDocumentData(ref as Parameters<typeof idbUseDocumentData>[0])
+      idbUseDocumentData(ref as Parameters<typeof idbUseDocumentData>[0]),
     );
   },
 

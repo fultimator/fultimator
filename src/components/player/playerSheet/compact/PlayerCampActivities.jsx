@@ -33,8 +33,15 @@ function highlightMatch(text, query) {
   const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, "ig");
   return source.split(regex).map((part, idx) =>
     idx % 2 === 1 ? (
-      <mark key={`${part}-${idx}`} style={{ backgroundColor: "yellow", padding: 0 }}>{part}</mark>
-    ) : part
+      <mark
+        key={`${part}-${idx}`}
+        style={{ backgroundColor: "yellow", padding: 0 }}
+      >
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
   );
 }
 
@@ -54,11 +61,12 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
 
   const activities = (player.campActivities ?? [])
     .filter((a) => a?.name)
-    .filter((activity) =>
-      !normalizedQuery ||
-      activity.name?.toLowerCase().includes(normalizedQuery) ||
-      activity.targetDescription?.toLowerCase().includes(normalizedQuery) ||
-      activity.effect?.toLowerCase().includes(normalizedQuery)
+    .filter(
+      (activity) =>
+        !normalizedQuery ||
+        activity.name?.toLowerCase().includes(normalizedQuery) ||
+        activity.targetDescription?.toLowerCase().includes(normalizedQuery) ||
+        activity.effect?.toLowerCase().includes(normalizedQuery),
     );
   if (activities.length === 0) return null;
 
@@ -77,7 +85,9 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
           >
             <StyledTableCellHeader sx={{ width: 36 }} />
             <StyledTableCellHeader colSpan={4}>
-              <Typography variant="h4">{t("Camp Activities (Max 2)")}</Typography>
+              <Typography variant="h4">
+                {t("Camp Activities (Max 2)")}
+              </Typography>
             </StyledTableCellHeader>
           </TableRow>
         </TableHead>
@@ -87,7 +97,9 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
             const hasDetails = activity.targetDescription || activity.effect;
             const forceOpen =
               !!normalizedQuery &&
-              (activity.targetDescription?.toLowerCase().includes(normalizedQuery) ||
+              (activity.targetDescription
+                ?.toLowerCase()
+                .includes(normalizedQuery) ||
                 activity.effect?.toLowerCase().includes(normalizedQuery));
             const isOpen = !!openRows.campActivities[activityKey] || forceOpen;
 
@@ -96,7 +108,13 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                 <TableRow>
                   <StyledTableCell sx={{ width: 36 }}>
                     {hasDetails && (
-                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleRow('campActivities', activityKey); }}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow("campActivities", activityKey);
+                        }}
+                      >
                         {isOpen ? (
                           <KeyboardArrowUp fontSize="small" />
                         ) : (
@@ -106,8 +124,15 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                     )}
                   </StyledTableCell>
                   <StyledTableCell
-                    onClick={(e) => { e.stopPropagation(); if (hasDetails) toggleRow('campActivities', activityKey); }}
-                    sx={{ cursor: hasDetails ? "pointer" : "default", minWidth: { xs: 60, sm: 100 }, wordBreak: "break-word" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (hasDetails) toggleRow("campActivities", activityKey);
+                    }}
+                    sx={{
+                      cursor: hasDetails ? "pointer" : "default",
+                      minWidth: { xs: 60, sm: 100 },
+                      wordBreak: "break-word",
+                    }}
                   >
                     <Typography
                       variant="body2"
@@ -115,8 +140,9 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                         fontWeight: "bold",
                         textTransform: "uppercase",
                         wordBreak: "break-word",
-                        overflowWrap: "break-word"
-                      }}>
+                        overflowWrap: "break-word",
+                      }}
+                    >
                       {highlightMatch(activity.name, searchQuery)}
                     </Typography>
                   </StyledTableCell>
@@ -130,14 +156,23 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
                         <Box sx={{ px: 2, py: 1 }}>
                           {activity.targetDescription && (
-                            <Typography variant="body2" sx={{ fontSize: "0.85rem", mb: 0.5 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: "0.85rem", mb: 0.5 }}
+                            >
                               <strong>{t("Target")}: </strong>
-                              {highlightMatch(activity.targetDescription, searchQuery)}
+                              {highlightMatch(
+                                activity.targetDescription,
+                                searchQuery,
+                              )}
                             </Typography>
                           )}
                           {activity.effect && (
                             <NotesMarkdown sx={{ fontSize: "0.85rem" }}>
-                              {highlightMarkdownText(activity.effect, searchQuery)}
+                              {highlightMarkdownText(
+                                activity.effect,
+                                searchQuery,
+                              )}
                             </NotesMarkdown>
                           )}
                         </Box>

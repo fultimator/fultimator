@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomHeader from '../../components/common/CustomHeader';
+import CustomHeader from "../../components/common/CustomHeader";
 
 function calcHit(firstResult, secondResult, bonus, dl) {
   // Calculate Critical Failure
@@ -102,7 +102,7 @@ export default function Probs() {
     secondDie,
     bonus,
     damage,
-    dl
+    dl,
   );
 
   const isMobile = window.innerWidth < 900;
@@ -110,8 +110,12 @@ export default function Probs() {
   return (
     <div>
       <Grid container spacing={2}>
-        <Grid  size={12}>
-          <CustomHeader type="top" headerText={t("Attacks Chance Generator")} showIconButton={false}/>
+        <Grid size={12}>
+          <CustomHeader
+            type="top"
+            headerText={t("Attacks Chance Generator")}
+            showIconButton={false}
+          />
         </Grid>
 
         {/* First die */}
@@ -119,8 +123,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"firstdie"}>{t("Die 1")}</InputLabel>
             <Select
@@ -146,8 +151,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"seconddie"}>{t("Die 2")}</InputLabel>
             <Select
@@ -173,8 +179,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="bonus"
@@ -209,7 +216,7 @@ export default function Probs() {
                       <Add />
                     </IconButton>
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -220,8 +227,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="damage"
@@ -256,7 +264,7 @@ export default function Probs() {
                       <Add />
                     </IconButton>
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -266,8 +274,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="dl"
@@ -302,7 +311,7 @@ export default function Probs() {
                       <Add />
                     </IconButton>
                   ),
-                }
+                },
               }}
             />
           </FormControl>
@@ -312,8 +321,9 @@ export default function Probs() {
           size={{
             xs: 6,
             sm: 4,
-            lg: 2
-          }}>
+            lg: 2,
+          }}
+        >
           <FormControl variant="standard" fullWidth>
             <TextField
               id="hp"
@@ -348,7 +358,7 @@ export default function Probs() {
                       <Add />
                     </IconButton>
                   ),
-                }
+                },
               }}
             />
           </FormControl>

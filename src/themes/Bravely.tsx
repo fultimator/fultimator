@@ -4,7 +4,7 @@ import { PaletteOptions } from "@mui/material/styles";
 // Light theme
 const lightBravely = createTheme({
   palette: {
-    mode: 'light',
+    mode: "light",
     primary: {
       main: "#765f43",
     },
@@ -86,7 +86,7 @@ const lightBravely = createTheme({
 // Dark theme
 const darkBravely = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
     primary: {
       main: "#765f43",
     },
@@ -168,7 +168,7 @@ const darkBravely = createTheme({
       styleOverrides: {
         root: {
           color: "#b0b0b0",
-          '&.Mui-focused': {
+          "&.Mui-focused": {
             color: "#ffffff",
           },
         },
@@ -179,7 +179,7 @@ const darkBravely = createTheme({
         outlined: {
           borderColor: "rgba(255, 255, 255, 0.23)",
           color: "#ffffff",
-          '&:hover': {
+          "&:hover": {
             borderColor: "#ffffff",
             backgroundColor: "#333333",
             color: "#ffffff",
@@ -190,16 +190,16 @@ const darkBravely = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
+          "& .MuiOutlinedInput-root": {
             backgroundColor: "#2b2b2b", // Darker background for textfield
             borderColor: "#555555", // Lighter border color for better contrast
-            '&:hover fieldset': {
+            "&:hover fieldset": {
               borderColor: "#ffffff", // White border on hover
             },
-            '&.Mui-focused fieldset': {
+            "&.Mui-focused fieldset": {
               borderColor: "#ffffff", // White border when focused
             },
-            '& .MuiInputBase-input': {
+            "& .MuiInputBase-input": {
               color: "#ffffff", // White text color for better readability in dark mode
             },
           },
@@ -217,7 +217,7 @@ const darkBravely = createTheme({
       styleOverrides: {
         root: () => ({
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor:  "#fff",
+            borderColor: "#fff",
           },
         }),
       },
@@ -276,7 +276,7 @@ const darkBravely = createTheme({
           },
         },
         thumb: {
-          backgroundColor: "#dccdc4", 
+          backgroundColor: "#dccdc4",
         },
         track: {
           backgroundColor: "#1e1e1e",
@@ -293,10 +293,10 @@ const darkBravely = createTheme({
         thumb: {
           backgroundColor: "#dccdc4",
           "&:hover, &.Mui-focusVisible": {
-            backgroundColor: "#756449", 
+            backgroundColor: "#756449",
           },
           "&.Mui-disabled": {
-            backgroundColor: "#7564491A", 
+            backgroundColor: "#7564491A",
           },
         },
         track: {
@@ -306,7 +306,7 @@ const darkBravely = createTheme({
           backgroundColor: "#756449",
         },
         mark: {
-          backgroundColor: "#756449", 
+          backgroundColor: "#756449",
         },
         markActive: {
           backgroundColor: "#dccdc4",

@@ -1,15 +1,10 @@
 import { RemoveCircleOutlined } from "@mui/icons-material";
 
-import {
-  Grid,
-  FormControl,
-  IconButton,
-  TextField,
-} from "@mui/material";
+import { Grid, FormControl, IconButton, TextField } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from '../common/CustomTextarea';
-import CustomHeader from '../common/CustomHeader';
+import CustomTextarea from "../common/CustomTextarea";
+import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
@@ -33,8 +28,8 @@ export default function EditActions({ npc, setNpc }) {
       actions: [
         ...(prevState.actions || []),
         {
-        name: "",
-        effect: "",
+          name: "",
+          effect: "",
         },
       ],
     }));
@@ -54,16 +49,22 @@ export default function EditActions({ npc, setNpc }) {
 
   return (
     <>
-      <CustomHeader type="top" addItem={addActions} headerText={t("Other Actions")} icon={Add} openCompendium={() => setModalOpen(true)} />
+      <CustomHeader
+        type="top"
+        addItem={addActions}
+        headerText={t("Other Actions")}
+        icon={Add}
+        openCompendium={() => setModalOpen(true)}
+      />
       {npc.actions?.map((actions, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid  sx={{ p: 0, m: 0 }}>
+            <Grid sx={{ p: 0, m: 0 }}>
               <IconButton onClick={() => openDeleteDialog(i)}>
                 <RemoveCircleOutlined />
               </IconButton>
             </Grid>
-            <Grid  size="grow">
+            <Grid size="grow">
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="name"
@@ -76,7 +77,7 @@ export default function EditActions({ npc, setNpc }) {
                 ></TextField>
               </FormControl>
             </Grid>
-            <Grid  size={3}>
+            <Grid size={3}>
               <FormControl variant="standard" fullWidth>
                 <TextField
                   id="spCost"
@@ -86,12 +87,12 @@ export default function EditActions({ npc, setNpc }) {
                   onChange={(e) => onChangeActions(i, "spCost", e.target.value)}
                   size="small"
                   slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" }
+                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
                   }}
                 />
               </FormControl>
             </Grid>
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormControl variant="standard" fullWidth>
                 {/* <TextField id="effect" label={t("Effect:")} value={actions.effect}
                   onChange={(e) => {
@@ -124,7 +125,11 @@ export default function EditActions({ npc, setNpc }) {
             ...prev,
             actions: [
               ...(prev.actions || []),
-              { name: item.name, effect: item.effect || "", spCost: item.spCost ?? 1 },
+              {
+                name: item.name,
+                effect: item.effect || "",
+                spCost: item.spCost ?? 1,
+              },
             ],
           }));
         }}

@@ -49,7 +49,8 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
       {isEditMode && (
         <Grid
           style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow">
+          size="grow"
+        >
           <Button
             onClick={onEdit}
             variant="outlined"
@@ -89,7 +90,8 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={8}>
+            size={8}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -107,7 +109,8 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={4}>
+            size={4}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -152,11 +155,12 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={8}>
+                  size={8}
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {dan.name === "dance_custom_name"
@@ -170,11 +174,12 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={4}>
+                  size={4}
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
-                      fontWeight: "bold"
+                      fontWeight: "bold",
                     }}
                   >
                     {dan.name === "dance_custom_name"
@@ -191,11 +196,13 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                     flexShrink: 0,
                     minHeight: 34,
                   }}
-                  size="grow"></Grid>
+                  size="grow"
+                ></Grid>
               )}
             </div>
             <Grid
-              container sx={{
+              container
+              sx={{
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
@@ -210,7 +217,8 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                     alignItems: "center",
                     justifyContent: "left",
                   }}
-                  size={12}>
+                  size={12}
+                >
                   <ReactMarkdown components={components}>
                     {dan.name === "dance_custom_name"
                       ? dan.effect

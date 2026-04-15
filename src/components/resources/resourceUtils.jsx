@@ -7,7 +7,7 @@ import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import StarIcon from "@mui/icons-material/Star";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
-import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
 import { useTranslate } from "../../translation/translate";
 
 export const getTypeIcon = (type) => {
@@ -37,7 +37,7 @@ export const getTypeIcon = (type) => {
   }
 };
 
-export const getTypeColor = ({type, isDarkMode = false}) => {
+export const getTypeColor = ({ type, isDarkMode = false }) => {
   switch (type) {
     case "both":
       return isDarkMode ? "#64b5f6" : "#1565c0";

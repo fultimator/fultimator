@@ -49,7 +49,7 @@ class ErrorBoundary extends Component {
     if (!contact || !message) {
       if (window.electron) {
         window.electron.alert(
-          "Both message and contact information are required."
+          "Both message and contact information are required.",
         );
       } else {
         alert("Both message and contact information are required.");
@@ -81,10 +81,10 @@ class ErrorBoundary extends Component {
         (errorDetail, index) =>
           `Error ${index + 1}: ${errorDetail.error.message}\nStack Trace: ${
             errorDetail.error.stack
-          }`
+          }`,
       )
       .join(
-        "\n\n"
+        "\n\n",
       )}\n\nUser Message: ${truncatedMessage}\n\nContact Info: ${contact}`;
 
     // Send a message to a Discord webhook
@@ -126,9 +126,11 @@ class ErrorBoundary extends Component {
 
       return (
         <Container>
-          <Box sx={{
-            mt: 2
-          }}>
+          <Box
+            sx={{
+              mt: 2,
+            }}
+          >
             <Typography variant="h2" gutterBottom color={"error"}>
               Something went wrong. Please report the error below or contact us
               in the Discord server #support channel.
@@ -141,8 +143,9 @@ class ErrorBoundary extends Component {
                 p: 2,
                 background: "white",
                 borderRadius: 1,
-                boxShadow: 1
-              }}>
+                boxShadow: 1,
+              }}
+            >
               <Typography variant="h6" gutterBottom>
                 Error Details:
               </Typography>
@@ -159,9 +162,11 @@ class ErrorBoundary extends Component {
                 ))}
               </List>
             </Box>
-            <Box sx={{
-              mt: 2
-            }}>
+            <Box
+              sx={{
+                mt: 2,
+              }}
+            >
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 Please provide as much information as possible to help us
                 diagnose the issue.
@@ -184,7 +189,7 @@ class ErrorBoundary extends Component {
                 onChange={this.handleMessageChange}
                 sx={{ mb: 2, background: "white" }}
                 slotProps={{
-                  htmlInput: { maxLength: 2000 }
+                  htmlInput: { maxLength: 2000 },
                 }}
               />
               <Button
@@ -209,7 +214,7 @@ class ErrorBoundary extends Component {
 const ReturnHomeButton = () => {
   const handleReturnHome = () => {
     if (window.electron) {
-        window.electron.navigateHome();
+      window.electron.navigateHome();
     } else {
       window.location.href = "/";
     }

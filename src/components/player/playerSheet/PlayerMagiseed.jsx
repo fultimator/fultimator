@@ -90,7 +90,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "magiseed" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
 
@@ -111,11 +111,15 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
     const growthClock = magiseedSpell.growthClock || 0;
     if (!currentMagiseed) return null;
 
-    const magiseedTemplate = magiseeds.find((m) => m.name === currentMagiseed.name);
+    const magiseedTemplate = magiseeds.find(
+      (m) => m.name === currentMagiseed.name,
+    );
     if (!magiseedTemplate) return null;
 
     const effectKey = Math.min(growthClock, 3);
-    const effect = currentMagiseed.effects?.[effectKey] || magiseedTemplate.effects?.[effectKey];
+    const effect =
+      currentMagiseed.effects?.[effectKey] ||
+      magiseedTemplate.effects?.[effectKey];
 
     return effect ? t(effect) : null;
   };
@@ -154,33 +158,70 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
             >
               {t("magiseed_garden")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {magiseedSpells.map((magiseedSpell, msIndex) => (
                 <React.Fragment key={msIndex}>
                   {/* Growth Clock Section */}
-                  <Grid  sx={{ mb: 2 }} size={12}>
-                    <Typography variant="h3" sx={{ fontWeight: "bold", textTransform: "uppercase", mb: 1 }}>
-                      {t("magiseed_growth_clock")} - {t(magiseedSpell.className)}
+                  <Grid sx={{ mb: 2 }} size={12}>
+                    <Typography
+                      variant="h3"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        mb: 1,
+                      }}
+                    >
+                      {t("magiseed_growth_clock")} -{" "}
+                      {t(magiseedSpell.className)}
                     </Typography>
-                    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
-                      <Grid >
+                    <Grid
+                      container
+                      sx={{ alignItems: "flex-start" }}
+                      spacing={2}
+                    >
+                      <Grid>
                         <Clock
                           numSections={4}
                           size={60}
                           state={getClockState(magiseedSpell.growthClock || 0)}
-                          setState={(isEditMode || setPlayer) ? (newState) => {
-                            const filledSections = newState.reduce((count, section) => count + (section ? 1 : 0), 0);
-                            handleClockChange(magiseedSpell, filledSections);
-                          } : undefined}
+                          setState={
+                            isEditMode || setPlayer
+                              ? (newState) => {
+                                  const filledSections = newState.reduce(
+                                    (count, section) =>
+                                      count + (section ? 1 : 0),
+                                    0,
+                                  );
+                                  handleClockChange(
+                                    magiseedSpell,
+                                    filledSections,
+                                  );
+                                }
+                              : undefined
+                          }
                           isCharacterSheet={!isEditMode && !setPlayer}
-                          onReset={(isEditMode || setPlayer) ? () => handleClockChange(magiseedSpell, 0) : undefined}
+                          onReset={
+                            isEditMode || setPlayer
+                              ? () => handleClockChange(magiseedSpell, 0)
+                              : undefined
+                          }
                         />
                         {(isEditMode || setPlayer) && (
-                          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            sx={{ mt: 1, justifyContent: "center" }}
+                          >
                             <Tooltip title={t("Decrement")} arrow>
                               <IconButton
                                 color="primary"
-                                onClick={() => decrementMagiseedClock(magiseedSpell)}
+                                onClick={() =>
+                                  decrementMagiseedClock(magiseedSpell)
+                                }
                                 size="small"
                                 sx={{ p: 0.25 }}
                               >
@@ -190,7 +231,9 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                             <Tooltip title={t("Reset")} arrow>
                               <IconButton
                                 color="primary"
-                                onClick={() => handleClockChange(magiseedSpell, 0)}
+                                onClick={() =>
+                                  handleClockChange(magiseedSpell, 0)
+                                }
                                 size="small"
                                 sx={{ p: 0.25 }}
                               >
@@ -200,7 +243,9 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                             <Tooltip title={t("Increment")} arrow>
                               <IconButton
                                 color="primary"
-                                onClick={() => incrementMagiseedClock(magiseedSpell)}
+                                onClick={() =>
+                                  incrementMagiseedClock(magiseedSpell)
+                                }
                                 size="small"
                                 sx={{ p: 0.25 }}
                               >
@@ -210,15 +255,18 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           </Stack>
                         )}
                       </Grid>
-                      <Grid  size="grow">
+                      <Grid size="grow">
                         <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
                           {magiseedSpell.currentMagiseed
-                            ? (magiseedSpell.currentMagiseed.customName || t(magiseedSpell.currentMagiseed.name))
+                            ? magiseedSpell.currentMagiseed.customName ||
+                              t(magiseedSpell.currentMagiseed.name)
                             : t("magiseed_no_magiseed")}
                         </Typography>
                         <LinearProgress
                           variant="determinate"
-                          value={getClockProgress(magiseedSpell.growthClock || 0)}
+                          value={getClockProgress(
+                            magiseedSpell.growthClock || 0,
+                          )}
                           sx={{
                             height: 10,
                             borderRadius: 5,
@@ -228,7 +276,10 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                             },
                           }}
                         />
-                        <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ mt: 0.5, display: "block" }}
+                        >
                           {magiseedSpell.growthClock || 0} / 4
                         </Typography>
                       </Grid>
@@ -236,86 +287,118 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                   </Grid>
 
                   {/* Current Effect */}
-                  {magiseedSpell.currentMagiseed && getCurrentEffect(magiseedSpell) && (
-                    <Grid  sx={{ mb: 2 }} size={12}>
-                      <Box sx={{ 
-                        p: 1.5, 
-                        backgroundColor: ternary + "20", 
-                        borderLeft: `4px solid ${primary}`,
-                        borderRadius: "0 4px 4px 0"
-                      }}>
-                        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-                          {t("magiseed_current_effect")} (T = {magiseedSpell.growthClock || 0})
-                        </Typography>
-                        <ReactMarkdown components={{ p: "span" }}>
-                          {getCurrentEffect(magiseedSpell)}
-                        </ReactMarkdown>
-                      </Box>
-                    </Grid>
-                  )}
+                  {magiseedSpell.currentMagiseed &&
+                    getCurrentEffect(magiseedSpell) && (
+                      <Grid sx={{ mb: 2 }} size={12}>
+                        <Box
+                          sx={{
+                            p: 1.5,
+                            backgroundColor: ternary + "20",
+                            borderLeft: `4px solid ${primary}`,
+                            borderRadius: "0 4px 4px 0",
+                          }}
+                        >
+                          <Typography
+                            variant="h4"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {t("magiseed_current_effect")} (T ={" "}
+                            {magiseedSpell.growthClock || 0})
+                          </Typography>
+                          <ReactMarkdown components={{ p: "span" }}>
+                            {getCurrentEffect(magiseedSpell)}
+                          </ReactMarkdown>
+                        </Box>
+                      </Grid>
+                    )}
 
                   {/* Available Magiseeds */}
-                  {magiseedSpell.magiseeds && magiseedSpell.magiseeds.map((seed, sIndex) => (
-                    <Grid
-                  container
-                  spacing={0}
-                  key={`${msIndex}-${sIndex}`}
-                      sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
-                      size={{
-                        xs: 12,
-                        md: 6
-                      }}>
-                      <Grid  sx={{ display: "flex" }} size={10}>
-                        <Typography
-                          id="spell-left-name"
-                          variant="h2"
+                  {magiseedSpell.magiseeds &&
+                    magiseedSpell.magiseeds.map((seed, sIndex) => (
+                      <Grid
+                        container
+                        spacing={0}
+                        key={`${msIndex}-${sIndex}`}
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
+                        size={{
+                          xs: 12,
+                          md: 6,
+                        }}
+                      >
+                        <Grid sx={{ display: "flex" }} size={10}>
+                          <Typography
+                            id="spell-left-name"
+                            variant="h2"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              backgroundColor: primary,
+                              padding: "5px",
+                              paddingLeft: "10px",
+                              color: "#fff",
+                              borderRadius: "8px 0 0 8px",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                            }}
+                          >
+                            {seed.customName || t(seed.name)}
+                            {magiseedSpell.currentMagiseed &&
+                              seed.name ===
+                                magiseedSpell.currentMagiseed.name && (
+                                <Typography
+                                  component="span"
+                                  variant="h3"
+                                  sx={{
+                                    ml: 1,
+                                    fontSize: "0.8em",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  ({t("magiseed_plant_in_garden")})
+                                </Typography>
+                              )}
+                          </Typography>
+                        </Grid>
+                        <Grid
                           sx={{
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            backgroundColor: primary,
-                            padding: "5px",
-                            paddingLeft: "10px",
-                            color: "#fff",
-                            borderRadius: "8px 0 0 8px",
                             display: "flex",
-                            alignItems: "center",
-                            width: "100%",
+                            alignItems: "stretch",
+                            maxHeight: "40px",
                           }}
+                          size={2}
                         >
-                          {seed.customName || t(seed.name)}
-                          {magiseedSpell.currentMagiseed && seed.name === magiseedSpell.currentMagiseed.name && (
-                            <Typography component="span" variant="h3" sx={{ ml: 1, fontSize: "0.8em", fontStyle: "italic" }}>
-                              ({t("magiseed_plant_in_garden")})
-                            </Typography>
-                          )}
-                        </Typography>
+                          <div
+                            id="spell-right-controls"
+                            style={{
+                              padding: "10px",
+                              backgroundColor: ternary,
+                              borderRadius: "0 8px 8px 0",
+                              marginRight: "15px",
+                              display: "flex",
+                              alignItems: "center",
+                              flexDirection: "row",
+                            }}
+                            className="spell-right-controls"
+                          >
+                            <Tooltip title={t("Info")}>
+                              <IconButton
+                                sx={{ padding: "0px" }}
+                                onClick={() =>
+                                  handleOpenModal(magiseedSpell, seed)
+                                }
+                              >
+                                <Info />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        </Grid>
                       </Grid>
-                      <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
-                        <div
-                          id="spell-right-controls"
-                          style={{
-                            padding: "10px",
-                            backgroundColor: ternary,
-                            borderRadius: "0 8px 8px 0",
-                            marginRight: "15px",
-                            display: "flex",
-                            alignItems: "center",
-                            flexDirection: "row",
-                          }}
-                          className="spell-right-controls"
-                        >
-                          <Tooltip title={t("Info")}>
-                            <IconButton
-                              sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(magiseedSpell, seed)}
-                            >
-                              <Info />
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      </Grid>
-                    </Grid>
-                  ))}
+                    ))}
                 </React.Fragment>
               ))}
             </Grid>
@@ -323,26 +406,35 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
               open={openModal}
               onClose={handleCloseModal}
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "80%" } } }
+                paper: { sx: { width: { xs: "90%", md: "80%" } } },
               }}
             >
               <DialogContent sx={{ p: 0 }}>
-                {selectedSeed && (() => {
-                  const template = magiseeds.find(m => m.name === selectedSeed.name) || {};
-                  return (
-                    <NonStaticSpellCard item={{
-                      ...template,
-                      ...selectedSeed,
-                      spellType: "magiseed",
-                      name: selectedSeed.customName || selectedSeed.name,
-                      description: selectedSeed.description || template.description,
-                      effects: selectedSeed.effects || template.effects,
-                    }} />
-                  );
-                })()}
+                {selectedSeed &&
+                  (() => {
+                    const template =
+                      magiseeds.find((m) => m.name === selectedSeed.name) || {};
+                    return (
+                      <NonStaticSpellCard
+                        item={{
+                          ...template,
+                          ...selectedSeed,
+                          spellType: "magiseed",
+                          name: selectedSeed.customName || selectedSeed.name,
+                          description:
+                            selectedSeed.description || template.description,
+                          effects: selectedSeed.effects || template.effects,
+                        }}
+                      />
+                    );
+                  })()}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleCloseModal}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseModal}
+                >
                   OK
                 </Button>
               </DialogActions>

@@ -18,7 +18,7 @@ import {
   ThemeProvider,
   useScrollTrigger,
 } from "@mui/material";
-import { Spa } from '@mui/icons-material'
+import { Spa } from "@mui/icons-material";
 import { useState } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
@@ -29,7 +29,7 @@ import Qualities from "../equip/Qualities/Qualities";
 import CustomWeapons from "../equip/customWeapons/CustomWeapons.jsx";
 import { RitualPretty, ProjectPretty } from "../equip/ritualsProjects/Pretty";
 import { useTranslate } from "../../translation/translate";
-import CustomHeaderAlt from '../../components/common/CustomHeaderAlt';
+import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import CustomTextarea from "../../components/common/CustomTextarea";
 
 const powerPMs = {
@@ -92,7 +92,8 @@ function RitualsProjects() {
   const scrollToSection = (sectionId) => {
     const target = document.getElementById(sectionId);
     if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY - sectionScrollOffset;
+    const top =
+      target.getBoundingClientRect().top + window.scrollY - sectionScrollOffset;
     window.scrollTo({ top, behavior: "smooth" });
   };
 
@@ -114,65 +115,152 @@ function RitualsProjects() {
           }}
         >
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-rituals")}>{t("Rituals")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-projects")}>{t("Projects")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-weapons")}>{t("Rare Weapons")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-custom-weapons")}>{t("Custom Weapons")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-armor-shield")}>{t("Armor & Shields")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-accessories")}>{t("Accessories")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-arcana")}>{t("Arcana")}</Button>
-            <Button size="small" variant="outlined" onClick={() => scrollToSection("section-qualities")}>{t("Qualities")}</Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-rituals")}
+            >
+              {t("Rituals")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-projects")}
+            >
+              {t("Projects")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-weapons")}
+            >
+              {t("Rare Weapons")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-custom-weapons")}
+            >
+              {t("Custom Weapons")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-armor-shield")}
+            >
+              {t("Armor & Shields")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-accessories")}
+            >
+              {t("Accessories")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-arcana")}
+            >
+              {t("Arcana")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-qualities")}
+            >
+              {t("Qualities")}
+            </Button>
           </Box>
         </Paper>
 
-        <Grid container spacing={2} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-rituals">
+        <Grid
+          container
+          spacing={2}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-rituals"
+        >
           <Grid size={12}>
             <Rituals />
           </Grid>
         </Grid>
 
-        <Grid container spacing={2} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-projects">
+        <Grid
+          container
+          spacing={2}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-projects"
+        >
           <Grid size={12}>
             <Projects />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-weapons">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-weapons"
+        >
           <Grid size={12}>
             <Weapons />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-custom-weapons">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-custom-weapons"
+        >
           <Grid size={12}>
             <CustomWeapons />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-armor-shield">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-armor-shield"
+        >
           <Grid size={12}>
             <ArmorShield />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-accessories">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-accessories"
+        >
           <Grid size={12}>
             <Accessories />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-arcana">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-arcana"
+        >
           <Grid size={12}>
             <Arcana />
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }} id="section-qualities">
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-qualities"
+        >
           <Grid size={12}>
             <Qualities />
           </Grid>
         </Grid>
-
       </Layout>
     </ThemeProvider>
   );
@@ -226,7 +314,9 @@ function Rituals() {
       ingredient ? t("Using special ingredient") : null,
       itemHeld ? `${t("Override DL")}: -${dlReduction}` : null,
       fastRitual ? t("Fast Ritual") : null,
-    ].filter(Boolean).join(" • "),
+    ]
+      .filter(Boolean)
+      .join(" • "),
   };
   return (
     <>
@@ -247,7 +337,10 @@ function Rituals() {
             }}
           >
             {/* Header */}
-            <CustomHeaderAlt headerText={t("Rituals")} icon={<Spa fontSize="large" />} />
+            <CustomHeaderAlt
+              headerText={t("Rituals")}
+              icon={<Spa fontSize="large" />}
+            />
             <Grid container>
               <Grid size={12} sx={{ mb: 1 }}>
                 <TextField
@@ -452,7 +545,9 @@ function Projects() {
       defect ? t("Has terrible flaw") : null,
       `${t("Crew")}: ${tinkerers} ${t("Tinkerers")}, ${helpers} ${t("Helpers")}, ${visionary} ${t("Visionary")}`,
       `${t("progress per day")}: ${progressPerDay}`,
-    ].filter(Boolean).join(" • "),
+    ]
+      .filter(Boolean)
+      .join(" • "),
   };
 
   return (
@@ -474,7 +569,10 @@ function Projects() {
             }}
           >
             {/* Header */}
-            <CustomHeaderAlt headerText={t("Projects")} icon={<Spa fontSize="large" />} />
+            <CustomHeaderAlt
+              headerText={t("Projects")}
+              icon={<Spa fontSize="large" />}
+            />
             <Grid container>
               <Grid size={12} sx={{ mb: 1 }}>
                 <TextField

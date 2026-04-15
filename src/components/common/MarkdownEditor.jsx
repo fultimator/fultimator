@@ -91,7 +91,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
       textField.focus();
       textField.setSelectionRange(
         start + prefix.length,
-        start + prefix.length + selectedText.length
+        start + prefix.length + selectedText.length,
       );
     }, 0);
   };
@@ -199,8 +199,9 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
           <Box
             sx={{
               p: 2,
-              width: 300
-            }}>
+              width: 300,
+            }}
+          >
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_table_title")}
             </Typography>
@@ -245,10 +246,10 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                             .fill(0)
                             .map(
                               (_, colIdx) =>
-                                `Row ${rowIdx + 1}, Col ${colIdx + 1}`
+                                `Row ${rowIdx + 1}, Col ${colIdx + 1}`,
                             )
                             .join(" | ") +
-                          " |"
+                          " |",
                       )
                       .join("\n");
 
@@ -283,7 +284,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                   defaultValue={3}
                   sx={{ width: 90, mr: 1 }}
                   slotProps={{
-                    htmlInput: { min: 1, max: 10 }
+                    htmlInput: { min: 1, max: 10 },
                   }}
                 />
                 <Typography>×</Typography>
@@ -295,7 +296,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                   defaultValue={3}
                   sx={{ width: 90, ml: 1 }}
                   slotProps={{
-                    htmlInput: { min: 1, max: 20 }
+                    htmlInput: { min: 1, max: 20 },
                   }}
                 />
               </Box>
@@ -326,10 +327,10 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                         Array(cols)
                           .fill(0)
                           .map(
-                            (_, colIdx) => `Cell ${rowIdx + 1},${colIdx + 1}`
+                            (_, colIdx) => `Cell ${rowIdx + 1},${colIdx + 1}`,
                           )
                           .join(" | ") +
-                        " |"
+                        " |",
                     )
                     .join("\n");
 
@@ -364,14 +365,14 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                 const emptyRow = "| " + Array(cols).fill("").join(" | ") + " |";
 
                 insertAtCursor(
-                  `${header}\n${separator}\n${emptyRow}\n${emptyRow}\n${emptyRow}`
+                  `${header}\n${separator}\n${emptyRow}\n${emptyRow}\n${emptyRow}`,
                 );
                 handlePopoverClose();
               }}
             >
               {t("mkeditor_table_empty")}
             </Button>
-          </Box>
+          </Box>,
         ),
     },
     {
@@ -388,8 +389,9 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
           <Box
             sx={{
               p: 2,
-              maxWidth: 300
-            }}>
+              maxWidth: 300,
+            }}
+          >
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_callout_title")}
             </Typography>
@@ -417,7 +419,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                 </Button>
               ))}
             </ButtonGroup>
-          </Box>
+          </Box>,
         ),
     },
     {
@@ -429,15 +431,16 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
           <Box
             sx={{
               p: 2,
-              maxWidth: 320
-            }}>
+              maxWidth: 320,
+            }}
+          >
             <Typography variant="subtitle2" gutterBottom>
               {t("mkeditor_tooltip_icon")}
             </Typography>
             <Grid container spacing={1}>
               {/* Type Icons */}
               {typeList.map((type) => (
-                <Grid  key={type} size={3}>
+                <Grid key={type} size={3}>
                   <Tooltip
                     title={t(type).charAt(0).toUpperCase() + t(type).slice(1)}
                     enterDelay={500}
@@ -464,7 +467,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
 
               {/* Dice Icons */}
               {["d4", "d6", "d8", "d10", "d12", "d20"].map((dice) => (
-                <Grid  key={dice} size={3}>
+                <Grid key={dice} size={3}>
                   <Tooltip
                     title={dice.toUpperCase()}
                     enterDelay={500}
@@ -495,18 +498,18 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
               ))}
               {/* Other Icons */}
               {["melee", "ranged", "magic", "spell", "martial"].map((icon) => (
-                <Grid  key={icon} size={3}>
+                <Grid key={icon} size={3}>
                   <Tooltip
                     title={
                       icon === "melee"
                         ? t("Melee")
                         : icon === "ranged"
-                        ? t("Ranged")
-                        : icon === "magic"
-                        ? t("Spell")
-                        : icon === "spell"
-                        ? t("offensive_spell")
-                        : t("martial")
+                          ? t("Ranged")
+                          : icon === "magic"
+                            ? t("Spell")
+                            : icon === "spell"
+                              ? t("offensive_spell")
+                              : t("martial")
                     }
                     enterDelay={500}
                     leaveDelay={30}
@@ -534,7 +537,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
                 </Grid>
               ))}
             </Grid>
-          </Box>
+          </Box>,
         ),
     },
   ];
@@ -562,9 +565,11 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
         <Tab value="preview" label={t("mkeditor_tab_preview")} />
         {!isMobile && <Tab value="split" label={t("mkeditor_tab_split")} />}
       </Tabs>
-      <Box sx={{
-        p: 2
-      }}>
+      <Box
+        sx={{
+          p: 2,
+        }}
+      >
         <Box sx={{ display: "flex", flexWrap: "wrap", mb: 1 }}>
           {buttons.map((btn, idx) => (
             <Tooltip key={idx} title={btn.tooltip}>
@@ -603,7 +608,7 @@ const MarkdownEditor = ({ initialValue = "", onChange }) => {
               slotProps={{
                 htmlInput: {
                   maxLength: 5000,
-                }
+                },
               }}
             />
           )}

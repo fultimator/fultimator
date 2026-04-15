@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { Martial } from "../../../../components/icons";
 import armor from "../../../../libs/armor";
 import { useTranslate } from "../../../../translation/translate";

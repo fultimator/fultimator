@@ -85,15 +85,13 @@ export function createAppMenu(mainWindow: BrowserWindow) {
         {
           label: "Visit GitHub",
           click: () =>
-            shell.openExternal(
-              "https://github.com/fultimator/fultimator"
-            ),
+            shell.openExternal("https://github.com/fultimator/fultimator"),
         },
         {
           label: "Report Issue",
           click: () =>
             shell.openExternal(
-              "https://github.com/fultimator/fultimator/issues"
+              "https://github.com/fultimator/fultimator/issues",
             ),
         },
         {
@@ -144,7 +142,7 @@ System: ${systemInfo}`,
 
 export function checkForUpdates(mainWindow: BrowserWindow) {
   const packageJson = JSON.parse(
-    fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8")
+    fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"),
   );
   const currentVersion = packageJson.version;
 
@@ -167,8 +165,8 @@ export function checkForUpdates(mainWindow: BrowserWindow) {
             .sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
               semver.rcompare(
                 String(a.tag_name).replace(/^v/, ""),
-                String(b.tag_name).replace(/^v/, "")
-              )
+                String(b.tag_name).replace(/^v/, ""),
+              ),
             )[0]; // Sort newest first
 
           if (!latestRelease) {
@@ -206,7 +204,7 @@ export function checkForUpdates(mainWindow: BrowserWindow) {
             });
           }
         });
-      }
+      },
     )
     .on("error", (err) => {
       dialog.showErrorBox("Update Check Failed", err.message);

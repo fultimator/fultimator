@@ -68,7 +68,7 @@ function StatChangeDialog({
     damageTypeValue = "",
     guarding = false,
     ignoreResistance = false,
-    ignoreImmunity = false
+    ignoreImmunity = false,
   ) => {
     const affinities = target?.affinities || {};
     const damage = Number.parseInt(damageValue, 10) || 0;
@@ -112,7 +112,7 @@ function StatChangeDialog({
         damageType,
         isGuarding,
         isIgnoreResistance,
-        isIgnoreImmunity
+        isIgnoreImmunity,
       );
     } else {
       adjustedValue = -val;
@@ -234,7 +234,7 @@ function StatChangeDialog({
                           damageType,
                           isGuarding,
                           isIgnoreResistance,
-                          isIgnoreImmunity
+                          isIgnoreImmunity,
                         );
                         return calculated < 0
                           ? `${Math.abs(calculated)} ${t("combat_sim_healing")}`
@@ -276,8 +276,8 @@ export default function PlayerControls({ player, setPlayer }) {
         0,
         Math.min(
           prevPlayer.stats[stat].current + value,
-          prevPlayer.stats[stat].max
-        )
+          prevPlayer.stats[stat].max,
+        ),
       );
       return {
         ...prevPlayer,
@@ -296,7 +296,7 @@ export default function PlayerControls({ player, setPlayer }) {
         ...prevPlayer.info,
         fabulapoints: Math.max(
           0,
-          Math.min(9999, prevPlayer.info.fabulapoints + value)
+          Math.min(9999, prevPlayer.info.fabulapoints + value),
         ),
       },
     }));
@@ -307,7 +307,7 @@ export default function PlayerControls({ player, setPlayer }) {
     setPlayer((prevPlayer) => {
       const newZenit = Math.max(
         0,
-        Math.min(99999999, prevPlayer.info.zenit + changeValue)
+        Math.min(99999999, prevPlayer.info.zenit + changeValue),
       );
       return {
         ...prevPlayer,
@@ -331,7 +331,7 @@ export default function PlayerControls({ player, setPlayer }) {
     setPlayer((prev) => {
       const current = Math.max(
         0,
-        Math.min(prev.stats[key].current + amount, prev.stats[key].max)
+        Math.min(prev.stats[key].current + amount, prev.stats[key].max),
       );
       return {
         ...prev,
@@ -346,13 +346,18 @@ export default function PlayerControls({ player, setPlayer }) {
     const positiveIncrements = increments.filter((val) => val > 0);
 
     return (
-      <Grid container spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
+      <Grid
+        container
+        spacing={1}
+        sx={{ alignItems: "center", flexWrap: "wrap" }}
+      >
         <Grid
           size={{
             xs: 12,
             sm: 3,
-            md: 3
-          }}>
+            md: 3,
+          }}
+        >
           <Typography
             variant="h3"
             sx={{ lineHeight: 1.2, width: "fit-content" }}
@@ -363,9 +368,15 @@ export default function PlayerControls({ player, setPlayer }) {
         <Grid
           size={{
             xs: 12,
-            sm: "grow"
-          }}>
-          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
+            sm: "grow",
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ flexWrap: "wrap" }}
+            useFlexGap
+          >
             <Button
               variant="outlined"
               color={color}
@@ -397,7 +408,7 @@ export default function PlayerControls({ player, setPlayer }) {
                 size="small"
                 onClick={changeStat(
                   "hp",
-                  Math.floor(player.stats.hp.max / 2) - player.stats.hp.current
+                  Math.floor(player.stats.hp.max / 2) - player.stats.hp.current,
                 )}
               >
                 {t("Half")}
@@ -458,24 +469,19 @@ export default function PlayerControls({ player, setPlayer }) {
         </Typography>
 
         <Grid container spacing={1} sx={{ p: 1 }}>
-          <Grid  size={12}>
-            {renderStatControls("hp", "HP", "error")}
-          </Grid>
-          <Grid  size={12}>
-            {renderStatControls("mp", "MP", "info")}
-          </Grid>
-          <Grid  size={12}>
-            {renderStatControls("ip", "IP", "success")}
-          </Grid>
+          <Grid size={12}>{renderStatControls("hp", "HP", "error")}</Grid>
+          <Grid size={12}>{renderStatControls("mp", "MP", "info")}</Grid>
+          <Grid size={12}>{renderStatControls("ip", "IP", "success")}</Grid>
 
-          <Grid  size={12}>
+          <Grid size={12}>
             <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
                   sm: 3,
-                  md: 3
-                }}>
+                  md: 3,
+                }}
+              >
                 <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
                   {`${t("Fabula Points")}【${player.info.fabulapoints}】`}
                 </Typography>
@@ -483,8 +489,9 @@ export default function PlayerControls({ player, setPlayer }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: "grow"
-                }}>
+                  sm: "grow",
+                }}
+              >
                 <ButtonGroup variant="outlined" size="small" color="primary">
                   <Button onClick={changeFabulaPoints(-1)}>-1</Button>
                   <Button onClick={changeFabulaPoints(1)}>+1</Button>
@@ -493,14 +500,15 @@ export default function PlayerControls({ player, setPlayer }) {
             </Grid>
           </Grid>
 
-          <Grid  size={12}>
+          <Grid size={12}>
             <Grid container spacing={1} sx={{ alignItems: "center" }}>
               <Grid
                 size={{
                   xs: 12,
                   sm: 3,
-                  md: 3
-                }}>
+                  md: 3,
+                }}
+              >
                 <Typography variant="h3" sx={{ lineHeight: 1.2 }}>
                   {`${t("Zenit")}【${player.info.zenit}】`}
                 </Typography>
@@ -508,16 +516,18 @@ export default function PlayerControls({ player, setPlayer }) {
               <Grid
                 size={{
                   xs: 12,
-                  sm: "grow"
-                }}>
+                  sm: "grow",
+                }}
+              >
                 <Stack
                   direction="row"
                   spacing={1}
                   useFlexGap
                   sx={{
                     flexWrap: "wrap",
-                    alignItems: "center"
-                  }}>
+                    alignItems: "center",
+                  }}
+                >
                   <ToggleButtonGroup
                     value={changeType}
                     exclusive
@@ -542,7 +552,7 @@ export default function PlayerControls({ player, setPlayer }) {
                     onChange={handleZenitChangeInput}
                     sx={{ width: 90 }}
                     slotProps={{
-                      htmlInput: { min: 0 }
+                      htmlInput: { min: 0 },
                     }}
                   />
 

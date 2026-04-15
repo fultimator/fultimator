@@ -25,7 +25,10 @@ import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
-import { PlayerSpellCard, NonStaticSpellCard } from "../../compendium/ItemCards";
+import {
+  PlayerSpellCard,
+  NonStaticSpellCard,
+} from "../../compendium/ItemCards";
 import { spellList } from "../../../libs/classes";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
@@ -76,7 +79,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     ["slow", "enraged"],
     ["dexUp"],
     6,
-    12
+    12,
   );
   const currInsight = calculateAttribute(
     player,
@@ -84,7 +87,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     ["dazed", "enraged"],
     ["insUp"],
     6,
-    12
+    12,
   );
   const currMight = calculateAttribute(
     player,
@@ -92,7 +95,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     ["weak", "poisoned"],
     ["migUp"],
     6,
-    12
+    12,
   );
   const currWillpower = calculateAttribute(
     player,
@@ -100,7 +103,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
-    12
+    12,
   );
 
   const attributeMap = {
@@ -117,7 +120,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "default" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -127,7 +130,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
       (spell) =>
         spell !== undefined &&
         spell.spellType === "gamble" &&
-        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined)
+        (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.spellName.localeCompare(b.spellName));
 
@@ -135,9 +138,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     if (spell.spellType === "default") {
       const staticSpell = spellList.find((s) => s.name === spell.name);
       const definedSpellProps = Object.fromEntries(
-        Object.entries(spell).filter(([, v]) => v !== undefined && v !== null)
+        Object.entries(spell).filter(([, v]) => v !== undefined && v !== null),
       );
-      setSelectedSpell({ ...staticSpell, ...definedSpellProps, class: spell.className });
+      setSelectedSpell({
+        ...staticSpell,
+        ...definedSpellProps,
+        class: spell.className,
+      });
     } else {
       setSelectedSpell(spell);
     }
@@ -218,8 +225,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               </Typography>
             )}
             <Grid container spacing={2} sx={{ textAlign: "center" }}>
-              <Grid  container size={6}>
-                <Grid  size={12}>
+              <Grid container size={6}>
+                <Grid size={12}>
                   <Typography
                     variant="h3"
                     sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -231,8 +238,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid  container size={6}>
-                <Grid  size={12}>
+              <Grid container size={6}>
+                <Grid size={12}>
                   <Typography
                     variant="h3"
                     sx={{ fontWeight: "bold", textTransform: "uppercase" }}
@@ -244,14 +251,14 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   </Typography>
                 </Grid>
               </Grid>
-              <Grid  sx={{ marginTop: "20px" }} size={12}>
+              <Grid sx={{ marginTop: "20px" }} size={12}>
                 <Typography component="span">
                   {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${attributes[attr2].shortcaps}]`}{" "}
                   {precBonus !== 0 ? " + " + precBonus : ""}
                 </Typography>
               </Grid>
             </Grid>
-          </>
+          </>,
         );
 
         /* Remove mp to the player (player.stats.mp.current - usedMp) */
@@ -298,49 +305,50 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const handleGambleRoll = () => {
     if (!isRolling) {
       const usedMp = selectedSpell.mp * targets;
-  
+
       // Check if the player has enough MP to cast the spell
       if (useMp && player.stats.mp.current < usedMp) {
         return;
       }
-  
+
       const attr = selectedSpell.attr;
       let attValue = attributeMap[attr];
-  
+
       let dices = [];
-  
+
       for (let i = 0; i < targets; i++) {
         // Roll the first dice
         const firstThrow = Math.floor(Math.random() * attValue) + 1;
-  
+
         // Find the matching effect based on the first roll
         const targetEffect = selectedSpell.targets.find(
-          (effect) => firstThrow >= effect.rangeFrom && firstThrow <= effect.rangeTo
+          (effect) =>
+            firstThrow >= effect.rangeFrom && firstThrow <= effect.rangeTo,
         );
-  
+
         const dice = {
           firstThrow: firstThrow,
           effect: targetEffect ? targetEffect.effect : "No effect",
         };
-  
+
         // If there's a second roll, roll a d6 and find the corresponding second effect
         if (targetEffect && targetEffect.secondRoll) {
           dice.secondRoll = true;
           dice.secondThrow = Math.floor(Math.random() * 6) + 1;
-  
+
           const secondEffect = targetEffect.secondEffects.find(
-            (effect) => effect.dieValue === dice.secondThrow
+            (effect) => effect.dieValue === dice.secondThrow,
           );
           dice.secondEffect = secondEffect ? secondEffect.effect : "No effect";
         }
-  
+
         dices.push(dice);
       }
-  
+
       // display of the gamble results
       setDialogMessage(
         <Grid container spacing={2}>
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="body1">
               {t("Choose one of the following effects") + ": "}
             </Typography>
@@ -348,19 +356,21 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               <Typography key={index} variant="h4" sx={{ margin: "10px 0" }}>
                 <strong>{t(`Result`) + " " + (index + 1) + ": "}</strong>
                 <br />
-                <strong>{t("First Dice") + " (d" + attValue + "):"}</strong> ({dice.firstThrow}) - {t(`${dice.effect}`)}
+                <strong>{t("First Dice") + " (d" + attValue + "):"}</strong> (
+                {dice.firstThrow}) - {t(`${dice.effect}`)}
                 {dice.secondRoll && (
                   <>
                     <br />
-                    <strong>{t("Second Dice") + " (d6):"}</strong> ({dice.secondThrow}) - {t(`${dice.secondEffect}`)}
+                    <strong>{t("Second Dice") + " (d6):"}</strong> (
+                    {dice.secondThrow}) - {t(`${dice.secondEffect}`)}
                   </>
                 )}
               </Typography>
             ))}
           </Grid>
-        </Grid>
-      );      
-  
+        </Grid>,
+      );
+
       // Deduct MP from the player
       if (useMp) {
         setPlayer((prevPlayer) => ({
@@ -374,7 +384,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
           },
         }));
       }
-  
+
       // Deduct IP for MagiSphere
       if (selectedSpell?.isMagisphere && useIp) {
         setPlayer((prevPlayer) => ({
@@ -388,14 +398,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
           },
         }));
       }
-  
+
       setIsRolling(true);
     } else {
       setIsRolling(false);
       setDialogMessage("");
     }
   };
-  
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -441,18 +450,27 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
             >
               {t("Spells")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em", flex: 1, width: "100%" }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ padding: "1em", flex: 1, width: "100%" }}
+            >
               {defaultSpells.map((spell, index) => (
                 <Grid
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -478,7 +496,14 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {spell.isOffensive && <OffensiveSpellIcon />}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -522,12 +547,17 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   container
                   spacing={0}
                   key={index}
-                  sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
                   size={{
                     xs: 12,
-                    md: 6
-                  }}>
-                  <Grid  sx={{ display: "flex" }} size={10}>
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
                     <Typography
                       id="spell-left-name"
                       variant="h2"
@@ -552,7 +582,14 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       {gamble.spellName}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch", maxHeight: "40px" }} size={2}>
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      maxHeight: "40px",
+                    }}
+                    size={2}
+                  >
                     <div
                       id="spell-right-controls"
                       style={{
@@ -592,7 +629,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 </Grid>
               ))}
               {magicModifier !== 0 && (
-                <Grid  sx={{ marginTop: "20px" }} size={12}>
+                <Grid sx={{ marginTop: "20px" }} size={12}>
                   <Typography variant="h3" sx={{ fontWeight: "bold" }}>
                     {t("Modifiers")}
                   </Typography>
@@ -611,18 +648,22 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               maxWidth="sm"
             >
               <DialogContent sx={{ p: 0 }}>
-                {selectedSpell && (
-                  selectedSpell.spellType === "default" ? (
+                {selectedSpell &&
+                  (selectedSpell.spellType === "default" ? (
                     <PlayerSpellCard spell={selectedSpell} />
                   ) : selectedSpell.spellType === "gamble" ? (
                     <SpellEntropistGamble gamble={selectedSpell} />
                   ) : (
                     <NonStaticSpellCard item={selectedSpell} />
-                  )
-                )}
+                  ))}
               </DialogContent>
               <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleOK} fullWidth>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOK}
+                  fullWidth
+                >
                   {t("Close")}
                 </Button>
               </DialogActions>
@@ -633,7 +674,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
               slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "50%" } } }
+                paper: { sx: { width: { xs: "90%", md: "50%" } } },
               }}
             >
               <DialogTitle
@@ -643,8 +684,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                     dialogSeverity === "error"
                       ? "#bb2124"
                       : dialogSeverity === "success"
-                      ? "#22bb33"
-                      : "#aaaaaa",
+                        ? "#22bb33"
+                        : "#aaaaaa",
                 }}
                 id="alert-dialog-title"
               >
@@ -654,15 +695,16 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 <DialogContent id="alert-dialog-description">
                   {!isRolling ? (
                     <Grid container sx={{ alignItems: "center" }} spacing={1}>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <Typography variant="body1">
-                          {selectedSpell?.spellType === "default" && t("Select number of targets from 1 to")}
-                          {selectedSpell?.spellType === "gamble" && t("Select number of dices you want to throw")}
-                          {" "}
+                          {selectedSpell?.spellType === "default" &&
+                            t("Select number of targets from 1 to")}
+                          {selectedSpell?.spellType === "gamble" &&
+                            t("Select number of dices you want to throw")}{" "}
                           {selectedSpell?.maxTargets || 1}:
                         </Typography>
                       </Grid>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <Select
                           value={targets}
                           onChange={(e) =>
@@ -677,7 +719,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                               <MenuItem key={i} value={i + 1}>
                                 {i + 1}
                               </MenuItem>
-                            )
+                            ),
                           )}
                         </Select>
                         {useMp && (
@@ -710,7 +752,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           </>
                         )}
                       </Grid>
-                      <Grid  size={12}>
+                      <Grid size={12}>
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -722,7 +764,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         />
                       </Grid>
                       {selectedSpell?.isMagisphere && (
-                        <Grid  size={12}>
+                        <Grid size={12}>
                           <FormControlLabel
                             control={
                               <Checkbox
@@ -741,7 +783,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                 </DialogContent>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleDialogClose} variant="contained" color="secondary">{t("Close")}</Button>
+                <Button
+                  onClick={handleDialogClose}
+                  variant="contained"
+                  color="secondary"
+                >
+                  {t("Close")}
+                </Button>
                 <Button
                   onClick={
                     selectedSpell && selectedSpell?.spellType === "default"

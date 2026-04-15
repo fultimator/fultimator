@@ -37,11 +37,17 @@ function isPilotConfigurationIllegal(formState) {
     if (!vehicle?.modules) return 0;
     return vehicle.modules
       .filter((m) => m.equipped && getModuleTypeForLimits(m) === moduleType)
-      .reduce((count, module) => count + (moduleType === "support" && module.isComplex ? 2 : 1), 0);
+      .reduce(
+        (count, module) =>
+          count + (moduleType === "support" && module.isComplex ? 2 : 1),
+        0,
+      );
   };
 
   return vehicles.some((vehicle) => {
-    const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+    const frameLimits = getFrameLimits(
+      vehicle.frame || "pilot_frame_exoskeleton",
+    );
     const totalSlots = (vehicle.modules || []).reduce((count, module) => {
       if (!module.equipped) return count;
       const moduleType = getModuleTypeForLimits(module);
@@ -91,7 +97,7 @@ export default function UnifiedSpellModal({
       magichant: "magichant",
       magiseed: "magiseed_garden",
       mutant: "mutant_therioforms",
-      "vehicles": "pilot_vehicle",
+      vehicles: "pilot_vehicle",
       symbol: "symbol_symbols",
       therioform: "mutant_therioforms",
       "tinkerer-alchemy": "Alchemy",
@@ -106,20 +112,28 @@ export default function UnifiedSpellModal({
       spellType
     );
   };
-  const resolveInitialSectionId = useCallback((sectionList) => {
-    if (!sectionList || sectionList.length === 0) return "general";
-    if (initialSectionId && sectionList.some((section) => section.id === initialSectionId)) {
-      return initialSectionId;
-    }
-    // Prefer the editable content tab by default when available.
-    if (sectionList.some((section) => section.id === "content")) {
-      return "content";
-    }
-    // Otherwise, default to the first defined section (e.g. cookbook for gourmet).
-    return sectionList[0].id;
-  }, [initialSectionId]);
+  const resolveInitialSectionId = useCallback(
+    (sectionList) => {
+      if (!sectionList || sectionList.length === 0) return "general";
+      if (
+        initialSectionId &&
+        sectionList.some((section) => section.id === initialSectionId)
+      ) {
+        return initialSectionId;
+      }
+      // Prefer the editable content tab by default when available.
+      if (sectionList.some((section) => section.id === "content")) {
+        return "content";
+      }
+      // Otherwise, default to the first defined section (e.g. cookbook for gourmet).
+      return sectionList[0].id;
+    },
+    [initialSectionId],
+  );
 
-  const [activeSectionId, setActiveSectionId] = useState(resolveInitialSectionId(sections));
+  const [activeSectionId, setActiveSectionId] = useState(
+    resolveInitialSectionId(sections),
+  );
   const [formState, setFormState] = useState(spell || {});
 
   const handleDeleteClick = () => {
@@ -133,9 +147,10 @@ export default function UnifiedSpellModal({
     setDeleteConfirmOpen(false);
   };
 
-  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen } = useDeleteConfirmation({
-    onConfirm: handleDeleteConfirm,
-  });
+  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen } =
+    useDeleteConfirmation({
+      onConfirm: handleDeleteConfirm,
+    });
 
   useEffect(() => {
     if (spell) {
@@ -161,7 +176,9 @@ export default function UnifiedSpellModal({
       spellType === "invoker"
         ? {
             ...formState,
-            availableInvocations: buildInvokerAvailableInvocations(formState?.skillLevel),
+            availableInvocations: buildInvokerAvailableInvocations(
+              formState?.skillLevel,
+            ),
           }
         : formState;
 
@@ -172,9 +189,9 @@ export default function UnifiedSpellModal({
     }
   };
 
-
-  const activeSection = sections?.find(s => s.id === activeSectionId);
-  const saveDisabled = spellType === "pilot" && isPilotConfigurationIllegal(formState);
+  const activeSection = sections?.find((s) => s.id === activeSectionId);
+  const saveDisabled =
+    spellType === "pilot" && isPilotConfigurationIllegal(formState);
 
   if (!sections || sections.length === 0) {
     return null;
@@ -186,7 +203,7 @@ export default function UnifiedSpellModal({
         open={open}
         onClose={onClose}
         slotProps={{
-          paper: { sx: { width: "85%", maxWidth: "lg" } }
+          paper: { sx: { width: "85%", maxWidth: "lg" } },
         }}
       >
         <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -250,7 +267,11 @@ export default function UnifiedSpellModal({
           <Button onClick={onClose} variant="outlined">
             {t("Cancel")}
           </Button>
-          <Button onClick={handleSave} variant="contained" disabled={saveDisabled}>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            disabled={saveDisabled}
+          >
             {t("Save")}
           </Button>
         </DialogActions>
@@ -259,7 +280,7 @@ export default function UnifiedSpellModal({
       {onDelete && (
         <DeleteConfirmationDialog
           open={deleteConfirmOpen}
-        onClose={setDeleteConfirmOpen}
+          onClose={setDeleteConfirmOpen}
           onConfirm={handleDeleteConfirm}
           title={t("Delete")}
           message={
@@ -267,10 +288,7 @@ export default function UnifiedSpellModal({
             t("Are you sure you want to delete this spell?")
           }
           itemPreview={
-            spell?.spellName ||
-            spell?.name ||
-            spell?.customName ||
-            spellType
+            spell?.spellName || spell?.name || spell?.customName || spellType
           }
         />
       )}

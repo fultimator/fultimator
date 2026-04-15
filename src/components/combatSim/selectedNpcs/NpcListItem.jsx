@@ -92,8 +92,8 @@ export default function NpcListItem({
             ? "1px solid #fff"
             : "1px solid #555"
           : selectedNpcID && selectedNpcID === npc.combatId
-          ? "1px solid " + primary
-          : "1px solid #ddd",
+            ? "1px solid " + primary
+            : "1px solid #ddd",
         marginY: 1,
         borderRadius: 1,
         display: "flex",
@@ -104,16 +104,16 @@ export default function NpcListItem({
             ? "#5c1010"
             : "#333"
           : npc.combatStats?.currentHp === 0
-          ? "#ffe6e6"
-          : "inherit",
+            ? "#ffe6e6"
+            : "inherit",
         "&:hover": {
           backgroundColor: isDarkMode
             ? npc.combatStats?.currentHp === 0
               ? "#6f0000"
               : "#444"
             : npc.combatStats?.currentHp === 0
-            ? "#ffcccc"
-            : "#f1f1f1",
+              ? "#ffcccc"
+              : "#f1f1f1",
         },
         paddingY: 1,
         flexDirection: "row",

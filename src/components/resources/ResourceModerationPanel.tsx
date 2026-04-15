@@ -58,7 +58,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
 }) => {
   const { t } = useTranslate();
   const [user] = useAuthState(auth);
-  const [pendingSubmissions, setPendingSubmissions] = useState<PendingSubmission[]>([]);
+  const [pendingSubmissions, setPendingSubmissions] = useState<
+    PendingSubmission[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<number | null>(null);
 
@@ -107,7 +109,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       const { error } = await supabase
         .from("submissions")
         .update({
-          status: 'approved',
+          status: "approved",
           reviewed_by: user?.uid,
           reviewed_at: new Date().toISOString(),
         })
@@ -141,14 +143,16 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
             },
             body: JSON.stringify({
               content: null,
-              embeds: [{
-                title: "✅ Homebrew Resource Approved",
-                description: embedDescription,
-                color: 65280, // Green color
-                footer: {
-                  text: "Fultimator Resource System - Approved",
+              embeds: [
+                {
+                  title: "✅ Homebrew Resource Approved",
+                  description: embedDescription,
+                  color: 65280, // Green color
+                  footer: {
+                    text: "Fultimator Resource System - Approved",
+                  },
                 },
-              }],
+              ],
               username: "Fultimator-Resources",
             }),
           });
@@ -158,7 +162,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       }
 
       // Remove from pending list
-      setPendingSubmissions(prev => prev.filter(s => s.id !== submission.id));
+      setPendingSubmissions((prev) =>
+        prev.filter((s) => s.id !== submission.id),
+      );
     } catch (error) {
       console.error("Error approving submission:", error);
       alert("Failed to approve submission: " + (error as Error).message);
@@ -176,10 +182,10 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       const { error } = await supabase
         .from("submissions")
         .update({
-          status: 'rejected',
+          status: "rejected",
           reviewed_by: user?.uid,
           reviewed_at: new Date().toISOString(),
-          rejection_reason: 'Rejected by moderator'
+          rejection_reason: "Rejected by moderator",
         })
         .eq("id", submission.id);
 
@@ -210,14 +216,16 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
             },
             body: JSON.stringify({
               content: null,
-              embeds: [{
-                title: "❌ Homebrew Submission Rejected",
-                description: embedDescription,
-                color: 16711680, // Red color
-                footer: {
-                  text: "Fultimator Submission System - Rejected",
+              embeds: [
+                {
+                  title: "❌ Homebrew Submission Rejected",
+                  description: embedDescription,
+                  color: 16711680, // Red color
+                  footer: {
+                    text: "Fultimator Submission System - Rejected",
+                  },
                 },
-              }],
+              ],
               username: "Fultimator-Resources",
             }),
           });
@@ -227,7 +235,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       }
 
       // Remove from pending list
-      setPendingSubmissions(prev => prev.filter(s => s.id !== submission.id));
+      setPendingSubmissions((prev) =>
+        prev.filter((s) => s.id !== submission.id),
+      );
     } catch (error) {
       console.error("Error rejecting submission:", error);
       alert("Failed to reject submission: " + (error as Error).message);
@@ -236,15 +246,12 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
     }
   };
 
-
   if (!user) {
     return (
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>{t("resources_access_denied")}</DialogTitle>
         <DialogContent>
-          <Alert severity="warning">
-            {t("resources_must_be_logged_in")}
-          </Alert>
+          <Alert severity="warning">{t("resources_must_be_logged_in")}</Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>{t("resources_close")}</Button>
@@ -277,8 +284,8 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       fullWidth
       slotProps={{
         paper: {
-          sx: { minHeight: '70vh' }
-        }
+          sx: { minHeight: "70vh" },
+        },
       }}
     >
       <DialogTitle>
@@ -293,9 +300,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
             <CircularProgress />
           </Box>
         ) : pendingSubmissions.length === 0 ? (
-          <Alert severity="info">
-            {t("resources_no_pending_submissions")}
-          </Alert>
+          <Alert severity="info">{t("resources_no_pending_submissions")}</Alert>
         ) : (
           <Box>
             <Typography variant="h6" gutterBottom>
@@ -303,9 +308,19 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
             </Typography>
 
             {pendingSubmissions.map((submission) => (
-              <Card key={submission.id} sx={{ mb: 2, border: '1px solid #ddd' }}>
+              <Card
+                key={submission.id}
+                sx={{ mb: 2, border: "1px solid #ddd" }}
+              >
                 <CardContent>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
+                    }}
+                  >
                     <Typography variant="h6" component="div">
                       {submission.title}
                     </Typography>
@@ -325,10 +340,14 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                     </Box>
                   </Box>
 
-                  <Typography gutterBottom sx={{
-                    color: "text.secondary"
-                  }}>
-                    <strong>{t("resources_author")}:</strong> {submission.author}
+                  <Typography
+                    gutterBottom
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
+                    <strong>{t("resources_author")}:</strong>{" "}
+                    {submission.author}
                   </Typography>
 
                   <Typography variant="body2">
@@ -340,7 +359,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                       href={submission.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
                       {submission.url}
                       <OpenInNew fontSize="small" />
@@ -349,14 +368,19 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
 
                   {submission.additional_notes && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" component="div" sx={{
-                        whiteSpace: 'pre-line',
-                        backgroundColor: 'rgba(0,0,0,0.05)',
-                        p: 2,
-                        borderRadius: 1,
-                        fontSize: '0.75rem'
-                      }}>
-                        <strong>Additional Notes:</strong><br />
+                      <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{
+                          whiteSpace: "pre-line",
+                          backgroundColor: "rgba(0,0,0,0.05)",
+                          p: 2,
+                          borderRadius: 1,
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        <strong>Additional Notes:</strong>
+                        <br />
                         {submission.additional_notes}
                       </Typography>
                     </Box>
@@ -364,21 +388,41 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
 
                   <Divider sx={{ my: 2 }} />
 
-                  <Typography variant="caption" sx={{
-                    color: "text.secondary"
-                  }}>
-                    <strong>Submitted:</strong> {new Date(submission.created_at).toLocaleString()} <br />
-                    <strong>Pricing:</strong> {submission.pricing_type || "Not specified"} <br />
-                    <strong>AI Content:</strong> {submission.uses_ai_content ? "Yes" : "No"} <br />
-                    <strong>Discord:</strong> {submission.discord_account || "Not provided"} <br />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
+                    <strong>Submitted:</strong>{" "}
+                    {new Date(submission.created_at).toLocaleString()} <br />
+                    <strong>Pricing:</strong>{" "}
+                    {submission.pricing_type || "Not specified"} <br />
+                    <strong>AI Content:</strong>{" "}
+                    {submission.uses_ai_content ? "Yes" : "No"} <br />
+                    <strong>Discord:</strong>{" "}
+                    {submission.discord_account || "Not provided"} <br />
                     <strong>Status:</strong> Pending Approval
                   </Typography>
 
-                  <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      justifyContent: "flex-end",
+                      mt: 2,
+                    }}
+                  >
                     <Button
                       variant="outlined"
                       color="error"
-                      startIcon={processing === submission.id ? <CircularProgress size={16} /> : <Cancel />}
+                      startIcon={
+                        processing === submission.id ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <Cancel />
+                        )
+                      }
                       disabled={processing === submission.id}
                       onClick={() => rejectSubmission(submission)}
                     >
@@ -387,7 +431,13 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
                     <Button
                       variant="contained"
                       color="success"
-                      startIcon={processing === submission.id ? <CircularProgress size={16} /> : <CheckCircle />}
+                      startIcon={
+                        processing === submission.id ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <CheckCircle />
+                        )
+                      }
                       disabled={processing === submission.id}
                       onClick={() => approveSubmission(submission)}
                     >

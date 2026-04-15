@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
 import { IS_ELECTRON, SUPPORTS_LOCAL_DB } from "../../platform";
-  // Local DB export / import
+// Local DB export / import
 import {
   getAuth,
   onAuthStateChanged,
@@ -39,7 +39,7 @@ import type { UserCredential } from "@platform/db";
 import { GoogleAuthProvider } from "firebase/auth";
 import { storeAccessToken } from "@platform/db";
 import { exportDatabase, importDatabase } from "../../utility/dbExportImport";
-  // Drive sync
+// Drive sync
 import DarkModeToggle, { DarkModeToggleProps } from "./DarkModeToggle";
 import ThemeSwitcher, { ThemeSwitcherProps } from "./ThemeSwitcher";
 import LanguageMenu from "./LanguageMenu";
@@ -124,7 +124,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
   const handleAuthentication = async (
     authAction: () => Promise<UserCredential | void>,
     successMessage: string,
-    errorMessagePrefix: string
+    errorMessagePrefix: string,
   ): Promise<void> => {
     try {
       await authAction();
@@ -141,7 +141,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     await handleAuthentication(
       () => firebaseSignOut(auth),
       t("Signed Out", true),
-      t("Sign-out Error", true)
+      t("Sign-out Error", true),
     );
   };
 
@@ -157,7 +157,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         return result;
       },
       t("Signed In", true),
-      t("Sign-in Error", true)
+      t("Sign-in Error", true),
     );
   };
 
@@ -173,7 +173,7 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         return result;
       },
       t("Switched Google Account", true),
-      t("Account Switch Error", true)
+      t("Account Switch Error", true),
     );
   };
 
@@ -264,17 +264,23 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         {isAuthenticated ? (
           <>
             <MenuItem onClick={handleSwitchAccount}>
-              <ListItemIcon><SwitchAccount /></ListItemIcon>
+              <ListItemIcon>
+                <SwitchAccount />
+              </ListItemIcon>
               <ListItemText primary={t("Switch Account")} />
             </MenuItem>
             <MenuItem onClick={handleSignOut}>
-              <ListItemIcon><Logout /></ListItemIcon>
+              <ListItemIcon>
+                <Logout />
+              </ListItemIcon>
               <ListItemText primary={t("Sign Out")} />
             </MenuItem>
           </>
         ) : (
           <MenuItem onClick={signInWithGoogle}>
-            <ListItemIcon><Login /></ListItemIcon>
+            <ListItemIcon>
+              <Login />
+            </ListItemIcon>
             <ListItemText primary={t("Sign In")} />
           </MenuItem>
         )}
@@ -282,10 +288,16 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         <Divider />
 
         <MenuItem>
-          <DarkModeToggle isDarkMode={isDarkMode} onToggleDarkMode={onToggleDarkMode} />
+          <DarkModeToggle
+            isDarkMode={isDarkMode}
+            onToggleDarkMode={onToggleDarkMode}
+          />
         </MenuItem>
 
-        <ThemeSwitcher selectedTheme={selectedTheme} onSelectTheme={onSelectTheme} />
+        <ThemeSwitcher
+          selectedTheme={selectedTheme}
+          onSelectTheme={onSelectTheme}
+        />
         <Divider />
 
         <LanguageMenu />
@@ -304,7 +316,9 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         <Divider />
 
         <MenuItem onClick={handleDialogOpen}>
-          <ListItemIcon><Help /></ListItemIcon>
+          <ListItemIcon>
+            <Help />
+          </ListItemIcon>
           <ListItemText primary={t("Help & Feedback")} />
         </MenuItem>
 
@@ -312,7 +326,9 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         {displayVersion && [
           <Divider key="version-divider" />,
           <MenuItem key="version" disabled>
-            <ListItemIcon><Info /></ListItemIcon>
+            <ListItemIcon>
+              <Info />
+            </ListItemIcon>
             <ListItemText
               primary={`${t("Version")} ${displayVersion}${IS_ELECTRON ? "" : " (web)"}`}
             />
@@ -343,7 +359,9 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         userEmail={userEmail}
         userUUID={userUUID}
         title={"Help & Feedback"}
-        placeholder={t("How can we help you today? Please leave a message in english!")}
+        placeholder={t(
+          "How can we help you today? Please leave a message in english!",
+        )}
         onSuccess={() => console.log("Successfully submitted feedback")}
         webhookUrl={import.meta.env.VITE_DISCORD_FEEDBACK_WEBHOOK_URL || ""}
       />
@@ -353,14 +371,24 @@ const MenuOption: React.FC<MenuOptionProps> = ({
         <DialogTitle>{t("Confirm Import")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t("Are you sure you want to import? This will replace your current local database.")}
+            {t(
+              "Are you sure you want to import? This will replace your current local database.",
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleImportCancel} color="secondary" variant="contained">
+          <Button
+            onClick={handleImportCancel}
+            color="secondary"
+            variant="contained"
+          >
             {t("Cancel")}
           </Button>
-          <Button onClick={handleImportConfirm} color="error" variant="contained">
+          <Button
+            onClick={handleImportConfirm}
+            color="error"
+            variant="contained"
+          >
             {t("Confirm")}
           </Button>
         </DialogActions>

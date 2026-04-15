@@ -49,31 +49,36 @@ const skills = [
   },
   {
     name: "Fortress",
-    description: "Permanently increase your maximum Hit Points by **【 SL × 3】**.",
+    description:
+      "Permanently increase your maximum Hit Points by **【 SL × 3】**.",
     class: "Guardian",
     maxLvl: 5,
   },
   {
     name: "Focused",
-    description: "Permanently increase your maximum Mind Points by **【 SL × 3】**.",
+    description:
+      "Permanently increase your maximum Mind Points by **【 SL × 3】**.",
     class: "Loremaster",
     maxLvl: 5,
   },
   {
     name: "Dodge",
-    description: "As long as you have no **shields** and no **martial armor** equipped, your Defense score is increased by **【SL】**",
+    description:
+      "As long as you have no **shields** and no **martial armor** equipped, your Defense score is increased by **【SL】**",
     class: "Rogue",
     maxLvl: 3,
   },
   {
     name: "Ranged Weapon Mastery",
-    description: "You gain a bonus equal to **【SL】** to all Accuracy Checks with **ranged** weapons.",
+    description:
+      "You gain a bonus equal to **【SL】** to all Accuracy Checks with **ranged** weapons.",
     class: "Sharpshooter",
     maxLvl: 4,
   },
   {
     name: "Melee Weapon Mastery",
-    description: "You gain a bonus equal to **【SL】** to all Accuracy Checks with **melee** weapons.",
+    description:
+      "You gain a bonus equal to **【SL】** to all Accuracy Checks with **melee** weapons.",
     class: "Weaponmaster",
     maxLvl: 4,
   },
@@ -82,7 +87,7 @@ const skills = [
     description: "Faithful Companion description",
     class: "Wayfarer",
     maxLvl: 5,
-  }
+  },
 ];
 
 export default skills;

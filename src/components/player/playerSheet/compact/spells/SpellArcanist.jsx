@@ -11,20 +11,32 @@ import rehypeRaw from "rehype-raw";
 import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 
-const StyledTableCell = styled(TableCell)({ 
+const StyledTableCell = styled(TableCell)({
   padding: "2px 4px",
   fontSize: "0.8rem",
-  borderBottom: "1px solid rgba(224, 224, 224, 1)"
+  borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
 const StyledMarkdown = ({ children, ...props }) => {
   return (
-    <div style={{ whiteSpace: "pre-line", display: "inline", margin: 0, padding: 0 }}>
+    <div
+      style={{
+        whiteSpace: "pre-line",
+        display: "inline",
+        margin: 0,
+        padding: 0,
+      }}
+    >
       <ReactMarkdown
         {...props}
         rehypePlugins={[rehypeRaw]}
         components={{
-          p: (props) => <p style={{ margin: 0, padding: 0, fontSize: "0.75rem" }} {...props} />,
+          p: (props) => (
+            <p
+              style={{ margin: 0, padding: 0, fontSize: "0.75rem" }}
+              {...props}
+            />
+          ),
           ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
           li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
           strong: (props) => (
@@ -32,7 +44,10 @@ const StyledMarkdown = ({ children, ...props }) => {
           ),
           em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
           mark: (props) => (
-            <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />
+            <mark
+              style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }}
+              {...props}
+            />
           ),
         }}
       >
@@ -46,26 +61,33 @@ export default function SpellArcanist({ arcana, rework }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const gradientColor = isDarkMode ? '#1f1f1f' : '#fff';
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   return (
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
       <TableBody>
         {/* Header Row */}
         <TableRow sx={{ backgroundColor: theme.primary }}>
-          <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}>
+          <StyledTableCell
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
+          >
             {arcana.name}
           </StyledTableCell>
         </TableRow>
-        
+
         {/* Description Row */}
-          <TableRow sx={{ backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})` }}>
+        <TableRow
+          sx={{
+            backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+          }}
+        >
           <StyledTableCell>
             <Typography
               sx={{
                 fontStyle: "italic",
-                fontSize: "0.8rem"
-              }}>
+                fontSize: "0.8rem",
+              }}
+            >
               {!arcana.description ? (
                 t("No Description")
               ) : (
@@ -74,9 +96,14 @@ export default function SpellArcanist({ arcana, rework }) {
                   allowedElements={["strong", "em", "mark"]}
                   unwrapDisallowed={true}
                   components={{
-                    p: (props) => <span style={{ fontSize: "0.8rem" }} {...props} />,
+                    p: (props) => (
+                      <span style={{ fontSize: "0.8rem" }} {...props} />
+                    ),
                     mark: (props) => (
-                      <mark style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }} {...props} />
+                      <mark
+                        style={{ backgroundColor: "#ffeb3b", padding: "0 1px" }}
+                        {...props}
+                      />
                     ),
                   }}
                 >
@@ -97,7 +124,9 @@ export default function SpellArcanist({ arcana, rework }) {
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
                   components={{
-                    p: (props) => <span style={{ fontSize: "0.8rem" }} {...props} />,
+                    p: (props) => (
+                      <span style={{ fontSize: "0.8rem" }} {...props} />
+                    ),
                   }}
                 >
                   {arcana.domain}
@@ -109,7 +138,9 @@ export default function SpellArcanist({ arcana, rework }) {
 
         {/* Merge Row */}
         <TableRow sx={{ backgroundColor: theme.secondary }}>
-          <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}>
+          <StyledTableCell
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+          >
             {t("MERGE")}: {arcana.merge}
           </StyledTableCell>
         </TableRow>
@@ -119,7 +150,10 @@ export default function SpellArcanist({ arcana, rework }) {
               {!arcana.mergeDesc ? (
                 t("No Merge Benefit")
               ) : (
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed
+                >
                   {arcana.mergeDesc}
                 </StyledMarkdown>
               )}
@@ -131,7 +165,9 @@ export default function SpellArcanist({ arcana, rework }) {
         {rework && (
           <>
             <TableRow sx={{ backgroundColor: theme.secondary }}>
-              <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}>
+              <StyledTableCell
+                sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+              >
                 {t("PULSE")}: {arcana.pulse}
               </StyledTableCell>
             </TableRow>
@@ -141,7 +177,10 @@ export default function SpellArcanist({ arcana, rework }) {
                   {!arcana.pulseDesc ? (
                     t("No Pulse Benefit")
                   ) : (
-                    <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed
+                    >
                       {arcana.pulseDesc}
                     </StyledMarkdown>
                   )}
@@ -153,7 +192,9 @@ export default function SpellArcanist({ arcana, rework }) {
 
         {/* Dismiss Row */}
         <TableRow sx={{ backgroundColor: theme.secondary }}>
-          <StyledTableCell sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}>
+          <StyledTableCell
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+          >
             {t("DISMISS")}: {arcana.dismiss}
           </StyledTableCell>
         </TableRow>
@@ -163,7 +204,10 @@ export default function SpellArcanist({ arcana, rework }) {
               {!arcana.dismissDesc ? (
                 t("No Dismiss Benefit")
               ) : (
-                <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+                <StyledMarkdown
+                  allowedElements={["strong", "em"]}
+                  unwrapDisallowed
+                >
                   {arcana.dismissDesc}
                 </StyledMarkdown>
               )}

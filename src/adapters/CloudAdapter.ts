@@ -25,7 +25,12 @@ import {
 } from "react-firebase-hooks/firestore";
 import { firestore } from "../firebase";
 import { STORES, getDb } from "../platform/idb";
-import type { DatabaseAdapter, DbError, DbErrorCode, WriteBatch } from "../types/Database";
+import type {
+  DatabaseAdapter,
+  DbError,
+  DbErrorCode,
+  WriteBatch,
+} from "../types/Database";
 
 function normalizeFirestoreError(err: unknown): DbError {
   if (err && typeof err === "object" && "code" in err) {
@@ -50,10 +55,11 @@ export const CloudAdapter: DatabaseAdapter = {
   query: (ref: unknown, ...constraints: unknown[]) =>
     query(
       ref as CollectionReference | Query,
-      ...(constraints as Parameters<typeof query>[1][])
+      ...(constraints as Parameters<typeof query>[1][]),
     ),
 
-  where: (field, op, value) => where(field, op as Parameters<typeof where>[1], value),
+  where: (field, op, value) =>
+    where(field, op as Parameters<typeof where>[1], value),
 
   orderBy: (field, direction) => orderBy(field, direction),
 
@@ -122,7 +128,7 @@ export const CloudAdapter: DatabaseAdapter = {
   useCollectionData(queryRef: unknown) {
     const [data, loading, err] = useCollectionDataFirestore(
       queryRef as Query | null | undefined,
-      { idField: "id" }
+      { idField: "id" },
     );
     const dbError: DbError | null = err ? normalizeFirestoreError(err) : null;
     return [data ?? [], loading, dbError];
@@ -131,7 +137,7 @@ export const CloudAdapter: DatabaseAdapter = {
   useDocumentData(ref: unknown) {
     const [data, loading, err] = useDocumentDataFirestore(
       ref as DocumentReference | null | undefined,
-      { idField: "id" }
+      { idField: "id" },
     );
     const dbError: DbError | null = err ? normalizeFirestoreError(err) : null;
     return [data, loading, dbError];

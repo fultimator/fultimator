@@ -17,11 +17,21 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Add, ExpandMore, Delete, ErrorOutlined, Search, ContentCopy } from "@mui/icons-material";
+import {
+  Add,
+  ExpandMore,
+  Delete,
+  ErrorOutlined,
+  Search,
+  ContentCopy,
+} from "@mui/icons-material";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import VehicleModule from "../VehicleModule";
-import { availableFrames, availableModules } from "../../../../libs/pilotVehicleData";
+import {
+  availableFrames,
+  availableModules,
+} from "../../../../libs/pilotVehicleData";
 import CustomTextarea from "../../../common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 
@@ -32,7 +42,7 @@ import ReactMarkdown from "react-markdown";
 export default function PilotContentSection({ formState, setFormState, t }) {
   const vehicles = useMemo(
     () => formState?.vehicles || formState?.currentVehicles || [],
-    [formState?.vehicles, formState?.currentVehicles]
+    [formState?.vehicles, formState?.currentVehicles],
   );
 
   const [deleteConfirmation, setDeleteConfirmation] = useState({
@@ -54,14 +64,15 @@ export default function PilotContentSection({ formState, setFormState, t }) {
     (updater) => {
       setFormState((prev) => {
         const current = prev?.vehicles || prev?.currentVehicles || [];
-        const nextVehicles = typeof updater === "function" ? updater(current) : updater;
+        const nextVehicles =
+          typeof updater === "function" ? updater(current) : updater;
         return {
           ...prev,
           vehicles: nextVehicles,
         };
       });
     },
-    [setFormState]
+    [setFormState],
   );
 
   const getFrameLimits = useCallback((frameName) => {
@@ -85,28 +96,32 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           return count + (moduleType === "support" && module.isComplex ? 2 : 1);
         }, 0);
     },
-    [getModuleTypeForLimits]
+    [getModuleTypeForLimits],
   );
 
   const getSlotUsageText = useCallback(
     (vehicle, moduleType) => {
-      const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+      const frameLimits = getFrameLimits(
+        vehicle.frame || "pilot_frame_exoskeleton",
+      );
       const equipped = getEquippedCount(vehicle, moduleType);
       const limit = frameLimits[moduleType];
       if (limit === -1) return `(${equipped}/∞)`;
       return `(${equipped}/${limit})`;
     },
-    [getFrameLimits, getEquippedCount]
+    [getFrameLimits, getEquippedCount],
   );
 
   const isSlotUsageOverLimit = useCallback(
     (vehicle, moduleType) => {
-      const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+      const frameLimits = getFrameLimits(
+        vehicle.frame || "pilot_frame_exoskeleton",
+      );
       const equipped = getEquippedCount(vehicle, moduleType);
       const limit = frameLimits[moduleType];
       return limit !== -1 && equipped > limit;
     },
-    [getFrameLimits, getEquippedCount]
+    [getFrameLimits, getEquippedCount],
   );
 
   const canEquipModule = useCallback(
@@ -123,11 +138,16 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return count + (mType === "support" && m.isComplex ? 2 : 1);
       }, 0);
 
-      if (!module.equipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
+      if (
+        !module.equipped &&
+        totalUsedSlots + slotsNeeded > maxEnabledModules
+      ) {
         return false;
       }
 
-      const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+      const frameLimits = getFrameLimits(
+        vehicle.frame || "pilot_frame_exoskeleton",
+      );
       if (frameType === "custom") return true;
       if (frameLimits[frameType] === -1) return true;
 
@@ -136,24 +156,27 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           (m, idx) =>
             idx !== moduleIndex &&
             m.equipped &&
-            getModuleTypeForLimits(m) === "weapon"
+            getModuleTypeForLimits(m) === "weapon",
         );
 
-        const hasBothHandsWeapon = equippedWeapons.some((m) => m.equippedSlot === "both");
+        const hasBothHandsWeapon = equippedWeapons.some(
+          (m) => m.equippedSlot === "both",
+        );
         if (hasBothHandsWeapon) return false;
 
         if (!module.equipped) {
           const mainOccupied = equippedWeapons.some(
-            (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "main"
+            (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "main",
           );
           const offOccupied = equippedWeapons.some(
-            (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "off"
+            (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "off",
           );
 
           if (module.isShield) {
             if (!offOccupied) return true;
             const offHandShield = equippedWeapons.find(
-              (m) => m.isShield && (m.equippedSlot === "off" || !m.equippedSlot)
+              (m) =>
+                m.isShield && (m.equippedSlot === "off" || !m.equippedSlot),
             );
             return !!offHandShield && !mainOccupied;
           }
@@ -161,13 +184,14 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           return !mainOccupied || !offOccupied;
         }
 
-        const proposedSlot = module.equippedSlot || (module.isShield ? "off" : "main");
+        const proposedSlot =
+          module.equippedSlot || (module.isShield ? "off" : "main");
         if (proposedSlot === "both") {
           return equippedWeapons.length === 0;
         }
 
         const occupiedSlots = equippedWeapons.map(
-          (m) => m.equippedSlot || (m.isShield ? "off" : "main")
+          (m) => m.equippedSlot || (m.isShield ? "off" : "main"),
         );
         return !occupiedSlots.includes(proposedSlot);
       }
@@ -177,7 +201,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           (m, idx) =>
             idx !== moduleIndex &&
             m.equipped &&
-            getModuleTypeForLimits(m) === frameType
+            getModuleTypeForLimits(m) === frameType,
         )
         .reduce((count, m) => {
           return count + (frameType === "support" && m.isComplex ? 2 : 1);
@@ -185,42 +209,52 @@ export default function PilotContentSection({ formState, setFormState, t }) {
 
       return currentlyEquippedSlots + slotsNeeded <= frameLimits[frameType];
     },
-    [getFrameLimits, getModuleTypeForLimits]
+    [getFrameLimits, getModuleTypeForLimits],
   );
 
   // Memoize ReactMarkdown components to prevent recreation on every render
   const markdownComponents = useMemo(
     () => ({
-      p: ({ _node, ...props }) => <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />,
-      strong: ({ _node, ...props }) => <strong style={{ fontWeight: "bold" }} {...props} />,
+      p: ({ _node, ...props }) => (
+        <p style={{ margin: "0 0 8px 0", fontSize: "0.875rem" }} {...props} />
+      ),
+      strong: ({ _node, ...props }) => (
+        <strong style={{ fontWeight: "bold" }} {...props} />
+      ),
     }),
-    []
+    [],
   );
 
   // Memoize passenger/distance text generators
-  const getPassengersText = useCallback((passengers) => {
-    switch (passengers) {
-      case 0:
-        return t("None");
-      case 1:
-        return t("pilot_passengers_up_1");
-      case 2:
-        return t("pilot_passengers_up_2");
-      case 3:
-        return t("pilot_passengers_up_3");
-      default:
-        return t("None");
-    }
-  }, [t]);
+  const getPassengersText = useCallback(
+    (passengers) => {
+      switch (passengers) {
+        case 0:
+          return t("None");
+        case 1:
+          return t("pilot_passengers_up_1");
+        case 2:
+          return t("pilot_passengers_up_2");
+        case 3:
+          return t("pilot_passengers_up_3");
+        default:
+          return t("None");
+      }
+    },
+    [t],
+  );
 
   const getDistanceText = useCallback(
-    (distance) => (distance === 1 ? t("pilot_distance_no_mod") : `x${distance}`),
-    [t]
+    (distance) =>
+      distance === 1 ? t("pilot_distance_no_mod") : `x${distance}`,
+    [t],
   );
 
   const isAnyVehicleIllegal = useMemo(() => {
     return vehicles.some((vehicle) => {
-      const frameLimits = getFrameLimits(vehicle.frame || "pilot_frame_exoskeleton");
+      const frameLimits = getFrameLimits(
+        vehicle.frame || "pilot_frame_exoskeleton",
+      );
       const totalSlots = (vehicle.modules || []).reduce((count, m) => {
         if (!m.equipped) return count;
         const mType = getModuleTypeForLimits(m);
@@ -270,7 +304,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return updated;
       });
     },
-    [updateVehicles]
+    [updateVehicles],
   );
 
   const handleDeleteVehicleClick = useCallback(
@@ -284,14 +318,20 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         name: vehicle?.customName || vehicle?.name || `Vehicle ${index + 1}`,
       });
     },
-    [vehicles]
+    [vehicles],
   );
 
   const handleConfirmDeleteVehicle = useCallback(() => {
     updateVehicles((current) =>
-      current.filter((_, i) => i !== deleteConfirmation.vehicleIndex)
+      current.filter((_, i) => i !== deleteConfirmation.vehicleIndex),
     );
-    setDeleteConfirmation({ open: false, type: null, vehicleIndex: null, moduleIndex: null, name: "" });
+    setDeleteConfirmation({
+      open: false,
+      type: null,
+      vehicleIndex: null,
+      moduleIndex: null,
+      name: "",
+    });
   }, [deleteConfirmation.vehicleIndex, updateVehicles]);
 
   const handleCloneVehicle = useCallback(
@@ -310,7 +350,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return updated;
       });
     },
-    [updateVehicles]
+    [updateVehicles],
   );
 
   const handleAddModule = useCallback(
@@ -334,7 +374,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return updated;
       });
     },
-    [updateVehicles]
+    [updateVehicles],
   );
 
   const handleModuleChange = useCallback(
@@ -358,23 +398,34 @@ export default function PilotContentSection({ formState, setFormState, t }) {
               equippedSlot: currentModule.equippedSlot || null,
               customName:
                 selected.name === "pilot_custom_armor" ||
-                  selected.name === "pilot_custom_weapon" ||
-                  selected.name === "pilot_custom_support"
+                selected.name === "pilot_custom_weapon" ||
+                selected.name === "pilot_custom_support"
                   ? currentModule.customName || ""
                   : "",
             };
           }
         } else if (field === "equipped") {
           const normalizeWeaponSlot = (mod) => {
-            if (mod?.equippedSlot === "main" || mod?.equippedSlot === "off" || mod?.equippedSlot === "both") {
+            if (
+              mod?.equippedSlot === "main" ||
+              mod?.equippedSlot === "off" ||
+              mod?.equippedSlot === "both"
+            ) {
               return mod.equippedSlot;
             }
             return mod?.isShield ? "off" : "main";
           };
 
-          const resolveWeaponEquipSlot = (allModules, modIndex, moduleToEquip) => {
+          const resolveWeaponEquipSlot = (
+            allModules,
+            modIndex,
+            moduleToEquip,
+          ) => {
             const equippedWeapons = (allModules || []).filter(
-              (m, idx) => idx !== modIndex && m.equipped && m.type === "pilot_module_weapon"
+              (m, idx) =>
+                idx !== modIndex &&
+                m.equipped &&
+                m.type === "pilot_module_weapon",
             );
 
             if (moduleToEquip.cumbersome) return "both";
@@ -408,13 +459,21 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             if (currentModule.type === "pilot_module_armor") return "armor";
             if (currentModule.type === "pilot_module_support") return "support";
             if (currentModule.type === "pilot_module_weapon") {
-              return resolveWeaponEquipSlot(modules, moduleIndex, currentModule);
+              return resolveWeaponEquipSlot(
+                modules,
+                moduleIndex,
+                currentModule,
+              );
             }
             return currentModule.equippedSlot || null;
           })();
 
           // Keep state unchanged when equip was requested but no valid slot is available.
-          if (value && currentModule.type === "pilot_module_weapon" && !resolvedSlot) {
+          if (
+            value &&
+            currentModule.type === "pilot_module_weapon" &&
+            !resolvedSlot
+          ) {
             return current;
           }
 
@@ -445,7 +504,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             };
 
             const otherEquippedWeapons = modules.filter(
-              (m, idx) => idx !== moduleIndex && m.equipped && m.type === "pilot_module_weapon"
+              (m, idx) =>
+                idx !== moduleIndex &&
+                m.equipped &&
+                m.type === "pilot_module_weapon",
             );
 
             // Cumbersome weapons always take both hands.
@@ -463,7 +525,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                 return slot === "both" || slot === requestedHand;
               });
 
-              const conflictingBoth = conflictingWeapons.some((m) => normalizeSlot(m) === "both");
+              const conflictingBoth = conflictingWeapons.some(
+                (m) => normalizeSlot(m) === "both",
+              );
               const currentHand = normalizeSlot(currentModule);
               const oppositeHand = requestedHand === "main" ? "off" : "main";
               const canSwap =
@@ -477,7 +541,8 @@ export default function PilotContentSection({ formState, setFormState, t }) {
 
               if (canSwap) {
                 const swapTargetIndex = modules.findIndex(
-                  (m, idx) => idx !== moduleIndex && m === conflictingWeapons[0]
+                  (m, idx) =>
+                    idx !== moduleIndex && m === conflictingWeapons[0],
                 );
                 if (swapTargetIndex >= 0) {
                   modules[swapTargetIndex] = {
@@ -490,7 +555,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
 
             if (currentModule.isShield && value === "main") {
               const projectedOtherWeapons = modules.filter(
-                (m, idx) => idx !== moduleIndex && m.equipped && m.type === "pilot_module_weapon"
+                (m, idx) =>
+                  idx !== moduleIndex &&
+                  m.equipped &&
+                  m.type === "pilot_module_weapon",
               );
               const hasOffHandShield = projectedOtherWeapons.some((m) => {
                 const slot = normalizeSlot(m);
@@ -516,7 +584,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return updated;
       });
     },
-    [updateVehicles]
+    [updateVehicles],
   );
 
   const handleDeleteModuleClick = useCallback(
@@ -530,7 +598,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         name: module?.customName || module?.name || `Module ${moduleIndex + 1}`,
       });
     },
-    [vehicles]
+    [vehicles],
   );
 
   const handleConfirmDeleteModule = useCallback(() => {
@@ -538,13 +606,23 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       const updated = [...current];
       const vehicle = { ...updated[deleteConfirmation.vehicleIndex] };
       vehicle.modules = (vehicle.modules || []).filter(
-        (_, i) => i !== deleteConfirmation.moduleIndex
+        (_, i) => i !== deleteConfirmation.moduleIndex,
       );
       updated[deleteConfirmation.vehicleIndex] = vehicle;
       return updated;
     });
-    setDeleteConfirmation({ open: false, type: null, vehicleIndex: null, moduleIndex: null, name: "" });
-  }, [deleteConfirmation.vehicleIndex, deleteConfirmation.moduleIndex, updateVehicles]);
+    setDeleteConfirmation({
+      open: false,
+      type: null,
+      vehicleIndex: null,
+      moduleIndex: null,
+      name: "",
+    });
+  }, [
+    deleteConfirmation.vehicleIndex,
+    deleteConfirmation.moduleIndex,
+    updateVehicles,
+  ]);
 
   const handleCloneModule = useCallback(
     (vehicleIndex, moduleIndex) => {
@@ -558,16 +636,13 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         return updated;
       });
     },
-    [updateVehicles]
+    [updateVehicles],
   );
 
-  const handleCompendiumVehicleImport = useCallback(
-    () => {
-      handleAddVehicle();
-      setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }));
-    },
-    [handleAddVehicle]
-  );
+  const handleCompendiumVehicleImport = useCallback(() => {
+    handleAddVehicle();
+    setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }));
+  }, [handleAddVehicle]);
 
   const handleCompendiumModuleImport = useCallback(
     (item) => {
@@ -603,34 +678,47 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         vehicleIndexForModule: null,
       }));
     },
-    [compendiumState, updateVehicles]
+    [compendiumState, updateVehicles],
   );
 
   return (
     <Grid container spacing={2}>
-      <Grid  size={12}>
+      <Grid size={12}>
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
           <Tooltip title={t("Browse Compendium")}>
             <IconButton
               size="small"
-              onClick={() => setCompendiumState((prev) => ({ ...prev, vehiclesOpen: true }))}
-              sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
+              onClick={() =>
+                setCompendiumState((prev) => ({ ...prev, vehiclesOpen: true }))
+              }
+              sx={{
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 2,
+              }}
             >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Button size="small" variant="outlined" startIcon={<Add />} onClick={handleAddVehicle}>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={handleAddVehicle}
+          >
             {t("pilot_vehicles_add")}
           </Button>
         </Box>
       </Grid>
       {Array.isArray(vehicles) && vehicles.length > 0 ? (
         vehicles.map((vehicle, vehicleIndex) => (
-          <Grid  key={vehicleIndex} size={12}>
+          <Grid key={vehicleIndex} size={12}>
             <Accordion defaultExpanded={vehicleIndex === 0}>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography>
-                  {vehicle.customName || vehicle.name || `${t("pilot_vehicle")} ${vehicleIndex + 1}`}
+                  {vehicle.customName ||
+                    vehicle.name ||
+                    `${t("pilot_vehicle")} ${vehicleIndex + 1}`}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -638,14 +726,19 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 8
-                    }}>
+                      sm: 8,
+                    }}
+                  >
                     <TextField
                       fullWidth
                       label={t("pilot_vehicles_name")}
                       value={vehicle.customName || ""}
                       onChange={(e) =>
-                        handleVehicleChange(vehicleIndex, "customName", e.target.value)
+                        handleVehicleChange(
+                          vehicleIndex,
+                          "customName",
+                          e.target.value,
+                        )
                       }
                     />
                   </Grid>
@@ -653,13 +746,15 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                   <Grid
                     size={{
                       xs: 12,
-                      sm: 4
-                    }}>
+                      sm: 4,
+                    }}
+                  >
                     <Box
                       sx={{
                         display: "flex",
-                        gap: 1
-                      }}>
+                        gap: 1,
+                      }}
+                    >
                       <Button
                         onClick={() => handleDeleteVehicleClick(vehicleIndex)}
                         variant="outlined"
@@ -679,7 +774,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                       </Button>
                       <Button
                         onClick={() =>
-                          handleVehicleChange(vehicleIndex, "enabled", !vehicle.enabled)
+                          handleVehicleChange(
+                            vehicleIndex,
+                            "enabled",
+                            !vehicle.enabled,
+                          )
                         }
                         variant={vehicle.enabled ? "contained" : "outlined"}
                         color={vehicle.enabled ? "success" : "primary"}
@@ -690,30 +789,41 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     </Box>
                   </Grid>
 
-                  <Grid  size={12}>
+                  <Grid size={12}>
                     <CustomTextarea
                       label={t("pilot_vehicles_description")}
                       value={vehicle.description || ""}
                       onChange={(e) =>
-                        handleVehicleChange(vehicleIndex, "description", e.target.value)
+                        handleVehicleChange(
+                          vehicleIndex,
+                          "description",
+                          e.target.value,
+                        )
                       }
                     />
                   </Grid>
 
-                  <Grid  size={12}>
-                    <Typography variant="h6">{t("pilot_vehicles_frame")}</Typography>
+                  <Grid size={12}>
+                    <Typography variant="h6">
+                      {t("pilot_vehicles_frame")}
+                    </Typography>
                     <Grid container spacing={2} sx={{ mt: 1, mb: 2 }}>
                       <Grid
                         size={{
                           xs: 12,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         <FormControl fullWidth>
                           <InputLabel>{t("pilot_frame_type")}</InputLabel>
                           <Select
                             value={vehicle.frame || "pilot_frame_exoskeleton"}
                             onChange={(e) =>
-                              handleVehicleChange(vehicleIndex, "frame", e.target.value)
+                              handleVehicleChange(
+                                vehicleIndex,
+                                "frame",
+                                e.target.value,
+                              )
                             }
                           >
                             {availableFrames.map((frame) => (
@@ -728,23 +838,38 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                       <Grid
                         size={{
                           xs: 12,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         {(() => {
                           const currentFrame = availableFrames.find(
-                            (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton")
+                            (f) =>
+                              f.name ===
+                              (vehicle.frame || "pilot_frame_exoskeleton"),
                           );
                           if (!currentFrame) return null;
 
                           return (
                             <div>
-                              <Typography variant="body2" sx={{ color: "text.secondary", mb: 1 }}>
-                                <strong>{t("pilot_passengers")}:</strong> {getPassengersText(currentFrame.passengers)}
+                              <Typography
+                                variant="body2"
+                                sx={{ color: "text.secondary", mb: 1 }}
+                              >
+                                <strong>{t("pilot_passengers")}:</strong>{" "}
+                                {getPassengersText(currentFrame.passengers)}
                               </Typography>
-                              <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>
-                                <strong>{t("pilot_distance")}:</strong> {getDistanceText(currentFrame.distance)}
+                              <Typography
+                                variant="body2"
+                                sx={{ color: "text.secondary", mb: 2 }}
+                              >
+                                <strong>{t("pilot_distance")}:</strong>{" "}
+                                {getDistanceText(currentFrame.distance)}
                               </Typography>
-                              <div style={{ color: "var(--mui-palette-text-secondary)" }}>
+                              <div
+                                style={{
+                                  color: "var(--mui-palette-text-secondary)",
+                                }}
+                              >
                                 <ReactMarkdown components={markdownComponents}>
                                   {t(currentFrame.description)}
                                 </ReactMarkdown>
@@ -757,14 +882,21 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                       <Grid
                         size={{
                           xs: 12,
-                          sm: 6
-                        }}>
+                          sm: 6,
+                        }}
+                      >
                         {(() => {
-                          const totalSlots = (vehicle.modules || []).reduce((count, m) => {
-                            if (!m.equipped) return count;
-                            const mType = getModuleTypeForLimits(m);
-                            return count + (mType === "support" && m.isComplex ? 2 : 1);
-                          }, 0);
+                          const totalSlots = (vehicle.modules || []).reduce(
+                            (count, m) => {
+                              if (!m.equipped) return count;
+                              const mType = getModuleTypeForLimits(m);
+                              return (
+                                count +
+                                (mType === "support" && m.isComplex ? 2 : 1)
+                              );
+                            },
+                            0,
+                          );
                           const maxLimit = vehicle.maxEnabledModules || 3;
                           const isOverTotal = totalSlots > maxLimit;
 
@@ -785,7 +917,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                                 handleVehicleChange(
                                   vehicleIndex,
                                   "maxEnabledModules",
-                                  parseInt(e.target.value, 10)
+                                  parseInt(e.target.value, 10),
                                 )
                               }
                             />
@@ -795,16 +927,24 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                     </Grid>
                   </Grid>
 
-                  <Grid  size={12}>
+                  <Grid size={12}>
                     <Typography variant="h6" sx={{ mb: 1 }}>
                       {t("pilot_modules")}
                     </Typography>
-                    <Typography variant="subtitle2" sx={{ mt: 1, mb: 1, fontWeight: "bold" }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ mt: 1, mb: 1, fontWeight: "bold" }}
+                    >
                       {t("pilot_module_add")}
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+                    <Box
+                      sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}
+                    >
                       {["armor", "weapon", "support"].map((moduleType) => (
-                        <Box key={moduleType} sx={{ display: "flex", gap: 0.5 }}>
+                        <Box
+                          key={moduleType}
+                          sx={{ display: "flex", gap: 0.5 }}
+                        >
                           <Tooltip title={t("Browse Compendium")}>
                             <IconButton
                               size="small"
@@ -816,7 +956,11 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                                   vehicleIndexForModule: vehicleIndex,
                                 }))
                               }
-                              sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
+                              sx={{
+                                border: "1px solid",
+                                borderColor: "divider",
+                                borderRadius: 2,
+                              }}
                             >
                               <Search fontSize="small" />
                             </IconButton>
@@ -825,19 +969,25 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
-                            color={isSlotUsageOverLimit(vehicle, moduleType) ? "error" : "primary"}
-                            onClick={() => handleAddModule(vehicleIndex, moduleType)}
+                            color={
+                              isSlotUsageOverLimit(vehicle, moduleType)
+                                ? "error"
+                                : "primary"
+                            }
+                            onClick={() =>
+                              handleAddModule(vehicleIndex, moduleType)
+                            }
                           >
-                            {t(`pilot_module_${moduleType}`)} {getSlotUsageText(vehicle, moduleType)}
+                            {t(`pilot_module_${moduleType}`)}{" "}
+                            {getSlotUsageText(vehicle, moduleType)}
                           </Button>
-
                         </Box>
                       ))}
                     </Box>
                   </Grid>
 
                   {(vehicle.modules || []).map((module, moduleIndex) => (
-                    <Grid  key={moduleIndex} size={12}>
+                    <Grid key={moduleIndex} size={12}>
                       <VehicleModule
                         module={module}
                         moduleIndex={moduleIndex}
@@ -856,12 +1006,13 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           </Grid>
         ))
       ) : (
-        <Grid  size={12}>
+        <Grid size={12}>
           <Typography
             sx={{
               color: "text.secondary",
-              fontStyle: "italic"
-            }}>
+              fontStyle: "italic",
+            }}
+          >
             {t("No vehicles added")}
           </Typography>
         </Grid>
@@ -869,8 +1020,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       <Grid
         size={{
           xs: 12,
-          sm: 12
-        }}>
+          sm: 12,
+        }}
+      >
         <FormControlLabel
           control={
             <Switch
@@ -887,8 +1039,12 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         />
       </Grid>
       {isAnyVehicleIllegal && (
-        <Grid  size={12}>
-          <Typography color="error" variant="caption" sx={{ display: "flex", alignItems: "center" }}>
+        <Grid size={12}>
+          <Typography
+            color="error"
+            variant="caption"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
             <ErrorOutlined sx={{ fontSize: 16, mr: 0.5 }} />
             {t("Illegal module configuration detected")}
           </Typography>
@@ -916,7 +1072,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       />
       <CompendiumViewerModal
         open={compendiumState.vehiclesOpen}
-        onClose={() => setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }))}
+        onClose={() =>
+          setCompendiumState((prev) => ({ ...prev, vehiclesOpen: false }))
+        }
         onAddItem={handleCompendiumVehicleImport}
         initialType="player-spells"
         restrictToTypes={["player-spells"]}

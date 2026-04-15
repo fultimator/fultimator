@@ -38,7 +38,10 @@ export default function SpellTinkererAlchemyTargetModal({
   const validateTargets = useCallback(() => {
     let error = "";
 
-    const ranges = targets.map(({ rangeFrom, rangeTo }) => ({ rangeFrom, rangeTo }));
+    const ranges = targets.map(({ rangeFrom, rangeTo }) => ({
+      rangeFrom,
+      rangeTo,
+    }));
     const flatRanges = ranges.flatMap(({ rangeFrom, rangeTo }) => {
       const rangeArray = [];
       for (let i = rangeFrom; i <= rangeTo; i++) {
@@ -48,7 +51,7 @@ export default function SpellTinkererAlchemyTargetModal({
     });
 
     const hasOverlap = flatRanges.some(
-      (value, index, array) => array.indexOf(value) !== index
+      (value, index, array) => array.indexOf(value) !== index,
     );
 
     if (hasOverlap) {
@@ -88,7 +91,9 @@ export default function SpellTinkererAlchemyTargetModal({
 
   const handleSave = () => {
     if (validateTargets()) {
-      const sortedTargets = [...targets].sort((a, b) => a.rangeFrom - b.rangeFrom);
+      const sortedTargets = [...targets].sort(
+        (a, b) => a.rangeFrom - b.rangeFrom,
+      );
       onSave(alchemy.index, { ...editedAlchemy, targets: sortedTargets });
     }
   };
@@ -103,7 +108,7 @@ export default function SpellTinkererAlchemyTargetModal({
             width: "80%",
             maxWidth: "lg",
           },
-        }
+        },
       }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
@@ -124,10 +129,12 @@ export default function SpellTinkererAlchemyTargetModal({
       <DialogContent>
         <Grid container spacing={2}>
           {targets.map((target, index) => (
-            <Grid  key={index} container spacing={2} size={12}>
-              <Grid  size={2}>
+            <Grid key={index} container spacing={2} size={12}>
+              <Grid size={2}>
                 <FormControl fullWidth>
-                  <InputLabel id={`range-from-label-${index}`}>{t("Range From")}</InputLabel>
+                  <InputLabel id={`range-from-label-${index}`}>
+                    {t("Range From")}
+                  </InputLabel>
                   <Select
                     labelId={`range-from-label-${index}`}
                     id={`range-from-select-${index}`}
@@ -145,9 +152,11 @@ export default function SpellTinkererAlchemyTargetModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid  size={2}>
+              <Grid size={2}>
                 <FormControl fullWidth>
-                  <InputLabel id={`range-to-label-${index}`}>{t("Range To")}</InputLabel>
+                  <InputLabel id={`range-to-label-${index}`}>
+                    {t("Range To")}
+                  </InputLabel>
                   <Select
                     labelId={`range-to-label-${index}`}
                     id={`range-to-select-${index}`}
@@ -165,7 +174,7 @@ export default function SpellTinkererAlchemyTargetModal({
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid  size={7}>
+              <Grid size={7}>
                 <TextField
                   label={t("Effect")}
                   value={target.effect}
@@ -175,9 +184,9 @@ export default function SpellTinkererAlchemyTargetModal({
                   fullWidth
                 />
               </Grid>
-              <Grid  size={1}>
+              <Grid size={1}>
                 <Button
-                sx={{height: "100%"}}
+                  sx={{ height: "100%" }}
                   variant="contained"
                   color="error"
                   onClick={() => handleRemoveTarget(index)}
@@ -187,13 +196,13 @@ export default function SpellTinkererAlchemyTargetModal({
               </Grid>
             </Grid>
           ))}
-          <Grid  size={12}>
+          <Grid size={12}>
             <Button variant="contained" onClick={handleAddTarget}>
               {t("Add Target")}
             </Button>
           </Grid>
           {validationError && (
-            <Grid  size={12}>
+            <Grid size={12}>
               <FormHelperText error>{validationError}</FormHelperText>
             </Grid>
           )}

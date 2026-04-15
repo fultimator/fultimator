@@ -1,40 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Radio,
-  Typography, Box, Divider, Tooltip, IconButton,
-} from '@mui/material';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CloseIcon from '@mui/icons-material/Close';
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
-import { useTranslate } from '../../../../translation/translate';
-import { resolveEffectiveSlot } from './equipmentSlots';
-import { equipItemToSlot, clearSlotAction } from './loadoutActions';
-import attributes from '../../../../libs/attributes';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  Radio,
+  Typography,
+  Box,
+  Divider,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CloseIcon from "@mui/icons-material/Close";
+import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
+import { useTranslate } from "../../../../translation/translate";
+import { resolveEffectiveSlot } from "./equipmentSlots";
+import { equipItemToSlot, clearSlotAction } from "./loadoutActions";
+import attributes from "../../../../libs/attributes";
 
 function moduleStatLine(module) {
-  if (!module) return '-';
-  if (module.type === 'pilot_module_weapon') {
-    if (module.isShield) return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
+  if (!module) return "-";
+  if (module.type === "pilot_module_weapon") {
+    if (module.isShield)
+      return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
     const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
     const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
-    const hands = module.cumbersome ? '2H' : '1H';
-    return `${a1}+${a2} / ${module.damage ?? '?'} ${module.damageType ?? ''} / ${hands}`.trim();
+    const hands = module.cumbersome ? "2H" : "1H";
+    return `${a1}+${a2} / ${module.damage ?? "?"} ${module.damageType ?? ""} / ${hands}`.trim();
   }
-  if (module.type === 'pilot_module_armor') {
+  if (module.type === "pilot_module_armor") {
     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
   }
-  return module.description ? module.description.slice(0, 40) : '-';
+  return module.description ? module.description.slice(0, 40) : "-";
 }
 
 // Customizations that make a custom weapon martial
 const MARTIAL_CUSTOMIZATIONS = [
-  'weapon_customization_quick',
-  'weapon_customization_magicdefenseboost',
-  'weapon_customization_powerful',
+  "weapon_customization_quick",
+  "weapon_customization_magicdefenseboost",
+  "weapon_customization_powerful",
 ];
 
-const resolveDef  = (item) => item.def  || 0;
+const resolveDef = (item) => item.def || 0;
 const resolveMdef = (item) => item.mdef || 0;
 
 /**
@@ -47,8 +61,14 @@ const resolveMdef = (item) => item.mdef || 0;
  * onClearOtherHandModule - called when an item is selected and the other hand has an active module
  */
 export default function SlotPickerDialog({
-  open, onClose, slot, player, setPlayer,
-  vehicleModules = [], onSelectModule, onDisableModule,
+  open,
+  onClose,
+  slot,
+  player,
+  setPlayer,
+  vehicleModules = [],
+  onSelectModule,
+  onDisableModule,
   openModuleOverride = false,
   onClearOtherHandModule,
 }) {
@@ -68,32 +88,34 @@ export default function SlotPickerDialog({
     }
   }, [open, openModuleOverride]);
 
-  const hasDualShieldBearer = player?.classes?.some(cls =>
-    cls.skills?.some(
-      sk => sk.specialSkill === 'Dual Shieldbearer' && sk.currentLvl === 1
-    )
-  ) ?? false;
+  const hasDualShieldBearer =
+    player?.classes?.some((cls) =>
+      cls.skills?.some(
+        (sk) => sk.specialSkill === "Dual Shieldbearer" && sk.currentLvl === 1,
+      ),
+    ) ?? false;
 
   const inv = player?.equipment?.[0] || {};
 
   const mainHandHasTwoHanded = (() => {
-    const res = resolveEffectiveSlot(player, 'mainHand');
-    if (res?.kind === 'vehicleModule') return res.module.cumbersome ?? false;
+    const res = resolveEffectiveSlot(player, "mainHand");
+    if (res?.kind === "vehicleModule") return res.module.cumbersome ?? false;
 
     const ref = player?.equippedSlots?.mainHand;
     if (!ref) return false;
-    if (ref.source === 'customWeapons') return true; // always two-handed
-    const w = ref.index !== undefined
-      ? inv?.weapons?.[ref.index]
-      : inv?.weapons?.find(x => x.name === ref.name);
+    if (ref.source === "customWeapons") return true; // always two-handed
+    const w =
+      ref.index !== undefined
+        ? inv?.weapons?.[ref.index]
+        : inv?.weapons?.find((x) => x.name === ref.name);
     return w?.hands === 2 || w?.isTwoHand || false;
   })();
 
   const otherHandHasWeaponModule = (() => {
-    if (slot !== 'mainHand' && slot !== 'offHand') return false;
-    const otherSlot = slot === 'mainHand' ? 'offHand' : 'mainHand';
+    if (slot !== "mainHand" && slot !== "offHand") return false;
+    const otherSlot = slot === "mainHand" ? "offHand" : "mainHand";
     const res = resolveEffectiveSlot(player, otherSlot);
-    return res?.kind === 'vehicleModule';
+    return res?.kind === "vehicleModule";
   })();
 
   // Martial proficiency check
@@ -104,23 +126,26 @@ export default function SlotPickerDialog({
    */
   const checkMartialProficiency = (candidate) => {
     const { item, source } = candidate;
-    if (source === 'accessories') return true; // no martial concept
+    if (source === "accessories") return true; // no martial concept
 
     let isMartial = false;
     let itemType = null; // 'meleeWeapon' | 'rangedWeapon' | 'shield' | 'armor'
 
-    if (source === 'customWeapons') {
-      isMartial = (item.customizations ?? []).some(c => MARTIAL_CUSTOMIZATIONS.includes(c.name));
-      itemType = item.range === 'weapon_range_ranged' ? 'rangedWeapon' : 'meleeWeapon';
-    } else if (source === 'weapons') {
+    if (source === "customWeapons") {
+      isMartial = (item.customizations ?? []).some((c) =>
+        MARTIAL_CUSTOMIZATIONS.includes(c.name),
+      );
+      itemType =
+        item.range === "weapon_range_ranged" ? "rangedWeapon" : "meleeWeapon";
+    } else if (source === "weapons") {
       isMartial = item.martial ?? false;
-      itemType = item.ranged ? 'rangedWeapon' : 'meleeWeapon';
-    } else if (source === 'shields') {
+      itemType = item.ranged ? "rangedWeapon" : "meleeWeapon";
+    } else if (source === "shields") {
       isMartial = item.martial ?? false;
-      itemType = 'shield';
-    } else if (source === 'armor') {
+      itemType = "shield";
+    } else if (source === "armor") {
       isMartial = item.martial ?? false;
-      itemType = 'armor';
+      itemType = "armor";
     }
 
     if (!isMartial) return true;
@@ -128,21 +153,23 @@ export default function SlotPickerDialog({
     for (const cls of player?.classes ?? []) {
       const martials = cls.benefits?.martials;
       if (!martials) continue;
-      if (itemType === 'meleeWeapon'  && martials.melee)  return true;
-      if (itemType === 'rangedWeapon' && martials.ranged) return true;
-      if (itemType === 'shield'       && martials.shield) return true;
-      if (itemType === 'armor'        && martials.armor)  return true;
+      if (itemType === "meleeWeapon" && martials.melee) return true;
+      if (itemType === "rangedWeapon" && martials.ranged) return true;
+      if (itemType === "shield" && martials.shield) return true;
+      if (itemType === "armor" && martials.armor) return true;
     }
     return false;
   };
 
   const isUnarmedStrike = (candidate) =>
-    candidate?.source === 'weapons' && candidate?.item?.name === 'Unarmed Strike';
+    candidate?.source === "weapons" &&
+    candidate?.item?.name === "Unarmed Strike";
 
-  const slotKeys = ['mainHand', 'offHand', 'armor', 'accessory'];
+  const slotKeys = ["mainHand", "offHand", "armor", "accessory"];
   const candidateMatchesRef = (candidate, ref) => {
     if (!ref || ref.source !== candidate.source) return false;
-    if (ref.index !== undefined && candidate.index !== undefined) return ref.index === candidate.index;
+    if (ref.index !== undefined && candidate.index !== undefined)
+      return ref.index === candidate.index;
     return ref.name === candidate.label;
   };
 
@@ -152,46 +179,77 @@ export default function SlotPickerDialog({
       const att1 = attributes[w.att1]?.shortcaps ?? w.att1;
       const att2 = attributes[w.att2]?.shortcaps ?? w.att2;
       const atts = `${att1}+${att2}`;
-      const dmg = w.dmg ?? w.damage ?? '?';
-      const hands = (w.hands === 2 || w.isTwoHand) ? '2H' : '1H';
-      return `${atts} / ${dmg} ${t(w.type || '')} / ${hands}`;
+      const dmg = w.dmg ?? w.damage ?? "?";
+      const hands = w.hands === 2 || w.isTwoHand ? "2H" : "1H";
+      return `${atts} / ${dmg} ${t(w.type || "")} / ${hands}`;
     };
 
     switch (slot) {
-      case 'mainHand': {
-        const weapons = (inv.weapons ?? [])
-          .map((w, i) => ({ label: w.name, sub: formatWeapon(w), source: 'weapons', item: w, index: i }));
-        const customs = (inv.customWeapons ?? [])
-          .map((w, i) => ({ label: w.name, sub: w.category, source: 'customWeapons', item: w, index: i }));
+      case "mainHand": {
+        const weapons = (inv.weapons ?? []).map((w, i) => ({
+          label: w.name,
+          sub: formatWeapon(w),
+          source: "weapons",
+          item: w,
+          index: i,
+        }));
+        const customs = (inv.customWeapons ?? []).map((w, i) => ({
+          label: w.name,
+          sub: w.category,
+          source: "customWeapons",
+          item: w,
+          index: i,
+        }));
         const shields = hasDualShieldBearer
           ? (inv.shields ?? []).map((s, i) => ({
-              label: s.name, sub: `DEF +${resolveDef(s)}`, source: 'shields', item: s, index: i,
+              label: s.name,
+              sub: `DEF +${resolveDef(s)}`,
+              source: "shields",
+              item: s,
+              index: i,
             }))
           : [];
         return [...weapons, ...customs, ...shields];
       }
-      case 'offHand': {
+      case "offHand": {
         if (mainHandHasTwoHanded) return [];
         const oneHanded = (inv.weapons ?? [])
-          .filter(w => !(w.hands === 2 || w.isTwoHand))
+          .filter((w) => !(w.hands === 2 || w.isTwoHand))
           .map((w, _, _arr) => {
             const i = (inv.weapons ?? []).indexOf(w);
-            return { label: w.name, sub: formatWeapon(w), source: 'weapons', item: w, index: i };
+            return {
+              label: w.name,
+              sub: formatWeapon(w),
+              source: "weapons",
+              item: w,
+              index: i,
+            };
           });
-        const shields = (inv.shields ?? [])
-          .map((s, i) => ({ label: s.name, sub: `DEF +${resolveDef(s)}  MDEF +${resolveMdef(s)}`, source: 'shields', item: s, index: i }));
+        const shields = (inv.shields ?? []).map((s, i) => ({
+          label: s.name,
+          sub: `DEF +${resolveDef(s)}  MDEF +${resolveMdef(s)}`,
+          source: "shields",
+          item: s,
+          index: i,
+        }));
         return [...oneHanded, ...shields];
       }
-      case 'armor':
-        return (inv.armor ?? [])
-          .map((a, i) => ({
-            label: a.name,
-            sub: `DEF +${resolveDef(a)}  MDEF +${resolveMdef(a)}  INIT ${(a.init ?? 0) >= 0 ? '+' : ''}${a.init ?? 0}`,
-            source: 'armor', item: a, index: i,
-          }));
-      case 'accessory':
-        return (inv.accessories ?? [])
-          .map((a, i) => ({ label: a.name, sub: a.quality || '-', source: 'accessories', item: a, index: i }));
+      case "armor":
+        return (inv.armor ?? []).map((a, i) => ({
+          label: a.name,
+          sub: `DEF +${resolveDef(a)}  MDEF +${resolveMdef(a)}  INIT ${(a.init ?? 0) >= 0 ? "+" : ""}${a.init ?? 0}`,
+          source: "armor",
+          item: a,
+          index: i,
+        }));
+      case "accessory":
+        return (inv.accessories ?? []).map((a, i) => ({
+          label: a.name,
+          sub: a.quality || "-",
+          source: "accessories",
+          item: a,
+          index: i,
+        }));
       default:
         return [];
     }
@@ -203,7 +261,9 @@ export default function SlotPickerDialog({
 
   const candidates = rawCandidates
     .map((c) => {
-      const assignedSlots = slotKeys.filter((slotKey) => candidateMatchesRef(c, slots[slotKey]));
+      const assignedSlots = slotKeys.filter((slotKey) =>
+        candidateMatchesRef(c, slots[slotKey]),
+      );
       const inCurrentSlot = assignedSlots.includes(slot);
       const inOtherSlot = assignedSlots.some((slotKey) => slotKey !== slot);
       return {
@@ -222,19 +282,25 @@ export default function SlotPickerDialog({
     });
 
   const handleSelect = (candidate) => {
-    setPlayer(prev => equipItemToSlot(prev, slot, candidate));
+    setPlayer((prev) => equipItemToSlot(prev, slot, candidate));
     if (otherHandHasWeaponModule) onClearOtherHandModule?.();
     onClose();
   };
 
   const handleClear = () => {
-    if (!currentRef) { onClose(); return; }
-    setPlayer(prev => clearSlotAction(prev, slot));
+    if (!currentRef) {
+      onClose();
+      return;
+    }
+    setPlayer((prev) => clearSlotAction(prev, slot));
     onClose();
   };
 
   const handleAccept = () => {
-    if (!pendingCandidate) { onClose(); return; }
+    if (!pendingCandidate) {
+      onClose();
+      return;
+    }
     if (!checkMartialProficiency(pendingCandidate)) {
       setMartialWarning(pendingCandidate);
       return;
@@ -242,33 +308,39 @@ export default function SlotPickerDialog({
     handleSelect(pendingCandidate);
   };
 
-  const slotLabel = {
-    mainHand:  t('Main Hand'),
-    offHand:   t('Off Hand'),
-    armor:     t('Armor'),
-    accessory: t('Accessory'),
-  }[slot] ?? slot;
+  const slotLabel =
+    {
+      mainHand: t("Main Hand"),
+      offHand: t("Off Hand"),
+      armor: t("Armor"),
+      accessory: t("Accessory"),
+    }[slot] ?? slot;
 
   // Visually-selected item: pending click wins over the currently equipped one
-  const selectedCandidate = pendingCandidate
-    ?? candidates.find(c => {
-      if (c.source !== currentRef?.source || c.label !== currentRef?.name) return false;
+  const selectedCandidate =
+    pendingCandidate ??
+    candidates.find((c) => {
+      if (c.source !== currentRef?.source || c.label !== currentRef?.name)
+        return false;
       if (currentRef.index !== undefined) return c.index === currentRef.index;
       return true;
-    })
-    ?? null;
+    }) ??
+    null;
 
   // Preview: last hovered (latches: no onMouseLeave so no flicker), falls back to selection
   const previewCandidate = hoveredCandidate ?? selectedCandidate ?? null;
 
   // Module preview: hovered module wins, falls back to the currently active one
-  const activeModule = vehicleModules.find(m =>
-    m.enabled && (
-      (slot === 'mainHand' && (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
-      (slot === 'offHand'  && (m.equippedSlot === 'off'  || m.equippedSlot === 'both')) ||
-      (slot === 'armor'    && m.equippedSlot === 'armor')
-    )
-  ) ?? null;
+  const activeModule =
+    vehicleModules.find(
+      (m) =>
+        m.enabled &&
+        ((slot === "mainHand" &&
+          (m.equippedSlot === "main" || m.equippedSlot === "both")) ||
+          (slot === "offHand" &&
+            (m.equippedSlot === "off" || m.equippedSlot === "both")) ||
+          (slot === "armor" && m.equippedSlot === "armor")),
+    ) ?? null;
   const previewModule = hoveredModule ?? pendingModule ?? activeModule ?? null;
 
   return (
@@ -276,14 +348,27 @@ export default function SlotPickerDialog({
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
         {moduleOverrideOpen ? (
           /* Module override view */
-          (<>
-            <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <>
+            <DialogTitle
+              sx={{
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <PrecisionManufacturingIcon color="success" fontSize="small" />
-              {t('Slot - Module Override')}
+              {t("Slot - Module Override")}
               <IconButton
                 aria-label="close"
                 onClick={onClose}
-                sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
               >
                 <CloseIcon />
               </IconButton>
@@ -292,17 +377,34 @@ export default function SlotPickerDialog({
               {/* Module preview panel */}
               <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewModule ? (
-                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
-                    <Typography variant="body2" noWrap sx={{
-                      fontWeight: 700
-                    }}>{previewModule.customName || t(previewModule.name)}</Typography>
+                  <Box
+                    sx={{
+                      p: 1,
+                      bgcolor: "action.selected",
+                      borderRadius: 1,
+                      height: "100%",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      noWrap
+                      sx={{
+                        fontWeight: 700,
+                      }}
+                    >
+                      {previewModule.customName || t(previewModule.name)}
+                    </Typography>
                     <Typography
                       variant="caption"
                       noWrap
                       sx={{
                         color: "text.secondary",
-                        display: "block"
-                      }}>{moduleStatLine(previewModule)}</Typography>
+                        display: "block",
+                      }}
+                    >
+                      {moduleStatLine(previewModule)}
+                    </Typography>
                     {previewModule.description && (
                       <Typography
                         variant="caption"
@@ -310,24 +412,33 @@ export default function SlotPickerDialog({
                           color: "text.primary",
                           display: "block",
                           mt: 0.5,
-                          fontStyle: 'italic',
+                          fontStyle: "italic",
                           WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}>
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
                         {t(previewModule.description)}
                       </Typography>
                     )}
                   </Box>
                 ) : (
-                  <Box sx={{ p: 1, display: 'flex', alignItems: 'center', height: '100%' }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
                     <Typography
                       variant="caption"
                       sx={{
                         color: "text.disabled",
-                        fontStyle: "italic"
-                      }}>
-                      {t('Hover a module to preview')}
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {t("Hover a module to preview")}
                     </Typography>
                   </Box>
                 )}
@@ -335,27 +446,48 @@ export default function SlotPickerDialog({
               <Divider />
               <List dense disablePadding>
                 {vehicleModules.map((m) => {
-                  const isActive = m.enabled && (
-                    (slot === 'mainHand' && (m.equippedSlot === 'main' || m.equippedSlot === 'both')) ||
-                    (slot === 'offHand'  && (m.equippedSlot === 'off'  || m.equippedSlot === 'both')) ||
-                    (slot === 'armor'    && m.equippedSlot === 'armor')
-                  );
-                  const isPending = pendingModule?.originalIndex === m.originalIndex;
+                  const isActive =
+                    m.enabled &&
+                    ((slot === "mainHand" &&
+                      (m.equippedSlot === "main" ||
+                        m.equippedSlot === "both")) ||
+                      (slot === "offHand" &&
+                        (m.equippedSlot === "off" ||
+                          m.equippedSlot === "both")) ||
+                      (slot === "armor" && m.equippedSlot === "armor"));
+                  const isPending =
+                    pendingModule?.originalIndex === m.originalIndex;
                   const isChecked = isPending || (!pendingModule && isActive);
                   return (
-                    <ListItem key={m.originalIndex} disablePadding onMouseEnter={() => setHoveredModule(m)}>
+                    <ListItem
+                      key={m.originalIndex}
+                      disablePadding
+                      onMouseEnter={() => setHoveredModule(m)}
+                    >
                       <ListItemButton
                         onClick={() => setPendingModule(m)}
-                        onDoubleClick={() => { onSelectModule?.(m.originalIndex); onClose(); }}
+                        onDoubleClick={() => {
+                          onSelectModule?.(m.originalIndex);
+                          onClose();
+                        }}
                       >
                         <ListItemIcon sx={{ minWidth: 36 }}>
-                          <Radio edge="start" checked={isChecked} disableRipple size="small" color="success" />
+                          <Radio
+                            edge="start"
+                            checked={isChecked}
+                            disableRipple
+                            size="small"
+                            color="success"
+                          />
                         </ListItemIcon>
                         <ListItemText
                           primary={m.customName || t(m.name)}
                           secondary={moduleStatLine(m)}
-                          primaryTypographyProps={{ variant: 'body2', fontWeight: (isPending || isActive) ? 700 : 400 }}
-                          secondaryTypographyProps={{ variant: 'caption' }}
+                          primaryTypographyProps={{
+                            variant: "body2",
+                            fontWeight: isPending || isActive ? 700 : 400,
+                          }}
+                          secondaryTypographyProps={{ variant: "caption" }}
                         />
                       </ListItemButton>
                     </ListItem>
@@ -363,36 +495,66 @@ export default function SlotPickerDialog({
                 })}
               </List>
             </DialogContent>
-            <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
-              <Button size="small" color="error" variant="contained" onClick={() => { onDisableModule?.(); onClose(); }}>
-                {t('Disable Module')}
+            <DialogActions
+              sx={{ justifyContent: "space-between", px: 3, py: 2 }}
+            >
+              <Button
+                size="small"
+                color="error"
+                variant="contained"
+                onClick={() => {
+                  onDisableModule?.();
+                  onClose();
+                }}
+              >
+                {t("Disable Module")}
               </Button>
               <Box>
-                <Button size="small" color="primary" sx={{ mr: 1 }} onClick={() => { onDisableModule?.(); setModuleOverrideOpen(false); }}>
-                  {t('Use Regular Equipment')}
+                <Button
+                  size="small"
+                  color="primary"
+                  sx={{ mr: 1 }}
+                  onClick={() => {
+                    onDisableModule?.();
+                    setModuleOverrideOpen(false);
+                  }}
+                >
+                  {t("Use Regular Equipment")}
                 </Button>
-                <Button size="small" sx={{ mr: 1 }} onClick={onClose}>{t('Cancel')}</Button>
+                <Button size="small" sx={{ mr: 1 }} onClick={onClose}>
+                  {t("Cancel")}
+                </Button>
                 <Button
                   size="small"
                   color="success"
                   variant="contained"
                   disabled={!pendingModule}
-                  onClick={() => { onSelectModule?.(pendingModule.originalIndex); onClose(); }}
+                  onClick={() => {
+                    onSelectModule?.(pendingModule.originalIndex);
+                    onClose();
+                  }}
                 >
-                  {t('Accept')}
+                  {t("Accept")}
                 </Button>
               </Box>
             </DialogActions>
-          </>)
+          </>
         ) : (
           /* Regular item picker view */
-          (<>
-            <DialogTitle sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
-              {t('Choose item for')}: {slotLabel}
+          <>
+            <DialogTitle
+              sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+            >
+              {t("Choose item for")}: {slotLabel}
               <IconButton
                 aria-label="close"
                 onClick={onClose}
-                sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
+                sx={{
+                  position: "absolute",
+                  right: 8,
+                  top: 8,
+                  color: (theme) => theme.palette.grey[500],
+                }}
               >
                 <CloseIcon />
               </IconButton>
@@ -401,19 +563,38 @@ export default function SlotPickerDialog({
               {/* Item preview panel */}
               <Box sx={{ px: 2, py: 1, height: 108 }}>
                 {previewCandidate ? (
-                  <Box sx={{ p: 1, bgcolor: 'action.selected', borderRadius: 1, height: '100%', overflow: 'hidden' }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      bgcolor: "action.selected",
+                      borderRadius: 1,
+                      height: "100%",
+                      overflow: "hidden",
+                    }}
+                  >
                     <Box
                       sx={{
                         display: "flex",
                         gap: 0.5,
-                        alignItems: "center"
-                      }}>
-                      <Typography variant="body2" noWrap sx={{
-                        fontWeight: 700
-                      }}>{previewCandidate.label}</Typography>
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        noWrap
+                        sx={{
+                          fontWeight: 700,
+                        }}
+                      >
+                        {previewCandidate.label}
+                      </Typography>
                       {!checkMartialProficiency(previewCandidate) && (
-                        <Tooltip title={t('Not proficient with this martial item')}>
-                          <WarningAmberIcon sx={{ fontSize: 14, color: 'warning.main' }} />
+                        <Tooltip
+                          title={t("Not proficient with this martial item")}
+                        >
+                          <WarningAmberIcon
+                            sx={{ fontSize: 14, color: "warning.main" }}
+                          />
                         </Tooltip>
                       )}
                     </Box>
@@ -422,58 +603,97 @@ export default function SlotPickerDialog({
                       noWrap
                       sx={{
                         color: "text.secondary",
-                        display: "block"
-                      }}>{previewCandidate.sub}</Typography>
-                    {previewCandidate.item?.quality && previewCandidate.item.quality !== previewCandidate.sub && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "text.primary",
-                          display: "block",
-                          mt: 0.5,
-                          fontStyle: 'italic',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}>
-                        {previewCandidate.item.quality}
-                      </Typography>
-                    )}
+                        display: "block",
+                      }}
+                    >
+                      {previewCandidate.sub}
+                    </Typography>
+                    {previewCandidate.item?.quality &&
+                      previewCandidate.item.quality !==
+                        previewCandidate.sub && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "text.primary",
+                            display: "block",
+                            mt: 0.5,
+                            fontStyle: "italic",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {previewCandidate.item.quality}
+                        </Typography>
+                      )}
                   </Box>
                 ) : (
-                  <Box sx={{ p: 1, display: 'flex', alignItems: 'center', height: '100%' }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
                     <Typography
                       variant="caption"
                       sx={{
                         color: "text.disabled",
-                        fontStyle: "italic"
-                      }}>
-                      {t('Hover an item to preview')}
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {t("Hover an item to preview")}
                     </Typography>
                   </Box>
                 )}
               </Box>
               <Divider />
               {otherHandHasWeaponModule && (
-                <Typography sx={{ px: 2, pt: 1.5, pb: 0.5, color: 'warning.main', fontSize: '0.75rem' }}>
-                  {t('Slot is restricted by a weapon module in the other hand.')} {t('Equipping item will clear slots')}
+                <Typography
+                  sx={{
+                    px: 2,
+                    pt: 1.5,
+                    pb: 0.5,
+                    color: "warning.main",
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {t(
+                    "Slot is restricted by a weapon module in the other hand.",
+                  )}{" "}
+                  {t("Equipping item will clear slots")}
                 </Typography>
               )}
               {candidates.length === 0 ? (
-                <Typography sx={{ p: 2, color: 'text.secondary' }}>
-                  {mainHandHasTwoHanded && slot === 'offHand'
-                    ? t('Off Hand is locked by a two-handed weapon.')
-                    : t('No items available for this slot.')}
+                <Typography sx={{ p: 2, color: "text.secondary" }}>
+                  {mainHandHasTwoHanded && slot === "offHand"
+                    ? t("Off Hand is locked by a two-handed weapon.")
+                    : t("No items available for this slot.")}
                 </Typography>
               ) : (
                 <List dense disablePadding>
                   {candidates.map((c, i) => {
-                    const isPending = pendingCandidate?.label === c.label && pendingCandidate?.source === c.source && pendingCandidate?.index === c.index;
-                    const isEquipped = currentRef?.name === c.label && currentRef?.source === c.source && (currentRef.index === undefined || currentRef.index === c.index);
-                    const isChecked = selectedCandidate?.label === c.label && selectedCandidate?.source === c.source && selectedCandidate?.index === c.index;
+                    const isPending =
+                      pendingCandidate?.label === c.label &&
+                      pendingCandidate?.source === c.source &&
+                      pendingCandidate?.index === c.index;
+                    const isEquipped =
+                      currentRef?.name === c.label &&
+                      currentRef?.source === c.source &&
+                      (currentRef.index === undefined ||
+                        currentRef.index === c.index);
+                    const isChecked =
+                      selectedCandidate?.label === c.label &&
+                      selectedCandidate?.source === c.source &&
+                      selectedCandidate?.index === c.index;
                     const isProficient = checkMartialProficiency(c);
                     return (
-                      <ListItem key={i} disablePadding onMouseEnter={() => setHoveredCandidate(c)}>
+                      <ListItem
+                        key={i}
+                        disablePadding
+                        onMouseEnter={() => setHoveredCandidate(c)}
+                      >
                         <ListItemButton
                           onClick={() => setPendingCandidate(c)}
                           onDoubleClick={() => {
@@ -486,7 +706,13 @@ export default function SlotPickerDialog({
                           }}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
-                            <Radio edge="start" checked={isChecked} disableRipple size="small" color="primary" />
+                            <Radio
+                              edge="start"
+                              checked={isChecked}
+                              disableRipple
+                              size="small"
+                              color="primary"
+                            />
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -495,26 +721,43 @@ export default function SlotPickerDialog({
                                 sx={{
                                   display: "flex",
                                   gap: 0.5,
-                                  alignItems: "center"
-                                }}>
+                                  alignItems: "center",
+                                }}
+                              >
                                 <span>{c.label}</span>
                                 {(c.inCurrentSlot || c.inOtherSlot) && (
-                                  <Typography component="span" variant="caption" sx={{
-                                    color: "text.secondary"
-                                  }}>
-                                    ({t('Equipped')})
+                                  <Typography
+                                    component="span"
+                                    variant="caption"
+                                    sx={{
+                                      color: "text.secondary",
+                                    }}
+                                  >
+                                    ({t("Equipped")})
                                   </Typography>
                                 )}
                                 {!isProficient && (
-                                  <Tooltip title={t('Not proficient  -  martial item')}>
-                                    <WarningAmberIcon sx={{ fontSize: 13, color: 'warning.main', verticalAlign: 'middle' }} />
+                                  <Tooltip
+                                    title={t("Not proficient  -  martial item")}
+                                  >
+                                    <WarningAmberIcon
+                                      sx={{
+                                        fontSize: 13,
+                                        color: "warning.main",
+                                        verticalAlign: "middle",
+                                      }}
+                                    />
                                   </Tooltip>
                                 )}
                               </Box>
                             }
                             secondary={c.sub}
-                            primaryTypographyProps={{ variant: 'body2', fontWeight: (isPending || isEquipped) ? 700 : 400, component: 'div' }}
-                            secondaryTypographyProps={{ variant: 'caption' }}
+                            primaryTypographyProps={{
+                              variant: "body2",
+                              fontWeight: isPending || isEquipped ? 700 : 400,
+                              component: "div",
+                            }}
+                            secondaryTypographyProps={{ variant: "caption" }}
                           />
                         </ListItemButton>
                       </ListItem>
@@ -523,46 +766,89 @@ export default function SlotPickerDialog({
                 </List>
               )}
             </DialogContent>
-            <DialogActions sx={{ justifyContent: 'space-between', px: 3, py: 2 }}>
+            <DialogActions
+              sx={{ justifyContent: "space-between", px: 3, py: 2 }}
+            >
               <Box>
                 {currentRef && (
-                  <Button onClick={handleClear} color="error" variant="contained" size="small">
-                    {t('Unequip')}
+                  <Button
+                    onClick={handleClear}
+                    color="error"
+                    variant="contained"
+                    size="small"
+                  >
+                    {t("Unequip")}
                   </Button>
                 )}
                 {vehicleModules.length > 0 && (
-                  <Button onClick={() => { setHoveredModule(null); setPendingModule(null); setModuleOverrideOpen(true); }} color="success" size="small" sx={{ ml: currentRef ? 1 : 0 }}>
-                    {t('Use Module Equipment')}
+                  <Button
+                    onClick={() => {
+                      setHoveredModule(null);
+                      setPendingModule(null);
+                      setModuleOverrideOpen(true);
+                    }}
+                    color="success"
+                    size="small"
+                    sx={{ ml: currentRef ? 1 : 0 }}
+                  >
+                    {t("Use Module Equipment")}
                   </Button>
                 )}
               </Box>
               <Box>
-                <Button onClick={onClose} size="small" sx={{ mr: 1 }}>{t('Cancel')}</Button>
-                <Button onClick={handleAccept} color="primary" variant="contained" size="small" disabled={!pendingCandidate}>
-                  {t('Accept')}
+                <Button onClick={onClose} size="small" sx={{ mr: 1 }}>
+                  {t("Cancel")}
+                </Button>
+                <Button
+                  onClick={handleAccept}
+                  color="primary"
+                  variant="contained"
+                  size="small"
+                  disabled={!pendingCandidate}
+                >
+                  {t("Accept")}
                 </Button>
               </Box>
             </DialogActions>
-          </>)
+          </>
         )}
       </Dialog>
       {/* Martial proficiency warning */}
       {martialWarning && (
-        <Dialog open onClose={() => setMartialWarning(null)} maxWidth="xs" fullWidth>
-          <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+        <Dialog
+          open
+          onClose={() => setMartialWarning(null)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              color: "warning.main",
+            }}
+          >
             <WarningAmberIcon fontSize="small" />
-            {t('Not Proficient')}
+            {t("Not Proficient")}
           </DialogTitle>
           <DialogContent>
             <Typography variant="body2">
-              <strong>{martialWarning.label}</strong> {t('is a martial item and your character is not proficient with it.')}
+              <strong>{martialWarning.label}</strong>{" "}
+              {t(
+                "is a martial item and your character is not proficient with it.",
+              )}
             </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-              {t('Equipping it without proficiency may be against the rules. Equip anyway?')}
+            <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
+              {t(
+                "Equipping it without proficiency may be against the rules. Equip anyway?",
+              )}
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setMartialWarning(null)} size="small">{t('Cancel')}</Button>
+            <Button onClick={() => setMartialWarning(null)} size="small">
+              {t("Cancel")}
+            </Button>
             <Button
               color="warning"
               variant="contained"
@@ -572,7 +858,7 @@ export default function SlotPickerDialog({
                 setMartialWarning(null);
               }}
             >
-              {t('Equip Anyway')}
+              {t("Equip Anyway")}
             </Button>
           </DialogActions>
         </Dialog>

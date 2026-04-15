@@ -105,9 +105,12 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   }));
 
   // Upload an in-memory buffer to Google Drive (used by IndexedDB sync)
-  ipcMain.handle("upload-buffer-to-google-drive", async (_event, buffer: ArrayBuffer, fileName: string) => {
-    return await uploadBufferToGoogleDrive(buffer, fileName);
-  });
+  ipcMain.handle(
+    "upload-buffer-to-google-drive",
+    async (_event, buffer: ArrayBuffer, fileName: string) => {
+      return await uploadBufferToGoogleDrive(buffer, fileName);
+    },
+  );
 
   // Handle file save with native dialog
   ipcMain.handle("save-file", async (event, { fileName, buffer }) => {
@@ -115,11 +118,11 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
       const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
         defaultPath: path.join(app.getPath("downloads"), fileName),
         filters: [
-          { name: 'All Files', extensions: ['*'] },
-          { name: 'JSON', extensions: ['json'] },
-          { name: 'Images', extensions: ['png', 'jpg', 'jpeg'] },
-          { name: 'ZIP', extensions: ['zip'] }
-        ]
+          { name: "All Files", extensions: ["*"] },
+          { name: "JSON", extensions: ["json"] },
+          { name: "Images", extensions: ["png", "jpg", "jpeg"] },
+          { name: "ZIP", extensions: ["zip"] },
+        ],
       });
 
       if (canceled || !filePath) {
@@ -183,5 +186,4 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   ipcMain.handle("get-path", (event, pathName) => {
     return app.getPath(pathName);
   });
-
 }

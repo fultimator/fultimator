@@ -1405,7 +1405,7 @@ const classList = [
       },
     ],
   },
-    {
+  {
     name: "Floralist",
     book: "natural",
     benefits: {
@@ -1702,67 +1702,67 @@ export const tinkererAlchemy = {
     {
       dieValue: 1,
       effect: t(
-        "treats their Dexterity and Might dice as if they were one size higher (up to a maximum of d12) until the end of your next turn"
+        "treats their Dexterity and Might dice as if they were one size higher (up to a maximum of d12) until the end of your next turn",
       ),
     },
     {
       dieValue: 2,
       effect: t(
-        "treats their Insight and Willpower dice as if they were one size higher (up to a maximum of d12) until the end of your next turn"
+        "treats their Insight and Willpower dice as if they were one size higher (up to a maximum of d12) until the end of your next turn",
       ),
     },
     {
       dieValue: 3,
       effect: t(
-        "suffers 20 air damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 air damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 4,
       effect: t(
-        "suffers 20 bolt damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 bolt damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 5,
       effect: t(
-        "suffers 20 dark damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 dark damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 6,
       effect: t(
-        "suffers 20 earth damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 earth damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 7,
       effect: t(
-        "suffers 20 fire damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 fire damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 8,
       effect: t(
-        "suffers 20 ice damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher"
+        "suffers 20 ice damage. This amount increases to 30 damage if you are level 20 or higher, or to 40 damage if you are level 40 or higher",
       ),
     },
     {
       dieValue: 9,
       effect: t(
-        "gains Resistance to air and fire damage until the end of the scene"
+        "gains Resistance to air and fire damage until the end of the scene",
       ),
     },
     {
       dieValue: 10,
       effect: t(
-        "gains Resistance to bolt and ice damage until the end of the scene"
+        "gains Resistance to bolt and ice damage until the end of the scene",
       ),
     },
     {
       dieValue: 11,
       effect: t(
-        "gains Resistance to dark and earth damage until the end of the scene"
+        "gains Resistance to dark and earth damage until the end of the scene",
       ),
     },
     {
@@ -1812,63 +1812,63 @@ export const tinkererInfusion = {
       infusionRank: 1,
       name: t("Cryo"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **ice**."
+        "The attack deals 5 extra damage, and its damage becomes **ice**.",
       ),
     },
     {
       infusionRank: 1,
       name: t("Pyro"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **fire**."
+        "The attack deals 5 extra damage, and its damage becomes **fire**.",
       ),
     },
     {
       infusionRank: 1,
       name: t("Volt"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **bolt**."
+        "The attack deals 5 extra damage, and its damage becomes **bolt**.",
       ),
     },
     {
       infusionRank: 2,
       name: t("Cyclone"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **air**."
+        "The attack deals 5 extra damage, and its damage becomes **air**.",
       ),
     },
     {
       infusionRank: 2,
       name: t("Exorcism"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **light**."
+        "The attack deals 5 extra damage, and its damage becomes **light**.",
       ),
     },
     {
       infusionRank: 2,
       name: t("Seismic"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **earth**."
+        "The attack deals 5 extra damage, and its damage becomes **earth**.",
       ),
     },
     {
       infusionRank: 2,
       name: t("Shadow"),
       effect: t(
-        "The attack deals 5 extra damage, and its damage becomes **dark**."
+        "The attack deals 5 extra damage, and its damage becomes **dark**.",
       ),
     },
     {
       infusionRank: 3,
       name: t("Vampire"),
       effect: t(
-        "Choose one option: you recover an amount of HP equal to half the HP loss suffered by the target of the attack; **or** you recover an amount of MP equal to half the HP loss suffered by the target of the attack. This infusion can only be used if the attack targeted **a single** creature."
+        "Choose one option: you recover an amount of HP equal to half the HP loss suffered by the target of the attack; **or** you recover an amount of MP equal to half the HP loss suffered by the target of the attack. This infusion can only be used if the attack targeted **a single** creature.",
       ),
     },
     {
       infusionRank: 3,
       name: t("Venom"),
       effect: t(
-        "The attack deals 5 extra damage, its damage becomes **poison**, and each creature hit by the attack suffers **poisoned**."
+        "The attack deals 5 extra damage, its damage becomes **poison**, and each creature hit by the attack suffers **poisoned**.",
       ),
     },
   ],
@@ -2200,45 +2200,35 @@ export const spellList = [
       {
         rangeFrom: 1,
         rangeTo: 1,
-        effect: t(
-          "GambleEffect1"
-        ),
+        effect: t("GambleEffect1"),
         secondRoll: false,
         secondEffects: [],
       },
       {
         rangeFrom: 2,
         rangeTo: 3,
-        effect: t(
-          "GambleEffect2"
-        ),
+        effect: t("GambleEffect2"),
         secondRoll: false,
         secondEffects: [],
       },
       {
         rangeFrom: 4,
         rangeTo: 6,
-        effect: t(
-          "GambleEffect3"
-        ),
+        effect: t("GambleEffect3"),
         secondRoll: false,
         secondEffects: [],
       },
       {
         rangeFrom: 7,
         rangeTo: 8,
-        effect: t(
-          "GambleEffect4"
-        ),
+        effect: t("GambleEffect4"),
         secondRoll: false,
         secondEffects: [],
       },
       {
         rangeFrom: 9,
         rangeTo: 12,
-        effect: t(
-          "GambleEffect5"
-        ),
+        effect: t("GambleEffect5"),
         secondRoll: true,
         secondEffects: [
           {
@@ -2579,45 +2569,35 @@ export const entropistGamble = {
     {
       rangeFrom: 1,
       rangeTo: 1,
-      effect: t(
-        "GambleEffect1"
-      ),
+      effect: t("GambleEffect1"),
       secondRoll: false,
       secondEffects: [],
     },
     {
       rangeFrom: 2,
       rangeTo: 3,
-      effect: t(
-        "GambleEffect2"
-      ),
+      effect: t("GambleEffect2"),
       secondRoll: false,
       secondEffects: [],
     },
     {
       rangeFrom: 4,
       rangeTo: 6,
-      effect: t(
-        "GambleEffect3"
-      ),
+      effect: t("GambleEffect3"),
       secondRoll: false,
       secondEffects: [],
     },
     {
       rangeFrom: 7,
       rangeTo: 8,
-      effect: t(
-        "GambleEffect4"
-      ),
+      effect: t("GambleEffect4"),
       secondRoll: false,
       secondEffects: [],
     },
     {
       rangeFrom: 9,
       rangeTo: 12,
-      effect: t(
-        "GambleEffect5"
-      ),
+      effect: t("GambleEffect5"),
       secondRoll: true,
       secondEffects: [
         {

@@ -37,7 +37,6 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
         alignItems: "stretch",
         py: 1,
         minHeight: 60,
-
       }}
     >
       {/* Attribute Selectors */}
@@ -98,7 +97,7 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
               attributes.find((attr) => attr.label === selectedAttr1).value,
               attributes.find((attr) => attr.label === selectedAttr2).value,
               selectedAttr1,
-              selectedAttr2
+              selectedAttr2,
             );
           }}
           sx={{

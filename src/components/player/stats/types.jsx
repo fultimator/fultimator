@@ -9,7 +9,7 @@ import {
   PhysicalIcon,
   PoisonIcon,
   WindIcon,
-} from "../../icons"
+} from "../../icons";
 import { useTranslate } from "../../../translation/translate";
 // import { typeList } from "../../typeConstants";
 
@@ -61,8 +61,9 @@ export function TypeAffinity({ type, affinity }) {
         textAlign: "left",
         textTransform: "uppercase",
         px: 0.2,
-        fontSize: "1rem"
-      }}>
+        fontSize: "1rem",
+      }}
+    >
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
       {/* Affinity */} {affinity}

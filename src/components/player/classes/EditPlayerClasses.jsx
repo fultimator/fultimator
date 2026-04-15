@@ -56,7 +56,7 @@ export default function EditPlayerClasses({
       : 0;
     if (player.classes && player.classes.length - maxLevelClasses > 3) {
       newWarnings.push(
-        "The number of classes exceeds the limit beyond the number of classes at level 10."
+        "The number of classes exceeds the limit beyond the number of classes at level 10.",
       );
     }
 
@@ -79,7 +79,7 @@ export default function EditPlayerClasses({
 
       /* Add class from data */
       const classExists = player.classes.some(
-        (cls) => cls.name.toLowerCase() === name.toLowerCase()
+        (cls) => cls.name.toLowerCase() === name.toLowerCase(),
       );
 
       if (classExists) {
@@ -124,7 +124,7 @@ export default function EditPlayerClasses({
   const addClassToPlayer = (name, isHomebrew) => {
     // Check if the selected class type already exists in player's classes
     const classExists = player.classes.some(
-      (cls) => cls.name.toLowerCase() === name.toLowerCase()
+      (cls) => cls.name.toLowerCase() === name.toLowerCase(),
     );
 
     if (classExists) {
@@ -230,7 +230,7 @@ export default function EditPlayerClasses({
     skillName,
     maxLevel,
     description,
-    specialSkill
+    specialSkill,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -263,7 +263,7 @@ export default function EditPlayerClasses({
     skillName,
     maxLevel,
     description,
-    specialSkill
+    specialSkill,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -388,7 +388,7 @@ export default function EditPlayerClasses({
     if (type !== "classes") return;
 
     const classExists = player.classes.some(
-      (cls) => cls.name.toLowerCase() === item.name.toLowerCase()
+      (cls) => cls.name.toLowerCase() === item.name.toLowerCase(),
     );
     if (classExists) {
       alert(t("This class type already exists for the character"));
@@ -442,7 +442,7 @@ export default function EditPlayerClasses({
             }}
           >
             <Grid container spacing={2}>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Classes")}
@@ -454,7 +454,7 @@ export default function EditPlayerClasses({
                 />
               </Grid>
               {warnings.map((warning, index) => (
-                <Grid  key={index} size={12}>
+                <Grid key={index} size={12}>
                   <Alert variant="filled" severity="warning">
                     {t(warning)}
                   </Alert>
@@ -571,7 +571,7 @@ export default function EditPlayerClasses({
             borderColor: secondary,
           }}
         >
-          <Grid  size={12}>
+          <Grid size={12}>
             <Typography variant="h3" align="center">
               {t("No classes added yet")}
             </Typography>
@@ -631,11 +631,15 @@ export default function EditPlayerClasses({
             fullWidth
             value={newClassName}
             onChange={(e) => setNewClassName(e.target.value)}
-            sx={{mt: 2}}
+            sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color="secondary" variant="contained">
+          <Button
+            onClick={() => setDialogOpen(false)}
+            color="secondary"
+            variant="contained"
+          >
             {t("Cancel")}
           </Button>
           <Button

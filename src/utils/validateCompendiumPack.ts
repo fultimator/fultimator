@@ -43,7 +43,10 @@ export function validateManifest(manifest: unknown): ValidationResult {
   if (m.author !== undefined && typeof m.author !== "string") {
     errors.push('"author" must be a string');
   }
-  if (m.fultimatorMinVersion !== undefined && typeof m.fultimatorMinVersion !== "string") {
+  if (
+    m.fultimatorMinVersion !== undefined &&
+    typeof m.fultimatorMinVersion !== "string"
+  ) {
     errors.push('"fultimatorMinVersion" must be a string');
   }
   if (
@@ -52,7 +55,7 @@ export function validateManifest(manifest: unknown): ValidationResult {
     !isVersionCompatible(m.fultimatorMinVersion)
   ) {
     errors.push(
-      `Pack requires fultimator >= ${m.fultimatorMinVersion} (current: ${APP_VERSION})`
+      `Pack requires fultimator >= ${m.fultimatorMinVersion} (current: ${APP_VERSION})`,
     );
   }
 
