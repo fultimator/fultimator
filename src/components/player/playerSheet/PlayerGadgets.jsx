@@ -24,7 +24,7 @@ import { Info, Casino, CheckCircle } from "@mui/icons-material";
 import SpellTinkererAlchemy from "../spells/SpellTinkererAlchemy";
 import SpellTinkererInfusion from "../spells/SpellTinkererInfusion";
 import SpellTinkererMagitech from "../spells/SpellTinkererMagitech";
-import { syncSlots } from "../../player/equipment/slots/loadoutActions";
+import { syncSlots } from "../equipment/slots/equipmentSlots";
 
 const ranks = ["Basic", "Advanced", "Superior"]; // Define ranks
 const elements = ["physical", "wind", "bolt", "earth", "fire", "ice"];

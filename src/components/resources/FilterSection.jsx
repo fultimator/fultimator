@@ -15,7 +15,7 @@ import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import {
   getTypeIcon,
-  getTypeLabel,
+  useTypeLabel,
   getTypeColor,
   languages
 } from "./resourceUtils";
@@ -33,6 +33,7 @@ export default function FilterSection({
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const getTypeLabel = useTypeLabel();
 
   return (
     <Paper

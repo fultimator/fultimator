@@ -25,7 +25,7 @@ import { useTheme } from "@mui/material/styles";
 import {
   getTypeIcon,
   getTypeColor,
-  getTypeLabel,
+  useTypeLabel,
   languages,
 } from "./resourceUtils";
 
@@ -37,6 +37,7 @@ export default function ResourceCard({
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const getTypeLabel = useTypeLabel();
 
   const [digitalDialogOpen, setDigitalDialogOpen] = useState(false);
   const [physicalDialogOpen, setPhysicalDialogOpen] = useState(false);
