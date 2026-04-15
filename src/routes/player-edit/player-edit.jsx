@@ -27,10 +27,6 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Tabs } from "@mui/base/Tabs";
-import { TabsList as BaseTabsList } from "@mui/base/TabsList";
-import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
-import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import Layout from "../../components/Layout";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
@@ -63,7 +59,18 @@ import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
-import { BugReport, Save, Info, KeyboardArrowUp, FullscreenTwoTone, FullscreenExitTwoTone, Download, Settings, Lock, LockOpen } from "@mui/icons-material";
+import {
+  BugReport,
+  Save,
+  Info,
+  KeyboardArrowUp,
+  FullscreenTwoTone,
+  FullscreenExitTwoTone,
+  Download,
+  Settings,
+  Lock,
+  LockOpen,
+} from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
@@ -97,9 +104,12 @@ import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
 import PlayerDance from "../../components/player/playerSheet/PlayerDance";
 import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 import { fixVerticalLabels } from "../../utility/screenshotFix";
-import { applyPreSaveTransforms, applyPostLoadTransforms } from '../../components/player/playerTransforms';
+import {
+  applyPreSaveTransforms,
+  applyPostLoadTransforms,
+} from "../../components/player/playerTransforms";
 import classList from "../../libs/classes";
-import PlayerLoadout from '../../components/player/playerSheet/PlayerLoadout';
+import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
 
@@ -111,14 +121,19 @@ export default function PlayerEdit() {
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
   const location = useLocation();
 
-  const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] = useState(false);
-  const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] = useState(false);
+  const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] =
+    useState(false);
+  const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] =
+    useState(false);
 
   let params = useParams(); // URL parameters hook
 
   // UUIDs (crypto.randomUUID) come from IDB on both web and desktop.
   // Firestore auto-IDs are 20-char alphanumeric: never match the UUID pattern.
-  const isLocalPlayer = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.playerId);
+  const isLocalPlayer =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      params.playerId,
+    );
 
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
@@ -128,8 +143,10 @@ export default function PlayerEdit() {
   const cloudRef = cloudDb.doc("player-personal", params.playerId);
 
   // Both hooks are always called, then we choose the source.
-  const [localPlayer, localLoading, localError] = localDb.useDocumentData(localRef);
-  const [cloudPlayer, cloudLoading, cloudError] = cloudDb.useDocumentData(cloudRef);
+  const [localPlayer, localLoading, localError] =
+    localDb.useDocumentData(localRef);
+  const [cloudPlayer, cloudLoading, cloudError] =
+    cloudDb.useDocumentData(cloudRef);
 
   const requestedMode =
     location?.state?.dbMode === "local" || location?.state?.dbMode === "cloud"
@@ -169,7 +186,7 @@ export default function PlayerEdit() {
 
   const [ritualClockSections, setRitualClockSections] = useState(4);
   const [ritualClockState, setRitualClockState] = useState(
-    new Array(4).fill(false)
+    new Array(4).fill(false),
   );
 
   const [isSheetEditMode, setIsSheetEditMode] = useState(true);
@@ -177,7 +194,8 @@ export default function PlayerEdit() {
 
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
-  const isOwner = isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
+  const isOwner =
+    isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
   const isEditMode = isOwner && isSheetEditMode;
 
   const handleCtrlS = useCallback(
@@ -189,13 +207,13 @@ export default function PlayerEdit() {
           ...playerTemp,
           settings: {
             ...playerTemp?.settings,
-            defaultView: compactView ? "compact" : "normal"
-          }
+            defaultView: compactView ? "compact" : "normal",
+          },
         };
         activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
       }
     },
-    [ref, playerTemp, compactView, isOwner, activeSetDoc]
+    [ref, playerTemp, compactView, isOwner, activeSetDoc],
   );
 
   useEffect(() => {
@@ -210,7 +228,9 @@ export default function PlayerEdit() {
 
   useEffect(() => {
     if (player) {
-      const updatedPlayerTemp = applyPostLoadTransforms(JSON.parse(JSON.stringify(player)));
+      const updatedPlayerTemp = applyPostLoadTransforms(
+        JSON.parse(JSON.stringify(player)),
+      );
       setPlayerTemp(updatedPlayerTemp);
       setIsUpdated(false);
       setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
@@ -220,12 +240,14 @@ export default function PlayerEdit() {
   const playerBaseline = useMemo(() => {
     if (!player) return null;
     return applyPreSaveTransforms(
-      applyPostLoadTransforms(JSON.parse(JSON.stringify(player)))
+      applyPostLoadTransforms(JSON.parse(JSON.stringify(player))),
     );
   }, [player]);
 
   useEffect(() => {
-    const current = playerTemp ? applyPreSaveTransforms(playerTemp) : playerTemp;
+    const current = playerTemp
+      ? applyPreSaveTransforms(playerTemp)
+      : playerTemp;
     setIsUpdated(!deepEqual(current, playerBaseline));
   }, [playerTemp, playerBaseline]);
 
@@ -234,7 +256,9 @@ export default function PlayerEdit() {
   const [download] = useDownload();
 
   const takeScreenshot = async () => {
-    const element = document.getElementById(compactView ? "character-sheet-short" : "character-sheet");
+    const element = document.getElementById(
+      compactView ? "character-sheet-short" : "character-sheet",
+    );
     const cleanup = fixVerticalLabels(element);
     const canvas = await html2canvas(element, {
       useCORS: true,
@@ -317,17 +341,26 @@ export default function PlayerEdit() {
             hp: {
               ...prevPlayer.stats.hp,
               max: maxHP,
-              current: Math.min(Number(prevPlayer.stats.hp.current) || 0, maxHP),
+              current: Math.min(
+                Number(prevPlayer.stats.hp.current) || 0,
+                maxHP,
+              ),
             },
             mp: {
               ...prevPlayer.stats.mp,
               max: maxMP,
-              current: Math.min(Number(prevPlayer.stats.mp.current) || 0, maxMP),
+              current: Math.min(
+                Number(prevPlayer.stats.mp.current) || 0,
+                maxMP,
+              ),
             },
             ip: {
               ...prevPlayer.stats.ip,
               max: maxIP,
-              current: Math.min(Number(prevPlayer.stats.ip.current) || 0, maxIP),
+              current: Math.min(
+                Number(prevPlayer.stats.ip.current) || 0,
+                maxIP,
+              ),
             },
           },
         };
@@ -343,7 +376,7 @@ export default function PlayerEdit() {
   //           skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
   //       )
   //     );
-      
+
   //     const inv = playerTemp.equipment?.[0];
   //     const equippedShields =
   //       inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
@@ -398,7 +431,9 @@ export default function PlayerEdit() {
       .flatMap((cls) => cls.skills ?? [])
       .map((skill) => skill.specialSkill)
       .filter(Boolean);
-    return Array.from(new Set(specialSkills)).sort((a, b) => a.localeCompare(b));
+    return Array.from(new Set(specialSkills)).sort((a, b) =>
+      a.localeCompare(b),
+    );
   }, []);
 
   const activeSpecialSkillMap = useMemo(() => {
@@ -457,8 +492,8 @@ export default function PlayerEdit() {
       specialSkillOverrides: {
         ...Object.fromEntries(
           Object.entries(prevSettings.specialSkillOverrides ?? {}).filter(
-            ([name, value]) => name !== skillName && value === true
-          )
+            ([name, value]) => name !== skillName && value === true,
+          ),
         ),
         ...(checked ? { [skillName]: true } : {}),
       },
@@ -479,7 +514,9 @@ export default function PlayerEdit() {
     return (
       <Layout>
         <Box sx={{ p: 3 }}>
-          <Typography variant="h6">{t("Could not load this player.")}</Typography>
+          <Typography variant="h6">
+            {t("Could not load this player.")}
+          </Typography>
         </Box>
       </Layout>
     );
@@ -497,7 +534,7 @@ export default function PlayerEdit() {
 
   return (
     <Layout unsavedChanges={isUpdated}>
-      <Tabs value={openTab} onChange={handleTabChange}>
+      <Box>
         {isSmallScreen ? (
           <>
             <Drawer
@@ -544,36 +581,95 @@ export default function PlayerEdit() {
             </Drawer>
           </>
         ) : (
-          <TabsList primary={ternary} secondary={secondary} ternary={ternary}>
-            {/* spacer mirrors the toggle button to keep tabs visually centered */}
-            <Box sx={{ width: 32, flexShrink: 0 }} />
-            <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Tab value={0}>{t("Player Sheet")}</Tab>
-              <Divider orientation="vertical" flexItem />
-              <Tab value={1}>{t("Informations")}</Tab>
-              <Tab value={2}>{t("Stats")}</Tab>
-              <Tab value={3}>{t("Classes")}</Tab>
-              <Tab value={4}>{t("Spells")}</Tab>
-              <Tab value={5}>{t("Equipment")}</Tab>
-              <Tab value={6}>{t("Notes")}</Tab>
-              <Tab value={7}><Settings /></Tab>
-            </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+            <TabsList primary={ternary}>
+              <Tab
+                onClick={(e) => handleTabChange(e, 0)}
+                isActive={openTab === 0}
+              >
+                {t("Player Sheet")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 1)}
+                isActive={openTab === 1}
+              >
+                {t("Informations")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 2)}
+                isActive={openTab === 2}
+              >
+                {t("Stats")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 3)}
+                isActive={openTab === 3}
+              >
+                {t("Classes")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 4)}
+                isActive={openTab === 4}
+              >
+                {t("Spells")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 5)}
+                isActive={openTab === 5}
+              >
+                {t("Equipment")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 6)}
+                isActive={openTab === 6}
+              >
+                {t("Notes")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 7)}
+                isActive={openTab === 7}
+                sx={{ minWidth: 48 }}
+              >
+                <Settings />
+              </Tab>
+            </TabsList>
             {isOwner ? (
-              <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
-                <IconButton size="small" onClick={() => setIsSheetEditMode((v) => !v)} sx={{ color: "inherit", flexShrink: 0 }}>
-                  {isSheetEditMode ? <LockOpen /> : <Lock />}
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Box sx={{ width: 32, flexShrink: 0 }} />
-            )}
-          </TabsList>
+              <Paper
+                elevation={0}
+                sx={{
+                  backgroundColor: ternary,
+                  borderRadius: "12px",
+                  px: 0.5,
+                  py: 0.5,
+                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Tooltip
+                  title={
+                    isSheetEditMode
+                      ? t("Switch to Preview Mode")
+                      : t("Switch to Edit Mode")
+                  }
+                >
+                  <IconButton
+                    size="small"
+                    onClick={() => setIsSheetEditMode((v) => !v)}
+                    sx={{ color: "inherit", flexShrink: 0 }}
+                  >
+                    {isSheetEditMode ? <LockOpen /> : <Lock />}
+                  </IconButton>
+                </Tooltip>
+              </Paper>
+            ) : null}
+          </Box>
         )}
 
         {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
-            <Grid  size={isSmallScreen ? 10 : 6}>
+            <Grid size={isSmallScreen ? 10 : 6}>
               <Button
                 variant="contained"
                 color="primary"
@@ -584,7 +680,7 @@ export default function PlayerEdit() {
                 {t("Download Character Sheet")}
               </Button>
             </Grid>
-            <Grid  size={isSmallScreen ? 2 : 6}>
+            <Grid size={isSmallScreen ? 2 : 6}>
               <Button
                 variant="outlined"
                 color="primary"
@@ -592,11 +688,9 @@ export default function PlayerEdit() {
                 style={{ width: "100%" }}
                 sx={{ display: isSmallScreen ? "none" : "flex" }}
               >
-                {compactView
-                  ? t("Normal View")
-                  : t("Compact View")}
+                {compactView ? t("Normal View") : t("Compact View")}
               </Button>
-              
+
               {/* Mobile icon version */}
               {isSmallScreen && (
                 <IconButton
@@ -614,16 +708,17 @@ export default function PlayerEdit() {
             </Grid>
           </Grid>
         )}
-        
-        <TabPanel value={0}>
+
+        <TabPanel value={0} currentValue={openTab}>
           {compactView ? (
             <Grid
               container
               sx={{
                 justifyContent: "center",
-                padding: 1
-              }}>
-              <Grid container  size={12}>
+                padding: 1,
+              }}
+            >
+              <Grid container size={12}>
                 <PlayerCardSheet
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
@@ -633,7 +728,9 @@ export default function PlayerEdit() {
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
                   updateMaxStats={updateMaxStats}
-                  onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
+                  onToggleEditMode={
+                    isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
+                  }
                   onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
                 />
@@ -649,11 +746,20 @@ export default function PlayerEdit() {
                 updateMaxStats={updateMaxStats}
               />
               <Divider sx={{ my: 1 }} />
-              <PlayerNumbers player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} isOwner={isOwner} />
+              <PlayerNumbers
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+                isOwner={isOwner}
+              />
               <Divider sx={{ my: 1 }} />
               <GenericRolls player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
-              <PlayerBonds player={playerTemp} setPlayer={setPlayerTemp} isEditMode={isEditMode} />
+              <PlayerBonds
+                player={playerTemp}
+                setPlayer={setPlayerTemp}
+                isEditMode={isEditMode}
+              />
               <PlayerNotes
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -748,9 +854,7 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
               />
-              <PlayerTherioforms
-                player={playerTemp}
-              />
+              <PlayerTherioforms player={playerTemp} />
               <PlayerGourmet
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -775,7 +879,7 @@ export default function PlayerEdit() {
             </div>
           )}
         </TabPanel>
-        <TabPanel value={1}>
+        <TabPanel value={1} currentValue={openTab}>
           <EditPlayerBasics
             player={playerTemp}
             setPlayer={setPlayerTemp}
@@ -831,7 +935,7 @@ export default function PlayerEdit() {
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={2}>
+        <TabPanel value={2} currentValue={openTab}>
           <EditPlayerAttributes
             player={playerTemp}
             setPlayer={setPlayerTemp}
@@ -871,7 +975,7 @@ export default function PlayerEdit() {
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={3}>
+        <TabPanel value={3} currentValue={openTab}>
           <EditPlayerClasses
             player={playerTemp}
             setPlayer={setPlayerTemp}
@@ -879,28 +983,28 @@ export default function PlayerEdit() {
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={4}>
+        <TabPanel value={4} currentValue={openTab}>
           <EditPlayerSpells
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={5}>
+        <TabPanel value={5} currentValue={openTab}>
           <EditPlayerEquipment
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={6}>
+        <TabPanel value={6} currentValue={openTab}>
           <EditPlayerNotes
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
           />
         </TabPanel>
-        <TabPanel value={7}>
+        <TabPanel value={7} currentValue={openTab}>
           <Paper
             elevation={3}
             sx={{
@@ -911,7 +1015,7 @@ export default function PlayerEdit() {
             }}
           >
             <Grid container spacing={2}>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <CustomHeader
                   type="top"
                   headerText={t("Settings")}
@@ -919,16 +1023,22 @@ export default function PlayerEdit() {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid  size={12}>
+              <Grid size={12}>
                 <Box sx={{ px: 2, pb: 2 }}>
                   <SettingRow
                     label={t("Default View")}
                     hint={t("Choose which view opens first in Player Edit.")}
                   >
-                    <FormControl variant="outlined" size="small" sx={{ minWidth: 180 }}>
+                    <FormControl
+                      variant="outlined"
+                      size="small"
+                      sx={{ minWidth: 180 }}
+                    >
                       <Select
                         value={defaultView}
-                        onChange={(e) => handleDefaultViewChange(e.target.value)}
+                        onChange={(e) =>
+                          handleDefaultViewChange(e.target.value)
+                        }
                       >
                         <MenuItem value="normal">{t("Normal View")}</MenuItem>
                         <MenuItem value="compact">{t("Compact View")}</MenuItem>
@@ -938,7 +1048,9 @@ export default function PlayerEdit() {
 
                   <SettingRow
                     label={t("Special Skills Overrides")}
-                    hint={t("Open a modal with active special skills and override toggles.")}
+                    hint={t(
+                      "Open a modal with active special skills and override toggles.",
+                    )}
                   >
                     <Button
                       variant="outlined"
@@ -951,7 +1063,9 @@ export default function PlayerEdit() {
 
                   <SettingRow
                     label={t("Optional Rules")}
-                    hint={t("Open optional features such as Quirks, Zero Power, and Technospheres.")}
+                    hint={t(
+                      "Open optional features such as Quirks, Zero Power, and Technospheres.",
+                    )}
                   >
                     <Button
                       variant="outlined"
@@ -975,7 +1089,7 @@ export default function PlayerEdit() {
           {t("Report a Bug")}
         </Button>
         <Box sx={{ height: "15vh" }} />
-      </Tabs>
+      </Box>
       {/* Floating Action Buttons */}
       {isSmallScreen && (
         <Box
@@ -988,7 +1102,11 @@ export default function PlayerEdit() {
           }}
         >
           <Fab onClick={toggleDrawer(true)} color="primary" size="medium">
-            <Stack direction="column" sx={{ alignItems: "center" }} spacing={0.5}>
+            <Stack
+              direction="column"
+              sx={{ alignItems: "center" }}
+              spacing={0.5}
+            >
               <MenuBookIcon fontSize="medium" />
               <Typography variant="caption" sx={{ fontSize: "10px" }}>
                 {t("Menu")}
@@ -1021,8 +1139,8 @@ export default function PlayerEdit() {
                   ...playerTemp,
                   settings: {
                     ...playerTemp?.settings,
-                    defaultView: compactView ? "compact" : "normal"
-                  }
+                    defaultView: compactView ? "compact" : "normal",
+                  },
                 };
                 activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
               }}
@@ -1046,13 +1164,23 @@ export default function PlayerEdit() {
         )}
 
         {isSmallScreen && isOwner && openTab === 0 && (
-          <Tooltip title={isSheetEditMode ? t("Switch to Preview Mode") : t("Switch to Edit Mode")}>
+          <Tooltip
+            title={
+              isSheetEditMode
+                ? t("Switch to Preview Mode")
+                : t("Switch to Edit Mode")
+            }
+          >
             <Fab
               size="medium"
               onClick={() => setIsSheetEditMode((v) => !v)}
               color="primary"
             >
-              {isSheetEditMode ? <LockOpen fontSize="medium" /> : <Lock fontSize="medium" />}
+              {isSheetEditMode ? (
+                <LockOpen fontSize="medium" />
+              ) : (
+                <Lock fontSize="medium" />
+              )}
             </Fab>
           </Tooltip>
         )}
@@ -1077,30 +1205,42 @@ export default function PlayerEdit() {
                     hint={
                       isActive
                         ? `${t("Active in")}: ${activeSkill.classList.join(", ")} • ${t("Highest Level")}: ${activeSkill.level}`
-                        : t("Not currently active. Enable to force this special skill behavior.")
+                        : t(
+                            "Not currently active. Enable to force this special skill behavior.",
+                          )
                     }
                   >
                     <Checkbox
-                      checked={isActive || Boolean(specialSkillOverrides[skillName])}
+                      checked={
+                        isActive || Boolean(specialSkillOverrides[skillName])
+                      }
                       disabled={isActive}
                       onChange={(e) =>
-                        handleSpecialSkillOverrideChange(skillName, e.target.checked)
+                        handleSpecialSkillOverrideChange(
+                          skillName,
+                          e.target.checked,
+                        )
                       }
                     />
                   </SettingRow>
                 );
               })
             ) : (
-              <Typography variant="body2" sx={{
-                color: "text.secondary"
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("No special skills found in class definitions.")}
               </Typography>
             )}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>{t("Close")}</Button>
+          <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -1114,47 +1254,65 @@ export default function PlayerEdit() {
           <Box sx={{ mt: 1 }}>
             <SettingRow
               label={t("Quirks")}
-              hint={t("Enable or disable Quirk sections in Player Sheet and edit tabs.")}
+              hint={t(
+                "Enable or disable Quirk sections in Player Sheet and edit tabs.",
+              )}
             >
               <Checkbox
                 checked={optionalRules.quirks}
-                onChange={(e) => handleOptionalRuleChange("quirks", e.target.checked)}
+                onChange={(e) =>
+                  handleOptionalRuleChange("quirks", e.target.checked)
+                }
               />
             </SettingRow>
 
             <SettingRow
               label={t("Camp Activities")}
-              hint={t("Enable or disable Camp Activities sections in Player Sheet and edit tabs.")}
+              hint={t(
+                "Enable or disable Camp Activities sections in Player Sheet and edit tabs.",
+              )}
             >
               <Checkbox
                 checked={optionalRules.campActivities}
-                onChange={(e) => handleOptionalRuleChange("campActivities", e.target.checked)}
+                onChange={(e) =>
+                  handleOptionalRuleChange("campActivities", e.target.checked)
+                }
               />
             </SettingRow>
 
             <SettingRow
               label={t("Zero Power")}
-              hint={t("Enable or disable Zero Power sections in Player Sheet and edit tabs.")}
+              hint={t(
+                "Enable or disable Zero Power sections in Player Sheet and edit tabs.",
+              )}
             >
               <Checkbox
                 checked={optionalRules.zeroPower}
-                onChange={(e) => handleOptionalRuleChange("zeroPower", e.target.checked)}
+                onChange={(e) =>
+                  handleOptionalRuleChange("zeroPower", e.target.checked)
+                }
               />
             </SettingRow>
 
             <SettingRow
               label={t("Technospheres")}
-              hint={t("Placeholder toggle stored in settings for future Technospheres behavior.")}
+              hint={t(
+                "Placeholder toggle stored in settings for future Technospheres behavior.",
+              )}
             >
               <Checkbox
                 checked={optionalRules.technospheres}
-                onChange={(e) => handleOptionalRuleChange("technospheres", e.target.checked)}
+                onChange={(e) =>
+                  handleOptionalRuleChange("technospheres", e.target.checked)
+                }
               />
             </SettingRow>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsOptionalRulesModalOpen(false)}>{t("Close")}</Button>
+          <Button onClick={() => setIsOptionalRulesModalOpen(false)}>
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
       <HelpFeedbackDialog
@@ -1171,53 +1329,60 @@ export default function PlayerEdit() {
   );
 }
 
-const Tab = styled(BaseTab)(({ theme }) => ({
+const Tab = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "isActive",
+})(({ theme, isActive }) => ({
   fontFamily: "IBM Plex Sans, sans-serif",
-  color: theme.palette.text.primary,
-  cursor: "pointer",
+  color: isActive
+    ? theme.palette.primary.contrastText
+    : theme.palette.text.primary,
   fontSize: "0.875rem",
   fontWeight: "bold",
   backgroundColor: "transparent",
-  width: "100%",
-  lineHeight: 1.5,
-  padding: "8px 12px",
-  margin: "6px",
-  border: "none",
+  minWidth: "fit-content",
+  lineHeight: 1.2,
+  padding: "8px 10px",
+  margin: "4px",
   borderRadius: "8px",
-  display: "flex",
-  justifyContent: "center",
+  textTransform: "none",
+  border: "none",
+  whiteSpace: "nowrap",
   "&:hover": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: isActive
+      ? theme.palette.primary.main
+      : theme.palette.action.hover,
   },
-  "&:focus": {
-    color: theme.palette.text.primary,
-    outline: `3px solid ${theme.palette.primary.light}`,
-  },
-  [`&.${tabClasses.selected}`]: {
+  ...(isActive && {
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-  },
-  [`&.${tabClasses.disabled}`]: {
-    opacity: 0.5,
-    cursor: "not-allowed",
-  },
+  }),
 }));
 
-const TabPanel = styled(BaseTabPanel)(() => ({
-  width: "100%",
-  fontFamily: "IBM Plex Sans, sans-serif",
-  fontSize: "0.875rem",
-}));
+function TabPanel({ children, value, currentValue }) {
+  if (value !== currentValue) return null;
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        fontFamily: "IBM Plex Sans, sans-serif",
+        fontSize: "0.875rem",
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
-const TabsList = styled(BaseTabsList)(
-  ({ primary, _secondary, _ternary }) => `
+const TabsList = styled(Box)(
+  ({ primary }) => `
     min-width: 400px;
+    flex: 1;
     background-color: ${primary};
     border-radius: 12px;
-    margin-bottom: 16px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    overflow-x: auto;
     padding: 0 4px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-  `
+  `,
 );

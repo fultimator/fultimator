@@ -20,7 +20,9 @@
     "local-deploy": "node DownloadTranslations.js && vite build && npx serve dist",
     "deploy": "node DownloadTranslations.js && vite build && firebase deploy",
     "translate": "node DownloadTranslations.js",
-    "lint": "eslint . --report-unused-disable-directives-severity warn"
+    "lint": "eslint . --report-unused-disable-directives-severity warn",
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -33,7 +35,6 @@
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mui/base": "^5.0.0-beta.70",
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
     "@supabase/supabase-js": "^2.49.8",
@@ -87,11 +88,15 @@
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^30.0.1",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^26.8.1",
     "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
     "typescript": "^5.2.2",
     "typescript-eslint": "^8.0.0",
     "vite": "^6.0.0",
@@ -114,5 +119,14 @@
   "buildcounter": {
     "version": "2.0.0",
     "count": 82
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,md,json}": [
+      "prettier --write"
+    ]
   }
 }
