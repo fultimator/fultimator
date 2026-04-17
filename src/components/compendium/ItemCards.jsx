@@ -23,7 +23,6 @@ import Diamond from "../Diamond";
 import attributes from "../../libs/attributes";
 import types from "../../libs/types";
 import {
-  spellList,
   tinkererAlchemy,
   tinkererInfusion,
   arcanumList,

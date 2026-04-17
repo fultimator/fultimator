@@ -3,10 +3,8 @@ import {
   Paper,
   Grid,
   Typography,
-  useMediaQuery,
-  IconButton,
-  TextField,
   Box,
+  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,12 +13,9 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import ZenitIcon from "../../svgs/zenit.svg?react";
-import ExpIcon from "../../svgs/exp.svg?react";
-import FabulaIcon from "../../svgs/fabula.svg?react";
 
 function ZenitDialog({ open, handleClose, currentValue, onApply, t }) {
   const [amount, setAmount] = useState("");
@@ -106,14 +101,12 @@ function ZenitDialog({ open, handleClose, currentValue, onApply, t }) {
 export default function PlayerNumbers({
   player,
   setPlayer,
-  isEditMode,
   isOwner,
   isCharacterSheet,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [zenitOpen, setZenitOpen] = useState(false);
 
@@ -122,11 +115,6 @@ export default function PlayerNumbers({
       ...prev,
       info: { ...prev.info, [key]: value },
     }));
-  };
-
-  const handleIncrement = (key, delta) => {
-    const current = parseInt(player.info[key], 10) || 0;
-    handleUpdate(key, Math.max(0, current + delta));
   };
 
   return (
@@ -154,154 +142,11 @@ export default function PlayerNumbers({
         spacing={{ xs: 1, md: 2 }}
         sx={{ padding: "1em", alignItems: "center", width: "100%" }}
       >
-        {/* Fabula Points */}
-        <Grid
-          size={{
-            xs: 4,
-            md: 4,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize: { xs: "0.8rem", md: "1rem" },
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                }}
-              >
-                {t("Fabula Points")}
-              </Typography>
-              <FabulaIcon style={{ width: "18px", height: "18px" }} />
-            </Box>
-            {isEditMode ? (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() => handleIncrement("fabulapoints", -1)}
-                >
-                  <Remove fontSize="small" />
-                </IconButton>
-                <TextField
-                  value={player.info.fabulapoints}
-                  onChange={(e) =>
-                    handleUpdate(
-                      "fabulapoints",
-                      parseInt(e.target.value, 10) || 0,
-                    )
-                  }
-                  size="small"
-                  variant="standard"
-                  slotProps={{
-                    htmlInput: {
-                      style: {
-                        textAlign: "center",
-                        width: "40px",
-                        fontWeight: "bold",
-                        fontSize: "1.2rem",
-                      },
-                    },
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  onClick={() => handleIncrement("fabulapoints", 1)}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Box>
-            ) : (
-              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                {player.info.fabulapoints}
-              </Typography>
-            )}
-          </Box>
-        </Grid>
-
-        {/* EXP */}
-        <Grid
-          size={{
-            xs: 4,
-            md: 4,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 0.5 }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize: { xs: "0.8rem", md: "1rem" },
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                }}
-              >
-                {isMobile ? "Exp" : t("Exp")}
-              </Typography>
-              <ExpIcon style={{ width: "18px", height: "18px" }} />
-            </Box>
-            {isEditMode ? (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={() => handleIncrement("exp", -1)}
-                >
-                  <Remove fontSize="small" />
-                </IconButton>
-                <TextField
-                  value={player.info.exp}
-                  onChange={(e) =>
-                    handleUpdate("exp", parseInt(e.target.value, 10) || 0)
-                  }
-                  size="small"
-                  variant="standard"
-                  slotProps={{
-                    htmlInput: {
-                      style: {
-                        textAlign: "center",
-                        width: "40px",
-                        fontWeight: "bold",
-                        fontSize: "1.2rem",
-                      },
-                    },
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  onClick={() => handleIncrement("exp", 1)}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Box>
-            ) : (
-              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                {player.info.exp}
-              </Typography>
-            )}
-          </Box>
-        </Grid>
-
         {/* Zenit */}
         <Grid
           size={{
-            xs: 4,
-            md: 4,
+            xs: 12,
+            md: 12,
           }}
         >
           <Box

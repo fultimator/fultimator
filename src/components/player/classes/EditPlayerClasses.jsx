@@ -207,6 +207,13 @@ export default function EditPlayerClasses({
       };
     }
 
+    // Update player level to match sum of class levels
+    const totalLevels = updatedPlayer.classes.reduce(
+      (acc, cls) => acc + parseInt(cls.lvl),
+      0,
+    );
+    updatedPlayer.lvl = totalLevels;
+
     setPlayer(updatedPlayer);
     updateMaxStats();
   };

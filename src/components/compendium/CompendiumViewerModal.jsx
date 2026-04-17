@@ -235,6 +235,8 @@ const CompendiumViewerModal = ({
     initialSpellClass,
     initialSearchQuery,
     initialModuleTypeFilter,
+    initialOptionalSubtypes,
+    restrictToTypes,
   ]);
 
   const activePack =
@@ -495,7 +497,7 @@ const CompendiumViewerModal = ({
   // Handlers
   const handleTypeChange = useCallback(
     (type) => {
-      if (restrictToTypes && !restrictToTypes.includes(type)) return;
+      if (restrictToTypes?.length && !restrictToTypes.includes(type)) return;
       setSelectedType(type);
       setSearchQuery("");
       setSelectedIdx(null);

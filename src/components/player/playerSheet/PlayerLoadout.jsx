@@ -167,7 +167,7 @@ function SlotCard({
         (resolved.item?.accuracyCheck?.att1 &&
           resolved.item?.accuracyCheck?.att2));
 
-  const clickable = !locked && isEditMode && !!onClick && !isAux;
+  const clickable = !locked && !!onClick && !isAux;
   const showRoll = !!onRoll && isWeaponType && !isEmpty;
   const showSwap =
     !!onSwap &&
@@ -353,7 +353,7 @@ function SlotCard({
 
 function VehicleSupportCard({ label, module, isEditMode, onClick }) {
   const { t } = useTranslate();
-  const clickable = isEditMode && !!onClick;
+  const clickable = !!onClick;
   const content = (
     <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
       {module ? (
@@ -475,7 +475,7 @@ export default function PlayerLoadout({
   const theme = useCustomTheme();
   const primary = theme.primary;
   const secondary = theme.secondary;
-  const canClickSlot = isEditMode || (isCharacterSheet && !!isOwner);
+  const canClickSlot = isEditMode || !!isOwner || !!setPlayer;
 
   const [pickerSlot, setPickerSlot] = useState(null);
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =

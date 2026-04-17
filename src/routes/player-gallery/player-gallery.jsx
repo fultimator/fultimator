@@ -399,7 +399,13 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = { ...player, name: newName, published: false };
+      // Apply migrations before copying to cloud
+      const migrated = applyPostLoadTransforms(player);
+      const data = applyPreSaveTransforms({
+        ...migrated,
+        name: newName,
+        published: false,
+      });
       delete data.id;
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       notify(t("Copied to Cloud"));
@@ -441,7 +447,13 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = { ...player, name: newName, published: false };
+      // Apply migrations before moving to cloud
+      const migrated = applyPostLoadTransforms(player);
+      const data = applyPreSaveTransforms({
+        ...migrated,
+        name: newName,
+        published: false,
+      });
       delete data.id;
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
@@ -459,6 +471,8 @@ function Personal() {
       const migrated = applyPostLoadTransforms(player);
       await db.setDoc(ref, applyPreSaveTransforms(migrated));
     }
+    // Wait longer for Firestore to propagate changes to real-time listeners
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
 
   const toggleSelectMode = () => {
@@ -524,7 +538,13 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, published: false };
+        // Apply migrations before copying to cloud
+        const migrated = applyPostLoadTransforms(p);
+        const data = applyPreSaveTransforms({
+          ...migrated,
+          name: newName,
+          published: false,
+        });
         delete data.id;
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
@@ -579,7 +599,13 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, published: false };
+        // Apply migrations before moving to cloud
+        const migrated = applyPostLoadTransforms(p);
+        const data = applyPreSaveTransforms({
+          ...migrated,
+          name: newName,
+          published: false,
+        });
         delete data.id;
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
@@ -628,7 +654,13 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, published: false };
+        // Apply migrations before copying to cloud
+        const migrated = applyPostLoadTransforms(p);
+        const data = applyPreSaveTransforms({
+          ...migrated,
+          name: newName,
+          published: false,
+        });
         delete data.id;
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
@@ -680,7 +712,13 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = { ...p, name: newName, published: false };
+        // Apply migrations before moving to cloud
+        const migrated = applyPostLoadTransforms(p);
+        const data = applyPreSaveTransforms({
+          ...migrated,
+          name: newName,
+          published: false,
+        });
         delete data.id;
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));

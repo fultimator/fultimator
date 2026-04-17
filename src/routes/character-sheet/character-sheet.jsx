@@ -13,8 +13,13 @@ import {
   Box,
   useMediaQuery,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import html2canvas from "html2canvas";
+import Confetti from "react-confetti";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
 import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
@@ -103,6 +108,9 @@ export default function CharacterSheet() {
   const [isUpdated, setIsUpdated] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
+  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 250);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -167,7 +175,7 @@ export default function CharacterSheet() {
       setPlayer((prevPlayer) => {
         const lvl = Number(prevPlayer.lvl) || 0;
         const might = Number(prevPlayer.attributes?.might) || 0;
-        const willpower = Number(prevPlayer.attributes?.will) || 0;
+        const willpower = Number(prevPlayer.attributes?.willpower) || 0;
 
         const baseMaxHP = lvl + might * 5;
         const baseMaxMP = lvl + willpower * 5;
@@ -311,6 +319,107 @@ export default function CharacterSheet() {
     }
   };
 
+  const canLevelUpFromExp =
+    isOwner &&
+    (parseInt(player?.info?.exp, 10) || 0) >= 10 &&
+    (player?.lvl || 0) < 50;
+
+  const handleConfirmLevelUpFromExp = () => {
+    setPlayer((prevPlayer) => {
+      if (!prevPlayer) return prevPlayer;
+
+      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
+      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
+
+      const leveledPlayer = {
+        ...prevPlayer,
+        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
+        info: {
+          ...prevPlayer.info,
+          exp: Math.max(0, currentExp - 10),
+        },
+      };
+
+      // Recalculate max stats for the new level
+      const mig = Number(leveledPlayer.attributes?.might) || 0;
+      const wil = Number(leveledPlayer.attributes?.willpower) || 0;
+      const lvl = Number(leveledPlayer.lvl) || 0;
+
+      const baseMaxHP = mig * 5 + lvl;
+      const baseMaxMP = wil * 5 + lvl;
+
+      let hpBonus = 0;
+      let mpBonus = 0;
+      let ipBonus = 0;
+
+      (leveledPlayer.classes || []).forEach((cls) => {
+        if (cls.benefits) {
+          hpBonus += Number(cls.benefits.hpplus) || 0;
+          mpBonus += Number(cls.benefits.mpplus) || 0;
+          ipBonus += Number(cls.benefits.ipplus) || 0;
+        }
+      });
+
+      if (leveledPlayer.modifiers) {
+        hpBonus += Number(leveledPlayer.modifiers.hp) || 0;
+        mpBonus += Number(leveledPlayer.modifiers.mp) || 0;
+        ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
+      }
+
+      const fortressBonus = (leveledPlayer.classes || [])
+        .map((cls) => cls.skills || [])
+        .flat()
+        .filter((skill) => skill.specialSkill === "Fortress")
+        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+        .reduce((a, b) => a + b, 0);
+      hpBonus += fortressBonus;
+
+      const focusedBonus = (leveledPlayer.classes || [])
+        .map((cls) => cls.skills || [])
+        .flat()
+        .filter((skill) => skill.specialSkill === "Focused")
+        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+        .reduce((a, b) => a + b, 0);
+      mpBonus += focusedBonus;
+
+      const maxHP = baseMaxHP + hpBonus;
+      const maxMP = baseMaxMP + mpBonus;
+      const maxIP = 6 + ipBonus;
+
+      return {
+        ...leveledPlayer,
+        stats: {
+          hp: {
+            ...leveledPlayer.stats.hp,
+            max: maxHP,
+            current: Math.min(
+              Number(leveledPlayer.stats.hp.current) || 0,
+              maxHP,
+            ),
+          },
+          mp: {
+            ...leveledPlayer.stats.mp,
+            max: maxMP,
+            current: Math.min(
+              Number(leveledPlayer.stats.mp.current) || 0,
+              maxMP,
+            ),
+          },
+          ip: {
+            ...leveledPlayer.stats.ip,
+            max: maxIP,
+            current: Math.min(
+              Number(leveledPlayer.stats.ip.current) || 0,
+              maxIP,
+            ),
+          },
+        },
+      };
+    });
+    setLevelUpDialogOpen(false);
+    setLevelUpCelebrationOpen(true);
+  };
+
   if (!player) {
     return null;
   }
@@ -403,6 +512,8 @@ export default function CharacterSheet() {
                   isCharacterSheet={true}
                   characterImage={player.info.imgurl}
                   updateMaxStats={updateMaxStats}
+                  canLevelUpFromExp={canLevelUpFromExp}
+                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
                 />
                 <PlayerNumbers
                   player={player}
@@ -561,6 +672,9 @@ export default function CharacterSheet() {
               optionalRules={optionalRules}
               characterImage={player.info.imgurl}
               id="character-sheet-short"
+              canLevelUpFromExp={canLevelUpFromExp}
+              onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+              updateMaxStats={updateMaxStats}
             />
           </Grid>
         </Grid>
@@ -609,6 +723,57 @@ export default function CharacterSheet() {
             </Fab>
           </Tooltip>
         </Box>
+      )}
+      <Dialog
+        open={levelUpDialogOpen}
+        onClose={() => setLevelUpDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle variant="h4">{t("Level Up Confirmation")}</DialogTitle>
+        <DialogContent>
+          <Typography>{t("Do you want to use 10 EXP to level up?")}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setLevelUpDialogOpen(false)}
+          >
+            {t("Cancel")}
+          </Button>
+          <Button variant="contained" onClick={handleConfirmLevelUpFromExp}>
+            {t("Level Up")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={levelUpCelebrationOpen}
+        onClose={() => setLevelUpCelebrationOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle variant="h4">{t("New Level Reached!")}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t("You spent 10 EXP and advanced to the next level.")}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => setLevelUpCelebrationOpen(false)}
+          >
+            {t("OK")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {levelUpCelebrationOpen && (
+        <Confetti
+          recycle={true}
+          numberOfPieces={250}
+          run={levelUpCelebrationOpen}
+        />
       )}
     </Layout>
   );

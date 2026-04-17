@@ -401,11 +401,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const addLog = (message, name, value, status) => {
     const newLog = {
       id: Date.now(),
-      timestamp: new Date().toLocaleTimeString(),
-      message,
-      name,
-      value,
-      status,
+      timestamp: new Date(),
+      text: message,
+      value1: name,
+      value2: value,
+      value3: status,
     };
     setLogs((prev) => [newLog, ...prev]);
   };

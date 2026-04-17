@@ -70,10 +70,13 @@ import {
   Settings,
   Lock,
   LockOpen,
+  ExpandMore,
+  ExpandLess,
 } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
+import Confetti from "react-confetti";
 import useDownload from "../../hooks/useDownload";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
@@ -183,6 +186,7 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [compactView, setCompactView] = useState(false);
+  const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
   const [ritualClockSections, setRitualClockSections] = useState(4);
   const [ritualClockState, setRitualClockState] = useState(
@@ -191,6 +195,8 @@ export default function PlayerEdit() {
 
   const [isSheetEditMode, setIsSheetEditMode] = useState(true);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
+  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
 
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
@@ -285,88 +291,81 @@ export default function PlayerEdit() {
     setDrawerOpen(open);
   };
 
-  const updateMaxStats = () => {
-    if (playerTemp) {
-      setPlayerTemp((prevPlayer) => {
-        const mig = Number(prevPlayer.attributes?.might) || 0;
-        const wil = Number(prevPlayer.attributes?.will) || 0;
-        const lvl = Number(prevPlayer.lvl) || 0;
+  const recalculatePlayerMaxStats = useCallback((prevPlayer) => {
+    const mig = Number(prevPlayer.attributes?.might) || 0;
+    const wil = Number(prevPlayer.attributes?.willpower) || 0;
+    const lvl = Number(prevPlayer.lvl) || 0;
 
-        const baseMaxHP = mig * 5 + lvl;
-        const baseMaxMP = wil * 5 + lvl;
+    const baseMaxHP = mig * 5 + lvl;
+    const baseMaxMP = wil * 5 + lvl;
 
-        let hpBonus = 0;
-        let mpBonus = 0;
-        let ipBonus = 0;
+    let hpBonus = 0;
+    let mpBonus = 0;
+    let ipBonus = 0;
 
-        prevPlayer.classes.forEach((cls) => {
-          if (cls.benefits) {
-            hpBonus += Number(cls.benefits.hpplus) || 0;
-            mpBonus += Number(cls.benefits.mpplus) || 0;
-            ipBonus += Number(cls.benefits.ipplus) || 0;
-          }
-        });
+    (prevPlayer.classes || []).forEach((cls) => {
+      if (cls.benefits) {
+        hpBonus += Number(cls.benefits.hpplus) || 0;
+        mpBonus += Number(cls.benefits.mpplus) || 0;
+        ipBonus += Number(cls.benefits.ipplus) || 0;
+      }
+    });
 
-        if (prevPlayer.modifiers) {
-          hpBonus += Number(prevPlayer.modifiers.hp) || 0;
-          mpBonus += Number(prevPlayer.modifiers.mp) || 0;
-          ipBonus += Number(prevPlayer.modifiers.ip) || 0;
-        }
-
-        // Guardian: Fortress Skill Bonus
-        const fortressBonus = prevPlayer.classes
-          .map((cls) => cls.skills || [])
-          .flat()
-          .filter((skill) => skill.specialSkill === "Fortress")
-          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-          .reduce((a, b) => a + b, 0);
-        hpBonus += fortressBonus;
-
-        // Loremaster: Focused Skill Bonus
-        const focusedBonus = prevPlayer.classes
-          .map((cls) => cls.skills || [])
-          .flat()
-          .filter((skill) => skill.specialSkill === "Focused")
-          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-          .reduce((a, b) => a + b, 0);
-        mpBonus += focusedBonus;
-
-        const maxHP = baseMaxHP + hpBonus;
-        const maxMP = baseMaxMP + mpBonus;
-        const maxIP = 6 + ipBonus;
-
-        return {
-          ...prevPlayer,
-          stats: {
-            hp: {
-              ...prevPlayer.stats.hp,
-              max: maxHP,
-              current: Math.min(
-                Number(prevPlayer.stats.hp.current) || 0,
-                maxHP,
-              ),
-            },
-            mp: {
-              ...prevPlayer.stats.mp,
-              max: maxMP,
-              current: Math.min(
-                Number(prevPlayer.stats.mp.current) || 0,
-                maxMP,
-              ),
-            },
-            ip: {
-              ...prevPlayer.stats.ip,
-              max: maxIP,
-              current: Math.min(
-                Number(prevPlayer.stats.ip.current) || 0,
-                maxIP,
-              ),
-            },
-          },
-        };
-      });
+    if (prevPlayer.modifiers) {
+      hpBonus += Number(prevPlayer.modifiers.hp) || 0;
+      mpBonus += Number(prevPlayer.modifiers.mp) || 0;
+      ipBonus += Number(prevPlayer.modifiers.ip) || 0;
     }
-  };
+
+    // Guardian: Fortress Skill Bonus
+    const fortressBonus = (prevPlayer.classes || [])
+      .map((cls) => cls.skills || [])
+      .flat()
+      .filter((skill) => skill.specialSkill === "Fortress")
+      .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+      .reduce((a, b) => a + b, 0);
+    hpBonus += fortressBonus;
+
+    // Loremaster: Focused Skill Bonus
+    const focusedBonus = (prevPlayer.classes || [])
+      .map((cls) => cls.skills || [])
+      .flat()
+      .filter((skill) => skill.specialSkill === "Focused")
+      .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+      .reduce((a, b) => a + b, 0);
+    mpBonus += focusedBonus;
+
+    const maxHP = baseMaxHP + hpBonus;
+    const maxMP = baseMaxMP + mpBonus;
+    const maxIP = 6 + ipBonus;
+
+    return {
+      ...prevPlayer,
+      stats: {
+        hp: {
+          ...prevPlayer.stats.hp,
+          max: maxHP,
+          current: Math.min(Number(prevPlayer.stats.hp.current) || 0, maxHP),
+        },
+        mp: {
+          ...prevPlayer.stats.mp,
+          max: maxMP,
+          current: Math.min(Number(prevPlayer.stats.mp.current) || 0, maxMP),
+        },
+        ip: {
+          ...prevPlayer.stats.ip,
+          max: maxIP,
+          current: Math.min(Number(prevPlayer.stats.ip.current) || 0, maxIP),
+        },
+      },
+    };
+  }, []);
+
+  const updateMaxStats = useCallback(() => {
+    setPlayerTemp((prevPlayer) =>
+      prevPlayer ? recalculatePlayerMaxStats(prevPlayer) : prevPlayer,
+    );
+  }, [recalculatePlayerMaxStats]);
 
   // const checkEquipment = () => {
   //   if (playerTemp) {
@@ -408,6 +407,32 @@ export default function PlayerEdit() {
 
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
+  const canLevelUpFromExp =
+    isOwner &&
+    (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
+    (playerTemp?.lvl || 0) < 50;
+
+  const handleConfirmLevelUpFromExp = () => {
+    setPlayerTemp((prevPlayer) => {
+      if (!prevPlayer) return prevPlayer;
+
+      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
+      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
+
+      const leveledPlayer = {
+        ...prevPlayer,
+        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
+        info: {
+          ...prevPlayer.info,
+          exp: Math.max(0, currentExp - 10),
+        },
+      };
+      return recalculatePlayerMaxStats(leveledPlayer);
+    });
+    setLevelUpDialogOpen(false);
+    setLevelUpCelebrationOpen(true);
+  };
+
   const optionalRules = {
     quirks: settings.optionalRules?.quirks ?? false,
     campActivities: settings.optionalRules?.campActivities ?? false,
@@ -708,7 +733,6 @@ export default function PlayerEdit() {
             </Grid>
           </Grid>
         )}
-
         <TabPanel value={0} currentValue={openTab}>
           {compactView ? (
             <Grid
@@ -719,6 +743,30 @@ export default function PlayerEdit() {
               }}
             >
               <Grid container size={12}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    mb: 1,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      compactViewExpanded
+                        ? t("Collapse Details")
+                        : t("Expand Details")
+                    }
+                  >
+                    <IconButton
+                      onClick={() => setCompactViewExpanded((prev) => !prev)}
+                    >
+                      {compactViewExpanded ? <ExpandLess /> : <ExpandMore />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Grid>
+              <Grid container size={12}>
                 <PlayerCardSheet
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
@@ -727,7 +775,10 @@ export default function PlayerEdit() {
                   optionalRules={optionalRules}
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
+                  isExpanded={compactViewExpanded}
                   updateMaxStats={updateMaxStats}
+                  canLevelUpFromExp={canLevelUpFromExp}
+                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
                   onToggleEditMode={
                     isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
                   }
@@ -742,8 +793,11 @@ export default function PlayerEdit() {
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
+                isOwner={isOwner}
                 isCharacterSheet={false}
                 updateMaxStats={updateMaxStats}
+                canLevelUpFromExp={canLevelUpFromExp}
+                onLevelUpRequest={() => setLevelUpDialogOpen(true)}
               />
               <Divider sx={{ my: 1 }} />
               <PlayerNumbers
@@ -773,6 +827,7 @@ export default function PlayerEdit() {
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
+                isOwner={isOwner}
               />
               <PlayerEquipment
                 player={playerTemp}
@@ -1186,6 +1241,57 @@ export default function PlayerEdit() {
         )}
       </Box>
       <Dialog
+        open={levelUpDialogOpen}
+        onClose={() => setLevelUpDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle variant="h4">{t("Level Up Confirmation")}</DialogTitle>
+        <DialogContent>
+          <Typography>{t("Do you want to use 10 EXP to level up?")}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setLevelUpDialogOpen(false)}
+          >
+            {t("Cancel")}
+          </Button>
+          <Button variant="contained" onClick={handleConfirmLevelUpFromExp}>
+            {t("Level Up")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={levelUpCelebrationOpen}
+        onClose={() => setLevelUpCelebrationOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle variant="h4">{t("New Level Reached!")}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t("You spent 10 EXP and advanced to the next level.")}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={() => setLevelUpCelebrationOpen(false)}
+          >
+            {t("OK")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {levelUpCelebrationOpen && (
+        <Confetti
+          recycle={true}
+          numberOfPieces={250}
+          run={levelUpCelebrationOpen}
+        />
+      )}
+      <Dialog
         open={isSpecialSkillsModalOpen}
         onClose={() => setIsSpecialSkillsModalOpen(false)}
         fullWidth
@@ -1381,7 +1487,7 @@ const TabsList = styled(Box)(
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow-x: auto;
+    overflow-x: hidden;
     padding: 0 4px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
   `,

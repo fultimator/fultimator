@@ -25,7 +25,7 @@ function stripRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
   if (!inv) return player;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const strip = (arr: Array<Record<string, any>>): any[] =>
-    arr.map(({ _isEquipped, ...rest }) => rest);
+    arr.map(({ isEquipped, ...rest }) => rest);
   return {
     ...player,
     equipment: [

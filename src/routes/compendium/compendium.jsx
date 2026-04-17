@@ -249,7 +249,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   const customTheme = useCustomTheme();
   const isPackMode = selectedCompendium !== "official";
   const baseTypes = isPackMode ? PACK_ITEM_TYPES : ITEM_TYPES;
-  const activeTypes = restrictToTypes
+  const activeTypes = restrictToTypes?.length
     ? baseTypes.filter((x) => restrictToTypes.includes(x.key))
     : baseTypes;
 
@@ -362,15 +362,18 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           )}
         </Box>
 
-        {(!restrictToTypes || restrictToTypes.length > 1) && (
+        {(!restrictToTypes || restrictToTypes.length !== 1) && (
           <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
             <FormControl fullWidth size="small">
               <InputLabel>{t("Item Type")}</InputLabel>
               <Select
                 value={
+                  activeTypes.length > 0 &&
                   activeTypes.some((x) => x.key === selectedType)
                     ? selectedType
-                    : activeTypes[0].key
+                    : activeTypes.length > 0
+                      ? activeTypes[0].key
+                      : ""
                 }
                 onChange={(e) => onTypeChange(e.target.value)}
                 label={t("Item Type")}
